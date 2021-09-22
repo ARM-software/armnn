@@ -50,6 +50,11 @@ python3-pyarmnn_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 libarmnn-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 libarmnntfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 ```
+* Dependency Packages (These are empty packages that provide a user-friendly name for other packages they will install)
+```
+armnn-latest-all_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
+armnn-latest-ref_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
+```
 ### arm64
 * Runtime Packages
 ```
@@ -67,6 +72,15 @@ python3-pyarmnn_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 libarmnn-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 libarmnntfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 
+```
+* Dependency Packages (These are empty packages that provide a user-friendly name for other packages they will install)
+```
+armnn-latest-all_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+armnn-latest-cpu_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+armnn-latest-cpu-gpu_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+armnn-latest-cpu-gpu-ref_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+armnn-latest-gpu_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+armnn-latest-ref_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 ```
 ### armhf
 * Runtime Packages
@@ -86,8 +100,49 @@ libarmnn-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
 libarmnntfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
 
 ```
+* Dependency Packages (These are empty packages that provide a user-friendly name for other packages they will install)
+```
+armnn-latest-all_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+armnn-latest-cpu_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+armnn-latest-cpu-gpu_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+armnn-latest-cpu-gpu-ref_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+armnn-latest-gpu_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+armnn-latest-ref_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
+```
 
-## Check latest version of packages
+## Install desired combination of packages
+The easiest way to install all of the available packages for your systems architecture is to run the command:
+
+```
+ sudo apt-get install -y python3-pyarmnn armnn-latest-all
+ # Verify installation via python:
+ python3 -c "import pyarmnn as ann;print(ann.GetVersion())"
+ # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 26.0.0
+```
+This will install PyArmNN and the three backends for Neon (CpuAcc), OpenCL (GpuAcc) and our Reference Backend.
+It will also install their dependencies including the arm-compute-library package along with the Tensorflow Lite Parser
+and it's dependency Arm NN Core.
+If the user does not wish to use PyArmNN they can go up a level of dependencies and instead just install the
+armnn-latest-all package:
+```
+  # Install ArmNN Core, CpuAcc Backend, GpuAcc Backend and Reference Backend as well as the TensorFlow Lite Parser:
+  # (This will only install CpuAcc and GpuAcc Backends on arm64 and armhf architectures)
+  sudo apt-get install -y armnn-latest-all
+
+  # Install ArmNN Core, CpuAcc Backend as well as the TensorFlow Lite Parser:
+  sudo apt-get install -y armnn-latest-cpu
+
+  # Install ArmNN Core, CpuAcc Backend, GpuAcc Backend as well as the TensorFlow Lite Parser:
+  sudo apt-get install -y armnn-latest-cpu-gpu
+
+  # Install ArmNN Core, GpuAcc Backend as well as the TensorFlow Lite Parser:
+  sudo apt-get install -y armnn-latest-gpu
+
+  # Install ArmNN Core, Reference Backend as well as the TensorFlow Lite Parser:
+  sudo apt-get install -y armnn-latest-ref
+```
+
+## Installation of specific ABI versioned packages
 Due to Debian Packaging requiring the pristine tarball from our Github release, the version on Launchpad may not align
 with the released version on Github depending on the complexity of newly added features.
 In order to check for the latest available Arm NN version use apt-cache search:
@@ -114,33 +169,18 @@ In order to check for the latest available Arm NN version use apt-cache search:
 
  # Export the ARMNN_MAJOR_VERSION to the latest visible e.g. libarmnn25 to allow installation using the below examples
  export ARMNN_MAJOR_VERSION=26
-```
 
-
-## Install desired combination of packages
-The easiest way to install all of the available packages for your systems architecture is to run the command:
-
-```
- sudo apt-get install -y python3-pyarmnn libarmnn-cpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-gpuacc-backend${ARMNN_MAJOR_VERSION} libarmnn-cpuref-backend${ARMNN_MAJOR_VERSION}
- # Verify installation via python:
- python3 -c "import pyarmnn as ann;print(ann.GetVersion())" 
- # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 26.0.0
-```
-This will install PyArmNN and the three backends for Neon, Compute Library and our Reference Backend.
-It will also install their dependencies including the arm-compute-library package along with the Tensorflow Lite Parser
-and it's dependency Arm NN Core.
-If the user does not wish to use PyArmNN they can go up a level of dependencies and instead just install the
-Tensorflow Lite Parser:
-```
   # As the Tensorflow Lite Parser is now ABI stable it will have a different version to ARMNN_MAJOR_VERSION please choose latest version:
   apt-cache search libarmnntfliteparser
   # Returns e.g. libarmnntfliteparser24 so we then export that version, for reference this comes from include/armnnTfLiteParser/Version.hpp:
   export TFLITE_PARSER_VERSION=24
+
   sudo apt-get install -y libarmnntfliteparser${TFLITE_PARSER_VERSION} libarmnn-cpuacc-backend${ARMNN_MAJOR_VERSION}
 ```
 
 ## Uninstall packages
 The easiest way to uninstall all of the previously installed packages is to run the command:
 ```
- sudo apt autoremove -y libarmnn${ARMNN_MAJOR_VERSION}
+ sudo apt-get purge -y armnn-latest-all
+ sudo apt autoremove -y armnn-latest-all
 ```

@@ -762,12 +762,14 @@ if(BUILD_UNIT_TESTS)
             src/armnnOnnxParser/test/FullyConnected.cpp
             src/armnnOnnxParser/test/Gather.cpp
             src/armnnOnnxParser/test/GetInputsOutputs.cpp
+            src/armnnOnnxParser/test/OnnxParserTestUtils.cpp
             src/armnnOnnxParser/test/OnnxParserTestUtils.hpp
             src/armnnOnnxParser/test/Pooling.cpp
             src/armnnOnnxParser/test/ProtoxtFixture.cpp
             src/armnnOnnxParser/test/Relu.cpp
             src/armnnOnnxParser/test/Reshape.cpp
             src/armnnOnnxParser/test/Shape.cpp
+            src/armnnOnnxParser/test/Unsqueeze.cpp
             )
     endif()
 

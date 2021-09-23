@@ -76,6 +76,8 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
 - Tanh
   - See the ONNX [Tanh documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Tanh) for more information.
 
+- Unsqueeze
+  - See the ONNX [Unsqueeze documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Unsqueeze) for more information.
 
 ### Partially supported
 

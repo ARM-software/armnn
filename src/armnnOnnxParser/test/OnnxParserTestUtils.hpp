@@ -5,17 +5,14 @@
 
 #pragma once
 
+#include <iostream>
+#include <vector>
+
 namespace armnnUtils
 {
 
-std::string ConstructTensorShapeString(const std::vector<int>& shape)
-{
-    std::string shapeStr;
-    for (int i : shape)
-    {
-        shapeStr = fmt::format("{} dim {{ dim_value: {} }}", shapeStr, i);
-    }
-    return shapeStr;
-}
+std::string ConstructTensorShapeString(const std::vector<int>& shape);
+
+std::string ConstructIntsAttribute(const std::string& name, const std::vector<int>& value);
 
 } // namespace armnnUtils

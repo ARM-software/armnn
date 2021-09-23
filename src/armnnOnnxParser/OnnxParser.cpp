@@ -429,6 +429,7 @@ const std::map<std::string, OnnxParserImpl::OperationParsingFunction> OnnxParser
     { "Flatten",               &OnnxParserImpl::ParseFlatten },
     { "Shape",                 &OnnxParserImpl::ParseShape },
     { "Gather",                &OnnxParserImpl::ParseGather },
+    { "Unsqueeze",             &OnnxParserImpl::ParseUnsqueeze }
 };
 
 template<typename TypePair, typename Location>
@@ -1832,6 +1833,59 @@ void OnnxParserImpl::ParseReshape(const onnx::NodeProto& node)
 
         CreateReshapeLayer(node.input(0), node.output(0), node.name());
     }
+}
+
+void OnnxParserImpl::ParseUnsqueeze(const onnx::NodeProto& node)
+{
+    CHECK_VALID_SIZE(armnn::numeric_cast<size_t>(node.input_size()), 1, 2);
+    CHECK_VALID_SIZE(armnn::numeric_cast<size_t>(node.output_size()), 1);
+
+    CHECK_VALID_DATATYPE(node.name(), node.input(0),
+                         m_TensorsInfo[node.input(0)].m_dtype,
+                         onnx::TensorProto::FLOAT); //input
+
+    TensorShape inputShape = m_TensorsInfo[node.input(0)].m_info->GetShape();
+    std::vector<uint32_t> dims;
+    if (node.input_size() == 1 && node.attribute_size() > 0)
+    {
+        dims = ReadMandatoryNodeUint32ListAttribute(node, "axes");
+    }
+    else
+    {
+        CHECK_VALID_DATATYPE(node.name(), node.input(1),
+                             m_TensorsInfo[node.input(1)].m_dtype,
+                             onnx::TensorProto::INT64); //axes
+
+        auto int64Axes = m_TensorsInfo[node.input(1)].m_tensor->int64_data().data();
+        uint numDim = armnn::numeric_cast<uint>(m_TensorsInfo[node.input(1)].m_tensor->int64_data_size());
+
+        for(uint i = 0; i < numDim; i++)
+        {
+            uint32_t uint32Value = CHECKED_NON_NEGATIVE(CHECKED_INT32(int64Axes[i]));
+            dims.push_back(uint32Value);
+        }
+    }
+
+    // Ensure that the axes are sorted
+    std::sort(dims.begin(), dims.end());
+
+    std::vector<unsigned int> targetShape;
+
+    for(uint i = 0; i < inputShape.GetNumDimensions(); i++)
+    {
+        targetShape.push_back(inputShape[i]);
+    }
+
+    for(uint i = 0; i < dims.size(); i++)
+    {
+        targetShape.insert(targetShape.begin() + armnn::numeric_cast<int>(dims[i]), 1);
+    }
+
+    auto outInfo = ComputeReshapeInfo(TensorShape(armnn::numeric_cast<unsigned int>(targetShape.size()),
+                                                  targetShape.data()), inputShape, node.output(0));
+    m_TensorsInfo[node.output(0)].m_info = std::make_unique<TensorInfo>(outInfo);
+
+    CreateReshapeLayer(node.input(0), node.output(0), node.name());
 }
 
 void OnnxParserImpl::PrependForBroadcast(const std::string& outputName,

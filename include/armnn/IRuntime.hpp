@@ -246,7 +246,7 @@ public:
     /// Allowing for a set of OutputTensors to be imported and mapped once, but used in execution many times.
     /// This function is not thread safe and must not be used while other threads are calling Execute().
     /// Only compatible with AsyncEnabled networks
-    std::vector<ImportedInputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors);
+    std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors);
 
     /// Un-import and delete the imported InputTensor/s
     /// This function is not thread safe and must not be used while other threads are calling Execute().

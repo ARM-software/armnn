@@ -21,6 +21,20 @@ endforeach()
 
 cmake_policy(SET CMP0057 NEW)
 
+# If the root of the tensorflow source tree has not been specified
+# and we are trying to build the tensorflow lite parser make
+# our best guess as to where it will be i.e. one directory above
+# the one this CMakeLists.txt file lives in, in a subdirectory
+# called tensorflow
+if (BUILD_TF_LITE_PARSER AND "${TENSORFLOW_ROOT}" STREQUAL "")
+  set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../tensorflow" CACHE INTERNAL "")
+  message(STATUS "Set TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
+else()
+  message(STATUS "TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
+endif()
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/delegate/cmake/Modules/")
+
 set(as_subproject Armnn)
 
 macro(find_package)

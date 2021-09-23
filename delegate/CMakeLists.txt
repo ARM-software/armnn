@@ -68,6 +68,7 @@ endif()
 target_link_libraries(armnnDelegate PUBLIC Armnn::Armnn)
 
 ## Add TfLite v2.3.1 dependency
+find_package(TfLiteSrc REQUIRED MODULE)
 find_package(TfLite REQUIRED MODULE)
 
 target_link_libraries(armnnDelegate PUBLIC ${TfLite_LIB})
@@ -114,6 +115,11 @@ target_include_directories(thirdparty_headers INTERFACE $<BUILD_INTERFACE:${ARMN
                                                         $<INSTALL_INTERFACE:include/thirdparty_headers>)
 
 target_compile_options(thirdparty_headers INTERFACE -Wno-old-style-cast)
+
+add_library(profiling_library_headers INTERFACE)
+target_include_directories(profiling_library_headers INTERFACE $<BUILD_INTERFACE:${ARMNN_SOURCE_DIR}/profiling>
+                                                              $<INSTALL_INTERFACE:include/profiling_library_headers>)
+
 
 set_target_properties(armnnDelegate PROPERTIES VERSION ${DELEGATE_LIB_VERSION} SOVERSION ${DELEGATE_LIB_SOVERSION})
 
@@ -232,6 +238,7 @@ if(BUILD_UNIT_TESTS)
 
     target_link_libraries(DelegateUnitTests PRIVATE tflite_headers)
     target_link_libraries(DelegateUnitTests PRIVATE flatbuffer_headers)
+    target_link_libraries(DelegateUnitTests PRIVATE profiling_library_headers)
 
 endif()
 

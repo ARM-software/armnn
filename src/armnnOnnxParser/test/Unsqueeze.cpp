@@ -77,6 +77,14 @@ struct UnsqueezeUnsortedAxesFixture : UnsqueezeFixture
     }
 };
 
+struct UnsqueezeScalarFixture : UnsqueezeFixture
+{
+    UnsqueezeScalarFixture() : UnsqueezeFixture({ 0 }, { }, { 1 })
+    {
+        Setup();
+    }
+};
+
 TEST_CASE_FIXTURE(UnsqueezeSingleAxesFixture, "UnsqueezeSingleAxesTest")
 {
     RunTest<3, float>({{"Input", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f }}},
@@ -105,6 +113,12 @@ TEST_CASE_FIXTURE(UnsqueezeUnsortedAxesFixture, "UnsqueezeUnsortedAxesTest")
                                    6.0f, 7.0f, 8.0f, 9.0f, 10.0f }}},
                       {{"Output", { 1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
                                     6.0f, 7.0f, 8.0f, 9.0f, 10.0f }}});
+}
+
+TEST_CASE_FIXTURE(UnsqueezeScalarFixture, "UnsqueezeScalarTest")
+{
+    RunTest<1, float>({{"Input", { 1.0f }}},
+                      {{"Output", { 1.0f }}});
 }
 
 struct UnsqueezeInputAxesFixture : public armnnUtils::ParserPrototxtFixture<armnnOnnxParser::IOnnxParser>

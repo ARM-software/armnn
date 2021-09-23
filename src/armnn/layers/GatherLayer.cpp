@@ -37,6 +37,11 @@ std::vector<TensorShape> GatherLayer::InferOutputShapes(const std::vector<Tensor
     const TensorShape& params = inputShapes[0];
     const TensorShape& indices = inputShapes[1];
 
+    if (indices.GetDimensionality() == Dimensionality::Scalar && indices.GetNumDimensions() == 1)
+    {
+         return std::vector<TensorShape>({ TensorShape(Dimensionality::Scalar)});
+    }
+
     const unsigned int paramsDim = params.GetNumDimensions();
     const unsigned int indicesDim = indices.GetNumDimensions();
     const unsigned int outputDim = paramsDim - 1 + indicesDim;
@@ -78,7 +83,8 @@ void GatherLayer::ValidateTensorShapesFromInputs()
             {GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
              GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()});
     ARMNN_ASSERT(inferredShapes.size() == 1);
-    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
+    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified ||
+                 inferredShapes[0].GetDimensionality() == Dimensionality::Scalar);
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "GatherLayer");
 }

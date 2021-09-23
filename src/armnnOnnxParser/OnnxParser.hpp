@@ -74,9 +74,11 @@ private:
 
     void SetupInfo(const google::protobuf::RepeatedPtrField<onnx::ValueInfoProto >* list);
 
-    std::vector<armnn::TensorInfo> ComputeOutputInfo(std::vector<std::string> outNames,
-                                                     const armnn::IConnectableLayer* layer,
-                                                     std::vector<armnn::TensorShape> inputShapes);
+    std::vector<armnn::TensorInfo> ComputeOutputInfo(
+        std::vector<std::string> outNames,
+        const armnn::IConnectableLayer* layer,
+        std::vector<armnn::TensorShape> inputShapes,
+        const onnx::TensorProto::DataType& type = onnx::TensorProto::FLOAT);
 
     void DetectFullyConnected();
 

@@ -416,6 +416,55 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>FLOAT32
     </table>
 <tr>
+  <td rowspan="3">ChannelShuffleLayer
+  <td rowspan="3" style="width:200px;"> Layer to reorganize the channels of a tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_CHANNEL_SHUFFLE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+         <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QSYMMS8
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMS8
+    <tr><td>QASYMMU8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>QASYMMS8
+    <tr><td>QASYMMU8
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
   <td rowspan="3">ComparisonLayer
   <td rowspan="3" style="width:200px;"> Layer to compare 2 tensors.
   <td rowspan="3">

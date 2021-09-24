@@ -27,7 +27,10 @@ public:
     /// will lead to a valid configuration of @ref ReduceLayer.
     void ValidateTensorShapesFromInputs() override;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
+
 
 protected:
     /// Constructor to create a ReduceLayer.

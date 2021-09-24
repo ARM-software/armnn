@@ -13,21 +13,13 @@
 
 namespace armnn
 {
-class ILayerVisitor
+class ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ABI stable IStrategy instead.", "22.05") ILayerVisitor
 {
 protected:
-    ARMNN_DEPRECATED_MSG("Use ABI stable IStrategy instead.")
     ILayerVisitor() {}
     virtual ~ILayerVisitor() {}
 
 public:
-    /// Function an absolute layer should call back to when its Accept(ILayerVisitor&)
-    /// function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
-    virtual void VisitAbsLayer(const IConnectableLayer* layer,
-                               const char* name = nullptr) = 0;
 
     /// Function that an activation layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
@@ -93,13 +85,7 @@ public:
     /// @param name - Optional name for the layer.
     virtual void VisitConcatLayer(const IConnectableLayer* layer,
                                   const OriginsDescriptor& concatDescriptor,
-                                  const char* name = nullptr)
-    {
-        // default implementation to ease transition while MergerLayer is being deprecated
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        VisitMergerLayer(layer, concatDescriptor, name);
-        ARMNN_NO_DEPRECATE_WARN_END
-    }
+                                  const char* name = nullptr) = 0;
 
     /// Function a layer with no inputs and a single output, which always corresponds to
     /// the passed in constant tensor should call back to when its Accept(ILayerVisitor&) function is invoked.
@@ -178,13 +164,6 @@ public:
                                             const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                             const char* name = nullptr) = 0;
 
-    /// Function an Equal layer should call back to when its Accept(ILayerVisitor&) function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
-    virtual void VisitEqualLayer(const IConnectableLayer* layer,
-                                 const char* name = nullptr) = 0;
-
     /// Function a fill layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param fillDescriptor - Description of the layer
@@ -216,7 +195,7 @@ public:
     /// @param weights - Tensor for the weights data.
     /// @param biases - Optional tensor for the bias data.
     /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitFullyConnectedLayer without ConstTensors")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use VisitFullyConnectedLayer without ConstTensors", "22.05")
     virtual void VisitFullyConnectedLayer(const IConnectableLayer* layer,
                                           const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                           const ConstTensor& weights,
@@ -225,25 +204,11 @@ public:
 
     /// Function a Gather layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitGatherLayer with descriptor instead")
-    virtual void VisitGatherLayer(const IConnectableLayer* layer,
-                                  const char* name = nullptr) = 0;
-
-    /// Function a Gather layer should call back to when its Accept(ILayerVisitor&) function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param gatherDescriptor - Parameters for the gather operation.
     /// @param name - Optional name for the layer.
     virtual void VisitGatherLayer(const IConnectableLayer* layer,
                                   const GatherDescriptor& gatherDescriptor,
                                   const char* name = nullptr) = 0;
-
-    /// Function a Greater layer should call back to when its Accept(ILayerVisitor&) function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
-    virtual void VisitGreaterLayer(const IConnectableLayer* layer,
-                                   const char* name = nullptr) = 0;
 
     /// Function that an InputLayer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
@@ -317,18 +282,6 @@ public:
     /// @param name - Optional name for the layer.
     virtual void VisitMergeLayer(const IConnectableLayer* layer,
                                  const char* name = nullptr) = 0;
-
-    /// Function that a merger layer should call back to when its Accept(ILayerVisitor&) function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param mergerDescriptor - MergerDescriptor (synonym for OriginsDescriptor) to configure the concatenation
-    ///                           process. Number of Views must be equal to the number of inputs, and their order
-    ///                           must match - e.g. first view corresponds to the first input, second view to the
-    ///                           second input, etc....
-    /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitConcatLayer instead")
-    virtual void VisitMergerLayer(const IConnectableLayer* layer,
-                                  const MergerDescriptor& mergerDescriptor,
-                                  const char* name = nullptr) = 0;
 
     /// Function a Minimum layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
@@ -437,15 +390,6 @@ public:
                                    const ReshapeDescriptor& reshapeDescriptor,
                                    const char* name = nullptr) = 0;
 
-    /// Function that a resize bilinear layer should call back to when its Accept(ILayerVisitor&) function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param resizeDesc - Parameters for the resize operation.
-    /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitResizeLayer instead")
-    virtual void VisitResizeBilinearLayer(const IConnectableLayer* layer,
-                                          const ResizeBilinearDescriptor& resizeDesc,
-                                          const char* name = nullptr) = 0;
-
     /// Function that a resize layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param resizeDescriptor - Parameters for the resize operation.
@@ -453,14 +397,6 @@ public:
     virtual void VisitResizeLayer(const IConnectableLayer* layer,
                                   const ResizeDescriptor& resizeDescriptor,
                                   const char* name = nullptr) = 0;
-
-    /// Function a Reciprocal of square root layer should call back to when its Accept(ILayerVisitor&)
-    /// function is invoked.
-    /// @param layer - pointer to the layer which is calling back to this visit function.
-    /// @param name - Optional name for the layer.
-    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
-    virtual void VisitRsqrtLayer(const IConnectableLayer* layer,
-                                 const char* name = nullptr) = 0;
 
     /// Function that a slice layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.

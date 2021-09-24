@@ -83,9 +83,11 @@ void GatherLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "GatherLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void GatherLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitGatherLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

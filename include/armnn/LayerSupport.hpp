@@ -214,14 +214,6 @@ bool IsMergeSupported(const BackendId& backend,
                       char* reasonIfUnsupported = nullptr,
                       size_t reasonIfUnsupportedMaxLength = 1024);
 
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
-ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
-bool IsMergerSupported(const BackendId& backend,
-                       const std::vector<const TensorInfo*> inputs,
-                       const TensorInfo& output,
-                       const OriginsDescriptor& descriptor,
-                       char* reasonIfUnsupported = nullptr,
-                       size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsMinimumSupported(const BackendId& backend,
@@ -318,14 +310,6 @@ bool IsReshapeSupported(const BackendId& backend,
                         size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
-ARMNN_DEPRECATED_MSG("Use IsResizeSupported instead")
-bool IsResizeBilinearSupported(const BackendId& backend,
-                               const TensorInfo& input,
-                               const TensorInfo& output,
-                               char* reasonIfUnsupported = nullptr,
-                               size_t reasonIfUnsupportedMaxLength = 1024);
-
-/// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsResizeSupported(const BackendId& backend,
                        const TensorInfo& input,
                        const TensorInfo& output,
@@ -363,13 +347,6 @@ bool IsSpaceToDepthSupported(const BackendId& backend,
                              const SpaceToDepthDescriptor& descriptor,
                              char* reasonIfUnsupported = nullptr,
                              size_t reasonIfUnsupportedMaxLength = 1024);
-
-ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
-bool IsSplitterSupported(const BackendId& backend,
-                         const TensorInfo& input,
-                         const ViewsDescriptor& descriptor,
-                         char* reasonIfUnsupported = nullptr,
-                         size_t reasonIfUnsupportedMaxLength = 1024);
 
 /// Deprecated in favor of IBackend and ILayerSupport interfaces
 bool IsSplitterSupported(const BackendId& backend,

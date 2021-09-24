@@ -11,7 +11,9 @@ namespace armnn
 class ChannelShuffleLayer : public LayerWithParameters<ChannelShuffleDescriptor>
 {
 public:
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
 
     /// Creates a dynamically-allocated copy of this layer.
     /// @param graph The graph into which this layer is being cloned

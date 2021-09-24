@@ -143,6 +143,7 @@ Layer::ConstantTensors Convolution2dLayer::GetConstantTensorsByRef()
     return {m_Weight, m_Bias};
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void Convolution2dLayer::Accept(ILayerVisitor& visitor) const
 {
     ManagedConstTensorHandle managedWeight(m_Weight);
@@ -158,6 +159,7 @@ void Convolution2dLayer::Accept(ILayerVisitor& visitor) const
 
     visitor.VisitConvolution2dLayer(this, GetParameters(), weightsTensor, optionalBiasTensor, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void Convolution2dLayer::ExecuteStrategy(IStrategy& strategy) const
 {

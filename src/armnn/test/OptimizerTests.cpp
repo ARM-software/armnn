@@ -13,13 +13,12 @@
 #include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/INetwork.hpp>
-#include <armnn/LayerVisitorBase.hpp>
+#include <armnn/StrategyBase.hpp>
 
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <armnnUtils/FloatingPointConverter.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
-#include <backendsCommon/IBackendInternal.hpp>
 #include <backendsCommon/LayerSupportBase.hpp>
 #include <backendsCommon/TensorHandle.hpp>
 
@@ -201,10 +200,6 @@ public:
         return nullptr;
     }
 
-    IBackendInternal::Optimizations GetOptimizations() const override
-    {
-        return {};
-    }
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override
     {
         return std::make_shared<MockLayerSupport>();
@@ -265,10 +260,6 @@ public:
         return nullptr;
     }
 
-    IBackendInternal::Optimizations GetOptimizations() const override
-    {
-        return {};
-    }
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override
     {
         return std::make_shared<MockLayerSupport>();
@@ -707,30 +698,42 @@ TEST_CASE("BackendCapabilityTest")
 
 TEST_CASE("BackendHintTest")
 {
-    class TestBackendAssignment : public LayerVisitorBase<VisitorNoThrowPolicy>
+    class TestBackendAssignment : public StrategyBase<NoThrowStrategy>
     {
     public:
-        void VisitInputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override
-        {
-            IgnoreUnused(id, name);
-            auto inputLayer = PolymorphicDowncast<const InputLayer*>(layer);
-            CHECK((inputLayer->GetBackendId() == "MockBackend"));
-        }
 
-        void VisitOutputLayer(const IConnectableLayer* layer, LayerBindingId id, const char* name = nullptr) override
+        void ExecuteStrategy(const armnn::IConnectableLayer* layer,
+                             const armnn::BaseDescriptor& descriptor,
+                             const std::vector<armnn::ConstTensor>& constants,
+                             const char* name,
+                             const armnn::LayerBindingId id = 0) override
         {
-            IgnoreUnused(id, name);
-            auto outputLayer = PolymorphicDowncast<const OutputLayer*>(layer);
-            CHECK((outputLayer->GetBackendId() == "MockBackend"));
-        }
-
-        void VisitActivationLayer(const IConnectableLayer* layer,
-                                  const ActivationDescriptor& activationDescriptor,
-                                  const char* name = nullptr) override
-        {
-            IgnoreUnused(activationDescriptor, name);
-            auto activation = PolymorphicDowncast<const ActivationLayer*>(layer);
-            CHECK((activation->GetBackendId() == "CustomBackend"));
+            armnn::IgnoreUnused(descriptor, constants, id, name);
+            switch (layer->GetType())
+            {
+                case armnn::LayerType::Input:
+                {
+                    auto inputLayer = PolymorphicDowncast<const InputLayer*>(layer);
+                    CHECK((inputLayer->GetBackendId() == "MockBackend"));
+                    break;
+                }
+                case armnn::LayerType::Output:
+                {
+                    auto outputLayer = PolymorphicDowncast<const OutputLayer*>(layer);
+                    CHECK((outputLayer->GetBackendId() == "MockBackend"));
+                    break;
+                }
+                case armnn::LayerType::Activation:
+                {
+                    auto activation = PolymorphicDowncast<const ActivationLayer*>(layer);
+                    CHECK((activation->GetBackendId() == "CustomBackend"));
+                    break;
+                }
+                default:
+                {
+                    m_DefaultStrategy.Apply(GetLayerTypeAsCString(layer->GetType()));
+                }
+            }
         }
     };
 
@@ -802,7 +805,7 @@ TEST_CASE("BackendHintTest")
     TestBackendAssignment visitor;
     for (auto it = firstLayer; it != lastLayer; ++it)
     {
-        (*it)->Accept(visitor);
+        (*it)->ExecuteStrategy(visitor);
     }
     // Clean up the registry for the next test.
     backendRegistry.Deregister("MockBackend");

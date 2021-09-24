@@ -45,9 +45,11 @@ void FloorLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "FloorLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void FloorLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitFloorLayer(this, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

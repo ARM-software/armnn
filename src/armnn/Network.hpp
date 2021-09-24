@@ -41,9 +41,6 @@ public:
 
     IConnectableLayer* AddInputLayer(LayerBindingId id, const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
-    IConnectableLayer* AddAbsLayer(const char* name = nullptr);
-
     IConnectableLayer* AddActivationLayer(const ActivationDescriptor& activationDescriptor,
                                           const char* name = nullptr);
 
@@ -78,12 +75,12 @@ public:
                                              const Optional<ConstTensor>& biases,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const ConstTensor& biases,
@@ -105,19 +102,6 @@ public:
         const Optional<ConstTensor>& biases,
         const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const ConstTensor& biases,
-        const char* name = nullptr);
-
     IConnectableLayer* AddDequantizeLayer(const char* name = nullptr);
 
     IConnectableLayer* AddDetectionPostProcessLayer(
@@ -129,9 +113,6 @@ public:
 
     IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                 const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
-    IConnectableLayer* AddEqualLayer(const char* name = nullptr);
 
     IConnectableLayer* AddMergeLayer(const char* name = nullptr);
 
@@ -148,20 +129,8 @@ public:
                                               const Optional<ConstTensor>& biases,
                                               const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
-    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                              const ConstTensor& weights,
-                                              const Optional<ConstTensor>& biases,
-                                              const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("This AddGatherLayer overload is deprecated")
-    IConnectableLayer* AddGatherLayer(const char* name = nullptr);
-
     IConnectableLayer* AddGatherLayer(const GatherDescriptor& gatherDescriptor,
                                       const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
-    IConnectableLayer* AddGreaterLayer(const char* name = nullptr);
 
     IConnectableLayer* AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
                                                      const char* name = nullptr);
@@ -184,10 +153,6 @@ public:
     IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr);
 
     IConnectableLayer* AddMinimumLayer(const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use AddConcatLayer instead")
-    IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
-                                      const char* name = nullptr);
 
     IConnectableLayer* AddMultiplicationLayer(const char* name = nullptr);
 
@@ -220,18 +185,11 @@ public:
     IConnectableLayer* AddReduceLayer(const ReduceDescriptor& reduceDescriptor,
                                       const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("Use AddResizeLayer instead")
-    IConnectableLayer* AddResizeBilinearLayer(const ResizeBilinearDescriptor& resizeDesc,
-                                              const char* name = nullptr);
-
     IConnectableLayer* AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
                                       const char* name = nullptr);
 
     IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
                                        const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
-    IConnectableLayer* AddRsqrtLayer(const char* name = nullptr);
 
     IConnectableLayer* AddShapeLayer(const char* name = nullptr);
 
@@ -274,7 +232,9 @@ public:
                                                           const LstmInputParams& params,
                                                           const char* name = nullptr);
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const;
+    ARMNN_NO_DEPRECATE_WARN_END
 
     void ExecuteStrategy(IStrategy& strategy) const;
 

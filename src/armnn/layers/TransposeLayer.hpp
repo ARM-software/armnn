@@ -58,7 +58,10 @@ public:
                GetPermutation().IsEqual(PolymorphicDowncast<const TransposeLayer*>(&other)->GetPermutation());
     }
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
+
 
 protected:
     /// Constructor to create a TransposeLayer.

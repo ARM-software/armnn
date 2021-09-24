@@ -58,25 +58,10 @@ IBackendInternal::IMemoryManagerUniquePtr RefBackend::CreateMemoryManager() cons
     return std::make_unique<RefMemoryManager>();
 }
 
-IBackendInternal::Optimizations RefBackend::GetOptimizations() const
-{
-    return Optimizations{};
-}
-
 IBackendInternal::ILayerSupportSharedPtr RefBackend::GetLayerSupport() const
 {
     static ILayerSupportSharedPtr layerSupport{new RefLayerSupport};
     return layerSupport;
-}
-
-bool RefBackend::HasCapability(BackendCapability capabilityClass) const
-{
-    auto search = oldCpuRefCapabilities.find(capabilityClass);
-    if (search != oldCpuRefCapabilities.end())
-    {
-        return true;
-    }
-    return false;
 }
 
 OptimizationViews RefBackend::OptimizeSubgraphView(const SubgraphView& subgraph) const

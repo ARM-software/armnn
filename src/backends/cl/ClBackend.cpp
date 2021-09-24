@@ -192,11 +192,6 @@ IBackendInternal::IBackendProfilingContextPtr ClBackend::CreateBackendProfilingC
     return IBackendProfilingContextPtr{};
 }
 
-IBackendInternal::Optimizations ClBackend::GetOptimizations() const
-{
-    return Optimizations{};
-}
-
 IBackendInternal::IBackendSpecificModelContextPtr ClBackend::CreateBackendSpecificModelContext(
     const ModelOptions& modelOptions) const
 {

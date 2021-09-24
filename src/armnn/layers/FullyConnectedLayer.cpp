@@ -80,10 +80,12 @@ Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()
     return {m_Weight, m_Bias};
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void FullyConnectedLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitFullyConnectedLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void FullyConnectedLayer::ExecuteStrategy(IStrategy& strategy) const
 {

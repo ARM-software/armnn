@@ -243,14 +243,6 @@ private:
     uint32_t**        m_ViewSizes;
 };
 
-template <typename TensorShapeIt>
-ARMNN_DEPRECATED_MSG("Use CreateDescriptorForConcatenation instead")
-OriginsDescriptor CreateMergerDescriptorForConcatenation(TensorShapeIt first,
-                                                         TensorShapeIt last,
-                                                         unsigned int concatenationDimension)
-{
-    return CreateDescriptorForConcatenation(first, last, concatenationDimension);
-}
 
 /// @brief Convenience template to create an OriginsDescriptor to use when creating a ConcatLayer for performing
 /// concatenation of a number of input tensors.
@@ -402,7 +394,7 @@ struct FullyConnectedDescriptor : BaseDescriptor
     }
 
     /// Get the number of views/inputs.
-    ARMNN_DEPRECATED_MSG("Use GetNumInputs instead")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use GetNumInputs instead", "22.05")
     uint32_t GetNumViews() const;
 
     /// Get the number of views/inputs.
@@ -839,7 +831,10 @@ struct GatherDescriptor : BaseDescriptor
 };
 
 /// A ResizeBilinearDescriptor for the ResizeBilinearLayer.
-struct ResizeBilinearDescriptor : BaseDescriptor
+struct ARMNN_DEPRECATED_MSG_REMOVAL_DATE(
+        "ResizeBilinearDescriptor is not supported anymore. Use ResizeDescriptor instead.",
+        "22.08")
+        ResizeBilinearDescriptor : BaseDescriptor
 {
     ResizeBilinearDescriptor()
         : m_TargetWidth(0)
@@ -849,6 +844,7 @@ struct ResizeBilinearDescriptor : BaseDescriptor
         , m_HalfPixelCenters(false)
     {}
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     bool operator ==(const ResizeBilinearDescriptor& rhs) const
     {
         return m_TargetWidth          == rhs.m_TargetWidth &&
@@ -857,6 +853,7 @@ struct ResizeBilinearDescriptor : BaseDescriptor
                m_AlignCorners         == rhs.m_AlignCorners &&
                m_HalfPixelCenters     == rhs.m_HalfPixelCenters;
     }
+    ARMNN_NO_DEPRECATE_WARN_END
 
     /// Target width value.
     uint32_t          m_TargetWidth;

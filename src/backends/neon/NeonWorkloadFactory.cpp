@@ -131,17 +131,6 @@ std::unique_ptr<ITensorHandle> NeonWorkloadFactory::CreateTensorHandle(const Ten
     return tensorHandle;
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-
-    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
-    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Abs);
-
-    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
-}
-
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                  const WorkloadInfo&              info) const
 {
@@ -323,17 +312,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateElementwiseUnary(
     }
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-
-    ComparisonQueueDescriptor comparisonDescriptor;
-    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Equal);
-
-    return CreateComparison(comparisonDescriptor, info);
-}
-
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateFill(const FillQueueDescriptor& descriptor,
                                                            const WorkloadInfo& info) const
 {
@@ -356,17 +334,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGather(const armnn::Gather
                                                              const armnn::WorkloadInfo& info) const
 {
     return std::make_unique<NeonGatherWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
-                                                              const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-
-    ComparisonQueueDescriptor comparisonDescriptor;
-    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Greater);
-
-    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
@@ -447,12 +414,6 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMemImport(const Mem
     }
 
     return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo&          info) const
-{
-    return CreateConcat(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
@@ -550,32 +511,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateResize(const ResizeQueueDe
                                                              const WorkloadInfo& info) const
 {
     return std::make_unique<NeonResizeWorkload>(descriptor, info);
-}
-
-std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateResizeBilinear(
-    const ResizeBilinearQueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    ResizeQueueDescriptor resizeDescriptor;
-    resizeDescriptor.m_Inputs  = descriptor.m_Inputs;
-    resizeDescriptor.m_Outputs = descriptor.m_Outputs;
-
-    resizeDescriptor.m_Parameters.m_DataLayout   = descriptor.m_Parameters.m_DataLayout;
-    resizeDescriptor.m_Parameters.m_TargetWidth  = descriptor.m_Parameters.m_TargetWidth;
-    resizeDescriptor.m_Parameters.m_TargetHeight = descriptor.m_Parameters.m_TargetHeight;
-
-    return CreateResize(resizeDescriptor, info);
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor &descriptor,
-                                                            const WorkloadInfo &info) const
-{
-    IgnoreUnused(descriptor);
-
-    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
-    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);
-
-    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,

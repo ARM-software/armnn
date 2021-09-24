@@ -169,6 +169,7 @@ Layer::ConstantTensors QuantizedLstmLayer::GetConstantTensorsByRef()
     };
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void QuantizedLstmLayer::Accept(ILayerVisitor& visitor) const
 {
     QuantizedLstmInputParams inputParams;
@@ -305,6 +306,7 @@ void QuantizedLstmLayer::Accept(ILayerVisitor& visitor) const
 
     visitor.VisitQuantizedLstmLayer(this, inputParams, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void QuantizedLstmLayer::ExecuteStrategy(IStrategy& strategy) const
 {

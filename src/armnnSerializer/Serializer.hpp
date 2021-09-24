@@ -104,10 +104,6 @@ private:
     uint32_t m_layerId;
 
 private:
-    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
-    void SerializeAbsLayer(const armnn::IConnectableLayer* layer,
-                                  const char* name = nullptr);
-
     void SerializeActivationLayer(const armnn::IConnectableLayer* layer,
                                   const armnn::ActivationDescriptor& descriptor,
                                   const char* name = nullptr);
@@ -181,9 +177,6 @@ private:
                                         const armnn::ElementwiseUnaryDescriptor& descriptor,
                                         const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
-    void SerializeEqualLayer(const armnn::IConnectableLayer* layer, const char* name);
-
     void SerializeFillLayer(const armnn::IConnectableLayer* layer,
                             const armnn::FillDescriptor& fillDescriptor,
                             const char* name = nullptr);
@@ -198,9 +191,6 @@ private:
     void SerializeGatherLayer(const armnn::IConnectableLayer* layer,
                               const armnn::GatherDescriptor& gatherDescriptor,
                               const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use VisitComparisonLayer instead")
-    void SerializeGreaterLayer(const armnn::IConnectableLayer* layer, const char* name = nullptr);
 
     void SerializeInputLayer(const armnn::IConnectableLayer* layer,
                          armnn::LayerBindingId id,
@@ -239,11 +229,6 @@ private:
 
     void SerializeMergeLayer(const armnn::IConnectableLayer* layer,
                              const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use VisitConcatLayer instead")
-    void SerializeMergerLayer(const armnn::IConnectableLayer* layer,
-                              const armnn::MergerDescriptor& mergerDescriptor,
-                              const char* name = nullptr);
 
     void SerializeMultiplicationLayer(const armnn::IConnectableLayer* layer,
                                       const char* name = nullptr);
@@ -293,15 +278,6 @@ private:
     void SerializeResizeLayer(const armnn::IConnectableLayer* layer,
                               const armnn::ResizeDescriptor& resizeDescriptor,
                               const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use VisitResizeLayer instead")
-    void SerializeResizeBilinearLayer(const armnn::IConnectableLayer* layer,
-                                      const armnn::ResizeBilinearDescriptor& resizeDescriptor,
-                                      const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("Use VisitElementwiseUnaryLayer instead")
-    void SerializeRsqrtLayer(const armnn::IConnectableLayer* layer,
-                             const char* name = nullptr);
 
     void SerializeSliceLayer(const armnn::IConnectableLayer* layer,
                              const armnn::SliceDescriptor& sliceDescriptor,

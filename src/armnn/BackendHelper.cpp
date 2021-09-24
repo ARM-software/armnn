@@ -136,15 +136,6 @@ bool LayerSupportHandle::IsBackendRegistered() const
     return false;
 }
 
-
-bool LayerSupportHandle::IsAbsSupported(const TensorInfo& input,
-                                        const TensorInfo& output,
-                                        Optional<std::string&> reasonIfUnsupported)
-{
-    // Call the IsXXXLayerSupport function of the specific backend.
-    return m_LayerSupport->IsAbsSupported(input, output, reasonIfUnsupported.value());
-}
-
 bool LayerSupportHandle::IsActivationSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const ActivationDescriptor& descriptor,
@@ -388,14 +379,6 @@ bool LayerSupportHandle::IsElementwiseUnarySupported(const TensorInfo& input,
     return m_LayerSupport->IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported.value());
 }
 
-bool LayerSupportHandle::IsEqualSupported(const TensorInfo& input0,
-                                          const TensorInfo& input1,
-                                          const TensorInfo& output,
-                                          Optional<std::string&> reasonIfUnsupported)
-{
-    return m_LayerSupport->IsEqualSupported(input0, input1, output, reasonIfUnsupported.value());
-}
-
 bool LayerSupportHandle::IsFakeQuantizationSupported(const TensorInfo& input,
                                                      const FakeQuantizationDescriptor& descriptor,
                                                      Optional<std::string&> reasonIfUnsupported)
@@ -478,26 +461,10 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
 bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
                                            const TensorInfo& input1,
                                            const TensorInfo& output,
-                                           Optional<std::string&> reasonIfUnsupported)
-{
-    return m_LayerSupport->IsGatherSupported(input0, input1, output, reasonIfUnsupported.value());
-}
-
-bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
-                                           const TensorInfo& input1,
-                                           const TensorInfo& output,
                                            const GatherDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported)
 {
     return m_LayerSupport->IsGatherSupported(input0, input1, output, descriptor, reasonIfUnsupported.value());
-}
-
-bool LayerSupportHandle::IsGreaterSupported(const TensorInfo& input0,
-                                            const TensorInfo& input1,
-                                            const TensorInfo& ouput,
-                                            Optional<std::string&> reasonIfUnsupported)
-{
-    return m_LayerSupport->IsGreaterSupported(input0, input1, ouput, reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsInputSupported(const TensorInfo& input,
@@ -611,14 +578,6 @@ bool LayerSupportHandle::IsMergeSupported(const TensorInfo& input0,
                                           Optional<std::string&> reasonIfUnsupported)
 {
     return m_LayerSupport->IsMergeSupported(input0, input1, output, reasonIfUnsupported.value());
-}
-
-bool LayerSupportHandle::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
-                                           const TensorInfo& output,
-                                           const OriginsDescriptor& descriptor,
-                                           Optional<std::string&> reasonIfUnsupported)
-{
-    return m_LayerSupport->IsMergerSupported(inputs, output, descriptor, reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMinimumSupported(const TensorInfo& input0,
@@ -758,26 +717,12 @@ bool LayerSupportHandle::IsReshapeSupported(const TensorInfo& input,
     return m_LayerSupport->IsReshapeSupported(input, output, descriptor, reasonIfUnsupported.value());
 }
 
-bool LayerSupportHandle::IsResizeBilinearSupported(const TensorInfo& input,
-                                                   const TensorInfo& output,
-                                                   Optional<std::string&> reasonIfUnsupported)
-{
-    return m_LayerSupport->IsResizeBilinearSupported(input, output, reasonIfUnsupported.value());
-}
-
 bool LayerSupportHandle::IsResizeSupported(const TensorInfo& input,
                                            const TensorInfo& output,
                                            const ResizeDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported)
 {
     return m_LayerSupport->IsResizeSupported(input, output, descriptor, reasonIfUnsupported.value());
-}
-
-bool LayerSupportHandle::IsRsqrtSupported(const TensorInfo& input,
-                                          const TensorInfo& output,
-                                          Optional<std::string&> reasonIfUnsupported)
-{
-    return m_LayerSupport->IsRsqrtSupported(input, output, reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsShapeSupported(const TensorInfo& input,
@@ -817,13 +762,6 @@ bool LayerSupportHandle::IsSpaceToDepthSupported(const TensorInfo& input,
                                                  Optional<std::string&> reasonIfUnsupported)
 {
     return m_LayerSupport->IsSpaceToDepthSupported(input, output, descriptor, reasonIfUnsupported.value());
-}
-
-bool LayerSupportHandle::IsSplitterSupported(const TensorInfo& input,
-                                             const ViewsDescriptor& descriptor,
-                                             Optional<std::string&> reasonIfUnsupported)
-{
-    return m_LayerSupport->IsSplitterSupported(input, descriptor, reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSplitterSupported(const TensorInfo& input,

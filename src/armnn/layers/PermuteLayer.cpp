@@ -57,9 +57,11 @@ void PermuteLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "PermuteLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void PermuteLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitPermuteLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

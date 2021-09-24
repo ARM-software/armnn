@@ -66,10 +66,6 @@ public:
                                                       DataLayout dataLayout,
                                                       const bool IsMemoryManaged = true) const override;
 
-    ARMNN_DEPRECATED_MSG("Use CreateElementwiseUnary instead")
-    std::unique_ptr<IWorkload> CreateAbs(const AbsQueueDescriptor& descriptor,
-                                         const WorkloadInfo& info) const override;
-
     std::unique_ptr<IWorkload> CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                 const WorkloadInfo& info) const override;
 
@@ -139,10 +135,6 @@ public:
     std::unique_ptr<IWorkload> CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const override;
 
-    ARMNN_DEPRECATED_MSG("Use CreateComparison instead")
-    std::unique_ptr<IWorkload> CreateEqual(const EqualQueueDescriptor& descriptor,
-                                           const WorkloadInfo& info) const override;
-
     std::unique_ptr<IWorkload> CreateFakeQuantization(const FakeQuantizationQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const override;
 
@@ -157,10 +149,6 @@ public:
 
     std::unique_ptr<IWorkload> CreateGather(const GatherQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
-
-    ARMNN_DEPRECATED_MSG("Use CreateComparison instead")
-    std::unique_ptr<IWorkload> CreateGreater(const GreaterQueueDescriptor& descriptor,
-                                             const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
@@ -191,10 +179,6 @@ public:
 
     std::unique_ptr<IWorkload> CreateMemImport(const MemImportQueueDescriptor& descriptor,
                                                 const WorkloadInfo& info) const override;
-
-    ARMNN_DEPRECATED_MSG("Use CreateConcat instead")
-    std::unique_ptr<IWorkload> CreateMerger(const MergerQueueDescriptor& descriptor,
-                                            const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateMinimum(const MinimumQueueDescriptor& descriptor,
                                              const WorkloadInfo& info) const override;
@@ -240,14 +224,6 @@ public:
 
     std::unique_ptr<IWorkload> CreateResize(const ResizeQueueDescriptor& descriptor,
                                             const WorkloadInfo& info) const override;
-
-    ARMNN_DEPRECATED_MSG("Use CreateResize instead")
-    std::unique_ptr<IWorkload> CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
-                                                    const WorkloadInfo& info) const override;
-
-    ARMNN_DEPRECATED_MSG("Use CreateElementwiseUnary instead")
-    std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
-                                           const WorkloadInfo& info) const override;
 
     std::unique_ptr<IWorkload> CreateShape(const ShapeQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;

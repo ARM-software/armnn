@@ -75,9 +75,11 @@ void ResizeLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ResizeLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void ResizeLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitResizeLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

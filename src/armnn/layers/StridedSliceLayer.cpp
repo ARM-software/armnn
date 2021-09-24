@@ -111,9 +111,11 @@ void StridedSliceLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "StridedSliceLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void StridedSliceLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitStridedSliceLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

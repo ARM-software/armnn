@@ -193,6 +193,7 @@ list(APPEND armnn_sources
     include/armnn/NetworkFwd.hpp
     include/armnn/Optional.hpp
     include/armnn/QuantizedLstmParams.hpp
+    include/armnn/StrategyBase.hpp
     include/armnn/Tensor.hpp
     include/armnn/TensorFwd.hpp
     include/armnn/Threadpool.hpp

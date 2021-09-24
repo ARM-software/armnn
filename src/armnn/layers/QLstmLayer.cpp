@@ -302,6 +302,7 @@ Layer::ConstantTensors QLstmLayer::GetConstantTensorsByRef()
             m_LayerNormParameters.m_OutputLayerNormWeights};
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void QLstmLayer::Accept(ILayerVisitor& visitor) const
 {
     LstmInputParams inputParams;
@@ -531,6 +532,7 @@ void QLstmLayer::Accept(ILayerVisitor& visitor) const
 
     visitor.VisitQLstmLayer(this, GetParameters(), inputParams, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 
 void QLstmLayer::ExecuteStrategy(IStrategy& strategy) const

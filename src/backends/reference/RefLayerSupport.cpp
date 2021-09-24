@@ -58,15 +58,6 @@ std::string CreateIncorrectDimensionsErrorMsg(unsigned int expected,
 
 } // anonymous namespace
 
-bool RefLayerSupport::IsAbsSupported(const TensorInfo& input, const TensorInfo& output,
-                                     Optional<std::string&> reasonIfUnsupported) const
-{
-    return IsElementwiseUnarySupported(input,
-                                       output,
-                                       ElementwiseUnaryDescriptor(UnaryOperation::Abs),
-                                       reasonIfUnsupported);
-}
-
 bool RefLayerSupport::IsActivationSupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             const ActivationDescriptor& descriptor,
@@ -565,15 +556,12 @@ bool RefLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
     const DataType inputType = input.GetDataType();
     if (IsQuantized8BitType(inputType))
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        std::array<DataType, 4> supportedWeightTypes =
+        std::array<DataType, 3> supportedWeightTypes =
         {
             DataType::QAsymmS8,
             DataType::QAsymmU8,
-            DataType::QSymmS8,
-            DataType::QuantizedSymm8PerAxis // deprecated
+            DataType::QSymmS8
         };
-        ARMNN_NO_DEPRECATE_WARN_END
 
         supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
                                       "Reference Convolution2d: weights type not supported for quantized input.");
@@ -769,15 +757,12 @@ bool RefLayerSupport::IsDepthwiseConvolutionSupported(const TensorInfo& input,
     const DataType inputType = input.GetDataType();
     if (IsQuantized8BitType(inputType))
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        std::array<DataType, 4> supportedWeightTypes =
+        std::array<DataType, 3> supportedWeightTypes =
                 {
                         DataType::QAsymmS8,
                         DataType::QAsymmU8,
                         DataType::QSymmS8,
-                        DataType::QuantizedSymm8PerAxis // deprecated
                 };
-        ARMNN_NO_DEPRECATE_WARN_END
 
         supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
                                        "Reference DepthwiseConvolution2d: weights type not supported for "
@@ -977,18 +962,6 @@ bool RefLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
     return supported;
 }
 
-bool RefLayerSupport::IsEqualSupported(const TensorInfo& input0,
-                                       const TensorInfo& input1,
-                                       const TensorInfo& output,
-                                       Optional<std::string&> reasonIfUnsupported) const
-{
-    return IsComparisonSupported(input0,
-                                 input1,
-                                 output,
-                                 ComparisonDescriptor(ComparisonOperation::Equal),
-                                 reasonIfUnsupported);
-}
-
 bool RefLayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
                                                   const FakeQuantizationDescriptor& descriptor,
                                                   Optional<std::string&> reasonIfUnsupported) const
@@ -1171,18 +1144,6 @@ bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
                                   "Reference Gather: input and output types not matching");
 
     return supported;
-}
-
-bool RefLayerSupport::IsGreaterSupported(const TensorInfo& input0,
-                                         const TensorInfo& input1,
-                                         const TensorInfo& output,
-                                         Optional<std::string&> reasonIfUnsupported) const
-{
-    return IsComparisonSupported(input0,
-                                 input1,
-                                 output,
-                                 ComparisonDescriptor(ComparisonOperation::Greater),
-                                 reasonIfUnsupported);
 }
 
 bool RefLayerSupport::IsInputSupported(const TensorInfo& /*input*/,
@@ -1521,14 +1482,6 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
     }
 
     return supported;
-}
-
-bool RefLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
-                                        const TensorInfo& output,
-                                        const MergerDescriptor& descriptor,
-                                        Optional<std::string&> reasonIfUnsupported) const
-{
-    return IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported);
 }
 
 bool RefLayerSupport::IsMemCopySupported(const TensorInfo &input,
@@ -1897,33 +1850,6 @@ bool RefLayerSupport::IsReshapeSupported(const TensorInfo& input,
         "Reference reshape: input type not supported.");
 }
 
-bool RefLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
-                                                const TensorInfo& output,
-                                                Optional<std::string&> reasonIfUnsupported) const
-{
-    bool supported = true;
-    std::array<DataType,6> supportedTypes =
-    {
-        DataType::BFloat16,
-        DataType::Float32,
-        DataType::Float16,
-        DataType::QAsymmS8,
-        DataType::QAsymmU8,
-        DataType::QSymmS16
-    };
-
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference ResizeBilinear: input type not supported");
-
-    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
-                                  "Reference ResizeBilinear: output type not supported");
-
-    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference ResizeBilinear: input and output types not matching");
-
-    return supported;
-}
-
 bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
                                         const TensorInfo& output,
                                         const ResizeDescriptor& descriptor,
@@ -1951,16 +1877,6 @@ bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
                                   "Reference Resize: input and output types not matching");
 
     return supported;
-}
-
-bool RefLayerSupport::IsRsqrtSupported(const TensorInfo& input,
-                                       const TensorInfo& output,
-                                       Optional<std::string&> reasonIfUnsupported) const
-{
-    return IsElementwiseUnarySupported(input,
-                                       output,
-                                       ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt),
-                                       reasonIfUnsupported);
 }
 
 bool RefLayerSupport::IsShapeSupported(const TensorInfo& input,
@@ -2096,28 +2012,6 @@ bool RefLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
 
     supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
         "Reference SpaceToDepth: input and output types are mismatched");
-
-    return supported;
-}
-
-bool RefLayerSupport::IsSplitterSupported(const TensorInfo& input,
-                                          const ViewsDescriptor& descriptor,
-                                          Optional<std::string&> reasonIfUnsupported) const
-{
-    IgnoreUnused(descriptor);
-    bool supported = true;
-    std::array<DataType,6> supportedTypes =
-    {
-        DataType::BFloat16,
-        DataType::Float32,
-        DataType::Float16,
-        DataType::QAsymmS8,
-        DataType::QAsymmU8,
-        DataType::QSymmS16
-    };
-
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference splitter: input type not supported");
 
     return supported;
 }
@@ -2322,15 +2216,12 @@ bool RefLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,
     const DataType inputType = input.GetDataType();
     if (IsQuantized8BitType(inputType))
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        std::array<DataType, 4> supportedWeightTypes =
+        std::array<DataType, 3> supportedWeightTypes =
         {
             DataType::QAsymmS8,
             DataType::QAsymmU8,
-            DataType::QSymmS8,
-            DataType::QuantizedSymm8PerAxis //Deprecated
+            DataType::QSymmS8
         };
-        ARMNN_NO_DEPRECATE_WARN_END
 
         supported &= CheckSupportRule(TypeAnyOf(weights, supportedWeightTypes), reasonIfUnsupported,
                                       "Reference TransposeConvolution2d: weights type not supported for "

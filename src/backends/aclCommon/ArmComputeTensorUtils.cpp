@@ -37,10 +37,6 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multi
         {
             return multiScales ? arm_compute::DataType::QSYMM8_PER_CHANNEL : arm_compute::DataType::QSYMM8;
         }
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        case armnn::DataType::QuantizedSymm8PerAxis:
-            return arm_compute::DataType::QSYMM8_PER_CHANNEL;
-        ARMNN_NO_DEPRECATE_WARN_END
         case armnn::DataType::Signed32:
             return arm_compute::DataType::S32;
         default:

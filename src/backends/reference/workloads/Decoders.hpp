@@ -67,13 +67,6 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
 {
     switch(info.GetDataType())
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        case armnn::DataType::QuantizedSymm8PerAxis:
-        {
-            std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
-            return std::make_unique<QSymm8PerAxisDecoder>(static_cast<const int8_t*>(data), info);
-        }
-        ARMNN_NO_DEPRECATE_WARN_END
         case DataType::QAsymmS8:
         {
             return std::make_unique<QASymmS8Decoder>(

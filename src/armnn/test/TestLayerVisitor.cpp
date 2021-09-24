@@ -49,6 +49,62 @@ void TestLayerVisitor::CheckConstTensors(const ConstTensor& expected, const Cons
     }
 }
 
+void TestLayerVisitor::CheckConstTensors(const ConstTensor& expected, const ConstTensorHandle& actual)
+{
+    auto& actualInfo = actual.GetTensorInfo();
+    CHECK(expected.GetInfo() == actualInfo);
+    CHECK(expected.GetNumDimensions() == actualInfo.GetNumDimensions());
+    CHECK(expected.GetNumElements() == actualInfo.GetNumElements());
+    CHECK(expected.GetNumBytes() == actualInfo.GetNumBytes());
+    if (expected.GetNumBytes() == actualInfo.GetNumBytes())
+    {
+        //check data is the same byte by byte
+        const unsigned char* expectedPtr = static_cast<const unsigned char*>(expected.GetMemoryArea());
+        const unsigned char* actualPtr = static_cast<const unsigned char*>(actual.Map(true));
+        for (unsigned int i = 0; i < expected.GetNumBytes(); i++)
+        {
+            CHECK(*(expectedPtr + i) == *(actualPtr + i));
+        }
+        actual.Unmap();
+    }
+}
+
+void TestLayerVisitor::CheckConstTensorPtrs(const std::string& name,
+                                            const ConstTensor* expected,
+                                            const std::shared_ptr<ConstTensorHandle> actual)
+{
+    if (expected == nullptr)
+    {
+        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+    }
+    else
+    {
+        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        if (actual != nullptr)
+        {
+            CheckConstTensors(*expected, *actual);
+        }
+    }
+}
+
+void TestLayerVisitor::CheckConstTensorPtrs(const std::string& name,
+                                            const ConstTensor* expected,
+                                            const ConstTensor* actual)
+{
+    if (expected == nullptr)
+    {
+        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+    }
+    else
+    {
+        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        if (actual != nullptr)
+        {
+            CheckConstTensors(*expected, *actual);
+        }
+    }
+}
+
 void TestLayerVisitor::CheckOptionalConstTensors(const Optional<ConstTensor>& expected,
                                                  const Optional<ConstTensor>& actual)
 {

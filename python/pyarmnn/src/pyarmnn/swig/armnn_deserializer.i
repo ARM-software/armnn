@@ -6,7 +6,6 @@
 %{
 #include "armnnDeserializer/IDeserializer.hpp"
 #include "armnn/Types.hpp"
-#include "ProfilingGuid.hpp"
 #include "armnn/INetwork.hpp"
 #include "armnn/Exceptions.hpp"
 #include <string>

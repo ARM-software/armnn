@@ -77,9 +77,11 @@ void SpaceToDepthLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "SpaceToDepthLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void SpaceToDepthLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitSpaceToDepthLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

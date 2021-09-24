@@ -22,16 +22,6 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
 {
     switch(info.GetDataType())
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        case armnn::DataType::QuantizedSymm8PerAxis:
-        {
-            std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
-            return std::make_unique<QSymm8PerAxisEncoder>(
-                static_cast<int8_t*>(data),
-                params.second,
-                params.first);
-        }
-        ARMNN_NO_DEPRECATE_WARN_END
         case armnn::DataType::QAsymmS8:
         {
             return std::make_unique<QASymmS8Encoder>(

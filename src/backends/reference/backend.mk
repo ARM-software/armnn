@@ -88,7 +88,6 @@ BACKEND_SOURCES := \
         workloads/RefQuantizeWorkload.cpp \
         workloads/RefReduceWorkload.cpp \
         workloads/RefReshapeWorkload.cpp \
-        workloads/RefResizeBilinearWorkload.cpp \
         workloads/RefResizeWorkload.cpp \
         workloads/RefSliceWorkload.cpp \
         workloads/RefSoftmaxWorkload.cpp \

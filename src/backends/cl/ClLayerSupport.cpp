@@ -176,14 +176,6 @@ ClLayerSupport::ClLayerSupport()
 {
 }
 
-bool ClLayerSupport::IsAbsSupported(const TensorInfo& input,
-                                    const TensorInfo& output,
-                                    Optional<std::string&> reasonIfUnsupported) const
-{
-    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Abs);
-    return IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported);
-}
-
 bool ClLayerSupport::IsActivationSupported(const TensorInfo& input,
                                            const TensorInfo& output,
                                            const ActivationDescriptor& descriptor,
@@ -563,15 +555,6 @@ bool ClLayerSupport::IsGatherSupported(const TensorInfo& input0,
                                    descriptor);
 }
 
-bool ClLayerSupport::IsGreaterSupported(const TensorInfo& input0,
-                                        const TensorInfo& input1,
-                                        const TensorInfo& output,
-                                        Optional<std::string&> reasonIfUnsupported) const
-{
-    ComparisonDescriptor descriptor(ComparisonOperation::Greater);
-    return IsComparisonSupported(input0, input1, output, descriptor, reasonIfUnsupported);
-}
-
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
@@ -688,14 +671,6 @@ bool ClLayerSupport::IsMeanSupported(const TensorInfo& input,
                                    input,
                                    output,
                                    descriptor);
-}
-
-bool ClLayerSupport::IsMergerSupported(const std::vector<const TensorInfo*> inputs,
-                                       const TensorInfo& output,
-                                       const MergerDescriptor& descriptor,
-                                       Optional<std::string&> reasonIfUnsupported) const
-{
-    return IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported);
 }
 
 bool ClLayerSupport::IsMinimumSupported(const TensorInfo& input0,
@@ -864,29 +839,6 @@ bool ClLayerSupport::IsResizeSupported(const TensorInfo& input,
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClResizeWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
-bool ClLayerSupport::IsResizeBilinearSupported(const TensorInfo& input,
-                                               const TensorInfo& output,
-                                               Optional<std::string&> reasonIfUnsupported) const
-{
-    ResizeDescriptor descriptor;
-    descriptor.m_Method     = ResizeMethod::Bilinear;
-    descriptor.m_DataLayout = DataLayout::NCHW;
-
-    const TensorShape& outputShape = output.GetShape();
-    descriptor.m_TargetHeight = outputShape[2];
-    descriptor.m_TargetWidth  = outputShape[3];
-
-    return IsResizeSupported(input, output, descriptor, reasonIfUnsupported);
-}
-
-bool ClLayerSupport::IsRsqrtSupported(const TensorInfo& input,
-                                      const TensorInfo& output,
-                                      Optional<std::string&> reasonIfUnsupported) const
-{
-    ElementwiseUnaryDescriptor descriptor(UnaryOperation::Rsqrt);
-    return IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported);
-}
-
 bool ClLayerSupport::IsSliceSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       const SliceDescriptor& descriptor,
@@ -925,17 +877,6 @@ bool ClLayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
                                    input,
                                    output,
                                    descriptor);
-}
-
-bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
-                                         const ViewsDescriptor& descriptor,
-                                         Optional<std::string&> reasonIfUnsupported) const
-{
-    IgnoreUnused(descriptor);
-    return IsSupportedForDataTypeCl(reasonIfUnsupported,
-                                    input.GetDataType(),
-                                    &TrueFunc<>,
-                                    &TrueFunc<>);
 }
 
 bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,

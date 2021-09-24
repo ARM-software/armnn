@@ -32,9 +32,11 @@ AdditionLayer* AdditionLayer::Clone(Graph& graph) const
     return CloneBase<AdditionLayer>(graph, GetName());
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void AdditionLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitAdditionLayer(this, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

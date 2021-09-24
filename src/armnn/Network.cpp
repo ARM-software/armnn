@@ -139,27 +139,6 @@ IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
 }
 
 
-IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
-    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-    const ConstTensor& weights,
-    const char* name)
-{
-    Optional<ConstTensor> biases;
-    return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
-}
-
-
-IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
-    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-    const ConstTensor& weights,
-    const ConstTensor& biases,
-    const char* name)
-{
-    return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights,
-                                                        armnn::Optional<ConstTensor>(biases), name);
-}
-
-
 IConnectableLayer* INetwork::AddDequantizeLayer(const char* name)
 {
     return pNetworkImpl->AddDequantizeLayer(name);
@@ -264,17 +243,6 @@ IConnectableLayer* INetwork::AddMergeLayer(const char* name)
     return pNetworkImpl->AddMergeLayer(name);
 }
 
-IConnectableLayer* INetwork::AddMergerLayer(const MergerDescriptor& mergerDescriptor,
-                                            const char* name)
-{
-    return pNetworkImpl->AddConcatLayer(mergerDescriptor, name);
-}
-
-IConnectableLayer* INetwork::AddAbsLayer(const char* name)
-{
-    return pNetworkImpl->AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Abs), name);
-}
-
 IConnectableLayer* INetwork::AddAdditionLayer(const char* name)
 {
     return pNetworkImpl->AddAdditionLayer(name);
@@ -298,20 +266,6 @@ IConnectableLayer* INetwork::AddBatchNormalizationLayer(const BatchNormalization
 IConnectableLayer* INetwork::AddRankLayer(const char* name)
 {
     return pNetworkImpl->AddRankLayer(name);
-}
-
-IConnectableLayer* INetwork::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
-                                                    const char* name)
-{
-    ResizeDescriptor resizeDescriptor;
-    resizeDescriptor.m_Method           = ResizeMethod::Bilinear;
-    resizeDescriptor.m_DataLayout       = descriptor.m_DataLayout;
-    resizeDescriptor.m_TargetWidth      = descriptor.m_TargetWidth;
-    resizeDescriptor.m_TargetHeight     = descriptor.m_TargetHeight;
-    resizeDescriptor.m_AlignCorners     = descriptor.m_AlignCorners;
-    resizeDescriptor.m_HalfPixelCenters = descriptor.m_HalfPixelCenters;
-
-    return pNetworkImpl->AddResizeLayer(resizeDescriptor, name);
 }
 
 IConnectableLayer* INetwork::AddResizeLayer(const ResizeDescriptor& resizeDescriptor,
@@ -426,27 +380,6 @@ IConnectableLayer* INetwork::AddMinimumLayer(const char* name)
     return pNetworkImpl->AddMinimumLayer(name);
 }
 
-IConnectableLayer* INetwork::AddGreaterLayer(const char* name)
-{
-    return pNetworkImpl->AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Greater), name);
-}
-
-IConnectableLayer* INetwork::AddEqualLayer(const char* name)
-{
-    return pNetworkImpl->AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Equal), name);
-}
-
-IConnectableLayer* INetwork::AddRsqrtLayer(const char* name)
-{
-    return pNetworkImpl->AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt), name);
-}
-
-IConnectableLayer* INetwork::AddGatherLayer(const char* name)
-{
-    GatherDescriptor gatherDescriptor{};
-    return pNetworkImpl->AddGatherLayer(gatherDescriptor, name);
-}
-
 IConnectableLayer* INetwork::AddGatherLayer(const GatherDescriptor& descriptor,
                                             const char* name)
 {
@@ -527,10 +460,12 @@ IConnectableLayer* INetwork::AddChannelShuffleLayer(const ChannelShuffleDescript
     return pNetworkImpl->AddChannelShuffleLayer(descriptor, name);
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void INetwork::Accept(ILayerVisitor& visitor) const
 {
     return pNetworkImpl->Accept(visitor);
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void INetwork::ExecuteStrategy(IStrategy& strategy) const
 {
@@ -1774,23 +1709,6 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
     Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
 
-    // Run backend specific optimizations (deprecated)
-    for (auto&& chosenBackend : backendSettings.m_SelectedBackends)
-    {
-        auto factoryFun = BackendRegistryInstance().GetFactory(chosenBackend);
-        auto backendPtr = factoryFun();
-        ARMNN_ASSERT(backendPtr.get() != nullptr);
-
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        auto backendSpecificOptimizations = backendPtr->GetOptimizations();
-        ARMNN_NO_DEPRECATE_WARN_END
-
-        if (!backendSpecificOptimizations.empty())
-        {
-            Optimizer::Pass(optNetObjPtr->pOptimizedNetworkImpl->GetGraph(), backendSpecificOptimizations);
-        }
-    }
-
     return optNet;
 }
 bool NetworkImpl::GetShapeInferenceMethod()
@@ -1938,15 +1856,6 @@ IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescr
     return layer;
 }
 
-IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                       const ConstTensor& weights,
-                                                       const Optional<ConstTensor>& biases,
-                                                       const char* name)
-{
-    Optional<ConstTensor> optionalWeights(weights);
-    return AddFullyConnectedLayer(fullyConnectedDescriptor, optionalWeights, biases, name);
-}
-
 IConnectableLayer* NetworkImpl::AddConcatLayer(const ConcatDescriptor& concatDescriptor,
                                            const char* name)
 {
@@ -2060,25 +1969,6 @@ IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
     return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
 }
 
-IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
-    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-    const ConstTensor& weights,
-    const char* name)
-{
-    Optional<ConstTensor> biases;
-    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
-}
-
-IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
-    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-    const ConstTensor& weights,
-    const ConstTensor& biases,
-    const char* name)
-{
-    Optional<ConstTensor> optionalBiases(biases);
-    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, optionalBiases, name);
-}
-
 IConnectableLayer* NetworkImpl::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,
                                                          const ConstTensor& anchors, const char* name)
 {
@@ -2147,17 +2037,6 @@ IConnectableLayer* NetworkImpl::AddMinimumLayer(const char* name)
     return m_Graph->AddLayer<MinimumLayer>(name);
 }
 
-IConnectableLayer* NetworkImpl::AddMergerLayer(const MergerDescriptor& mergerDescriptor,
-                                           const char* name)
-{
-    return AddConcatLayer(mergerDescriptor, name);
-}
-
-IConnectableLayer* NetworkImpl::AddAbsLayer(const char * name)
-{
-    return AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Abs), name);
-}
-
 IConnectableLayer* NetworkImpl::AddAdditionLayer(const char* name)
 {
     return m_Graph->AddLayer<AdditionLayer>(name);
@@ -2199,20 +2078,6 @@ IConnectableLayer* NetworkImpl::AddReduceLayer(const ReduceDescriptor& reduceDes
                                                const char* name)
 {
     return m_Graph->AddLayer<ReduceLayer>(reduceDescriptor, name);
-}
-
-IConnectableLayer* NetworkImpl::AddResizeBilinearLayer(const ResizeBilinearDescriptor& descriptor,
-                                                       const char* name)
-{
-    ResizeDescriptor resizeDescriptor;
-    resizeDescriptor.m_Method           = ResizeMethod::Bilinear;
-    resizeDescriptor.m_DataLayout       = descriptor.m_DataLayout;
-    resizeDescriptor.m_TargetWidth      = descriptor.m_TargetWidth;
-    resizeDescriptor.m_TargetHeight     = descriptor.m_TargetHeight;
-    resizeDescriptor.m_AlignCorners     = descriptor.m_AlignCorners;
-    resizeDescriptor.m_HalfPixelCenters = descriptor.m_HalfPixelCenters;
-
-    return m_Graph->AddLayer<ResizeLayer>(resizeDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddResizeLayer(const ResizeDescriptor& resizeDescriptor, const char* name)
@@ -2450,27 +2315,6 @@ IConnectableLayer* NetworkImpl::AddStridedSliceLayer(const StridedSliceDescripto
                                                  const char* name)
 {
     return m_Graph->AddLayer<StridedSliceLayer>(stridedSliceDescriptor, name);
-}
-
-IConnectableLayer* NetworkImpl::AddGreaterLayer(const char* name)
-{
-    return AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Greater), name);
-}
-
-IConnectableLayer* NetworkImpl::AddEqualLayer(const char* name)
-{
-    return AddComparisonLayer(ComparisonDescriptor(ComparisonOperation::Equal), name);
-}
-
-IConnectableLayer* NetworkImpl::AddRsqrtLayer(const char * name)
-{
-    return AddElementwiseUnaryLayer(ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt), name);
-}
-
-IConnectableLayer* NetworkImpl::AddGatherLayer(const char* name)
-{
-    GatherDescriptor gatherDescriptor{};
-    return AddGatherLayer(gatherDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddGatherLayer(const GatherDescriptor& gatherDescriptor,
@@ -2863,6 +2707,7 @@ IConnectableLayer* NetworkImpl::AddUnidirectionalSequenceLstmLayer(
     return layer;
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void NetworkImpl::Accept(ILayerVisitor& visitor) const
 {
     for (auto layer : GetGraph())
@@ -2870,6 +2715,7 @@ void NetworkImpl::Accept(ILayerVisitor& visitor) const
         layer->Accept(visitor);
     };
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const
 {

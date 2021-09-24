@@ -24,7 +24,9 @@ public:
     /// @param [in] graph The graph into which this layer is being cloned.
     DivisionLayer* Clone(Graph& graph) const override;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
 
 protected:
     /// Constructor to create a DivisionLayer.

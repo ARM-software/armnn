@@ -129,16 +129,6 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
     return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
-                                                         const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
-    elementwiseUnaryDescriptor.m_Parameters.m_Operation = UnaryOperation::Abs;
-
-    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
-}
-
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                 const WorkloadInfo& info) const
 {
@@ -331,16 +321,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateElementwiseUnary(const Elem
     return std::make_unique<RefElementwiseUnaryWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-    ComparisonQueueDescriptor comparisonDescriptor;
-    comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Equal;
-
-    return CreateComparison(comparisonDescriptor, info);
-}
-
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateFakeQuantization(const FakeQuantizationQueueDescriptor& descriptor,
                                                                       const WorkloadInfo& info) const
 {
@@ -377,16 +357,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGather(const GatherQueueDes
                                                             const WorkloadInfo& info) const
 {
     return std::make_unique<RefGatherWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
-                                                             const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-    ComparisonQueueDescriptor comparisonDescriptor;
-    comparisonDescriptor.m_Parameters.m_Operation = ComparisonOperation::Greater;
-
-    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
@@ -477,12 +447,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMemImport(const MemImportQu
         throw InvalidArgumentException("RefWorkloadFactory: CreateMemImport() expected an input tensor.");
     }
     return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
-{
-    return CreateConcat(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
@@ -613,28 +577,6 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResize(const ResizeQueueDes
                                                             const WorkloadInfo& info) const
 {
     return std::make_unique<RefResizeWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
-                                                                    const WorkloadInfo& info) const
-{
-    ResizeQueueDescriptor resizeDescriptor;
-    resizeDescriptor.m_Parameters.m_Method       = ResizeMethod::Bilinear;
-    resizeDescriptor.m_Parameters.m_DataLayout   = descriptor.m_Parameters.m_DataLayout;
-    resizeDescriptor.m_Parameters.m_TargetWidth  = descriptor.m_Parameters.m_TargetWidth;
-    resizeDescriptor.m_Parameters.m_TargetHeight = descriptor.m_Parameters.m_TargetHeight;
-
-    return CreateResize(resizeDescriptor, info);
-}
-
-std::unique_ptr<IWorkload> RefWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
-    elementwiseUnaryDescriptor.m_Parameters.m_Operation = UnaryOperation::Rsqrt;
-
-    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateShape(const ShapeQueueDescriptor& descriptor,

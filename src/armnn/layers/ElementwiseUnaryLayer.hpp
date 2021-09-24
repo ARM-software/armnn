@@ -34,7 +34,9 @@ public:
     /// @param [in] shapeInferenceMethod Indicates if output shape shall be overwritten or just validated.
     void ValidateTensorShapesFromInputs() override;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
 
 protected:
     /// Constructor to create a ElementwiseUnaryLayer

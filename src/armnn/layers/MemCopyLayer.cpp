@@ -49,11 +49,13 @@ void MemCopyLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "MemCopyLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void MemCopyLayer::Accept(ILayerVisitor& visitor) const
 {
     IgnoreUnused(visitor);
     throw armnn::Exception("MemCopyLayer should not appear in an input graph");
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void MemCopyLayer::ExecuteStrategy(IStrategy& strategy) const
 {

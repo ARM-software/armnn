@@ -378,16 +378,6 @@ void StringifyLayerParameters<ReshapeDescriptor>::Serialize(ParameterStringifyFu
     fn("TargetShape",ss.str());
 }
 
-void StringifyLayerParameters<ResizeBilinearDescriptor>::Serialize(ParameterStringifyFunction& fn,
-                                                                   const ResizeBilinearDescriptor& desc)
-{
-    fn("TargetWidth", std::to_string(desc.m_TargetWidth));
-    fn("TargetHeight", std::to_string(desc.m_TargetHeight));
-    fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
-    fn("AlignCorners", std::to_string(desc.m_AlignCorners));
-    fn("HalfPixelCenters", std::to_string(desc.m_HalfPixelCenters));
-}
-
 void StringifyLayerParameters<ResizeDescriptor>::Serialize(ParameterStringifyFunction& fn,
                                                            const ResizeDescriptor& desc)
 {

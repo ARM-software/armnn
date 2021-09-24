@@ -57,9 +57,11 @@ void TransposeLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "TransposeLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void TransposeLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitTransposeLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

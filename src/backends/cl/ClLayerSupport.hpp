@@ -18,11 +18,6 @@ public:
     ClLayerSupport();
     ~ClLayerSupport() {}
 
-    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
-    bool IsAbsSupported(const TensorInfo& input,
-                        const TensorInfo& output,
-                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     bool IsActivationSupported(const TensorInfo& input,
                                const TensorInfo& output,
                                const ActivationDescriptor& descriptor,
@@ -145,12 +140,6 @@ public:
                            const GatherDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported) const override;
 
-    ARMNN_DEPRECATED_MSG("Use IsComparisonSupported instead")
-    bool IsGreaterSupported(const TensorInfo& input0,
-                            const TensorInfo& input1,
-                            const TensorInfo& ouput,
-                            Optional<std::string&> reasonIfUnsupported) const override;
-
     bool IsInputSupported(const TensorInfo& input,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
@@ -195,12 +184,6 @@ public:
                          const TensorInfo& output,
                          const MeanDescriptor& descriptor,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
-    bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
-                           const TensorInfo& output,
-                           const MergerDescriptor& descriptor,
-                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsMinimumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
@@ -277,16 +260,6 @@ public:
                            const ResizeDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG("Use IsResizeSupported instead")
-    bool IsResizeBilinearSupported(const TensorInfo& input,
-                                   const TensorInfo& output,
-                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    ARMNN_DEPRECATED_MSG("Use IsElementwiseUnarySupported instead")
-    bool IsRsqrtSupported(const TensorInfo& input,
-                          const TensorInfo& output,
-                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     bool IsSliceSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           const SliceDescriptor& descriptor,
@@ -306,11 +279,6 @@ public:
                                  const TensorInfo& output,
                                  const SpaceToDepthDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
-    bool IsSplitterSupported(const TensorInfo& input,
-                             const ViewsDescriptor& descriptor,
-                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsSplitterSupported(const TensorInfo& input,
                              const std::vector<std::reference_wrapper<TensorInfo>>& outputs,

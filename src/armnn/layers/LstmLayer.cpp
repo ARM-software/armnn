@@ -300,6 +300,7 @@ Layer::ConstantTensors LstmLayer::GetConstantTensorsByRef()
             m_LayerNormParameters.m_OutputLayerNormWeights};
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void LstmLayer::Accept(ILayerVisitor& visitor) const
 {
     LstmInputParams inputParams;
@@ -509,6 +510,7 @@ void LstmLayer::Accept(ILayerVisitor& visitor) const
 
     visitor.VisitLstmLayer(this, GetParameters(), inputParams, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void LstmLayer::ExecuteStrategy(IStrategy& strategy) const
 {

@@ -46,9 +46,11 @@ void L2NormalizationLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "L2NormalizationLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void L2NormalizationLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitL2NormalizationLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

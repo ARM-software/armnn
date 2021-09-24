@@ -2412,6 +2412,9 @@ void IDeserializer::DeserializerImpl::ParseResize(GraphPtr graph, unsigned int l
     RegisterOutputSlots(graph, layerIndex, layer);
 }
 
+
+/// @Note The ResizeBiliniar operation was deprecated and removed in favor of the Resize operation.
+///       This function is kept for backwards compatibility.
 void IDeserializer::DeserializerImpl::ParseResizeBilinear(GraphPtr graph, unsigned int layerIndex)
 {
     CHECK_LAYERS(graph, 0, layerIndex);

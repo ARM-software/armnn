@@ -27,10 +27,6 @@ protected:
     virtual ~ILayerSupport() {}
 
 public:
-    virtual bool IsAbsSupported(const TensorInfo& input,
-                                const TensorInfo& output,
-                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
     virtual bool IsActivationSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const ActivationDescriptor& descriptor,
@@ -162,11 +158,6 @@ public:
                                              const ElementwiseUnaryDescriptor& descriptor,
                                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    virtual bool IsEqualSupported(const TensorInfo& input0,
-                                  const TensorInfo& input1,
-                                  const TensorInfo& output,
-                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
     virtual bool IsFakeQuantizationSupported(const TensorInfo& input,
                                              const FakeQuantizationDescriptor& descriptor,
                                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
@@ -190,18 +181,8 @@ public:
     virtual bool IsGatherSupported(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    const TensorInfo& output,
-                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
-    virtual bool IsGatherSupported(const TensorInfo& input0,
-                                   const TensorInfo& input1,
-                                   const TensorInfo& output,
                                    const GatherDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
-    virtual bool IsGreaterSupported(const TensorInfo& input0,
-                                    const TensorInfo& input1,
-                                    const TensorInfo& ouput,
-                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsInputSupported(const TensorInfo& input,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
@@ -266,11 +247,6 @@ public:
                                   const TensorInfo& input1,
                                   const TensorInfo& output,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
-    virtual bool IsMergerSupported(const std::vector<const TensorInfo*> inputs,
-                                   const TensorInfo& output,
-                                   const OriginsDescriptor& descriptor,
-                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsMinimumSupported(const TensorInfo& input0,
                                     const TensorInfo& input1,
@@ -350,18 +326,10 @@ public:
                                     const ReshapeDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
-    virtual bool IsResizeBilinearSupported(const TensorInfo& input,
-                                           const TensorInfo& output,
-                                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
     virtual bool IsResizeSupported(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const ResizeDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
-    virtual bool IsRsqrtSupported(const TensorInfo& input,
-                                  const TensorInfo& output,
-                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsShapeSupported(const TensorInfo& input,
                                   const TensorInfo& output,
@@ -386,10 +354,6 @@ public:
                                          const TensorInfo& output,
                                          const SpaceToDepthDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
-
-    virtual bool IsSplitterSupported(const TensorInfo& input,
-                                     const ViewsDescriptor& descriptor,
-                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
     virtual bool IsSplitterSupported(const TensorInfo& input,
                                      const std::vector<std::reference_wrapper<TensorInfo>>& outputs,

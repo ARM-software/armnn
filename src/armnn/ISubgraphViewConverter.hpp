@@ -25,9 +25,4 @@ public:
     virtual std::vector<CompiledBlobPtr> CompileNetwork() = 0;
 };
 
-///
-/// Old ISubGraphConverter definition kept for backward compatibility only.
-///
-using ISubGraphConverter ARMNN_DEPRECATED_MSG("This type is no longer supported") = ISubgraphViewConverter;
-
 } // namespace armnn

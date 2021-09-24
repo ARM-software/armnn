@@ -88,8 +88,17 @@ public:
     /// Returns the unique id of the layer
     virtual LayerGuid GetGuid() const = 0;
 
+    // The Accept function needs to be wrapped in a no warn macro to avoid deprecation warnings from
+    // the deprecated ILayerVisitor which is used in the function.
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     /// Apply a visitor to this layer
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Accept is deprecated. The ILayerVisitor that works in conjunction with this "
+                                      "Accept function is deprecated. Use IStrategy in combination with "
+                                      "ExecuteStrategy instead, which is an ABI/API stable version of the "
+                                      "visitor pattern.",
+                                      "22.05")
     virtual void Accept(ILayerVisitor& visitor) const = 0;
+    ARMNN_NO_DEPRECATE_WARN_END
 
     /// Apply a visitor to this layer
     virtual void ExecuteStrategy(IStrategy& strategy) const = 0;
@@ -230,12 +239,12 @@ public:
                                              const Optional<ConstTensor>& biases,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddConvolution2dLayer overload is deprecated")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const ConstTensor& biases,
@@ -269,19 +278,6 @@ public:
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
         const Optional<ConstTensor>& biases,
-        const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const ConstTensor& biases,
         const char* name = nullptr);
 
     /// Adds a Dequantize layer to the network.
@@ -337,13 +333,13 @@ public:
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddFullyConnectedLayer overload is deprecated", "22.05")
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const Optional<ConstTensor>& weights,
                                               const Optional<ConstTensor>& biases,
                                               const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG("This AddFullyConnectedLayer overload is deprecated")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddFullyConnectedLayer overload is deprecated", "22.05")
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const ConstTensor& weights,
                                               const Optional<ConstTensor>& biases,
@@ -414,23 +410,6 @@ public:
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddMergeLayer(const char* name = nullptr);
 
-    /// Adds a concat layer to the network.
-    /// @param mergerDescriptor - MergerDescriptor (synonym for OriginsDescriptor) to configure the concatenation
-    ///                           process. Number of Views must be equal to the number of inputs, and their order
-    ///                           must match - e.g. first view corresponds to the first input, second view to the
-    ///                           second input, etc....
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddConcatLayer instead")
-    IConnectableLayer* AddMergerLayer(const MergerDescriptor& mergerDescriptor,
-        const char* name = nullptr);
-
-    /// Add absolute layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
-    IConnectableLayer* AddAbsLayer(const char* name = nullptr);
-
     /// Adds an addition layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
@@ -459,14 +438,6 @@ public:
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddRankLayer(const char* name = nullptr);
-
-    /// Adds a resize bilinear layer to the network.
-    /// @param resizeDesc - Parameters for the resize operation.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddResizeLayer instead")
-    IConnectableLayer* AddResizeBilinearLayer(const ResizeBilinearDescriptor& resizeDesc,
-                                              const char* name = nullptr);
 
     /// Adds a resize layer to the network.
     /// @param resizeDescriptor - Parameters for the resize operation.
@@ -608,30 +579,6 @@ public:
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddMinimumLayer(const char* name = nullptr);
 
-    /// Add a Greater layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
-    IConnectableLayer* AddGreaterLayer(const char* name = nullptr);
-
-    /// Add a Equal layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddComparisonLayer instead")
-    IConnectableLayer* AddEqualLayer(const char* name = nullptr);
-
-    /// Add Reciprocal of square root layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddElementwiseUnaryLayer instead")
-    IConnectableLayer* AddRsqrtLayer(const char* name = nullptr);
-
-    /// Add Gather layer to the network.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("Use AddGatherLayer with descriptor instead")
-    IConnectableLayer* AddGatherLayer(const char* name = nullptr);
-
     /// Add Gather layer to the network.
     /// @param descriptor - Description of the gather layer.
     /// @param name - Optional name for the layer.
@@ -722,7 +669,17 @@ public:
     IConnectableLayer* AddChannelShuffleLayer(const ChannelShuffleDescriptor& descriptor,
                                               const char* name = nullptr);
 
+    // The Accept function needs to be wrapped in a no warn macro to avoid deprecation warnings from
+    // the deprecated ILayerVisitor which is used in the function.
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
+    /// Apply a visitor to this layer
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Accept is deprecated. The ILayerVisitor that works in conjunction with this "
+                                      "Accept function is deprecated. Use IStrategy in combination with "
+                                      "ExecuteStrategy instead, which is an ABI/API stable version of the "
+                                      "visitor pattern.",
+                                      "22.05")
     void Accept(ILayerVisitor& visitor) const;
+    ARMNN_NO_DEPRECATE_WARN_END
 
     void ExecuteStrategy(IStrategy& strategy) const;
 

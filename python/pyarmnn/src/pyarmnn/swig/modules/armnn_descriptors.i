@@ -5,7 +5,6 @@
 %{
 #include "armnn/Descriptors.hpp"
 #include "armnn/Types.hpp"
-#include "ProfilingGuid.hpp"
 %}
 
 namespace std {

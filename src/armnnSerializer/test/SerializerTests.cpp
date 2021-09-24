@@ -748,7 +748,7 @@ TEST_CASE("SerializeDivision")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-TEST_CASE("SerializeDeserializeEqual")
+TEST_CASE("SerializeDeserializeComparisonEqual")
 {
     const std::string layerName("EqualLayer");
     const armnn::TensorInfo inputTensorInfo1 = armnn::TensorInfo({2, 1, 2, 4}, armnn::DataType::Float32);
@@ -758,9 +758,8 @@ TEST_CASE("SerializeDeserializeEqual")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer2 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const equalLayer = network->AddEqualLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::ComparisonDescriptor equalDescriptor(armnn::ComparisonOperation::Equal);
+    armnn::IConnectableLayer* const equalLayer = network->AddComparisonLayer(equalDescriptor, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer1->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
@@ -1111,10 +1110,7 @@ TEST_CASE("SerializeGather")
 }
 
 
-// NOTE: Until the deprecated AddGreaterLayer disappears this test checks that calling
-//       AddGreaterLayer places a ComparisonLayer into the serialized format and that
-//       when this deserialises we have a ComparisonLayer
-TEST_CASE("SerializeGreaterDeprecated")
+TEST_CASE("SerializeComparisonGreater")
 {
     const std::string layerName("greater");
 
@@ -1126,9 +1122,8 @@ TEST_CASE("SerializeGreaterDeprecated")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const equalLayer = network->AddGreaterLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::ComparisonDescriptor greaterDescriptor(armnn::ComparisonOperation::Greater);
+    armnn::IConnectableLayer* const equalLayer = network->AddComparisonLayer(greaterDescriptor, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer0->GetOutputSlot(0).Connect(equalLayer->GetInputSlot(0));
@@ -1443,44 +1438,6 @@ public:
         }
     }
 };
-
-// NOTE: Until the deprecated AddMergerLayer disappears this test checks that calling
-//       AddMergerLayer places a ConcatLayer into the serialized format and that
-//       when this deserialises we have a ConcatLayer
-TEST_CASE("SerializeMerger")
-{
-    const std::string layerName("merger");
-    const armnn::TensorInfo inputInfo = armnn::TensorInfo({2, 3, 2, 2}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo = armnn::TensorInfo({4, 3, 2, 2}, armnn::DataType::Float32);
-
-    const std::vector<armnn::TensorShape> shapes({inputInfo.GetShape(), inputInfo.GetShape()});
-
-    armnn::OriginsDescriptor descriptor =
-        armnn::CreateDescriptorForConcatenation(shapes.begin(), shapes.end(), 0);
-
-    armnn::INetworkPtr network = armnn::INetwork::Create();
-    armnn::IConnectableLayer* const inputLayerOne = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const inputLayerTwo = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const mergerLayer = network->AddMergerLayer(descriptor, layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
-    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
-
-    inputLayerOne->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(0));
-    inputLayerTwo->GetOutputSlot(0).Connect(mergerLayer->GetInputSlot(1));
-    mergerLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-
-    inputLayerOne->GetOutputSlot(0).SetTensorInfo(inputInfo);
-    inputLayerTwo->GetOutputSlot(0).SetTensorInfo(inputInfo);
-    mergerLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
-
-    std::string mergerLayerNetwork = SerializeNetwork(*network);
-    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(mergerLayerNetwork);
-    CHECK(deserializedNetwork);
-
-    MergerLayerVerifier verifier(layerName, {inputInfo, inputInfo}, {outputInfo}, descriptor);
-    deserializedNetwork->ExecuteStrategy(verifier);
-}
 
 TEST_CASE("EnsureMergerLayerBackwardCompatibility")
 {
@@ -1979,14 +1936,14 @@ TEST_CASE("SerializeResize")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-class ResizeBilinearLayerVerifier : public LayerVerifierBaseWithDescriptor<armnn::ResizeBilinearDescriptor>
+class ResizeBilinearLayerVerifier : public LayerVerifierBaseWithDescriptor<armnn::ResizeDescriptor>
 {
 public:
     ResizeBilinearLayerVerifier(const std::string& layerName,
                                 const std::vector<armnn::TensorInfo>& inputInfos,
                                 const std::vector<armnn::TensorInfo>& outputInfos,
-                                const armnn::ResizeBilinearDescriptor& descriptor)
-        : LayerVerifierBaseWithDescriptor<armnn::ResizeBilinearDescriptor>(
+                                const armnn::ResizeDescriptor& descriptor)
+        : LayerVerifierBaseWithDescriptor<armnn::ResizeDescriptor>(
             layerName, inputInfos, outputInfos, descriptor) {}
 
     void ExecuteStrategy(const armnn::IConnectableLayer* layer,
@@ -2022,16 +1979,14 @@ public:
     }
 };
 
-// NOTE: Until the deprecated AddResizeBilinearLayer disappears this test checks that
-//       calling AddResizeBilinearLayer places a ResizeLayer into the serialized format
-//       and that when this deserialises we have a ResizeLayer
 TEST_CASE("SerializeResizeBilinear")
 {
     const std::string layerName("resizeBilinear");
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
 
-    armnn::ResizeBilinearDescriptor desc;
+    armnn::ResizeDescriptor desc;
+    desc.m_Method = armnn::ResizeMethod::Bilinear;
     desc.m_TargetWidth  = 4u;
     desc.m_TargetHeight = 2u;
     desc.m_AlignCorners = true;
@@ -2039,9 +1994,7 @@ TEST_CASE("SerializeResizeBilinear")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const resizeLayer = network->AddResizeBilinearLayer(desc, layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const resizeLayer = network->AddResizeLayer(desc, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(resizeLayer->GetInputSlot(0));
@@ -2060,7 +2013,7 @@ TEST_CASE("SerializeResizeBilinear")
 TEST_CASE("EnsureResizeBilinearBackwardCompatibility")
 {
     // The hex data below is a flat buffer containing a simple network with an input,
-    // a ResizeBilinearLayer (now deprecated) and an output
+    // a ResizeBilinearLayer (now deprecated and removed) and an output
     //
     // This test verifies that we can still deserialize this old-style model by replacing
     // the ResizeBilinearLayer with an equivalent ResizeLayer
@@ -2105,7 +2058,7 @@ TEST_CASE("EnsureResizeBilinearBackwardCompatibility")
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
 
-    armnn::ResizeBilinearDescriptor descriptor;
+    armnn::ResizeDescriptor descriptor;
     descriptor.m_TargetWidth  = 4u;
     descriptor.m_TargetHeight = 2u;
 

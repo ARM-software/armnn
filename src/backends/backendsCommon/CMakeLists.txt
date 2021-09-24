@@ -12,7 +12,6 @@ list(APPEND armnnBackendsCommon_sources
     DynamicBackendUtils.hpp
     IBackendContext.hpp
     IBackendInternal.cpp
-    IBackendInternal.hpp
     IMemoryManager.hpp
     ITensorHandle.hpp
     ITensorHandleFactory.cpp

@@ -307,11 +307,13 @@ Layer::ConstantTensors UnidirectionalSequenceLstmLayer::GetConstantTensorsByRef(
             m_LayerNormParameters.m_OutputLayerNormWeights};
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void UnidirectionalSequenceLstmLayer::Accept(ILayerVisitor& visitor) const
 {
     IgnoreUnused(visitor);
     throw armnn::Exception("UnidirectionalSequenceLstmLayer: VisitUnidirectionalSequenceLstmLayer is not implemented");
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void UnidirectionalSequenceLstmLayer::ExecuteStrategy(IStrategy& strategy) const
 {

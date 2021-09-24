@@ -60,7 +60,10 @@ public:
                GetPermutation().IsEqual(PolymorphicDowncast<const PermuteLayer*>(&other)->GetPermutation());
     }
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
+
 
 protected:
     /// Constructor to create a PermuteLayer.

@@ -52,11 +52,13 @@ void DebugLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DebugLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void DebugLayer::Accept(ILayerVisitor& visitor) const
 {
     // by design debug layers are never in input graphs
     IgnoreUnused(visitor);
     throw armnn::Exception("DebugLayer should never appear in an input graph");
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

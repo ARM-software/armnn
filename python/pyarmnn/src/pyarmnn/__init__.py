@@ -67,6 +67,10 @@ from ._generated.pyarmnn import IProfiler
 from ._generated.pyarmnn import DataType_Float16, DataType_Float32, DataType_QAsymmU8, DataType_Signed32, \
     DataType_Boolean, DataType_QSymmS16, DataType_QSymmS8, DataType_QAsymmS8
 from ._generated.pyarmnn import DataLayout_NCHW, DataLayout_NHWC
+from ._generated.pyarmnn import MemorySource_Malloc, MemorySource_Undefined, MemorySource_DmaBuf, \
+    MemorySource_DmaBufProtected
+from ._generated.pyarmnn import ProfilingDetailsMethod_Undefined, ProfilingDetailsMethod_DetailsWithEvents, \
+    ProfilingDetailsMethod_DetailsOnly
 
 from ._generated.pyarmnn import ActivationFunction_Abs, ActivationFunction_BoundedReLu, ActivationFunction_LeakyReLu, \
     ActivationFunction_Linear, ActivationFunction_ReLu, ActivationFunction_Sigmoid, ActivationFunction_SoftReLu, \

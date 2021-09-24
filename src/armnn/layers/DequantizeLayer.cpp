@@ -46,9 +46,11 @@ void DequantizeLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DequantizeLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void DequantizeLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitDequantizeLayer(this, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

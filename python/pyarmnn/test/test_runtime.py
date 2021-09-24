@@ -3,6 +3,7 @@
 import os
 
 import pytest
+import warnings
 import numpy as np
 
 import pyarmnn as ann
@@ -156,6 +157,30 @@ def test_load_network_properties_provided(random_runtime):
     assert "" == messages
     assert net_id == 0
 
+def test_network_properties_constructor(random_runtime):
+    preferred_backends = random_runtime[0]
+    network = random_runtime[1]
+    runtime = random_runtime[2]
+
+    opt_network, _ = ann.Optimize(network, preferred_backends,
+                                  runtime.GetDeviceSpec(), ann.OptimizerOptions())
+
+    inputSource = ann.MemorySource_Undefined
+    outputSource = ann.MemorySource_Undefined
+    properties = ann.INetworkProperties(True, inputSource, outputSource)
+    assert properties.m_AsyncEnabled == True
+    assert properties.m_ProfilingEnabled == False
+    assert properties.m_OutputNetworkDetailsMethod == ann.ProfilingDetailsMethod_Undefined
+    assert properties.m_InputSource == ann.MemorySource_Undefined
+    assert properties.m_OutputSource == ann.MemorySource_Undefined
+
+    net_id, messages = runtime.LoadNetwork(opt_network, properties)
+    assert "" == messages
+    assert net_id == 0
+
+def test_network_properties_deprecated_constructor():
+    with pytest.warns(DeprecationWarning):
+        warnings.warn("Deprecated: Use constructor with MemorySource argument instead.", DeprecationWarning)
 
 def test_unload_network_fails_for_invalid_net_id(random_runtime):
     preferred_backends = random_runtime[0]

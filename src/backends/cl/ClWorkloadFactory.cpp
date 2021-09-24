@@ -194,17 +194,6 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
         PolymorphicDowncast<IClTensorHandle*>(&parent), shape, coords);
 }
 
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateAbs(const AbsQueueDescriptor& descriptor,
-                                                        const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-
-    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
-    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Abs);
-
-    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
-}
-
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {
@@ -376,17 +365,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateElementwiseUnary(const Eleme
     }
 }
 
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateEqual(const EqualQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-
-    ComparisonQueueDescriptor comparisonDescriptor;
-    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Equal);
-
-    return CreateComparison(comparisonDescriptor, info);
-}
-
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateFill(const FillQueueDescriptor& descriptor,
                                                          const WorkloadInfo& info) const
 {
@@ -412,17 +390,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGather(const GatherQueueDesc
                                                            const WorkloadInfo& info) const
 {
     return MakeWorkload<ClGatherWorkload>(descriptor, info, m_CLCompileContext);
-}
-
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-
-    ComparisonQueueDescriptor comparisonDescriptor;
-    comparisonDescriptor.m_Parameters = ComparisonDescriptor(ComparisonOperation::Greater);
-
-    return CreateComparison(comparisonDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateInput(const InputQueueDescriptor& descriptor,
@@ -505,12 +472,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMemImport(const MemImportQue
     }
 
     return std::make_unique<ImportMemGenericWorkload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMerger(const MergerQueueDescriptor& descriptor,
-                                                           const WorkloadInfo& info) const
-{
-    return CreateConcat(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateMinimum(const MinimumQueueDescriptor& descriptor,
@@ -607,32 +568,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateResize(const ResizeQueueDesc
                                                            const WorkloadInfo& info) const
 {
     return MakeWorkload<ClResizeWorkload>(descriptor, info, m_CLCompileContext);
-}
-
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& descriptor,
-                                                                   const WorkloadInfo& info) const
-{
-    ResizeQueueDescriptor resizeDescriptor;
-    resizeDescriptor.m_Inputs  = descriptor.m_Inputs;
-    resizeDescriptor.m_Outputs = descriptor.m_Outputs;
-
-    resizeDescriptor.m_Parameters.m_Method       = ResizeMethod::Bilinear;
-    resizeDescriptor.m_Parameters.m_DataLayout   = descriptor.m_Parameters.m_DataLayout;
-    resizeDescriptor.m_Parameters.m_TargetHeight = descriptor.m_Parameters.m_TargetHeight;
-    resizeDescriptor.m_Parameters.m_TargetWidth  = descriptor.m_Parameters.m_TargetWidth;
-
-    return CreateResize(resizeDescriptor, info);
-}
-
-std::unique_ptr<IWorkload> ClWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& descriptor,
-                                                          const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-
-    ElementwiseUnaryQueueDescriptor elementwiseUnaryDescriptor;
-    elementwiseUnaryDescriptor.m_Parameters = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);
-
-    return CreateElementwiseUnary(elementwiseUnaryDescriptor, info);
 }
 
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateSlice(const SliceQueueDescriptor& descriptor,

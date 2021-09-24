@@ -45,9 +45,11 @@ void ActivationLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ActivationLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void ActivationLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitActivationLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

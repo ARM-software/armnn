@@ -1499,13 +1499,6 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                          modelOptions);
 }
 
-// Default Implementations
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateAbs(const AbsQueueDescriptor& /*descriptor*/,
-                                                       const WorkloadInfo& /*info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& /*descriptor*/,
                                                               const WorkloadInfo& /*info*/) const
 {
@@ -1644,12 +1637,6 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateElementwiseUnary(const Elemen
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateEqual(const EqualQueueDescriptor& /*descriptor*/,
-                                                         const WorkloadInfo& /*Info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateFakeQuantization(const FakeQuantizationQueueDescriptor& /*desc*/,
                                                                     const WorkloadInfo& /*info*/) const
 {
@@ -1676,12 +1663,6 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateFullyConnected(const FullyCon
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateGather(const GatherQueueDescriptor& /*descriptor*/,
                                                           const WorkloadInfo& /*info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateGreater(const GreaterQueueDescriptor& /*descriptor*/,
-                                                           const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
@@ -1749,12 +1730,6 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateMemImport(const MemImportQueu
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateMerge(const MergeQueueDescriptor& /*descriptor*/,
                                                          const WorkloadInfo& /*info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateMerger(const MergerQueueDescriptor& /*descriptor*/,
-                                                          const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }
@@ -1848,20 +1823,8 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateReshape(const ReshapeQueueDes
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateResizeBilinear(const ResizeBilinearQueueDescriptor& /*descriptor*/,
-                                                                  const WorkloadInfo& /*info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateResize(const ResizeQueueDescriptor& /*descriptor*/,
                                                             const WorkloadInfo& /*info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateRsqrt(const RsqrtQueueDescriptor& /*descriptor*/,
-                                                         const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();
 }

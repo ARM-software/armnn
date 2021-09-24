@@ -46,10 +46,12 @@ void CastLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "CastLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void CastLayer::Accept(ILayerVisitor& visitor) const
 {
     IgnoreUnused(visitor);
     throw armnn::Exception("CastLayer VisitCastLayer is not implemented");
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

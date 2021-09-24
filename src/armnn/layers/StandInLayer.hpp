@@ -37,7 +37,10 @@ public:
 
     /// Accepts a visitor object and calls VisitStandInLayer() method.
     /// @param visitor The visitor on which to call VisitStandInLayer() method.
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
+
 
 protected:
     /// Constructor to create a StandInLayer.

@@ -34,13 +34,15 @@
 #   define ARMNN_NO_DEPRECATE_WARN_END
 #endif
 
-#define ARMNN_SUPRESS_DEPRECATE_WARNING(func) \
+#define ARMNN_SUPPRESS_DEPRECATE_WARNING(func) \
 ARMNN_NO_DEPRECATE_WARN_BEGIN \
 func; \
 ARMNN_NO_DEPRECATE_WARN_END
 
 #define ARMNN_DEPRECATED [[deprecated]]
 #define ARMNN_DEPRECATED_MSG(message) [[deprecated(message)]]
+#define ARMNN_DEPRECATED_MSG_REMOVAL_DATE(message, removed_in_release) \
+[[deprecated("Expected to be removed in release " #removed_in_release ". " message)]]
 
 #if defined(__GNUC__) && (__GNUC__ < 6)
 #   define ARMNN_DEPRECATED_ENUM

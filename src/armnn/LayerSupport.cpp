@@ -305,18 +305,6 @@ bool IsFullyConnectedSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsFullyConnectedSupported, input, output, weights, biases, descriptor);
 }
 
-ARMNN_DEPRECATED_MSG("Use IsGatherSupported with descriptor instead")
-bool IsGatherSupported(const BackendId& backend,
-                       const TensorInfo& input0,
-                       const TensorInfo& input1,
-                       const TensorInfo& output,
-                       char* reasonIfUnsupported,
-                       size_t reasonIfUnsupportedMaxLength)
-{
-    const GatherDescriptor descriptor{};
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsGatherSupported, input0, input1, output, descriptor);
-}
-
 bool IsGatherSupported(const BackendId& backend,
                        const TensorInfo& input0,
                        const TensorInfo& input1,
@@ -421,21 +409,6 @@ bool IsMergeSupported(const BackendId& backend,
                       size_t reasonIfUnsupportedMaxLength)
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergeSupported, input0, input1, output);
-}
-
-ARMNN_DEPRECATED_MSG("Use IsConcatSupported instead")
-bool IsMergerSupported(const BackendId& backend,
-                       std::vector<const TensorInfo*> inputs,
-                       const TensorInfo& output,
-                       const OriginsDescriptor& descriptor,
-                       char* reasonIfUnsupported,
-                       size_t reasonIfUnsupportedMaxLength)
-{
-    ARMNN_ASSERT(inputs.size() > 0);
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsMergerSupported, inputs, output, descriptor);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 bool IsMinimumSupported(const BackendId& backend,
@@ -589,36 +562,6 @@ bool IsResizeSupported(const BackendId& backend,
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeSupported, input, output, descriptor);
 }
 
-ARMNN_DEPRECATED_MSG("Use IsResizeSupported instead")
-bool IsResizeBilinearSupported(const BackendId& backend,
-                               const TensorInfo& input,
-                               const TensorInfo& output,
-                               char* reasonIfUnsupported,
-                               size_t reasonIfUnsupportedMaxLength)
-{
-    ResizeDescriptor descriptor;
-    descriptor.m_Method = ResizeMethod::Bilinear;
-
-    const TensorShape& outputShape = output.GetShape();
-    descriptor.m_TargetWidth  = outputShape[3];
-    descriptor.m_TargetHeight = outputShape[2];
-
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsResizeSupported, input, output, descriptor);
-}
-
-bool IsRsqrtSupported(const BackendId& backend,
-                      const TensorInfo& input,
-                      const TensorInfo& output,
-                      char* reasonIfUnsupported,
-                      size_t reasonIfUnsupportedMaxLength)
-{
-    FORWARD_LAYER_SUPPORT_FUNC(backend,
-                               IsElementwiseUnarySupported,
-                               input,
-                               output,
-                               ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt));
-}
-
 bool IsSoftmaxSupported(const BackendId& backend,
                         const TensorInfo& input,
                         const TensorInfo& output,
@@ -647,18 +590,6 @@ bool IsSpaceToDepthSupported(const BackendId& backend,
                              size_t reasonIfUnsupportedMaxLength)
 {
     FORWARD_LAYER_SUPPORT_FUNC(backend, IsSpaceToDepthSupported, input, output, descriptor);
-}
-
-ARMNN_DEPRECATED_MSG("Use IsSplitterSupported with outputs instead")
-bool IsSplitterSupported(const BackendId& backend,
-                         const TensorInfo& input,
-                         const ViewsDescriptor& descriptor,
-                         char* reasonIfUnsupported,
-                         size_t reasonIfUnsupportedMaxLength)
-{
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    FORWARD_LAYER_SUPPORT_FUNC(backend, IsSplitterSupported, input, descriptor);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 bool IsSplitterSupported(const BackendId& backend,

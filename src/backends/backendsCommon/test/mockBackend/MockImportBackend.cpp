@@ -79,11 +79,6 @@ IBackendInternal::IMemoryManagerUniquePtr MockImportBackend::CreateMemoryManager
     return std::make_unique<RefMemoryManager>();
 }
 
-IBackendInternal::Optimizations MockImportBackend::GetOptimizations() const
-{
-    return Optimizations{};
-}
-
 IBackendInternal::ILayerSupportSharedPtr MockImportBackend::GetLayerSupport() const
 {
     static ILayerSupportSharedPtr layerSupport{new MockImportLayerSupport};

@@ -45,9 +45,11 @@ void QuantizeLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "QuantizeLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void QuantizeLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitQuantizeLayer(this, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } //namespace armnn

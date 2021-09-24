@@ -148,8 +148,6 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefReduceWorkload.hpp
     RefReshapeWorkload.cpp
     RefReshapeWorkload.hpp
-    RefResizeBilinearWorkload.cpp
-    RefResizeBilinearWorkload.hpp
     RefResizeWorkload.cpp
     RefResizeWorkload.hpp
     RefShapeWorkload.hpp

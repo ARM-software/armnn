@@ -40,7 +40,6 @@ public:
     IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
         const IRuntime::CreationOptions& creationOptions, IBackendProfilingPtr& backendProfiling) override;
 
-    IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 
     OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const override;

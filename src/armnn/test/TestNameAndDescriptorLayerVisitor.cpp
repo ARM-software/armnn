@@ -20,7 +20,7 @@ TEST_CASE(#testName) \
     Test##name##LayerVisitor visitor(descriptor, layerName); \
     armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer(descriptor, layerName); \
-    layer->Accept(visitor); \
+    layer->ExecuteStrategy(visitor); \
 }
 
 #define TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(name, testName) \
@@ -30,7 +30,7 @@ TEST_CASE(#testName) \
     Test##name##LayerVisitor visitor(descriptor); \
     armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer(descriptor); \
-    layer->Accept(visitor); \
+    layer->ExecuteStrategy(visitor); \
 }
 
 template<typename Descriptor> Descriptor GetDescriptor();

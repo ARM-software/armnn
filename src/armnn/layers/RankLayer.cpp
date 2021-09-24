@@ -41,10 +41,13 @@ void RankLayer::ValidateTensorShapesFromInputs()
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
     ValidateAndCopyShape(outputShape, inferredShape, m_ShapeInferenceMethod, "RankLayer");
 }
+
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void RankLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitRankLayer(this, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void RankLayer::ExecuteStrategy(IStrategy& strategy) const
 {

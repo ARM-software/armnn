@@ -35,9 +35,11 @@ void InputLayer::ValidateTensorShapesFromInputs()
                                                "InputLayer should already have the TensorInfo set.");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void InputLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitInputLayer(this, this->GetBindingId(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace

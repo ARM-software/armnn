@@ -4,6 +4,7 @@
 //
 %{
 #include "armnn/IRuntime.hpp"
+#include "armnn/Deprecated.hpp"
 #include <iostream>
 #include <ostream>
 #include <sstream>
@@ -97,25 +98,43 @@ struct CreationOptions
     ExternalProfilingOptions m_ProfilingOptions;
 };
 
+%{
+typedef armnn::INetworkProperties INetworkProperties;
+%}
+
 namespace armnn
 {
 
+%nodefaultctor INetworkProperties;
 struct INetworkProperties
 {
     %feature("docstring",
-    "
+             "
     Structure for holding network properties.
 
     Contains:
-        m_ImportEnabled (bool): Enable import.
-
-        m_ExportEnabled (bool): Enable export.
+        m_AsyncEnabled (bool): Enable asynchronous execution of multiple network.
+        m_InputSource (MemorySource): When inputs are imported this defines the type of the imported memory.
+        m_OutputSource (MemorySource): When outputs are imported this defines the type of the imported memory.
+        m_ProfilingEnabled (bool): Enable profiling.
+        ProfilingDetailsMethod (ProfilingDetailsMethod): Customize profiling details.
 
     ") INetworkProperties;
-    INetworkProperties(bool importEnabled = false, bool exportEnabled = false);
+    INetworkProperties(bool asyncEnabled,
+                       MemorySource inputSource,
+                       MemorySource outputSource,
+                       bool profilingEnabled = false,
+                       ProfilingDetailsMethod detailsMethod = ProfilingDetailsMethod::Undefined);
 
-    const bool m_ImportEnabled;
-    const bool m_ExportEnabled;
+
+    const bool m_AsyncEnabled;
+
+    const bool m_ProfilingEnabled;
+
+    const ProfilingDetailsMethod m_OutputNetworkDetailsMethod;
+
+    const MemorySource m_InputSource;
+    const MemorySource m_OutputSource;
 };
 
 %feature("docstring",
@@ -291,6 +310,28 @@ public:
         return armnn::IRuntime::CreateRaw(options);
     }
 
+}
+
+%extend INetworkProperties {
+    %feature("docstring",
+             "
+    Structure for holding network properties.
+
+            Contains:
+    m_ImportEnabled (bool): Enable import.
+
+            m_ExportEnabled (bool): Enable export.
+
+    ") INetworkProperties;
+    INetworkProperties(bool importEnabled = false, bool exportEnabled = false) {
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
+        return new INetworkProperties(importEnabled, exportEnabled);
+        ARMNN_NO_DEPRECATE_WARN_END
+    }
+    %pythonprepend INetworkProperties(bool, bool) %{
+        import warnings
+        warnings.warn("Deprecated: Use constructor with MemorySource argument instead.", DeprecationWarning)
+    %}
 }
 
 }

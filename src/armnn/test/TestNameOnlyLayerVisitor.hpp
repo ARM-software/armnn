@@ -15,12 +15,28 @@ class Test##name##LayerVisitor : public armnn::TestLayerVisitor \
 public: \
     explicit Test##name##LayerVisitor(const char* layerName = nullptr) : armnn::TestLayerVisitor(layerName) {}; \
     \
-    void Visit##name##Layer(const armnn::IConnectableLayer* layer, \
-                            const char* layerName = nullptr) override \
+    void ExecuteStrategy(const armnn::IConnectableLayer* layer, \
+                         const armnn::BaseDescriptor& descriptor, \
+                         const std::vector<armnn::ConstTensor>& constants, \
+                         const char* layerName, \
+                         const armnn::LayerBindingId id = 0) override \
     { \
-        CheckLayerPointer(layer); \
-        CheckLayerName(layerName); \
+        armnn::IgnoreUnused(descriptor, constants, id); \
+        switch (layer->GetType()) \
+        { \
+            case armnn::LayerType::name: \
+            { \
+                CheckLayerPointer(layer); \
+                CheckLayerName(layerName); \
+                break; \
+            } \
+            default: \
+            { \
+                m_DefaultStrategy.Apply(GetLayerTypeAsCString(layer->GetType())); \
+            } \
+        } \
     } \
+    \
 };
 
 } // anonymous namespace

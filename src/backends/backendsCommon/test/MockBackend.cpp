@@ -117,11 +117,6 @@ IBackendInternal::IMemoryManagerUniquePtr MockBackend::CreateMemoryManager() con
     return IMemoryManagerUniquePtr{};
 }
 
-IBackendInternal::Optimizations MockBackend::GetOptimizations() const
-{
-    return Optimizations{};
-}
-
 IBackendInternal::ILayerSupportSharedPtr MockBackend::GetLayerSupport() const
 {
     static ILayerSupportSharedPtr layerSupport{new MockLayerSupport};

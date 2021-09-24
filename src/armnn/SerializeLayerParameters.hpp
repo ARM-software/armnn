@@ -139,11 +139,6 @@ template <> struct StringifyLayerParameters<ReshapeDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const ReshapeDescriptor& desc);
 };
 
-template <> struct StringifyLayerParameters<ResizeBilinearDescriptor>
-{
-    static void Serialize(ParameterStringifyFunction& fn, const ResizeBilinearDescriptor& desc);
-};
-
 template <> struct StringifyLayerParameters<ResizeDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const ResizeDescriptor& desc);

@@ -46,11 +46,13 @@ void FakeQuantizationLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "FakeQuantizationLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void FakeQuantizationLayer::Accept(ILayerVisitor& visitor) const
 {
     IgnoreUnused(visitor);
     throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void FakeQuantizationLayer::ExecuteStrategy(IStrategy& strategy) const
 {

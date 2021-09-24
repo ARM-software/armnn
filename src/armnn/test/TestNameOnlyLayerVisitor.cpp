@@ -18,7 +18,7 @@ TEST_CASE(#testName) \
     Test##name##LayerVisitor visitor("name##Layer"); \
     armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer("name##Layer"); \
-    layer->Accept(visitor); \
+    layer->ExecuteStrategy(visitor); \
 }
 
 #define TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR(name, testName) \
@@ -27,7 +27,7 @@ TEST_CASE(#testName) \
     Test##name##LayerVisitor visitor; \
     armnn::NetworkImpl net; \
     armnn::IConnectableLayer *const layer = net.Add##name##Layer(); \
-    layer->Accept(visitor); \
+    layer->ExecuteStrategy(visitor); \
 }
 
 } // anonymous namespace

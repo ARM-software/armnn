@@ -103,11 +103,6 @@ IBackendInternal::IBackendProfilingContextPtr NeonBackend::CreateBackendProfilin
     return IBackendProfilingContextPtr{};
 }
 
-IBackendInternal::Optimizations NeonBackend::GetOptimizations() const
-{
-    return Optimizations{};
-}
-
 IBackendInternal::IBackendSpecificModelContextPtr NeonBackend::CreateBackendSpecificModelContext(
     const ModelOptions& modelOptions) const
 {

@@ -48,6 +48,7 @@ void ConvertFp32ToBf16Layer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "LayerName");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void ConvertFp32ToBf16Layer::Accept(ILayerVisitor& visitor) const
 {
     // these conversion layers are only inserted by the
@@ -55,5 +56,6 @@ void ConvertFp32ToBf16Layer::Accept(ILayerVisitor& visitor) const
     IgnoreUnused(visitor);
     throw armnn::Exception("ConvertFp32ToBf16Layer should never appear in an input graph");
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

@@ -46,9 +46,11 @@ void SoftmaxLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "SoftmaxLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void SoftmaxLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitSoftmaxLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

@@ -19,7 +19,7 @@ TEST_CASE("CheckInputLayerVisitorBindingIdAndName")
     NetworkImpl net;
 
     IConnectableLayer *const layer = net.AddInputLayer(1, layerName);
-    layer->Accept(visitor);
+    layer->ExecuteStrategy(visitor);
 }
 
 TEST_CASE("CheckInputLayerVisitorBindingIdAndNameNull")
@@ -28,7 +28,7 @@ TEST_CASE("CheckInputLayerVisitorBindingIdAndNameNull")
     NetworkImpl net;
 
     IConnectableLayer *const layer = net.AddInputLayer(1);
-    layer->Accept(visitor);
+    layer->ExecuteStrategy(visitor);
 }
 
 TEST_CASE("CheckOutputLayerVisitorBindingIdAndName")
@@ -38,7 +38,7 @@ TEST_CASE("CheckOutputLayerVisitorBindingIdAndName")
     NetworkImpl net;
 
     IConnectableLayer *const layer = net.AddOutputLayer(1, layerName);
-    layer->Accept(visitor);
+    layer->ExecuteStrategy(visitor);
 }
 
 TEST_CASE("CheckOutputLayerVisitorBindingIdAndNameNull")
@@ -47,7 +47,7 @@ TEST_CASE("CheckOutputLayerVisitorBindingIdAndNameNull")
     NetworkImpl net;
 
     IConnectableLayer *const layer = net.AddOutputLayer(1);
-    layer->Accept(visitor);
+    layer->ExecuteStrategy(visitor);
 }
 
 }

@@ -34,10 +34,6 @@ public:
                                                       const bool /*IsMemoryManaged*/) const override
     { return nullptr; }
 
-    std::unique_ptr<IWorkload> CreateAbs(const AbsQueueDescriptor& /*descriptor*/,
-                                         const WorkloadInfo& /*info*/) const override
-    { return nullptr; }
-
     std::unique_ptr<IWorkload> CreateActivation(const ActivationQueueDescriptor& /*descriptor*/,
                                                 const WorkloadInfo& /*info*/) const override
     { return nullptr; }
@@ -111,19 +107,17 @@ public:
     {
         if (descriptor.m_Parameters.m_Operation == UnaryOperation::Abs)
         {
-            AbsQueueDescriptor absDescriptor;
-            return CreateAbs(absDescriptor, info);
+            { return nullptr; }
         }
         else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Rsqrt)
         {
-            RsqrtQueueDescriptor rsqrtDescriptor;
-            return CreateRsqrt(rsqrtDescriptor, info);
+            { return nullptr; }
         }
         else if (descriptor.m_Parameters.m_Operation == UnaryOperation::LogicalNot)
         {
             return CreateLogicalUnary(descriptor, info);
         }
-        return nullptr;
+        { return nullptr; }
     }
 
     std::unique_ptr<IWorkload> CreateFakeQuantization(const FakeQuantizationQueueDescriptor& /*descriptor*/,
@@ -232,10 +226,6 @@ public:
 
     std::unique_ptr<IWorkload> CreateResize(const ResizeQueueDescriptor& /*descriptor*/,
                                             const WorkloadInfo& /*info*/) const override
-    { return nullptr; }
-
-    std::unique_ptr<IWorkload> CreateRsqrt(const RsqrtQueueDescriptor& /*descriptor*/,
-                                           const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
     std::unique_ptr<IWorkload> CreateSlice(const SliceQueueDescriptor& /*descriptor*/,

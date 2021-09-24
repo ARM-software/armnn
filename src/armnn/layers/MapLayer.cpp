@@ -41,10 +41,12 @@ void MapLayer::ValidateTensorShapesFromInputs()
     ARMNN_ASSERT(GetNumOutputSlots() == 0);
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void MapLayer::Accept(ILayerVisitor& visitor) const
 {
     IgnoreUnused(visitor);
     throw armnn::Exception("MapLayer should not appear in an input graph");
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

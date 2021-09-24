@@ -6,7 +6,6 @@
 #include "armnn/INetwork.hpp"
 #include "armnn/BackendId.hpp"
 #include "armnn/Types.hpp"
-#include "ProfilingGuid.hpp"
 #include "armnn/Optional.hpp"
 #include <fstream>
 %}
@@ -989,7 +988,7 @@ public:
                                                      const armnn::ConstTensor& weights,
                                                      armnn::ConstTensor* biases = nullptr,
                                                      const char* name = nullptr) {
-
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         if (biases) {
             return $self->AddFullyConnectedLayer(fullyConnectedDescriptor, weights,
                                                  armnn::Optional<armnn::ConstTensor>(*biases), name);
@@ -997,7 +996,7 @@ public:
             return $self->AddFullyConnectedLayer(fullyConnectedDescriptor, weights,
                                                  armnn::Optional<armnn::ConstTensor>(), name);
         }
-
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     %feature("docstring",

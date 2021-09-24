@@ -41,8 +41,10 @@ void StandInLayer::ValidateTensorShapesFromInputs()
     // so do nothing here.
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void StandInLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitStandInLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 } // namespace armnn

@@ -155,15 +155,6 @@ void SerializerStrategy::SerializeOutputLayer(const armnn::IConnectableLayer* la
     CreateAnyLayer(flatBufferOutputLayer.o, serializer::Layer::Layer_OutputLayer);
 }
 
-void SerializerStrategy::SerializeAbsLayer(const armnn::IConnectableLayer* layer, const char* name)
-{
-    IgnoreUnused(name);
-    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Abs);
-    auto flatBufferAbsLayer  = serializer::CreateAbsLayer(m_flatBufferBuilder, flatBufferBaseLayer);
-
-    CreateAnyLayer(flatBufferAbsLayer.o, serializer::Layer::Layer_AbsLayer);
-}
-
 // Build FlatBuffer for Activation Layer
 void SerializerStrategy::SerializeActivationLayer(const armnn::IConnectableLayer* layer,
                                                   const armnn::ActivationDescriptor& descriptor,
@@ -570,16 +561,6 @@ void SerializerStrategy::SerializeElementwiseUnaryLayer(const armnn::IConnectabl
     CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_ElementwiseUnaryLayer);
 }
 
-void SerializerStrategy::SerializeEqualLayer(const armnn::IConnectableLayer* layer, const char* name)
-{
-    IgnoreUnused(name);
-
-    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Equal);
-    auto fbEqualLayer = serializer::CreateEqualLayer(m_flatBufferBuilder, fbBaseLayer);
-
-    CreateAnyLayer(fbEqualLayer.o, serializer::Layer::Layer_EqualLayer);
-}
-
 void SerializerStrategy::SerializeFillLayer(const armnn::IConnectableLayer* layer,
                                        const armnn::FillDescriptor& fillDescriptor,
                                        const char* name)
@@ -617,17 +598,6 @@ void SerializerStrategy::SerializeGatherLayer(const armnn::IConnectableLayer* la
     auto flatBufferLayer   = serializer::CreateGatherLayer(m_flatBufferBuilder, fbGatherBaseLayer, fbGatherDescriptor);
 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_GatherLayer);
-}
-
-
-void SerializerStrategy::SerializeGreaterLayer(const armnn::IConnectableLayer* layer, const char* name)
-{
-    IgnoreUnused(name);
-
-    auto fbGreaterBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Greater);
-    auto fbGreaterLayer = serializer::CreateGreaterLayer(m_flatBufferBuilder, fbGreaterBaseLayer);
-
-    CreateAnyLayer(fbGreaterLayer.o, serializer::Layer::Layer_GreaterLayer);
 }
 
 void SerializerStrategy::SerializeInstanceNormalizationLayer(
@@ -874,13 +844,6 @@ void SerializerStrategy::SerializeMergeLayer(const armnn::IConnectableLayer* lay
     CreateAnyLayer(fbMergeLayer.o, serializer::Layer::Layer_MergeLayer);
 }
 
-void SerializerStrategy::SerializeMergerLayer(const armnn::IConnectableLayer* layer,
-                                         const armnn::MergerDescriptor& mergerDescriptor,
-                                         const char* name)
-{
-    SerializeConcatLayer(layer, mergerDescriptor, name);
-}
-
 void SerializerStrategy::SerializeConcatLayer(const armnn::IConnectableLayer* layer,
                                          const armnn::ConcatDescriptor& concatDescriptor,
                                          const char* name)
@@ -1034,29 +997,6 @@ void SerializerStrategy::SerializeReshapeLayer(const armnn::IConnectableLayer* l
     CreateAnyLayer(flatBufferReshapeLayer.o, serializer::Layer::Layer_ReshapeLayer);
 }
 
-void SerializerStrategy::SerializeResizeBilinearLayer(const armnn::IConnectableLayer* layer,
-                                                 const armnn::ResizeBilinearDescriptor& resizeDescriptor,
-                                                 const char* name)
-{
-    IgnoreUnused(name);
-
-    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_ResizeBilinear);
-
-    auto flatBufferDescriptor =
-        CreateResizeBilinearDescriptor(m_flatBufferBuilder,
-                                       resizeDescriptor.m_TargetWidth,
-                                       resizeDescriptor.m_TargetHeight,
-                                       GetFlatBufferDataLayout(resizeDescriptor.m_DataLayout),
-                                       resizeDescriptor.m_AlignCorners,
-                                       resizeDescriptor.m_HalfPixelCenters);
-
-    auto flatBufferLayer = serializer::CreateResizeBilinearLayer(m_flatBufferBuilder,
-                                                                 flatBufferBaseLayer,
-                                                                 flatBufferDescriptor);
-
-    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ResizeBilinearLayer);
-}
-
 void SerializerStrategy::SerializeResizeLayer(const armnn::IConnectableLayer* layer,
                                          const armnn::ResizeDescriptor& resizeDescriptor,
                                          const char* name)
@@ -1079,16 +1019,6 @@ void SerializerStrategy::SerializeResizeLayer(const armnn::IConnectableLayer* la
                                                          flatBufferDescriptor);
 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ResizeLayer);
-}
-
-void SerializerStrategy::SerializeRsqrtLayer(const armnn::IConnectableLayer* layer, const char* name)
-{
-    IgnoreUnused(name);
-
-    auto fbRsqrtBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Rsqrt);
-    auto fbRsqrtLayer     = serializer::CreateRsqrtLayer(m_flatBufferBuilder, fbRsqrtBaseLayer);
-
-    CreateAnyLayer(fbRsqrtLayer.o, serializer::Layer::Layer_RsqrtLayer);
 }
 
 void SerializerStrategy::SerializeSliceLayer(const armnn::IConnectableLayer* layer,

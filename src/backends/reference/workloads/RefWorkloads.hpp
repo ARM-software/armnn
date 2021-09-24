@@ -59,7 +59,6 @@
 #include "RefRankWorkload.hpp"
 #include "RefReduceWorkload.hpp"
 #include "RefReshapeWorkload.hpp"
-#include "RefResizeBilinearWorkload.hpp"
 #include "RefResizeWorkload.hpp"
 #include "RefShapeWorkload.hpp"
 #include "RefSliceWorkload.hpp"

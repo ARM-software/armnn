@@ -48,7 +48,6 @@ public:
     IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override;
     IBackendInternal::IBackendProfilingContextPtr CreateBackendProfilingContext(
         const IRuntime::CreationOptions&, IBackendProfilingPtr& backendProfiling) override;
-    IBackendInternal::Optimizations GetOptimizations() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport(const ModelOptions& modelOptions) const override;
 

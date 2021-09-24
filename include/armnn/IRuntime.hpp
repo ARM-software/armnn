@@ -31,7 +31,7 @@ using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
 struct INetworkProperties
 {
-    ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor with MemorySource argument")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Please use INetworkProperties constructor with MemorySource argument", "22.02")
     INetworkProperties(bool importEnabled = false,
                        bool exportEnabled = false,
                        bool asyncEnabled = false,
@@ -45,7 +45,7 @@ struct INetworkProperties
           m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
     {}
 
-    ARMNN_DEPRECATED_MSG("Please use INetworkProperties constructor without numThreads argument")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Please use INetworkProperties constructor without numThreads argument", "22.02")
     INetworkProperties(bool asyncEnabled,
                        MemorySource inputSource,
                        MemorySource outputSource,

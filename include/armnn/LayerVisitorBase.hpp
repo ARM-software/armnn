@@ -30,8 +30,6 @@ protected:
     virtual ~LayerVisitorBase() {}
 
 public:
-    void VisitAbsLayer(const IConnectableLayer*,
-                       const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitActivationLayer(const IConnectableLayer*,
                               const ActivationDescriptor&,
@@ -99,9 +97,6 @@ public:
                                     const ElementwiseUnaryDescriptor&,
                                     const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitEqualLayer(const IConnectableLayer*,
-                         const char*) override { DefaultPolicy::Apply(__func__); }
-
     void VisitFillLayer(const IConnectableLayer*,
                         const FillDescriptor&,
                         const char*) override { DefaultPolicy::Apply(__func__); }
@@ -119,16 +114,9 @@ public:
                                   const Optional<ConstTensor>&,
                                   const char*) override { DefaultPolicy::Apply(__func__); }
 
-    ARMNN_DEPRECATED_MSG("Use VisitGatherLayer with descriptor instead")
-    void VisitGatherLayer(const IConnectableLayer*,
-                          const char*) override { DefaultPolicy::Apply(__func__); }
-
     void VisitGatherLayer(const IConnectableLayer*,
                           const GatherDescriptor&,
                           const char*) override { DefaultPolicy::Apply(__func__); }
-
-    void VisitGreaterLayer(const IConnectableLayer*,
-                           const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitInputLayer(const IConnectableLayer*,
                          LayerBindingId,
@@ -164,10 +152,6 @@ public:
 
     void VisitMergeLayer(const IConnectableLayer*,
                          const char*) override { DefaultPolicy::Apply(__func__); }
-
-    void VisitMergerLayer(const IConnectableLayer*,
-                          const MergerDescriptor&,
-                          const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitMinimumLayer(const IConnectableLayer*,
                            const char*) override { DefaultPolicy::Apply(__func__); }
@@ -221,16 +205,9 @@ public:
                            const ReshapeDescriptor&,
                            const char*) override { DefaultPolicy::Apply(__func__); }
 
-    void VisitResizeBilinearLayer(const IConnectableLayer*,
-                                  const ResizeBilinearDescriptor&,
-                                  const char*) override { DefaultPolicy::Apply(__func__); }
-
     void VisitResizeLayer(const IConnectableLayer*,
                           const ResizeDescriptor&,
                           const char*) override { DefaultPolicy::Apply(__func__); }
-
-    void VisitRsqrtLayer(const IConnectableLayer*,
-                         const char*) override { DefaultPolicy::Apply(__func__); }
 
     void VisitSliceLayer(const IConnectableLayer*,
                          const SliceDescriptor&,

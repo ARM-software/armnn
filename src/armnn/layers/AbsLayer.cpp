@@ -46,9 +46,11 @@ void AbsLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "AbsLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void AbsLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitAbsLayer(this, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

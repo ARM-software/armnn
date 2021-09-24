@@ -157,15 +157,12 @@ void ValidateTensorDataType(const TensorInfo& tensor, DataType dataType,
 
 void ValidPerAxisQuantizedDataType(const TensorInfo& tensor, const std::string& descName, const std::string& tensorName)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    if (tensor.GetDataType() != DataType::QSymmS8 &&
-        tensor.GetDataType() != DataType::QuantizedSymm8PerAxis)
+    if (tensor.GetDataType() != DataType::QSymmS8)
     {
         throw InvalidArgumentException(descName +
             ": Expected data type which supports per-axis quantization scheme but got " +
             GetDataTypeName(tensor.GetDataType()) + " for " + tensorName + " tensor.");
     }
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 //---------------------------------------------------------------
@@ -362,15 +359,12 @@ void ValidateWeightDataType(const TensorInfo& inputInfo,
     const DataType inputType = inputInfo.GetDataType();
     if (IsQuantized8BitType(inputType))
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         const std::vector<DataType> validTypes =
         {
             DataType::QAsymmS8,
             DataType::QAsymmU8,
-            DataType::QSymmS8,
-            DataType::QuantizedSymm8PerAxis // deprecated
+            DataType::QSymmS8
         };
-        ARMNN_NO_DEPRECATE_WARN_END
 
         ValidateDataTypes(weightInfo, validTypes, descName);
     }

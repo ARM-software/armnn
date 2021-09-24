@@ -72,9 +72,9 @@ PyArmNN can also be built using the provided python scripts only. The advantage 
 
 *ARMNN_INCLUDE* and *ARMNN_LIB* are mandatory and should point to Arm NN includes and libraries against which you will be generating the wrappers. *SWIG_EXECUTABLE* should only be set if you have multiple versions of SWIG installed or you used a custom location for your installation:
 ```bash
-$ export SWIG_EXECUTABLE=<path_to_swig>
-$ export ARMNN_INCLUDE=<path_to_armnn_include>
-$ export ARMNN_LIB=<path_to_armnn_libraries>
+$ export SWIG_EXECUTABLE=/full/path/to/swig/executable
+$ export ARMNN_INCLUDE=/full/path/to/armnn/include:/full/path/to/armnn/profiling/common/include
+$ export ARMNN_LIB=/path/to/libs
 ```
 
 ##### 2. Clean and build SWIG wrappers:

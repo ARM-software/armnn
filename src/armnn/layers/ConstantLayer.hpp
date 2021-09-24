@@ -39,7 +39,9 @@ public:
     /// Free up the constant source data stored by the layer.
     void ReleaseConstantData() override {}
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
 
     void ExecuteStrategy(IStrategy& strategy) const override;
 

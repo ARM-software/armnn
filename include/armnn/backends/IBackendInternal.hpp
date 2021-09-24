@@ -98,25 +98,6 @@ public:
     using IMemoryManagerUniquePtr = std::unique_ptr<IMemoryManager>;
     using IMemoryManagerSharedPtr = std::shared_ptr<IMemoryManager>;
 
-    using GraphUniquePtr = std::unique_ptr<Graph>;
-    using SubgraphViewUniquePtr = std::unique_ptr<SubgraphView>;
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    using ISubGraphConverterPtr ARMNN_DEPRECATED_MSG("This type is no longer supported")
-        = std::unique_ptr<ISubGraphConverter>;
-    using SubGraphUniquePtr ARMNN_DEPRECATED_MSG("SubGraph is deprecated, use SubgraphView instead")
-        = std::unique_ptr<SubGraph>;
-
-    ARMNN_DEPRECATED_MSG("This method is no longer supported")
-    virtual ISubGraphConverterPtr CreateSubGraphConverter(const std::shared_ptr<SubGraph>& subGraph) const;
-
-    ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
-    virtual Optimizations GetOptimizations() const;
-
-    ARMNN_DEPRECATED_MSG("Use \"OptimizationViews OptimizeSubgraphView(const SubgraphView&)\" instead")
-    virtual SubGraphUniquePtr OptimizeSubGraph(const SubGraph& subGraph, bool& optimizationAttempted) const;
-    ARMNN_NO_DEPRECATE_WARN_END
-
     virtual IMemoryManagerUniquePtr CreateMemoryManager() const;
 
     virtual IWorkloadFactoryPtr CreateWorkloadFactory(
@@ -194,7 +175,7 @@ public:
     };
 
     /// Returns true if backend support the capability false otherwise
-    ARMNN_DEPRECATED_MSG("This function has been deprecated in favour of GetCapability")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated in favour of GetCapability", "22.05")
     virtual bool HasCapability(BackendCapability /*capabilityClass*/) const { return false; }
 
     /// Signals the backend to use a custom memory allocator provided by the user

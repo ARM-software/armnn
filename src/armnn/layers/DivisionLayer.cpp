@@ -32,9 +32,11 @@ DivisionLayer* DivisionLayer::Clone(Graph& graph) const
     return CloneBase<DivisionLayer>(graph, GetName());
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void DivisionLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitDivisionLayer(this, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

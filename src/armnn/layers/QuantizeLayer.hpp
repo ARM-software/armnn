@@ -23,7 +23,10 @@ public:
 
     void ValidateTensorShapesFromInputs() override;
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const override;
+    ARMNN_NO_DEPRECATE_WARN_END
+
 
 protected:
     QuantizeLayer(const char* name);

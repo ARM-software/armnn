@@ -53,9 +53,11 @@ void ReshapeLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ReshapeLayer");
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void ReshapeLayer::Accept(ILayerVisitor& visitor) const
 {
     visitor.VisitReshapeLayer(this, GetParameters(), GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

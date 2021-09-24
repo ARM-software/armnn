@@ -148,6 +148,7 @@ Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()
     return {m_Weight, m_Bias};
 }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 void DepthwiseConvolution2dLayer::Accept(ILayerVisitor& visitor) const
 {
     ManagedConstTensorHandle managedWeight(m_Weight);
@@ -163,6 +164,7 @@ void DepthwiseConvolution2dLayer::Accept(ILayerVisitor& visitor) const
 
     visitor.VisitDepthwiseConvolution2dLayer(this, GetParameters(), weightsTensor, optionalBiasTensor, GetName());
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 void DepthwiseConvolution2dLayer::ExecuteStrategy(IStrategy& strategy) const
 {

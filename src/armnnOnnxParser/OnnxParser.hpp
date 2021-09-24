@@ -113,6 +113,7 @@ private:
     void ParseAdd(const onnx::NodeProto& nodeProto);
     void ParseAveragePool(const onnx::NodeProto& nodeProto);
     void ParseBatchNormalization(const onnx::NodeProto& node);
+    void ParseConcat(const onnx::NodeProto& nodeProto);
     void ParseConstant(const onnx::NodeProto& nodeProto);
     void ParseConv(const onnx::NodeProto& nodeProto);
     void ParseFlatten(const onnx::NodeProto& node);

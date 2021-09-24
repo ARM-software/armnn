@@ -40,6 +40,9 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
 - AveragePool
   - See the ONNX [AveragePool documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#AveragePool) for more information.
 
+- Concat
+  - See the ONNX [Concat documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Concat) for more information.
+
 - Constant
   - See the ONNX [Constant documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Constant) for more information.
 

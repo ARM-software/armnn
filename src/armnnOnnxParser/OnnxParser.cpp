@@ -9,6 +9,7 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <ParserHelper.hpp>
 #include <VerificationHelpers.hpp>
 
 #include <fmt/format.h>
@@ -164,6 +165,18 @@ void ReadOptionalNodeAttributeImpl(const onnx::NodeProto& node,
             }
         }
     }
+}
+
+int ReadMandatoryNodeIntAttribute(const onnx::NodeProto& node,
+                                    const std::string& name)
+{
+    int attribValue = 0;
+    ReadMandatoryNodeAttributeImpl(node, name, onnx::AttributeProto::INT,
+                                  [&attribValue](const onnx::AttributeProto& attrValue)
+                                      {
+                                          attribValue = CHECKED_INT32(attrValue.i());
+                                      });
+    return attribValue;
 }
 
 int64_t ReadOptionalNodeInt64Attribute(const onnx::NodeProto& node,
@@ -429,7 +442,8 @@ const std::map<std::string, OnnxParserImpl::OperationParsingFunction> OnnxParser
     { "Flatten",               &OnnxParserImpl::ParseFlatten },
     { "Shape",                 &OnnxParserImpl::ParseShape },
     { "Gather",                &OnnxParserImpl::ParseGather },
-    { "Unsqueeze",             &OnnxParserImpl::ParseUnsqueeze }
+    { "Unsqueeze",             &OnnxParserImpl::ParseUnsqueeze },
+    { "Concat",                &OnnxParserImpl::ParseConcat }
 };
 
 template<typename TypePair, typename Location>
@@ -1429,6 +1443,52 @@ void OnnxParserImpl::ParseBatchNormalization(const onnx::NodeProto& node)
 
     // register the output connection
     RegisterOutputSlots(layer, {node.output(0)});
+}
+
+void OnnxParserImpl::ParseConcat(const onnx::NodeProto& node)
+{
+    CHECK_VALID_SIZE(static_cast<size_t>(node.output_size()), 1);
+
+    uint32_t numConcatView = static_cast<uint32_t>(node.input_size());
+    uint32_t inputRank = m_TensorsInfo[node.input(0)].m_info->GetNumDimensions();
+
+    int axisInt = ReadMandatoryNodeIntAttribute(node, "axis");
+
+    unsigned int concatDimInput = static_cast<unsigned int>(
+        (static_cast<int>(inputRank) + axisInt) % static_cast<int>(inputRank));
+
+    OriginsDescriptor concatDescriptor(numConcatView, inputRank);
+    concatDescriptor.SetConcatAxis(concatDimInput);
+
+    unsigned int mergeDimOrigin = 0;
+
+    std::vector<TensorShape> inputShapes;
+    std::vector<std::string> tensorIds;
+
+    for (unsigned int viewIndex = 0; viewIndex < numConcatView; ++viewIndex)
+    {
+        std::string nodeName = node.input(static_cast<int>(viewIndex));
+        auto inputTensorInfo = *m_TensorsInfo[nodeName].m_info;
+        inputShapes.push_back(inputTensorInfo.GetShape());
+        tensorIds.push_back(nodeName);
+
+        // Set up concatDescriptor view origin
+        armnnUtils::ProcessConcatInputTensorInfo(
+            inputTensorInfo, concatDescriptor, concatDimInput, viewIndex, mergeDimOrigin);
+    }
+
+    IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, node.name().c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    auto outputInfo = ComputeOutputInfo({node.output(0)}, layer, inputShapes);
+
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
+
+    // register the input connection slots for the layer, connections are made after all layers have been created
+    RegisterInputSlots(layer, tensorIds);
+
+    // register the output connection slots for the layer, connections are made after all layers have been created
+    RegisterOutputSlots(layer, { node.output(0) });
 }
 
 void OnnxParserImpl::ParseConstant(const onnx::NodeProto& node)

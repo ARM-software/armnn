@@ -756,6 +756,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnOnnxParser/test/Addition.cpp
             src/armnnOnnxParser/test/BatchNorm.cpp
             src/armnnOnnxParser/test/Clip.cpp
+            src/armnnOnnxParser/test/Concat.cpp
             src/armnnOnnxParser/test/Const.cpp
             src/armnnOnnxParser/test/Constructor.cpp
             src/armnnOnnxParser/test/Conv2D.cpp

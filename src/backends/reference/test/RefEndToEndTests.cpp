@@ -8,6 +8,7 @@
 #include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ChannelShuffleEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
@@ -513,6 +514,16 @@ TEST_CASE("RefBatchToSpaceNdEndToEndComplexUint8NCHWTest")
 TEST_CASE("RefBatchToSpaceNdEndToEndComplexQSymm16NCHWTest")
 {
     BatchToSpaceNdComplexEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NCHW);
+}
+
+TEST_CASE("RefChannelShuffleFloatTest")
+{
+    ChannelShuffleEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefChannelShuffleUint8Test")
+{
+    ChannelShuffleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
 }
 
 TEST_CASE("RefConcatEndToEndDim0Test")

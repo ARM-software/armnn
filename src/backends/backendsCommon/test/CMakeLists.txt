@@ -10,6 +10,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     BackendIdTests.cpp
     BackendProfilingTests.cpp
     BackendRegistryTests.cpp
+    ChannelShuffleEndToEndTestImpl.hpp
     ComparisonEndToEndTestImpl.hpp
     CompatibilityTests.cpp
     DefaultAsyncExecuteTest.cpp

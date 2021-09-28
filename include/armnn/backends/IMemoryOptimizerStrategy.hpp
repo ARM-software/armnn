@@ -22,8 +22,8 @@ struct MemBlock
     const unsigned int m_StartOfLife; // Y start
     const unsigned int m_EndOfLife; // Y end
 
-    const size_t m_MemSize; // X start
-    size_t m_Offset; // X end
+    const size_t m_MemSize; // Offset + Memsize = X end
+    size_t m_Offset; // X start
 
     const unsigned int m_Index; // Index to keep order
 };
@@ -40,7 +40,7 @@ struct MemBin
 // A IMemoryOptimizerStrategy must ensure that
 // 1: All MemBlocks have been assigned to a MemBin
 // 2: No MemBlock is assigned to multiple MemBins
-// 3: No two MemBlocks in a MemBin overlap in the X dimension
+// 3: No two Memblocks in a MemBin overlap in both the X and Y axis
 //    (a strategy cannot change the y axis or length of a MemBlock)
 class IMemoryOptimizerStrategy
 {

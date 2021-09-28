@@ -21,7 +21,7 @@ MemBlockStrategyType ConstLayerMemoryOptimizerStrategy::GetMemBlockStrategyType(
 // A IMemoryOptimizerStrategy must ensure that
 // 1: All MemBlocks have been assigned to a MemBin
 // 2: No MemBlock is assigned to multiple MemBins
-// 3: No two MemBlocks in a MemBin overlap in the X dimension
+// 3: No two Memblocks in a MemBin overlap in both the X and Y axis
 std::vector<MemBin> ConstLayerMemoryOptimizerStrategy::Optimize(std::vector<MemBlock>& memBlocks)
 {
     std::vector<MemBin> memBins;

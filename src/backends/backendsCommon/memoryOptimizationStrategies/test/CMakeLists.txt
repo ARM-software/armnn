@@ -5,6 +5,7 @@
 
 list(APPEND armnnMemoryOptimizationStrategiesUnitTests_sources
      ConstLayerMemoryOptimizerStrategyTests.cpp
+     MemoryOptimizerStrategyValidatorTests.cpp
 )
 
 add_library(armnnMemoryOptimizationStrategiesUnitTests OBJECT ${armnnMemoryOptimizationStrategiesUnitTests_sources})

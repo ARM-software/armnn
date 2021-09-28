@@ -6,6 +6,8 @@
 list(APPEND armnnMemoryOptimizationStrategies_sources
      ConstLayerMemoryOptimizerStrategy.hpp
      ConstLayerMemoryOptimizerStrategy.cpp
+     MemoryOptimizerStrategyValidator.hpp
+     MemoryOptimizerStrategyValidator.cpp
 )
 
 if(BUILD_UNIT_TESTS)

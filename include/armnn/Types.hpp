@@ -212,12 +212,12 @@ enum class MemorySource : uint32_t
 
 enum class MemBlockStrategyType
 {
-    // MemBlocks can be packed on the Y axis only.
+    // MemBlocks can be packed on the Y axis only, overlap allowed on X axis.
     // In other words MemBlocks with overlapping lifetimes cannot use the same MemBin,
     // equivalent to blob or pooling memory management.
     SingleAxisPacking  = 0,
 
-    // MemBlocks can be packed on the Y and X axis.
+    // MemBlocks can be packed on either Y or X axis but cannot overlap on both.
     // In other words MemBlocks with overlapping lifetimes can use the same MemBin,
     // equivalent to offset or slab memory management.
     MultiAxisPacking  = 1

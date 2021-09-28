@@ -4,6 +4,7 @@
 //
 
 #include <backendsCommon/memoryOptimizationStrategies/ConstLayerMemoryOptimizerStrategy.hpp>
+#include <backendsCommon/memoryOptimizationStrategies/MemoryOptimizerStrategyValidator.hpp>
 
 #include <doctest/doctest.h>
 #include <vector>
@@ -46,6 +47,31 @@ TEST_CASE("ConstLayerMemoryOptimizerStrategyTest")
     CHECK(memBins[4].m_MemBlocks[0].m_Offset == 0);
     CHECK(memBins[4].m_MemBlocks[0].m_MemSize == 5);
     CHECK(memBins[4].m_MemBlocks[0].m_Index == 4);
+}
+
+TEST_CASE("ConstLayerMemoryOptimizerStrategyValidatorTest")
+{
+    // create a few memory blocks
+    MemBlock memBlock0(0, 2, 20, 0, 0);
+    MemBlock memBlock1(2, 3, 10, 20, 1);
+    MemBlock memBlock2(3, 5, 15, 30, 2);
+    MemBlock memBlock3(5, 6, 20, 50, 3);
+    MemBlock memBlock4(7, 8, 5, 70, 4);
+
+    std::vector<MemBlock> memBlocks;
+    memBlocks.reserve(5);
+    memBlocks.push_back(memBlock0);
+    memBlocks.push_back(memBlock1);
+    memBlocks.push_back(memBlock2);
+    memBlocks.push_back(memBlock3);
+    memBlocks.push_back(memBlock4);
+
+    // Optimize the memory blocks with ConstLayerMemoryOptimizerStrategy
+    ConstLayerMemoryOptimizerStrategy constLayerMemoryOptimizerStrategy;
+    auto ptr = std::make_shared<ConstLayerMemoryOptimizerStrategy>(constLayerMemoryOptimizerStrategy);
+    MemoryOptimizerValidator validator(std::move(ptr));
+    // Ensure ConstLayerMemoryOptimizerStrategy is valid
+    CHECK(validator.Validate(memBlocks));
 }
 
 }

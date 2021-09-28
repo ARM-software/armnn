@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="93d6cf0028aea111f624b320027576a26354e998" #Decouple logging flag from debug and assert flags
+DEFAULT_CLFRAMEWORKREVISION="a71711008dad9a786a66dcd734b19cb102d65ec5" #Generate  an operator configuration file from a list of tflite models
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

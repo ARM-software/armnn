@@ -67,7 +67,7 @@ if(NOT ARMNN_SUB_PROJECT)
 endif()
 target_link_libraries(armnnDelegate PUBLIC Armnn::Armnn)
 
-## Add TfLite v2.3.1 dependency
+## Add TfLite dependency
 find_package(TfLiteSrc REQUIRED MODULE)
 find_package(TfLite REQUIRED MODULE)
 

@@ -16,6 +16,7 @@
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
 #include <tensorflow/lite/minimal_logging.h>
+#include <tensorflow/lite/version.h>
 
 #include "tensorflow/lite/kernels/kernel_util.h"
 
@@ -294,7 +295,12 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
             activationDesc.m_Function = armnn::ActivationFunction::ReLu;
             break;
         }
+// The name of kTfLiteActRelu1 changed after TF Lite v2.3
+#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 3)
+        case kTfLiteActReluN1To1:
+#else
         case kTfLiteActRelu1:
+#endif
         {
             activationDesc.m_Function = armnn::ActivationFunction::BoundedReLu;
             activationDesc.m_A = 1.0f;

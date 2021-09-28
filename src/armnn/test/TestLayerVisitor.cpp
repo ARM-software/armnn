@@ -75,11 +75,11 @@ void TestLayerVisitor::CheckConstTensorPtrs(const std::string& name,
 {
     if (expected == nullptr)
     {
-        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+        CHECK_MESSAGE(actual == nullptr, (name + " actual should have been a nullptr"));
     }
     else
     {
-        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        CHECK_MESSAGE(actual != nullptr, (name + " actual should have been set"));
         if (actual != nullptr)
         {
             CheckConstTensors(*expected, *actual);
@@ -93,11 +93,11 @@ void TestLayerVisitor::CheckConstTensorPtrs(const std::string& name,
 {
     if (expected == nullptr)
     {
-        CHECK_MESSAGE(actual == nullptr, name + " actual should have been a nullptr");
+        CHECK_MESSAGE(actual == nullptr, (name + " actual should have been a nullptr"));
     }
     else
     {
-        CHECK_MESSAGE(actual != nullptr, name + " actual should have been set");
+        CHECK_MESSAGE(actual != nullptr, (name + " actual should have been set"));
         if (actual != nullptr)
         {
             CheckConstTensors(*expected, *actual);

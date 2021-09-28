@@ -68,7 +68,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
             }
             catch (std::invalid_argument const&)
             {
-                FAIL("Could not convert measurements to double: " + numberString);
+                FAIL(("Could not convert measurements to double: " + numberString));
             }
 
             numberString.clear();
@@ -83,7 +83,7 @@ std::vector<double> ExtractMeasurements(const std::string& exp)
             }
             catch (std::invalid_argument const&)
             {
-                FAIL("Could not convert measurements to double: " + numberString);
+                FAIL(("Could not convert measurements to double: " + numberString));
             }
             numberString.clear();
         }

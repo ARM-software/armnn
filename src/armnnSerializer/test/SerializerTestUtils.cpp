@@ -75,24 +75,24 @@ void LayerVerifierBase::VerifyConstTensors(const std::string& tensorName,
 {
     if (expectedPtr == nullptr)
     {
-        CHECK_MESSAGE(actualPtr == nullptr, tensorName + " should not exist");
+        CHECK_MESSAGE(actualPtr == nullptr, (tensorName + " should not exist"));
     }
     else
     {
-        CHECK_MESSAGE(actualPtr != nullptr, tensorName + " should have been set");
+        CHECK_MESSAGE(actualPtr != nullptr, (tensorName + " should have been set"));
         if (actualPtr != nullptr)
         {
             const armnn::TensorInfo& expectedInfo = expectedPtr->GetInfo();
             const armnn::TensorInfo& actualInfo = actualPtr->GetInfo();
 
             CHECK_MESSAGE(expectedInfo.GetShape() == actualInfo.GetShape(),
-                                tensorName + " shapes don't match");
+                          (tensorName + " shapes don't match"));
             CHECK_MESSAGE(
                     GetDataTypeName(expectedInfo.GetDataType()) == GetDataTypeName(actualInfo.GetDataType()),
-                    tensorName + " data types don't match");
+                    (tensorName + " data types don't match"));
 
             CHECK_MESSAGE(expectedPtr->GetNumBytes() == actualPtr->GetNumBytes(),
-                                tensorName + " (GetNumBytes) data sizes do not match");
+                          (tensorName + " (GetNumBytes) data sizes do not match"));
             if (expectedPtr->GetNumBytes() == actualPtr->GetNumBytes())
             {
                 //check the data is identical
@@ -107,7 +107,7 @@ void LayerVerifierBase::VerifyConstTensors(const std::string& tensorName,
                         break;
                     }
                 }
-                CHECK_MESSAGE(same, tensorName + " data does not match");
+                CHECK_MESSAGE(same, (tensorName + " data does not match"));
             }
         }
     }

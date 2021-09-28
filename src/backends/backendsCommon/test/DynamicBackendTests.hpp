@@ -146,7 +146,7 @@ std::string GetBasePath(const std::string& basePath)
     // This is the base path from the build where the test libraries were built.
     path sharedObjectPath = programLocation.append(basePath);
     REQUIRE_MESSAGE(exists(sharedObjectPath),
-                    "Base path for shared objects does not exist: " + sharedObjectPath.string());
+                    ("Base path for shared objects does not exist: " + sharedObjectPath.string()));
     return sharedObjectPath.string();
 }
 
@@ -385,7 +385,7 @@ void CreateValidDynamicBackendObjectTestImpl()
 
     // We expect this path to exists so we can load a valid dynamic backend.
     CHECK_MESSAGE(fs::exists(testSubDirectory),
-                       "Base path for shared objects does not exist: " + testSubDirectory);
+                  ("Base path for shared objects does not exist: " + testSubDirectory));
 
     std::string sharedObjectFilePath = GetTestFilePath(testSubDirectory, g_TestValidTestDynamicBackendFileName);
 

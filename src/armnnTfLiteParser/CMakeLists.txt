@@ -31,10 +31,13 @@ if(BUILD_TF_LITE_PARSER)
     target_include_directories(tflite_version_headers INTERFACE $<BUILD_INTERFACE:${TfLite_INCLUDE_DIR}>
                                                                 $<INSTALL_INTERFACE:include/tflite_version_headers>)
 
-    target_compile_options(tflite_version_headers INTERFACE -Wno-conversion
-                                                            -Wno-sign-conversion
-                                                            -Wno-unused-parameter
-                                                            -Wno-unused-function)
+    if(COMPILER_IS_GNU_LIKE)
+        target_compile_options(tflite_version_headers INTERFACE -Wno-conversion
+                                                                -Wno-sign-conversion
+                                                                -Wno-unused-parameter
+                                                                -Wno-unused-function)
+    endif()
+                                                            
 
     # If user has explicitly specified flatbuffers lib then use that,
     # otherwise search for it based on FLATBUFFERS_BUILD_DIR

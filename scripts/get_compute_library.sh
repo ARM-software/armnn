@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a71711008dad9a786a66dcd734b19cb102d65ec5" #Generate  an operator configuration file from a list of tflite models
+DEFAULT_CLFRAMEWORKREVISION="2e53f17f4f3c9179455c05d49a47a236067e00c0" #Provide logging for configure functions in all gpu operators
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

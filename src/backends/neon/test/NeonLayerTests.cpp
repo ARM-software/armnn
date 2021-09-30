@@ -1422,6 +1422,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(CastFloatToUInt8, CastFloat32ToUInt82dTest)
 // ChannelShuffle
 ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle4DFloat32, ChannelShuffle4DTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle4DQAsymmU8, ChannelShuffle4DTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ChannelShuffle4DQAsymmS8, ChannelShuffle4DTest<DataType::QAsymmS8>)
 
 #if defined(ARMNNREF_ENABLED)
 

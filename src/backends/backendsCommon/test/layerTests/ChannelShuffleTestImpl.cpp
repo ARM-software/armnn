@@ -244,6 +244,12 @@ SimpleChannelShuffleTest<armnn::DataType::QAsymmU8>(
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+SimpleChannelShuffleTest<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 2>
 ChannelShuffle2DTest<armnn::DataType::Float32>(
     armnn::IWorkloadFactory& workloadFactory,
@@ -252,6 +258,12 @@ ChannelShuffle2DTest<armnn::DataType::Float32>(
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 2>
 ChannelShuffle2DTest<armnn::DataType::QAsymmU8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 2>
+ChannelShuffle2DTest<armnn::DataType::QAsymmS8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
@@ -267,3 +279,9 @@ ChannelShuffle4DTest<armnn::DataType::QAsymmU8>(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+ChannelShuffle4DTest<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2e53f17f4f3c9179455c05d49a47a236067e00c0" #Provide logging for configure functions in all gpu operators
+DEFAULT_CLFRAMEWORKREVISION="63e0beb9fb9646407d123e830165546e9129e95d" #Add support for non-constant weights and biases in CpuFullyConnected
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

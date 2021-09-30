@@ -120,12 +120,16 @@ private:
     void ParseConv(const onnx::NodeProto& nodeProto);
     void ParseFlatten(const onnx::NodeProto& node);
     void ParseGather(const onnx::NodeProto& node);
+    void ParseGemm(const onnx::NodeProto& node);
     void ParseGlobalAveragePool(const onnx::NodeProto& node);
     void ParseMaxPool(const onnx::NodeProto& nodeProto);
     void ParseShape(const onnx::NodeProto& node);
     void ParseReshape(const onnx::NodeProto& nodeProto);
     void ParseUnsqueeze(const onnx::NodeProto& nodeProto);
 
+    void RegisterInputSlot(armnn::IConnectableLayer* layer,
+                           const std::string& tensorId,
+                           unsigned int slotIndex);
     void RegisterInputSlots(armnn::IConnectableLayer* layer, const std::vector<std::string>& tensorIndexes);
     void RegisterOutputSlots(armnn::IConnectableLayer* layer, const std::vector<std::string>& tensorIndexes);
 

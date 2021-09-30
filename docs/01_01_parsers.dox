@@ -88,6 +88,8 @@ The Arm NN SDK ONNX parser currently only supports fp32 operators.
   - The parser only supports 2D convolutions with a group = 1 or group = #Nb_of_channel (depthwise convolution)
 - BatchNormalization
   - The parser does not support training mode. See the ONNX [BatchNormalization documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#BatchNormalization) for more information.
+- Gemm
+  - The parser only supports constant bias or non-constant bias where bias dimension = 1. See the ONNX [Gemm documentation](https://github.com/onnx/onnx/blob/master/docs/Operators.md#Gemm) for more information.
 - MatMul
   - The parser only supports constant weights in a fully connected layer.
 

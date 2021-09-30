@@ -434,7 +434,8 @@ const std::map<std::string, OnnxParserImpl::OperationParsingFunction> OnnxParser
     { "Shape",                 &OnnxParserImpl::ParseShape },
     { "Gather",                &OnnxParserImpl::ParseGather },
     { "Unsqueeze",             &OnnxParserImpl::ParseUnsqueeze },
-    { "Concat",                &OnnxParserImpl::ParseConcat }
+    { "Concat",                &OnnxParserImpl::ParseConcat },
+    { "Gemm",                  &OnnxParserImpl::ParseGemm }
 };
 
 template<typename TypePair, typename Location>
@@ -1800,6 +1801,175 @@ void OnnxParserImpl::ParseGather(const onnx::NodeProto& node)
     RegisterOutputSlots(layer, { node.output(0) });
 }
 
+void OnnxParserImpl::ParseGemm(const onnx::NodeProto& node)
+{
+    CHECK_VALID_SIZE(static_cast<size_t>(node.input_size()), 2, 3);
+    CHECK_VALID_SIZE(static_cast<size_t>(node.output_size()), 1);
+
+    int transA = static_cast<int>(ReadOptionalNodeUint32Attribute(node, "transA", 0));
+    int transB = static_cast<int>(ReadOptionalNodeUint32Attribute(node, "transB", 0));
+    float alpha = ReadOptionalNodeFloatAttribute(node, "alpha", 1.0);
+    float beta = ReadOptionalNodeFloatAttribute(node, "beta", 1.0);
+    bool biasEnabled = node.input_size() == 3;
+
+    TensorShape input0Shape = m_TensorsInfo[node.input(0)].m_info->GetShape();
+    TensorShape input1Shape = m_TensorsInfo[node.input(1)].m_info->GetShape();
+
+    // if transB != 0, add transpose to the input1 (tanspose weight matrix in FullyConnected)
+    armnn::FullyConnectedDescriptor fullyConnectedDescriptor;
+    fullyConnectedDescriptor.m_BiasEnabled = biasEnabled;
+    fullyConnectedDescriptor.m_TransposeWeightMatrix = transB;
+
+    IConnectableLayer* layer = nullptr;
+
+    // Just add a FullyConnected layer, weights and biases are handled as inputs now.
+    layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor, node.name().c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    // if transA != 0, add transpose to the input0
+    if (transA != 0)
+    {
+        std::string transAName = "transpose_" + node.input(0);
+        armnn::TransposeDescriptor transposeADescriptor;
+        transposeADescriptor.m_DimMappings = { 1, 0 };
+        IConnectableLayer* transALayer = m_Network->AddTransposeLayer(transposeADescriptor, transAName.c_str());
+        ARMNN_ASSERT(transALayer != nullptr);
+        auto transAInfo = ComputeOutputInfo({ transAName }, transALayer, { input0Shape });
+        transALayer->GetOutputSlot(0).SetTensorInfo(transAInfo[0]);
+        transALayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
+        // register the input connection slots for the layer, connections are made after all layers have been created
+        RegisterInputSlot(transALayer, node.input(0), 0);
+        input0Shape = transAInfo[0].GetShape();
+    }
+    else
+    {
+        RegisterInputSlot(layer, node.input(0), 0);
+    }
+
+    // Add constant layer to store weights/biases and connect to FullyConnected layer.
+    if(m_TensorsInfo[node.input(1)].isConstant())
+    {
+        IConnectableLayer* weightsLayer = m_Network->AddConstantLayer(CreateConstTensor(node.input(1)).first);
+        TensorInfo weightInfo = *m_TensorsInfo[node.input(1)].m_info;
+        weightInfo.SetConstant();
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightInfo);
+
+        // if alpha != 1, multiply to the weight
+        if (alpha != 1)
+        {
+            std::string activationName = "activation_" + node.input(1);
+            armnn::ActivationDescriptor activationDescriptor;
+            activationDescriptor.m_A = alpha;
+            activationDescriptor.m_Function = ActivationFunction::Linear;
+            IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
+            ARMNN_ASSERT(actLayer != nullptr);
+
+            auto actInfo = ComputeOutputInfo({ activationName }, actLayer, { weightInfo.GetShape() });
+            actLayer->GetOutputSlot(0).SetTensorInfo(actInfo[0]);
+            actLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+            weightsLayer->GetOutputSlot(0).Connect(actLayer->GetInputSlot(0u));
+            input1Shape = actInfo[0].GetShape();
+        }
+        else
+        {
+            weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+            input1Shape = weightInfo.GetShape();
+        }
+    }
+    else
+    {
+        // if alpha != 1, multiply to the weight
+        if (alpha != 1)
+        {
+            std::string activationName = "activation_" + node.input(1);
+            armnn::ActivationDescriptor activationDescriptor;
+            activationDescriptor.m_A = alpha;
+            activationDescriptor.m_Function = ActivationFunction::Linear;
+            IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
+            ARMNN_ASSERT(actLayer != nullptr);
+
+            auto actInfo = ComputeOutputInfo({ activationName }, actLayer, { input1Shape });
+            actLayer->GetOutputSlot(0).SetTensorInfo(actInfo[0]);
+            actLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+            RegisterInputSlot(actLayer, node.input(1), 0);
+            input1Shape = actInfo[0].GetShape();
+        }
+        else
+        {
+            RegisterInputSlot(layer, node.input(1), 1);
+        }
+    }
+
+    if(biasEnabled && m_TensorsInfo[node.input(2)].isConstant())
+    {
+        To1DTensor(node.input(2), CHECK_LOCATION());
+        IConnectableLayer* biasLayer = m_Network->AddConstantLayer(CreateConstTensor(node.input(2)).first);
+        TensorInfo biasInfo = *m_TensorsInfo[node.input(2)].m_info;
+        biasInfo.SetConstant();
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biasInfo);
+
+        // if beta != 1, multiply to the bias
+        if (beta != 1)
+        {
+            std::string activationName = "activation_" + node.input(2);
+            armnn::ActivationDescriptor activationDescriptor;
+            activationDescriptor.m_A = beta;
+            activationDescriptor.m_Function = ActivationFunction::Linear;
+            IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
+            ARMNN_ASSERT(actLayer != nullptr);
+
+            auto actInfo = ComputeOutputInfo({ activationName }, actLayer, { biasInfo.GetShape() });
+            actLayer->GetOutputSlot(0).SetTensorInfo(actInfo[0]);
+            actLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+            biasLayer->GetOutputSlot(0).Connect(actLayer->GetInputSlot(0u));
+        }
+        else
+        {
+            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+        }
+    }
+    else if (biasEnabled)
+    {
+        // Currently we support non-constant tensor of input C (bias) of Gemm when the dimension is 1
+        if (m_TensorsInfo[node.input(2)].m_info->GetNumDimensions() != 1)
+        {
+            throw ParseException(fmt::format("The parser supports constant or non-constant with 1 dimension for "
+                                             "Input C of Gemm. Input '{}' in '{}' is not supported '{}'",
+                                             node.input(2),
+                                             node.name(),
+                                             CHECK_LOCATION().AsString()));
+        }
+        // if beta != 1, multiply to the bias
+        if (beta != 1)
+        {
+            std::string activationName = "activation_" + node.input(2);
+            armnn::ActivationDescriptor activationDescriptor;
+            activationDescriptor.m_A = beta;
+            activationDescriptor.m_Function = ActivationFunction::Linear;
+            IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
+            ARMNN_ASSERT(actLayer != nullptr);
+
+            auto actInfo = ComputeOutputInfo({ activationName },
+                                             actLayer,
+                                             { m_TensorsInfo[node.input(2)].m_info->GetShape() });
+            actLayer->GetOutputSlot(0).SetTensorInfo(actInfo[0]);
+            actLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+            RegisterInputSlot(actLayer, node.input(2), 0);
+        }
+        else
+        {
+            RegisterInputSlot(layer, node.input(2), 2);
+        }
+    }
+
+    // Set final output of the FullyConnected layer
+    auto outputInfo = ComputeOutputInfo({ node.output(0) }, layer,
+                                        { input0Shape, input1Shape });
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
+
+    RegisterOutputSlots(layer, {node.output(0)});
+}
+
 void OnnxParserImpl::ParseGlobalAveragePool(const onnx::NodeProto& node)
 {
     Pooling2dDescriptor desc = Pooling2dDescriptor();
@@ -2029,6 +2199,22 @@ void OnnxParserImpl::SetupOutputLayers()
 
         RegisterInputSlots(layer, { m_Graph->output(outputIndex).name() });
     }
+}
+
+void OnnxParserImpl::RegisterInputSlot(IConnectableLayer* layer,
+                                       const std::string& tensorId,
+                                       unsigned int slotIndex)
+{
+    armnn::IInputSlot* slot = &(layer->GetInputSlot(slotIndex));
+
+    auto it = m_TensorConnections.find(tensorId);
+
+    if (it == m_TensorConnections.end())
+    {
+        //First time seing this tensor, we need to map it
+        m_TensorConnections[tensorId] = TensorSlots();
+    }
+    m_TensorConnections[tensorId].inputSlots.push_back(slot);
 }
 
 void OnnxParserImpl::RegisterInputSlots(IConnectableLayer* layer, const std::vector<std::string>& tensorIds)

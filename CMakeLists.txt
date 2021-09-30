@@ -766,6 +766,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnOnnxParser/test/Flatten.cpp
             src/armnnOnnxParser/test/FullyConnected.cpp
             src/armnnOnnxParser/test/Gather.cpp
+            src/armnnOnnxParser/test/Gemm.cpp
             src/armnnOnnxParser/test/GetInputsOutputs.cpp
             src/armnnOnnxParser/test/OnnxParserTestUtils.cpp
             src/armnnOnnxParser/test/OnnxParserTestUtils.hpp

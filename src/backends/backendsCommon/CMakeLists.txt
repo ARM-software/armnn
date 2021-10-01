@@ -1,11 +1,9 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 list(APPEND armnnBackendsCommon_sources
-    TensorHandle.cpp
-    TensorHandle.hpp
     DynamicBackend.cpp
     DynamicBackend.hpp
     DynamicBackendUtils.cpp
@@ -29,10 +27,14 @@ list(APPEND armnnBackendsCommon_sources
     MemoryOptimizerStrategyFactory.hpp
     MemoryOptimizerStrategyLibrary.cpp
     MemoryOptimizerStrategyLibrary.hpp
+    MemoryManager.cpp
+    MemoryManager.hpp
     MemSyncWorkload.cpp
     MemSyncWorkload.hpp
     OptimizationViews.cpp
     OptimizationViews.hpp
+    TensorHandle.cpp
+    TensorHandle.hpp
     TensorHandleFactoryRegistry.cpp
     TensorHandleFactoryRegistry.hpp
     UnmapWorkload.cpp

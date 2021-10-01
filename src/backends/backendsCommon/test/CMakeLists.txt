@@ -13,6 +13,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ChannelShuffleEndToEndTestImpl.hpp
     ComparisonEndToEndTestImpl.hpp
     CompatibilityTests.cpp
+    ConcatEndToEndTestImpl.hpp
     Convolution3dEndToEndTestImpl.hpp
     CustomMemoryOptimizerStrategyTests.cpp
     DefaultAsyncExecuteTest.cpp
@@ -35,7 +36,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     LayerTests.hpp
     LogSoftmaxEndToEndTestImpl.cpp
     LogSoftmaxEndToEndTestImpl.hpp
-    ConcatEndToEndTestImpl.hpp
+    MemoryManagerTests.cpp
     MockBackend.cpp
     MockBackend.hpp
     MockBackendId.hpp

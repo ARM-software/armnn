@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include <mutex>
-
 namespace armnn
 {
 
@@ -26,23 +24,20 @@ public:
     virtual NetworkId GetNetworkId() = 0;
 
     /// Allocate the backing memory required for execution. If this is not called, then allocation will be
-    /// deferred to execution time. The mutex must be locked.
+    /// deferred to execution time.
     virtual void Allocate() = 0;
 
-    /// Free the backing memory required for execution. The mutex must be locked.
+    /// Free the backing memory required for execution.
     virtual void Free() = 0;
 
-    /// IsAllocated returns true if the backing memory is currently allocated. The mutex must be locked.
+    /// IsAllocated returns true if the backing memory is currently allocated.
     virtual bool IsAllocated() = 0;
 
-    /// Get a mutex which can be used for synchronizing access to the WorkingMemHandle object.
-    virtual std::mutex& GetMutex() = 0;
-
-    /// Get the WorkingMemDescriptor for a Layer. The mutex must be locked.
+    /// Get the WorkingMemDescriptor for a Layer.
     virtual WorkingMemDescriptor& GetWorkingMemDescriptor(LayerGuid id) = 0;
 
     /// Get the WorkingMemDescriptor at an index. The WorkingMemDescriptors are stored in the same order as
-    /// the Workloads in a topologically sorted graph. The mutex must be locked.
+    /// the Workloads in a topologically sorted graph.
     virtual WorkingMemDescriptor& GetWorkingMemDescriptorAt(unsigned int id) = 0;
 };
 

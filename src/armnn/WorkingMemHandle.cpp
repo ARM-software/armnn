@@ -7,6 +7,7 @@
 #include "WorkingMemHandle.hpp"
 #include "Network.hpp"
 #include <armnn/backends/IMemoryManager.hpp>
+#include <fmt/format.h>
 
 namespace armnn
 {
@@ -15,8 +16,8 @@ namespace experimental
 {
 
 WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
-        std::vector<std::pair<LayerBindingId, LayerGuid>> inputHandles,
-        std::vector<InputConnectionInfo> inputConnections,
+        std::vector<InputMemDescriptorCoords> inputLayerInfo,
+        std::vector<OutputMemDescriptorCoords> ouputLayerInfo,
         std::vector<WorkingMemDescriptor> workingMemDescriptors,
         std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap,
         std::vector<std::shared_ptr<IMemoryManager>> memoryManagers,
@@ -26,39 +27,66 @@ WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
     , m_WorkingMemDescriptorMap(workingMemDescriptorMap)
     , m_MemoryManagers(memoryManagers)
     , m_OwnedTensorHandles(std::move(ownedTensorHandles))
+    , m_BindingIdVec(inputLayerInfo.size() + ouputLayerInfo.size())
+    , m_InputSize(numeric_cast<DifferenceType>(inputLayerInfo.size()))
     , m_IsAllocated(false)
-    , m_Mutex()
 {
-    unsigned int maxInputBindingId = 0;
-    for (auto pair : inputHandles)
+    for (const auto& inputInfo : inputLayerInfo)
     {
-        unsigned int bindingId = numeric_cast<unsigned int>(pair.first);
-        if (maxInputBindingId < bindingId)
+        m_InputValidationMap[inputInfo.m_LayerBindingId] = false;
+
+        // Map the LayerBindingIds to the corresponding input ITensorHandle*
+        auto memDesc = m_WorkingMemDescriptors.at(inputInfo.m_InputSlotCoords[0].first);
+        ITensorHandle* inputTensorHandle = memDesc.m_Inputs[inputInfo.m_InputSlotCoords[0].second];
+        m_InputHandleMap[inputInfo.m_LayerBindingId] = inputTensorHandle;
+
+        // For every input we need to store all locations from which that input's ITensorHandle* is read.
+        // So we can, at a later point, swap in and out the ITensorHandle* at that location.
+        for (auto inputSlot : inputInfo.m_InputSlotCoords)
         {
-            maxInputBindingId = bindingId;
+            WorkingMemDescriptor& workingMemDescriptor = m_WorkingMemDescriptors.at(inputSlot.first);
+
+            auto inputPos = workingMemDescriptor.m_Inputs.begin();
+
+            // The DifferenceType of a vector can be unsigned int or signed int depending on the std implementation
+            // This cast removes any conversion warnings
+            inputPos += numeric_cast<DifferenceType>(inputSlot.second);
+            m_InputConnectionMap[inputInfo.m_LayerBindingId].push_back(inputPos);
+        }
+    }
+
+    for (const auto& outputInfo : ouputLayerInfo)
+    {
+        for (auto bindingId : outputInfo.m_LayerBindingIds)
+        {
+            m_OutputValidationMap[bindingId] = false;
+
+            // Store the outputSlot position of the tensorhandle
+            auto outputPos = m_WorkingMemDescriptors.at(outputInfo.m_OutputSlotCoords.first).m_Outputs.begin();
+            outputPos += numeric_cast<DifferenceType>(outputInfo.m_OutputSlotCoords.second);
+
+            m_OutputHandleMap[bindingId] = *outputPos;
         }
 
-    }
+        // More than one layerBinding id means the tensorhandle is connected to more than one OutputLayer.
+        // Importing in this case would likely cause unexpected behaviour, so we disallow it.
+        if (outputInfo.m_LayerBindingIds.size() != 1)
+        {
+            continue;
+        }
 
-    // Create a map of LayerBindingIds to the corresponding input ITensorHandle*
-    for (auto pair : inputHandles)
-    {
-        m_InputHandleMap[pair.first] = m_WorkingMemDescriptorMap.at(pair.second).m_Outputs[0];
-        m_ValidationMap[pair.first] = false;
-    }
+        // Store the inputSlot positions of the tensorhandle
+        for (auto outputSlot : outputInfo.m_InputSlotCoords)
+        {
+            WorkingMemDescriptor& workingMemDescriptor = m_WorkingMemDescriptors.at(outputSlot.first);
 
-    // For every input we need to store all locations from which that input's ITensorHandle* is read.
-    // So we can, at a later point, swap in and out the ITensorHandle* at that location.
-    for (auto inputConnectionInfo : inputConnections)
-    {
-        WorkingMemDescriptor& workingMemDescriptor = m_WorkingMemDescriptors[inputConnectionInfo.m_DescriptorIndex];
+            auto inputPos = workingMemDescriptor.m_Inputs.begin();
 
-        auto pos = workingMemDescriptor.m_Inputs.begin();
-        // The difference_type of a vector can be unsigned int or signed int depending on the std implementation
-        // This cast removes any conversion warnings
-        pos += numeric_cast<std::vector<ITensorHandle*>::difference_type>(inputConnectionInfo.m_InputIndex);
-
-        m_InputConnectionMap[inputConnectionInfo.m_LayerBindingId].push_back(pos);
+            // The DifferenceType of a vector can be unsigned int or signed int depending on the std implementation
+            // This cast removes any conversion warnings
+            inputPos += numeric_cast<DifferenceType>(outputSlot.second);
+            m_OutputConnectionMap[outputInfo.m_LayerBindingIds[0]].push_back(inputPos);
+        }
     }
 }
 
@@ -88,6 +116,74 @@ void WorkingMemHandle::Free()
     {
         mgr->Release();
     }
+}
+
+void WorkingMemHandle::MemSyncOutputs()
+{
+    for (auto output : m_OutputConnectionMap)
+    {
+        (*output.second[0])->Map(true);
+        (*output.second[0])->Unmap();
+    }
+}
+
+void WorkingMemHandle::ValidateBindingIds()
+{
+    auto resetInputValidationMap = [&]()
+    {
+        for (auto& pair: m_InputValidationMap)
+        {
+            pair.second = false;
+        }
+    };
+
+    auto resetOutputValidationMap = [&]()
+    {
+        for (auto& pair: m_OutputValidationMap)
+        {
+            pair.second = false;
+        }
+    };
+
+    std::for_each(m_BindingIdVec.begin(), m_BindingIdVec.begin() + m_InputSize, [&](LayerBindingId id)
+    {
+        try
+        {
+            bool& isUsed = m_InputValidationMap.at(id);
+            if (isUsed)
+            {
+                resetInputValidationMap();
+                throw InvalidArgumentException(fmt::format("Duplicate Input LayerBindingId: {}", id));
+            }
+            isUsed = true;
+        }
+        catch (const std::out_of_range&)
+        {
+            resetInputValidationMap();
+            throw InvalidArgumentException(fmt::format("Unknown Input LayerBindingId: {}", id));
+        }
+    });
+    resetInputValidationMap();
+
+    std::for_each(m_BindingIdVec.begin() + m_InputSize, m_BindingIdVec.end(), [&](LayerBindingId id)
+    {
+        try
+        {
+            bool& isUsed = m_OutputValidationMap.at(id);
+            if (isUsed)
+            {
+                resetOutputValidationMap();
+                throw InvalidArgumentException(fmt::format("Duplicate Output LayerBindingId: {}", id));
+            }
+            isUsed = true;
+        }
+        catch (const std::out_of_range&)
+        {
+            resetOutputValidationMap();
+            throw InvalidArgumentException(fmt::format("Unknown Output LayerBindingId: {}", id));
+        }
+    });
+    resetOutputValidationMap();
 }
 
 } // end experimental namespace

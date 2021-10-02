@@ -166,8 +166,8 @@ TEST_CASE("Ref_Backends_Unknown_Capability_Test")
     CHECK(!armnn::HasCapability(AsyncExecutionString, refCapabilities));
 
     CHECK(!armnn::HasCapability("Telekinesis", refCapabilities));
-    armnn::BackendOptions::BackendOption unkownCapability{"Telekinesis", true};
-    CHECK(!armnn::HasCapability(unkownCapability, refCapabilities));
+    armnn::BackendOptions::BackendOption unknownCapability{"Telekinesis", true};
+    CHECK(!armnn::HasCapability(unknownCapability, refCapabilities));
 }
 
 TEST_CASE ("Ref_Backends_Capability_Test")
@@ -180,7 +180,7 @@ TEST_CASE ("Ref_Backends_Capability_Test")
                           {"AsyncExecution", true},
                           {"ProtectedContentAllocation", false},
                           {"ConstantTensorsAsInputs", true},
-                          {"PreImportIOTensors", false},
+                          {"PreImportIOTensors", true},
                           {"ExternallyManagedMemory", false},
                           {"MultiAxisPacking", false}});
 }

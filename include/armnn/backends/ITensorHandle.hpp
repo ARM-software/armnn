@@ -77,6 +77,9 @@ public:
         IgnoreUnused(memory, source);
         return false;
     };
+    /// Unimport externally allocated memory
+    virtual void Unimport()
+    {};
 };
 
 }

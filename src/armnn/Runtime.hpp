@@ -56,6 +56,10 @@ public:
     TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
     std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors);
+    std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors);
+
+    void ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds);
+    void ClearImportedOutputs(NetworkId networkId, const std::vector<ImportedOutputId> outputIds);
 
     // Evaluates network using input in inputTensors, outputs filled into outputTensors.
     Status EnqueueWorkload(NetworkId networkId,
@@ -69,7 +73,8 @@ public:
     Status Execute(IWorkingMemHandle& workingMemHandle,
                    const InputTensors& inputTensors,
                    const OutputTensors& outputTensors,
-                   std::vector<ImportedInputId> preImportedInputs);
+                   std::vector<ImportedInputId> preImportedInputs,
+                   std::vector<ImportedOutputId> preImportedOutputs);
 
     /// Unloads a network from the Runtime.
     /// At the moment this only removes the network from the m_Impl->m_Network.

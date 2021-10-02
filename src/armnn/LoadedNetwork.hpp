@@ -50,6 +50,10 @@ public:
     TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const;
 
     std::vector<ImportedInputId> ImportInputs(const InputTensors& inputTensors);
+    std::vector<ImportedOutputId> ImportOutputs(const OutputTensors& outputTensors);
+
+    void ClearImportedInputs(const std::vector<ImportedInputId> inputIds);
+    void ClearImportedOutputs(const std::vector<ImportedOutputId> outputIds);
 
     /// Single thread execution of the loaded network
     Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors);
@@ -58,7 +62,8 @@ public:
     Status Execute(const InputTensors& inputTensors,
                    const OutputTensors& outputTensors,
                    IWorkingMemHandle& workingMemHandle,
-                   std::vector<ImportedInputId> preImportedInputs = {});
+                   std::vector<ImportedInputId> preImportedInputs = {},
+                   std::vector<ImportedOutputId> preImportedOutputs = {});
 
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                             std::string& errorMessage,
@@ -105,12 +110,15 @@ private:
 
     void EnqueueInput(const ConstTensor& inputTensor, ITensorHandle* inputTensorHandle);
 
-    void EnqueueOutput(const BindableLayer& layer, const Tensor& outputTensor, WorkingMemHandle& handle);
+    void ImportOutputTensor(const Tensor& outputTensor, ITensorHandle* outputTensorHandle);
 
     bool Execute(std::unique_ptr<profiling::TimelineUtilityMethods>& timelineUtils,
                  profiling::ProfilingGuid inferenceGuid);
 
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
+
+    inline LayerBindingId ValidateImportedInputID(ImportedInputId id);
+    inline LayerBindingId ValidateImportedOutputID(ImportedOutputId id);
 
     using BackendPtrMap = std::unordered_map<BackendId, IBackendInternalUniquePtr>;
 
@@ -134,21 +142,36 @@ private:
 
     profiling::ProfilingService& m_ProfilingService;
 
-    struct ImportedInputHandlePin
+    struct ImportedTensorHandlePin
     {
-        ImportedInputHandlePin(LayerBindingId layerBindingId,
-                               std::unique_ptr<ITensorHandle> tensorHandle)
+        ImportedTensorHandlePin()
+        {}
+
+        ImportedTensorHandlePin(LayerBindingId layerBindingId,
+                                std::unique_ptr<ITensorHandle> tensorHandle)
         : m_LayerBindingId(layerBindingId)
         , m_TensorHandle(std::move(tensorHandle))
         {}
+
+        ImportedTensorHandlePin(ImportedTensorHandlePin&&) = default;
+
+        ~ImportedTensorHandlePin()
+        {
+            if (m_TensorHandle)
+            {
+                m_TensorHandle->Unimport();
+            }
+        }
 
         LayerBindingId m_LayerBindingId;
         std::unique_ptr<ITensorHandle> m_TensorHandle;
     };
 
-    std::vector<ImportedInputHandlePin> m_PreImportedInputHandles;
+    std::vector<ImportedTensorHandlePin> m_PreImportedInputHandles;
+    std::vector<ImportedTensorHandlePin> m_PreImportedOutputHandles;
 
     ImportedInputId m_CurImportedInputId = 0;
+    ImportedInputId m_CurImportedOutputId = 0;
 };
 
 }

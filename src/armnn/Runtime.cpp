@@ -82,6 +82,19 @@ std::vector<ImportedInputId> IRuntime::ImportInputs(NetworkId networkId, const I
     return pRuntimeImpl->ImportInputs(networkId, inputTensors);
 }
 
+std::vector<ImportedOutputId> IRuntime::ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors)
+{
+    return pRuntimeImpl->ImportOutputs(networkId, outputTensors);
+}
+
+void IRuntime::ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds)
+{
+    return pRuntimeImpl->ClearImportedInputs(networkId, inputIds);
+}
+void IRuntime::ClearImportedOutputs(NetworkId networkId, const std::vector<ImportedOutputId> outputIds)
+{
+    return pRuntimeImpl->ClearImportedOutputs(networkId, outputIds);
+}
 
 Status IRuntime::EnqueueWorkload(NetworkId networkId,
                                  const InputTensors& inputTensors,
@@ -93,9 +106,10 @@ Status IRuntime::EnqueueWorkload(NetworkId networkId,
 Status IRuntime::Execute(IWorkingMemHandle& workingMemHandle,
                          const InputTensors& inputTensors,
                          const OutputTensors& outputTensors,
-                         std::vector<ImportedInputId> preImportedInputs)
+                         std::vector<ImportedInputId> preImportedInputs,
+                         std::vector<ImportedOutputId> preImportedOutputs)
 {
-    return pRuntimeImpl->Execute(workingMemHandle, inputTensors, outputTensors, preImportedInputs);
+    return pRuntimeImpl->Execute(workingMemHandle, inputTensors, outputTensors, preImportedInputs, preImportedOutputs);
 }
 
 Status IRuntime::UnloadNetwork(NetworkId networkId)
@@ -528,7 +542,19 @@ std::vector<ImportedInputId> RuntimeImpl::ImportInputs(NetworkId networkId, cons
     return GetLoadedNetworkPtr(networkId)->ImportInputs(inputTensors);
 }
 
+std::vector<ImportedOutputId> RuntimeImpl::ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors)
+{
+    return GetLoadedNetworkPtr(networkId)->ImportOutputs(outputTensors);
+}
 
+void RuntimeImpl::ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds)
+{
+    return GetLoadedNetworkPtr(networkId)->ClearImportedInputs(inputIds);
+}
+void RuntimeImpl::ClearImportedOutputs(NetworkId networkId, const std::vector<ImportedOutputId> outputIds)
+{
+    return GetLoadedNetworkPtr(networkId)->ClearImportedOutputs(outputIds);
+}
 
 Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
                                 const InputTensors& inputTensors,
@@ -566,7 +592,8 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
 Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
                             const InputTensors& inputTensors,
                             const OutputTensors& outputTensors,
-                            std::vector<ImportedInputId> preImportedInputs)
+                            std::vector<ImportedInputId> preImportedInputs,
+                            std::vector<ImportedOutputId> preImportedOutputs)
 {
     NetworkId networkId = iWorkingMemHandle.GetNetworkId();
     LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
@@ -585,7 +612,11 @@ Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
 
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
 
-    return loadedNetwork->Execute(inputTensors, outputTensors, iWorkingMemHandle, preImportedInputs);
+    return loadedNetwork->Execute(inputTensors,
+                                  outputTensors,
+                                  iWorkingMemHandle,
+                                  preImportedInputs,
+                                  preImportedOutputs);
 }
 
 /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have

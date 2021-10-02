@@ -56,7 +56,7 @@ bool Contains(const MapType& map, const typename MapType::key_type& key)
 
 // Utility template for comparing tensor elements
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-bool Compare(T a, T b, float tolerance = 0.000001f)
+inline bool Compare(T a, T b, float tolerance = 0.000001f)
 {
     if (ArmnnType == armnn::DataType::Boolean)
     {

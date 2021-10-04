@@ -43,6 +43,10 @@ std::vector<std::string> gpu_options {"gpu-tuning-level",
  *                  back to next backend in list if previous doesn't
  *                  provide support for operation. e.g. "GpuAcc,CpuAcc"
  *
+ *    Option key: "dynamic-backends-path" \n
+ *    Possible values: [filenameString] \n
+ *    Descriptions: This is the directory that will be searched for any dynamic backends.
+ *
  *    Option key: "logging-severity" \n
  *    Possible values: ["trace"/"debug"/"info"/"warning"/"error"/"fatal"] \n
  *    Description: Sets the logging severity level for ArmNN. Logging
@@ -62,6 +66,10 @@ std::vector<std::string> gpu_options {"gpu-tuning-level",
  *    Option key: "gpu-tuning-file" \n
  *    Possible values: [filenameString] \n
  *    Description: File name for the tuning file.
+ *
+ *    Option key: "gpu-enable-profiling" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Enables GPU profiling
  *
  *    Option key: "gpu-kernel-profiling-enabled" \n
  *    Possible values: ["true"/"false"] \n
@@ -105,6 +113,45 @@ std::vector<std::string> gpu_options {"gpu-tuning-level",
  *    Possible values: ["true"/"false"] \n
  *    Description: Enable memory import
  *
+ *    Option key: "enable-internal-profiling" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Enable the internal profiling feature.
+ *
+ *    Option key: "internal-profiling-detail" \n
+ *    Possible values: [1/2] \n
+ *    Description: Set the detail on the internal profiling. 1 = DetailsWithEvents, 2 = DetailsOnly.
+ *
+ *    Option key: "enable-external-profiling" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Enable the external profiling feature.
+ *
+ *    Option key: "timeline-profiling" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Indicates whether external timeline profiling is enabled or not.
+ *
+ *    Option key: "outgoing-capture-file" \n
+ *    Possible values: [filenameString] \n
+ *    Description: Path to a file in which outgoing timeline profiling messages will be stored.
+ *
+ *    Option key: "incoming-capture-file" \n
+ *    Possible values: [filenameString] \n
+ *    Description: Path to a file in which incoming timeline profiling messages will be stored.
+ *
+ *    Option key: "file-only-external-profiling" \n
+ *    Possible values: ["true"/"false"] \n
+ *    Description: Enable profiling output to file only.
+ *
+ *    Option key: "counter-capture-period" \n
+ *    Possible values: Integer, Default is 10000u
+ *    Description: Value in microseconds of the profiling capture period. \n
+ *
+ *    Option key: "profiling-file-format" \n
+ *    Possible values: String of ["binary"] \n
+ *    Description: The format of the file used for outputting profiling data. Currently on "binary" is supported.
+ *
+ *    Option key: "serialize-to-dot" \n
+ *    Possible values: [filenameString] \n
+ *    Description: Serialize the optimized network to the file specified in "dot" format.
  *
  * @param[in]     option_keys     Delegate option names
  * @param[in]     options_values  Delegate option values
@@ -125,6 +172,9 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
         // (Initializes with CpuRef backend)
         armnnDelegate::DelegateOptions options = armnnDelegate::TfLiteArmnnDelegateOptionsDefault();
         armnn::OptimizerOptions optimizerOptions;
+        bool internalProfilingState = false;
+        armnn::ProfilingDetailsMethod internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
+        armnn::IRuntime::CreationOptions::ExternalProfilingOptions extProfilingParams;
         for (size_t i = 0; i < num_options; ++i)
         {
             // Process backends
@@ -140,6 +190,11 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
                     pch = strtok (NULL, ",");
                 }
                 options.SetBackends(backends);
+            }
+            // Process dynamic-backends-path
+            else if (std::string(options_keys[i]) == std::string("dynamic-backends-path"))
+            {
+                options.SetDynamicBackendsPath(std::string(options_values[i]));
             }
             // Process logging level
             else if (std::string(options_keys[i]) == std::string("logging-severity"))
@@ -161,6 +216,10 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
             {
                 armnn::BackendOptions option("GpuAcc", {{"TuningFile", std::string(options_values[i])}});
                 options.AddBackendOption(option);
+            }
+            else if (std::string(options_keys[i]) == std::string("gpu-enable-profiling"))
+            {
+                options.SetGpuProfilingState(*options_values[i] != '0');
             }
             else if (std::string(options_keys[i]) == std::string("gpu-kernel-profiling-enabled"))
             {
@@ -213,12 +272,76 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
             {
                optimizerOptions.m_ImportEnabled = *options_values[i] != '0';
             }
+            // Process enable-internal-profiling
+            else if (std::string(options_keys[i]) == std::string("enable-internal-profiling"))
+            {
+                internalProfilingState = *options_values[i] != '0';
+            }
+            // Process internal-profiling-detail
+            else if (std::string(options_keys[i]) == std::string("internal-profiling-detail"))
+            {
+                uint32_t detailLevel = static_cast<uint32_t>(std::stoul(options_values[i]));
+                switch (detailLevel)
+                {
+                    case 1:
+                        internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
+                        break;
+                    case 2:
+                        internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsOnly;
+                        break;
+                    default:
+                        internalProfilingDetail = armnn::ProfilingDetailsMethod::Undefined;
+                        break;
+                }
+            }
+            // Process enable-external-profiling
+            else if (std::string(options_keys[i]) == std::string("enable-external-profiling"))
+            {
+                extProfilingParams.m_EnableProfiling = *options_values[i] != '0';
+            }
+            // Process timeline-profiling
+            else if (std::string(options_keys[i]) == std::string("timeline-profiling"))
+            {
+                extProfilingParams.m_TimelineEnabled = *options_values[i] != '0';
+            }
+            // Process outgoing-capture-file
+            else if (std::string(options_keys[i]) == std::string("outgoing-capture-file"))
+            {
+                extProfilingParams.m_OutgoingCaptureFile = options_values[i];
+            }
+            // Process incoming-capture-file
+            else if (std::string(options_keys[i]) == std::string("incoming-capture-file"))
+            {
+                extProfilingParams.m_IncomingCaptureFile = options_values[i];
+            }
+            // Process file-only-external-profiling
+            else if (std::string(options_keys[i]) == std::string("file-only-external-profiling"))
+            {
+                extProfilingParams.m_FileOnly = *options_values[i] != '0';
+            }
+            // Process counter-capture-period
+            else if (std::string(options_keys[i]) == std::string("counter-capture-period"))
+            {
+                extProfilingParams.m_CapturePeriod = static_cast<uint32_t>(std::stoul(options_values[i]));
+            }
+            // Process profiling-file-format
+            else if (std::string(options_keys[i]) == std::string("profiling-file-format"))
+            {
+                extProfilingParams.m_FileFormat = options_values[i];
+            }
+            // Process serialize-to-dot
+            else if (std::string(options_keys[i]) == std::string("serialize-to-dot"))
+            {
+                options.SetSerializeToDot(options_values[i]);
+            }
             else
             {
                 throw armnn::Exception("Unknown option for the ArmNN Delegate given: " + std::string(options_keys[i]));
             }
         }
         options.SetOptimizerOptions(optimizerOptions);
+        options.SetInternalProfilingParams(internalProfilingState, internalProfilingDetail);
+        options.SetExternalProfilingParams(extProfilingParams);
         delegate = TfLiteArmnnDelegateCreate(options);
     }
     catch (const std::exception& ex)

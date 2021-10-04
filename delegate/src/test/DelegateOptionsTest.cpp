@@ -5,6 +5,7 @@
 
 #include "DelegateOptionsTestHelper.hpp"
 #include <common/include/ProfilingGuid.hpp>
+#include <armnnUtils/Filesystem.hpp>
 
 namespace armnnDelegate
 {
@@ -184,6 +185,44 @@ TEST_CASE ("ArmnnDelegateModelOptions_CpuAcc_Test")
                               expectedResult,
                               delegateOptions);
 }
+
+TEST_CASE ("ArmnnDelegateSerializeToDot")
+{
+    const fs::path filename(fs::temp_directory_path() / "ArmnnDelegateSerializeToDot.dot");
+    if ( fs::exists(filename) )
+    {
+        fs::remove(filename);
+    }
+    std::stringstream ss;
+    {
+        StreamRedirector redirect(std::cout, ss.rdbuf());
+
+        std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+        std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
+        std::vector<float> inputData = { 1, 2, 3, 4 };
+        std::vector<float> divData = { 2, 2, 3, 4 };
+        std::vector<float> expectedResult = { 1, 2, 2, 2 };
+
+        armnn::OptimizerOptions optimizerOptions(false, false, false, false);
+        armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
+        // Enable serialize to dot by specifying the target file name.
+        delegateOptions.SetSerializeToDot(filename);
+        DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
+                                  backends,
+                                  tensorShape,
+                                  inputData,
+                                  inputData,
+                                  divData,
+                                  expectedResult,
+                                  delegateOptions);
+    }
+    CHECK(fs::exists(filename));
+    // The file should have a size greater than 0 bytes.
+    CHECK(fs::file_size(filename) > 0);
+    // Clean up.
+    fs::remove(filename);
+}
+
 
 }
 

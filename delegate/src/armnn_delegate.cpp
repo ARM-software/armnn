@@ -39,6 +39,7 @@
 #include "UnidirectionalSequenceLstm.hpp"
 #include "Unpack.hpp"
 
+#include <armnnUtils/Filesystem.hpp>
 #include <flatbuffers/flatbuffers.h>
 #include <tensorflow/lite/context_util.h>
 
@@ -137,6 +138,9 @@ Delegate::Delegate(armnnDelegate::DelegateOptions options)
 
     // Create ArmNN Runtime
     armnn::IRuntime::CreationOptions runtimeOptions;
+    runtimeOptions.m_DynamicBackendsPath = m_Options.GetDynamicBackendsPath();
+    runtimeOptions.m_EnableGpuProfiling = m_Options.GetGpuProfilingState();
+    runtimeOptions.m_ProfilingOptions = m_Options.GetExternalProfilingParams();
 
     auto backendOptions = m_Options.GetBackendOptions();
     if (!backendOptions.empty())
@@ -363,27 +367,34 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
         throw armnn::Exception("TfLiteArmnnDelegate: Unable to optimize the network!");
     }
 
+    // If set, we will serialize the optimized model into a dot file.
+    const std::string serializeToDotFile = delegate->m_Options.GetSerializeToDot();
+    if (!serializeToDotFile.empty())
+    {
+        fs::path filename = serializeToDotFile;
+        std::fstream file(filename.c_str(), std::ios_base::out);
+        optNet->SerializeToDot(file);
+    }
+
     try
     {
         // Load graph into runtime
         std::string errorMessage;
         armnn::Status loadingStatus;
+        armnn::MemorySource memorySource = armnn::MemorySource::Undefined;
         if (delegate->m_Options.GetOptimizerOptions().m_ImportEnabled)
         {
-            armnn::INetworkProperties networkProperties(false,
-                                                        armnn::MemorySource::Malloc,
-                                                        armnn::MemorySource::Malloc);
-            loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
-                                                             std::move(optNet),
-                                                             errorMessage,
-                                                             networkProperties);
+            memorySource = armnn::MemorySource::Malloc;
         }
-        else
-        {
-            loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
-                                                             std::move(optNet),
-                                                             errorMessage);
-        }
+        armnn::INetworkProperties networkProperties(false,
+                                                    memorySource,
+                                                    memorySource,
+                                                    delegate->m_Options.GetInternalProfilingState(),
+                                                    delegate->m_Options.GetInternalProfilingDetail());
+        loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
+                                                         std::move(optNet),
+                                                         errorMessage,
+                                                         networkProperties);
         if (loadingStatus != armnn::Status::Success)
         {
             // Optimize failed

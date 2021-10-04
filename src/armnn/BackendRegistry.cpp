@@ -128,4 +128,26 @@ std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> BackendRegistry
     return m_CustomMemoryAllocatorMap;
 }
 
+void BackendRegistry::RegisterMemoryOptimizerStrategy(const BackendId& id,
+                                                      std::shared_ptr<IMemoryOptimizerStrategy> strategy)
+{
+    if (m_MemoryOptimizerStrategyMap.find(id) != m_MemoryOptimizerStrategyMap.end())
+    {
+        throw InvalidArgumentException(
+            std::string(id) + " already has an memory optimizer strategy associated with it",
+            CHECK_LOCATION());
+    }
+    m_MemoryOptimizerStrategyMap[id] = strategy;
+}
+
+void BackendRegistry::DeregisterMemoryOptimizerStrategy(const BackendId &id)
+{
+    m_MemoryOptimizerStrategyMap.erase(id);
+}
+
+MemoryOptimizerStrategiesMapRef BackendRegistry::GetMemoryOptimizerStrategies()
+{
+    return m_MemoryOptimizerStrategyMap;
+}
+
 } // namespace armnn

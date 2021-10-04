@@ -17,7 +17,8 @@ const BackendCapabilities cpuRefCapabilities("CpuRef",
                                                     {"ConstantTensorsAsInputs", true},
                                                     {"PreImportIOTensors", false},
                                                     {"ExternallyManagedMemory", false},
-                                                    {"MultiAxisPacking", false}
+                                                    {"MultiAxisPacking", false},
+                                                    {"SingleAxisPacking", true}
                                              });
 
 const std::set<armnn::BackendCapability> oldCpuRefCapabilities {

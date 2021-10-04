@@ -8,7 +8,9 @@
 #include <armnn/BackendId.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/backends/ICustomAllocator.hpp>
+#include <armnn/backends/IMemoryOptimizerStrategy.hpp>
 
+#include <algorithm>
 #include <memory>
 #include <unordered_map>
 #include <functional>
@@ -22,6 +24,7 @@ namespace profiling
 }
 class IBackendInternal;
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;
+using MemoryOptimizerStrategiesMapRef = std::unordered_map<BackendId, std::shared_ptr<IMemoryOptimizerStrategy>>;
 
 class BackendRegistry
 {
@@ -38,6 +41,8 @@ public:
     void SetProfilingService(armnn::Optional<profiling::ProfilingService&> profilingService);
     void RegisterAllocator(const BackendId& id, std::shared_ptr<ICustomAllocator> alloc);
     std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> GetAllocators();
+    void RegisterMemoryOptimizerStrategy(const BackendId& id, std::shared_ptr<IMemoryOptimizerStrategy> strategy);
+    MemoryOptimizerStrategiesMapRef GetMemoryOptimizerStrategies();
 
     BackendRegistry() {}
     virtual ~BackendRegistry() {}
@@ -54,6 +59,7 @@ public:
 
     void Deregister(const BackendId& id);
     void DeregisterAllocator(const BackendId &id);
+    void DeregisterMemoryOptimizerStrategy(const BackendId &id);
 
 protected:
     using FactoryStorage = std::unordered_map<BackendId, FactoryFunction>;
@@ -68,6 +74,7 @@ private:
     FactoryStorage m_Factories;
     armnn::Optional<profiling::ProfilingService&> m_ProfilingService;
     std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> m_CustomMemoryAllocatorMap;
+    std::unordered_map<BackendId, std::shared_ptr<IMemoryOptimizerStrategy>> m_MemoryOptimizerStrategyMap;
 };
 
 BackendRegistry& BackendRegistryInstance();

@@ -249,6 +249,16 @@ constexpr const char* GetResizeMethodAsCString(ResizeMethod method)
     }
 }
 
+constexpr const char* GetMemBlockStrategyTypeName(MemBlockStrategyType memBlockStrategyType)
+{
+    switch (memBlockStrategyType)
+    {
+        case MemBlockStrategyType::SingleAxisPacking: return "SingleAxisPacking";
+        case MemBlockStrategyType::MultiAxisPacking:  return "MultiAxisPacking";
+        default:                                      return "Unknown";
+    }
+}
+
 template<typename T>
 struct IsHalfType
     : std::integral_constant<bool, std::is_floating_point<T>::value && sizeof(T) == 2>

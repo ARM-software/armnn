@@ -296,4 +296,22 @@ void ParseOptions(const std::vector<BackendOptions>& options, BackendId backend,
     }
 }
 
+inline bool ParseBooleanBackendOption(const armnn::BackendOptions::Var& value, bool defaultValue)
+{
+    if (value.IsBool())
+    {
+        return value.AsBool();
+    }
+    return defaultValue;
+}
+
+inline std::string ParseStringBackendOption(const armnn::BackendOptions::Var& value, std::string defaultValue)
+{
+    if (value.IsString())
+    {
+        return value.AsString();
+    }
+    return defaultValue;
+}
+
 } //namespace armnn

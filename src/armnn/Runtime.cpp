@@ -12,6 +12,7 @@
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
+#include <backendsCommon/MemoryOptimizerStrategyLibrary.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
@@ -373,6 +374,45 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                     BackendRegistryInstance().RegisterAllocator(id, customAllocatorMapIterator->second);
                 }
             }
+
+            // check if custom memory optimizer strategy map is set
+            if (!options.m_MemoryOptimizerStrategyMap.empty())
+            {
+                auto customMemoryOptimizerStrategyMapIterator = options.m_MemoryOptimizerStrategyMap.find(id);
+                // if a memory optimizer strategy is provided make the backend use that instead of the default
+                if (customMemoryOptimizerStrategyMapIterator != options.m_MemoryOptimizerStrategyMap.end())
+                {
+                    // no errors.. register the memory optimizer strategy with the BackendRegistry
+                    BackendRegistryInstance().RegisterMemoryOptimizerStrategy(
+                        id, customMemoryOptimizerStrategyMapIterator->second);
+
+                    ARMNN_LOG(info) << "MemoryOptimizerStrategy  "
+                                    << customMemoryOptimizerStrategyMapIterator->second->GetName()
+                                    << " set for the backend " << id << ".";
+                }
+            }
+            else
+            {
+                // check if to use one of the existing memory optimizer strategies is set
+                std::string memoryOptimizerStrategyName = "";
+                ParseOptions(options.m_BackendOptions, id, [&](std::string name, const BackendOptions::Var& value)
+                {
+                    if (name == "MemoryOptimizerStrategy")
+                    {
+                        memoryOptimizerStrategyName = ParseStringBackendOption(value, "");
+                    }
+                });
+                if (memoryOptimizerStrategyName != "")
+                {
+                    MemoryOptimizerStrategyLibrary memoryOptimizerStrategyLibrary;
+                    if (memoryOptimizerStrategyLibrary.SetMemoryOptimizerStrategy(id, memoryOptimizerStrategyName))
+                    {
+                        ARMNN_LOG(info) << "MemoryOptimizerStrategy  "
+                                        << memoryOptimizerStrategyName << " set for the backend " << id << ".";
+                    }
+                }
+            }
+
             auto context = backend->CreateBackendContext(options);
 
             // backends are allowed to return nullptrs if they

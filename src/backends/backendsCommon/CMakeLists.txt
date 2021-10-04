@@ -26,6 +26,9 @@ list(APPEND armnnBackendsCommon_sources
     MemCopyWorkload.hpp
     MemImportWorkload.cpp
     MemImportWorkload.hpp
+    MemoryOptimizerStrategyFactory.hpp
+    MemoryOptimizerStrategyLibrary.cpp
+    MemoryOptimizerStrategyLibrary.hpp
     MemSyncWorkload.cpp
     MemSyncWorkload.hpp
     OptimizationViews.cpp

@@ -17,6 +17,7 @@ COMMON_SOURCES := \
     MapWorkload.cpp \
     MemCopyWorkload.cpp \
     MemImportWorkload.cpp \
+    MemoryOptimizerStrategyLibrary.cpp \
     MemSyncWorkload.cpp \
     OptimizationViews.cpp \
     TensorHandleFactoryRegistry.cpp \
@@ -32,6 +33,7 @@ COMMON_SOURCES := \
 
 COMMON_TEST_SOURCES := \
     test/CommonTestUtils.cpp \
+    test/CustomMemoryOptimizerStrategyTests.cpp \
     test/InstanceNormalizationEndToEndTestImpl.cpp \
     test/JsonPrinterTestImpl.cpp \
     test/LogSoftmaxEndToEndTestImpl.cpp \

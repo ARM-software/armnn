@@ -7,6 +7,7 @@
 #include <armnn/BackendRegistry.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
+#include <backendsCommon/memoryOptimizationStrategies/ConstLayerMemoryOptimizerStrategy.hpp>
 #include <reference/RefBackend.hpp>
 
 #include <doctest/doctest.h>
@@ -144,5 +145,25 @@ TEST_CASE("ThrowBackendUnavailableException")
     // Clean up the registry for the next test.
     BackendRegistryInstance().Deregister(mockBackendId);
 }
+
+#if defined(ARMNNREF_ENABLED)
+TEST_CASE("RegisterMemoryOptimizerStrategy")
+{
+    using namespace armnn;
+
+    const BackendId cpuRefBackendId(armnn::Compute::CpuRef);
+    CHECK(BackendRegistryInstance().GetMemoryOptimizerStrategies().empty());
+
+    // Register the memory optimizer
+    std::shared_ptr<IMemoryOptimizerStrategy> memoryOptimizerStrategy =
+        std::make_shared<ConstLayerMemoryOptimizerStrategy>();
+    BackendRegistryInstance().RegisterMemoryOptimizerStrategy(cpuRefBackendId, memoryOptimizerStrategy);
+    CHECK(!BackendRegistryInstance().GetMemoryOptimizerStrategies().empty());
+    CHECK(BackendRegistryInstance().GetMemoryOptimizerStrategies().size() == 1);
+    // De-register the memory optimizer
+    BackendRegistryInstance().DeregisterMemoryOptimizerStrategy(cpuRefBackendId);
+    CHECK(BackendRegistryInstance().GetMemoryOptimizerStrategies().empty());
+}
+#endif
 
 }

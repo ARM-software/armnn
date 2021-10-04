@@ -15,6 +15,7 @@
 #include "profiling/ILocalPacketHandler.hpp"
 
 #include <armnn/backends/ICustomAllocator.hpp>
+#include <armnn/backends/IMemoryOptimizerStrategy.hpp>
 #include <memory>
 #include <map>
 
@@ -106,6 +107,7 @@ public:
             , m_DynamicBackendsPath("")
             , m_ProtectedMode(false)
             , m_CustomAllocatorMap()
+            , m_MemoryOptimizerStrategyMap()
         {}
 
         /// If set, uses the GpuAcc tuned parameters from the given object when executing GPU workloads.
@@ -134,6 +136,14 @@ public:
         ///
         /// @note Only supported for GpuAcc
         std::map<BackendId, std::shared_ptr<ICustomAllocator>> m_CustomAllocatorMap;
+
+        /// @brief A map to define a custom memory optimizer strategy for specific backend Ids.
+        ///
+        /// @details  A Memory Optimizer Strategy provides a solution to an abstract representation of
+        /// a network's memory requirements. This can also be used to return a pre-computed solution
+        /// for a specific network. Set this if you want to implement a Custom Memory Optimizer Strategy
+        /// for a given backend.
+        std::map<BackendId, std::shared_ptr<IMemoryOptimizerStrategy>> m_MemoryOptimizerStrategyMap;
 
         struct ExternalProfilingOptions
         {
@@ -168,6 +178,7 @@ public:
         ///       {
         ///         {"TuningLevel", 2},
         ///         {"TuningFile", filename}
+        ///         {"MemoryOptimizerStrategy", strategyname}
         ///       }
         ///     });
         /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -185,6 +196,9 @@ public:
         /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         /// The following backend options are available:
+        /// AllBackends:
+        ///   "MemoryOptimizerStrategy" : string [stategynameString]
+        ///    (Existing Memory Optimizer Strategies: ConstLayerMemoryOptimizerStrategy)
         /// GpuAcc:
         ///   "TuningLevel" : int [0..3] (0=UseOnly(default) | 1=RapidTuning | 2=NormalTuning | 3=ExhaustiveTuning)
         ///   "TuningFile" : string [filenameString]

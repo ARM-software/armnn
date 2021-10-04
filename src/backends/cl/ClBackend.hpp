@@ -30,7 +30,8 @@ const BackendCapabilities gpuAccCapabilities("GpuAcc",
                                                      {"ConstantTensorsAsInputs", false},
                                                      {"PreImportIOTensors", false},
                                                      {"ExternallyManagedMemory", false},
-                                                     {"MultiAxisPacking", false}
+                                                     {"MultiAxisPacking", false},
+                                                     {"SingleAxisPacking", true}
                                              });
 
 class ClBackend : public IBackendInternal

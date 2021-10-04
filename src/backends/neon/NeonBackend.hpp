@@ -18,7 +18,8 @@ const BackendCapabilities cpuAccCapabilities("GpuAcc",
                                                      {"ConstantTensorsAsInputs", false},
                                                      {"PreImportIOTensors", false},
                                                      {"ExternallyManagedMemory", false},
-                                                     {"MultiAxisPacking", false}
+                                                     {"MultiAxisPacking", false},
+                                                     {"SingleAxisPacking", true}
                                              });
 
 

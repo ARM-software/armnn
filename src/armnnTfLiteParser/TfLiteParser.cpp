@@ -642,6 +642,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_CAST]                    = &TfLiteParserImpl::ParseCast;
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParserImpl::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParserImpl::ParseConv2D;
+    m_ParserFunctions[tflite::BuiltinOperator_CONV_3D]                 = &TfLiteParserImpl::ParseConv3D;
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParserImpl::ParseCustomOperator;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTH_TO_SPACE]          = &TfLiteParserImpl::ParseDepthToSpace;
     m_ParserFunctions[tflite::BuiltinOperator_DEPTHWISE_CONV_2D]       = &TfLiteParserImpl::ParseDepthwiseConv2D;
@@ -1044,6 +1045,90 @@ void TfLiteParserImpl::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParserImpl::ParseConv3D(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsConv3DOptions();
+
+    CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
+
+    Convolution3dDescriptor desc;
+    desc.m_BiasEnabled = false;
+    desc.m_DataLayout = armnn::DataLayout::NDHWC;
+    desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
+    desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
+    desc.m_StrideZ = CHECKED_NON_NEGATIVE(options->stride_d);
+    desc.m_DilationX = CHECKED_NON_NEGATIVE(options->dilation_w_factor);
+    desc.m_DilationY = CHECKED_NON_NEGATIVE(options->dilation_h_factor);
+    desc.m_DilationZ = CHECKED_NON_NEGATIVE(options->dilation_d_factor);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2, 3);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
+
+    // Assuming input is NDHWC
+    unsigned int inputDepth  = inputTensorInfo.GetShape()[1];
+    unsigned int inputHeight = inputTensorInfo.GetShape()[2];
+    unsigned int inputWidth  = inputTensorInfo.GetShape()[3];
+
+    // Assuming the filter is DHWIO : Depth, Height, Width, OutputChannels, InputChannels
+    unsigned int filterDepth  = filterTensorInfo.GetShape()[0];
+    unsigned int filterHeight = filterTensorInfo.GetShape()[1];
+    unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+
+    CalcPadding(inputDepth, filterDepth, desc.m_StrideZ,
+                desc.m_DilationY, desc.m_PadFront, desc.m_PadBack, options->padding);
+    CalcPadding(inputHeight, filterHeight, desc.m_StrideY,
+                desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, options->padding);
+    CalcPadding(inputWidth, filterWidth, desc.m_StrideX,
+                desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
+
+    auto filterTensorAndData = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo);
+
+    armnn::IConnectableLayer* layer = nullptr;
+    auto layerName = fmt::format("Conv3D:{}:{}", subgraphIndex, operatorIndex);
+
+    if (inputs.size() == 3)
+    {
+        desc.m_BiasEnabled = true;
+        armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
+        auto biasTensorAndData = CreateConstTensorNonPermuted(inputs[2], biasTensorInfo);
+        layer = m_Network->AddConvolution3dLayer(desc,
+                                                 filterTensorAndData,
+                                                 Optional<ConstTensor>(biasTensorAndData),
+                                                 layerName.c_str());
+    }
+    else
+    {
+        layer = m_Network->AddConvolution3dLayer(desc,
+                                                 filterTensorAndData,
+                                                 EmptyOptional(),
+                                                 layerName.c_str());
+    }
+
+    ARMNN_ASSERT(layer != nullptr);
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    // Register the input connection slots for the layer, connections are made after all layers have been created
+    // only the tensors for the inputs are relevant, exclude the const tensors
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    // Register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }

@@ -113,6 +113,7 @@ private:
     void ParseComparison(size_t subgraphIndex, size_t operatorIndex, armnn::ComparisonOperation comparisonOperation);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
+    void ParseConv3D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthToSpace(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDequantize(size_t subgraphIndex, size_t operatorIndex);

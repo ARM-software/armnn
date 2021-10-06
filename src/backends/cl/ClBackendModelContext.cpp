@@ -32,7 +32,7 @@ namespace armnn
 {
 
 ClBackendModelContext::ClBackendModelContext(const ModelOptions& modelOptions)
-    : m_CachedNetworkFilePath(""), m_IsFastMathEnabled(false), m_SaveCachedNetwork(false)
+    : m_CachedNetworkFilePath(""), m_IsFastMathEnabled(false), m_SaveCachedNetwork(false), m_CachedFileDescriptor(-1)
 {
    if (!modelOptions.empty())
    {
@@ -49,6 +49,10 @@ ClBackendModelContext::ClBackendModelContext(const ModelOptions& modelOptions)
            if (name == "CachedNetworkFilePath")
            {
                m_CachedNetworkFilePath = ParseFile(value, "");
+           }
+           if (name == "CachedFileDescriptor")
+           {
+               m_CachedFileDescriptor = armnn::ParseIntBackendOption(value, -1);
            }
        });
    }
@@ -67,6 +71,11 @@ bool ClBackendModelContext::IsFastMathEnabled() const
 bool ClBackendModelContext::SaveCachedNetwork() const
 {
     return m_SaveCachedNetwork;
+}
+
+int ClBackendModelContext::GetCachedFileDescriptor() const
+{
+    return m_CachedFileDescriptor;
 }
 
 } // namespace armnn

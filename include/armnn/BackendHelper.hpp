@@ -448,4 +448,7 @@ Optional<const BackendOptions::BackendOption> GetCapability(const std::string& b
 ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated in favour of GetBackendCapability", "22.05")
 bool IsCapabilitySupported(const armnn::BackendId& backend, armnn::BackendCapability capability);
 
+/// Returns the number of cached files if backend supports caching
+unsigned int GetNumberOfCacheFiles(const armnn::BackendId& backend);
+
 }

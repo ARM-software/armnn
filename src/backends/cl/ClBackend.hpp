@@ -105,6 +105,8 @@ public:
         return m_UsingCustomAllocator;
     }
 
+    virtual unsigned int GetNumberOfCacheFiles() const override { return 1; }
+
     // Cl requires a arm_compute::IAllocator we wrap the Arm NN ICustomAllocator to achieve this
     class ClBackendCustomAllocatorWrapper : public arm_compute::IAllocator
     {

@@ -314,4 +314,13 @@ inline std::string ParseStringBackendOption(const armnn::BackendOptions::Var& va
     return defaultValue;
 }
 
+inline int ParseIntBackendOption(const armnn::BackendOptions::Var& value, int defaultValue)
+{
+    if (value.IsInt())
+    {
+        return value.AsInt();
+    }
+    return defaultValue;
+}
+
 } //namespace armnn

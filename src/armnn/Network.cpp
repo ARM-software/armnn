@@ -524,6 +524,16 @@ profiling::ProfilingGuid IOptimizedNetwork::GetGuid() const
     return pOptimizedNetworkImpl->GetGuid();
 }
 
+size_t IOptimizedNetwork::GetNumInputs() const
+{
+    return pOptimizedNetworkImpl->GetNumInputs();
+}
+
+size_t IOptimizedNetwork::GetNumOutputs() const
+{
+    return pOptimizedNetworkImpl->GetNumOutputs();
+}
+
 Status OptimizedNetworkImpl::PrintGraph()
 {
     m_Graph->Print();
@@ -533,6 +543,16 @@ Status OptimizedNetworkImpl::PrintGraph()
 Status OptimizedNetworkImpl::SerializeToDot(std::ostream& stream) const
 {
     return m_Graph->SerializeToDot(stream);
+}
+
+size_t OptimizedNetworkImpl::GetNumInputs() const
+{
+    return m_Graph->GetNumInputs();
+}
+
+size_t OptimizedNetworkImpl::GetNumOutputs() const
+{
+    return m_Graph->GetNumOutputs();
 }
 
 void ReportError(const std::string& errorMessage,

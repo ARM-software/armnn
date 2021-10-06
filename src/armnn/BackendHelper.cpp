@@ -126,6 +126,18 @@ bool IsCapabilitySupported(const armnn::BackendId& backend, armnn::BackendCapabi
     return hasCapability;
 }
 
+unsigned int GetNumberOfCacheFiles(const armnn::BackendId& backend)
+{
+    auto const& backendRegistry = armnn::BackendRegistryInstance();
+    if (backendRegistry.IsBackendRegistered(backend))
+    {
+        auto factoryFunc = backendRegistry.GetFactory(backend);
+        auto backendObject = factoryFunc();
+        return backendObject->GetNumberOfCacheFiles();
+    }
+    return 0;
+}
+
 bool LayerSupportHandle::IsBackendRegistered() const
 {
     if (m_LayerSupport)

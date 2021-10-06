@@ -206,6 +206,11 @@ public:
     {
         throw armnn::Exception("GetDefaultAllocator: Function has not been implemented in backend.");
     }
+
+    /// Returns the number of files cached if backend supports caching
+    ///
+    /// \return - Returns 0 if backend does not support caching otherwise number of files cached
+    virtual unsigned int GetNumberOfCacheFiles() const { return 0; }
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

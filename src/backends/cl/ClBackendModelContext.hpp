@@ -36,10 +36,13 @@ public:
 
     bool SaveCachedNetwork() const;
 
+    int GetCachedFileDescriptor() const;
+
 private:
     std::string m_CachedNetworkFilePath;
     bool m_IsFastMathEnabled;
     bool m_SaveCachedNetwork;
+    int m_CachedFileDescriptor;
 
 };
 

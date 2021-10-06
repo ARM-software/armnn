@@ -21,6 +21,9 @@ public:
 
     virtual profiling::ProfilingGuid GetGuid() const { return m_Guid; };
 
+    virtual size_t GetNumInputs() const;
+    virtual size_t GetNumOutputs() const;
+
     Graph& GetGraph() { return *m_Graph; }
     ModelOptions& GetModelOptions() { return m_ModelOptions; }
 

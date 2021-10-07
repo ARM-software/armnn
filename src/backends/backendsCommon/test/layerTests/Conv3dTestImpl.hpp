@@ -32,7 +32,7 @@ LayerTestResult<int8_t , 5> SimpleConvolution3d3x3x3Int8Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory,
         bool biasEnabled);
 
-LayerTestResult<u_int8_t, 5> SimpleConvolution3d3x3x3Uint8Test(
+LayerTestResult<uint8_t, 5> SimpleConvolution3d3x3x3Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
@@ -56,7 +56,7 @@ LayerTestResult<int8_t , 5> Convolution3d2x2x2Strides3x5x5Int8Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory,
         bool biasEnabled);
 
-LayerTestResult<u_int8_t, 5> Convolution3d2x2x2Strides3x5x5Uint8Test(
+LayerTestResult<uint8_t, 5> Convolution3d2x2x2Strides3x5x5Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
@@ -80,7 +80,7 @@ LayerTestResult<int8_t , 5> Convolution3d2x2x2Dilation2x2x2Int8Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory,
         bool biasEnabled);
 
-LayerTestResult<u_int8_t, 5> Convolution3d2x2x2Dilation2x2x2Uint8Test(
+LayerTestResult<uint8_t, 5> Convolution3d2x2x2Dilation2x2x2Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
@@ -104,7 +104,7 @@ LayerTestResult<int8_t , 5> Convolution3dPaddingSame3x3x3Int8Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory,
         bool biasEnabled);
 
-LayerTestResult<u_int8_t, 5> Convolution3dPaddingSame3x3x3Uint8Test(
+LayerTestResult<uint8_t, 5> Convolution3dPaddingSame3x3x3Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,

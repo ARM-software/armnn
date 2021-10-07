@@ -63,7 +63,7 @@ void ApplyBiasToData(std::vector<T>& v, const std::vector<B>& bias,
 
     for (uint32_t i = 0; i < bias.size(); ++i)
     {
-        for (long unsigned int j = i; j < v.size(); j+=bias.size())
+        for (size_t j = i; j < v.size(); j+=bias.size())
         {
             // Note we need to dequantize and re-quantize the image value and the bias.
             float dBias = SelectiveDequantize(bias[i], bScale, bOffset);

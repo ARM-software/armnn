@@ -84,6 +84,25 @@ armnn::INetworkPtr CreateFullyConnectedNetworkConstWeightsNonConstBias(const arm
     return network;
 }
 
+armnn::INetworkPtr CreateFullyConnectedNetworkNoTensorInfoConstWeights(const armnn::TensorInfo& inputTensorInfo,
+                                                                       const armnn::TensorInfo& outputTensorInfo,
+                                                                       const armnn::ConstTensor& weightsConstantTensor,
+                                                                       armnn::FullyConnectedDescriptor descriptor)
+{
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
+    armnn::IConnectableLayer* weightsLayer  = network->AddConstantLayer(weightsConstantTensor, "Weights");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
+    armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
+
+    Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
+    weightsLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(1));
+    Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId>& backends)
 {
@@ -141,7 +160,8 @@ void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::BackendId>& backends,
                                                        const bool transposeWeights,
-                                                       const bool constantWeightsOrBias)
+                                                       const bool constantWeightsOrBias,
+                                                       const bool tensorInfoSet)
 {
     unsigned int inputWidth = 1;
     unsigned int inputHeight = 1;
@@ -210,7 +230,24 @@ void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::
     descriptor.m_TransposeWeightMatrix = transposeWeights;
     descriptor.m_ConstantWeights = constantWeightsOrBias;
 
-    if (!constantWeightsOrBias)
+    if(!tensorInfoSet)
+    {
+        // Tests constant weights and non constant bias.
+        ConstTensor weightsConstantTensor(weightsDesc, weights.data());
+
+        armnn::INetworkPtr network = CreateFullyConnectedNetworkNoTensorInfoConstWeights(inputTensorInfo,
+                                                                                         outputTensorInfo,
+                                                                                         weightsConstantTensor,
+                                                                                         descriptor);
+        CHECK(network);
+
+        // Create runtime in which test will run
+        IRuntime::CreationOptions options;
+        IRuntimePtr runtime(IRuntime::Create(options));
+
+        CHECK_THROWS_AS( Optimize(*network, backends, runtime->GetDeviceSpec()), LayerValidationException );
+    }
+    else if (!constantWeightsOrBias)
     {
         // Tests non constant weights and constant bias.
         ConstTensor biasConstantTensor(biasesDesc, biasValues.data());

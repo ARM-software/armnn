@@ -618,12 +618,17 @@ TEST_CASE("RefFullyConnectedEndToEndTestFloat32")
 
 TEST_CASE("RefFullyConnectedEndToEndTestNonConstantWeightsConstantBiasesFloat32")
 {
-    FullyConnectedWithDynamicOrConstantInputsEndToEnd<armnn::DataType::Float32>(defaultBackends, true, true);
+    FullyConnectedWithDynamicOrConstantInputsEndToEnd<armnn::DataType::Float32>(defaultBackends, true, true, true);
 }
 
 TEST_CASE("RefFullyConnectedEndToEndTestConstantWeightsNonConstantBiasesFloat32")
 {
-    FullyConnectedWithDynamicOrConstantInputsEndToEnd<armnn::DataType::Float32>(defaultBackends, true, false);
+    FullyConnectedWithDynamicOrConstantInputsEndToEnd<armnn::DataType::Float32>(defaultBackends, true, false, true);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestConstantWeightsTensorInfoNotSet")
+{
+    FullyConnectedWithDynamicOrConstantInputsEndToEnd<armnn::DataType::Float32>(defaultBackends, true, false, false);
 }
 
 TEST_CASE("RefGatherFloatTest")

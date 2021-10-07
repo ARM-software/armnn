@@ -203,6 +203,10 @@ public:
     void SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer);
     void SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& substituteSubgraph);
 
+    /// For each ConstantLayer in Graph, ensures TensorInfo is set on all output slots.
+    /// LayerValidationException thrown if no TensorInfo is set.
+    void VerifyConstantLayerSetTensorInfo() const;
+
     void InferTensorInfos();
 
     void AttachObservable(IGraphObservable* const observable, GraphEvent notifyOnEvent) {

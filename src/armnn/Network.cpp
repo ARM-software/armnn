@@ -1576,6 +1576,9 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
         throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
     }
 
+    // Ensure TensorInfo is set on all output slots of ConstantLayers in the graph
+    inNetwork.pNetworkImpl->GetGraph().VerifyConstantLayerSetTensorInfo();
+
     std::unique_ptr<Graph> graph = std::make_unique<Graph>(inNetwork.pNetworkImpl->GetGraph());
 
     auto optNet = IOptimizedNetworkPtr(new IOptimizedNetwork(std::move(graph), options.m_ModelOptions),

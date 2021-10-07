@@ -526,6 +526,33 @@ void Graph::EraseSubgraphLayers(SubgraphView &subgraph)
     subgraph.Clear();
 }
 
+/// For each ConstantLayer in Graph, ensures TensorInfo is set on all output slots.
+/// LayerValidationException thrown if no TensorInfo is set.
+///
+/// @throws LayerValidationException
+void Graph::VerifyConstantLayerSetTensorInfo() const
+{
+    for (auto&& layer : TopologicalSort())
+    {
+        if(layer->GetType() == armnn::LayerType::Constant)
+        {
+            for (auto&& output: layer->GetOutputSlots())
+            {
+                if (!output.IsTensorInfoSet())
+                {
+                    std::ostringstream message;
+                    message << "Output slot TensorInfo not set on "
+                            << GetLayerTypeAsCString(layer->GetType())
+                            << " layer \""
+                            << layer->GetName()
+                            << "\"";
+                    throw LayerValidationException(message.str());
+                }
+            }
+        }
+    }
+}
+
 void Graph::InferTensorInfos()
 {
     for (auto&& layer : TopologicalSort())
@@ -536,7 +563,9 @@ void Graph::InferTensorInfos()
             if (source == NULL)
             {
                 std::ostringstream message;
-                message << "Input not connected on "
+                message << "Input slot "
+                        << input.GetSlotIndex()
+                        << " not connected to an output slot on "
                         << GetLayerTypeAsCString(layer->GetType())
                         << " layer \""
                         << layer->GetName()
@@ -546,13 +575,19 @@ void Graph::InferTensorInfos()
 
             if (!source->IsTensorInfoSet())
             {
-                throw LayerValidationException("All inputs must have the TensorInfo set at this point.");
+                std::ostringstream message;
+                message << "Output slot TensorInfo not set on "
+                        << GetLayerTypeAsCString(layer->GetType())
+                        << " layer \""
+                        << layer->GetName()
+                        << "\"";
+                throw LayerValidationException(message.str());
             }
+        }
 
-            if (layer->m_ShapeInferenceMethod == ShapeInferenceMethod::ValidateOnly)
-            {
-                layer->ValidateTensorShapesFromInputs();
-            }
+        if (layer->m_ShapeInferenceMethod == ShapeInferenceMethod::ValidateOnly)
+        {
+            layer->ValidateTensorShapesFromInputs();
         }
     }
 }

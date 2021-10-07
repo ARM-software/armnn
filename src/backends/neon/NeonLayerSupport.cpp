@@ -466,6 +466,11 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            reasonIfUnsupported,
                                            input,
                                            output);
+        case UnaryOperation::Sin:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSinWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
         default:
             return false;
     }

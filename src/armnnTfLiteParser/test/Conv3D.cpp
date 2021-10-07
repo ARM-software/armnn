@@ -6,6 +6,8 @@
 #include "ParserFlatbuffersFixture.hpp"
 #include <sstream>
 
+// Conv3D support was added in TF 2.5, so for backwards compatibility a hash define is needed.
+#if defined(ARMNN_POST_TFLITE_2_3)
 TEST_SUITE("TensorflowLiteParser_Conv3D")
 {
 struct SimpleConv3DFixture : public ParserFlatbuffersFixture
@@ -284,3 +286,4 @@ TEST_CASE_FIXTURE(Relu6Conv3DWithBiasesFixture, "ParseConv3DAndRelu6WithBias")
 }
 
 }
+#endif

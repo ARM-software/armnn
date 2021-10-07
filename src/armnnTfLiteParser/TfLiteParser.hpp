@@ -13,6 +13,12 @@
 #include <unordered_map>
 #include <vector>
 
+#include <tensorflow/lite/version.h>
+
+#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 3)
+#define ARMNN_POST_TFLITE_2_3
+#endif
+
 namespace armnnTfLiteParser
 {
 
@@ -113,7 +119,10 @@ private:
     void ParseComparison(size_t subgraphIndex, size_t operatorIndex, armnn::ComparisonOperation comparisonOperation);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
+    // Conv3D support was added in TF 2.5, so for backwards compatibility a hash define is needed.
+    #if defined(ARMNN_POST_TFLITE_2_3)
     void ParseConv3D(size_t subgraphIndex, size_t operatorIndex);
+    #endif
     void ParseDepthToSpace(size_t subgraphIndex, size_t operatorIndex);
     void ParseDepthwiseConv2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseDequantize(size_t subgraphIndex, size_t operatorIndex);

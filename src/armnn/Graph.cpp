@@ -534,7 +534,7 @@ void Graph::VerifyConstantLayerSetTensorInfo() const
 {
     for (auto&& layer : TopologicalSort())
     {
-        if(layer->GetType() == armnn::LayerType::Constant)
+        if (layer->GetType() == armnn::LayerType::Constant)
         {
             for (auto&& output: layer->GetOutputSlots())
             {
@@ -562,15 +562,9 @@ void Graph::InferTensorInfos()
             const IOutputSlot* source = input.GetConnectedOutputSlot();
             if (source == NULL)
             {
-                std::ostringstream message;
-                message << "Input slot "
-                        << input.GetSlotIndex()
-                        << " not connected to an output slot on "
-                        << GetLayerTypeAsCString(layer->GetType())
-                        << " layer \""
-                        << layer->GetName()
-                        << "\"";
-                throw LayerValidationException(message.str());
+                // Throws exception due to a layer input not being connected to an output slot.
+                // Verifies input slot weights and bias are set for FullyConnected layers.
+                ConstructErrorMessageForUnconnectedInputs(layer, input.GetSlotIndex());
             }
 
             if (!source->IsTensorInfoSet())
@@ -578,9 +572,8 @@ void Graph::InferTensorInfos()
                 std::ostringstream message;
                 message << "Output slot TensorInfo not set on "
                         << GetLayerTypeAsCString(layer->GetType())
-                        << " layer \""
-                        << layer->GetName()
-                        << "\"";
+                        << " layer "
+                        << std::quoted(layer->GetName());
                 throw LayerValidationException(message.str());
             }
         }
@@ -590,6 +583,56 @@ void Graph::InferTensorInfos()
             layer->ValidateTensorShapesFromInputs();
         }
     }
+}
+
+/// Throws exception due to a layer input not being connected to an output slot.
+/// Verifies weights and bias are set for FullyConnected layers on input slots 1
+/// and 2 respectively. Method checks if bias is enabled before ensuring it is set.
+///
+/// @param layer constant pointer to a Layer object
+/// @param slotIndex input slot index of layer
+/// @throws LayerValidationException
+void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
+                                                      unsigned int slotIndex)
+{
+    std::ostringstream message;
+    bool noWeightsAndBias = false;
+
+    if (layer->GetType() == armnn::LayerType::FullyConnected && slotIndex > 0)
+    {
+        // If weights are not set and is bias enabled, also check if bias is set
+        if (slotIndex == 1 && layer->GetNumInputSlots() == 3)
+        {
+            const IOutputSlot* biasSource = layer->GetInputSlot(2).GetConnectedOutputSlot();
+            if (biasSource == NULL)
+            {
+                message << "FullyConnected layer weights and bias not set: ";
+                noWeightsAndBias = true;
+            }
+        }
+
+        // Only weights or bias are not set
+        if (!noWeightsAndBias)
+        {
+            if (slotIndex == 1)
+            {
+                message << "FullyConnected layer weights not set: ";
+            }
+            else
+            {
+                message << "FullyConnected layer bias not set: ";
+            }
+        }
+    }
+
+    std::string slotString = noWeightsAndBias ? "1 & 2" : std::to_string(slotIndex);
+    message << "Input slot(s) "
+            << slotString
+            << " not connected to an output slot on "
+            << GetLayerTypeAsCString(layer->GetType())
+            << " layer "
+            << std::quoted(layer->GetName());
+    throw LayerValidationException(message.str());
 }
 
 } // namespace armnn

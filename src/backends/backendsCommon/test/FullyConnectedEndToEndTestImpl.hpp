@@ -103,6 +103,61 @@ armnn::INetworkPtr CreateFullyConnectedNetworkNoTensorInfoConstWeights(const arm
     return network;
 }
 
+armnn::INetworkPtr CreateFullyConnectedNetworkNoConnectedWeightsExplicit(const armnn::TensorInfo& inputTensorInfo,
+                                                                         const armnn::TensorInfo& outputTensorInfo,
+                                                                         const armnn::TensorInfo& biasTensorInfo,
+                                                                         armnn::FullyConnectedDescriptor descriptor)
+{
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
+    armnn::IConnectableLayer* biasLayer   = network->AddInputLayer(2, "Bias_Input");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
+    armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
+
+    Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
+    Connect(biasLayer, fullyConnectedLayer, biasTensorInfo, 0, 2);
+    Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
+armnn::INetworkPtr CreateFullyConnectedNetworkNoConnectedWeightsAndBias(const armnn::TensorInfo& inputTensorInfo,
+                                                                        const armnn::TensorInfo& outputTensorInfo,
+                                                                        armnn::FullyConnectedDescriptor descriptor)
+{
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
+    armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
+
+    Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
+    Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
+armnn::INetworkPtr CreateFullyConnectedNetworkNoConnectedBiasExplicit(const armnn::TensorInfo& inputTensorInfo,
+                                                                      const armnn::TensorInfo& outputTensorInfo,
+                                                                      const armnn::TensorInfo& weightsTensorInfo,
+                                                                      const armnn::ConstTensor& weightsConstantTensor,
+                                                                      armnn::FullyConnectedDescriptor descriptor)
+{
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
+    armnn::IConnectableLayer* weightsLayer  = network->AddConstantLayer(weightsConstantTensor, "Weights");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
+    armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
+
+    Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
+    Connect(weightsLayer, fullyConnectedLayer, weightsTensorInfo, 0, 1);
+    Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId>& backends)
 {
@@ -160,8 +215,7 @@ void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::BackendId>& backends,
                                                        const bool transposeWeights,
-                                                       const bool constantWeightsOrBias,
-                                                       const bool tensorInfoSet)
+                                                       const bool constantWeightsOrBias)
 {
     unsigned int inputWidth = 1;
     unsigned int inputHeight = 1;
@@ -230,24 +284,7 @@ void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::
     descriptor.m_TransposeWeightMatrix = transposeWeights;
     descriptor.m_ConstantWeights = constantWeightsOrBias;
 
-    if(!tensorInfoSet)
-    {
-        // Tests constant weights and non constant bias.
-        ConstTensor weightsConstantTensor(weightsDesc, weights.data());
-
-        armnn::INetworkPtr network = CreateFullyConnectedNetworkNoTensorInfoConstWeights(inputTensorInfo,
-                                                                                         outputTensorInfo,
-                                                                                         weightsConstantTensor,
-                                                                                         descriptor);
-        CHECK(network);
-
-        // Create runtime in which test will run
-        IRuntime::CreationOptions options;
-        IRuntimePtr runtime(IRuntime::Create(options));
-
-        CHECK_THROWS_AS( Optimize(*network, backends, runtime->GetDeviceSpec()), LayerValidationException );
-    }
-    else if (!constantWeightsOrBias)
+    if (!constantWeightsOrBias)
     {
         // Tests non constant weights and constant bias.
         ConstTensor biasConstantTensor(biasesDesc, biasValues.data());
@@ -290,6 +327,165 @@ void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::
                                                     expectedOutputTensorData,
                                                     backends,
                                                     1.0f);
+    }
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
+                                 const bool explicitCheck,
+                                 const bool biasEnabled,
+                                 const bool connectedWeights,
+                                 const bool connectedBias,
+                                 const bool tensorInfoSet)
+{
+    unsigned int inputWidth = 1;
+    unsigned int inputHeight = 1;
+    unsigned int inputChannels = 5;
+    unsigned int inputNum = 2;
+
+    unsigned int outputChannels = 3;
+    unsigned int outputNum = 2;
+
+    unsigned int inputShape[]   = { inputNum, inputChannels, inputHeight, inputWidth };
+    unsigned int outputShape[]  = { outputNum, outputChannels };
+    unsigned int weightsShape[] = { inputChannels, outputChannels };
+
+    unsigned int biasShape[] = { outputChannels };
+
+    armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Float32);
+    armnn::TensorInfo weightsDesc = armnn::TensorInfo(2, weightsShape, armnn::DataType::Float32);
+    armnn::TensorInfo biasesDesc = armnn::TensorInfo(1, biasShape, armnn::DataType::Float32);
+
+    std::vector<float> weights =
+    {
+        .5f, 2.f, .5f,
+        .5f, 2.f, 1.f,
+        .5f, 2.f, 2.f,
+        .5f, 2.f, 3.f,
+        .5f, 2.f, 4.f
+    };
+
+    FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = biasEnabled;
+
+    if(explicitCheck)
+    {
+        if(!biasEnabled)
+        {
+            try
+            {
+                CreateFullyConnectedNetworkNoConnectedWeightsExplicit(inputTensorInfo,
+                                                                      outputTensorInfo,
+                                                                      biasesDesc,
+                                                                      descriptor);
+                FAIL("LayerValidationException should have been thrown");
+            }
+            catch (const LayerValidationException& exc)
+            {
+                CHECK(strcmp(exc.what(), "Tried to connect bias to FullyConnected layer when bias is not enabled: "
+                                         "Failed to connect to input slot 2 on FullyConnected layer "
+                                         "\"Fully_Connected\" as the slot does not exist or is unavailable") == 0);
+            }
+        }
+        else if (!connectedWeights)
+        {
+            armnn::INetworkPtr network = CreateFullyConnectedNetworkNoConnectedWeightsExplicit(inputTensorInfo,
+                                                                                               outputTensorInfo,
+                                                                                               biasesDesc,
+                                                                                               descriptor);
+            CHECK(network);
+
+            // Create runtime in which test will run
+            IRuntime::CreationOptions options;
+            IRuntimePtr               runtime(IRuntime::Create(options));
+
+            try
+            {
+                Optimize(*network, backends, runtime->GetDeviceSpec());
+                FAIL("LayerValidationException should have been thrown");
+            }
+            catch (const LayerValidationException& exc)
+            {
+                CHECK(strcmp(exc.what(), "FullyConnected layer weights not set: Input slot(s) 1 not connected "
+                                         "to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
+            }
+        }
+        else if (!connectedBias)
+        {
+            // Tests with constant weights.
+            ConstTensor weightsConstantTensor(weightsDesc, weights.data());
+
+            armnn::INetworkPtr network = CreateFullyConnectedNetworkNoConnectedBiasExplicit(inputTensorInfo,
+                                                                                            outputTensorInfo,
+                                                                                            weightsDesc,
+                                                                                            weightsConstantTensor,
+                                                                                            descriptor);
+            CHECK(network);
+
+            // Create runtime in which test will run
+            IRuntime::CreationOptions options;
+            IRuntimePtr               runtime(IRuntime::Create(options));
+
+            try
+            {
+                Optimize(*network, backends, runtime->GetDeviceSpec());
+                FAIL("LayerValidationException should have been thrown");
+            }
+            catch (const LayerValidationException& exc)
+            {
+                CHECK(strcmp(exc.what(), "FullyConnected layer bias not set: Input slot(s) 2 not connected "
+                                         "to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
+            }
+        }
+    }
+    else if(!connectedWeights && !connectedBias)
+    {
+        armnn::INetworkPtr network = CreateFullyConnectedNetworkNoConnectedWeightsAndBias(inputTensorInfo,
+                                                                                          outputTensorInfo,
+                                                                                          descriptor);
+        CHECK(network);
+
+        // Create runtime in which test will run
+        IRuntime::CreationOptions options;
+        IRuntimePtr               runtime(IRuntime::Create(options));
+
+        try
+        {
+            Optimize(*network, backends, runtime->GetDeviceSpec());
+            FAIL("LayerValidationException should have been thrown");
+        }
+        catch (const LayerValidationException& exc)
+        {
+            CHECK(strcmp(exc.what(), "FullyConnected layer weights and bias not set: Input slot(s) 1 & 2 not "
+                                     "connected to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
+        }
+
+    }
+    else if(!tensorInfoSet)
+    {
+        // Tests with constant weights.
+        ConstTensor weightsConstantTensor(weightsDesc, weights.data());
+
+        armnn::INetworkPtr network = CreateFullyConnectedNetworkNoTensorInfoConstWeights(inputTensorInfo,
+                                                                                         outputTensorInfo,
+                                                                                         weightsConstantTensor,
+                                                                                         descriptor);
+        CHECK(network);
+
+        // Create runtime in which test will run
+        IRuntime::CreationOptions options;
+        IRuntimePtr runtime(IRuntime::Create(options));
+
+        try
+        {
+            Optimize(*network, backends, runtime->GetDeviceSpec());
+            FAIL("LayerValidationException should have been thrown");
+        }
+        catch (const LayerValidationException& exc)
+        {
+            CHECK(strcmp(exc.what(), "Output slot TensorInfo not set on Constant layer \"Weights\"") == 0);
+        }
     }
 }
 

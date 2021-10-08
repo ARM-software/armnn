@@ -268,6 +268,11 @@ private:
 
     std::map<const GraphEvent, std::list<IGraphObservable*>> m_Views;
     ShapeInferenceMethod m_ShapeInferenceMethod;
+
+    // Throws exception due to a layer input not being connected to an output slot.
+    /// Also verifies weights and bias are set for FullyConnected layers.
+    void ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
+                                                   unsigned int slotIndex);
 };
 
 /// Common base class for layers in the graph.

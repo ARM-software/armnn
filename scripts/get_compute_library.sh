@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="63e0beb9fb9646407d123e830165546e9129e95d" #Add support for non-constant weights and biases in CpuFullyConnected
+DEFAULT_CLFRAMEWORKREVISION="c9fe9fc3fc8c58a9d724776f75831ab35f07b253" #Add support for 5D data layout indexing
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -35,8 +35,39 @@
 #endif
 
 #include <future>
+
+/**
+ * Given a measured duration and a threshold time tell the user whether we succeeded or not.
+ *
+ * @param duration the measured inference duration.
+ * @param thresholdTime the threshold time in milliseconds.
+ * @return false if the measured time exceeded the threshold.
+ */
+bool CheckInferenceTimeThreshold(const std::chrono::duration<double, std::milli>& duration,
+                                 const double& thresholdTime)
+{
+    ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+                    << std::fixed << duration.count() << " ms\n";
+    // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+    if (thresholdTime != 0.0)
+    {
+        ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
+                        << std::fixed << thresholdTime << " ms";
+        auto thresholdMinusInference = thresholdTime - duration.count();
+        ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                        << std::fixed << thresholdMinusInference << " ms" << "\n";
+       if (thresholdMinusInference < 0)
+        {
+            std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
+            ARMNN_LOG(fatal) << errorMessage;
+            return false;
+        }
+    }
+    return true;
+}
+
 #if defined(ARMNN_TFLITE_DELEGATE)
-int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
+int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRuntime::CreationOptions runtimeOptions,
                            const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
 {
     using namespace tflite;
@@ -54,7 +85,10 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
     if (params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate)
     {
         // Create the Armnn Delegate
-        armnnDelegate::DelegateOptions delegateOptions(params.m_ComputeDevices);
+        // Populate a DelegateOptions from the ExecuteNetworkParams.
+        armnnDelegate::DelegateOptions delegateOptions = params.ToDelegateOptions();
+        delegateOptions.SetExternalProfilingParams(runtimeOptions.m_ProfilingOptions);
+
         std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
                 theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
                                  armnnDelegate::TfLiteArmnnDelegateDelete);
@@ -71,18 +105,11 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
         std::cout << "Running on TfLite without ArmNN delegate\n";
     }
 
-
-    std::vector<std::string>  inputBindings;
-    for (const std::string& inputName: params.m_InputNames)
-    {
-        inputBindings.push_back(inputName);
-    }
-
     armnn::Optional<std::string> dataFile = params.m_GenerateTensorData
                                             ? armnn::EmptyOptional()
                                             : armnn::MakeOptional<std::string>(params.m_InputTensorDataFilePaths[0]);
 
-    const size_t numInputs = inputBindings.size();
+    const size_t numInputs = params.m_InputNames.size();
 
     for(unsigned int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
     {
@@ -212,15 +239,36 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
 
     for (size_t x = 0; x < params.m_Iterations; x++)
     {
+        // Start timer to record inference time in milliseconds.
+        const auto start_time = armnn::GetTimeNow();
         // Run the inference
         status = tfLiteInterpreter->Invoke();
+        const auto duration = armnn::GetTimeDuration(start_time);
 
         // Print out the output
         for (unsigned int outputIndex = 0; outputIndex < params.m_OutputNames.size(); ++outputIndex)
         {
             auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[outputIndex];
             TfLiteIntArray* outputDims = tfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
-
+            // If we've been asked to write to a file then set a file output stream. Otherwise use stdout.
+            FILE* outputTensorFile = stdout;
+            if (!params.m_OutputTensorFiles.empty())
+            {
+                outputTensorFile = fopen(params.m_OutputTensorFiles[outputIndex].c_str(), "w");
+                if (outputTensorFile == NULL)
+                {
+                    ARMNN_LOG(fatal) << "Specified output tensor file, \"" <<
+                                     params.m_OutputTensorFiles[outputIndex] <<
+                                     "\", cannot be created. Defaulting to stdout. " <<
+                                     "Error was: " << std::strerror(errno);
+                    outputTensorFile = stdout;
+                }
+                else
+                {
+                    ARMNN_LOG(info) << "Writing output " << outputIndex << "' of iteration: " << x+1 << " to file: '"
+                                    << params.m_OutputTensorFiles[outputIndex] << "'";
+                }
+            }
             long outputSize = 1;
             for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
             {
@@ -242,7 +290,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                 {
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        printf("%f ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%f ", tfLiteDelageOutputData[i]);
                     }
                 }
             }
@@ -260,7 +308,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                 {
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        printf("%d ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%d ", tfLiteDelageOutputData[i]);
                     }
                 }
             }
@@ -278,7 +326,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                 {
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        printf("%d ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%d ", tfLiteDelageOutputData[i]);
                     }
                 }
             }
@@ -297,7 +345,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
                 {
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        printf("%u ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%u ", tfLiteDelageOutputData[i]);
                     }
                 }
             }
@@ -310,6 +358,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params,
             }
             std::cout << std::endl;
         }
+        CheckInferenceTimeThreshold(duration, params.m_ThresholdTime);
     }
 
     return status;
@@ -628,24 +677,7 @@ int MainImpl(const ExecuteNetworkParams& params,
                         mapbox::util::apply_visitor(printer, inferenceOutputMap.at(cb->GetInferenceId())[i]);
                     }
 
-                    ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
-                                    << std::fixed << inferenceDuration.count() << " ms\n";
-
-                     // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
-                    if (params.m_ThresholdTime != 0.0)
-                    {
-                        ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
-                                        << std::fixed << params.m_ThresholdTime << " ms";
-                        auto thresholdMinusInference =
-                            params.m_ThresholdTime - duration<double, std::milli>(inferenceDuration).count();
-                        ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
-                                        << std::fixed << thresholdMinusInference << " ms" << "\n";
-
-                        if (thresholdMinusInference < 0)
-                        {
-                            ARMNN_LOG(fatal) << "Elapsed inference time is greater than provided threshold time. \n";
-                        }
-                    }
+                    CheckInferenceTimeThreshold(inferenceDuration, params.m_ThresholdTime);
                     ++j;
                 }
                 //print duration difference between overallStartTime and overallEndTime
@@ -739,26 +771,8 @@ int MainImpl(const ExecuteNetworkParams& params,
                                               !params.m_DontPrintOutputs);
                         mapbox::util::apply_visitor(printer, outputs[j][i]);
                     }
-
-                    ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
-                                    << std::fixed << inferenceDuration.count() << " ms\n";
-
-                    // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
-                    if (params.m_ThresholdTime != 0.0)
-                    {
-                        ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
-                                        << std::fixed << params.m_ThresholdTime << " ms";
-                        auto thresholdMinusInference = params.m_ThresholdTime - inferenceDuration.count();
-                        ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
-                                        << std::fixed << thresholdMinusInference << " ms" << "\n";
-
-                        if (thresholdMinusInference < 0)
-                        {
-                            ARMNN_LOG(fatal) << "Elapsed inference time is greater than provided threshold time. \n";
-                        }
-                    }
+                    CheckInferenceTimeThreshold(inferenceDuration, params.m_ThresholdTime);
                     ARMNN_LOG(info) << "Asynchronous Execution is finished for Inference ID: " << inferenceID << " \n";
-
                 }
                 // finish timer
                 const auto duration = armnn::GetTimeDuration(start_time);
@@ -780,7 +794,6 @@ int MainImpl(const ExecuteNetworkParams& params,
 
     return EXIT_SUCCESS;
 }
-
 
 // MAIN
 int main(int argc, const char* argv[])
@@ -853,7 +866,7 @@ int main(int argc, const char* argv[])
                     ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
         {
         #if defined(ARMNN_TF_LITE_DELEGATE)
-            return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, runtime);
+            return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, ProgramOptions.m_RuntimeOptions, runtime);
         #else
             ARMNN_LOG(fatal) << "Not built with Arm NN Tensorflow-Lite delegate support.";
             return EXIT_FAILURE;

@@ -233,3 +233,59 @@ void ExecuteNetworkParams::ValidateParams()
         ARMNN_LOG(warning) << "No input files provided, input tensors will be filled with 0s.";
     }
 }
+
+#if defined(ARMNN_TFLITE_DELEGATE)
+/**
+ * A utility method that populates a DelegateOptions object from this ExecuteNetworkParams.
+ *
+ * @return a populated armnnDelegate::DelegateOptions object.
+ */
+armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
+{
+    armnnDelegate::DelegateOptions delegateOptions(m_ComputeDevices);
+    delegateOptions.SetDynamicBackendsPath(m_DynamicBackendsPath);
+    delegateOptions.SetGpuProfilingState(m_EnableProfiling);
+
+    armnn::OptimizerOptions options;
+    options.m_ReduceFp32ToFp16 = m_EnableFp16TurboMode;
+    options.m_ReduceFp32ToBf16 = m_EnableBf16TurboMode;
+    options.m_Debug = m_PrintIntermediate;
+
+    options.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly;
+    if (m_InferOutputShape)
+    {
+        options.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::InferAndValidate;
+    }
+
+    armnn::BackendOptions gpuAcc("GpuAcc",
+                                 {
+        { "FastMathEnabled", m_EnableFastMath },
+        { "SaveCachedNetwork", m_SaveCachedNetwork },
+        { "CachedNetworkFilePath", m_CachedNetworkFilePath },
+        { "TuningLevel", m_TuningLevel},
+        { "TuningFile", m_TuningPath.c_str()},
+        { "KernelProfilingEnabled", m_EnableProfiling},
+        { "MLGOTuningFilePath", m_MLGOTuningFilePath}
+                                 });
+
+    armnn::BackendOptions cpuAcc("CpuAcc",
+                                 {
+        { "FastMathEnabled", m_EnableFastMath },
+        { "NumberOfThreads", m_NumberOfThreads }
+                                 });
+    options.m_ModelOptions.push_back(gpuAcc);
+    options.m_ModelOptions.push_back(cpuAcc);
+
+    delegateOptions.SetOptimizerOptions(options);
+
+    // If v,visualize-optimized-model is enabled then construct a file name for the dot file.
+    if (m_EnableLayerDetails)
+    {
+        fs::path filename = m_ModelPath;
+        filename.replace_extension("dot");
+        delegateOptions.SetSerializeToDot(filename);
+    }
+
+    return delegateOptions;
+}
+#endif

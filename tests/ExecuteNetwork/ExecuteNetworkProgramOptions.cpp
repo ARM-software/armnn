@@ -242,7 +242,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                 ("l,dequantize-output",
                  "If this option is enabled, all quantized outputs will be dequantized to float. "
                  "If unset, default to not get dequantized. "
-                 "Accepted values (true or false)",
+                 "Accepted values (true or false)"
+                 " (Not available when executing ArmNNTfLiteDelegate or TfliteInterpreter)",
                  cxxopts::value<bool>(m_ExNetParams.m_DequantizeOutput)->default_value("false")->implicit_value("true"))
 
                 ("p,print-intermediate-layers",
@@ -261,9 +262,9 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("q,quantize-input",
                  "If this option is enabled, all float inputs will be quantized as appropriate for the model's inputs. "
-                 "If unset, default to not quantized. Accepted values (true or false)",
+                 "If unset, default to not quantized. Accepted values (true or false)"
+                 " (Not available when executing ArmNNTfLiteDelegate or TfliteInterpreter)",
                  cxxopts::value<bool>(m_ExNetParams.m_QuantizeInput)->default_value("false")->implicit_value("true"))
-
                 ("r,threshold-time",
                  "Threshold time is the maximum allowed time for inference measured in milliseconds. If the actual "
                  "inference time is greater than the threshold time, the test will fail. By default, no threshold "
@@ -286,7 +287,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::string>())
 
                 ("x,subgraph-number",
-                 "Id of the subgraph to be executed. Defaults to 0.",
+                 "Id of the subgraph to be executed. Defaults to 0."
+                 " (Not available when executing ArmNNTfLiteDelegate or TfliteInterpreter)",
                  cxxopts::value<size_t>(m_ExNetParams.m_SubgraphId)->default_value("0"))
 
                 ("y,input-type",

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c9fe9fc3fc8c58a9d724776f75831ab35f07b253" #Add support for 5D data layout indexing
+DEFAULT_CLFRAMEWORKREVISION="0d11b70fbfa95431dacd7dce02403cf90bc688d5" #Fix precision issue in ChannelShuffleKernel
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

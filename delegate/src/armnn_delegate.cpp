@@ -522,6 +522,15 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinConv2d);
+// Conv3d is only correctly supported for external delegates from TF Lite v2.6, as there was a breaking bug in v2.5.
+#if defined(ARMNN_POST_TFLITE_2_5)
+        case kTfLiteBuiltinConv3d:
+            return VisitConvolutionOperator(delegateData,
+                                            tfLiteContext,
+                                            tfLiteNode,
+                                            nodeIndex,
+                                            kTfLiteBuiltinConv3d);
+#endif
         case kTfLiteBuiltinDepthToSpace:
             return VisitDepthToSpaceOperator(delegateData,
                                              tfLiteContext,

@@ -11,6 +11,15 @@
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
 #include <tensorflow/lite/minimal_logging.h>
+#include <tensorflow/lite/version.h>
+
+#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 3)
+#define ARMNN_POST_TFLITE_2_3
+#endif
+
+#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 5)
+#define ARMNN_POST_TFLITE_2_5
+#endif
 
 namespace armnnDelegate
 {

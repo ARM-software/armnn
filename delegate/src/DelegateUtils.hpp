@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <armnn_delegate.hpp>
+
 #include <armnn/ArmNN.hpp>
 #include <armnn/BackendHelper.hpp>
 #include <armnn/utility/Assert.hpp>
@@ -16,7 +18,6 @@
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
 #include <tensorflow/lite/minimal_logging.h>
-#include <tensorflow/lite/version.h>
 
 #include "tensorflow/lite/kernels/kernel_util.h"
 
@@ -296,7 +297,7 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
             break;
         }
 // The name of kTfLiteActRelu1 changed after TF Lite v2.3
-#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 3)
+#if defined(ARMNN_POST_TFLITE_2_3)
         case kTfLiteActReluN1To1:
 #else
         case kTfLiteActRelu1:

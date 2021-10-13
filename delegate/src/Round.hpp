@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "SharedFunctions.hpp"
+
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
@@ -36,27 +38,17 @@ TfLiteStatus VisitFloorOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
+    // NOTE: looks like the outputTensorInfo is the only thing that is required for the case
+    //       where we are adding the floor layer so maybe move the other stuff inside the
+    //       if !delegateData block for efficiency.
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
-
-    bool isSupported = false;
-    auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
-    {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
-                                   tfLiteContext,
-                                   IsFloorSupported,
-                                   delegateData.m_Backends,
-                                   isSupported,
-                                   inputTensorInfo,
-                                   outInfo);
-    };
 
     // If the m_Network is a nullptr, this signals that a prerequisite TfLite callback is required to clarify the
     // support for the operator
     // If supported, VisitFloorOperator will be called again to add the layer to the network as seen further below
     if (!delegateData.m_Network)
     {
-        validateFunc(outputTensorInfo, isSupported);
-        return isSupported ? kTfLiteOk : kTfLiteError;
+        return ValidateFloorOperator(delegateData, tfLiteContext, inputTensorInfo, outputTensorInfo);
     }
 
     // Add a Floor layer

@@ -42,6 +42,7 @@
 #include <armnnUtils/Filesystem.hpp>
 #include <flatbuffers/flatbuffers.h>
 #include <tensorflow/lite/context_util.h>
+#include <tensorflow/lite/schema/schema_generated.h>
 
 #include <algorithm>
 #include <iostream>
@@ -583,6 +584,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                       tfLiteNode,
                                       nodeIndex,
                                       kTfLiteBuiltinFloor);
+        case kTfLiteBuiltinFloorDiv:
+            return VisitElementwiseBinaryOperator(delegateData,
+                                                  tfLiteContext,
+                                                  tfLiteNode,
+                                                  nodeIndex,
+                                                  kTfLiteBuiltinFloorDiv);
         case kTfLiteBuiltinFullyConnected:
             return VisitFullyConnectedOperator(delegateData,
                                                tfLiteContext,

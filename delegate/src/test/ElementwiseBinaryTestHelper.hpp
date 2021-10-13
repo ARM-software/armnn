@@ -123,6 +123,12 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
             operatorBuiltinOptions = CreateSubOptions(flatBufferBuilder, activationType).Union();
             break;
         }
+        case BuiltinOperator_FLOOR_DIV:
+        {
+            operatorBuiltinOptionsType = tflite::BuiltinOptions_FloorDivOptions;
+            operatorBuiltinOptions = CreateSubOptions(flatBufferBuilder, activationType).Union();
+            break;
+        }
         default:
             break;
     }

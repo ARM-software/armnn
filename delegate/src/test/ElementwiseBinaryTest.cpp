@@ -332,6 +332,43 @@ void DivUint8Test(std::vector<armnn::BackendId>& backends)
                                    expectedOutputValues, 0.25f, 0);
 }
 
+void FloorDivFP32Test(std::vector<armnn::BackendId>& backends)
+{
+    std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
+    std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
+    std::vector<int32_t> expectedOutputShape { 2, 2, 2, 2 };
+
+    std::vector<float> input0Values =
+    {
+        -37.5f, -15.2f, -8.76f, -2.0f,  -2.6f, -1.0f,  -0.8f,   0.0f,
+          4.0f,   1.6f,  2.0f,   5.2f,   6.0f, 35.04f, 60.8f, 150.0f
+    };
+
+    std::vector<float> input1Values =
+    {
+        1.f, 1.f, 1.f, 1.f, 2.f, 2.f, 2.f, 2.f,
+        4.f, 4.f, 4.f, 4.f, 4.f, 4.f, 4.f, 4.f
+    };
+
+    std::vector<float> expectedOutputValues =
+    {
+        -38.0f, -16.0f, -9.0f,  -2.0f, -2.0f, -1.0f,  -1.0f,  0.0f,
+          1.0f,   0.0f,  0.0f,   1.0f,  1.0f,  8.0f,  15.0f, 37.0f
+    };
+
+    ElementwiseBinaryTest<float>(tflite::BuiltinOperator_FLOOR_DIV,
+                                 tflite::ActivationFunctionType_NONE,
+                                 ::tflite::TensorType_FLOAT32,
+                                 backends,
+                                 input0Shape,
+                                 input1Shape,
+                                 expectedOutputShape,
+                                 input0Values,
+                                 input1Values,
+                                 expectedOutputValues);
+
+}
+
 void MaxFP32Test(std::vector<armnn::BackendId>& backends)
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
@@ -745,6 +782,12 @@ TEST_CASE ("DIV_Broadcast_GpuAcc_Test")
     DivBroadcastTest(backends);
 }
 
+TEST_CASE ("FLOORDIV_FP32_GpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
+    FloorDivFP32Test(backends);
+}
+
 TEST_CASE ("MAX_FP32_GpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
@@ -864,6 +907,12 @@ TEST_CASE ("DIV_Broadcast_CpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     DivBroadcastTest(backends);
+}
+
+TEST_CASE ("FLOORDIV_FP32_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    FloorDivFP32Test(backends);
 }
 
 TEST_CASE ("MAX_FP32_CpuAcc_Test")
@@ -990,6 +1039,12 @@ TEST_CASE ("DIV_Broadcast_CpuRef_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     DivBroadcastTest(backends);
+}
+
+TEST_CASE ("FLOORDIV_FP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    FloorDivFP32Test(backends);
 }
 
 TEST_CASE ("DIV_UINT8_CpuRef_Test")

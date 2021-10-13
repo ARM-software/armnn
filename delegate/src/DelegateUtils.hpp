@@ -595,7 +595,7 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
     for (unsigned int inputIndex = 0; inputIndex < layer->GetNumInputSlots(); ++inputIndex)
     {
         const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[inputIndex]];
-        if(tflite::IsConstantTensor(&tfLiteInputTensor))
+        if (tflite::IsConstantTensor(&tfLiteInputTensor))
         {
             armnn::TensorInfo inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
             bool isSupported = false;
@@ -618,7 +618,6 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
 
             delegateData.m_OutputSlotForNode[tfLiteNode->inputs->data[inputIndex]] = &outputSlot;
         }
-
     }
     return kTfLiteOk;
 }
@@ -632,5 +631,14 @@ unsigned int ComputeWrappedIndex(int index, unsigned int numDimensions)
 
     return static_cast<unsigned int>(wrappedIndex);
 };
+
+bool AreAllSigned32(const armnn::TensorInfo& inputInfo1,
+                    const armnn::TensorInfo& inputInfo2,
+                    const armnn::TensorInfo& outputInfo)
+{
+    return (armnn::DataType::Signed32 == inputInfo1.GetDataType()) &&
+           (armnn::DataType::Signed32 == inputInfo2.GetDataType()) &&
+           (armnn::DataType::Signed32 == outputInfo.GetDataType());
+}
 
 } // namespace anonymous

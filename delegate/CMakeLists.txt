@@ -32,6 +32,7 @@ list(APPEND armnnDelegate_sources
         src/Gather.hpp
         src/LogicalBinary.hpp
         src/Lstm.hpp
+        src/MultiLayerFacade.hpp
         src/Normalization.hpp
         src/Pack.hpp
         src/Pad.hpp
@@ -43,6 +44,8 @@ list(APPEND armnnDelegate_sources
         src/Resize.hpp
         src/Round.hpp
         src/Shape.hpp
+        src/SharedFunctions.hpp
+        src/SharedFunctions.cpp
         src/Slice.hpp
         src/Softmax.hpp
         src/SpaceDepth.hpp

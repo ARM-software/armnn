@@ -93,9 +93,9 @@ struct TypeAnyOf : public Rule
     TypeAnyOf(const TensorInfo& info, const Container& c)
     {
         m_Res = std::any_of(c.begin(), c.end(), [&info](DataType dt)
-            {
-                return dt == info.GetDataType();
-            });
+        {
+            return dt == info.GetDataType();
+        });
     }
 };
 

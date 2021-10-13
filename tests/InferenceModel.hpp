@@ -450,9 +450,9 @@ public:
             options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
             options.m_ReduceFp32ToBf16 = params.m_EnableBf16TurboMode;
             options.m_Debug = params.m_PrintIntermediateLayers;
-
             options.m_shapeInferenceMethod = params.m_InferOutputShape ?
                     armnn::ShapeInferenceMethod::InferAndValidate : armnn::ShapeInferenceMethod::ValidateOnly;
+            options.m_ProfilingEnabled = m_EnableProfiling;
 
             armnn::BackendOptions gpuAcc("GpuAcc",
             {

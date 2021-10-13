@@ -27,6 +27,7 @@ namespace armnn
 
 Graph::Graph(const Graph& other)
 :   m_LayersInOrder(other.m_LayersInOrder)
+,   m_Profiler(other.m_Profiler)
 {
     std::unordered_map<const Layer*, Layer*> otherToClonedMap;
 
@@ -634,6 +635,11 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
             << " layer "
             << std::quoted(layer->GetName());
     throw LayerValidationException(message.str());
+}
+
+const std::shared_ptr<IProfiler>& Graph::GetProfiler() const
+{
+    return m_Profiler;
 }
 
 } // namespace armnn

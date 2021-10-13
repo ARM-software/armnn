@@ -516,6 +516,11 @@ Status IOptimizedNetwork::SerializeToDot(std::ostream& stream) const
     return pOptimizedNetworkImpl->SerializeToDot(stream);
 }
 
+const std::shared_ptr<IProfiler>& IOptimizedNetwork::GetProfiler() const
+{
+    return pOptimizedNetworkImpl->GetGraph().GetProfiler();
+}
+
 profiling::ProfilingGuid IOptimizedNetwork::GetGuid() const
 {
     return pOptimizedNetworkImpl->GetGuid();

@@ -6,6 +6,7 @@
 
 #include "LayersFwd.hpp"
 #include "IGraphObservable.hpp"
+#include "Profiling.hpp"
 
 #include <armnn/Types.hpp>
 #include <armnn/TensorFwd.hpp>
@@ -96,6 +97,7 @@ public:
         : m_LayersInOrder(true)
         , m_ShapeInferenceMethod(shapeInferenceMethod ? ShapeInferenceMethod::InferAndValidate :
                                                         ShapeInferenceMethod::ValidateOnly)
+        , m_Profiler(std::make_shared<IProfiler>())
         {}
 
     Graph(const Graph& other);
@@ -113,6 +115,7 @@ public:
         m_OutputIds     = std::move(other.m_OutputIds);
         m_LayersInOrder = std::move(other.m_LayersInOrder);
         m_Views         = std::move(other.m_Views);
+        m_Profiler      = std::move(other.m_Profiler);
 
         other.ForEachLayer([this](Layer* otherLayer)
         {
@@ -220,6 +223,8 @@ public:
     /// Gets the position of a layer in the graph.
     Iterator GetPosInGraph(Layer& layer);
 
+    const std::shared_ptr<IProfiler>& GetProfiler() const;
+
 private:
     template <typename LayerT>
     class LayerInGraphBase;
@@ -268,6 +273,7 @@ private:
 
     std::map<const GraphEvent, std::list<IGraphObservable*>> m_Views;
     ShapeInferenceMethod m_ShapeInferenceMethod;
+    std::shared_ptr<IProfiler> m_Profiler;
 
     // Throws exception due to a layer input not being connected to an output slot.
     /// Also verifies weights and bias are set for FullyConnected layers.

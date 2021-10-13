@@ -715,6 +715,7 @@ class WorkingMemHandle;
 struct BackendSettings;
 struct OptimizationResult;
 class OptimizedNetworkImpl;
+class IProfiler;
 class IOptimizedNetwork
 {
 public:
@@ -731,6 +732,8 @@ public:
     IOptimizedNetwork(std::unique_ptr<Graph> graph);
     IOptimizedNetwork(std::unique_ptr<OptimizedNetworkImpl> impl);
     ~IOptimizedNetwork();
+
+    const std::shared_ptr<IProfiler>& GetProfiler() const;
 
 protected:
     friend class LoadedNetwork;

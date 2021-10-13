@@ -73,7 +73,7 @@ public:
     // NOTE we return by reference as the purpose of this method is only to provide
     // access to the private m_Profiler and in theory we should not need to increment
     // the shared_ptr's reference counter
-    const std::shared_ptr<IProfiler>& GetProfiler() const { return m_Profiler; }
+    const std::shared_ptr<IProfiler>& GetProfiler() const { return m_OptimizedNetwork->GetProfiler(); }
 
     void FreeWorkingMemory();
 
@@ -126,7 +126,6 @@ private:
     WorkloadFactoryMap  m_WorkloadFactories;
 
     std::unique_ptr<IOptimizedNetwork> m_OptimizedNetwork;
-    std::shared_ptr<IProfiler>         m_Profiler;
 
     WorkloadQueue                      m_InputQueue;
     WorkloadQueue                      m_WorkloadQueue;

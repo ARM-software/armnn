@@ -162,6 +162,10 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
                                 std::string& errorMessage,
                                 const INetworkProperties& networkProperties)
 {
+    // Register the profiler
+    auto profiler = inNetwork->GetProfiler();
+    ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
+
     IOptimizedNetwork* rawNetwork = inNetwork.release();
 
     networkIdOut = GenerateNetworkId();
@@ -249,6 +253,9 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
     {
         context.second->AfterUnloadNetwork(networkId);
     }
+
+    // Unregister the profiler
+    ProfilerManager::GetInstance().RegisterProfiler(nullptr);
 
     ARMNN_LOG(debug) << "RuntimeImpl::UnloadNetwork(): Unloaded network with ID: " << networkId;
     return Status::Success;

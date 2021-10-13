@@ -36,6 +36,19 @@ public:
     /// Create the network directly from protobuf text in a string. Useful for debugging/testing
     armnn::INetworkPtr CreateNetworkFromString(const std::string& protoText);
 
+    /// Create the network from a protobuf binary file on disk, with inputShapes specified
+    armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile,
+                                                   const std::map<std::string, armnn::TensorShape>& inputShapes);
+
+    /// Create the network from a protobuf text file on disk, with inputShapes specified
+    armnn::INetworkPtr CreateNetworkFromTextFile(const char* graphFile,
+                                                 const std::map<std::string, armnn::TensorShape>& inputShapes);
+
+     /// Create the network directly from protobuf text in a string, with inputShapes specified.
+     /// Useful for debugging/testing
+    armnn::INetworkPtr CreateNetworkFromString(const std::string& protoText,
+                                               const std::map<std::string, armnn::TensorShape>& inputShapes);
+
     /// Retrieve binding info (layer id and tensor info) for the network input identified by the given layer name
     BindingPointInfo GetNetworkInputBindingInfo(const std::string& name) const;
 

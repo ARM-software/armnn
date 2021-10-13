@@ -180,6 +180,7 @@ Status Graph::AllocateDynamicBuffers()
 {
     // Layers must be sorted in topological order
     ARMNN_ASSERT(m_LayersInOrder);
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_AllocateDynamicBuffers");
 
     std::unordered_set<const ITensorHandle*> preallocatedTensors;
     std::unordered_map<const ITensorHandle*, unsigned int> handleReferenceCounts;

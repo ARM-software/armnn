@@ -230,58 +230,58 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
     }
 
     //Then create workloads.
-    for (auto&& layer : order)
     {
-        if (timelineUtils)
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_CreateWorkloads");
+        for (auto&& layer: order)
         {
-            // Add layer to the post-optimisation network structure
-            AddLayerStructure(timelineUtils, *layer, networkGuid);
-        }
-
-        const IWorkloadFactory& workloadFactory = GetWorkloadFactory(*layer);
-
-        switch (layer->GetType())
-        {
-        case LayerType::Input:
-        case LayerType::Output:
+            if (timelineUtils)
             {
-                // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput().
-                break;
+                // Add layer to the post-optimisation network structure
+                AddLayerStructure(timelineUtils, *layer, networkGuid);
             }
-        default:
+
+            const IWorkloadFactory& workloadFactory = GetWorkloadFactory(*layer);
+
+            switch (layer->GetType())
             {
-                auto workload = layer->CreateWorkload(workloadFactory);
-
-                if (!workload)
+                case LayerType::Input:
+                case LayerType::Output:
                 {
-                    const char* const layerName =
-                        layer->GetNameStr().length() != 0 ? layer->GetName() : "<Unnamed>";
-                    throw InvalidArgumentException(
-                        fmt::format("No workload created for layer (name: '{0}' type: '{1}') (compute '{2}')",
-                                    layerName, static_cast<int>(layer->GetType()), layer->GetBackendId().Get()
-                    ));
+                    // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput().
+                    break;
                 }
+                default: {
+                    auto workload = layer->CreateWorkload(workloadFactory);
 
-                if (timelineUtils)
-                {
-                    // Add workload to the post-optimisation network structure
-                    AddWorkloadStructure(timelineUtils, workload, *layer);
-                }
+                    if (!workload)
+                    {
+                        const char* const layerName =
+                                layer->GetNameStr().length() != 0 ? layer->GetName() : "<Unnamed>";
+                        throw InvalidArgumentException(
+                                fmt::format("No workload created for layer (name: '{0}' type: '{1}') (compute '{2}')",
+                                            layerName, static_cast<int>(layer->GetType()), layer->GetBackendId().Get()
+                                ));
+                    }
 
-                // For async networks ConstantWorkloads are managed exclusively by LoadedNetwork
-                // and are separated out from the other workloads
-                if (networkProperties.m_AsyncEnabled && layer->GetType() == LayerType::Constant)
-                {
-                    m_ConstantWorkloads[layer->GetGuid()] = std::move(workload);
-                }
-                else
-                {
-                    m_WorkloadQueue.push_back(move(workload));
-                }
+                    if (timelineUtils)
+                    {
+                        // Add workload to the post-optimisation network structure
+                        AddWorkloadStructure(timelineUtils, workload, *layer);
+                    }
 
-                // release the constant data in the layer..
-                layer->ReleaseConstantData();
-                break;
+                    // For async networks ConstantWorkloads are managed exclusively by LoadedNetwork
+                    // and are separated out from the other workloads
+                    if (networkProperties.m_AsyncEnabled && layer->GetType() == LayerType::Constant)
+                    {
+                        m_ConstantWorkloads[layer->GetGuid()] = std::move(workload);
+                    } else {
+                        m_WorkloadQueue.push_back(move(workload));
+                    }
+
+                    // release the constant data in the layer..
+                    layer->ReleaseConstantData();
+                    break;
+                }
             }
         }
     }
@@ -304,6 +304,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
         // Now that the intermediate tensor memory has been set-up,
         // do any post allocation configuration for each workload.
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_PostAllocationConfigure");
         for (auto &workload : m_WorkloadQueue)
         {
             workload->PostAllocationConfigure();
@@ -317,6 +318,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
 void LoadedNetwork::AllocateAndExecuteConstantWorkloads()
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_AllocateAndExecuteConstants");
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph();
     for (auto&& layer : order)
     {
@@ -343,6 +345,7 @@ void LoadedNetwork::AllocateAndExecuteConstantWorkloads()
 
 void LoadedNetwork::SendNetworkStructure()
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_SendNetworkStructure");
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
 

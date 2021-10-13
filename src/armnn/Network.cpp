@@ -886,6 +886,7 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   Graph::Iterator& lastLayer,
                                   Optional<std::vector<std::string>&> errMessages)
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_AssignBackends");
     OptimizationResult result;
 
     // Helper lambda to compose meaningful error message before returning with error
@@ -1046,7 +1047,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                                              Optional<std::vector<std::string>&> errMessages)
 {
     ARMNN_ASSERT(optNetObjPtr);
-
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ApplyBackendOptimizations")
     OptimizationResult result;
 
     // Get the optimized graph
@@ -1078,6 +1079,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
         for (auto& subgraph : subgraphs)
         {
             // Try to optimize the current sub-graph
+            ARMNN_SCOPED_PROFILING_EVENT(backendObjPtr->GetId(), "Optimizer_OptimizeSubgraph");
             OptimizationViews optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraph, modelOptions);
             ARMNN_ASSERT(optimizationViews.Validate(*subgraph));
 
@@ -1498,6 +1500,7 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
                                               bool importEnabled,
                                               Optional<std::vector<std::string>&> errMessages)
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_SelectTensorHandleStrategy");
     OptimizationResult result;
 
     optGraph.ForEachLayer([&backends, &registry, &result, &errMessages, importEnabled](Layer* layer)
@@ -1566,6 +1569,12 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                               const OptimizerOptions& options,
                               Optional<std::vector<std::string>&> messages)
 {
+    // Enable profiling
+    auto profiler = inNetwork.pNetworkImpl->GetGraph().GetProfiler();
+    ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
+    profiler->EnableProfiling(options.m_ProfilingEnabled);
+
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer");
     if (backendPreferences.empty())
     {
         throw InvalidArgumentException("Invoked Optimize with no backends specified");
@@ -1630,6 +1639,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
     if (options.m_ReduceFp32ToFp16)
     {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToFp16");
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
         Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
     }
@@ -1639,6 +1649,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     // Only Constant weight of Convolution2d and FullyConnected are converted from Fp32 to Bf16
     if (options.m_ReduceFp32ToBf16)
     {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToBf16");
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToBf16Converter()));
     }
 
@@ -1706,12 +1717,17 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
     }
 
     // Based on the tensor handle strategy determined above, insert copy layers where required.
-    optGraph.AddCompatibilityLayers(backends, tensorHandleFactoryRegistry);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_AddCompatibilityLayers");
+        optGraph.AddCompatibilityLayers(backends, tensorHandleFactoryRegistry);
+    }
 
     // Convert constants
-    Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
-    Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
-
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ConvertConstants");
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
+    }
     return optNet;
 }
 bool NetworkImpl::GetShapeInferenceMethod()

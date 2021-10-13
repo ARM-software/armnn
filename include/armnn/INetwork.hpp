@@ -124,6 +124,7 @@ struct OptimizerOptions
         , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
         , m_ImportEnabled(false)
         , m_ModelOptions()
+        , m_ProfilingEnabled(false)
     {}
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16, bool importEnabled,
@@ -134,6 +135,7 @@ struct OptimizerOptions
         , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
         , m_ImportEnabled(importEnabled)
         , m_ModelOptions(modelOptions)
+        , m_ProfilingEnabled(false)
     {
         if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
         {
@@ -150,6 +152,7 @@ struct OptimizerOptions
         , m_shapeInferenceMethod(shapeInferenceMethod)
         , m_ImportEnabled(importEnabled)
         , m_ModelOptions(modelOptions)
+        , m_ProfilingEnabled(false)
     {
         if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
         {
@@ -174,6 +177,9 @@ struct OptimizerOptions
 
     // Enable Model Options
     ModelOptions m_ModelOptions;
+
+    // Enable profiling dump of the optimizer phase
+    bool m_ProfilingEnabled;
 };
 
 class IWorkloadFactory;

@@ -15,6 +15,7 @@ Optimizer::Optimizer()
 
 void Optimizer::Pass(Graph& graph, const Optimizations& optimizations)
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_Pass");
     // Create observables to observe changes to the graph
     AddedLayerObservable addedLayerObservable(graph);
     ErasedLayerNamesObservable erasedLayerNamesObservable(graph);

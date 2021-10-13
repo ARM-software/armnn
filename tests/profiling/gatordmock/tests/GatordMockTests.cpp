@@ -112,7 +112,7 @@ void WaitFor(std::function<bool()> predicate, std::string errorMsg, uint32_t tim
     {
         if (timeSlept >= timeout)
         {
-            FAIL("Timeout: " + errorMsg);
+            FAIL("Timeout: " << errorMsg);
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(sleepTime));
         timeSlept += sleepTime;

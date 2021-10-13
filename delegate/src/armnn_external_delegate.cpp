@@ -276,6 +276,7 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
             else if (std::string(options_keys[i]) == std::string("enable-internal-profiling"))
             {
                 internalProfilingState = *options_values[i] != '0';
+                optimizerOptions.m_ProfilingEnabled = internalProfilingState;
             }
             // Process internal-profiling-detail
             else if (std::string(options_keys[i]) == std::string("internal-profiling-detail"))

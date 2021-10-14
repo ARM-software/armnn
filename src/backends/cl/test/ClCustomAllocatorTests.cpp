@@ -10,13 +10,13 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/BackendRegistry.hpp>
+
 #include <cl/ClBackend.hpp>
 #if defined(ARMCOMPUTENEON_ENABLED)
 #include <neon/NeonBackend.hpp>
 #endif
-
 #include <doctest/doctest.h>
-
+#include <armnn/utility/IgnoreUnused.hpp>
 // Contains the OpenCl interfaces for mapping memory in the Gpu Page Tables
 // Requires the OpenCl backend to be included (GpuAcc)
 #include <arm_compute/core/CL/CLKernelLibrary.h>
@@ -31,7 +31,7 @@ class SampleClBackendCustomAllocator : public armnn::ICustomAllocator
 public:
     SampleClBackendCustomAllocator() = default;
 
-    void* allocate(size_t size, size_t alignment)
+    void* allocate(size_t size, size_t alignment) override
     {
         // If alignment is 0 just use the CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE for alignment
         if (alignment == 0)
@@ -49,12 +49,12 @@ public:
     }
 
     /** Interface to be implemented by the child class to free the allocated tensor */
-    void free(void* ptr)
+    void free(void* ptr) override
     {
         std::free(ptr);
     }
 
-    armnn::MemorySource GetMemorySourceType()
+    armnn::MemorySource GetMemorySourceType() override
     {
         return armnn::MemorySource::Malloc;
     }

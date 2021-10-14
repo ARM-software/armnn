@@ -17,6 +17,7 @@ list(APPEND armnnClBackendUnitTests_sources
     ClOptimizedNetworkTests.cpp
     ClRuntimeTests.cpp
     ClWorkloadFactoryHelper.hpp
+    DefaultAllocatorTests.cpp
     Fp16SupportTest.cpp
     OpenClTimerTest.cpp
 )

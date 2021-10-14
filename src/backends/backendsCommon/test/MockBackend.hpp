@@ -165,6 +165,8 @@ public:
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
 
     OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const override;
+
+    std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
 };
 
 class MockLayerSupport : public LayerSupportBase

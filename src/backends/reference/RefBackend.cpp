@@ -13,6 +13,7 @@
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+#include <backendsCommon/DefaultAllocator.hpp>
 
 #include <Optimizer.hpp>
 
@@ -84,6 +85,11 @@ void RefBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegistry
 
     registry.RegisterMemoryManager(memoryManager);
     registry.RegisterFactory(std::make_unique<RefTensorHandleFactory>(memoryManager));
+}
+
+std::unique_ptr<ICustomAllocator> RefBackend::GetDefaultAllocator() const
+{
+    return std::make_unique<DefaultAllocator>();
 }
 
 } // namespace armnn

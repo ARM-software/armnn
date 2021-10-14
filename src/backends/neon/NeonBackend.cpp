@@ -22,15 +22,16 @@
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include "workloads/NeonAdditionWorkload.hpp"
-#include "workloads/NeonBatchNormalizationWorkload.hpp"
-#include "workloads/NeonConvolution2dWorkload.hpp"
-#include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
-#include "workloads/NeonDivisionWorkload.hpp"
-#include "workloads/NeonFullyConnectedWorkload.hpp"
-#include "workloads/NeonMultiplicationWorkload.hpp"
-#include "workloads/NeonReduceWorkload.hpp"
-#include "workloads/NeonSubtractionWorkload.hpp"
+#include <neon/workloads/NeonAdditionWorkload.hpp>
+#include <neon/workloads/NeonBatchNormalizationWorkload.hpp>
+#include <neon/workloads/NeonConvolution2dWorkload.hpp>
+#include <neon/workloads/NeonDepthwiseConvolutionWorkload.hpp>
+#include <neon/workloads/NeonDivisionWorkload.hpp>
+#include <neon/workloads/NeonFullyConnectedWorkload.hpp>
+#include <neon/workloads/NeonMultiplicationWorkload.hpp>
+#include <neon/workloads/NeonReduceWorkload.hpp>
+#include <neon/workloads/NeonSubtractionWorkload.hpp>
+#include <backendsCommon/DefaultAllocator.hpp>
 
 #include <Optimizer.hpp>
 
@@ -426,5 +427,11 @@ void NeonBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegistr
     registry.RegisterMemoryManager(memoryManager);
     registry.RegisterFactory(std::make_unique<NeonTensorHandleFactory>(memoryManager));
 }
+
+std::unique_ptr<ICustomAllocator> NeonBackend::GetDefaultAllocator() const
+{
+    return std::make_unique<DefaultAllocator>();
+}
+
 
 } // namespace armnn

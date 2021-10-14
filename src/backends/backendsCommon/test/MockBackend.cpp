@@ -10,6 +10,7 @@
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
+#include <backendsCommon/DefaultAllocator.hpp>
 
 #include <Optimizer.hpp>
 #include <SubgraphViewSelector.hpp>
@@ -256,6 +257,11 @@ OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph
     }
 
     return optimizationViews;
+}
+
+std::unique_ptr<ICustomAllocator> MockBackend::GetDefaultAllocator() const
+{
+    return std::make_unique<DefaultAllocator>();
 }
 
 } // namespace armnn

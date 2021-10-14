@@ -13,12 +13,12 @@
 #include <SubgraphView.hpp>
 #include <optimizations/Optimization.hpp>
 
-#include "IBackendContext.hpp"
-#include "armnn/backends/profiling/IBackendProfiling.hpp"
-#include "armnn/backends/profiling/IBackendProfilingContext.hpp"
-#include "IMemoryManager.hpp"
-#include "ITensorHandleFactory.hpp"
-#include "OptimizationViews.hpp"
+#include <armnn/backends/IBackendContext.hpp>
+#include <armnn/backends/IMemoryManager.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
+#include <armnn/backends/OptimizationViews.hpp>
+#include <armnn/backends/profiling/IBackendProfiling.hpp>
+#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
 #include <vector>
 #include <memory>
@@ -197,6 +197,14 @@ public:
             errMsg.value() = message.str();
         }
         return false;
+    }
+
+    /// Returns the default memory allocator for the backend
+    ///
+    /// \return - Returns unique pointer to the Default Allocator of the Backend
+    virtual std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const
+    {
+        throw armnn::Exception("GetDefaultAllocator: Function has not been implemented in backend.");
     }
 };
 

@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <memory>
 #include <armnn/MemorySources.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -31,13 +32,26 @@ public:
     /** Interface to be implemented by the child class to free the allocated bytes */
     virtual void free(void* ptr) = 0;
 
-    //  Used to specify what type of memory is being allocated by this allocator.
-    //  Supported types are:
-    //      MemorySource::Malloc
-    //      MemorySource::DmaBuf
-    //  Unsupported types are:
-    //      MemorySource::DmaBufProtected
+    /**  Used to specify what type of memory is being allocated by this allocator.
+     *  Supported types are:
+     *       MemorySource::Malloc
+     *       MemorySource::DmaBuf
+     *   Unsupported types are:
+     *      MemorySource::DmaBufProtected
+     */
     virtual armnn::MemorySource GetMemorySourceType() = 0;
+
+    /** Interface that may be implemented to allow retrieval of Memory Region
+     *  from allocated buffer at a certain offset
+     */
+    virtual void* GetMemoryRegionAtOffset(void* buffer, size_t offset, size_t alignment = 0)
+    {
+        IgnoreUnused(offset);
+        IgnoreUnused(alignment);
+        IgnoreUnused(buffer);
+        throw armnn::Exception(
+                "ICustomerAllocator::GetMemoryRegionAtOffset(): This function should be overridden in subclass.");
+    }
 
 };
 } // namespace armnn

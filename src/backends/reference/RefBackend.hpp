@@ -60,6 +60,8 @@ public:
     {
         return cpuRefCapabilities;
     };
+
+    std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
 };
 
 } // namespace armnn

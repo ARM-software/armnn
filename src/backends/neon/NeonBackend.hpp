@@ -65,6 +65,8 @@ public:
     {
         return cpuAccCapabilities;
     };
+
+    std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
 };
 
 } // namespace armnn

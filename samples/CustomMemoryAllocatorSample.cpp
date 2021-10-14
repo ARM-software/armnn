@@ -19,7 +19,7 @@ class SampleClBackendCustomAllocator : public armnn::ICustomAllocator
 public:
     SampleClBackendCustomAllocator() = default;
 
-    void* allocate(size_t size, size_t alignment)
+    void* allocate(size_t size, size_t alignment) override
     {
         // If alignment is 0 just use the CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE for alignment
         if (alignment == 0)
@@ -34,16 +34,6 @@ public:
             throw armnn::Exception("SampleClBackendCustomAllocator::Alignment failed");
         }
         return allocatedMemPtr;
-    }
-
-    void free(void* ptr)
-    {
-        std::free(ptr);
-    }
-
-    armnn::MemorySource GetMemorySourceType()
-    {
-        return armnn::MemorySource::Malloc;
     }
 };
 

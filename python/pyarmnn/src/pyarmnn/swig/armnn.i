@@ -14,6 +14,7 @@
 
 //armnn api submodules
 %include "modules/armnn_backend.i"
+%include "modules/armnn_backend_opt.i"
 %include "modules/armnn_types.i"
 %include "modules/armnn_descriptors.i"
 %include "modules/armnn_lstmparam.i"

@@ -97,6 +97,7 @@ def test_python_disowns_network(random_runtime):
 
     assert not opt_network.thisown
 
+
 def test_load_network(random_runtime):
     preferred_backends = random_runtime[0]
     network = random_runtime[1]
@@ -108,6 +109,7 @@ def test_load_network(random_runtime):
     net_id, messages = runtime.LoadNetwork(opt_network)
     assert "" == messages
     assert net_id == 0
+
 
 def test_create_runtime_with_external_profiling_enabled():
 
@@ -124,6 +126,7 @@ def test_create_runtime_with_external_profiling_enabled():
     runtime = ann.IRuntime(options)
 
     assert runtime is not None
+
 
 def test_create_runtime_with_external_profiling_enabled_invalid_options():
 
@@ -157,6 +160,7 @@ def test_load_network_properties_provided(random_runtime):
     assert "" == messages
     assert net_id == 0
 
+
 def test_network_properties_constructor(random_runtime):
     preferred_backends = random_runtime[0]
     network = random_runtime[1]
@@ -178,9 +182,11 @@ def test_network_properties_constructor(random_runtime):
     assert "" == messages
     assert net_id == 0
 
+
 def test_network_properties_deprecated_constructor():
     with pytest.warns(DeprecationWarning):
         warnings.warn("Deprecated: Use constructor with MemorySource argument instead.", DeprecationWarning)
+
 
 def test_unload_network_fails_for_invalid_net_id(random_runtime):
     preferred_backends = random_runtime[0]

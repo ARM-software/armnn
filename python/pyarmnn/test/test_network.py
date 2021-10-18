@@ -6,12 +6,15 @@ import stat
 import pytest
 import pyarmnn as ann
 
+
 def test_optimizer_options_default_values():
     opt = ann.OptimizerOptions()
     assert opt.m_ReduceFp32ToFp16 == False
     assert opt.m_Debug == False
     assert opt.m_ReduceFp32ToBf16 == False
     assert opt.m_ImportEnabled == False
+    assert opt.m_shapeInferenceMethod == ann.ShapeInferenceMethod_ValidateOnly
+
 
 def test_optimizer_options_set_values1():
     opt = ann.OptimizerOptions(True, True)
@@ -19,6 +22,8 @@ def test_optimizer_options_set_values1():
     assert opt.m_Debug == True
     assert opt.m_ReduceFp32ToBf16 == False
     assert opt.m_ImportEnabled == False
+    assert opt.m_shapeInferenceMethod == ann.ShapeInferenceMethod_ValidateOnly
+
 
 def test_optimizer_options_set_values2():
     opt = ann.OptimizerOptions(False, False, True)
@@ -26,13 +31,17 @@ def test_optimizer_options_set_values2():
     assert opt.m_Debug == False
     assert opt.m_ReduceFp32ToBf16 == True
     assert opt.m_ImportEnabled == False
+    assert opt.m_shapeInferenceMethod == ann.ShapeInferenceMethod_ValidateOnly
+
 
 def test_optimizer_options_set_values3():
-    opt = ann.OptimizerOptions(False, False, True, True)
+    opt = ann.OptimizerOptions(False, False, True, ann.ShapeInferenceMethod_InferAndValidate, True)
     assert opt.m_ReduceFp32ToFp16 == False
     assert opt.m_Debug == False
     assert opt.m_ReduceFp32ToBf16 == True
     assert opt.m_ImportEnabled == True
+    assert opt.m_shapeInferenceMethod == ann.ShapeInferenceMethod_InferAndValidate
+
 
 @pytest.fixture(scope="function")
 def get_runtime(shared_data_folder, network_file):

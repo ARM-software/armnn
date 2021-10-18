@@ -48,6 +48,7 @@ def create_with_opt() :
     parserOptions.m_InferAndValidate = True
     return ann.ITfLiteParser(parserOptions)
 
+
 def test_tflite_parser_with_optional_options_out_of_scope(shared_data_folder):
     parser = create_with_opt()
     network = parser.CreateNetworkFromBinaryFile(os.path.join(shared_data_folder, "mock_model.tflite"))

@@ -5,7 +5,6 @@ import os
 import pytest
 import pyarmnn as ann
 import numpy as np
-from typing import List
 
 
 @pytest.fixture()

@@ -1,7 +1,5 @@
 # Copyright © 2020 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
-import os
-import platform
 import pytest
 import pyarmnn as ann
 

@@ -11,6 +11,11 @@
 %}
 
 %include <typemaps/network_optimize.i>
+%include <typemaps/model_options.i>
+
+namespace std {
+    %template() std::vector<armnn::BackendOptions>;
+}
 
 namespace armnn
 {
@@ -24,9 +29,19 @@ Contains:
                                that can not be reduced will be left in Fp32.
     m_ReduceFp32ToFp16 (bool): Reduces Fp32 network to Fp16 for faster processing. Layers
                                that can not be reduced will be left in Fp32.
-    m_ImportEnabled (bool): Enable memory import.
+    m_ImportEnabled (bool):    Enable memory import.
+    m_shapeInferenceMethod:    The ShapeInferenceMethod modifies how the output shapes are treated.
+                               When ValidateOnly is selected, the output shapes are inferred from the input parameters
+                               of the layer and any mismatch is reported.
+                               When InferAndValidate is selected 2 actions are performed: (1)infer output shape from
+                               inputs and (2)validate the shapes as in ValidateOnly. This option has been added to work
+                               with tensors which rank or dimension sizes are not specified explicitly, however this
+                               information can be calculated from the inputs.
+    m_ModelOptions:            List of backends optimisation options.
 
 ") OptimizerOptions;
+
+%model_options_typemap;
 struct OptimizerOptions
 {
     OptimizerOptions();
@@ -34,13 +49,18 @@ struct OptimizerOptions
     OptimizerOptions(bool reduceFp32ToFp16,
                      bool debug,
                      bool reduceFp32ToBf16 = false,
-                     bool importEnabled = false);
+                     ShapeInferenceMethod shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly,
+                     bool importEnabled = false,
+                     std::vector<armnn::BackendOptions> modelOptions = {});
 
     bool m_ReduceFp32ToBf16;
     bool m_ReduceFp32ToFp16;
     bool m_Debug;
+    ShapeInferenceMethod m_shapeInferenceMethod;
     bool m_ImportEnabled;
+    std::vector<armnn::BackendOptions> m_ModelOptions;
 };
+%model_options_clear;
 
 %feature("docstring",
 "

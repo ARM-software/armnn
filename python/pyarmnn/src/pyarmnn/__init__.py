@@ -53,6 +53,7 @@ from ._generated.pyarmnn import Optimize, OptimizerOptions, IOptimizedNetwork, I
 # Backend
 from ._generated.pyarmnn import BackendId
 from ._generated.pyarmnn import IDeviceSpec
+from ._generated.pyarmnn import BackendOptions, BackendOption
 
 # Tensors
 from ._generated.pyarmnn import TensorInfo, TensorShape
@@ -65,7 +66,8 @@ from ._generated.pyarmnn import IProfiler
 
 # Types
 from ._generated.pyarmnn import DataType_Float16, DataType_Float32, DataType_QAsymmU8, DataType_Signed32, \
-    DataType_Boolean, DataType_QSymmS16, DataType_QSymmS8, DataType_QAsymmS8
+    DataType_Boolean, DataType_QSymmS16, DataType_QSymmS8, DataType_QAsymmS8, ShapeInferenceMethod_ValidateOnly, \
+    ShapeInferenceMethod_InferAndValidate
 from ._generated.pyarmnn import DataLayout_NCHW, DataLayout_NHWC
 from ._generated.pyarmnn import MemorySource_Malloc, MemorySource_Undefined, MemorySource_DmaBuf, \
     MemorySource_DmaBufProtected

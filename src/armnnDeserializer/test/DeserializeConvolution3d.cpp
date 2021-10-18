@@ -30,13 +30,11 @@ struct Convolution3dFixture : public ParserFlatbuffersSerializeFixture
                   base: {
                     layerName: "InputLayer",
                     layerType: "Input",
-                    inputSlots: [{
-                        index: 0,
-                        connection: {sourceLayerIndex:0, outputSlotIndex:0 },
-                    }],
+                    inputSlots: [
+
+                    ],
                     outputSlots: [
                       {
-                        index: 0,
                         tensorInfo: {
                           dimensions: )" + inputShape + R"(,
                           dataType: )" + dataType + R"(,
@@ -56,26 +54,19 @@ struct Convolution3dFixture : public ParserFlatbuffersSerializeFixture
               }
             },
             {
-              layer_type: "Convolution3dLayer",
+              layer_type: "ConstantLayer",
               layer: {
                 base: {
                   index: 1,
-                  layerName: "convolution3d",
-                  layerType: "Convolution2d",
+                  layerName: "Weights",
+                  layerType: "Constant",
                   inputSlots: [
-                    {
-                      index: 0,
-                      connection: {
-                        sourceLayerIndex: 0,
-                        outputSlotIndex: 0
-                      }
-                    }
+
                   ],
                   outputSlots: [
                     {
-                      index: 0,
                       tensorInfo: {
-                        dimensions: )" + outputShape + R"(,
+                        dimensions: )" + weightsShape + R"(,
                         dataType: )" + dataType + R"(,
                         quantizationScale: 0.1,
                         dimensionSpecificity: [
@@ -89,12 +80,7 @@ struct Convolution3dFixture : public ParserFlatbuffersSerializeFixture
                     }
                   ]
                 },
-                descriptor: {
-                  strideX: 2,
-                  strideY: 2,
-                  strideZ: 2
-                },
-                weights: {
+                input: {
                   info: {
                     dimensions: )" + weightsShape + R"(,
                     dataType: )" + dataType + R"(,
@@ -127,29 +113,71 @@ struct Convolution3dFixture : public ParserFlatbuffersSerializeFixture
               }
             },
             {
+              layer_type: "Convolution3dLayer",
+              layer: {
+                base: {
+                  index: 2,
+                  layerName: "convolution3d",
+                  layerType: "Convolution3d",
+                  inputSlots: [
+                    {
+                      connection: {
+                        sourceLayerIndex: 0,
+                        outputSlotIndex: 0
+                      }
+                    },
+                    {
+                      index: 1,
+                      connection: {
+                        sourceLayerIndex: 1,
+                        outputSlotIndex: 0
+                      }
+                    }
+                  ],
+                  outputSlots: [
+                    {
+                      tensorInfo: {
+                        dimensions: )" + outputShape + R"(,
+                        dataType: )" + dataType + R"(,
+                        quantizationScale: 0.1,
+                        dimensionSpecificity: [
+                          true,
+                          true,
+                          true,
+                          true,
+                          true
+                        ]
+                      }
+                    }
+                  ]
+                },
+                descriptor: {
+                  strideX: 2,
+                  strideY: 2,
+                  strideZ: 2
+                }
+              }
+            },
+            {
               layer_type: "OutputLayer",
               layer: {
                 base: {
                   layerBindingId: 2,
                   base: {
-                    index: 2,
+                    index: 3,
                     layerName: "OutputLayer",
                     layerType: "Output",
                     inputSlots: [
                       {
                         connection: {
-                          sourceLayerIndex: 1,
+                          sourceLayerIndex: 2,
                           outputSlotIndex: 0
                         }
                       }
                     ],
-                    outputSlots: [{
-                        index: 0,
-                        tensorInfo: {
-                            dimensions: )" + outputShape + R"(,
-                            dataType: )" + dataType + R"(
-                        },
-                    }]
+                    outputSlots: [
+
+                    ]
                   }
                 }
               }

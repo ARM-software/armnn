@@ -258,13 +258,9 @@ public:
 
     /// Adds a 3D convolution layer to the network.
     /// @param convolution3dDescriptor - Description of the 3D convolution layer.
-    /// @param weights - Tensor for the weights data.
-    /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,
-                                             const ConstTensor& weights,
-                                             const Optional<ConstTensor>& biases,
                                              const char* name = nullptr);
 
     /// Adds a depth to space layer to the network.

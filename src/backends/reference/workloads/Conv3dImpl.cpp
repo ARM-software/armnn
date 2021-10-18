@@ -113,11 +113,25 @@ void Convolve3d(const TensorShape& rInputShape,
 
                                             // Keep this implementation, as using DataLayoutIndexed::GetIndex
                                             // causes large performance regression.
-                                            inputIndex = batchIdx * inputDepth * inputHeight * inputWidth * inChannels +
-                                                         (zInput-paddingFront) * inputHeight * inputWidth * inChannels +
-                                                         (yInput-paddingTop) * inputWidth * inChannels +
-                                                         (xInput-paddingLeft) * inChannels +
-                                                         cInput;
+                                            if (dataLayoutIndexed.GetDataLayout() == DataLayout::NDHWC)
+                                            {
+                                                inputIndex =
+                                                        batchIdx * inputDepth * inputHeight * inputWidth * inChannels +
+                                                        (zInput-paddingFront) * inputHeight * inputWidth * inChannels +
+                                                        (yInput-paddingTop) * inputWidth * inChannels +
+                                                        (xInput-paddingLeft) * inChannels +
+                                                        cInput;
+                                            }
+                                            else
+                                            {
+                                                // NCDHW DataLayout
+                                                inputIndex =
+                                                        batchIdx * inputDepth * inputHeight * inputWidth * inChannels +
+                                                        inputDepth * inputHeight * inputWidth * cInput +
+                                                        (zInput-paddingFront) * inputHeight * inputWidth +
+                                                        (yInput-paddingTop) * inputWidth +
+                                                        xInput-paddingLeft;
+                                            }
 
                                             inputValue = inputVec[inputIndex];
                                         }
@@ -133,11 +147,24 @@ void Convolve3d(const TensorShape& rInputShape,
                             sum += biasVec[cOutput];
                         }
 
-                        unsigned int outIdx = batchIdx * outputDepth * outputHeight * outputWidth * outChannels +
-                                              zOutput * outputHeight * outputWidth * outChannels +
-                                              yOutput * outputWidth * outChannels +
-                                              xOutput * outChannels +
-                                              cOutput;
+                        unsigned int outIdx;
+                        if (dataLayoutIndexed.GetDataLayout() == DataLayout::NDHWC)
+                        {
+                            outIdx = batchIdx * outputDepth * outputHeight * outputWidth * outChannels +
+                                     zOutput * outputHeight * outputWidth * outChannels +
+                                     yOutput * outputWidth * outChannels +
+                                     xOutput * outChannels +
+                                     cOutput;
+                        }
+                        else
+                        {
+                            // NCDHW DataLayout
+                            outIdx = batchIdx * outputDepth * outputHeight * outputWidth * outChannels +
+                                     cOutput * outputDepth * outputHeight * outputWidth +
+                                     zOutput * outputHeight * outputWidth +
+                                     yOutput * outputWidth +
+                                     xOutput;
+                        }
 
                         rOutputEncoder[outIdx];
                         rOutputEncoder.Set(sum);

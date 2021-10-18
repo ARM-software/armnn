@@ -16,12 +16,6 @@ class ScopedTensorHandle;
 class Convolution3dLayer : public LayerWithParameters<Convolution3dDescriptor>
 {
 public:
-
-    /// A unique pointer to store Weight values.
-    std::shared_ptr<ConstTensorHandle> m_Weight;
-    /// A unique pointer to store Bias values.
-    std::shared_ptr<ConstTensorHandle> m_Bias;
-
     /// Makes a workload for the Convolution3d type.
     /// @param [in] graph The graph where this layer can be found.
     /// @param [in] factory The workload factory which will create the workload.
@@ -59,10 +53,6 @@ protected:
 
     /// Default destructor
     ~Convolution3dLayer() = default;
-
-    /// Retrieve the handles to the constant values stored by the layer.
-    /// @return A vector of the constant tensors stored by this layer.
-    ConstantTensors GetConstantTensorsByRef() override;
 };
 
 } // namespace

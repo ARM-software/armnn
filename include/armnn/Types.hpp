@@ -50,7 +50,8 @@ enum class DataLayout
 {
     NCHW = 1,
     NHWC = 2,
-    NDHWC = 3
+    NDHWC = 3,
+    NCDHW = 4
 };
 
 /// Define the behaviour of the internal profiler when outputting network details

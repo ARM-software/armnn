@@ -208,18 +208,9 @@ struct Convolution2dQueueDescriptor : QueueDescriptorWithParameters<Convolution2
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-// Convolution 2D layer workload data.
+// Convolution 3D layer workload data.
 struct Convolution3dQueueDescriptor : QueueDescriptorWithParameters<Convolution3dDescriptor>
 {
-    Convolution3dQueueDescriptor()
-        : m_Weight(nullptr)
-        , m_Bias(nullptr)
-    {
-    }
-
-    const ConstTensorHandle* m_Weight;
-    const ConstTensorHandle* m_Bias;
-
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 

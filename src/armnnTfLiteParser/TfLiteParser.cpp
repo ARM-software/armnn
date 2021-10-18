@@ -1099,36 +1099,29 @@ void TfLiteParserImpl::ParseConv3D(size_t subgraphIndex, size_t operatorIndex)
 
     auto filterTensorAndData = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo);
 
-    armnn::IConnectableLayer* layer = nullptr;
     auto layerName = fmt::format("Conv3D:{}:{}", subgraphIndex, operatorIndex);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    // Add the first input and weights tensor to the registration list.
+    // The constant weights will be added by SetupConstantLayers.
+    std::vector<unsigned int> tensorIndexesToRegister = {inputTensorIndexes[0], inputTensorIndexes[1]};
 
     if (inputs.size() == 3)
     {
         desc.m_BiasEnabled = true;
-        armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensorNonPermuted(inputs[2], biasTensorInfo);
-        layer = m_Network->AddConvolution3dLayer(desc,
-                                                 filterTensorAndData,
-                                                 Optional<ConstTensor>(biasTensorAndData),
-                                                 layerName.c_str());
-    }
-    else
-    {
-        layer = m_Network->AddConvolution3dLayer(desc,
-                                                 filterTensorAndData,
-                                                 EmptyOptional(),
-                                                 layerName.c_str());
+
+        // Add the biases input to the registration list, a constant layer will be added by SetupConstantLayers.
+        tensorIndexesToRegister.emplace_back(inputTensorIndexes[2]);
     }
 
+    armnn::IConnectableLayer* layer = m_Network->AddConvolution3dLayer(desc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Register the input connection slots for the layer, connections are made after all layers have been created
-    // only the tensors for the inputs are relevant, exclude the const tensors
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, tensorIndexesToRegister);
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // Register the output connection slots for the layer, connections are made after all layers have been created

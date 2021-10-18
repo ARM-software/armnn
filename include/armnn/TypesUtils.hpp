@@ -215,6 +215,7 @@ constexpr const char* GetDataLayoutName(DataLayout dataLayout)
         case DataLayout::NCHW:  return "NCHW";
         case DataLayout::NHWC:  return "NHWC";
         case DataLayout::NDHWC: return "NDHWC";
+        case DataLayout::NCDHW: return "NCDHW";
         default:                return "Unknown";
     }
 }

@@ -407,7 +407,7 @@ void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
             }
             catch (const LayerValidationException& exc)
             {
-                CHECK(strcmp(exc.what(), "FullyConnected layer weights not set: Input slot(s) 1 not connected "
+                CHECK(strcmp(exc.what(), "Fully_Connected layer weights not set: Input slot(s) 1 not connected "
                                          "to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
             }
         }
@@ -434,7 +434,7 @@ void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
             }
             catch (const LayerValidationException& exc)
             {
-                CHECK(strcmp(exc.what(), "FullyConnected layer bias not set: Input slot(s) 2 not connected "
+                CHECK(strcmp(exc.what(), "Fully_Connected layer bias not set: Input slot(s) 2 not connected "
                                          "to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
             }
         }
@@ -457,7 +457,7 @@ void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
         }
         catch (const LayerValidationException& exc)
         {
-            CHECK(strcmp(exc.what(), "FullyConnected layer weights and bias not set: Input slot(s) 1 & 2 not "
+            CHECK(strcmp(exc.what(), "Fully_Connected layer weights and bias not set: Input slot(s) 1 & 2 not "
                                      "connected to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
         }
 

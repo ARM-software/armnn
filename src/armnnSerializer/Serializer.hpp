@@ -150,7 +150,6 @@ private:
 
     void SerializeConvolution3dLayer(const armnn::IConnectableLayer* layer,
                                      const armnn::Convolution3dDescriptor& descriptor,
-                                     const std::vector<armnn::ConstTensor>& constants,
                                      const char* name = nullptr);
 
     void SerializeDepthToSpaceLayer(const armnn::IConnectableLayer* layer,

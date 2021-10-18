@@ -250,7 +250,11 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo input  = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
                                                        dataType);
             const TensorInfo output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
-            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
+
+            ARMNN_ASSERT_MSG(layer.GetInputSlot(1).GetConnection(),
+                             "Convolution3dLayer: Weights should be connected as a Constant Layer.");
+            const TensorInfo weights = OverrideDataType(layer.GetInputSlot(1).GetConnection()->GetTensorInfo(),
+                                                        dataType);
 
             const Convolution3dDescriptor& descriptor = cLayer->GetParameters();
 
@@ -258,14 +262,15 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                biases = OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
+                biases = OverrideDataType(layer.GetInputSlot(2).GetConnection()->GetTensorInfo(),
+                                          GetBiasTypeFromWeightsType(dataType));
             }
 
             result = layerSupportObject.IsConvolution3dSupported(
                                               input,
                                               output,
                                               descriptor,
-                                              OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType),
+                                              weights,
                                               biases,
                                               reason);
             break;

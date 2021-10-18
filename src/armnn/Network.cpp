@@ -114,11 +114,9 @@ IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor
 
 
 IConnectableLayer* INetwork::AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const Optional<ConstTensor>& biases,
                                                    const char* name)
 {
-    return pNetworkImpl->AddConvolution3dLayer(convolution3dDescriptor, weights, biases, name);
+    return pNetworkImpl->AddConvolution3dLayer(convolution3dDescriptor, name);
 }
 
 
@@ -1934,25 +1932,9 @@ IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescrip
 }
 
 IConnectableLayer* NetworkImpl::AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,
-                                                      const ConstTensor& weights,
-                                                      const Optional<ConstTensor>& biases,
                                                       const char* name)
 {
-    if (convolution3dDescriptor.m_BiasEnabled && !biases.has_value())
-    {
-        throw InvalidArgumentException("AddConvolution2dLayer: biases cannot be empty");
-    }
-
-    const auto layer = m_Graph->AddLayer<Convolution3dLayer>(convolution3dDescriptor, name);
-
-    layer->m_Weight = std::make_shared<ScopedTensorHandle>(weights);
-
-    if (convolution3dDescriptor.m_BiasEnabled)
-    {
-        layer->m_Bias = std::make_shared<ScopedTensorHandle>(biases.value());
-    }
-
-    return layer;
+    return m_Graph->AddLayer<Convolution3dLayer>(convolution3dDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,

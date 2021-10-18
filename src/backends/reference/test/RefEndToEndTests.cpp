@@ -11,6 +11,7 @@
 #include <backendsCommon/test/ChannelShuffleEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
+#include <backendsCommon/test/Convolution3dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
@@ -564,6 +565,36 @@ TEST_CASE("RefConcatEndToEndDim3Test")
 TEST_CASE("RefConcatEndToEndDim3Uint8Test")
 {
     ConcatDim3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("RefConvolution3dFloat32Test")
+{
+    Convolution3dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(defaultBackends,
+                                                                              armnn::DataLayout::NDHWC);
+}
+
+TEST_CASE("RefConvolution3dNcdhwFloat32Test")
+{
+    Convolution3dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(defaultBackends,
+                                                                              armnn::DataLayout::NCDHW);
+}
+
+TEST_CASE("RefConvolution3dFloat16Test")
+{
+    Convolution3dEndToEnd<armnn::DataType::Float16, armnn::DataType::Float16>(defaultBackends,
+                                                                              armnn::DataLayout::NDHWC);
+}
+
+TEST_CASE("RefConvolution3dUint8Test")
+{
+    Convolution3dEndToEnd<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(defaultBackends,
+                                                                                armnn::DataLayout::NDHWC);
+}
+
+TEST_CASE("RefConvolution3dInt8Test")
+{
+    Convolution3dEndToEnd<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(defaultBackends,
+                                                                                armnn::DataLayout::NDHWC);
 }
 
 TEST_CASE("RefEluEndToEndTestFloat32")

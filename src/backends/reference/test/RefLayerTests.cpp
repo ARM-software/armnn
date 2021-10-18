@@ -208,37 +208,119 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution2d3x3Stride2x2BFloat16SmallValue,
                      false,
                      DataLayout::NHWC);
 
-// Convolution 3d
-ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Float32, SimpleConvolution3d3x3x3Float32Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Int8, SimpleConvolution3d3x3x3Int8Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Uint8, SimpleConvolution3d3x3x3Uint8Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Int16, SimpleConvolution3d3x3x3Int16Test, false)
+// Convolution 3d - NDHWC
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Float32,
+                              SimpleConvolution3d3x3x3Float32Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Int8,
+                              SimpleConvolution3d3x3x3Int8Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Uint8,
+                              SimpleConvolution3d3x3x3Uint8Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3Int16,
+                              SimpleConvolution3d3x3x3Int16Test,
+                              false,
+                              DataLayout::NDHWC)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5Float32, Convolution3d2x2x2Strides3x5x5Float32Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5TestInt8, Convolution3d2x2x2Strides3x5x5Int8Test, true)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5TestUint8, Convolution3d2x2x2Strides3x5x5Uint8Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5TestInt16, Convolution3d2x2x2Strides3x5x5Int16Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5Float32,
+                              Convolution3d2x2x2Strides3x5x5Float32Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5TestInt8,
+                              Convolution3d2x2x2Strides3x5x5Int8Test,
+                              true,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5TestUint8,
+                              Convolution3d2x2x2Strides3x5x5Uint8Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5TestInt16,
+                              Convolution3d2x2x2Strides3x5x5Int16Test,
+                              true,
+                              DataLayout::NDHWC)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3Float32, Convolution3dPaddingSame3x3x3Float32Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3TestInt8, Convolution3dPaddingSame3x3x3Int8Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3TestUint8, Convolution3dPaddingSame3x3x3Uint8Test, false)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3TestInt16, Convolution3dPaddingSame3x3x3Int16Test, false)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3Float32,
+                              Convolution3dPaddingSame3x3x3Float32Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3TestInt8,
+                              Convolution3dPaddingSame3x3x3Int8Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3TestUint8,
+                              Convolution3dPaddingSame3x3x3Uint8Test,
+                              false,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3TestInt16,
+                              Convolution3dPaddingSame3x3x3Int16Test,
+                              false,
+                              DataLayout::NDHWC)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2Float32, Convolution3d2x2x2Dilation2x2x2Float32Test, true)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2TestInt8, Convolution3d2x2x2Dilation2x2x2Int8Test, true)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2TestUint8, Convolution3d2x2x2Dilation2x2x2Uint8Test, true)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2TestInt16, Convolution3d2x2x2Dilation2x2x2Int16Test, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2Float32,
+                              Convolution3d2x2x2Dilation2x2x2Float32Test,
+                              true,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2TestInt8,
+                              Convolution3d2x2x2Dilation2x2x2Int8Test,
+                              true,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2TestUint8,
+                              Convolution3d2x2x2Dilation2x2x2Uint8Test,
+                              true,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2TestInt16,
+                              Convolution3d2x2x2Dilation2x2x2Int16Test,
+                              true,
+                              DataLayout::NDHWC)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dStrideDilationPadding3x3x3Float32,
                               Convolution3dStrideDilationPadding3x3x3Float32Test,
-                              true)
+                              true,
+                              DataLayout::NDHWC)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Stride3x3x3SmallTestFloat32,
                               Convolution3d2x2x2Stride3x3x3SmallFloat32Test,
-                              false)
+                              false,
+                              DataLayout::NDHWC)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x3x3TestFloat16, Convolution3d2x3x3Float16Test, true)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2SmallTestFloat16, Convolution3d2x2x2SmallFloat16Test, false)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x3x3TestFloat16,
+                              Convolution3d2x3x3Float16Test,
+                              true,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2SmallTestFloat16,
+                              Convolution3d2x2x2SmallFloat16Test,
+                              false,
+                              DataLayout::NDHWC)
+
+// Convolution 3d - NCDHW
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution3d3x3x3NcdhwFloat32,
+                              SimpleConvolution3d3x3x3Float32Test,
+                              false,
+                              DataLayout::NCDHW)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x3x3TestNcdhwFloat16,
+                              Convolution3d2x3x3Float16Test,
+                              false,
+                              DataLayout::NCDHW)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Strides3x5x5NcdhwTestInt8,
+                              Convolution3d2x2x2Strides3x5x5Int8Test,
+                              true,
+                              DataLayout::NCDHW)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3dPaddingSame3x3x3NcdhwTestUint8,
+                              Convolution3dPaddingSame3x3x3Uint8Test,
+                              false,
+                              DataLayout::NCDHW)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Dilation2x2x2NcdhwTestInt16,
+                              Convolution3d2x2x2Dilation2x2x2Int16Test,
+                              true,
+                              DataLayout::NCDHW)
 
 
 // Depthwise Convolution

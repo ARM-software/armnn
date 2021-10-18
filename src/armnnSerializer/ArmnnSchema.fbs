@@ -46,7 +46,8 @@ enum DataType : byte {
 enum DataLayout : byte {
     NHWC = 0,
     NCHW = 1,
-    NDHWC = 2
+    NDHWC = 2,
+    NCDHW = 3
 }
 
 enum ReduceOperation: byte {
@@ -287,8 +288,6 @@ table Convolution2dDescriptor {
 table Convolution3dLayer {
     base:LayerBase;
     descriptor:Convolution3dDescriptor;
-    weights:ConstTensor;
-    biases:ConstTensor;
 }
 
 table Convolution3dDescriptor {

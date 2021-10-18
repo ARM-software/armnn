@@ -441,4 +441,15 @@ uint32_t FullyConnectedDescriptor::GetNumInputs() const
     return numInputs;
 }
 
+uint32_t Convolution3dDescriptor::GetNumInputs() const
+{
+    // Return 2 otherwise check if bias is enabled
+    unsigned int numInputs = 2;
+    if (m_BiasEnabled)
+    {
+        numInputs = 3;
+    }
+    return numInputs;
+}
+
 }

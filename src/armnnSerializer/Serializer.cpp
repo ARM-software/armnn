@@ -388,18 +388,15 @@ void SerializerStrategy::SerializeConvolution2dLayer(const armnn::IConnectableLa
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution2dLayer);
 }
 
-// Build FlatBuffer for Convolution2dLayer
+// Build FlatBuffer for Convolution3dLayer
 void SerializerStrategy::SerializeConvolution3dLayer(const armnn::IConnectableLayer* layer,
                                                      const armnn::Convolution3dDescriptor& descriptor,
-                                                     const std::vector<armnn::ConstTensor>& constants,
                                                      const char* name)
 {
     IgnoreUnused(name);
 
-    const armnn::ConstTensor weights = constants[0];
-
     // Create FlatBuffer BaseLayer
-    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Convolution2d);
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Convolution3d);
 
     auto flatBufferDescriptor = CreateConvolution3dDescriptor(m_flatBufferBuilder,
                                                               descriptor.m_PadLeft,
@@ -416,21 +413,11 @@ void SerializerStrategy::SerializeConvolution3dLayer(const armnn::IConnectableLa
                                                               descriptor.m_DilationZ,
                                                               descriptor.m_BiasEnabled,
                                                               GetFlatBufferDataLayout(descriptor.m_DataLayout));
-    auto flatBufferWeightsConstTensorInfo = CreateConstTensorInfo(weights);
-    flatbuffers::Offset<serializer::ConstTensor> flatBufferBiasesConstTensorInfo;
 
-    if (constants.size() > 1)
-    {
-        const armnn::ConstTensor biases = constants[1];
-        flatBufferBiasesConstTensorInfo = CreateConstTensorInfo(biases);
-    }
-
-    // Create the FlatBuffer Convolution2dLayer
+    // Create the FlatBuffer Convolution3dLayer
     auto flatBufferLayer = CreateConvolution3dLayer(m_flatBufferBuilder,
                                                     flatBufferBaseLayer,
-                                                    flatBufferDescriptor,
-                                                    flatBufferWeightsConstTensorInfo,
-                                                    flatBufferBiasesConstTensorInfo);
+                                                    flatBufferDescriptor);
 
     // Add the AnyLayer to the FlatBufferLayers
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution3dLayer);
@@ -2038,7 +2025,6 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
                     static_cast<const armnn::Convolution3dDescriptor&>(descriptor);
             SerializeConvolution3dLayer(layer,
                                         layerDescriptor,
-                                        constants,
                                         name);
             break;
         }

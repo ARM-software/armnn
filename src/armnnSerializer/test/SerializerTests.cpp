@@ -472,25 +472,26 @@ TEST_CASE("SerializeConvolution3d")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const convLayer   =
-            network->AddConvolution3dLayer(descriptor,
-                                           weights,
-                                           armnn::Optional<armnn::ConstTensor>(biases),
-                                           layerName.c_str());
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights, "Weights");
+    armnn::IConnectableLayer* const biasesLayer = network->AddConstantLayer(biases, "Biases");
+    armnn::IConnectableLayer* const convLayer   = network->AddConvolution3dLayer(descriptor, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(2));
     convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    biasesLayer->GetOutputSlot(0).SetTensorInfo(biasesInfo);
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     CHECK(deserializedNetwork);
 
-    const std::vector<armnn::ConstTensor>& constants {weights, biases};
-    LayerVerifierBaseWithDescriptorAndConstants<armnn::Convolution3dDescriptor> verifier(
-            layerName, {inputInfo}, {outputInfo}, descriptor, constants);
+    LayerVerifierBaseWithDescriptor<armnn::Convolution3dDescriptor> verifier(
+            layerName, {inputInfo, weightsInfo, biasesInfo}, {outputInfo}, descriptor);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 

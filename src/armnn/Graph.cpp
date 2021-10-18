@@ -588,7 +588,7 @@ void Graph::InferTensorInfos()
 }
 
 /// Throws exception due to a layer input not being connected to an output slot.
-/// Verifies weights and bias are set for FullyConnected layers on input slots 1
+/// Verifies weights and bias are set for layers on input slots 1
 /// and 2 respectively. Method checks if bias is enabled before ensuring it is set.
 ///
 /// @param layer constant pointer to a Layer object
@@ -600,7 +600,8 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
     std::ostringstream message;
     bool noWeightsAndBias = false;
 
-    if (layer->GetType() == armnn::LayerType::FullyConnected && slotIndex > 0)
+    if ((layer->GetType() == armnn::LayerType::FullyConnected ||
+         layer->GetType() == armnn::LayerType::Convolution3d) && slotIndex > 0)
     {
         // If weights are not set and is bias enabled, also check if bias is set
         if (slotIndex == 1 && layer->GetNumInputSlots() == 3)
@@ -608,7 +609,7 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
             const IOutputSlot* biasSource = layer->GetInputSlot(2).GetConnectedOutputSlot();
             if (biasSource == NULL)
             {
-                message << "FullyConnected layer weights and bias not set: ";
+                message << layer->GetName() << " layer weights and bias not set: ";
                 noWeightsAndBias = true;
             }
         }
@@ -618,11 +619,11 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
         {
             if (slotIndex == 1)
             {
-                message << "FullyConnected layer weights not set: ";
+                message << layer->GetName() << " layer weights not set: ";
             }
             else
             {
-                message << "FullyConnected layer bias not set: ";
+                message << layer->GetName() << " layer bias not set: ";
             }
         }
     }

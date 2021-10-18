@@ -13,6 +13,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ChannelShuffleEndToEndTestImpl.hpp
     ComparisonEndToEndTestImpl.hpp
     CompatibilityTests.cpp
+    Convolution3dEndToEndTestImpl.hpp
     CustomMemoryOptimizerStrategyTests.cpp
     DefaultAsyncExecuteTest.cpp
     DepthToSpaceEndToEndTestImpl.hpp

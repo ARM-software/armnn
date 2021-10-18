@@ -31,6 +31,12 @@ DataLayoutIndexed::DataLayoutIndexed(armnn::DataLayout dataLayout)
             m_WidthIndex    = 3;
             m_ChannelsIndex = 4;
             break;
+        case armnn::DataLayout::NCDHW:
+            m_ChannelsIndex = 1;
+            m_DepthIndex    = 2;
+            m_HeightIndex   = 3;
+            m_WidthIndex    = 4;
+            break;
         default:
             throw armnn::InvalidArgumentException("Unknown DataLayout value: " +
                                                   std::to_string(static_cast<int>(dataLayout)));

@@ -11,6 +11,7 @@
 
 #include <backendsCommon/TensorHandle.hpp>
 
+#include <backendsCommon/test/DataLayoutUtils.hpp>
 #include <backendsCommon/test/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
@@ -228,23 +229,20 @@ LayerTestResult<T, 5> SimpleConvolution3dTestImpl(
                         biasDesc.GetQuantizationScale(), biasDesc.GetQuantizationOffset());
     }
 
-    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
-
-    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
-
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
-
-    armnn::ScopedTensorHandle biasTensor(biasDesc);
-    if (biasEnabled)
+    // Permute input and output if data layout is NCDHW.
+    if (dataLayout == armnn::DataLayout::NCDHW)
     {
-        AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
+        PermuteTensorNdhwcToNcdhw(inputTensorInfo, inputData);
+        PermuteTensorNdhwcToNcdhw(outputTensorInfo, outputData);
     }
 
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+
+    std::unique_ptr<armnn::ITensorHandle> input0Handle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> input1Handle = tensorHandleFactory.CreateTensorHandle(kernelDesc);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+
     armnn::Convolution3dQueueDescriptor data;
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - it can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_StrideZ = strideZ;
@@ -261,14 +259,29 @@ LayerTestResult<T, 5> SimpleConvolution3dTestImpl(
     data.m_Parameters.m_BiasEnabled = biasEnabled;
 
     armnn::WorkloadInfo info;
-    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddInputToWorkload(data, info, inputTensorInfo, input0Handle.get());
+    AddInputToWorkload(data, info, kernelDesc, input1Handle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
+    std::unique_ptr<armnn::ITensorHandle> input2Handle = nullptr;
+    if (biasEnabled)
+    {
+        input2Handle = tensorHandleFactory.CreateTensorHandle(biasDesc);
+        AddInputToWorkload(data, info, biasDesc, input2Handle.get());
+    }
+
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution3d(data, info);
-    inputHandle->Allocate();
+    input0Handle->Allocate();
+    input1Handle->Allocate();
     outputHandle->Allocate();
 
-    CopyDataToITensorHandle(inputHandle.get(), inputData.data());
+    CopyDataToITensorHandle(input0Handle.get(), inputData.data());
+    CopyDataToITensorHandle(input1Handle.get(), kernel.data());
+    if (biasEnabled)
+    {
+        input2Handle->Allocate();
+        CopyDataToITensorHandle(input2Handle.get(), bias.data());
+    }
 
     ExecuteWorkload(*workload, memoryManager);
 
@@ -840,40 +853,44 @@ LayerTestResult<float, 5> SimpleConvolution3d3x3x3Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return SimpleConvolution3d3x3x3TestCommon<armnn::DataType::Float32, armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int8_t, 5> SimpleConvolution3d3x3x3Int8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return SimpleConvolution3d3x3x3TestCommon<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> SimpleConvolution3d3x3x3Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return SimpleConvolution3d3x3x3TestCommon<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int16_t, 5> SimpleConvolution3d3x3x3Int16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return SimpleConvolution3d3x3x3TestCommon<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 
@@ -881,158 +898,174 @@ LayerTestResult<float, 5> Convolution3d2x2x2Strides3x5x5Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Strides3x5x5TestCommon<armnn::DataType::Float32, armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int8_t, 5> Convolution3d2x2x2Strides3x5x5Int8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Strides3x5x5TestCommon<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> Convolution3d2x2x2Strides3x5x5Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Strides3x5x5TestCommon<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int16_t, 5> Convolution3d2x2x2Strides3x5x5Int16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Strides3x5x5TestCommon<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<float, 5> Convolution3d2x2x2Dilation2x2x2Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Dilation2x2x2TestCommon<armnn::DataType::Float32, armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int8_t, 5> Convolution3d2x2x2Dilation2x2x2Int8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Dilation2x2x2TestCommon<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> Convolution3d2x2x2Dilation2x2x2Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Dilation2x2x2TestCommon<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int16_t, 5> Convolution3d2x2x2Dilation2x2x2Int16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Dilation2x2x2TestCommon<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<float, 5> Convolution3dPaddingSame3x3x3Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3dPaddingSame3x3x3TestCommon<armnn::DataType::Float32, armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int8_t, 5> Convolution3dPaddingSame3x3x3Int8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3dPaddingSame3x3x3TestCommon<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> Convolution3dPaddingSame3x3x3Uint8Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3dPaddingSame3x3x3TestCommon<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<int16_t, 5> Convolution3dPaddingSame3x3x3Int16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3dPaddingSame3x3x3TestCommon<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<float, 5> Convolution3dStrideDilationPadding3x3x3Float32Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3dStrideDilationPadding3x3x3TestCommonFloat32(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<float, 5> Convolution3d2x2x2Stride3x3x3SmallFloat32Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2Stride3x3x3SmallTestCommonFloat32(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<armnn::Half, 5> Convolution3d2x3x3Float16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x3x3TestCommonFloat16(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }
 
 LayerTestResult<armnn::Half, 5> Convolution3d2x2x2SmallFloat16Test(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        bool biasEnabled)
+        bool biasEnabled,
+        armnn::DataLayout dataLayout)
 {
     return Convolution3d2x2x2SmallTestCommonFloat16(
-            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, armnn::DataLayout::NDHWC);
+            workloadFactory, memoryManager, tensorHandleFactory, biasEnabled, dataLayout);
 }

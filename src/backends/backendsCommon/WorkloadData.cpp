@@ -1320,7 +1320,12 @@ void Convolution3dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
 {
     const std::string descriptorName{"Convolution3dQueueDescriptor"};
 
-    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    uint32_t numInputs = 2;
+    if (m_Parameters.m_BiasEnabled)
+    {
+        numInputs = 3;
+    }
+    ValidateNumInputs(workloadInfo,  descriptorName, numInputs);
     ValidateNumOutputs(workloadInfo, descriptorName, 1);
 
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
@@ -1329,9 +1334,7 @@ void Convolution3dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
     ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 5, "input");
     ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 5, "output");
 
-    ValidatePointer(m_Weight, descriptorName, "weight");
-
-    const TensorInfo& weightTensorInfo = m_Weight->GetTensorInfo();
+    const TensorInfo& weightTensorInfo = workloadInfo.m_InputTensorInfos[1];
     ValidateTensorNumDimensions(weightTensorInfo, descriptorName, 5, "weight");
 
     ValidateWeightDataType(inputTensorInfo, weightTensorInfo, descriptorName);
@@ -1339,9 +1342,7 @@ void Convolution3dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
     Optional<TensorInfo> optionalBiasTensorInfo;
     if (m_Parameters.m_BiasEnabled)
     {
-        ValidatePointer(m_Bias, descriptorName, "bias");
-
-        optionalBiasTensorInfo = MakeOptional<TensorInfo>(m_Bias->GetTensorInfo());
+        optionalBiasTensorInfo = MakeOptional<TensorInfo>(workloadInfo.m_InputTensorInfos[2]);
         const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
 
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");

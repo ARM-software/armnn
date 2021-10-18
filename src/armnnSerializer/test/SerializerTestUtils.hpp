@@ -69,6 +69,7 @@ public:
         {
             case armnn::LayerType::Input: break;
             case armnn::LayerType::Output: break;
+            case armnn::LayerType::Constant: break;
             default:
             {
                 VerifyNameAndConnections(layer, name);

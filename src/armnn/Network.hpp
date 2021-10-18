@@ -87,8 +87,6 @@ public:
                                              const char* name = nullptr);
 
     IConnectableLayer* AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,
-                                             const ConstTensor& weights,
-                                             const Optional<ConstTensor>& biases,
                                              const char* name = nullptr);
 
     IConnectableLayer* AddConstantLayer(const ConstTensor& input, const char* name = nullptr);

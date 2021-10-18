@@ -99,6 +99,8 @@ armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout
             return armnnSerializer::DataLayout::DataLayout_NHWC;
         case armnn::DataLayout::NDHWC:
             return armnnSerializer::DataLayout::DataLayout_NDHWC;
+        case armnn::DataLayout::NCDHW:
+            return armnnSerializer::DataLayout::DataLayout_NCDHW;
         case armnn::DataLayout::NCHW:
         default:
             return armnnSerializer::DataLayout::DataLayout_NCHW;

@@ -498,6 +498,9 @@ struct Convolution3dDescriptor : BaseDescriptor
                m_DataLayout  == rhs.m_DataLayout;
     }
 
+    /// Get the number of views/inputs.
+    uint32_t GetNumInputs() const;
+
     /// Padding left value in the width dimension.
     uint32_t             m_PadLeft;
     /// Padding right value in the width dimension.
@@ -524,7 +527,7 @@ struct Convolution3dDescriptor : BaseDescriptor
     uint32_t             m_DilationZ;
     /// Enable/disable bias.
     bool                 m_BiasEnabled;
-    /// The data layout to be used (NDHWC).
+    /// The data layout to be used (NDHWC, NCDHW).
     DataLayout           m_DataLayout;
 };
 

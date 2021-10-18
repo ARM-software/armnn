@@ -449,6 +449,8 @@ armnn::DataLayout ToDataLayout(armnnSerializer::DataLayout dataLayout)
             return armnn::DataLayout::NHWC;
         case armnnSerializer::DataLayout::DataLayout_NDHWC:
             return armnn::DataLayout::NDHWC;
+        case armnnSerializer::DataLayout::DataLayout_NCDHW:
+            return armnn::DataLayout::NCDHW;
         case armnnSerializer::DataLayout::DataLayout_NCHW:
         default:
             return armnn::DataLayout::NCHW;
@@ -1402,7 +1404,6 @@ void IDeserializer::DeserializerImpl::ParseConvolution3d(GraphPtr graph, unsigne
     CHECK_LAYERS(graph, 0, layerIndex);
     auto inputs = GetInputs(graph, layerIndex);
     CHECK_LOCATION();
-    CHECK_VALID_SIZE(inputs.size(), 1);
 
     auto outputs = GetOutputs(graph, layerIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
@@ -1424,22 +1425,14 @@ void IDeserializer::DeserializerImpl::ParseConvolution3d(GraphPtr graph, unsigne
     descriptor.m_DilationX = serializerDescriptor->dilationX();
     descriptor.m_DilationY = serializerDescriptor->dilationY();
     descriptor.m_DilationZ = serializerDescriptor->dilationZ();
-    descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
+    descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();
     descriptor.m_DataLayout = ToDataLayout(serializerDescriptor->dataLayout());
 
-    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
-    armnn::ConstTensor biases;
+    uint32_t numInputs = descriptor.GetNumInputs();
+    CHECK_VALID_SIZE(inputs.size(), numInputs);
 
-    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
-    if (descriptor.m_BiasEnabled)
-    {
-        biases = ToConstTensor(serializerLayer->biases());
-        optionalBiases = armnn::Optional<armnn::ConstTensor>(biases);
-    }
-    IConnectableLayer* layer = m_Network->AddConvolution3dLayer(descriptor,
-                                                                weights,
-                                                                optionalBiases,
-                                                                layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddConvolution3dLayer(descriptor, layerName.c_str());
+
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 

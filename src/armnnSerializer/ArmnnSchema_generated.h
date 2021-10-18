@@ -540,31 +540,34 @@ enum DataLayout {
   DataLayout_NHWC = 0,
   DataLayout_NCHW = 1,
   DataLayout_NDHWC = 2,
+  DataLayout_NCDHW = 3,
   DataLayout_MIN = DataLayout_NHWC,
-  DataLayout_MAX = DataLayout_NDHWC
+  DataLayout_MAX = DataLayout_NCDHW
 };
 
-inline const DataLayout (&EnumValuesDataLayout())[3] {
+inline const DataLayout (&EnumValuesDataLayout())[4] {
   static const DataLayout values[] = {
     DataLayout_NHWC,
     DataLayout_NCHW,
-    DataLayout_NDHWC
+    DataLayout_NDHWC,
+    DataLayout_NCDHW
   };
   return values;
 }
 
 inline const char * const *EnumNamesDataLayout() {
-  static const char * const names[4] = {
+  static const char * const names[5] = {
     "NHWC",
     "NCHW",
     "NDHWC",
+    "NCDHW",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameDataLayout(DataLayout e) {
-  if (flatbuffers::IsOutRange(e, DataLayout_NHWC, DataLayout_NDHWC)) return "";
+  if (flatbuffers::IsOutRange(e, DataLayout_NHWC, DataLayout_NCDHW)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesDataLayout()[index];
 }
@@ -3250,9 +3253,7 @@ struct Convolution3dLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef Convolution3dLayerBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_BASE = 4,
-    VT_DESCRIPTOR = 6,
-    VT_WEIGHTS = 8,
-    VT_BIASES = 10
+    VT_DESCRIPTOR = 6
   };
   const armnnSerializer::LayerBase *base() const {
     return GetPointer<const armnnSerializer::LayerBase *>(VT_BASE);
@@ -3260,22 +3261,12 @@ struct Convolution3dLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const armnnSerializer::Convolution3dDescriptor *descriptor() const {
     return GetPointer<const armnnSerializer::Convolution3dDescriptor *>(VT_DESCRIPTOR);
   }
-  const armnnSerializer::ConstTensor *weights() const {
-    return GetPointer<const armnnSerializer::ConstTensor *>(VT_WEIGHTS);
-  }
-  const armnnSerializer::ConstTensor *biases() const {
-    return GetPointer<const armnnSerializer::ConstTensor *>(VT_BIASES);
-  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_BASE) &&
            verifier.VerifyTable(base()) &&
            VerifyOffset(verifier, VT_DESCRIPTOR) &&
            verifier.VerifyTable(descriptor()) &&
-           VerifyOffset(verifier, VT_WEIGHTS) &&
-           verifier.VerifyTable(weights()) &&
-           VerifyOffset(verifier, VT_BIASES) &&
-           verifier.VerifyTable(biases()) &&
            verifier.EndTable();
   }
 };
@@ -3289,12 +3280,6 @@ struct Convolution3dLayerBuilder {
   }
   void add_descriptor(flatbuffers::Offset<armnnSerializer::Convolution3dDescriptor> descriptor) {
     fbb_.AddOffset(Convolution3dLayer::VT_DESCRIPTOR, descriptor);
-  }
-  void add_weights(flatbuffers::Offset<armnnSerializer::ConstTensor> weights) {
-    fbb_.AddOffset(Convolution3dLayer::VT_WEIGHTS, weights);
-  }
-  void add_biases(flatbuffers::Offset<armnnSerializer::ConstTensor> biases) {
-    fbb_.AddOffset(Convolution3dLayer::VT_BIASES, biases);
   }
   explicit Convolution3dLayerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -3311,12 +3296,8 @@ struct Convolution3dLayerBuilder {
 inline flatbuffers::Offset<Convolution3dLayer> CreateConvolution3dLayer(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<armnnSerializer::LayerBase> base = 0,
-    flatbuffers::Offset<armnnSerializer::Convolution3dDescriptor> descriptor = 0,
-    flatbuffers::Offset<armnnSerializer::ConstTensor> weights = 0,
-    flatbuffers::Offset<armnnSerializer::ConstTensor> biases = 0) {
+    flatbuffers::Offset<armnnSerializer::Convolution3dDescriptor> descriptor = 0) {
   Convolution3dLayerBuilder builder_(_fbb);
-  builder_.add_biases(biases);
-  builder_.add_weights(weights);
   builder_.add_descriptor(descriptor);
   builder_.add_base(base);
   return builder_.Finish();

@@ -16,7 +16,7 @@ namespace armnn
 {
 
 Convolution3dLayer::Convolution3dLayer(const Convolution3dDescriptor& param, const char* name)
-    : LayerWithParameters(1, 1, LayerType::Convolution3d, param, name)
+    : LayerWithParameters(param.GetNumInputs(), 1, LayerType::Convolution3d, param, name)
 {
 }
 
@@ -25,12 +25,11 @@ void Convolution3dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn
     const std::vector<TensorShape>& inputShapes =
     {
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        m_Weight->GetTensorInfo().GetShape()
+        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape(),
     };
 
     // Conv3d Filter Layout: [D,H,W,I,O]
     const TensorShape filterShape = inputShapes[1];
-    DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
     unsigned int filterDepth = filterShape[0];
     unsigned int filterHeight = filterShape[1];
     unsigned int filterWidth = filterShape[2];
@@ -48,18 +47,7 @@ void Convolution3dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn
 
 std::unique_ptr<IWorkload> Convolution3dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    // At this level constant data should not be released.
-    ARMNN_ASSERT_MSG(m_Weight != nullptr, "Convolution3dLayer: Weights data should not be null.");
-
     Convolution3dQueueDescriptor descriptor;
-    descriptor.m_Weight = m_Weight.get();
-
-    if (m_Param.m_BiasEnabled)
-    {
-        ARMNN_ASSERT_MSG(m_Bias != nullptr, "Convolution3dLayer: Bias data should not be null.");
-        descriptor.m_Bias = m_Bias.get();
-    }
-
     SetAdditionalInfo(descriptor);
 
     return factory.CreateConvolution3d(descriptor, PrepInfoAndDesc(descriptor));
@@ -68,14 +56,6 @@ std::unique_ptr<IWorkload> Convolution3dLayer::CreateWorkload(const IWorkloadFac
 Convolution3dLayer* Convolution3dLayer::Clone(Graph& graph) const
 {
     auto layer = CloneBase<Convolution3dLayer>(graph, m_Param, GetName());
-
-    layer->m_Weight = m_Weight ? m_Weight : nullptr;
-
-    if (layer->m_Param.m_BiasEnabled)
-    {
-        layer->m_Bias = m_Bias ? m_Bias : nullptr;
-    }
-
     return std::move(layer);
 }
 
@@ -117,34 +97,31 @@ std::vector<TensorShape> Convolution3dLayer::InferOutputShapes(const std::vector
     unsigned int outChannels = filterShape[4];
     unsigned int outBatchSize = inBatchSize;
 
-    TensorShape tensorShape = TensorShape( { outBatchSize, outDepth, outHeight, outWidth, outChannels } );
+    TensorShape tensorShape = m_Param.m_DataLayout == armnn::DataLayout::NDHWC ?
+            TensorShape( { outBatchSize, outDepth, outHeight, outWidth, outChannels } ) :
+            TensorShape( { outBatchSize, outChannels, outDepth, outHeight, outWidth });
 
     return std::vector<TensorShape>({ tensorShape });
 }
 
 void Convolution3dLayer::ValidateTensorShapesFromInputs()
 {
-    VerifyLayerConnections(1, CHECK_LOCATION());
+    VerifyLayerConnections(m_Param.GetNumInputs(), CHECK_LOCATION());
 
     const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
-    // check if we m_Weight data is not nullptr
-    ARMNN_ASSERT_MSG(m_Weight != nullptr, "Convolution3dLayer: Weights data should not be null.");
+    ARMNN_ASSERT_MSG(GetInputSlot(1).GetConnection(),
+                     "Convolution3dLayer: Weights should be connected to input slot 1.");
 
     auto inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        m_Weight->GetTensorInfo().GetShape() });
+        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "Convolution3dLayer");
-}
-
-Layer::ConstantTensors Convolution3dLayer::GetConstantTensorsByRef()
-{
-    return {m_Weight, m_Bias};
 }
 
 ARMNN_NO_DEPRECATE_WARN_BEGIN
@@ -157,16 +134,7 @@ ARMNN_NO_DEPRECATE_WARN_END
 
 void Convolution3dLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    ManagedConstTensorHandle managedWeight(m_Weight);
-    std::vector<armnn::ConstTensor> constTensors { { managedWeight.GetTensorInfo(), managedWeight.Map() } };
-
-    ManagedConstTensorHandle managedBias(m_Bias);
-    if (GetParameters().m_BiasEnabled)
-    {
-        constTensors.emplace_back(ConstTensor(managedBias.GetTensorInfo(), managedBias.Map()));
-    }
-
-    strategy.ExecuteStrategy(this, GetParameters(), constTensors, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
 
 } // namespace armnn

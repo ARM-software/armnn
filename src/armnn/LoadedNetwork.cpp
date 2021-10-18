@@ -122,6 +122,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                              m_TensorHandleFactoryRegistry(),
                              m_ProfilingService(profilingService)
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadedNetwork");
     // Get the profiler and register it for the current thread.
     const std::shared_ptr<IProfiler>& profiler = m_OptimizedNetwork->GetProfiler();
     ProfilerManager::GetInstance().RegisterProfiler(profiler.get());

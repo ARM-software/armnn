@@ -95,7 +95,7 @@ public:
     void AnalyzeEventSequenceAndWriteResults(EventIterType first, EventIterType last, std::ostream& outStream) const;
 
     std::map<std::string, ProfilingEventStats> CalculateProfilingEventStats() const;
-    void PopulateInferences(std::vector<const Event*>& outInferences, int& outBaseLevel) const;
+    void PopulateParent(std::vector<const Event*>& outEvents, int& outBaseLevel, std::string parentName) const;
     void PopulateDescendants(std::map<const Event*, std::vector<const Event*>>& outDescendantsMap) const;
 
     std::stack<Event*> m_Parents;

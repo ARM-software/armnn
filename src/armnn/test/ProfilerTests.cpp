@@ -290,10 +290,9 @@ TEST_CASE("ProfilerJsonPrinter")
     profiler->EnableProfiling(true);
 
     {
-        // Test scoped macro.
         ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
                                                       armnn::EmptyOptional(),
-                                                      "EnqueueWorkload",
+                                                      "Optimizer",
                                                       TestInstrument())
         ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
                                                       armnn::EmptyOptional(),
@@ -306,21 +305,57 @@ TEST_CASE("ProfilerJsonPrinter")
                                                               "Level 1A",
                                                               TestInstrument())
             }
-
+        }
+    }
+    {
+        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                      armnn::EmptyOptional(),
+                                                      "LoadedNetwork",
+                                                      TestInstrument())
+        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                      armnn::EmptyOptional(),
+                                                      "Level 0",
+                                                      TestInstrument())
+        {
             {
                 ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
                                                               armnn::EmptyOptional(),
-                                                              "Level 1B",
+                                                              "Level 1A",
                                                               TestInstrument())
-
+            }
+        }
+    }
+    {
+        // Test scoped macro.
+            ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                          armnn::EmptyOptional(),
+                                                          "EnqueueWorkload",
+                                                          TestInstrument())
+            ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                          armnn::EmptyOptional(),
+                                                          "Level 0",
+                                                          TestInstrument())
+            {
                 {
                     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
                                                                   armnn::EmptyOptional(),
-                                                                  "Level 2A",
+                                                                  "Level 1A",
                                                                   TestInstrument())
                 }
+                {
+                    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                                  armnn::EmptyOptional(),
+                                                                  "Level 1B",
+                                                                  TestInstrument())
+
+                    {
+                        ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc,
+                                                                      armnn::EmptyOptional(),
+                                                                      "Level 2A",
+                                                                      TestInstrument())
+                    }
+                }
             }
-        }
     }
 
     std::stringbuf buffer;
@@ -335,38 +370,62 @@ TEST_CASE("ProfilerJsonPrinter")
 
     // blessed output validated by a human eyeballing the output to make sure it's ok and then copying it here.
     // validation also included running the blessed output through an online json validation site
-    std::string blessedOutput("{\n\t\"ArmNN\": {\n\t\t\"inference_measurements_#1\": {\n\t\t\t\"type\": \""
-                              "Event\",\n\t\t\t\"Measurement1_#1\": {\n\t\t\t\t\"type\": \""
-                              "Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t\t\t1.000000\n\t\t\t\t],\n\t\t\t\t\""
-                              "unit\": \"ms\"\n\t\t\t},\n\t\t\t\"Measurement2_#1\": {\n\t\t\t\t\"type\": \""
-                              "Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t\t\t2.000000\n\t\t\t\t],\n\t\t\t\t\""
-                              "unit\": \"us\"\n\t\t\t},\n\t\t\t\"Level 0_#2\": {\n\t\t\t\t\"type\": \""
-                              "Event\",\n\t\t\t\t\"Measurement1_#2\": {\n\t\t\t\t\t\"type\": \""
+    std::string blessedOutput("{\n\t\"ArmNN\": {\n\t\t\"optimize_measurements_#1\": {\n\t\t\t\"type\": \"Event\""
+                              ",\n\t\t\t\"Measurement1_#1\": {\n\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\"raw\""
+                              ": [\n\t\t\t\t\t1.000000\n\t\t\t\t],\n\t\t\t\t\"unit\": \"ms\"\n\t\t\t},\n\t\t\t\""
+                              "Measurement2_#1\": {\n\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t"
+                              "\t\t2.000000\n\t\t\t\t],\n\t\t\t\t\"unit\": \"us\"\n\t\t\t},\n\t\t\t\"Level 0_#2\": {\n"
+                              "\t\t\t\t\"type\": \"Event\",\n\t\t\t\t\"Measurement1_#2\": {\n\t\t\t\t\t\"type\": \""
                               "Measurement\",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t1.000000\n\t\t\t\t\t],\n\t\t\t\t\t\""
                               "unit\": \"ms\"\n\t\t\t\t},\n\t\t\t\t\"Measurement2_#2\": {\n\t\t\t\t\t\"type\": \""
                               "Measurement\",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t2.000000\n\t\t\t\t\t],\n\t\t\t\t\t\""
-                              "unit\": \"us\"\n\t\t\t\t},\n\t\t\t\t\"Level 1A_#3\": {\n\t\t\t\t\t\"type\": \""
-                              "Event\",\n\t\t\t\t\t\"Measurement1_#3\": {\n\t\t\t\t\t\t\"type\": \""
-                              "Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
-                              "1.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
-                              "unit\": \"ms\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Measurement2_#3\": {\n\t\t\t\t\t\t\"type\": \""
-                              "Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
-                              "2.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
-                              "unit\": \"us\"\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t\t\"Level 1B_#4\": {\n\t\t\t\t\t\""
-                              "type\": \"Event\",\n\t\t\t\t\t\"Measurement1_#4\": {\n\t\t\t\t\t\t\"type\": \""
-                              "Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
-                              "1.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
-                              "unit\": \"ms\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Measurement2_#4\": {\n\t\t\t\t\t\t\""
-                              "type\": \"Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
-                              "2.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\""
-                              "unit\": \"us\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Level 2A_#5\": {\n\t\t\t\t\t\t\""
-                              "type\": \"Event\",\n\t\t\t\t\t\t\"Measurement1_#5\": {\n\t\t\t\t\t\t\t\"type\": \""
-                              "Measurement\",\n\t\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t\t"
-                              "1.000000\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t\""
-                              "unit\": \"ms\"\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"Measurement2_#5\": {\n\t\t\t\t\t\t\t\""
-                              "type\": \"Measurement\",\n\t\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t\t"
-                              "2.000000\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t\""
-                              "unit\": \"us\"\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n}\n");
+                              "unit\": \"us\"\n\t\t\t\t},\n\t\t\t\t\"Level 1A_#3\": {\n\t\t\t\t\t\"type\": \"Event\",\n"
+                              "\t\t\t\t\t\"Measurement1_#3\": {\n\t\t\t\t\t\t\"type\": \"Measurement\",\n"
+                              "\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t1.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\"unit\""
+                              ": \"ms\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Measurement2_#3\": {\n\t\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t2.000000\n\t\t\t\t\t\t],\n\t\t\t"
+                              "\t\t\t\"unit\": \"us\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t\""
+                              "loaded_network_measurements_#4\": {\n\t\t\t\"type\": \"Event\",\n\t\t\t\""
+                              "Measurement1_#4\": {\n\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t\t"
+                              "\t1.000000\n\t\t\t\t],\n\t\t\t\t\"unit\": \"ms\"\n\t\t\t},\n\t\t\t\"Measurement2_#4\""
+                              ": {\n\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t\t\t2.000000\n"
+                              "\t\t\t\t],\n\t\t\t\t\"unit\": \"us\"\n\t\t\t},\n\t\t\t\"Level 0_#5\": {\n\t\t\t\t\""
+                              "type\": \"Event\",\n\t\t\t\t\"Measurement1_#5\": {\n\t\t\t\t\t\"type\": \"Measurement\""
+                              ",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t1.000000\n\t\t\t\t\t],\n\t\t\t\t\t\"unit\": \""
+                              "ms\"\n\t\t\t\t},\n\t\t\t\t\"Measurement2_#5\": {\n\t\t\t\t\t\"type\": \"Measurement\""
+                              ",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t2.000000\n\t\t\t\t\t],\n\t\t\t\t\t\"unit\": \"us\""
+                              "\n\t\t\t\t},\n\t\t\t\t\"Level 1A_#6\": {\n\t\t\t\t\t\"type\": \"Event\",\n\t\t\t\t\t\""
+                              "Measurement1_#6\": {\n\t\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\t\"raw\": [\n"
+                              "\t\t\t\t\t\t\t1.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\"unit\": \"ms\"\n\t\t\t\t\t},\n"
+                              "\t\t\t\t\t\"Measurement2_#6\": {\n\t\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\t\""
+                              "raw\": [\n\t\t\t\t\t\t\t2.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\"unit\": \"us\""
+                              "\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t},\n\t\t\"inference_measurements_#7\": {\n"
+                              "\t\t\t\"type\": \"Event\",\n\t\t\t\"Measurement1_#7\": {\n\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\"raw\": [\n\t\t\t\t\t1.000000\n\t\t\t\t],\n\t\t\t\t\"unit\": \""
+                              "ms\"\n\t\t\t},\n\t\t\t\"Measurement2_#7\": {\n\t\t\t\t\"type\": \"Measurement\",\n"
+                              "\t\t\t\t\"raw\": [\n\t\t\t\t\t2.000000\n\t\t\t\t],\n\t\t\t\t\"unit\": \"us\"\n\t\t\t},\n"
+                              "\t\t\t\"Level 0_#8\": {\n\t\t\t\t\"type\": \"Event\",\n\t\t\t\t\"Measurement1_#8\": {\n"
+                              "\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t1.000000\n"
+                              "\t\t\t\t\t],\n\t\t\t\t\t\"unit\": \"ms\"\n\t\t\t\t},\n\t\t\t\t\"Measurement2_#8\": {\n"
+                              "\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t2.000000\n"
+                              "\t\t\t\t\t],\n\t\t\t\t\t\"unit\": \"us\"\n\t\t\t\t},\n\t\t\t\t\"Level 1A_#9\": {\n"
+                              "\t\t\t\t\t\"type\": \"Event\",\n\t\t\t\t\t\"Measurement1_#9\": {\n\t\t\t\t\t\t\"type\""
+                              ": \"Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t1.000000\n\t\t\t\t\t\t],\n"
+                              "\t\t\t\t\t\t\"unit\": \"ms\"\n\t\t\t\t\t},\n\t\t\t\t\t\"Measurement2_#9\": {\n"
+                              "\t\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t2.000000\n"
+                              "\t\t\t\t\t\t],\n\t\t\t\t\t\t\"unit\": \"us\"\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t\t\""
+                              "Level 1B_#10\": {\n\t\t\t\t\t\"type\": \"Event\",\n\t\t\t\t\t\"Measurement1_#10\""
+                              ": {\n\t\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t"
+                              "1.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\"unit\": \"ms\"\n\t\t\t\t\t},\n\t\t\t\t\t\""
+                              "Measurement2_#10\": {\n\t\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\t\"raw\""
+                              ": [\n\t\t\t\t\t\t\t2.000000\n\t\t\t\t\t\t],\n\t\t\t\t\t\t\"unit\": \"us\"\n"
+                              "\t\t\t\t\t},\n\t\t\t\t\t\"Level 2A_#11\": {\n\t\t\t\t\t\t\"type\": \"Event\",\n\t\t\t"
+                              "\t\t\t\"Measurement1_#11\": {\n\t\t\t\t\t\t\t\"type\": \"Measurement\",\n\t\t\t\t\t\t"
+                              "\t\"raw\": [\n\t\t\t\t\t\t\t\t1.000000\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t\"unit\": \""
+                              "ms\"\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"Measurement2_#11\": {\n\t\t\t\t\t\t\t\"type\": \""
+                              "Measurement\",\n\t\t\t\t\t\t\t\"raw\": [\n\t\t\t\t\t\t\t\t2.000000\n\t\t\t\t\t\t\t],\n"
+                              "\t\t\t\t\t\t\t\"unit\": \"us\"\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t}\n"
+                              "\t}\n}\n");
 
     CHECK(output == blessedOutput);
     armnn::ProfilerManager::GetInstance().RegisterProfiler(nullptr);

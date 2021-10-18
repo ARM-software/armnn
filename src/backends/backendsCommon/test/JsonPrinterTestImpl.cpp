@@ -132,7 +132,6 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
 
     // build up the structure of the network
     INetworkPtr net(INetwork::Create());
-
     IConnectableLayer* input = net->AddInputLayer(0, "input");
     SoftmaxDescriptor softmaxDescriptor;
     // Set Axis to -1 if CL or Neon until further Axes are supported.
@@ -158,7 +157,9 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
     softmax->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    armnn::OptimizerOptions optOptions;
+    optOptions.m_ProfilingEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
     if(!optNet)
     {
         FAIL("Error occurred during Optimization, Optimize() returned nullptr.");
@@ -215,6 +216,8 @@ inline void ValidateProfilerJson(std::string& result)
         {
 
             if (sectionVector[i].find("\"ArmNN\":") != std::string::npos
+                || sectionVector[i].find("\"optimize_measurements\":") != std::string::npos
+                || sectionVector[i].find("\"loaded_network_measurements\":") != std::string::npos
                 || sectionVector[i].find("\"inference_measurements\":") != std::string::npos)
             {
                 sectionVector.erase(sectionVector.begin() + static_cast<int>(i));

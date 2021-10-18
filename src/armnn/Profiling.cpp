@@ -254,16 +254,16 @@ int CalcLevel(const Event* eventPtr)
     return level;
 }
 
-void ProfilerImpl::PopulateInferences(std::vector<const Event*>& outInferences, int& outBaseLevel) const
+void ProfilerImpl::PopulateParent(std::vector<const Event*>& outEvents, int& outBaseLevel, std::string parentName) const
 {
-    outInferences.reserve(m_EventSequence.size());
+    outEvents.reserve(m_EventSequence.size());
     for (const auto& event : m_EventSequence)
     {
         const Event* eventPtrRaw = event.get();
-        if (eventPtrRaw->GetName() == "EnqueueWorkload")
+        if (eventPtrRaw->GetName() == parentName)
         {
             outBaseLevel = (outBaseLevel == -1) ? CalcLevel(eventPtrRaw) : outBaseLevel;
-            outInferences.push_back(eventPtrRaw);
+            outEvents.push_back(eventPtrRaw);
         }
     }
 }
@@ -362,18 +362,40 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     outStream.setf(std::ios::fixed);
     JsonPrinter printer(outStream);
 
-    // First find all the "inference" Events and print out duration measurements.
+    // First find all the parent Events and print out duration measurements.
     int baseLevel = -1;
+
+    std::vector<const Event*> optimizations;
+    PopulateParent(optimizations, baseLevel, "Optimizer");
+
+    std::vector<const Event*> loadedNetworks;
+    PopulateParent(loadedNetworks, baseLevel, "LoadedNetwork");
+
     std::vector<const Event*> inferences;
-    PopulateInferences(inferences, baseLevel);
+    PopulateParent(inferences, baseLevel, "EnqueueWorkload");
 
     // Second map out descendants hierarchy
     std::map<const Event*, std::vector<const Event*>> descendantsMap;
     PopulateDescendants(descendantsMap);
 
+    // Extract json objects for each parent event type
+    JsonChildObject optimizeObject{ "optimize_measurements" };
+
+    for (unsigned int optimizeIndex = 0; optimizeIndex < optimizations.size(); ++optimizeIndex)
+    {
+        auto optimization = optimizations[optimizeIndex];
+        ExtractJsonObjects(optimizeIndex, optimization, optimizeObject, descendantsMap);
+    }
+
+    JsonChildObject loadedNetworkObject{ "loaded_network_measurements" };
+
+    for (unsigned int loadedNetworkIndex = 0; loadedNetworkIndex < loadedNetworks.size(); ++loadedNetworkIndex)
+    {
+        auto loadedNetwork = loadedNetworks[loadedNetworkIndex];
+        ExtractJsonObjects(loadedNetworkIndex, loadedNetwork, loadedNetworkObject, descendantsMap);
+    }
+
     JsonChildObject inferenceObject{ "inference_measurements" };
-    std::vector<JsonChildObject> workloadObjects;
-    std::map<unsigned int, std::vector<JsonChildObject>> workloadToKernelObjects;
 
     for (unsigned int inferenceIndex = 0; inferenceIndex < inferences.size(); ++inferenceIndex)
     {
@@ -399,6 +421,12 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     size_t id = 0;
     if (m_DetailsToStdOutMethod != ProfilingDetailsMethod::DetailsOnly)
     {
+        printer.PrintJsonChildObject(optimizeObject, id);
+        printer.PrintSeparator();
+        printer.PrintNewLine();
+        printer.PrintJsonChildObject(loadedNetworkObject, id);
+        printer.PrintSeparator();
+        printer.PrintNewLine();
         printer.PrintJsonChildObject(inferenceObject, id);
     }
     // end of ArmNN
@@ -452,7 +480,7 @@ void ProfilerImpl::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
 
         int baseLevel = -1;
         std::vector<const Event*> inferences;
-        PopulateInferences(inferences, baseLevel);
+        PopulateParent(inferences, baseLevel, "EnqueueWorkload");
 
         // Second map out descendants hierarchy
         std::map<const Event*, std::vector<const Event*>> descendantsMap;

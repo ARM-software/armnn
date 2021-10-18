@@ -70,6 +70,7 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer(memoryManager)
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload");
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
 
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
@@ -97,16 +98,19 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_ConvolutionLayer.configure(clCompileContext,
-                                 &input,
-                                 m_KernelTensor.get(),
-                                 m_BiasTensor.get(),
-                                 &output,
-                                 padStrideInfo,
-                                 arm_compute::WeightsInfo(),
-                                 aclDilationInfo,
-                                 activationInfo,
-                                 isFastMathEnabled);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_configure");
+        m_ConvolutionLayer.configure(clCompileContext,
+                                     &input,
+                                     m_KernelTensor.get(),
+                                     m_BiasTensor.get(),
+                                     &output,
+                                     padStrideInfo,
+                                     arm_compute::WeightsInfo(),
+                                     aclDilationInfo,
+                                     activationInfo,
+                                     isFastMathEnabled);
+    }
 
     m_ConvolutionMethod =
         m_ConvolutionLayer.get_convolution_method(input.info(),
@@ -146,7 +150,10 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 
     // Force Compute Library to perform the necessary copying and reshaping, after which
     // delete all the input tensors that will no longer be needed
-    m_ConvolutionLayer.prepare();
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_prepare");
+        m_ConvolutionLayer.prepare();
+    }
     FreeUnusedTensors();
 }
 

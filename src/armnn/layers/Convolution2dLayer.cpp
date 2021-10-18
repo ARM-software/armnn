@@ -50,7 +50,7 @@ std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const IWorkloadFac
 {
     // on this level constant data should not be released..
     ARMNN_ASSERT_MSG(m_Weight != nullptr, "Convolution2dLayer: Weights data should not be null.");
-
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Convolution2dLayer_CreateWorkload");
     Convolution2dQueueDescriptor descriptor;
 
     descriptor.m_Weight = m_Weight.get();

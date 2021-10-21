@@ -27,7 +27,6 @@ WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
     , m_WorkingMemDescriptorMap(workingMemDescriptorMap)
     , m_MemoryManagers(memoryManagers)
     , m_OwnedTensorHandles(std::move(ownedTensorHandles))
-    , m_BindingIdVec(inputLayerInfo.size() + ouputLayerInfo.size())
     , m_InputSize(numeric_cast<DifferenceType>(inputLayerInfo.size()))
     , m_IsAllocated(false)
 {
@@ -54,7 +53,7 @@ WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
             m_InputConnectionMap[inputInfo.m_LayerBindingId].push_back(inputPos);
         }
     }
-
+    size_t bindingIdCount = inputLayerInfo.size();
     for (const auto& outputInfo : ouputLayerInfo)
     {
         for (auto bindingId : outputInfo.m_LayerBindingIds)
@@ -67,7 +66,7 @@ WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
 
             m_OutputHandleMap[bindingId] = *outputPos;
         }
-
+        bindingIdCount += outputInfo.m_LayerBindingIds.size();
         // More than one layerBinding id means the tensorhandle is connected to more than one OutputLayer.
         // Importing in this case would likely cause unexpected behaviour, so we disallow it.
         if (outputInfo.m_LayerBindingIds.size() != 1)
@@ -88,6 +87,7 @@ WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
             m_OutputConnectionMap[outputInfo.m_LayerBindingIds[0]].push_back(inputPos);
         }
     }
+    m_BindingIdVec = std::vector<LayerBindingId>(bindingIdCount);
 }
 
 void WorkingMemHandle::Allocate()

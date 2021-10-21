@@ -137,12 +137,12 @@ onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include 
 ```
 
 ## Build TfLite
-* Building TfLite (Tensorflow version 2.3.1)
+* Building TfLite (Tensorflow version 2.5.1)
 ```bash
 cd $HOME/armnn-devenv
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/
-git checkout fcc4b966f1265f466e82617020af93670141b009
+git checkout tags/v2.5.1
 cd ..
 mkdir tflite
 cd tflite

@@ -122,10 +122,10 @@ RUN cd $HOME/armnn-devenv/ && git clone https://review.mlplatform.org/ml/Compute
     git checkout $($HOME/armnn-devenv/armnn/scripts/get_compute_library.sh -p) && \
     scons Werror=0 arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j$(nproc) internal_only=0
 
-# Build Tensorflow 2.3.1
+# Build Tensorflow 2.5.1
 RUN cd $HOME/armnn-devenv && git clone https://github.com/tensorflow/tensorflow.git && \
     cd tensorflow && \
-    git checkout fcc4b966f1265f466e82617020af93670141b009 && \
+    git checkout a4dfb8d1a71385bd6d122e4f27f86dcebb96712d && \
     ../armnn/scripts/generate_tensorflow_protobuf.sh ../tensorflow-protobuf ../google/x86_64_pb_install
 
 # Download Flatbuffer

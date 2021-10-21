@@ -8,14 +8,17 @@ TensorFlow Lite Python package.
 
 This repository assumes you have built, or have downloaded the
 `libarmnnDelegate.so` and `libarmnn.so` from the GitHub releases page. You will
-also need to have built the TensorFlow Lite library from source.
+also need to have built the TensorFlow Lite library from source if you plan on building
+these ArmNN library files yourself. 
 
 If you have not already installed these, please follow our guides in the ArmNN
 repository. The guide to build the delegate can be found
 [here](../../delegate/BuildGuideNative.md) and the guide to integrate the
 delegate into Python can be found
-[here](../../delegate/IntegrateDelegateIntoPython.md).
+[here](../../delegate/DelegateQuickStartGuide.md).
 
+This guide will assume you have retrieved the binaries
+from the ArmNN Github page, so there is no need to build Tensorflow from source.
 
 ## Getting Started
 
@@ -73,12 +76,12 @@ from the Arm ML-Zoo).
   pip3 install -r requirements.txt
   ```
 
-6. Copy over your `libtensorflow_lite_all.so` and `libarmnn.so` library files
+6. Copy over your `libarmnnDelegate.so` and `libarmnn.so` library files
 you built/downloaded before trying this application to the application
 folder. For example:
 
   ```bash
-  cp path/to/tensorflow/directory/tensorflow/bazel-bin/libtensorflow_lite_all.so .
+  cp /path/to/armnn/binaries/libarmnnDelegate.so .
   cp /path/to/armnn/binaries/libarmnn.so .
   ```
 
@@ -89,12 +92,12 @@ You should now have the following folder structure:
 ```
 .
 ├── README.md
-├── run_classifier.py          # script for the demo
-├── libtensorflow_lite_all.so  # tflite library built from tensorflow
+├── run_classifier.py                                 # script for the demo
+├── libarmnnDelegate.so  
 ├── libarmnn.so
-├── cat.png                    # downloaded example image
-├── mobilenet_v2_1.0_224_quantized_1_default_1.tflite #tflite model from ml-zoo
-└── labelmappings.txt          # model labelmappings for output processing
+├── cat.png                                           # downloaded example image
+├── mobilenet_v2_1.0_224_quantized_1_default_1.tflite # tflite model from ml-zoo
+└── labelmappings.txt                                 # model label mappings for output processing
 ```
 
 ## Run the model
@@ -104,7 +107,7 @@ python3 run_classifier.py \
 --input_image cat.png \
 --model_file mobilenet_v2_1.0_224_quantized_1_default_1.tflite \
 --label_file labelmappings.txt \
---delegate_path /path/to/delegate/libarmnnDelegate.so.24 \
+--delegate_path /path/to/armnn/binaries/libarmnnDelegate.so \
 --preferred_backends GpuAcc CpuAcc CpuRef
 ```
 
@@ -122,7 +125,7 @@ Lite Delegate requires one extra step when loading in your model:
 ```python
 import tflite_runtime.interpreter as tflite
 
-armnn_delegate = tflite.load_delegate("/path/to/delegate/libarmnnDelegate.so",
+armnn_delegate = tflite.load_delegate("/path/to/armnn/binaries/libarmnnDelegate.so",
   options={
     "backends": "GpuAcc,CpuAcc,CpuRef",
     "logging-severity": "info"

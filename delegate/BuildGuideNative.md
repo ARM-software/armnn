@@ -23,19 +23,18 @@ natively (no cross-compilation required). This is to keep this guide simple.
 # Dependencies
 
 Build Dependencies:
- * Tensorflow Lite: this guide uses version 2.3.1 . Other versions may work.
+ * Tensorflow Lite: this guide uses version 2.5.1 . Other versions may work.
  * Flatbuffers 1.12.0
- * Arm NN 20.11 or higher
+ * Arm NN 21.11 or higher
 
 Required Tools:
- * Git. This guide uses version 2.17.1 . Other versions might work.
- * pip. This guide uses version 20.3.3 . Other versions might work.
- * wget. This guide uses version 1.17.1 . Other versions might work.
- * zip. This guide uses version 3.0 . Other versions might work.
- * unzip. This guide uses version 6.00 . Other versions might work.
- * cmake 3.7.0 or higher. This guide uses version 3.7.2
- * scons. This guide uses version 2.4.1 . Other versions might work.
- * bazel. This guide uses version 3.1.0 . Other versions might work.
+ * Git. This guide uses version 2.17.1. Other versions might work.
+ * pip. This guide uses version 20.3.3. Other versions might work.
+ * wget. This guide uses version 1.17.1. Other versions might work.
+ * zip. This guide uses version 3.0. Other versions might work.
+ * unzip. This guide uses version 6.00. Other versions might work.
+ * cmake 3.16.0 or higher. This guide uses version 3.16.0
+ * scons. This guide uses version 2.4.1. Other versions might work.
 
 Our first step is to build all the build dependencies I have mentioned above. We will have to create quite a few
 directories. To make navigation a bit easier define a base directory for the project. At this stage we can also
@@ -47,23 +46,22 @@ cd $BASEDIR
 apt-get update && apt-get install git wget unzip zip python git cmake scons
 ```
 ## Build Tensorflow Lite for C++
-Tensorflow has a few dependencies on it's own. It requires the python packages pip3, numpy, wheel,
-and also bazel which is used to compile Tensoflow. A description on how to build bazel can be
-found [here](https://docs.bazel.build/versions/master/install-compile-source.html). There are multiple ways.
-I decided to compile from source because that should work for any platform and therefore adds the most value
-to this guide. Depending on your operating system and architecture there might be an easier way.
+Tensorflow has a few dependencies on it's own. It requires the python packages pip3, numpy,
+and also Bazel or CMake which are used to compile Tensorflow. A description on how to build bazel can be
+found [here](https://docs.bazel.build/versions/master/install-compile-source.html). But for this guide, we will
+compile with CMake. Depending on your operating system and architecture there might be an easier way.
 ```bash
-# Install the required python packages
-pip3 install -U pip numpy wheel
+wget -O cmake-3.16.0.tar.gz https://cmake.org/files/v3.16/cmake-3.16.0.tar.gz
+tar -xzf cmake-3.16.0.tar.gz -C $BASEDIR/cmake-3.16.0
 
-# Bazel has a dependency on JDK (The specific JDK version depends on the bazel version but default-jdk tends to work.)
-sudo apt-get install default-jdk
-# Build Bazel
-wget -O bazel-3.1.0-dist.zip https://github.com/bazelbuild/bazel/releases/download/3.1.0/bazel-3.1.0-dist.zip
-unzip -d bazel bazel-3.1.0-dist.zip
-cd bazel
-env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh 
-# This creates an "output" directory where the bazel binary can be found
+# If you have an older CMake, remove installed in order to upgrade
+yes | sudo apt-get purge cmake
+hash -r
+
+cd $BASEDIR/cmake-3.16.0 
+./bootstrap 
+make 
+sudo make install 
 ```
 
 ### Download and build Tensorflow Lite
@@ -72,26 +70,13 @@ env EXTRA_BAZEL_ARGS="--host_javabase=@local_jdk//:jdk" bash ./compile.sh
 cd $BASEDIR
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/
-git checkout tags/v2.3.1 # Minimum version required for the delegate
+git checkout tags/v2.5.1 # Minimum version required for the delegate is v2.3.1
 ```
-Before we build, a target for tensorflow lite needs to be defined in the `BUILD` file. This can be 
-found in the root directory of Tensorflow. Append the following target to the file:
+Now the build process can be started. When calling "cmake", as below, you can specify a number of build
+flags. But if you have no need to configure your tensorflow build, you can follow the exact commands below:
 ```bash
-cc_binary(
-     name = "libtensorflow_lite_all.so",
-     linkshared = 1,
-     deps = [
-         "//tensorflow/lite:framework",
-         "//tensorflow/lite/kernels:builtin_ops",
-     ],
-)
-```
-Now the build process can be started. When calling "configure", as below, a dialog shows up that asks the
-user to specify additional options. If you don't have any particular needs to your build, decline all
-additional options and choose default values.
-```bash
-PATH="$BASEDIR/bazel/output:$PATH" ./configure
-$BASEDIR/bazel/output/bazel build --config=opt --config=monolithic --strip=always libtensorflow_lite_all.so
+cmake $BASEDIR/tensorflow
+cmake --build $BASEDIR/tflite-output # This will be your DTFLITE_LIB_ROOT directory
 ```
 
 ## Build Flatbuffers
@@ -154,7 +139,7 @@ with the additional cmake arguments shown below
 cd $BASEDIR/armnn/delegate && mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=release                               # A release build rather than a debug build.
          -DTENSORFLOW_ROOT=$BASEDIR/tensorflow \                  # The root directory where tensorflow can be found.
-         -DTFLITE_LIB_ROOT=$BASEDIR/tensorflow/bazel-bin \        # Directory where tensorflow libraries can be found.
+         -DTFLITE_LIB_ROOT=$BASEDIR/tflite-output \               # Directory where tensorflow libraries can be found.
          -DFLATBUFFERS_ROOT=$BASEDIR/flatbuffers-1.12.0/install \ # Flatbuffers install directory.
          -DArmnn_DIR=$BASEDIR/armnn/build \                       # Directory where the Arm NN library can be found
          -DARMNN_SOURCE_DIR=$BASEDIR/armnn                        # The top directory of the Arm NN repository. 
@@ -201,7 +186,7 @@ cmake .. -DARMCOMPUTE_ROOT=$BASEDIR/ComputeLibrary \
          -DBUILD_UNIT_TESTS=0 \
          -DBUILD_ARMNN_TFLITE_DELEGATE=1 \
          -DTENSORFLOW_ROOT=$BASEDIR/tensorflow \
-         -DTFLITE_LIB_ROOT=$BASEDIR/tensorflow/bazel-bin \
+         -DTFLITE_LIB_ROOT=$BASEDIR/tflite-output \
          -DFLATBUFFERS_ROOT=$BASEDIR/flatbuffers-1.12.0/install
 make
 ```

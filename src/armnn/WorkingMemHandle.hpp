@@ -119,7 +119,6 @@ public:
 private:
     using DifferenceType = std::vector<ITensorHandle*>::difference_type;
     NetworkId m_NetworkId;
-    std::shared_ptr<ProfilerImpl> m_Profiler;
 
     std::unordered_map<LayerBindingId, ITensorHandle*> m_InputHandleMap;
     std::unordered_map<LayerBindingId, ITensorHandle*> m_OutputHandleMap;

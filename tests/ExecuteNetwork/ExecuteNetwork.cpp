@@ -68,8 +68,7 @@ bool CheckInferenceTimeThreshold(const std::chrono::duration<double, std::milli>
 }
 
 #if defined(ARMNN_TFLITE_DELEGATE)
-int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRuntime::CreationOptions runtimeOptions,
-                           const std::shared_ptr<armnn::IRuntime>& runtime = nullptr)
+int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRuntime::CreationOptions runtimeOptions)
 {
     using namespace tflite;
 
@@ -867,7 +866,7 @@ int main(int argc, const char* argv[])
                     ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
         {
         #if defined(ARMNN_TF_LITE_DELEGATE)
-            return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, ProgramOptions.m_RuntimeOptions, runtime);
+            return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, ProgramOptions.m_RuntimeOptions);
         #else
             ARMNN_LOG(fatal) << "Not built with Arm NN Tensorflow-Lite delegate support.";
             return EXIT_FAILURE;

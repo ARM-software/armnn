@@ -397,7 +397,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
                                                          networkProperties);
         if (loadingStatus != armnn::Status::Success)
         {
-            // Optimize failed
+            // Network load failed.
             throw armnn::Exception("TfLiteArmnnDelegate: Network could not be loaded:" + errorMessage);
         }
     }
@@ -457,6 +457,12 @@ TfLiteStatus ArmnnSubgraph::Invoke(TfLiteContext* tfLiteContext, TfLiteNode* tfL
 
     // Run graph
     auto status = m_Runtime->EnqueueWorkload(m_NetworkId, inputTensors, outputTensors);
+    // The delegate holds its own Arm NN runtime so this is our last chance to print internal profiling data.
+    std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
+    if (profiler && profiler->IsProfilingEnabled())
+    {
+        profiler->Print(std::cout);
+    }
     return (status == armnn::Status::Success) ? kTfLiteOk : kTfLiteError;
 }
 

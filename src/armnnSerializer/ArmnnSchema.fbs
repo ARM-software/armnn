@@ -619,9 +619,16 @@ table PadLayer {
     descriptor:PadDescriptor;
 }
 
+enum PaddingMode : byte {
+    Constant  = 0,
+    Reflect   = 1,
+    Symmetric = 2
+}
+
 table PadDescriptor {
     padList:[uint];
     padValue:float = 0;
+    paddingMode:PaddingMode = Constant;
 }
 
 /// @deprecated Use ElementwiseUnaryLayer instead

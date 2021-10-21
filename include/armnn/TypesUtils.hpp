@@ -125,6 +125,17 @@ constexpr char const* GetPaddingMethodAsCString(PaddingMethod method)
     }
 }
 
+constexpr char const* GetPaddingModeAsCString(PaddingMode mode)
+{
+    switch (mode)
+    {
+        case PaddingMode::Constant:   return "Exclude";
+        case PaddingMode::Symmetric:  return "Symmetric";
+        case PaddingMode::Reflect:    return "Reflect";
+        default:                      return "Unknown";
+    }
+}
+
 constexpr char const* GetReduceOperationAsCString(ReduceOperation reduce_operation)
 {
     switch (reduce_operation)

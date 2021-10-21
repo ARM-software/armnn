@@ -28,7 +28,7 @@ NeonFillWorkload::NeonFillWorkload(const FillQueueDescriptor& descriptor, const 
     m_Data.ValidateInputsOutputs("NeonFillWorkload", 1, 1);
 
     arm_compute::ITensor& output = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
-    arm_compute::PixelValue pixelValue = GetPixelValue(output, descriptor.m_Parameters.m_Value);
+    arm_compute::PixelValue pixelValue = GetPixelValue(output.info(), descriptor.m_Parameters.m_Value);
 
     auto layer = std::make_unique<arm_compute::NEFill>();
     layer->configure(&output, pixelValue);

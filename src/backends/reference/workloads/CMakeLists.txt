@@ -52,6 +52,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Concatenate.hpp
     Concatenate.cpp
     Minimum.hpp
+    MirrorPad.cpp
+    MirrorPad.hpp
     Pad.cpp
     Pad.hpp
     Pooling2d.cpp

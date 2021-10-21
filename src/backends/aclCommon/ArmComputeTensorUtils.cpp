@@ -254,9 +254,9 @@ arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsign
     return arm_compute::Size2D(width, height);
 }
 
-arm_compute::PixelValue GetPixelValue(arm_compute::ITensor& input, float pixelValue)
+arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo, float pixelValue)
 {
-    switch (input.info()->data_type())
+    switch (tensorInfo->data_type())
     {
         case arm_compute::DataType::F16:
             return arm_compute::PixelValue(static_cast<Half>(pixelValue));
@@ -273,7 +273,7 @@ arm_compute::PixelValue GetPixelValue(arm_compute::ITensor& input, float pixelVa
             return arm_compute::PixelValue(static_cast<int32_t>(pixelValue));
         default:
             throw InvalidArgumentException("Unsupported DataType: [" +
-                                           std::to_string(static_cast<int>(input.info()->data_type())) + "]");
+                                           std::to_string(static_cast<int>(tensorInfo->data_type())) + "]");
     }
 }
 

@@ -166,6 +166,17 @@ enum class PaddingMethod
     Exclude     = 1
 };
 
+///
+/// The padding mode controls whether the padding should be filled with constant values (Constant), or
+/// reflect the input, either including the border values (Symmetric) or not (Reflect).
+///
+enum class PaddingMode
+{
+    Constant  = 0,
+    Reflect   = 1,
+    Symmetric = 2
+};
+
 enum class NormalizationAlgorithmChannel
 {
     Across = 0,

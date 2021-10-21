@@ -27,6 +27,8 @@ armnnSerializer::OutputShapeRounding GetFlatBufferOutputShapeRounding(
 
 armnnSerializer::PaddingMethod GetFlatBufferPaddingMethod(armnn::PaddingMethod paddingMethod);
 
+armnnSerializer::PaddingMode GetFlatBufferPaddingMode(armnn::PaddingMode paddingMode);
+
 armnnSerializer::NormalizationAlgorithmChannel GetFlatBufferNormalizationAlgorithmChannel(
     armnn::NormalizationAlgorithmChannel normalizationAlgorithmChannel);
 

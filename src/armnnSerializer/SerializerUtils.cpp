@@ -170,6 +170,19 @@ armnnSerializer::PaddingMethod GetFlatBufferPaddingMethod(armnn::PaddingMethod p
     }
 }
 
+armnnSerializer::PaddingMode GetFlatBufferPaddingMode(armnn::PaddingMode paddingMode)
+{
+    switch (paddingMode)
+    {
+        case armnn::PaddingMode::Reflect:
+            return armnnSerializer::PaddingMode::PaddingMode_Reflect;
+        case armnn::PaddingMode::Symmetric:
+            return armnnSerializer::PaddingMode::PaddingMode_Symmetric;
+        default:
+            return armnnSerializer::PaddingMode::PaddingMode_Constant;
+    }
+}
+
 armnnSerializer::NormalizationAlgorithmChannel GetFlatBufferNormalizationAlgorithmChannel(
     armnn::NormalizationAlgorithmChannel normalizationAlgorithmChannel)
 {

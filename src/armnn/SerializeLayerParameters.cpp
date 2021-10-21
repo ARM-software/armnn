@@ -293,6 +293,7 @@ void StringifyLayerParameters<PadDescriptor>::Serialize(ParameterStringifyFuncti
         fn("PadList", ss.str());
     }
     fn("PadValue", std::to_string(desc.m_PadValue));
+    fn("PaddingMode", GetPaddingModeAsCString(desc.m_PaddingMode));
 }
 
 void StringifyLayerParameters<PreCompiledDescriptor>::Serialize(ParameterStringifyFunction& fn,

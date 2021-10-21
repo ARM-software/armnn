@@ -65,8 +65,8 @@ arm_compute::PermutationVector BuildArmComputeTransposeVector(const armnn::Permu
 /// Utility function used to setup an arm_compute::Size2D object from width and height values.
 arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsigned int height);
 
-/// Gets the appropriate PixelValue for the input DataType
-arm_compute::PixelValue GetPixelValue(arm_compute::ITensor& input, float pixelValue);
+/// Gets the appropriate PixelValue for the TensorInfo DataType
+arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo, float pixelValue);
 
 /// Utility function used to setup an arm_compute::PadStrideInfo object from an armnn layer descriptor.
 template <typename Descriptor>

@@ -129,6 +129,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/MeanTestImpl.hpp
     layerTests/MinimumTestImpl.cpp
     layerTests/MinimumTestImpl.hpp
+    layerTests/MirrorPadTestImpl.cpp
+    layerTests/MirrorPadTestImpl.hpp
     layerTests/MultiplicationTestImpl.cpp
     layerTests/MultiplicationTestImpl.hpp
     layerTests/NegTestImpl.cpp

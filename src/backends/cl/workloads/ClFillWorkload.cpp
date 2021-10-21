@@ -29,7 +29,7 @@ ClFillWorkload::ClFillWorkload(const FillQueueDescriptor& descriptor,
     m_Data.ValidateInputsOutputs("ClFillWorkload", 1, 1);
 
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
-    arm_compute::PixelValue pixelValue = GetPixelValue(output, descriptor.m_Parameters.m_Value);
+    arm_compute::PixelValue pixelValue = GetPixelValue(output.info(), descriptor.m_Parameters.m_Value);
 
     m_Layer.configure(clCompileContext, &output, pixelValue);
 }

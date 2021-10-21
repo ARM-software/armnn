@@ -23,6 +23,7 @@ std::unique_ptr<IWorkload> PadLayer::CreateWorkload(const armnn::IWorkloadFactor
 {
     PadQueueDescriptor descriptor;
     descriptor.m_Parameters.m_PadList = m_Param.m_PadList;
+    descriptor.m_Parameters.m_PaddingMode = m_Param.m_PaddingMode;
     SetAdditionalInfo(descriptor);
 
     return factory.CreatePad(descriptor, PrepInfoAndDesc(descriptor));
@@ -33,6 +34,7 @@ PadLayer* PadLayer::Clone(Graph& graph) const
     auto layer = CloneBase<PadLayer>(graph, m_Param, GetName());
 
     layer->m_Param.m_PadList = m_Param.m_PadList;
+    layer->m_Param.m_PaddingMode = m_Param.m_PaddingMode;
 
     return std::move(layer);
 }

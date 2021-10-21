@@ -41,6 +41,7 @@ BACKEND_SOURCES := \
         workloads/Lstm.cpp \
         workloads/LstmUtils.cpp \
         workloads/Concatenate.cpp \
+        workloads/MirrorPad.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
         workloads/PreluImpl.cpp \

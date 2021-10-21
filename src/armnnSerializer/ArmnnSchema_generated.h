@@ -1198,6 +1198,39 @@ inline const char *EnumNameNormalizationAlgorithmMethod(NormalizationAlgorithmMe
   return EnumNamesNormalizationAlgorithmMethod()[index];
 }
 
+enum PaddingMode {
+  PaddingMode_Constant = 0,
+  PaddingMode_Reflect = 1,
+  PaddingMode_Symmetric = 2,
+  PaddingMode_MIN = PaddingMode_Constant,
+  PaddingMode_MAX = PaddingMode_Symmetric
+};
+
+inline const PaddingMode (&EnumValuesPaddingMode())[3] {
+  static const PaddingMode values[] = {
+    PaddingMode_Constant,
+    PaddingMode_Reflect,
+    PaddingMode_Symmetric
+  };
+  return values;
+}
+
+inline const char * const *EnumNamesPaddingMode() {
+  static const char * const names[4] = {
+    "Constant",
+    "Reflect",
+    "Symmetric",
+    nullptr
+  };
+  return names;
+}
+
+inline const char *EnumNamePaddingMode(PaddingMode e) {
+  if (flatbuffers::IsOutRange(e, PaddingMode_Constant, PaddingMode_Symmetric)) return "";
+  const size_t index = static_cast<size_t>(e);
+  return EnumNamesPaddingMode()[index];
+}
+
 enum Layer {
   Layer_NONE = 0,
   Layer_ActivationLayer = 1,
@@ -6383,7 +6416,8 @@ struct PadDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef PadDescriptorBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_PADLIST = 4,
-    VT_PADVALUE = 6
+    VT_PADVALUE = 6,
+    VT_PADDINGMODE = 8
   };
   const flatbuffers::Vector<uint32_t> *padList() const {
     return GetPointer<const flatbuffers::Vector<uint32_t> *>(VT_PADLIST);
@@ -6391,11 +6425,15 @@ struct PadDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float padValue() const {
     return GetField<float>(VT_PADVALUE, 0.0f);
   }
+  armnnSerializer::PaddingMode paddingMode() const {
+    return static_cast<armnnSerializer::PaddingMode>(GetField<int8_t>(VT_PADDINGMODE, 0));
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyOffset(verifier, VT_PADLIST) &&
            verifier.VerifyVector(padList()) &&
            VerifyField<float>(verifier, VT_PADVALUE) &&
+           VerifyField<int8_t>(verifier, VT_PADDINGMODE) &&
            verifier.EndTable();
   }
 };
@@ -6409,6 +6447,9 @@ struct PadDescriptorBuilder {
   }
   void add_padValue(float padValue) {
     fbb_.AddElement<float>(PadDescriptor::VT_PADVALUE, padValue, 0.0f);
+  }
+  void add_paddingMode(armnnSerializer::PaddingMode paddingMode) {
+    fbb_.AddElement<int8_t>(PadDescriptor::VT_PADDINGMODE, static_cast<int8_t>(paddingMode), 0);
   }
   explicit PadDescriptorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -6425,22 +6466,26 @@ struct PadDescriptorBuilder {
 inline flatbuffers::Offset<PadDescriptor> CreatePadDescriptor(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::Vector<uint32_t>> padList = 0,
-    float padValue = 0.0f) {
+    float padValue = 0.0f,
+    armnnSerializer::PaddingMode paddingMode = armnnSerializer::PaddingMode_Constant) {
   PadDescriptorBuilder builder_(_fbb);
   builder_.add_padValue(padValue);
   builder_.add_padList(padList);
+  builder_.add_paddingMode(paddingMode);
   return builder_.Finish();
 }
 
 inline flatbuffers::Offset<PadDescriptor> CreatePadDescriptorDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<uint32_t> *padList = nullptr,
-    float padValue = 0.0f) {
+    float padValue = 0.0f,
+    armnnSerializer::PaddingMode paddingMode = armnnSerializer::PaddingMode_Constant) {
   auto padList__ = padList ? _fbb.CreateVector<uint32_t>(*padList) : 0;
   return armnnSerializer::CreatePadDescriptor(
       _fbb,
       padList__,
-      padValue);
+      padValue,
+      paddingMode);
 }
 
 /// @deprecated Use ElementwiseUnaryLayer instead

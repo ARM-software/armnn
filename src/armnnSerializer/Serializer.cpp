@@ -894,7 +894,8 @@ void SerializerStrategy::SerializePadLayer(const armnn::IConnectableLayer* layer
 
     auto flatBufferPadDesc = serializer::CreatePadDescriptor(m_flatBufferBuilder,
                                                              m_flatBufferBuilder.CreateVector(padList),
-                                                             padDescriptor.m_PadValue);
+                                                             padDescriptor.m_PadValue,
+                                                             GetFlatBufferPaddingMode(padDescriptor.m_PaddingMode));
 
     auto flatBufferPadLayer = serializer::CreatePadLayer(m_flatBufferBuilder,
                                                          flatBufferBaseLayer,

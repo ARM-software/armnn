@@ -39,7 +39,7 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
 
     arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(reversed_PadList);
 
-    arm_compute::PixelValue pixelValue = GetPixelValue(input, descriptor.m_Parameters.m_PadValue);
+    arm_compute::PixelValue pixelValue = GetPixelValue(input.info(), descriptor.m_Parameters.m_PadValue);
 
     m_Layer.configure(clCompileContext, &input, &output, padList, pixelValue);
 }

@@ -1060,17 +1060,20 @@ struct MeanDescriptor : BaseDescriptor
 /// A PadDescriptor for the PadLayer.
 struct PadDescriptor : BaseDescriptor
 {
-    PadDescriptor() : m_PadValue(0)
+    PadDescriptor() : m_PadValue(0), m_PaddingMode(PaddingMode::Constant)
     {}
 
-    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList, const float& padValue = 0)
+    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList,
+                  const float& padValue = 0,
+                  const PaddingMode& paddingMode = PaddingMode::Constant)
         : m_PadList(padList)
         , m_PadValue(padValue)
+        , m_PaddingMode(paddingMode)
     {}
 
     bool operator ==(const PadDescriptor& rhs) const
     {
-        return m_PadList == rhs.m_PadList && m_PadValue == rhs.m_PadValue;
+        return m_PadList == rhs.m_PadList && m_PadValue == rhs.m_PadValue && m_PaddingMode == rhs.m_PaddingMode;
     }
 
     /// @brief Specifies the padding for input dimension.
@@ -1081,6 +1084,9 @@ struct PadDescriptor : BaseDescriptor
 
     /// Optional value to use for padding, defaults to 0
     float m_PadValue;
+
+    /// Specifies the Padding mode (Constant, Reflect or Symmetric)
+    PaddingMode m_PaddingMode;
 };
 
 /// A SliceDescriptor for the SliceLayer.

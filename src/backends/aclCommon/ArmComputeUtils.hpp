@@ -300,6 +300,17 @@ inline arm_compute::Conv3dInfo ComputeConv3DInfo(const armnn::Convolution3dQueue
     return arm_compute::Conv3dInfo{stride, padding, activationInfo, dilation, roundType, isFastMathEnabled};
 }
 
+inline arm_compute::PaddingMode ConvertPaddingModeToAcl(const PaddingMode& paddingMode)
+{
+    switch (paddingMode)
+    {
+        case PaddingMode::Constant:   return arm_compute::PaddingMode::CONSTANT;
+        case PaddingMode::Reflect:    return arm_compute::PaddingMode::REFLECT;
+        case PaddingMode::Symmetric:  return arm_compute::PaddingMode::SYMMETRIC;
+        default:                      throw InvalidArgumentException("Unsupported Padding Mode");
+    }
+}
+
 inline arm_compute::ReductionOperation ConvertReductionOperationToAcl(const ReduceDescriptor& descriptor)
 {
     switch (descriptor.m_ReduceOperation)

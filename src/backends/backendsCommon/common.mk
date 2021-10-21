@@ -77,6 +77,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/LstmTestImpl.cpp \
     test/layerTests/MaximumTestImpl.cpp \
     test/layerTests/MinimumTestImpl.cpp \
+    test/layerTests/MirrorPadTestImpl.cpp \
     test/layerTests/MultiplicationTestImpl.cpp \
     test/layerTests/NegTestImpl.cpp \
     test/layerTests/NormalizationTestImpl.cpp \

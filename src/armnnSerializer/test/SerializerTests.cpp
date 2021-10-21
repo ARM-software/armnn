@@ -1684,6 +1684,36 @@ TEST_CASE("SerializePad")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+TEST_CASE("SerializePadReflect")
+{
+    const std::string layerName("padReflect");
+    const armnn::TensorInfo inputTensorInfo = armnn::TensorInfo({1, 2, 3, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo outputTensorInfo = armnn::TensorInfo({1, 3, 5, 7}, armnn::DataType::Float32);
+
+    armnn::PadDescriptor desc({{0, 0}, {1, 0}, {1, 1}, {1, 2}});
+    desc.m_PaddingMode = armnn::PaddingMode::Reflect;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const padLayer = network->AddPadLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(padLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    padLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBaseWithDescriptor<armnn::PadDescriptor> verifier(layerName,
+                                                                   {inputTensorInfo},
+                                                                   {outputTensorInfo},
+                                                                   desc);
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
 TEST_CASE("EnsurePadBackwardCompatibility")
 {
     // The PadDescriptor is being extended with a float PadValue (so a value other than 0

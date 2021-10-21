@@ -1415,7 +1415,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat16_2, LogSoftmaxTest2<DataType::Flo
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat16_3, LogSoftmaxTest3<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat16_4, LogSoftmaxTest4<DataType::Float16>)
 
-// Pad
+// Pad - Constant
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadBFloat162d, PadBFloat162dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadBFloat162dCustomPadding, PadBFloat162dCustomPaddingTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadBFloat163d, PadBFloat163dTest)
@@ -1444,6 +1444,31 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(PadInt83d, PadInt83dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadInt84d, PadInt84dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadQAsymmS8, PadQAsymmTestCommon<DataType::QAsymmS8>, -2.0f, 3, 0.0f)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadQAsymmS8CustomPadding, PadQAsymmTestCommon<DataType::QAsymmS8>, -2.0f, 3, 2.0f)
+
+// Pad - Symmetric & Reflect
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric2dFloat32, PadSymmetric2dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect2dFloat32, PadReflect2dFloat32Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric3dFloat32, PadSymmetric3dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect3dFloat32, PadReflect3dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric3dUint8, PadSymmetric3dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect3dUint8, PadReflect3dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric3dInt8, PadSymmetric3dInt8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect3dInt8, PadReflect3dInt8Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric4dFloat32, PadSymmetric4dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect4dFloat32, PadReflect4dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric4dBFloat16, PadSymmetric4dBFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect4dBFloat16, PadReflect4dBFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric4dUint8, PadSymmetric4dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect4dUint8, PadReflect4dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric4dInt8, PadSymmetric4dInt8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect4dInt8, PadReflect4dInt8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric4dInt16, PadSymmetric4dInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect4dInt16, PadReflect4dInt16Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetricFloat16, PadSymmetricFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflectFloat16, PadReflectFloat16Test)
 
 // Constant
 ARMNN_AUTO_TEST_CASE_WITH_THF(Constant, ConstantTest)

@@ -5,6 +5,7 @@
 
 #include "RefPadWorkload.hpp"
 
+#include "MirrorPad.hpp"
 #include "Pad.hpp"
 #include "Profiling.hpp"
 #include "RefWorkloadUtils.hpp"
@@ -29,11 +30,19 @@ void RefPadWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITe
     const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
 
-    armnn::Pad(inputInfo,
-               outputInfo,
-               inputs[0],
-               outputs[0],
-               m_Data);
+    PaddingMode paddingMode = m_Data.m_Parameters.m_PaddingMode;
+    if (paddingMode == PaddingMode::Constant)
+    {
+        armnn::Pad(inputInfo, outputInfo, inputs[0], outputs[0], m_Data);
+    }
+    else if(paddingMode == PaddingMode::Reflect || paddingMode == PaddingMode::Symmetric)
+    {
+        armnn::MirrorPad(inputInfo, outputInfo, inputs[0], outputs[0], m_Data);
+    }
+    else
+    {
+        throw InvalidArgumentException("Padding mode not supported.");
+    }
 }
 
 } //namespace armnn

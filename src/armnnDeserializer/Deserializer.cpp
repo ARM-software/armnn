@@ -577,6 +577,19 @@ armnn::UnaryOperation ToUnaryOperation(armnnSerializer::UnaryOperation operation
     }
 }
 
+armnn::PaddingMode ToPaddingMode(armnnSerializer::PaddingMode paddingMode)
+{
+    switch (paddingMode)
+    {
+        case armnnSerializer::PaddingMode::PaddingMode_Reflect:
+            return armnn::PaddingMode::Reflect;
+        case armnnSerializer::PaddingMode::PaddingMode_Symmetric:
+            return armnn::PaddingMode::Symmetric;
+        default:
+            return armnn::PaddingMode::Constant;
+    }
+}
+
 armnn::ResizeMethod ToResizeMethod(armnnSerializer::ResizeMethod method)
 {
     switch (method)
@@ -2064,6 +2077,7 @@ void IDeserializer::DeserializerImpl::ParsePad(GraphPtr graph, unsigned int laye
 
     auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_PadLayer()->descriptor();
     auto flatBufferPadList = flatBufferDescriptor->padList();
+    auto paddingMode = flatBufferDescriptor->paddingMode();
     float padValue = flatBufferDescriptor->padValue();
 
     if (flatBufferPadList->Length() % 2 != 0)
@@ -2079,7 +2093,7 @@ void IDeserializer::DeserializerImpl::ParsePad(GraphPtr graph, unsigned int laye
         padList.emplace_back(flatBufferPadList->Get(i), flatBufferPadList->Get(i+1));
     }
 
-    armnn::PadDescriptor descriptor(padList, padValue);
+    armnn::PadDescriptor descriptor(padList, padValue, ToPaddingMode(paddingMode));
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddPadLayer(descriptor, layerName.c_str());

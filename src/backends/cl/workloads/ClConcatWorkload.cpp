@@ -88,9 +88,12 @@ ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor,
     // Create the layer function
     auto layer = std::make_unique<arm_compute::CLConcatenateLayer>();
 
-    // Configure input and output tensors
-    size_t aclAxis = CalcAxis(descriptor.m_Parameters);
-    layer->configure(clCompileContext, aclInputs, &output, aclAxis);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConcatWorkload_configure");
+        // Configure input and output tensors
+        size_t aclAxis = CalcAxis(descriptor.m_Parameters);
+        layer->configure(clCompileContext, aclInputs, &output, aclAxis);
+    }
 
     // Prepare
     layer->prepare();

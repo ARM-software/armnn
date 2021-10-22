@@ -86,7 +86,10 @@ ClChannelShuffleWorkload::ClChannelShuffleWorkload(const ChannelShuffleQueueDesc
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    m_ChannelShuffleLayer.configure(clCompileContext, &input, &output, descriptor.m_Parameters.m_NumGroups);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClChannelShuffleWorkload_configure");
+        m_ChannelShuffleLayer.configure(clCompileContext, &input, &output, descriptor.m_Parameters.m_NumGroups);
+    }
 }
 
 void ClChannelShuffleWorkload::Execute() const

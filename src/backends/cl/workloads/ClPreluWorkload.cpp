@@ -37,7 +37,10 @@ ClPreluWorkload::ClPreluWorkload(const PreluQueueDescriptor& descriptor,
     arm_compute::ICLTensor& alpha = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_PreluLayer.configure(clCompileContext, &input, &alpha, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPreluWorkload_configure");
+        m_PreluLayer.configure(clCompileContext, &input, &alpha, &output);
+    }
 }
 
 void ClPreluWorkload::Execute() const

@@ -33,8 +33,10 @@ ClAbsWorkload::ClAbsWorkload(const AbsQueueDescriptor& descriptor,
 
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
-
-    m_AbsLayer.configure(clCompileContext, &input, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClAbsWorkload_configure");
+        m_AbsLayer.configure(clCompileContext, &input, &output);
+    }
 }
 
 void ClAbsWorkload::Execute() const

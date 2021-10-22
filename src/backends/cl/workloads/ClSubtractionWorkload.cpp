@@ -31,7 +31,10 @@ ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& d
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_Layer.configure(clCompileContext, &input0, &input1, &output, g_AclConvertPolicy, activationInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSubtractionWorkload_configure");
+        m_Layer.configure(clCompileContext, &input0, &input1, &output, g_AclConvertPolicy, activationInfo);
+    }
 }
 
 void ClSubtractionWorkload::Execute() const

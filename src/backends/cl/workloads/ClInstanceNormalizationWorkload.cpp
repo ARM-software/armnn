@@ -50,12 +50,15 @@ ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    m_Layer.configure(clCompileContext,
-                      &input,
-                      &output,
-                      descriptor.m_Parameters.m_Gamma,
-                      descriptor.m_Parameters.m_Beta,
-                      descriptor.m_Parameters.m_Eps);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClInstanceNormalizationWorkload_configure");
+        m_Layer.configure(clCompileContext,
+                          &input,
+                          &output,
+                          descriptor.m_Parameters.m_Gamma,
+                          descriptor.m_Parameters.m_Beta,
+                          descriptor.m_Parameters.m_Eps);
+    }
 };
 
 void ClInstanceNormalizationWorkload::Execute() const

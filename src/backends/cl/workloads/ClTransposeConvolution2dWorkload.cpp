@@ -100,7 +100,11 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
     output.info()->set_data_layout(aclDataLayout);
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
-    m_Layer.configure(clCompileContext, &input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, padStrideInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClTransposeConvolution2dWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output,
+                          padStrideInfo);
+    }
 
     InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);
     if (m_BiasesTensor)

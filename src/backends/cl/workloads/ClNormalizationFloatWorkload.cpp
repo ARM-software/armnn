@@ -50,7 +50,10 @@ ClNormalizationFloatWorkload::ClNormalizationFloatWorkload(const NormalizationQu
 
     arm_compute::NormalizationLayerInfo normalizationInfo = BuildArmComputeNormalizationLayerInfo(m_Data.m_Parameters);
 
-    m_NormalizationLayer.configure(clCompileContext, &input, &output, normalizationInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClNormalizationFloatWorkload_configure");
+        m_NormalizationLayer.configure(clCompileContext, &input, &output, normalizationInfo);
+    }
 };
 
 void ClNormalizationFloatWorkload::Execute() const

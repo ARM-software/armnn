@@ -158,24 +158,27 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
                                         m_Data.m_Parameters.m_CellIntermediateScale,
                                         m_Data.m_Parameters.m_OutputIntermediateScale);
 
-    // QLSTM CL configure
-    m_QLstmLayer.configure(clCompileContext,
-                           &input,
-                           m_InputToForgetWeightsTensor.get(),
-                           m_InputToCellWeightsTensor.get(),
-                           m_InputToOutputWeightsTensor.get(),
-                           m_RecurrentToForgetWeightsTensor.get(),
-                           m_RecurrentToCellWeightsTensor.get(),
-                           m_RecurrentToOutputWeightsTensor.get(),
-                           m_ForgetGateBiasTensor.get(),
-                           m_CellBiasTensor.get(),
-                           m_OutputGateBiasTensor.get(),
-                           &cellStateIn,
-                           &outputStateIn,
-                           &cellStateOut,
-                           &outputStateOut,
-                           &output,
-                           qLstmParams);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClQLstmWorkload_configure");
+        // QLSTM CL configure
+        m_QLstmLayer.configure(clCompileContext,
+                               &input,
+                               m_InputToForgetWeightsTensor.get(),
+                               m_InputToCellWeightsTensor.get(),
+                               m_InputToOutputWeightsTensor.get(),
+                               m_RecurrentToForgetWeightsTensor.get(),
+                               m_RecurrentToCellWeightsTensor.get(),
+                               m_RecurrentToOutputWeightsTensor.get(),
+                               m_ForgetGateBiasTensor.get(),
+                               m_CellBiasTensor.get(),
+                               m_OutputGateBiasTensor.get(),
+                               &cellStateIn,
+                               &outputStateIn,
+                               &cellStateOut,
+                               &outputStateOut,
+                               &output,
+                               qLstmParams);
+    }
 
     // Initialise ACL tensor data for mandatory params
     InitializeArmComputeClTensorData(*m_InputToForgetWeightsTensor, m_Data.m_InputToForgetWeights);

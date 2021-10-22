@@ -31,7 +31,10 @@ ClReshapeWorkload::ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_Layer.configure(clCompileContext, &input, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClReshapeWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, &output);
+    }
 }
 
 void ClReshapeWorkload::Execute() const

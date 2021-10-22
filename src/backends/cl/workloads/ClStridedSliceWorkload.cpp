@@ -85,15 +85,18 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    m_StridedSliceLayer.configure(clCompileContext,
-                                  &input,
-                                  &output,
-                                  starts,
-                                  ends,
-                                  strides,
-                                  begin_mask,
-                                  end_mask,
-                                  shrink_axis_mask);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClStridedSliceWorkload_configure");
+        m_StridedSliceLayer.configure(clCompileContext,
+                                      &input,
+                                      &output,
+                                      starts,
+                                      ends,
+                                      strides,
+                                      begin_mask,
+                                      end_mask,
+                                      shrink_axis_mask);
+    }
 }
 
 void ClStridedSliceWorkload::Execute() const

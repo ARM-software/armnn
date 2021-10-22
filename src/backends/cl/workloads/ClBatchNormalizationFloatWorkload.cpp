@@ -86,15 +86,18 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_Layer.configure(clCompileContext,
-                      &input,
-                      &output,
-                      m_Mean.get(),
-                      m_Variance.get(),
-                      m_Beta.get(),
-                      m_Gamma.get(),
-                      m_Data.m_Parameters.m_Eps,
-                      activationInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClBatchNormalizationFloatWorkload_configure");
+        m_Layer.configure(clCompileContext,
+                          &input,
+                          &output,
+                          m_Mean.get(),
+                          m_Variance.get(),
+                          m_Beta.get(),
+                          m_Gamma.get(),
+                          m_Data.m_Parameters.m_Eps,
+                          activationInfo);
+    }
 
     InitializeArmComputeClTensorData(*m_Mean, m_Data.m_Mean);
     InitializeArmComputeClTensorData(*m_Variance, m_Data.m_Variance);

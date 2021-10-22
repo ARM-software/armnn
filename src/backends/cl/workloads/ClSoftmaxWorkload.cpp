@@ -44,7 +44,10 @@ ClSoftmaxWorkload::ClSoftmaxWorkload(const SoftmaxQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = static_cast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     int aclAxis = ComputeAclAxis(m_Data.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
-    m_SoftmaxLayer.configure(clCompileContext, &input, &output, m_Data.m_Parameters.m_Beta, aclAxis);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSoftmaxWorkload_configure");
+        m_SoftmaxLayer.configure(clCompileContext, &input, &output, m_Data.m_Parameters.m_Beta, aclAxis);
+    }
 }
 
 void ClSoftmaxWorkload::Execute() const

@@ -33,7 +33,10 @@ ClNegWorkload::ClNegWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_NegLayer.configure(clCompileContext, &input, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClNegWorkload_configure");
+        m_NegLayer.configure(clCompileContext, &input, &output);
+    }
 }
 
 void ClNegWorkload::Execute() const

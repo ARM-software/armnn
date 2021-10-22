@@ -42,7 +42,10 @@ ClBatchToSpaceNdWorkload::ClBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDesc
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     output.info()->set_data_layout(aclDataLayout);
 
-    m_Layer.configure(clCompileContext, &input, blockWidth, blockHeight, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClBatchToSpaceNdWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, blockWidth, blockHeight, &output);
+    }
 }
 
 void ClBatchToSpaceNdWorkload::Execute() const

@@ -51,7 +51,10 @@ ClSliceWorkload::ClSliceWorkload(const SliceQueueDescriptor& descriptor,
 
     std::tie(starts, ends) = SetClSliceData(m_Data.m_Parameters.m_Begin, m_Data.m_Parameters.m_Size);
 
-    m_SliceFunction.configure(clCompileContext, &input, &output, starts, ends);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSliceWorkload_configure");
+        m_SliceFunction.configure(clCompileContext, &input, &output, starts, ends);
+    }
 }
 
 void ClSliceWorkload::Execute() const

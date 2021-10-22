@@ -47,7 +47,10 @@ ClMinimumWorkload::ClMinimumWorkload(const MinimumQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_MinimumLayer.configure(clCompileContext, &input0, &input1, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMinimumWorkload_configure");
+        m_MinimumLayer.configure(clCompileContext, &input0, &input1, &output);
+    }
 }
 
 void ClMinimumWorkload::Execute() const

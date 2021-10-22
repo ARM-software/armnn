@@ -83,13 +83,15 @@ ClConvolution3dWorkload::ClConvolution3dWorkload(const Convolution3dQueueDescrip
     const arm_compute::Conv3dInfo aclConv3DInfo = ComputeConv3DInfo(descriptor,
                                                                     isFastMathEnabled);
 
-    m_ConvolutionLayer.configure(clCompileContext,
-                                 &input,
-                                 &weights,
-                                 biasesPtr,
-                                 &output,
-                                 aclConv3DInfo);
-
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution3dWorkload_configure");
+        m_ConvolutionLayer.configure(clCompileContext,
+                                     &input,
+                                     &weights,
+                                     biasesPtr,
+                                     &output,
+                                     aclConv3DInfo);
+    }
      // Add details for profiling output
     WorkloadInfo detailsInfo;
 

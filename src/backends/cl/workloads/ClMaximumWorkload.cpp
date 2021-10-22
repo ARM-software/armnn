@@ -47,7 +47,10 @@ ClMaximumWorkload::ClMaximumWorkload(const MaximumQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input1 = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_MaximumLayer.configure(clCompileContext, &input0, &input1, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMaximumWorkload_configure");
+        m_MaximumLayer.configure(clCompileContext, &input0, &input1, &output);
+    }
 }
 
 void ClMaximumWorkload::Execute() const

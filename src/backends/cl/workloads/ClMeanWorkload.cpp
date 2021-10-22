@@ -47,7 +47,10 @@ ClMeanWorkload::ClMeanWorkload(const MeanQueueDescriptor& descriptor,
                                                                           info.m_InputTensorInfos[0].GetNumDimensions(),
                                                                           m_Data.m_Parameters.m_Axis);
 
-    m_Layer.configure(clCompileContext, &input, coords, m_Data.m_Parameters.m_KeepDims, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMeanWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, coords, m_Data.m_Parameters.m_KeepDims, &output);
+    }
 }
 
 void ClMeanWorkload::Execute() const

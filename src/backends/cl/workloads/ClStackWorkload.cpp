@@ -66,7 +66,10 @@ ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor,
 
     m_Layer.reset(new arm_compute::CLStackLayer());
     int aclAxis = CalcAxis(descriptor.m_Parameters.m_Axis, descriptor.m_Parameters.m_InputShape.GetNumDimensions());
-    m_Layer->configure(clCompileContext, aclInputs, aclAxis, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClStackWorkload_configure");
+        m_Layer->configure(clCompileContext, aclInputs, aclAxis, &output);
+    }
 }
 
 void ClStackWorkload::Execute() const

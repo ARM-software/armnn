@@ -70,17 +70,20 @@ ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descrip
     auto unsignedAxis = armnnUtils::GetUnsignedAxis(numDims, m_Data.m_Parameters.m_Axis);
     int aclAxis = armnn::numeric_cast<int>(CalcAclAxis(numDims, unsignedAxis));
 
-    if (m_Data.m_Parameters.m_Function == ArgMinMaxFunction::Max)
     {
-        m_ArgMinMaxLayer.configure(&input, aclAxis, &output, arm_compute::ReductionOperation::ARG_IDX_MAX);
-    }
-    else
-    {
-        m_ArgMinMaxLayer.configure(clCompileContext,
-                                   &input,
-                                   aclAxis,
-                                   &output,
-                                   arm_compute::ReductionOperation::ARG_IDX_MIN);
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClArgMinMaxWorkload_configure");
+        if (m_Data.m_Parameters.m_Function == ArgMinMaxFunction::Max)
+        {
+            m_ArgMinMaxLayer.configure(&input, aclAxis, &output, arm_compute::ReductionOperation::ARG_IDX_MAX);
+        }
+        else
+        {
+            m_ArgMinMaxLayer.configure(clCompileContext,
+                                       &input,
+                                       aclAxis,
+                                       &output,
+                                       arm_compute::ReductionOperation::ARG_IDX_MIN);
+        }
     }
 }
 

@@ -44,7 +44,10 @@ ClLogicalNotWorkload::ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_LogicalNotLayer.configure(clCompileContext, &input, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClLogicalNotWorkload_configure");
+        m_LogicalNotLayer.configure(clCompileContext, &input, &output);
+    }
 }
 
 void ClLogicalNotWorkload::Execute() const

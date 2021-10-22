@@ -33,7 +33,10 @@ ClRsqrtWorkload::ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_RsqrtLayer.configure(clCompileContext, &input, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClRsqrtWorkload_configure");
+        m_RsqrtLayer.configure(clCompileContext, &input, &output);
+    }
 }
 
 void ClRsqrtWorkload::Execute() const

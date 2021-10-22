@@ -25,7 +25,10 @@ ClConvertFp32ToFp16Workload::ClConvertFp32ToFp16Workload(
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
 
-    m_Layer.configure(clCompileContext, &input, &output, g_AclConvertPolicy, 0);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvertFp32ToFp16Workload_configure");
+        m_Layer.configure(clCompileContext, &input, &output, g_AclConvertPolicy, 0);
+    }
 }
 
 void ClConvertFp32ToFp16Workload::Execute() const

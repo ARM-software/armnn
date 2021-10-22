@@ -102,7 +102,10 @@ ClSplitterWorkload::ClSplitterWorkload(const SplitterQueueDescriptor& descriptor
 
     unsigned int aclAxis = CalcAclAxis(descriptor.m_Parameters.GetNumDimensions(), *splitAxis.begin());
     auto layer = std::make_unique<arm_compute::CLSplit>();
-    layer->configure(&input, aclOutputs, aclAxis);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSplitterWorkload_configure");
+        layer->configure(&input, aclOutputs, aclAxis);
+    }
 
     // Prepare
     layer->prepare();

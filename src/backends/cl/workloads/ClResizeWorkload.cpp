@@ -73,15 +73,18 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor,
                                                  ? arm_compute::SamplingPolicy::CENTER
                                                  : arm_compute::SamplingPolicy::TOP_LEFT;
 
-    m_ResizeLayer.configure(clCompileContext,
-                            &input,
-                            &output,
-                            arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
-                                                         arm_compute::BorderMode::REPLICATE,
-                                                         arm_compute::PixelValue(0.f),
-                                                         samplingPolicy,
-                                                         true,
-                                                         descriptor.m_Parameters.m_AlignCorners));
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClResizeWorkload_configure");
+        m_ResizeLayer.configure(clCompileContext,
+                                &input,
+                                &output,
+                                arm_compute::ScaleKernelInfo(aclInterpolationPolicy,
+                                                             arm_compute::BorderMode::REPLICATE,
+                                                             arm_compute::PixelValue(0.f),
+                                                             samplingPolicy,
+                                                             true,
+                                                             descriptor.m_Parameters.m_AlignCorners));
+    }
 
 };
 

@@ -31,7 +31,10 @@ ClFillWorkload::ClFillWorkload(const FillQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
     arm_compute::PixelValue pixelValue = GetPixelValue(output.info(), descriptor.m_Parameters.m_Value);
 
-    m_Layer.configure(clCompileContext, &output, pixelValue);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClFillWorkload_configure");
+        m_Layer.configure(clCompileContext, &output, pixelValue);
+    }
 }
 
 void ClFillWorkload::Execute() const

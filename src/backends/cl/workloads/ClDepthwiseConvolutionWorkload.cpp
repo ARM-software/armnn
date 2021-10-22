@@ -135,17 +135,20 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
     m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer>();
-    static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
-        clCompileContext,
-        &input,
-        m_KernelTensor.get(),
-        m_BiasTensor.get(),
-        &output,
-        padStrideInfo,
-        depthMultiplier,
-        activationInfo,
-        aclDilationInfo);
 
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClDepthwiseConvolutionWorkload_configure");
+        static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
+                clCompileContext,
+                &input,
+                m_KernelTensor.get(),
+                m_BiasTensor.get(),
+                &output,
+                padStrideInfo,
+                depthMultiplier,
+                activationInfo,
+                aclDilationInfo);
+    }
     ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
     ScopedTensorHandle weightsPermutedHandle(weightPermuted);

@@ -45,8 +45,11 @@ ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     const armnn::PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
 
-    // Run the layer.
-    m_PermuteFunction.configure(clCompileContext, &input, &output, BuildArmComputePermutationVector(mappings));
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPermuteWorkload_configure");
+        // Run the layer.
+        m_PermuteFunction.configure(clCompileContext, &input, &output, BuildArmComputePermutationVector(mappings));
+    }
 }
 
 void ClPermuteWorkload::Execute() const

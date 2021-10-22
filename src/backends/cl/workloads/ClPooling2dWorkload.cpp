@@ -55,8 +55,11 @@ ClPooling2dWorkload::ClPooling2dWorkload(
 
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters, fpMixedPrecision);
 
-    // Run the layer.
-    m_PoolingLayer.configure(clCompileContext, &input, &output, layerInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPooling2dWorkload_configure");
+        // Run the layer.
+        m_PoolingLayer.configure(clCompileContext, &input, &output, layerInfo);
+    }
 }
 
 void ClPooling2dWorkload::Execute() const

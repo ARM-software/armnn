@@ -109,14 +109,18 @@ ClQuantizedLstmWorkload::ClQuantizedLstmWorkload(const QuantizedLstmQueueDescrip
     arm_compute::ICLTensor& cellStateOutTensor        = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     arm_compute::ICLTensor& outputStateOutTensor      = static_cast<IClTensorHandle*>(m_Data.m_Outputs[1])->GetTensor();
 
-    m_QuantizedLstmLayer.configure(clCompileContext, &inputTensor, m_InputToInputWeightsTensor.get(),
-                                   m_InputToForgetWeightsTensor.get(),
-                                   m_InputToCellWeightsTensor.get(), m_InputToOutputWeightsTensor.get(),
-                                   m_RecurrentToInputWeightsTensor.get(), m_RecurrentToForgetWeightsTensor.get(),
-                                   m_RecurrentToCellWeightsTensor.get(), m_RecurrentToOutputWeightsTensor.get(),
-                                   m_InputGateBiasTensor.get(), m_ForgetGateBiasTensor.get(), m_CellBiasTensor.get(),
-                                   m_OutputGateBiasTensor.get(), &cellStateInTensor, &outputStateInTensor,
-                                   &cellStateOutTensor, &outputStateOutTensor);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClQuantizedLstmWorkload_configure");
+        m_QuantizedLstmLayer.configure(clCompileContext, &inputTensor, m_InputToInputWeightsTensor.get(),
+                                       m_InputToForgetWeightsTensor.get(),
+                                       m_InputToCellWeightsTensor.get(), m_InputToOutputWeightsTensor.get(),
+                                       m_RecurrentToInputWeightsTensor.get(), m_RecurrentToForgetWeightsTensor.get(),
+                                       m_RecurrentToCellWeightsTensor.get(), m_RecurrentToOutputWeightsTensor.get(),
+                                       m_InputGateBiasTensor.get(), m_ForgetGateBiasTensor.get(),
+                                       m_CellBiasTensor.get(),
+                                       m_OutputGateBiasTensor.get(), &cellStateInTensor, &outputStateInTensor,
+                                       &cellStateOutTensor, &outputStateOutTensor);
+    }
 
     InitializeArmComputeClTensorData(*m_InputToInputWeightsTensor,      m_Data.m_InputToInputWeights);
     InitializeArmComputeClTensorData(*m_InputToForgetWeightsTensor,     m_Data.m_InputToForgetWeights);

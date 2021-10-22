@@ -76,13 +76,16 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    m_SpaceToBatchLayer.configure(clCompileContext,
-                                  &input,
-                                  blockWidth,
-                                  blockHeight,
-                                  paddingLeftTop,
-                                  paddingRightBottom,
-                                  &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSpaceToBatchNdWorkload_configure");
+        m_SpaceToBatchLayer.configure(clCompileContext,
+                                      &input,
+                                      blockWidth,
+                                      blockHeight,
+                                      paddingLeftTop,
+                                      paddingRightBottom,
+                                      &output);
+    }
 }
 
 void ClSpaceToBatchNdWorkload::Execute() const

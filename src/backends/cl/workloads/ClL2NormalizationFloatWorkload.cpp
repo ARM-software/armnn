@@ -48,7 +48,10 @@ ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2Normaliza
 
     int axis = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
-    m_Layer.configure(clCompileContext, &input, &output, axis, m_Data.m_Parameters.m_Eps);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClL2NormalizationFloatWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, &output, axis, m_Data.m_Parameters.m_Eps);
+    }
 }
 
 void ClL2NormalizationFloatWorkload::Execute() const

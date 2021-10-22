@@ -41,7 +41,10 @@ ClDequantizeWorkload::ClDequantizeWorkload(const DequantizeQueueDescriptor& desc
             m_Data.m_Outputs[0])->GetTensor();
 
     m_Layer.reset(new arm_compute::CLDequantizationLayer());
-    m_Layer->configure(clCompileContext, &input, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClDequantizeWorkload_configure");
+        m_Layer->configure(clCompileContext, &input, &output);
+    }
     m_Layer->prepare();
 }
 

@@ -35,7 +35,10 @@ ClCastWorkload::ClCastWorkload(const CastQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_CastLayer.configure(clCompileContext, &input, &output, g_AclConvertPolicy);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClCastWorkload_configure");
+        m_CastLayer.configure(clCompileContext, &input, &output, g_AclConvertPolicy);
+    }
 }
 
 void ClCastWorkload::Execute() const

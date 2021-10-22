@@ -42,11 +42,14 @@ ClTransposeWorkload::ClTransposeWorkload(const TransposeQueueDescriptor& descrip
     const arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     const armnn::PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
-    // Run the layer.
-    m_PermuteFunction.configure(clCompileContext,
-                                &input,
-                                &output,
-                                armcomputetensorutils::BuildArmComputeTransposeVector(mappings));
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClTransposeWorkload_configure");
+        // Run the layer.
+        m_PermuteFunction.configure(clCompileContext,
+                                    &input,
+                                    &output,
+                                    armcomputetensorutils::BuildArmComputeTransposeVector(mappings));
+    }
 }
 
 void ClTransposeWorkload::Execute() const

@@ -45,7 +45,10 @@ ClGatherWorkload::ClGatherWorkload(const GatherQueueDescriptor& descriptor,
 
     int aclAxis = ComputeAclAxis(descriptor.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
 
-    m_Layer.configure(clCompileContext, &input, &indices, &output, aclAxis);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClGatherWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, &indices, &output, aclAxis);
+    }
 };
 
 void ClGatherWorkload::Execute() const

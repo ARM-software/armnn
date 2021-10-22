@@ -58,7 +58,10 @@ ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& desc
 
     const arm_compute::ComparisonOperation comparisonOperation = ConvertComparisonOperationToAcl(m_Data.m_Parameters);
 
-    m_ComparisonLayer.configure(clCompileContext, &input0, &input1, &output, comparisonOperation);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClComparisonWorkload_configure");
+        m_ComparisonLayer.configure(clCompileContext, &input0, &input1, &output, comparisonOperation);
+    }
 }
 
 void ClComparisonWorkload::Execute() const

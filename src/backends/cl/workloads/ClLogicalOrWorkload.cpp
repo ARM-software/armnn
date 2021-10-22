@@ -48,7 +48,10 @@ ClLogicalOrWorkload::ClLogicalOrWorkload(const LogicalBinaryQueueDescriptor& des
     arm_compute::ICLTensor& input1 = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_LogicalOrLayer.configure(clCompileContext, &input0, &input1, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClLogicalOrWorkload_configure");
+        m_LogicalOrLayer.configure(clCompileContext, &input0, &input1, &output);
+    }
 }
 
 void ClLogicalOrWorkload::Execute() const

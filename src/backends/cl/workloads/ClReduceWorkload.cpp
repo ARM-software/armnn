@@ -60,11 +60,14 @@ ClReduceWorkload::ClReduceWorkload(const ReduceQueueDescriptor& descriptor, cons
     arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(input.info()->num_dimensions(),
                                                                           info.m_InputTensorInfos[0].GetNumDimensions(),
                                                                           m_Data.m_Parameters.m_vAxis);
-    m_Layer.configure(&input,
-                      &output,
-                      static_cast<unsigned int>(coords[0]),
-                      ConvertReductionOperationToAcl(m_Data.m_Parameters),
-                      m_Data.m_Parameters.m_KeepDims);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClReduceWorkload_configure");
+        m_Layer.configure(&input,
+                          &output,
+                          static_cast<unsigned int>(coords[0]),
+                          ConvertReductionOperationToAcl(m_Data.m_Parameters),
+                          m_Data.m_Parameters.m_KeepDims);
+    }
 }
 
 void ClReduceWorkload::Execute() const

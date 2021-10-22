@@ -88,12 +88,15 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
     arm_compute::FullyConnectedLayerInfo fc_info =
         ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
 
-    m_FullyConnectedLayer.configure(clCompileContext,
-                                    &input,
-                                    m_WeightsTensor.get(),
-                                    m_BiasesTensor.get(),
-                                    &output,
-                                    fc_info);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClFullyConnectedWorkload_configure");
+        m_FullyConnectedLayer.configure(clCompileContext,
+                                        &input,
+                                        m_WeightsTensor.get(),
+                                        m_BiasesTensor.get(),
+                                        &output,
+                                        fc_info);
+    }
 
     InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);
 

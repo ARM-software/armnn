@@ -41,7 +41,10 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
 
     arm_compute::PixelValue pixelValue = GetPixelValue(input.info(), descriptor.m_Parameters.m_PadValue);
 
-    m_Layer.configure(clCompileContext, &input, &output, padList, pixelValue);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPadWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, &output, padList, pixelValue);
+    }
 }
 
 void ClPadWorkload::Execute() const

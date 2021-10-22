@@ -62,15 +62,18 @@ ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDesc
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    // Construct
-    m_PixelWiseMultiplication.configure(clCompileContext,
-                                        &input0,
-                                        &input1,
-                                        &output,
-                                        1.0f,
-                                        convertPolicy,
-                                        arm_compute::RoundingPolicy::TO_NEAREST_EVEN,
-                                        activationInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMultiplicationWorkload_configure");
+        // Construct
+        m_PixelWiseMultiplication.configure(clCompileContext,
+                                            &input0,
+                                            &input1,
+                                            &output,
+                                            1.0f,
+                                            convertPolicy,
+                                            arm_compute::RoundingPolicy::TO_NEAREST_EVEN,
+                                            activationInfo);
+    }
 }
 
 void ClMultiplicationWorkload::Execute() const

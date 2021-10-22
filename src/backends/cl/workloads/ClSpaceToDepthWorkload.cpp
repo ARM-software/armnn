@@ -39,7 +39,10 @@ ClSpaceToDepthWorkload::ClSpaceToDepthWorkload(const SpaceToDepthQueueDescriptor
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     output.info()->set_data_layout(aclDataLayout);
 
-    m_Layer.configure(clCompileContext, &input, &output, blockSize);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSpaceToDepthWorkload_configure");
+        m_Layer.configure(clCompileContext, &input, &output, blockSize);
+    }
 }
 
 void ClSpaceToDepthWorkload::Execute() const

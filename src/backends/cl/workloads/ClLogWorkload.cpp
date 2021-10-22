@@ -33,7 +33,10 @@ ClLogWorkload::ClLogWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
-    m_LogLayer.configure(clCompileContext, &input, &output);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClLogWorkload_configure");
+        m_LogLayer.configure(clCompileContext, &input, &output);
+    }
 }
 
 void ClLogWorkload::Execute() const

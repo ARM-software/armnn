@@ -47,7 +47,10 @@ ClActivationWorkload::ClActivationWorkload(const ActivationQueueDescriptor& desc
 
     arm_compute::ICLTensor& input = static_cast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
-    m_ActivationLayer.configure(clCompileContext, &input, &output, activationLayerInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClActivationWorkload_configure");
+        m_ActivationLayer.configure(clCompileContext, &input, &output, activationLayerInfo);
+    }
 }
 
 void ClActivationWorkload::Execute() const

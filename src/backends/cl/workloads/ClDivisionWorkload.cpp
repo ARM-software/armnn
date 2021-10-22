@@ -44,7 +44,10 @@ ClDivisionWorkload::ClDivisionWorkload(const DivisionQueueDescriptor& descriptor
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
-    m_ArithmeticDivision.configure(clCompileContext, &input0, &input1, &output, activationInfo);
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClDivisionWorkload_configure");
+        m_ArithmeticDivision.configure(clCompileContext, &input0, &input1, &output, activationInfo);
+    }
 }
 
 void ClDivisionWorkload::Execute() const

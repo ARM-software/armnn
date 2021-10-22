@@ -725,6 +725,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                   tfLiteNode,
                                                   nodeIndex,
                                                   kTfLiteBuiltinMinimum);
+        case kTfLiteBuiltinMirrorPad:
+            return VisitPadOperator(delegateData,
+                                    tfLiteContext,
+                                    tfLiteNode,
+                                    nodeIndex,
+                                    kTfLiteBuiltinMirrorPad);
         case kTfLiteBuiltinMul:
             return VisitElementwiseBinaryOperator(delegateData,
                                                   tfLiteContext,

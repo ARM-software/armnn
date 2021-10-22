@@ -23,6 +23,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
 
     switch(tfLitePadOperatorCode)
     {
+        case kTfLiteBuiltinMirrorPad:
         case kTfLiteBuiltinPad:
             TF_LITE_ENSURE_STATUS(ValidateNumInputs(tfLiteContext, tfLiteNode, 2, nodeIndex));
             break;
@@ -104,6 +105,47 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
                     "TfLiteArmnnDelegate: Padding value datatype is not supported in operator #%d node #%d: ",
                     tfLitePadOperatorCode, nodeIndex);
                 return kTfLiteError;
+        }
+    }
+    else if (tfLitePadOperatorCode == kTfLiteBuiltinMirrorPad)
+    {
+        TfLiteMirrorPaddingParams* options = reinterpret_cast<TfLiteMirrorPaddingParams*>(tfLiteNode->builtin_data);
+
+
+        if (options->mode == TfLiteMirrorPaddingMode::kTfLiteMirrorPaddingReflect)
+        {
+            descriptor.m_PaddingMode = armnn::PaddingMode::Reflect;
+        }
+        else if (options->mode == TfLiteMirrorPaddingMode::kTfLiteMirrorPaddingSymmetric)
+        {
+            descriptor.m_PaddingMode = armnn::PaddingMode::Symmetric;
+        }
+        else
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: PaddingMode must be either REFLECT or SYMMETRIC in operator #%d node #%d: ",
+                tfLitePadOperatorCode, nodeIndex);
+        }
+
+        // If padding mode is Reflect then both paddings must be no greater than inputShape(i) - 1.
+        // If padding mode is Symmetric then both paddings must be no greater than inputShape(i).
+        auto inputShape = inputTensorInfo.GetShape();
+        auto padList = descriptor.m_PadList;
+
+        const unsigned int isReflect =
+                static_cast<unsigned int>(descriptor.m_PaddingMode == armnn::PaddingMode::Reflect);
+        for(unsigned int i = 0; i < padList.size(); ++i)
+        {
+            if(padList.at(i).first > (inputShape[i] - isReflect) ||
+               padList.at(i).second > (inputShape[i] - isReflect))
+            {
+                TF_LITE_MAYBE_KERNEL_LOG(
+                        tfLiteContext,
+                        "TfLiteArmnnDelegate: Padding values must be less (Reflect) or "
+                        "equal (Symmetric) to the dimension size in operator #%d node #%d: ",
+                        tfLitePadOperatorCode, nodeIndex);
+            }
         }
     }
 

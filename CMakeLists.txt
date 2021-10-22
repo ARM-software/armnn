@@ -708,6 +708,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/MaxPool2D.cpp
              src/armnnTfLiteParser/test/Mean.cpp
              src/armnnTfLiteParser/test/Minimum.cpp
+             src/armnnTfLiteParser/test/MirrorPad.cpp
              src/armnnTfLiteParser/test/Multiplication.cpp
              src/armnnTfLiteParser/test/Pack.cpp
              src/armnnTfLiteParser/test/Pad.cpp

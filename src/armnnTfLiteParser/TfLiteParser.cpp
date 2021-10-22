@@ -670,6 +670,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_MAXIMUM]                 = &TfLiteParserImpl::ParseMaximum;
     m_ParserFunctions[tflite::BuiltinOperator_MEAN]                    = &TfLiteParserImpl::ParseMean;
     m_ParserFunctions[tflite::BuiltinOperator_MINIMUM]                 = &TfLiteParserImpl::ParseMinimum;
+    m_ParserFunctions[tflite::BuiltinOperator_MIRROR_PAD]              = &TfLiteParserImpl::ParseMirrorPad;
     m_ParserFunctions[tflite::BuiltinOperator_MUL]                     = &TfLiteParserImpl::ParseMul;
     m_ParserFunctions[tflite::BuiltinOperator_NEG]                     = &TfLiteParserImpl::ParseNeg;
     m_ParserFunctions[tflite::BuiltinOperator_NOT_EQUAL]               = &TfLiteParserImpl::ParseNotEqual;
@@ -2201,6 +2202,77 @@ void TfLiteParserImpl::ParsePad(size_t subgraphIndex, size_t operatorIndex)
     }
 
     auto layerName = fmt::format("Pad:{}:{}", subgraphIndex, operatorIndex);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+
+    IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParserImpl::ParseMirrorPad(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    TfLiteParserImpl::TensorRawPtrVector inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    TfLiteParserImpl::TensorRawPtrVector outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+
+    armnn::TensorInfo padTensorInfo = ToTensorInfo(inputs[1]);
+    BufferRawPtr bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+
+    std::vector<unsigned int> padBuffer(padTensorInfo.GetNumElements());
+    ::memcpy(padBuffer.data(), bufferPtr->data.data(), padTensorInfo.GetNumBytes());
+
+    size_t step = 2;
+    armnn::PadDescriptor desc;
+    for (unsigned int i = 0; i < padTensorInfo.GetNumElements() / step; ++i)
+    {
+        desc.m_PadList.emplace_back(padBuffer[i * step], padBuffer[i * step + 1]);
+    }
+
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsMirrorPadOptions();
+
+    if (options->mode == tflite::MirrorPadMode_REFLECT)
+    {
+        desc.m_PaddingMode = PaddingMode::Reflect;
+    }
+    else if (options->mode == tflite::MirrorPadMode_SYMMETRIC)
+    {
+        desc.m_PaddingMode = PaddingMode::Symmetric;
+    }
+    else
+    {
+        ARMNN_THROW_PARSE_EXCEPTION("PaddingMode must be either REFLECT or SYMMETRIC");
+    }
+
+    // If padding mode is Reflect then both paddings must be no greater than inputShape(i) - 1.
+    // If padding mode is Symmetric then both paddings must be no greater than inputShape(i).
+    auto inputShape = inputTensorInfo.GetShape();
+    auto padList = desc.m_PadList;
+
+    const unsigned int isReflect = static_cast<unsigned int>(desc.m_PaddingMode == PaddingMode::Reflect);
+    for(unsigned int i = 0; i < padList.size(); ++i)
+    {
+        if(padList.at(i).first > (inputShape[i] - isReflect) ||
+           padList.at(i).second > (inputShape[i] - isReflect))
+        {
+            ARMNN_THROW_PARSE_EXCEPTION("Padding values must be less (Reflect) or "
+                                        "equal (Symmetric) to the dimension size.");
+        }
+    }
+
+    auto layerName = fmt::format("MirrorPad:{}:{}", subgraphIndex, operatorIndex);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
 
     IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());

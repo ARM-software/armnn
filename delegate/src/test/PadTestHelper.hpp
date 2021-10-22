@@ -25,6 +25,7 @@ template <typename T>
 std::vector<char> CreatePadTfLiteModel(
     tflite::BuiltinOperator padOperatorCode,
     tflite::TensorType tensorType,
+    tflite::MirrorPadMode paddingMode,
     const std::vector<int32_t>& inputTensorShape,
     const std::vector<int32_t>& paddingTensorShape,
     const std::vector<int32_t>& outputTensorShape,
@@ -87,7 +88,14 @@ std::vector<char> CreatePadTfLiteModel(
         operatorInputs = {{ 0, 1 }};
         subgraphInputs = {{ 0, 1 }};
         operatorBuiltinOptions = CreatePadOptions(flatBufferBuilder).Union();
+    }
+    else if(padOperatorCode == tflite::BuiltinOperator_MIRROR_PAD)
+    {
+        operatorInputs = {{ 0, 1 }};
+        subgraphInputs = {{ 0, 1 }};
 
+        operatorBuiltinOptionsType = BuiltinOptions_MirrorPadOptions;
+        operatorBuiltinOptions = CreateMirrorPadOptions(flatBufferBuilder, paddingMode).Union();
     }
     else if (padOperatorCode == tflite::BuiltinOperator_PADV2)
     {
@@ -116,7 +124,7 @@ std::vector<char> CreatePadTfLiteModel(
 
     // create operator
     const std::vector<int32_t> operatorOutputs{ 2 };
-    flatbuffers::Offset <Operator> redefineOperator =
+    flatbuffers::Offset <Operator> paddingOperator =
         CreateOperator(flatBufferBuilder,
                        0,
                        flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
@@ -130,7 +138,7 @@ std::vector<char> CreatePadTfLiteModel(
                        flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
                        flatBufferBuilder.CreateVector<int32_t>(subgraphInputs.data(), subgraphInputs.size()),
                        flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs.data(), subgraphOutputs.size()),
-                       flatBufferBuilder.CreateVector(&redefineOperator, 1));
+                       flatBufferBuilder.CreateVector(&paddingOperator, 1));
 
     flatbuffers::Offset <flatbuffers::String> modelDescription =
         flatBufferBuilder.CreateString("ArmnnDelegate: Pad Operator Model");
@@ -163,11 +171,13 @@ void PadTest(tflite::BuiltinOperator padOperatorCode,
              std::vector<T>& expectedOutputValues,
              T paddingValue,
              float quantScale = 1.0f,
-             int quantOffset  = 0)
+             int quantOffset  = 0,
+             tflite::MirrorPadMode paddingMode = tflite::MirrorPadMode_SYMMETRIC)
 {
     using namespace tflite;
     std::vector<char> modelBuffer = CreatePadTfLiteModel<T>(padOperatorCode,
                                                             tensorType,
+                                                            paddingMode,
                                                             inputShape,
                                                             paddingShape,
                                                             outputShape,

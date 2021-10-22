@@ -109,6 +109,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - MINIMUM
 
+- MIRROR_PAD
+
 - MUL
 
 - NEG

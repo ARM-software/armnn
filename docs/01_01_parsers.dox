@@ -149,6 +149,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - MAXIMUM
 - MEAN
 - MINIMUM
+- MIRROR_PAD
 - MUL
 - NEG
 - NOT_EQUAL

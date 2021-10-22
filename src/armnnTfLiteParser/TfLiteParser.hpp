@@ -149,6 +149,7 @@ private:
     void ParseMaximum(size_t subgraphIndex, size_t operatorIndex);
     void ParseMean(size_t subgraphIndex, size_t operatorIndex);
     void ParseMinimum(size_t subgraphIndex, size_t operatorIndex);
+    void ParseMirrorPad(size_t subgraphIndex, size_t operatorIndex);
     void ParseMul(size_t subgraphIndex, size_t operatorIndex);
     void ParseNeg(size_t subgraphIndex, size_t operatorIndex);
     void ParseNotEqual(size_t subgraphIndex, size_t operatorIndex);

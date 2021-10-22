@@ -160,6 +160,7 @@ if(BUILD_UNIT_TESTS)
         src/test/LogicalTestHelper.hpp
         src/test/LstmTest.cpp
         src/test/LstmTestHelper.hpp
+        src/test/MirrorPadTest.cpp
         src/test/NormalizationTest.cpp
         src/test/NormalizationTestHelper.hpp
         src/test/PackTest.cpp

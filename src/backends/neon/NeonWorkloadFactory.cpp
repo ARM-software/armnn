@@ -240,6 +240,27 @@ std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution2d(
                                                        isFastMathEnabled);
 }
 
+std::unique_ptr<armnn::IWorkload> NeonWorkloadFactory::CreateConvolution3d(
+        const Convolution3dQueueDescriptor& descriptor, const WorkloadInfo& info) const
+{
+    bool isFastMathEnabled = false;
+    if (m_ModelContextPtr)
+    {
+        if (m_ModelContextPtr.get() != nullptr)
+        {
+            auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
+            if (modelOptions)
+            {
+                isFastMathEnabled = modelOptions->IsFastMathEnabled();
+            }
+        }
+    }
+    return std::make_unique<NeonConvolution3dWorkload>(descriptor,
+                                                       info,
+                                                       m_MemoryManager->GetIntraLayerManager(),
+                                                       isFastMathEnabled);
+}
+
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
                                                             const WorkloadInfo& info) const
 {

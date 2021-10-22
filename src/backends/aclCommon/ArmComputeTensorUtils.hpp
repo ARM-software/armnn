@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -12,7 +12,6 @@
 #include <arm_compute/core/ITensor.h>
 #include <arm_compute/core/TensorInfo.h>
 #include <arm_compute/core/Types.h>
-#include <arm_compute/core/Size2D.h>
 
 #include <Half.hpp>
 

@@ -11,6 +11,7 @@
 #include <backendsCommon/WorkloadData.hpp>
 
 #include <arm_compute/core/Types.h>
+#include <arm_compute/runtime/FunctionDescriptors.h>
 
 #if defined(ARMCOMPUTENEON_ENABLED)
 #include "neon/workloads/NeonReduceWorkload.hpp"
@@ -262,6 +263,41 @@ inline unsigned int ComputePositiveAxis(const int& axis, const armnn::TensorInfo
 
     int positiveAxis = (axis < 0) ? rank + axis : axis;
     return static_cast<unsigned int>(positiveAxis);
+}
+
+/// Utility function used to setup an arm_compute::Conv3dInfo object from convolution3d descriptor.
+inline arm_compute::Conv3dInfo ComputeConv3DInfo(const armnn::Convolution3dDescriptor descriptor,
+                                                 bool isFastMathEnabled,
+                                                 const ActivationDescriptor* activationDescriptor)
+{
+    const arm_compute::Size3D    stride{descriptor.m_StrideX, descriptor.m_StrideY, descriptor.m_StrideZ};
+    const arm_compute::Padding3D padding{descriptor.m_PadLeft, descriptor.m_PadRight,
+                                         descriptor.m_PadTop, descriptor.m_PadBottom,
+                                         descriptor.m_PadFront, descriptor.m_PadBack};
+    const arm_compute::Size3D    dilation{descriptor.m_DilationX, descriptor.m_DilationY, descriptor.m_DilationZ};
+
+    const arm_compute::ActivationLayerInfo activationInfo =
+            ConvertActivationDescriptorToAclActivationLayerInfo(activationDescriptor);
+    const auto roundType = arm_compute::DimensionRoundingType::FLOOR;
+
+    return arm_compute::Conv3dInfo{stride, padding, activationInfo, dilation, roundType, isFastMathEnabled};
+}
+
+inline arm_compute::Conv3dInfo ComputeConv3DInfo(const armnn::Convolution3dQueueDescriptor queueDescriptor,
+                                                 bool isFastMathEnabled)
+{
+    auto descriptor = queueDescriptor.m_Parameters;
+    const arm_compute::Size3D    stride{descriptor.m_StrideX, descriptor.m_StrideY, descriptor.m_StrideZ};
+    const arm_compute::Padding3D padding{descriptor.m_PadLeft, descriptor.m_PadRight,
+                                         descriptor.m_PadTop, descriptor.m_PadBottom,
+                                         descriptor.m_PadFront, descriptor.m_PadBack};
+    const arm_compute::Size3D    dilation{descriptor.m_DilationX, descriptor.m_DilationY, descriptor.m_DilationZ};
+
+    const arm_compute::ActivationLayerInfo activationInfo =
+            ConvertAdditionalInfoToAclActivationLayerInfo(queueDescriptor);
+    const auto roundType = arm_compute::DimensionRoundingType::FLOOR;
+
+    return arm_compute::Conv3dInfo{stride, padding, activationInfo, dilation, roundType, isFastMathEnabled};
 }
 
 inline arm_compute::ReductionOperation ConvertReductionOperationToAcl(const ReduceDescriptor& descriptor)

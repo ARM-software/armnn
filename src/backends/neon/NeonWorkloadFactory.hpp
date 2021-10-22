@@ -97,6 +97,9 @@ public:
     std::unique_ptr<IWorkload> CreateConvolution2d(const Convolution2dQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreateConvolution3d(const Convolution3dQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreateDebug(const DebugQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override;
 

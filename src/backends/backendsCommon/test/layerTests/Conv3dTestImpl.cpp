@@ -89,6 +89,11 @@ void SetScaleOffset(float& qScale, int32_t& qOffset)
             break;
         }
         case armnn::DataType::QAsymmS8:
+        {
+            qScale = 0.1f;
+            qOffset = 64;
+            break;
+        }
         case armnn::DataType::QSymmS16:
         {
             qScale = 0.1f;
@@ -100,7 +105,7 @@ void SetScaleOffset(float& qScale, int32_t& qOffset)
         case armnn::DataType::Float32:
         default:
         {
-            qScale = 0.f;
+            qScale = 1.f;
             qOffset = 0;
             break;
         }

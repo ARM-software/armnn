@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <aclCommon/ArmComputeTensorUtils.hpp>
@@ -142,6 +142,10 @@ arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout)
         case armnn::DataLayout::NHWC : return arm_compute::DataLayout::NHWC;
 
         case armnn::DataLayout::NCHW : return arm_compute::DataLayout::NCHW;
+
+        case armnn::DataLayout::NDHWC : return arm_compute::DataLayout::NDHWC;
+
+        case armnn::DataLayout::NCDHW : return arm_compute::DataLayout::NCDHW;
 
         default: throw InvalidArgumentException("Unknown armnn::DataLayout: [" +
                                                 std::to_string(static_cast<int>(dataLayout)) + "]");

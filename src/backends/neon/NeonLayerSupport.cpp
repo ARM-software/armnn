@@ -33,6 +33,7 @@
 #include "workloads/NeonConcatWorkload.hpp"
 #include "workloads/NeonConstantWorkload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
+#include "workloads/NeonConvolution3dWorkload.hpp"
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
@@ -363,6 +364,39 @@ bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,
 #endif
 
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConvolution2dWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor,
+                                   weights,
+                                   biases,
+                                   isFastMathEnabled,
+                                   nullptr);
+}
+
+bool NeonLayerSupport::IsConvolution3dSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const Convolution3dDescriptor& descriptor,
+                                                const TensorInfo& weights,
+                                                const Optional<TensorInfo>& biases,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    bool isFastMathEnabled = false;
+#if defined(ARMCOMPUTENEON_ENABLED)
+    if (m_ModelContextPtr)
+    {
+        if (m_ModelContextPtr.get() != nullptr)
+        {
+            auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
+            if (modelOptions)
+            {
+                isFastMathEnabled = modelOptions->IsFastMathEnabled();
+            }
+        }
+    }
+#endif
+
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConvolution3dWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
                                    output,

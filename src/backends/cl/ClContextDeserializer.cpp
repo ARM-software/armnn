@@ -65,7 +65,7 @@ void ClContextDeserializer::DeserializeFromBinary(arm_compute::CLCompileContext&
 
     for (Program const* program : *clContext->programs())
     {
-        auto programName = program->name()->c_str();
+        const char* volatile programName = program->name()->c_str();
         auto programBinary = program->binary();
         std::vector<uint8_t> binary(programBinary->begin(), programBinary->begin() + programBinary->size());
 

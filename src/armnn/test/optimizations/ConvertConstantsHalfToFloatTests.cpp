@@ -25,7 +25,7 @@ TEST_CASE("ConvertConstantsHalfToFloatTest")
     std::vector<uint16_t> halfWeights(4);
     armnnUtils::FloatingPointConverter::ConvertFloat32To16(convWeightsData.data(), convWeightsData.size(),
                                                            halfWeights.data());
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float16), halfWeights);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float16, 0.0f, 0, true), halfWeights);
 
     //Create the simple test network
     auto input = graph.AddLayer<armnn::InputLayer>(0, "input");

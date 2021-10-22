@@ -74,7 +74,7 @@ TEST_CASE("NetworkModification")
 
     unsigned int dims[] = { 10,1,1,1 };
     std::vector<float> convWeightsData(10);
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32), convWeightsData);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), convWeightsData);
 
     armnn::Convolution2dDescriptor convDesc2d;
     armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d,
@@ -123,7 +123,7 @@ TEST_CASE("NetworkModification")
 
     armnn::BatchNormalizationDescriptor batchNormDesc;
 
-    armnn::TensorInfo tensorInfo({ 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> data(tensorInfo.GetNumBytes() / sizeof(float));
     armnn::ConstTensor invalidTensor(tensorInfo, data);
 

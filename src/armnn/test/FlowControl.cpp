@@ -27,7 +27,7 @@ TEST_CASE("ErrorOnLoadNetwork")
     INetworkPtr net(INetwork::Create());
 
     std::vector<uint8_t> falseData = {0};
-    ConstTensor falseTensor(armnn::TensorInfo({1}, armnn::DataType::Boolean), falseData);
+    ConstTensor falseTensor(armnn::TensorInfo({1}, armnn::DataType::Boolean, 0.0f, 0, true), falseData);
     IConnectableLayer* constLayer = net->AddConstantLayer(falseTensor, "const");
     constLayer->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo({1}, armnn::DataType::Boolean));
 

@@ -420,6 +420,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor)
                                            safeShape.data(),
                                            dimensionsSpecificity);
             ret = armnn::TensorInfo(tensorShape, type);
+            ret.SetConstant(true);
         }
         else
         {
@@ -442,7 +443,16 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor)
         armnn::TensorShape tensorShape(static_cast<unsigned int>(tensorDimensionSize),
                                        tensorDims.data(),
                                        dimensionsSpecificity);
-        ret = armnn::TensorInfo(tensorShape, type);
+
+        if(tflite::IsConstantTensor(&tfLiteTensor))
+        {
+            ret = armnn::TensorInfo(tensorShape, type);
+            ret.SetConstant(true);
+        }
+        else
+        {
+            ret = armnn::TensorInfo(tensorShape, type);
+        }
     }
 
     auto quantizationInfo = tfLiteTensor.quantization;

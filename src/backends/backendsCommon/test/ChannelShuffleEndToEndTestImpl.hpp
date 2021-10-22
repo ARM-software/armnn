@@ -37,6 +37,7 @@ void ChannelShuffleEndToEnd(const std::vector<BackendId>& backends)
 
     inputInfo.SetQuantizationScale(1.0f);
     inputInfo.SetQuantizationOffset(0);
+    inputInfo.SetConstant(true);
     outputInfo.SetQuantizationScale(1.0f);
     outputInfo.SetQuantizationOffset(0);
 

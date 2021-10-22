@@ -71,9 +71,11 @@ TEST_CASE("RuntimeRegisterDebugCallback")
     std::vector<float> inputData({-2, -1, 0, 1, 2});
     std::vector<float> outputData(5);
 
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
     {
-        {0, ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}
+        {0, ConstTensor(inputTensorInfo, inputData.data())}
     };
     OutputTensors outputTensors
     {

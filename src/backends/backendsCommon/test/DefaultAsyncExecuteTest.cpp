@@ -120,7 +120,7 @@ std::unique_ptr<Workload> CreateWorkload(TensorInfo info, ITensorHandle* inputTe
 
 TEST_CASE("TestAsyncExecute")
 {
-    TensorInfo info({5}, DataType::Signed32);
+    TensorInfo info({5}, DataType::Signed32, 0.0, 0, true);
 
     int inVals[5]{2, 2, 2, 2, 2};
     int outVals[5]{1, 1, 1, 1, 1};
@@ -157,7 +157,7 @@ TEST_CASE("TestAsyncExecute")
 
 TEST_CASE("TestDefaultAsyncExecute")
 {
-    TensorInfo info({5}, DataType::Signed32);
+    TensorInfo info({5}, DataType::Signed32, 0.0f, 0, true);
 
     std::vector<int> inVals{2, 2, 2, 2, 2};
     std::vector<int> outVals{1, 1, 1, 1, 1};
@@ -193,7 +193,7 @@ TEST_CASE("TestDefaultAsyncExeuteWithThreads")
 {
     // Use a large vector so the threads have a chance to interact
     unsigned int vecSize = 1000;
-    TensorInfo info({vecSize}, DataType::Signed32);
+    TensorInfo info({vecSize}, DataType::Signed32, 0.0f, 0, true);
 
     std::vector<int> inVals1(vecSize, 2);
     std::vector<int> outVals1(vecSize, 1);

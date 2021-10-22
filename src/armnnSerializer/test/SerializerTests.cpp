@@ -98,10 +98,10 @@ TEST_CASE("SerializeBatchNormalization")
     const armnn::TensorInfo inputInfo ({ 1, 3, 3, 1 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo meanInfo({1}, armnn::DataType::Float32);
-    const armnn::TensorInfo varianceInfo({1}, armnn::DataType::Float32);
-    const armnn::TensorInfo betaInfo({1}, armnn::DataType::Float32);
-    const armnn::TensorInfo gammaInfo({1}, armnn::DataType::Float32);
+    const armnn::TensorInfo meanInfo({1}, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo varianceInfo({1}, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo betaInfo({1}, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo gammaInfo({1}, armnn::DataType::Float32, 0.0f, 0, true);
 
     armnn::BatchNormalizationDescriptor descriptor;
     descriptor.m_Eps = 0.0010000000475f;
@@ -307,7 +307,7 @@ TEST_CASE("SerializeConstant")
     };
 
     const std::string layerName("constant");
-    const armnn::TensorInfo info({ 2, 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo info({ 2, 3 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> constantData = GenerateRandomData<float>(info.GetNumElements());
     armnn::ConstTensor constTensor(info, constantData);
@@ -339,8 +339,8 @@ TEST_CASE("SerializeConvolution2d")
     const armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     armnn::ConstTensor weights(weightsInfo, weightsData);
@@ -395,10 +395,10 @@ TEST_CASE("SerializeConvolution2dWithPerAxisParams")
     const std::vector<float> quantScales{ 0.75f, 0.65f, 0.85f };
     constexpr unsigned int quantDimension = 0;
 
-    const TensorInfo kernelInfo({ 3, 1, 1, 2 }, DataType::QSymmS8, quantScales, quantDimension);
+    const TensorInfo kernelInfo({ 3, 1, 1, 2 }, DataType::QSymmS8, quantScales, quantDimension, true);
 
     const std::vector<float> biasQuantScales{ 0.25f, 0.50f, 0.75f };
-    const TensorInfo biasInfo({ 3 }, DataType::Signed32, biasQuantScales, quantDimension);
+    const TensorInfo biasInfo({ 3 }, DataType::Signed32, biasQuantScales, quantDimension, true);
 
     std::vector<int8_t> kernelData = GenerateRandomData<int8_t>(kernelInfo.GetNumElements());
     armnn::ConstTensor weights(kernelInfo, kernelData);
@@ -445,8 +445,8 @@ TEST_CASE("SerializeConvolution3d")
     const armnn::TensorInfo inputInfo ({ 1, 5, 5, 5, 1 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 1, 2, 2, 2, 1 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo weightsInfo({ 3, 3, 3, 1, 1 }, armnn::DataType::Float32);
-    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 3, 3, 3, 1, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     armnn::ConstTensor weights(weightsInfo, weightsData);
@@ -530,8 +530,8 @@ TEST_CASE("SerializeDepthwiseConvolution2d")
     const armnn::TensorInfo inputInfo ({ 1, 5, 5, 3 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 1, 3, 3, 3 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 3 }, armnn::DataType::Float32);
-    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 3 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     armnn::ConstTensor weights(weightsInfo, weightsData);
@@ -585,11 +585,11 @@ TEST_CASE("SerializeDepthwiseConvolution2dWithPerAxisParams")
 
     const std::vector<float> quantScales{ 0.75f, 0.80f, 0.90f, 0.95f };
     const unsigned int quantDimension = 0;
-    TensorInfo kernelInfo({ 2, 2, 2, 2 }, DataType::QSymmS8, quantScales, quantDimension);
+    TensorInfo kernelInfo({ 2, 2, 2, 2 }, DataType::QSymmS8, quantScales, quantDimension, true);
 
     const std::vector<float> biasQuantScales{ 0.25f, 0.35f, 0.45f, 0.55f };
     constexpr unsigned int biasQuantDimension = 0;
-    TensorInfo biasInfo({ 4 }, DataType::Signed32, biasQuantScales, biasQuantDimension);
+    TensorInfo biasInfo({ 4 }, DataType::Signed32, biasQuantScales, biasQuantDimension, true);
 
     std::vector<int8_t> kernelData = GenerateRandomData<int8_t>(kernelInfo.GetNumElements());
     armnn::ConstTensor weights(kernelInfo, kernelData);
@@ -685,7 +685,7 @@ TEST_CASE("SerializeDeserializeDetectionPostProcess")
     descriptor.m_ScaleH = 5.0;
     descriptor.m_ScaleW = 5.0;
 
-    const armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32);
+    const armnn::TensorInfo anchorsInfo({ 6, 4 }, armnn::DataType::Float32, 0.0f, 0, true);
     const std::vector<float> anchorsData({
         0.5f, 0.5f, 1.0f, 1.0f,
         0.5f, 0.5f, 1.0f, 1.0f,
@@ -913,8 +913,8 @@ TEST_CASE("SerializeFullyConnected")
     const armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 2, 3 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32);
-    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     std::vector<float> biasesData  = GenerateRandomData<float>(biasesInfo.GetNumElements());
     armnn::ConstTensor weights(weightsInfo, weightsData);
@@ -1003,8 +1003,8 @@ TEST_CASE("SerializeFullyConnectedWeightsAndBiasesAsConstantLayers")
     const armnn::TensorInfo inputInfo ({ 2, 5, 1, 1 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 2, 3 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32);
-    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 5, 3 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 3 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     std::vector<float> biasesData  = GenerateRandomData<float>(biasesInfo.GetNumElements());
@@ -1077,7 +1077,7 @@ TEST_CASE("SerializeGather")
     const std::string layerName("gather");
     armnn::TensorInfo paramsInfo({ 8 }, armnn::DataType::QAsymmU8);
     armnn::TensorInfo outputInfo({ 3 }, armnn::DataType::QAsymmU8);
-    const armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32);
+    const armnn::TensorInfo indicesInfo({ 3 }, armnn::DataType::Signed32, 0.0f, 0, true);
     GatherDescriptor descriptor;
     descriptor.m_Axis = 1;
 
@@ -2447,7 +2447,7 @@ TEST_CASE("SerializeSwitch")
     };
 
     const std::string layerName("switch");
-    const armnn::TensorInfo info({ 1, 4 }, armnn::DataType::Float32);
+    const armnn::TensorInfo info({ 1, 4 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> constantData = GenerateRandomData<float>(info.GetNumElements());
     armnn::ConstTensor constTensor(info, constantData);
@@ -2509,8 +2509,8 @@ TEST_CASE("SerializeTransposeConvolution2d")
     const armnn::TensorInfo inputInfo ({ 1, 7, 7, 1 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 1, 9, 9, 1 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     armnn::ConstTensor weights(weightsInfo, weightsData);
@@ -2594,7 +2594,7 @@ TEST_CASE("SerializeDeserializeNonLinearNetwork")
     };
 
     const std::string layerName("constant");
-    const armnn::TensorInfo info({ 2, 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo info({ 2, 3 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> constantData = GenerateRandomData<float>(info.GetNumElements());
     armnn::ConstTensor constTensor(info, constantData);

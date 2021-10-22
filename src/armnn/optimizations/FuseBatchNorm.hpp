@@ -146,7 +146,7 @@ public:
                                              sqrtf(varianceVector[cOut] + epsilon)) + betaVector[cOut];
                 }
             }
-            ConstTensor fusedBiasTensor(TensorInfo({outputChannels}, ArmnnType), fusedBiasVector);
+            ConstTensor fusedBiasTensor(TensorInfo({outputChannels}, ArmnnType, 0.0f, 0, true), fusedBiasVector);
 
             // Insert the new convolution layer that has batch norm parameters fused into
             const std::string name = std::string("fused-") + child.GetName() + std::string("-into-") + base.GetName();

@@ -25,7 +25,7 @@ TEST_CASE("ConvertConstantsFloatToHalfTest")
     // Create const tensor from fp32 data
     unsigned int dims[] = { 4, 1, 1, 1 };
     std::vector<float> floatWeights{ 1.0f, 2.0f, 3.0f, 4.0f };
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32), floatWeights);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), floatWeights);
 
     // Create simple test network
     auto input = graph.AddLayer<armnn::InputLayer>(0, "input");

@@ -166,6 +166,7 @@ void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId
     armnn::TensorInfo inputTensorInfo({ 1, 1, 2, 3 }, ArmnnType);
     inputTensorInfo.SetQuantizationScale(0.1f);
     inputTensorInfo.SetQuantizationOffset(63);
+    inputTensorInfo.SetConstant(true);
 
     armnn::TensorInfo outputTensorInfo({ 1, 2 }, ArmnnType);
     outputTensorInfo.SetQuantizationScale(5.f);
@@ -174,6 +175,7 @@ void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId
     armnn::TensorInfo weightsTensorInfo({ 2, 6 }, ArmnnType);
     weightsTensorInfo.SetQuantizationScale(0.2f);
     weightsTensorInfo.SetQuantizationOffset(93);
+    weightsTensorInfo.SetConstant(true);
 
     FullyConnectedDescriptor descriptor;
     descriptor.m_ConstantWeights = false;
@@ -236,10 +238,10 @@ void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::
 
     unsigned int biasShape[] = { outputChannels };
 
-    armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32, 0.0f, 0, true);
     armnn::TensorInfo outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Float32);
-    armnn::TensorInfo weightsDesc = armnn::TensorInfo(2, weightsShape, armnn::DataType::Float32);
-    armnn::TensorInfo biasesDesc = armnn::TensorInfo(1, biasShape, armnn::DataType::Float32);
+    armnn::TensorInfo weightsDesc = armnn::TensorInfo(2, weightsShape, armnn::DataType::Float32, 0.0f, 0, true);
+    armnn::TensorInfo biasesDesc = armnn::TensorInfo(1, biasShape, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> input =
     {
@@ -352,10 +354,10 @@ void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
 
     unsigned int biasShape[] = { outputChannels };
 
-    armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+    armnn::TensorInfo inputTensorInfo = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32, 0.0f, 0, true);
     armnn::TensorInfo outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Float32);
-    armnn::TensorInfo weightsDesc = armnn::TensorInfo(2, weightsShape, armnn::DataType::Float32);
-    armnn::TensorInfo biasesDesc = armnn::TensorInfo(1, biasShape, armnn::DataType::Float32);
+    armnn::TensorInfo weightsDesc = armnn::TensorInfo(2, weightsShape, armnn::DataType::Float32, 0.0f, 0, true);
+    armnn::TensorInfo biasesDesc = armnn::TensorInfo(1, biasShape, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weights =
     {

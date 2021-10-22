@@ -30,7 +30,7 @@ INetworkPtr CreateBatchToSpaceNdNetwork(const armnn::TensorShape& inputShape,
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
-    TensorInfo inputTensorInfo(inputShape, DataType, qScale, qOffset);
+    TensorInfo inputTensorInfo(inputShape, DataType, qScale, qOffset, true);
     TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset);
 
     BatchToSpaceNdDescriptor batchToSpaceNdDesc(blockShape, crops);

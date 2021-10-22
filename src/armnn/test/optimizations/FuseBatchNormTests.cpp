@@ -107,11 +107,11 @@ INetworkPtr CreatNetwork(bool depthwise, bool preventFusing)
                                          21, 22, 23, 24,  25, 26, 27, 28,  29, 30, 31, 32,
                                          31, 32, 33, 34,  35, 36, 37, 38,  39, 40, 41, 42};
     std::vector<T> weightsVector(begin(weightsIntVector), end(weightsIntVector));
-    TensorInfo weightsInfo(4, weightsDimensionSizes, ArmnnType);
+    TensorInfo weightsInfo(4, weightsDimensionSizes, ArmnnType, 0.0f, 0, true);
     ConstTensor weights(weightsInfo, weightsVector);
 
     std::vector<T> biasVector = GetVector<T>(outputDimensionSizes[3], 3.3f, 0.1f);
-    TensorInfo biasInfo(1, outputChannelSize, ArmnnType);
+    TensorInfo biasInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true);
     ConstTensor bias(biasInfo, biasVector);
     Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
 
@@ -120,10 +120,10 @@ INetworkPtr CreatNetwork(bool depthwise, bool preventFusing)
     std::vector<T> meanVector     = GetVector<T>(outputDimensionSizes[3], 0.1f, 0.1f);
     std::vector<T> varianceVector = GetVector<T>(outputDimensionSizes[3], 1.0f, 0.1f);
 
-    ConstTensor beta    (TensorInfo(1, outputChannelSize, ArmnnType), betaVector);
-    ConstTensor gamma   (TensorInfo(1, outputChannelSize, ArmnnType), gammaVector);
-    ConstTensor mean    (TensorInfo(1, outputChannelSize, ArmnnType), meanVector);
-    ConstTensor variance(TensorInfo(1, outputChannelSize, ArmnnType), varianceVector);
+    ConstTensor beta    (TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), betaVector);
+    ConstTensor gamma   (TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), gammaVector);
+    ConstTensor mean    (TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), meanVector);
+    ConstTensor variance(TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), varianceVector);
 
     // Create a network
     INetworkPtr network = INetwork::Create();
@@ -215,8 +215,10 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
         outputDataFused.resize(108);
     }
 
+    TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors  inputTensorsFused {
-            {0, ConstTensor(run->GetInputTensorInfo (networkIdentifier, 0), inputDataFused.data())}};
+            {0, ConstTensor(inputTensorInfo, inputDataFused.data())}};
     OutputTensors outputTensorsFused{
             {0,      Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputDataFused.data())}};
 
@@ -259,8 +261,11 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
         outputDataNotFused.resize(108);
         outputData2NotFused.resize(108);
     }
+
+    TensorInfo inputTensorInfo2 = runNotFused->GetInputTensorInfo(networkIdentifierNotFused, 0);
+    inputTensorInfo2.SetConstant(true);
     InputTensors inputTensorsNotFused{
-            {0, ConstTensor(runNotFused->GetInputTensorInfo(networkIdentifierNotFused, 0), inputDataNotFused.data())}};
+            {0, ConstTensor(inputTensorInfo2, inputDataNotFused.data())}};
     OutputTensors outputTensorsNotFused{
             {0, Tensor(runNotFused->GetOutputTensorInfo(networkIdentifierNotFused, 0), outputDataNotFused.data())},
             {1, Tensor(runNotFused->GetOutputTensorInfo(networkIdentifierNotFused, 1), outputData2NotFused.data())}};

@@ -42,6 +42,8 @@ void GatherEndToEnd(const std::vector<BackendId>& backends)
 
     paramsInfo.SetQuantizationScale(1.0f);
     paramsInfo.SetQuantizationOffset(0);
+    paramsInfo.SetConstant(true);
+    indicesInfo.SetConstant(true);
     outputInfo.SetQuantizationScale(1.0f);
     outputInfo.SetQuantizationOffset(0);
 
@@ -78,6 +80,8 @@ void GatherMultiDimEndToEnd(const std::vector<BackendId>& backends)
 
     paramsInfo.SetQuantizationScale(1.0f);
     paramsInfo.SetQuantizationOffset(0);
+    paramsInfo.SetConstant(true);
+    indicesInfo.SetConstant(true);
     outputInfo.SetQuantizationScale(1.0f);
     outputInfo.SetQuantizationOffset(0);
 

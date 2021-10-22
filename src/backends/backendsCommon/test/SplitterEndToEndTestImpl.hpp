@@ -31,7 +31,7 @@ INetworkPtr CreateSplitterNetwork(const TensorShape& inputShape,
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
-    TensorInfo inputTensorInfo(inputShape, DataType, qScale, qOffset);
+    TensorInfo inputTensorInfo(inputShape, DataType, qScale, qOffset, true);
 
     std::vector<unsigned int> splitterDimSizes(inputShape.GetNumDimensions());
 

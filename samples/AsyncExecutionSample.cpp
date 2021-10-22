@@ -49,7 +49,7 @@ int main()
     INetworkPtr myNetwork = INetwork::Create();
 
     float weightsData[] = {1.0f}; // Identity
-    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32);
+    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32, 0.0f, 0, true);
     weightsInfo.SetConstant();
     ConstTensor weights(weightsInfo, weightsData);
 
@@ -104,11 +104,12 @@ int main()
     std::vector<std::vector<float>> outputData;
     outputData.resize(2, std::vector<float>(1));
 
-
+    inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo.SetConstant(true);
     std::vector<InputTensors> inputTensors
     {
-        {{0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData[0].data())}},
-        {{0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData[1].data())}}
+        {{0, armnn::ConstTensor(inputTensorInfo, inputData[0].data())}},
+        {{0, armnn::ConstTensor(inputTensorInfo, inputData[1].data())}}
     };
     std::vector<OutputTensors> outputTensors
     {

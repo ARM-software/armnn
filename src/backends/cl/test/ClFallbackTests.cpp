@@ -35,6 +35,7 @@ TEST_CASE("ClImportEnabledFallbackToNeon")
     sub->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     TensorInfo info = TensorInfo({ 1, 2, 4, 2 }, DataType::Float32);
+    info.SetConstant(true);
 
     input0->GetOutputSlot(0).SetTensorInfo(info);
     input1->GetOutputSlot(0).SetTensorInfo(info);
@@ -181,6 +182,7 @@ TEST_CASE("ClImportDisabledFallbackToNeon")
     sub->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     TensorInfo info = TensorInfo({ 1, 2, 3, 2 }, DataType::Float32);
+    info.SetConstant(true);
 
     input0->GetOutputSlot(0).SetTensorInfo(info);
     input1->GetOutputSlot(0).SetTensorInfo(info);
@@ -311,6 +313,7 @@ TEST_CASE("ClImportEnabledFallbackSubgraphToNeon")
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     TensorInfo info = TensorInfo({ 1, 2, 4, 2 }, DataType::Float32);
+    info.SetConstant(true);
     TensorInfo poolingInfo = TensorInfo({ 1, 2, 2, 1 }, DataType::Float32);
 
     input0->GetOutputSlot(0).SetTensorInfo(info);
@@ -468,6 +471,7 @@ TEST_CASE("ClImportDisableFallbackSubgraphToNeon")
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
     TensorInfo info = TensorInfo({ 1, 2, 3, 2 }, DataType::Float32);
+    info.SetConstant(true);
     TensorInfo poolingInfo = TensorInfo({ 1, 2, 1, 1 }, DataType::Float32);
 
     input0->GetOutputSlot(0).SetTensorInfo(info);
@@ -535,6 +539,7 @@ TEST_CASE("ClImportDisableFallbackSubgraphToNeon")
     std::vector<float> outputData(2);
 
     std::vector<float> expectedOutput{ 11.0f, -1.0f };
+
 
     InputTensors inputTensors
     {

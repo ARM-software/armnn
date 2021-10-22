@@ -21,7 +21,7 @@ def test_tensor_info_ctor_shape():
 
 
 def test_tensor_info__str__():
-    tensor_info = ann.TensorInfo(ann.TensorShape((2, 3)), ann.DataType_QAsymmU8, 0.5, 1)
+    tensor_info = ann.TensorInfo(ann.TensorShape((2, 3)), ann.DataType_QAsymmU8, 0.5, 1, True)
 
     assert tensor_info.__str__() == "TensorInfo{DataType: 2, IsQuantized: 1, QuantizationScale: 0.500000, " \
-                                    "QuantizationOffset: 1, NumDimensions: 2, NumElements: 6}"
+                                    "QuantizationOffset: 1, IsConstant: 1, NumDimensions: 2, NumElements: 6}"

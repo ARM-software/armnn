@@ -190,7 +190,7 @@ TEST_CASE("SerializeDeserializeLstmCifgPeepholeNoProjection")
     const uint32_t numUnits = 4;
     const uint32_t outputSize = numUnits;
 
-    armnn::TensorInfo inputWeightsInfo1({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo1({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo1.GetNumElements());
     armnn::ConstTensor inputToForgetWeights(inputWeightsInfo1, inputToForgetWeightsData);
 
@@ -200,7 +200,7 @@ TEST_CASE("SerializeDeserializeLstmCifgPeepholeNoProjection")
     std::vector<float> inputToOutputWeightsData = GenerateRandomData<float>(inputWeightsInfo1.GetNumElements());
     armnn::ConstTensor inputToOutputWeights(inputWeightsInfo1, inputToOutputWeightsData);
 
-    armnn::TensorInfo inputWeightsInfo2({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo2({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo2.GetNumElements());
     armnn::ConstTensor recurrentToForgetWeights(inputWeightsInfo2, recurrentToForgetWeightsData);
 
@@ -210,7 +210,7 @@ TEST_CASE("SerializeDeserializeLstmCifgPeepholeNoProjection")
     std::vector<float> recurrentToOutputWeightsData = GenerateRandomData<float>(inputWeightsInfo2.GetNumElements());
     armnn::ConstTensor recurrentToOutputWeights(inputWeightsInfo2, recurrentToOutputWeightsData);
 
-    armnn::TensorInfo inputWeightsInfo3({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo3({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> cellToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo3.GetNumElements());
     armnn::ConstTensor cellToForgetWeights(inputWeightsInfo3, cellToForgetWeightsData);
 
@@ -304,7 +304,7 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeAndProjection")
     const uint32_t numUnits = 20;
     const uint32_t outputSize = 16;
 
-    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToInputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToInputWeights(tensorInfo20x5, inputToInputWeightsData);
 
@@ -317,7 +317,7 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeAndProjection")
     std::vector<float> inputToOutputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToOutputWeights(tensorInfo20x5, inputToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor inputGateBias(tensorInfo20, inputGateBiasData);
 
@@ -330,7 +330,7 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeAndProjection")
     std::vector<float> outputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor outputGateBias(tensorInfo20, outputGateBiasData);
 
-    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToInputWeightsData = GenerateRandomData<float>(tensorInfo20x16.GetNumElements());
     armnn::ConstTensor recurrentToInputWeights(tensorInfo20x16, recurrentToInputWeightsData);
 
@@ -352,11 +352,11 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeAndProjection")
     std::vector<float> cellToOutputWeightsData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor cellToOutputWeights(tensorInfo20,  cellToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionWeightsData = GenerateRandomData<float>(tensorInfo16x20.GetNumElements());
     armnn::ConstTensor projectionWeights(tensorInfo16x20, projectionWeightsData);
 
-    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionBiasData(outputSize, 0.f);
     armnn::ConstTensor projectionBias(tensorInfo16, projectionBiasData);
 
@@ -451,7 +451,7 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeWithProjectionWithLayerNorm
     const uint32_t numUnits = 20;
     const uint32_t outputSize = 16;
 
-    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToInputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToInputWeights(tensorInfo20x5, inputToInputWeightsData);
 
@@ -464,7 +464,7 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeWithProjectionWithLayerNorm
     std::vector<float> inputToOutputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToOutputWeights(tensorInfo20x5, inputToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor inputGateBias(tensorInfo20, inputGateBiasData);
 
@@ -477,7 +477,7 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeWithProjectionWithLayerNorm
     std::vector<float> outputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor outputGateBias(tensorInfo20, outputGateBiasData);
 
-    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToInputWeightsData = GenerateRandomData<float>(tensorInfo20x16.GetNumElements());
     armnn::ConstTensor recurrentToInputWeights(tensorInfo20x16, recurrentToInputWeightsData);
 
@@ -499,11 +499,11 @@ TEST_CASE("SerializeDeserializeLstmNoCifgWithPeepholeWithProjectionWithLayerNorm
     std::vector<float> cellToOutputWeightsData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor cellToOutputWeights(tensorInfo20,  cellToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionWeightsData = GenerateRandomData<float>(tensorInfo16x20.GetNumElements());
     armnn::ConstTensor projectionWeights(tensorInfo16x20, projectionWeightsData);
 
-    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionBiasData(outputSize, 0.f);
     armnn::ConstTensor projectionBias(tensorInfo16, projectionBiasData);
 
@@ -1236,7 +1236,7 @@ TEST_CASE("EnsureLstmLayersBackwardCompatibility")
     const uint32_t numUnits   = 20u;
     const uint32_t outputSize = 16u;
 
-    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToInputWeightsData(tensorInfo20x5.GetNumElements(), 0.0f);
     armnn::ConstTensor inputToInputWeights(tensorInfo20x5, inputToInputWeightsData);
 
@@ -1249,7 +1249,7 @@ TEST_CASE("EnsureLstmLayersBackwardCompatibility")
     std::vector<float> inputToOutputWeightsData(tensorInfo20x5.GetNumElements(), 0.0f);
     armnn::ConstTensor inputToOutputWeights(tensorInfo20x5, inputToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputGateBiasData(tensorInfo20.GetNumElements(), 0.0f);
     armnn::ConstTensor inputGateBias(tensorInfo20, inputGateBiasData);
 
@@ -1262,7 +1262,7 @@ TEST_CASE("EnsureLstmLayersBackwardCompatibility")
     std::vector<float> outputGateBiasData(tensorInfo20.GetNumElements(), 0.0f);
     armnn::ConstTensor outputGateBias(tensorInfo20, outputGateBiasData);
 
-    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToInputWeightsData(tensorInfo20x16.GetNumElements(), 0.0f);
     armnn::ConstTensor recurrentToInputWeights(tensorInfo20x16, recurrentToInputWeightsData);
 
@@ -1284,11 +1284,11 @@ TEST_CASE("EnsureLstmLayersBackwardCompatibility")
     std::vector<float> cellToOutputWeightsData(tensorInfo20.GetNumElements(), 0.0f);
     armnn::ConstTensor cellToOutputWeights(tensorInfo20,  cellToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionWeightsData(tensorInfo16x20.GetNumElements(), 0.0f);
     armnn::ConstTensor projectionWeights(tensorInfo16x20, projectionWeightsData);
 
-    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionBiasData(outputSize, 0.0f);
     armnn::ConstTensor projectionBias(tensorInfo16, projectionBiasData);
 
@@ -1454,7 +1454,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo inputToInputWeightsInfo(inputToInputWeightsShape,
                                               armnn::DataType::QAsymmU8,
                                               weightsScale,
-                                              weightsOffset);
+                                              weightsOffset, true);
     armnn::ConstTensor inputToInputWeights(inputToInputWeightsInfo, inputToInputWeightsData);
 
     armnn::TensorShape inputToForgetWeightsShape = {4, 2};
@@ -1462,7 +1462,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo inputToForgetWeightsInfo(inputToForgetWeightsShape,
                                                armnn::DataType::QAsymmU8,
                                                weightsScale,
-                                               weightsOffset);
+                                               weightsOffset, true);
     armnn::ConstTensor inputToForgetWeights(inputToForgetWeightsInfo, inputToForgetWeightsData);
 
     armnn::TensorShape inputToCellWeightsShape = {4, 2};
@@ -1470,7 +1470,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo inputToCellWeightsInfo(inputToCellWeightsShape,
                                              armnn::DataType::QAsymmU8,
                                              weightsScale,
-                                             weightsOffset);
+                                             weightsOffset, true);
     armnn::ConstTensor inputToCellWeights(inputToCellWeightsInfo, inputToCellWeightsData);
 
     armnn::TensorShape inputToOutputWeightsShape = {4, 2};
@@ -1478,7 +1478,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo inputToOutputWeightsInfo(inputToOutputWeightsShape,
                                                armnn::DataType::QAsymmU8,
                                                weightsScale,
-                                               weightsOffset);
+                                               weightsOffset, true);
     armnn::ConstTensor inputToOutputWeights(inputToOutputWeightsInfo, inputToOutputWeightsData);
 
     // The shape of recurrent weight data is {outputSize, outputSize} = {4, 4}
@@ -1487,7 +1487,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo recurrentToInputWeightsInfo(recurrentToInputWeightsShape,
                                                   armnn::DataType::QAsymmU8,
                                                   weightsScale,
-                                                  weightsOffset);
+                                                  weightsOffset, true);
     armnn::ConstTensor recurrentToInputWeights(recurrentToInputWeightsInfo, recurrentToInputWeightsData);
 
     armnn::TensorShape recurrentToForgetWeightsShape = {4, 4};
@@ -1495,7 +1495,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo recurrentToForgetWeightsInfo(recurrentToForgetWeightsShape,
                                                    armnn::DataType::QAsymmU8,
                                                    weightsScale,
-                                                   weightsOffset);
+                                                   weightsOffset, true);
     armnn::ConstTensor recurrentToForgetWeights(recurrentToForgetWeightsInfo, recurrentToForgetWeightsData);
 
     armnn::TensorShape recurrentToCellWeightsShape = {4, 4};
@@ -1503,7 +1503,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo recurrentToCellWeightsInfo(recurrentToCellWeightsShape,
                                                  armnn::DataType::QAsymmU8,
                                                  weightsScale,
-                                                 weightsOffset);
+                                                 weightsOffset, true);
     armnn::ConstTensor recurrentToCellWeights(recurrentToCellWeightsInfo, recurrentToCellWeightsData);
 
     armnn::TensorShape recurrentToOutputWeightsShape = {4, 4};
@@ -1511,7 +1511,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo recurrentToOutputWeightsInfo(recurrentToOutputWeightsShape,
                                                    armnn::DataType::QAsymmU8,
                                                    weightsScale,
-                                                   weightsOffset);
+                                                   weightsOffset, true);
     armnn::ConstTensor recurrentToOutputWeights(recurrentToOutputWeightsInfo, recurrentToOutputWeightsData);
 
     // The shape of bias data is {outputSize} = {4}
@@ -1520,7 +1520,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo inputGateBiasInfo(inputGateBiasShape,
                                         armnn::DataType::Signed32,
                                         biasScale,
-                                        biasOffset);
+                                        biasOffset, true);
     armnn::ConstTensor inputGateBias(inputGateBiasInfo, inputGateBiasData);
 
     armnn::TensorShape forgetGateBiasShape = {4};
@@ -1528,7 +1528,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo forgetGateBiasInfo(forgetGateBiasShape,
                                          armnn::DataType::Signed32,
                                          biasScale,
-                                         biasOffset);
+                                         biasOffset, true);
     armnn::ConstTensor forgetGateBias(forgetGateBiasInfo, forgetGateBiasData);
 
     armnn::TensorShape cellBiasShape = {4};
@@ -1536,7 +1536,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo cellBiasInfo(cellBiasShape,
                                    armnn::DataType::Signed32,
                                    biasScale,
-                                   biasOffset);
+                                   biasOffset, true);
     armnn::ConstTensor cellBias(cellBiasInfo, cellBiasData);
 
     armnn::TensorShape outputGateBiasShape = {4};
@@ -1544,7 +1544,7 @@ TEST_CASE("SerializeDeserializeQuantizedLstm")
     armnn::TensorInfo outputGateBiasInfo(outputGateBiasShape,
                                          armnn::DataType::Signed32,
                                          biasScale,
-                                         biasOffset);
+                                         biasOffset, true);
     armnn::ConstTensor outputGateBias(outputGateBiasInfo, outputGateBiasData);
 
     armnn::QuantizedLstmInputParams params;
@@ -1655,14 +1655,14 @@ TEST_CASE("SerializeDeserializeQLstmBasic")
     armnn::TensorInfo inputWeightsInfo({numUnits, inputSize},
                                        armnn::DataType::QSymmS8,
                                        weightsScale,
-                                       weightsOffset);
+                                       weightsOffset, true);
 
     armnn::TensorInfo recurrentWeightsInfo({numUnits, outputSize},
                                            armnn::DataType::QSymmS8,
                                            weightsScale,
-                                           weightsOffset);
+                                           weightsOffset, true);
 
-    armnn::TensorInfo biasInfo({numUnits}, armnn::DataType::Signed32, biasScale, biasOffset);
+    armnn::TensorInfo biasInfo({numUnits}, armnn::DataType::Signed32, biasScale, biasOffset, true);
 
     std::vector<int8_t> inputToForgetWeightsData = GenerateRandomData<int8_t>(inputWeightsInfo.GetNumElements());
     std::vector<int8_t> inputToCellWeightsData   = GenerateRandomData<int8_t>(inputWeightsInfo.GetNumElements());
@@ -1816,22 +1816,22 @@ TEST_CASE("SerializeDeserializeQLstmCifgLayerNorm")
     armnn::TensorInfo inputWeightsInfo({numUnits, inputSize},
                                        armnn::DataType::QSymmS8,
                                        weightsScale,
-                                       weightsOffset);
+                                       weightsOffset, true);
 
     armnn::TensorInfo recurrentWeightsInfo({numUnits, outputSize},
                                            armnn::DataType::QSymmS8,
                                            weightsScale,
-                                           weightsOffset);
+                                           weightsOffset, true);
 
     armnn::TensorInfo biasInfo({numUnits},
                                armnn::DataType::Signed32,
                                biasScale,
-                               biasOffset);
+                               biasOffset, true);
 
     armnn::TensorInfo layerNormWeightsInfo({numUnits},
                                            armnn::DataType::QSymmS16,
                                            layerNormScale,
-                                           layerNormOffset);
+                                           layerNormOffset, true);
 
     // Mandatory params
     std::vector<int8_t> inputToForgetWeightsData = GenerateRandomData<int8_t>(inputWeightsInfo.GetNumElements());
@@ -2003,32 +2003,32 @@ TEST_CASE("SerializeDeserializeQLstmAdvanced")
     armnn::TensorInfo inputWeightsInfo({numUnits, inputSize},
                                        armnn::DataType::QSymmS8,
                                        weightsScale,
-                                       weightsOffset);
+                                       weightsOffset, true);
 
     armnn::TensorInfo recurrentWeightsInfo({numUnits, outputSize},
                                            armnn::DataType::QSymmS8,
                                            weightsScale,
-                                           weightsOffset);
+                                           weightsOffset, true);
 
     armnn::TensorInfo biasInfo({numUnits},
                                armnn::DataType::Signed32,
                                biasScale,
-                               biasOffset);
+                               biasOffset, true);
 
     armnn::TensorInfo peepholeWeightsInfo({numUnits},
                                           armnn::DataType::QSymmS16,
                                           weightsScale,
-                                          weightsOffset);
+                                          weightsOffset, true);
 
     armnn::TensorInfo layerNormWeightsInfo({numUnits},
                                            armnn::DataType::QSymmS16,
                                            layerNormScale,
-                                           layerNormOffset);
+                                           layerNormOffset, true);
 
     armnn::TensorInfo projectionWeightsInfo({outputSize, numUnits},
                                              armnn::DataType::QSymmS8,
                                              weightsScale,
-                                             weightsOffset);
+                                             weightsOffset, true);
 
     // Mandatory params
     std::vector<int8_t> inputToForgetWeightsData = GenerateRandomData<int8_t>(inputWeightsInfo.GetNumElements());
@@ -2213,7 +2213,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmCifgPeepholeNoProjectio
     const uint32_t numUnits = 4;
     const uint32_t outputSize = numUnits;
 
-    armnn::TensorInfo inputWeightsInfo1({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo1({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo1.GetNumElements());
     armnn::ConstTensor inputToForgetWeights(inputWeightsInfo1, inputToForgetWeightsData);
 
@@ -2223,7 +2223,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmCifgPeepholeNoProjectio
     std::vector<float> inputToOutputWeightsData = GenerateRandomData<float>(inputWeightsInfo1.GetNumElements());
     armnn::ConstTensor inputToOutputWeights(inputWeightsInfo1, inputToOutputWeightsData);
 
-    armnn::TensorInfo inputWeightsInfo2({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo2({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo2.GetNumElements());
     armnn::ConstTensor recurrentToForgetWeights(inputWeightsInfo2, recurrentToForgetWeightsData);
 
@@ -2233,7 +2233,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmCifgPeepholeNoProjectio
     std::vector<float> recurrentToOutputWeightsData = GenerateRandomData<float>(inputWeightsInfo2.GetNumElements());
     armnn::ConstTensor recurrentToOutputWeights(inputWeightsInfo2, recurrentToOutputWeightsData);
 
-    armnn::TensorInfo inputWeightsInfo3({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo3({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> cellToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo3.GetNumElements());
     armnn::ConstTensor cellToForgetWeights(inputWeightsInfo3, cellToForgetWeightsData);
 
@@ -2318,7 +2318,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeAndPr
     const uint32_t numUnits = 20;
     const uint32_t outputSize = 16;
 
-    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToInputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToInputWeights(tensorInfo20x5, inputToInputWeightsData);
 
@@ -2331,7 +2331,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeAndPr
     std::vector<float> inputToOutputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToOutputWeights(tensorInfo20x5, inputToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor inputGateBias(tensorInfo20, inputGateBiasData);
 
@@ -2344,7 +2344,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeAndPr
     std::vector<float> outputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor outputGateBias(tensorInfo20, outputGateBiasData);
 
-    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToInputWeightsData = GenerateRandomData<float>(tensorInfo20x16.GetNumElements());
     armnn::ConstTensor recurrentToInputWeights(tensorInfo20x16, recurrentToInputWeightsData);
 
@@ -2366,11 +2366,11 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeAndPr
     std::vector<float> cellToOutputWeightsData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor cellToOutputWeights(tensorInfo20,  cellToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionWeightsData = GenerateRandomData<float>(tensorInfo16x20.GetNumElements());
     armnn::ConstTensor projectionWeights(tensorInfo16x20, projectionWeightsData);
 
-    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionBiasData(outputSize, 0.f);
     armnn::ConstTensor projectionBias(tensorInfo16, projectionBiasData);
 
@@ -2456,7 +2456,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeWithP
     const uint32_t numUnits = 20;
     const uint32_t outputSize = 16;
 
-    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x5({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToInputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToInputWeights(tensorInfo20x5, inputToInputWeightsData);
 
@@ -2469,7 +2469,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeWithP
     std::vector<float> inputToOutputWeightsData = GenerateRandomData<float>(tensorInfo20x5.GetNumElements());
     armnn::ConstTensor inputToOutputWeights(tensorInfo20x5, inputToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor inputGateBias(tensorInfo20, inputGateBiasData);
 
@@ -2482,7 +2482,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeWithP
     std::vector<float> outputGateBiasData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor outputGateBias(tensorInfo20, outputGateBiasData);
 
-    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo20x16({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToInputWeightsData = GenerateRandomData<float>(tensorInfo20x16.GetNumElements());
     armnn::ConstTensor recurrentToInputWeights(tensorInfo20x16, recurrentToInputWeightsData);
 
@@ -2504,11 +2504,11 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmNoCifgWithPeepholeWithP
     std::vector<float> cellToOutputWeightsData = GenerateRandomData<float>(tensorInfo20.GetNumElements());
     armnn::ConstTensor cellToOutputWeights(tensorInfo20,  cellToOutputWeightsData);
 
-    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16x20({outputSize, numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionWeightsData = GenerateRandomData<float>(tensorInfo16x20.GetNumElements());
     armnn::ConstTensor projectionWeights(tensorInfo16x20, projectionWeightsData);
 
-    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo tensorInfo16({outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> projectionBiasData(outputSize, 0.f);
     armnn::ConstTensor projectionBias(tensorInfo16, projectionBiasData);
 
@@ -2611,7 +2611,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmCifgPeepholeNoProjectio
     const uint32_t numUnits = 4;
     const uint32_t outputSize = numUnits;
 
-    armnn::TensorInfo inputWeightsInfo1({numUnits, inputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo1({numUnits, inputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> inputToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo1.GetNumElements());
     armnn::ConstTensor inputToForgetWeights(inputWeightsInfo1, inputToForgetWeightsData);
 
@@ -2621,7 +2621,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmCifgPeepholeNoProjectio
     std::vector<float> inputToOutputWeightsData = GenerateRandomData<float>(inputWeightsInfo1.GetNumElements());
     armnn::ConstTensor inputToOutputWeights(inputWeightsInfo1, inputToOutputWeightsData);
 
-    armnn::TensorInfo inputWeightsInfo2({numUnits, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo2({numUnits, outputSize}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> recurrentToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo2.GetNumElements());
     armnn::ConstTensor recurrentToForgetWeights(inputWeightsInfo2, recurrentToForgetWeightsData);
 
@@ -2631,7 +2631,7 @@ TEST_CASE("SerializeDeserializeUnidirectionalSequenceLstmCifgPeepholeNoProjectio
     std::vector<float> recurrentToOutputWeightsData = GenerateRandomData<float>(inputWeightsInfo2.GetNumElements());
     armnn::ConstTensor recurrentToOutputWeights(inputWeightsInfo2, recurrentToOutputWeightsData);
 
-    armnn::TensorInfo inputWeightsInfo3({numUnits}, armnn::DataType::Float32);
+    armnn::TensorInfo inputWeightsInfo3({numUnits}, armnn::DataType::Float32, 0.0f, 0, true);
     std::vector<float> cellToForgetWeightsData = GenerateRandomData<float>(inputWeightsInfo3.GetNumElements());
     armnn::ConstTensor cellToForgetWeights(inputWeightsInfo3, cellToForgetWeightsData);
 

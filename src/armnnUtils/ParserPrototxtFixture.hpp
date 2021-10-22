@@ -208,6 +208,7 @@ void ParserPrototxtFixture<TParser>::RunTest(const std::map<std::string, std::ve
     for (auto&& it : inputData)
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(it.first);
+        bindingInfo.second.SetConstant(true);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
         if (bindingInfo.second.GetNumElements() != it.second.size())
         {

@@ -28,7 +28,7 @@ int main()
     INetworkPtr myNetwork = INetwork::Create();
 
     float weightsData[] = {1.0f}; // Identity
-    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32);
+    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32, 0.0f, 0, true);
     weightsInfo.SetConstant();
     ConstTensor weights(weightsInfo, weightsData);
 
@@ -75,11 +75,12 @@ int main()
     std::vector<float> inputData{number};
     std::vector<float> outputData(1);
 
-
-    InputTensors inputTensors{{0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0),
-                                                            inputData.data())}};
+    inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo.SetConstant(true);
+    InputTensors inputTensors{{0, armnn::ConstTensor(inputTensorInfo,
+                                                     inputData.data())}};
     OutputTensors outputTensors{{0, armnn::Tensor(run->GetOutputTensorInfo(networkIdentifier, 0),
-                                                         outputData.data())}};
+                                                  outputData.data())}};
 
     // Execute network
     run->EnqueueWorkload(networkIdentifier, inputTensors, outputTensors);

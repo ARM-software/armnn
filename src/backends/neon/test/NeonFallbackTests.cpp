@@ -107,11 +107,18 @@ TEST_CASE("FallbackImportToCpuAcc")
         11.0f, 9.0f, 7.0f, 5.0f, 3.0f, 1.0f, -1.0f, -3.0f, -5.0f, -7.0f, -9.0f, -11.0f
     };
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 2);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+    inputTensorInfo2.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), inputData2.data()) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) },
+        { 2, armnn::ConstTensor(inputTensorInfo2, inputData2.data()) }
     };
     OutputTensors outputTensors
     {
@@ -238,10 +245,15 @@ TEST_CASE("FallbackPaddingCopyToCpuAcc")
         6.0f, 12.0f
     };
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) }
     };
     OutputTensors outputTensors
     {
@@ -374,11 +386,18 @@ TEST_CASE("FallbackImportFromCpuAcc")
         13.0f, 11.0f, 11.0f, 9.0f, 7.0f, 7.0f, 7.0f, 5.0f, 5.0f, 3.0f, 3.0f, -5.0f
     };
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 2);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+    inputTensorInfo2.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), inputData2.data()) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) },
+        { 2, armnn::ConstTensor(inputTensorInfo2, inputData2.data()) }
     };
     OutputTensors outputTensors
     {
@@ -505,10 +524,15 @@ TEST_CASE("FallbackPaddingCopyFromCpuAcc")
         5.0f, 15.0f
     };
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) }
     };
     OutputTensors outputTensors
     {
@@ -639,11 +663,18 @@ TEST_CASE("FallbackDisableImportFromCpuAcc")
         13.0f, 11.0f, 11.0f, 9.0f, 7.0f, 7.0f, 7.0f, 5.0f, 5.0f, 3.0f, 3.0f, -5.0f
     };
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 2);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+    inputTensorInfo2.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), inputData2.data()) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) },
+        { 2, armnn::ConstTensor(inputTensorInfo2, inputData2.data()) }
     };
     OutputTensors outputTensors
     {
@@ -784,11 +815,18 @@ TEST_CASE("NeonImportEnabledFallbackToCl")
     auto* intputPtr = reinterpret_cast<float*>(alignedInputPtr);
     std::copy(inputData2.begin(), inputData2.end(), intputPtr);
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 2);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+    inputTensorInfo2.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), alignedInputPtr) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) },
+        { 2, armnn::ConstTensor(inputTensorInfo2, alignedInputPtr) }
     };
     OutputTensors outputTensors
     {
@@ -910,11 +948,18 @@ TEST_CASE("NeonImportDisabledFallbackToCl")
         11.0f, 9.0f, 7.0f, 5.0f, 3.0f, 1.0f, -1.0f, -3.0f, -5.0f, -7.0f, -9.0f, -11.0f
     };
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 2);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+    inputTensorInfo2.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), inputData2.data()) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) },
+        { 2, armnn::ConstTensor(inputTensorInfo2, inputData2.data()) }
     };
     OutputTensors outputTensors
     {
@@ -1061,11 +1106,18 @@ TEST_CASE("NeonImportEnabledFallbackSubgraphToCl")
     auto* intputPtr = reinterpret_cast<float*>(alignedInputPtr);
     std::copy(inputData2.begin(), inputData2.end(), intputPtr);
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 2);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+    inputTensorInfo2.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), alignedInputPtr) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) },
+        { 2, armnn::ConstTensor(inputTensorInfo2, alignedInputPtr) }
     };
     OutputTensors outputTensors
     {
@@ -1200,11 +1252,18 @@ TEST_CASE("NeonImportDisableFallbackSubgraphToCl")
 
     std::vector<float> expectedOutput{ 11.0f, -1.0f };
 
+    armnn::TensorInfo inputTensorInfo0 = runtime->GetInputTensorInfo(netId, 0);
+    armnn::TensorInfo inputTensorInfo1 = runtime->GetInputTensorInfo(netId, 1);
+    armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 2);
+    inputTensorInfo0.SetConstant(true);
+    inputTensorInfo1.SetConstant(true);
+    inputTensorInfo2.SetConstant(true);
+
     InputTensors inputTensors
     {
-        { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },
-        { 1, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 1), inputData1.data()) },
-        { 2, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 2), inputData2.data()) }
+        { 0, armnn::ConstTensor(inputTensorInfo0, inputData0.data()) },
+        { 1, armnn::ConstTensor(inputTensorInfo1, inputData1.data()) },
+        { 2, armnn::ConstTensor(inputTensorInfo2, inputData2.data()) }
     };
     OutputTensors outputTensors
     {

@@ -44,9 +44,11 @@ void RunInference(armnn::NetworkId& netId, armnn::IRuntimePtr& runtime, std::vec
         1, 10, 3, 200, 5 // Some inputs - one of which is sufficiently larger than the others to saturate softmax.
     };
 
+    armnn::TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     armnn::InputTensors inputTensors
     {
-        {0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}
+        {0, armnn::ConstTensor(inputTensorInfo, inputData.data())}
     };
 
     armnn::OutputTensors outputTensors

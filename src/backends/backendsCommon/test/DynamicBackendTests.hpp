@@ -1594,10 +1594,12 @@ void SampleDynamicBackendEndToEndTestImpl()
     std::vector<float> expectedOutputData{ 15.0f, 11.0f };
     std::vector<float> outputData(2);
 
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
         {
-            {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input0Data.data())},
-            {1,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input1Data.data())}
+            {0,armnn::ConstTensor(inputTensorInfo, input0Data.data())},
+            {1,armnn::ConstTensor(inputTensorInfo, input1Data.data())}
         };
     OutputTensors outputTensors
         {

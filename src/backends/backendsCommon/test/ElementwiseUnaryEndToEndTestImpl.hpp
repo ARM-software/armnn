@@ -33,7 +33,7 @@ INetworkPtr CreateElementwiseUnaryNetwork(const TensorShape& inputShape,
     ElementwiseUnaryDescriptor descriptor(operation);
     IConnectableLayer* elementwiseUnaryLayer = net->AddElementwiseUnaryLayer(descriptor, "elementwiseUnary");
 
-    TensorInfo inputTensorInfo(inputShape, ArmnnTypeInput, qScale, qOffset);
+    TensorInfo inputTensorInfo(inputShape, ArmnnTypeInput, qScale, qOffset, true);
     IConnectableLayer* input = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(0));
     Connect(input, elementwiseUnaryLayer, inputTensorInfo, 0, 0);
 

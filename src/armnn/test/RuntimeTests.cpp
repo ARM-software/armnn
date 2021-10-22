@@ -97,8 +97,8 @@ TEST_CASE("RuntimePreImportInputs")
     std::vector<int> inputData2(4, 20);
     std::vector<int> output(4);
 
-    ConstTensor inputTensor1({{4}, armnn::DataType::Signed32}, inputData1.data());
-    ConstTensor inputTensor2({{4}, armnn::DataType::Signed32}, inputData2.data());
+    ConstTensor inputTensor1({{4}, armnn::DataType::Signed32, 0.0f, 0, true}, inputData1.data());
+    ConstTensor inputTensor2({{4}, armnn::DataType::Signed32, 0.0f, 0, true}, inputData2.data());
     Tensor outputTensor({{4}, armnn::DataType::Signed32}, output.data());
 
     auto importedInputVec1 = runtime->ImportInputs(networkId, {{0, inputTensor1}});
@@ -177,7 +177,7 @@ TEST_CASE("RuntimePreImportOutputs")
     armnn::NetworkId   networkId = 1;
 
     armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
-    TensorInfo tensorInfo{{4}, armnn::DataType::Float32};
+    TensorInfo tensorInfo{{4}, armnn::DataType::Float32, 0.0f, 0, true};
 
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
@@ -902,9 +902,11 @@ TEST_CASE("ProfilingEnableCpuRef")
     std::vector<float> inputData(16);
     std::vector<float> outputData(16);
 
+    TensorInfo inputTensorInfo = runtime.GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors  inputTensors
     {
-        {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
+        {0, ConstTensor(inputTensorInfo, inputData.data())}
     };
     OutputTensors outputTensors
     {

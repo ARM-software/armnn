@@ -88,10 +88,12 @@ TEST_CASE("Fp16AdditionTest")
        100.0_h, 200.0_h, 300.0_h, 400.0_h
    };
 
+   TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+   inputTensorInfo.SetConstant(true);
    InputTensors inputTensors
    {
-       {0,ConstTensor(runtime->GetInputTensorInfo(netId, 0), input1Data.data())},
-       {1,ConstTensor(runtime->GetInputTensorInfo(netId, 0), input2Data.data())}
+       {0,ConstTensor(inputTensorInfo, input1Data.data())},
+       {1,ConstTensor(inputTensorInfo, input2Data.data())}
    };
 
    std::vector<Half> outputData(input1Data.size());

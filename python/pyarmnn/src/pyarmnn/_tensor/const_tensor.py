@@ -59,24 +59,31 @@ class ConstTensor(AnnConstTensor):
 
         Raises:
             TypeError: Unsupported input data type.
-            ValueError: Unsupported tensor data type and incorrect input data size.
+            ValueError: Unsupported tensor data type, incorrect input data size and creation of ConstTensor from non-constant TensorInfo.
         """
         self.__memory_area = None
 
         # TensorInfo as first argument and numpy array as second
         if len(args) > 1 and isinstance(args[0], TensorInfo):
-            if isinstance(args[1], np.ndarray):
+            if not isinstance(args[1], np.ndarray):
+                raise TypeError('Data must be provided as a numpy array.')
+            # if TensorInfo IsConstant is false
+            elif not args[0].IsConstant():
+                raise ValueError('TensorInfo when initializing ConstTensor must be set to constant.')
+            else:
                 self.__create_memory_area(args[0].GetDataType(), args[0].GetNumBytes(), args[0].GetNumElements(),
                                           args[1])
                 super().__init__(args[0], self.__memory_area.data)
-            else:
-                raise TypeError('Data must be provided as a numpy array.')
 
         # copy constructor - reference to memory area is passed from copied const
         # tensor and armnn's copy constructor is called
         elif len(args) > 0 and isinstance(args[0], (ConstTensor, Tensor)):
-            self.__memory_area = args[0].get_memory_area()
-            super().__init__(args[0])
+            # if TensorInfo IsConstant is false
+            if not args[0].GetInfo().IsConstant():
+                raise ValueError('TensorInfo of Tensor when initializing ConstTensor must be set to constant.')
+            else:
+                self.__memory_area = args[0].get_memory_area()
+                super().__init__(args[0])
 
         # empty tensor
         elif len(args) == 0:

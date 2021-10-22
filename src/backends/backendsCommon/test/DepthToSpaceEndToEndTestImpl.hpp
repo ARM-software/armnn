@@ -44,6 +44,7 @@ void DepthToSpaceEndToEndImpl(const std::vector<armnn::BackendId>& backends,
     using namespace armnn;
 
     TensorInfo inputInfo(nhwcInputShape, ArmnnType);
+    inputInfo.SetConstant(true);
     TensorInfo outputInfo(nhwcOutputShape, ArmnnType);
 
     constexpr float   qScale  = 0.25f;

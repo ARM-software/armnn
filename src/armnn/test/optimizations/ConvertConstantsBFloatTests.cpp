@@ -32,7 +32,7 @@ TEST_CASE("ConvertConstantsFloatToBFloatTest")
                                     -3.1055E+29f, // 0xF07ADC3C Round up
                                     -9.149516E-10f // 0xB07B7FFF Round down
                                    };
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32), floatWeights);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), floatWeights);
 
     // Create simple test network
     auto input = graph.AddLayer<armnn::InputLayer>(0, "input");
@@ -88,7 +88,7 @@ TEST_CASE("ConvertConstantsBFloatToFloatTest")
     std::vector<uint16_t> bfWeights(8);
     armnnUtils::FloatingPointConverter::ConvertFloat32ToBFloat16(convWeightsData.data(), convWeightsData.size(),
                                                                  bfWeights.data());
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::BFloat16), bfWeights);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::BFloat16, 0.0f, 0, true), bfWeights);
 
     //Create the simple test network
     auto input = graph.AddLayer<armnn::InputLayer>(0, "input");

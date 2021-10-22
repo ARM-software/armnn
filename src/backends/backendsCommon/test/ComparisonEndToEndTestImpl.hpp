@@ -35,7 +35,7 @@ INetworkPtr CreateComparisonNetwork(const std::vector<TensorShape>& inputShapes,
 
     for (unsigned int i = 0; i < inputShapes.size(); ++i)
     {
-        TensorInfo inputTensorInfo(inputShapes[i], ArmnnTypeInput, qScale, qOffset);
+        TensorInfo inputTensorInfo(inputShapes[i], ArmnnTypeInput, qScale, qOffset, true);
         IConnectableLayer* input = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(i));
         Connect(input, comparisonLayer, inputTensorInfo, 0, i);
     }

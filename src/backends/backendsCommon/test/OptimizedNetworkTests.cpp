@@ -370,8 +370,8 @@ TEST_CASE("OptimizeNetworkCopy")
     const armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
     const armnn::TensorInfo outputInfo({ 1, 2, 2, 1 }, armnn::DataType::Float32);
 
-    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
     armnn::ConstTensor weights(weightsInfo, weightsData);
@@ -443,10 +443,12 @@ TEST_CASE("OptimizeNetworkCopy")
     std::vector<float> inputData = GenerateRandomData<float>(runtime->GetInputTensorInfo(optNetId, 0).GetNumElements());
     std::vector<float> outputData(runtime->GetOutputTensorInfo(optNetId, 0).GetNumElements());
 
+    armnn::TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(optNetId, 0);
+    inputTensorInfo.SetConstant(true);
     armnn::InputTensors inputTensors
     {
         {
-            0 ,armnn::ConstTensor(runtime->GetInputTensorInfo(optNetId, 0), inputData.data())
+            0, armnn::ConstTensor(inputTensorInfo, inputData.data())
         }
     };
     armnn::OutputTensors outputTensors
@@ -464,10 +466,12 @@ TEST_CASE("OptimizeNetworkCopy")
         armnn::NetworkId netId = networkIds[i];
         std::vector<float> copyOutputData(runtime->GetOutputTensorInfo(netId, 0).GetNumElements());
 
+        armnn::TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 0);
+        inputTensorInfo2.SetConstant(true);
         armnn::InputTensors copyInputTensors
         {
             {
-                0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())
+                0, armnn::ConstTensor(inputTensorInfo2, inputData.data())
             }
         };
         armnn::OutputTensors copyOutputTensors

@@ -54,6 +54,7 @@ def make_input_tensors(inputs_binding_info: List[Tuple],
     for in_bind_info, in_data in zip(inputs_binding_info, input_data):
         in_tensor_id = in_bind_info[0]
         in_tensor_info = in_bind_info[1]
+        in_tensor_info.SetConstant()
         input_tensors.append((in_tensor_id, ConstTensor(in_tensor_info, in_data)))
 
     return input_tensors

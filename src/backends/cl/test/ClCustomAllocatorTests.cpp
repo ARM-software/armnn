@@ -67,7 +67,7 @@ armnn::INetworkPtr CreateTestNetwork(armnn::TensorInfo& inputTensorInfo)
 
     armnn::FullyConnectedDescriptor fullyConnectedDesc;
     float weightsData[] = {1.0f}; // Identity
-    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32);
+    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32, 0.0f, 0, true);
     weightsInfo.SetConstant(true);
     armnn::ConstTensor weights(weightsInfo, weightsData);
 
@@ -145,9 +145,11 @@ TEST_CASE("ClCustomAllocatorTest")
     auto* outputPtr = reinterpret_cast<float*>(alignedOutputPtr);
     std::fill_n(outputPtr, numElements, -10.0f);
 
+    armnn::TensorInfo inputTensorInfo2 = run->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo2.SetConstant(true);
     armnn::InputTensors inputTensors
     {
-        {0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), alignedInputPtr)},
+        {0, armnn::ConstTensor(inputTensorInfo2, alignedInputPtr)},
     };
     armnn::OutputTensors outputTensors
     {

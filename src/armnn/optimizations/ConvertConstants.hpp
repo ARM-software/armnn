@@ -35,7 +35,7 @@ struct BFloat16ToFloat32
                                                                          info.GetNumElements(),
                                                                          newValues.data());
 
-            TensorInfo newInfo(info.GetShape(), DataType::Float32);
+            TensorInfo newInfo(info.GetShape(), DataType::Float32, 0.0f, 0, true);
             ConstTensor newInput(newInfo, newValues);
             handle.reset(new ScopedTensorHandle(newInput));
         }
@@ -56,7 +56,7 @@ struct Float16ToFloat32
                                                                    info.GetNumElements(),
                                                                    newValues.data());
 
-            TensorInfo newInfo(info.GetShape(), DataType::Float32);
+            TensorInfo newInfo(info.GetShape(), DataType::Float32, 0.0f, 0, true);
             ConstTensor newInput(newInfo, newValues);
             handle.reset(new ScopedTensorHandle(newInput));
         }
@@ -77,7 +77,7 @@ struct Float32ToBFloat16
                                                                          info.GetNumElements(),
                                                                          newValues.data());
 
-            TensorInfo newInfo(info.GetShape(), DataType::BFloat16);
+            TensorInfo newInfo(info.GetShape(), DataType::BFloat16, 0.0f, 0, true);
             ConstTensor newInput(newInfo, newValues);
             handle.reset(new ScopedTensorHandle(newInput));
         }
@@ -98,7 +98,7 @@ struct Float32ToFloat16
                                                                    info.GetNumElements(),
                                                                    newValues.data());
 
-            TensorInfo newInfo(info.GetShape(), DataType::Float16);
+            TensorInfo newInfo(info.GetShape(), DataType::Float16, 0.0f, 0, true);
             ConstTensor newInput(newInfo, newValues);
             handle.reset(new ScopedTensorHandle(newInput));
         }

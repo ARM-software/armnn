@@ -27,6 +27,7 @@ def random_runtime(shared_data_folder):
     input_tensor_id = input_binding_info[0]
 
     input_tensor_info = input_binding_info[1]
+    input_tensor_info.SetConstant()
 
     output_names = parser.GetSubgraphOutputTensorNames(graph_id)
 

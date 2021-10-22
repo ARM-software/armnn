@@ -381,8 +381,8 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
 
     // Convolution details
     TensorInfo inputInfo({ 1, 2, 5, 1 }, DataType::Float32);
-    TensorInfo weightInfo({ 3, 2, 3, 1 }, DataType::Float32);
-    TensorInfo biasInfo({ 3 }, DataType::Float32);
+    TensorInfo weightInfo({ 3, 2, 3, 1 }, DataType::Float32, 0.0f, 0, true);
+    TensorInfo biasInfo({ 3 }, DataType::Float32, 0.0f, 0, true);
     TensorInfo outputInfo({ 1, 3, 7, 1 }, DataType::Float32);
     std::vector<float> weightsData{
         1.0f, 0.0f, 0.0f,
@@ -742,9 +742,11 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     std::vector<float> inputData(inputInfo.GetNumElements());
     std::vector<float> outputData(outputInfo.GetNumElements());
 
+    TensorInfo inputTensorInfo = runtime.GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
         {
-        {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
+        {0, ConstTensor(inputTensorInfo, inputData.data())}
         };
     OutputTensors outputTensors
         {

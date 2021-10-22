@@ -334,25 +334,57 @@ public:
         this->GetInfo().SetConstant();
     }
 
-    /// Can be implicitly constructed from non-const Tensor.
+    /// ConstTensor implicitly constructed from non-const Tensor.
+    ///
+    /// @param other - reference to a constant Tensor.
+    ///
+    /// @throws InvalidArgumentException when Tensor parameter TensorInfo is non-constant.
     ConstTensor(const Tensor& other) : BaseTensor<const void*>(other.GetInfo(), other.GetMemoryArea())
     {
-        this->GetInfo().SetConstant();
+        if (!this->GetInfo().IsConstant())
+        {
+            throw InvalidArgumentException("Invalid attempt to construct ConstTensor "
+                                           "from Tensor due to non-constant TensorInfo");
+        }
     }
 
     /// Constructor from a backing container.
+    ///
     /// @param container - An stl-like container type which implements data() and size() methods.
     /// Presence of data() and size() is a strong indicator of the continuous memory layout of the container,
     /// which is a requirement for Tensor data. Tensor instances do not claim ownership of referenced memory regions,
     /// that is, no attempt will be made by ArmNN to free these memory regions automatically.
+    ///
+    /// @throws InvalidArgumentException when isConstant parameter of input TensorInfo is false.
     template < template<typename, typename...> class ContainerType, typename T, typename...ContainerArgs >
     ConstTensor(const TensorInfo& info, const ContainerType<T, ContainerArgs...>& container)
         : BaseTensor<const void*>(info, container.data())
     {
-        this->GetInfo().SetConstant();
+        if (!this->GetInfo().IsConstant())
+        {
+            throw InvalidArgumentException("Invalid attempt to construct ConstTensor from non-constant TensorInfo.");
+        }
         if (container.size() * sizeof(T) != info.GetNumBytes())
         {
             throw InvalidArgumentException("Container size is not correct");
+        }
+    }
+
+    /// ConstTensor constructed from TensorInfo and MemoryType template (a raw memory pointer).
+    ///
+    /// @param info - reference to a constant TensorInfo.
+    /// @param memoryArea - Region of CPU-addressable memory where tensor data will be stored. Must be valid while
+    /// workloads are on the fly. Tensor instances do not claim ownership of referenced memory regions, that is,
+    /// no attempt will be made by ArmNN to free these memory regions automatically.
+    ///
+    /// @throws InvalidArgumentException when TensorInfo isConstant parameter is false.
+    template<typename MemoryType>
+    ConstTensor(const TensorInfo& info, MemoryType memoryArea)
+        : BaseTensor<const void*>(info, memoryArea)
+    {
+        if (!this->GetInfo().IsConstant())
+        {
+            throw InvalidArgumentException("Invalid attempt to construct ConstTensor from non-constant TensorInfo.");
         }
     }
 };

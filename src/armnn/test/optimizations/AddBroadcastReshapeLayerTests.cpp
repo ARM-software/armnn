@@ -290,7 +290,7 @@ TEST_CASE("ReshapeParentConstLayerTest")
 {
     Graph graph;
     const TensorInfo info0({ 1, 2, 3, 5 }, DataType::QAsymmU8);
-    const TensorInfo info1({ 5 }, DataType::QAsymmU8);
+    const TensorInfo info1({ 5 }, DataType::QAsymmU8, 0.0f, 0, true);
     const TensorInfo outputInfo({ 1, 2, 3, 5 }, DataType::QAsymmU8);
 
     auto input = graph.AddLayer<InputLayer>(0, "input");
@@ -346,7 +346,7 @@ TEST_CASE("ReshapeParentConstAddLayerMultipleConnectionsTest")
     // What we'll do is have two sequential add layers both using the same const tensor.
     Graph graph;
     const TensorInfo inputInfo({ 1, 512 }, DataType::Float32);
-    const TensorInfo constantTermInfo({ 1 }, DataType::Float32);
+    const TensorInfo constantTermInfo({ 1 }, DataType::Float32, 0.0f, 0, true);
     const TensorInfo outputInfo({ 1, 512 }, DataType::Float32);
 
     auto input = graph.AddLayer<InputLayer>(0, "input");

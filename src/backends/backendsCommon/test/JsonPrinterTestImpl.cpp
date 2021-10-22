@@ -177,9 +177,11 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
         };
     std::vector<uint8_t> outputData(5);
 
+    TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo2.SetConstant(true);
     armnn::InputTensors inputTensors
         {
-            {0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}
+            {0, armnn::ConstTensor(inputTensorInfo2, inputData.data())}
         };
     armnn::OutputTensors outputTensors
         {

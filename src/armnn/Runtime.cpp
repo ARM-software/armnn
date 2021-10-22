@@ -67,12 +67,12 @@ Status IRuntime::LoadNetwork(NetworkId& networkIdOut,
     return pRuntimeImpl->LoadNetwork(networkIdOut, std::move(network), errorMessage, networkProperties);
 }
 
-TensorInfo IRuntime::GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const
+armnn::TensorInfo IRuntime::GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const
 {
     return pRuntimeImpl->GetInputTensorInfo(networkId, layerId);
 }
 
-TensorInfo IRuntime::GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const
+armnn::TensorInfo IRuntime::GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const
 {
     return pRuntimeImpl->GetOutputTensorInfo(networkId, layerId);
 }

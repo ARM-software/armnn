@@ -405,7 +405,9 @@ void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
     armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
 
     std::vector<float> weightsVector(90);
-    armnn::ConstTensor weights(armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32), weightsVector);
+    armnn::ConstTensor weights(
+            armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32, 0.0f, 0, true),
+            weightsVector);
 
     Convolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
@@ -455,7 +457,9 @@ void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputSh
     armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
 
     std::vector<float> weightsVector(18);
-    armnn::ConstTensor weights(armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32), weightsVector);
+    armnn::ConstTensor weights(
+            armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32, 0.0f, 0, true),
+            weightsVector);
 
     DepthwiseConvolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
@@ -653,7 +657,7 @@ TEST_CASE("DetectionPostProcessValidateTensorShapes")
     armnn::TensorInfo boxEncodingsInfo({1, 10, 4}, DataType::QAsymmU8);
     armnn::TensorInfo scoresInfo({1, 10, 4}, DataType::QAsymmU8);
     std::vector<uint8_t> anchorsVector(40);
-    armnn::ConstTensor anchors(armnn::TensorInfo({10, 4}, armnn::DataType::QAsymmU8), anchorsVector);
+    armnn::ConstTensor anchors(armnn::TensorInfo({10, 4}, armnn::DataType::QAsymmU8, 0.0f, 0, true), anchorsVector);
 
     armnn::TensorInfo detectionBoxesInfo({1, 3, 4}, DataType::QAsymmU8);
     armnn::TensorInfo detectionScoresInfo({1, 3}, DataType::QAsymmU8);
@@ -833,16 +837,16 @@ TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
     TensorInfo outputInfo(4, outputDimensionSizes, DataType::Float32);
 
     std::vector<float> weightsVector = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-    ConstTensor weights(TensorInfo(4, weightsDimensionSizes, DataType::Float32), weightsVector);
+    ConstTensor weights(TensorInfo(4, weightsDimensionSizes, DataType::Float32, 0.0f, 0, true), weightsVector);
 
     std::vector<float> betaVector     = { 0.1f };
     std::vector<float> gammaVector    = { 0.5f };
     std::vector<float> meanVector     = { 0 };
     std::vector<float> varianceVector = { 1 };
-    ConstTensor beta(TensorInfo(1, outputChannelSize, DataType::Float32), betaVector);
-    ConstTensor gamma(TensorInfo(1, outputChannelSize, DataType::Float32), gammaVector);
-    ConstTensor mean(TensorInfo(1, outputChannelSize, DataType::Float32), meanVector);
-    ConstTensor variance(TensorInfo(1, outputChannelSize, DataType::Float32), varianceVector);
+    ConstTensor beta(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), betaVector);
+    ConstTensor gamma(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), gammaVector);
+    ConstTensor mean(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), meanVector);
+    ConstTensor variance(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), varianceVector);
 
     // Define the network
     Graph graph;
@@ -863,7 +867,7 @@ TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
     if (convolution2dDescriptor.m_BiasEnabled)
     {
         std::vector<float> biasVector = { 11 };
-        ConstTensor bias(TensorInfo(1, outputChannelSize, DataType::Float32), biasVector);
+        ConstTensor bias(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), biasVector);
         conv->m_Bias = std::make_unique<ScopedTensorHandle>(bias);
     }
 

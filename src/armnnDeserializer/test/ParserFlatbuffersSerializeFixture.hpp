@@ -215,6 +215,7 @@ void ParserFlatbuffersSerializeFixture::RunTest(
     {
         armnn::BindingPointInfo bindingInfo = ConvertBindingInfo(
             m_Parser->GetNetworkInputBindingInfo(layersId, it.first));
+        bindingInfo.second.SetConstant(true);
         armnn::VerifyTensorInfoDataType(bindingInfo.second, ArmnnInputType);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }

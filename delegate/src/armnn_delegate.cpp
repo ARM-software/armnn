@@ -422,7 +422,9 @@ TfLiteStatus ArmnnSubgraph::Invoke(TfLiteContext* tfLiteContext, TfLiteNode* tfL
         if (tensor->allocation_type != kTfLiteMmapRo)
         {
             const armnn::BindingPointInfo& inputBinding = m_InputBindings[inputIndex];
-            const armnn::ConstTensor inputTensor(inputBinding.second, tensor->data.data);
+            armnn::TensorInfo inputTensorInfo = inputBinding.second;
+            inputTensorInfo.SetConstant(true);
+            const armnn::ConstTensor inputTensor(inputTensorInfo, tensor->data.data);
             inputTensors.emplace_back(inputIdx, inputTensor);
 
             ++inputIndex;

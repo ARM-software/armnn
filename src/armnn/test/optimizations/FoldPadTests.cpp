@@ -45,7 +45,7 @@ TEST_CASE("FoldPadLayerIntoConvolution2dLayer")
     convolution2dDescriptor.m_DataLayout  = DataLayout::NHWC;
 
     std::vector<float> weightsVector(18);
-    ConstTensor        weights(TensorInfo(4, weightsShape, DataType::Float32), weightsVector);
+    ConstTensor        weights(TensorInfo(4, weightsShape, DataType::Float32, 0.0f, 0, true), weightsVector);
 
     Convolution2dLayer* conv2dLayer = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "conv2d");
     conv2dLayer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
@@ -122,7 +122,7 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConvolution2dLayer")
     depthwiseConvolution2dDescriptor.m_DataLayout  = DataLayout::NHWC;
 
     std::vector<float> weightsVector(18);
-    ConstTensor        weights(TensorInfo(4, weightsShape, DataType::Float32), weightsVector);
+    ConstTensor        weights(TensorInfo(4, weightsShape, DataType::Float32, 0.0f, 0, true), weightsVector);
 
     auto* depthwiseConv2dLayer = graph.AddLayer<DepthwiseConvolution2dLayer>(depthwiseConvolution2dDescriptor,
                                                                              "depthwiseConv2d");
@@ -526,7 +526,9 @@ TEST_CASE("FoldPadLayerIntoPooling2dLayer_ExecuteInferenceWithAndWithoutOptimiza
         NetworkId            networkIdentifier;
         CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
 
-        InputTensors inputTensors{{0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}};
+        TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+        inputTensorInfo.SetConstant(true);
+        InputTensors inputTensors{{0, ConstTensor(inputTensorInfo, inputData.data())}};
 
         // Set the initial values of the data to different values to the golden data just in case the inference fails.
         std::vector<float> optimizedData(32, -std::numeric_limits<float>::infinity());
@@ -614,10 +616,10 @@ TEST_CASE("FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutOptimizatio
                                               11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
                                               21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
                                               31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42};
-        TensorInfo            weightsInfo(4, weightsShape, DataType::Float32);
+        TensorInfo            weightsInfo(4, weightsShape, DataType::Float32, 0.0f, 0, true);
         ConstTensor           weights(weightsInfo, weightsData);
         std::vector<float>    biasVector   = {5, 6, 7, 8};
-        TensorInfo            biasInfo({4}, DataType::Float32);
+        TensorInfo            biasInfo({4}, DataType::Float32, 0.0f, 0, true);
         ConstTensor           bias(biasInfo, biasVector);
         Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
 
@@ -644,7 +646,9 @@ TEST_CASE("FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutOptimizatio
         NetworkId            networkIdentifier;
         CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
 
-        InputTensors inputTensors{{0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}};
+        TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+        inputTensorInfo.SetConstant(true);
+        InputTensors inputTensors{{0, ConstTensor(inputTensorInfo, inputData.data())}};
 
         // Set the initial values of the data to different values to the golden data just in case the inference fails.
         std::vector<float> optimizedData(100, -std::numeric_limits<float>::infinity());
@@ -732,10 +736,10 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOp
                                               11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
                                               21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
                                               31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42};
-        TensorInfo            weightsInfo(4, weightsShape, DataType::Float32);
+        TensorInfo            weightsInfo(4, weightsShape, DataType::Float32, 0.0f, 0, true);
         ConstTensor           weights(weightsInfo, weightsData);
         std::vector<float>    biasVector   = {5, 6, 7, 8, 9, 10, 11, 12, 5, 6, 7, 8};
-        TensorInfo            biasInfo({12}, DataType::Float32);
+        TensorInfo            biasInfo({12}, DataType::Float32, 0.0f, 0, true);
         ConstTensor           bias(biasInfo, biasVector);
         Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
 
@@ -762,7 +766,9 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOp
         NetworkId            networkIdentifier;
         CHECK(run->LoadNetwork(networkIdentifier, std::move(optimizedNetwork)) == Status::Success);
 
-        InputTensors inputTensors{{0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}};
+        TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+        inputTensorInfo.SetConstant(true);
+        InputTensors inputTensors{{0, ConstTensor(inputTensorInfo, inputData.data())}};
 
         // Set the initial values of the data to different values to the golden data just in case the inference fails.
         std::vector<float> optimizedData(300, -std::numeric_limits<float>::infinity());

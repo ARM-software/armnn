@@ -62,8 +62,10 @@ void AsyncThreadedEndToEndTestImpl(INetworkPtr network,
         inputTensors.reserve(inputTensorData.size());
         for (auto&& it : inputTensorData[i])
         {
+            TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(networkId, it.first);
+            inputTensorInfo.SetConstant(true);
             inputTensors.push_back({it.first,
-                                    ConstTensor(runtime->GetInputTensorInfo(networkId, it.first), it.second.data())});
+                                    ConstTensor(inputTensorInfo, it.second.data())});
         }
 
         outputTensors.reserve(expectedOutputData.size());
@@ -146,8 +148,10 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
     inputTensors.reserve(inputTensorData.size());
     for (auto&& it : inputTensorData)
     {
+        TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(networkId, it.first);
+        inputTensorInfo.SetConstant(true);
         inputTensors.push_back({it.first,
-                                ConstTensor(runtime->GetInputTensorInfo(networkId, it.first), it.second.data())});
+                                ConstTensor(inputTensorInfo, it.second.data())});
     }
 
     OutputTensors outputTensors;

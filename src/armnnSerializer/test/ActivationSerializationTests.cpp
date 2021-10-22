@@ -84,9 +84,11 @@ TEST_CASE("ActivationSerialization")
     run->LoadNetwork(networkIdentifier, std::move(deserializedOptimized));
 
     std::vector<float> inputData {0.0f, -5.3f, 42.0f, -42.0f};
+    armnn::TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo.SetConstant(true);
     armnn::InputTensors inputTensors
     {
-        {0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}
+        {0, armnn::ConstTensor(inputTensorInfo, inputData.data())}
     };
 
     std::vector<float> expectedOutputData {0.0f, 0.0f, 42.0f, 0.0f};

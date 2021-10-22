@@ -68,10 +68,10 @@ void TransposeConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     const float   qScale  = IsQuantizedType<T>() ? 0.25f : 1.0f;
     const int32_t qOffset = IsQuantizedType<T>() ? 50    : 0;
 
-    TensorInfo inputInfo(inputShape, ArmnnType, qScale, qOffset);
+    TensorInfo inputInfo(inputShape, ArmnnType, qScale, qOffset, true);
     TensorInfo outputInfo(outputShape, ArmnnType, qScale, qOffset);
-    TensorInfo weightsInfo(weightsShape, ArmnnType, qScale, qOffset);
-    TensorInfo biasesInfo({ channels }, ArmnnBType, qScale * qScale, 0);
+    TensorInfo weightsInfo(weightsShape, ArmnnType, qScale, qOffset, true);
+    TensorInfo biasesInfo({ channels }, ArmnnBType, qScale * qScale, 0, true);
 
     std::vector<float> inputData =
     {

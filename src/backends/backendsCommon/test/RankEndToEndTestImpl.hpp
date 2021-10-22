@@ -46,7 +46,7 @@ void RankEndToEnd(const std::vector<armnn::BackendId>& backends)
 
     std::vector<int32_t> expectedOutputData{ 4 };
 
-    TensorInfo inputInfo ({ 1, 1, 5, 3 }, ArmnnType);
+    TensorInfo inputInfo ({ 1, 1, 5, 3 }, ArmnnType, 0.0f, 0, true);
     TensorShape outputShape (Dimensionality::Scalar);
     TensorInfo outputInfo(outputShape, DataType::Signed32);
 

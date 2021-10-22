@@ -52,8 +52,8 @@ public:
                        std::string& errorMessage,
                        const INetworkProperties& networkProperties);
 
-    TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
-    TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
+    armnn::TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
+    armnn::TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
     std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors);
     std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors);

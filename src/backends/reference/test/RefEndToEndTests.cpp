@@ -133,9 +133,11 @@ TEST_CASE("Unsigned8")
     };
     std::vector<uint8_t> outputData(5);
 
+    TensorInfo inputTensorInfo2 = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo2.SetConstant(true);
     armnn::InputTensors inputTensors
     {
-        {0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}
+        {0, armnn::ConstTensor(inputTensorInfo2, inputData.data())}
     };
     armnn::OutputTensors outputTensors
     {
@@ -199,10 +201,12 @@ TEST_CASE("TrivialAdd")
     };
     std::vector<float> outputData(12);
 
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
     {
-        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input1Data.data())},
-        {1,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input2Data.data())}
+        {0,armnn::ConstTensor(inputTensorInfo, input1Data.data())},
+        {1,armnn::ConstTensor(inputTensorInfo, input2Data.data())}
     };
     OutputTensors outputTensors
     {
@@ -293,9 +297,11 @@ TEST_CASE("MultipleOutputs")
     std::vector<float> output2Data(inputData.size());
     std::vector<float> output3Data(inputData.size());
 
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
     {
-        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())}
+        {0,armnn::ConstTensor(inputTensorInfo, inputData.data())}
     };
     OutputTensors outputTensors
     {
@@ -357,10 +363,12 @@ TEST_CASE("TrivialMin")
         };
     std::vector<float> outputData(4);
 
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
         {
-            {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input1Data.data())},
-            {1,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), input2Data.data())}
+            {0,armnn::ConstTensor(inputTensorInfo, input1Data.data())},
+            {1,armnn::ConstTensor(inputTensorInfo, input2Data.data())}
         };
     OutputTensors outputTensors
         {

@@ -82,10 +82,13 @@ void DetectionPostProcessEndToEnd(const std::vector<BackendId>& backends, bool u
 
     boxEncodingsInfo.SetQuantizationScale(boxScale);
     boxEncodingsInfo.SetQuantizationOffset(boxOffset);
+    boxEncodingsInfo.SetConstant(true);
     scoresInfo.SetQuantizationScale(scoreScale);
     scoresInfo.SetQuantizationOffset(scoreOffset);
+    scoresInfo.SetConstant(true);
     anchorsInfo.SetQuantizationScale(anchorScale);
     anchorsInfo.SetQuantizationOffset(anchorOffset);
+    anchorsInfo.SetConstant(true);
 
     // Builds up the structure of the network
     armnn::INetworkPtr net = CreateDetectionPostProcessNetwork<T>(boxEncodingsInfo, scoresInfo,

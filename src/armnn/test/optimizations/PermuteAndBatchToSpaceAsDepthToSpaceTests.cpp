@@ -232,7 +232,7 @@ TEST_CASE("PermuteAndBatchToSpaceAsDepthToSpaceCorrectnessTest")
         -1.0f, -2.0f, -3.0f, -4.0f,    -10.0f, -20.0f, -30.0f, -40.0f,     -100.0f, -200.0f, -300.0f, -400.0f,
         // clang-format on
     };
-    ConstTensor input(TensorInfo({ 1, 2, 3, 4 }, DataType::Float32), inputData);
+    ConstTensor input(TensorInfo({ 1, 2, 3, 4 }, DataType::Float32, 0.0f, 0, true), inputData);
     InputTensors inputs = { { 0, input } };
     std::vector<float> outputData(4 * 6);
     Tensor output(TensorInfo({ 1, 4, 6, 1 }, DataType::Float32), outputData.data());
@@ -279,7 +279,7 @@ TEST_CASE("TransposeAndBatchToSpaceAsDepthToSpaceCorrectnessTest")
             -1.0f, -2.0f, -3.0f, -4.0f,    -10.0f, -20.0f, -30.0f, -40.0f,     -100.0f, -200.0f, -300.0f, -400.0f,
             // clang-format on
     };
-    ConstTensor input(TensorInfo({ 1, 2, 3, 4 }, DataType::Float32), inputData);
+    ConstTensor input(TensorInfo({ 1, 2, 3, 4 }, DataType::Float32, 0.0f, 0, true), inputData);
     InputTensors inputs = { { 0, input } };
     std::vector<float> outputData(4 * 6);
     Tensor output(TensorInfo({ 1, 4, 6, 1 }, DataType::Float32), outputData.data());

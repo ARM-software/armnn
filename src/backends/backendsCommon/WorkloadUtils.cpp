@@ -33,7 +33,7 @@ armnn::ConstTensor PermuteTensor(const ConstTensorHandle* tensor,
     {
         ::memcpy(permuteBuffer, tensor->GetConstTensor<void>(), tensorInfo.GetNumBytes());
     }
-
+    tensorInfo.SetConstant(true);
     return ConstTensor(tensorInfo, permuteBuffer);
 }
 

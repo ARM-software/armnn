@@ -52,7 +52,7 @@ void FillEndToEnd(const std::vector<armnn::BackendId>& backends)
     };
     std::vector<T> expectedOutputData = armnnUtils::QuantizedVector<T>(floatExpectedOutputData);
 
-    TensorInfo inputInfo ({ 4 }, DataType::Signed32);
+    TensorInfo inputInfo ({ 4 }, DataType::Signed32, 0.0f, 0, true);
     TensorInfo outputInfo({ 1, 1, 5, 3 }, ArmnnType);
 
     armnn::INetworkPtr network = CreateFillNetwork(inputInfo, outputInfo, descriptor);

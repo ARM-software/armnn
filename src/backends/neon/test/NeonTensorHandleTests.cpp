@@ -419,8 +419,10 @@ TEST_CASE("SplitteronXorYNoPaddingRequiredTest")
     inputTensors.reserve(inputTensorData.size());
     for (auto&& it : inputTensorData)
     {
+        TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(networkIdentifier, it.first);
+        inputTensorInfo.SetConstant(true);
         inputTensors.push_back({it.first,
-                              ConstTensor(runtime->GetInputTensorInfo(networkIdentifier, it.first), it.second.data())});
+                              ConstTensor(inputTensorInfo, it.second.data())});
     }
     OutputTensors outputTensors;
     outputTensors.reserve(expectedOutputData.size());
@@ -594,8 +596,10 @@ TEST_CASE("SplitteronXorYPaddingRequiredTest")
     inputTensors.reserve(inputTensorData.size());
     for (auto&& it : inputTensorData)
     {
+        TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(networkIdentifier, it.first);
+        inputTensorInfo.SetConstant(true);
         inputTensors.push_back({it.first,
-                              ConstTensor(runtime->GetInputTensorInfo(networkIdentifier, it.first), it.second.data())});
+                                ConstTensor(inputTensorInfo, it.second.data())});
     }
     OutputTensors outputTensors;
     outputTensors.reserve(expectedOutputData.size());

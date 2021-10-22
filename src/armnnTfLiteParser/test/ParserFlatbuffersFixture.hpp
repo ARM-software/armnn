@@ -303,6 +303,7 @@ void ParserFlatbuffersFixture::FillInputTensors(
     for (auto&& it : inputData)
     {
         armnn::BindingPointInfo bindingInfo = m_Parser->GetNetworkInputBindingInfo(subgraphId, it.first);
+        bindingInfo.second.SetConstant(true);
         armnn::VerifyTensorInfoDataType(bindingInfo.second, dataType);
         inputTensors.push_back({ bindingInfo.first, armnn::ConstTensor(bindingInfo.second, it.second.data()) });
     }

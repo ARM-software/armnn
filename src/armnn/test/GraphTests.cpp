@@ -601,7 +601,7 @@ TEST_CASE("CheckGraphConstTensorSharing")
         armnn::ConstantLayer* const constantLayer = graph1.AddLayer<armnn::ConstantLayer>("ConstantLayer");
 
         float weight = 1.0f;
-        armnn::ConstTensor constTensor({{ 1, 1 }, armnn::DataType::Float32}, &weight);
+        armnn::ConstTensor constTensor({{ 1, 1 }, armnn::DataType::Float32, 0.0f, 0, true}, &weight);
         constantLayer->m_LayerOutput = std::make_shared<armnn::ScopedTensorHandle>(constTensor);;
 
         // point sharedWeightPtr to graph1's const tensor

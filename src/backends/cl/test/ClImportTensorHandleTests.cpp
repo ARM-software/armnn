@@ -171,9 +171,11 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClImportEndToEnd")
     auto* outputPtr = reinterpret_cast<float*>(alignedOutputPtr);
     std::fill_n(outputPtr, numElements, -10.0f);
 
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
     {
-        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), alignedInputPtr)},
+        {0,armnn::ConstTensor(inputTensorInfo, alignedInputPtr)},
     };
     OutputTensors outputTensors
     {

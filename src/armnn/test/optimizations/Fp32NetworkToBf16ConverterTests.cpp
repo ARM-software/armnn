@@ -59,12 +59,12 @@ TEST_CASE("Fp32NetworkToBf16OptimizationConv2DTest")
                                     -3.1055E+29f, // 0xF07ADC3C Round up
                                     -9.149516E-10f // 0xB07B7FFF Round down
                                    };
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32), floatWeights);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), floatWeights);
 
     // Create const bias fp32 data
     unsigned int biasDims[] {4};
     std::vector<float> floatBias{ 1.0f, 2.0f, 3.0f, 4.0f };
-    armnn::ConstTensor bias(armnn::TensorInfo(1, biasDims, armnn::DataType::Float32), floatBias);
+    armnn::ConstTensor bias(armnn::TensorInfo(1, biasDims, armnn::DataType::Float32, 0.0f, 0, true), floatBias);
 
     // A network with Convolution2d layer
     auto input = graph.AddLayer<armnn::InputLayer>(0, "input");
@@ -129,12 +129,12 @@ TEST_CASE("Fp32NetworkToBf16OptimizationFullyConnectedTest")
                                     -3.1055E+29f, // 0xF07ADC3C Round up
                                     -9.149516E-10f // 0xB07B7FFF Round down
                                    };
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32), floatWeights);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), floatWeights);
 
     // Create const bias fp32 data
     unsigned int biasDims[] {4};
     std::vector<float> floatBias{ 1.0f, 2.0f, 3.0f, 4.0f };
-    armnn::ConstTensor bias(armnn::TensorInfo(1, biasDims, armnn::DataType::Float32), floatBias);
+    armnn::ConstTensor bias(armnn::TensorInfo(1, biasDims, armnn::DataType::Float32, 0.0f, 0, true), floatBias);
 
     // A network with FullyConnected layer
     auto input = graph.AddLayer<armnn::InputLayer>(0, "input");

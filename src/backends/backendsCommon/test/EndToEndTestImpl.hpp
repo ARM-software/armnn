@@ -79,7 +79,8 @@ bool ConstantUsageTest(const std::vector<BackendId>& computeDevice,
 
 inline bool ConstantUsageFloat32Test(const std::vector<BackendId>& backends)
 {
-    const TensorInfo commonTensorInfo({ 2, 3 }, DataType::Float32);
+    TensorInfo commonTensorInfo({ 2, 3 }, DataType::Float32);
+    commonTensorInfo.SetConstant(true);
 
     return ConstantUsageTest(backends,
         commonTensorInfo,
@@ -98,6 +99,7 @@ inline bool ConstantUsageUint8Test(const std::vector<BackendId>& backends)
 
     commonTensorInfo.SetQuantizationScale(scale);
     commonTensorInfo.SetQuantizationOffset(offset);
+    commonTensorInfo.SetConstant(true);
 
     return ConstantUsageTest(backends,
         commonTensorInfo,
@@ -198,7 +200,7 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
     input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
@@ -263,7 +265,7 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
@@ -334,7 +336,7 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
@@ -418,7 +420,7 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // optimize the network
@@ -449,6 +451,7 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     };
 
     INFO("Create Network");
+
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -507,7 +510,7 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // optimize the network
@@ -536,6 +539,7 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     };
 
     INFO("Create Network");
+
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -594,7 +598,7 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     input->GetOutputSlot(0).Connect(pooling->GetInputSlot(0));
     pooling->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
@@ -624,6 +628,7 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     };
 
     INFO("Create Network");
+
     InputTensors inputTensors
     {
         {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
@@ -685,7 +690,7 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
     activation->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
     activation->GetOutputSlot(0).Connect(output1->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32, 0.0f, 0, true));
     activation->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
 
     // Optimize the network
@@ -794,7 +799,7 @@ inline void StridedSliceInvalidSliceEndToEndTest(std::vector<BackendId> backends
     input->GetOutputSlot(0).Connect(stridedSlice->GetInputSlot(0));
     stridedSlice->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
 
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 2, 3 }, DataType::Float32));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 2, 3 }, DataType::Float32, 0.0f, 0, true));
     stridedSlice->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 3 }, DataType::Float32));
 
     // Attempt to optimize the network and check that the correct exception is thrown

@@ -66,7 +66,7 @@ struct Convolution2dTest
                                              21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
                                              31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42};
         std::vector<T>     weightsVector = armnnUtils::QuantizedVector<T>(weightsData, scale, offset);
-        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset);
+        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
         ConstTensor        weights(weightsInfo, weightsVector);
         Optional<ConstTensor> optionalBias;
 
@@ -115,7 +115,7 @@ public:
                                             21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
                                             31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42};
         std::vector<T>     weightsVector = armnnUtils::QuantizedVector<T>(weightsData, scale, offset);
-        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset);
+        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
         ConstTensor        weights(weightsInfo, weightsVector);
         Optional<ConstTensor> optionalBias;
 
@@ -212,10 +212,10 @@ public:
         std::vector<T> varianceVector = GetVector<T>(GetOutputShape()[3], 1.0f, 0.1f);
 
         const unsigned int outputChannelSize[] = { GetOutputShape()[3] };
-        ConstTensor beta(TensorInfo(1, outputChannelSize, ArmnnType), betaVector);
-        ConstTensor gamma(TensorInfo(1, outputChannelSize, ArmnnType), gammaVector);
-        ConstTensor mean(TensorInfo(1, outputChannelSize, ArmnnType), meanVector);
-        ConstTensor variance(TensorInfo(1, outputChannelSize, ArmnnType), varianceVector);
+        ConstTensor beta(TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), betaVector);
+        ConstTensor gamma(TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), gammaVector);
+        ConstTensor mean(TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), meanVector);
+        ConstTensor variance(TensorInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true), varianceVector);
 
         return network->AddBatchNormalizationLayer(descriptor, mean, variance, beta, gamma, name);
     }
@@ -491,8 +491,11 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
     std::vector<T> inputDataFused = armnnUtils::QuantizedVector<T>(data, scale, offset);
     std::vector<T> outputDataFused(LayerTest::outputSize);
 
+    armnn::TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo.SetConstant(true);
+
     InputTensors  inputTensorsFused{
-        {0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputDataFused.data())}};
+        {0, ConstTensor(inputTensorInfo, inputDataFused.data())}};
     OutputTensors outputTensorsFused{
         {0, Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputDataFused.data())}};
 
@@ -545,8 +548,11 @@ void FuseActivationIntoPreviousLayerTest(ActivationDescriptor activationDescript
     std::vector<T> outputDataNotFused(LayerTest::outputSize);
     std::vector<T> outputData2NotFused(LayerTest::outputSize);
 
+    TensorInfo inputTensorInfoNotFused = runNotFused->GetInputTensorInfo(networkIdentifierNotFused, 0);
+    inputTensorInfoNotFused.SetConstant(true);
+
     InputTensors  inputTensorsNotFused{
-        {0, ConstTensor(runNotFused->GetInputTensorInfo(networkIdentifierNotFused, 0), inputDataNotFused.data())}};
+        {0, ConstTensor(inputTensorInfoNotFused, inputDataNotFused.data())}};
     OutputTensors outputTensorsNotFused{
         {0, Tensor(runNotFused->GetOutputTensorInfo(networkIdentifierNotFused, 0), outputDataNotFused.data())},
         {1, Tensor(runNotFused->GetOutputTensorInfo(networkIdentifierNotFused, 1), outputData2NotFused.data())}};
@@ -591,8 +597,11 @@ bool FuseActivationSimpleTest(ActivationDescriptor activationDescriptor, Compute
         std::vector<T>     inputDataFused = armnnUtils::QuantizedVector<T>(data, scale, offset);
         std::vector<T>     outputDataFused(LayerTest::outputSize);
 
+        TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+        inputTensorInfo.SetConstant(true);
+
         InputTensors  inputTensorsFused{
-            {0, ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputDataFused.data())}};
+            {0, ConstTensor(inputTensorInfo, inputDataFused.data())}};
         OutputTensors outputTensorsFused{
             {0, Tensor(run->GetOutputTensorInfo(networkIdentifier, 0), outputDataFused.data())}};
 

@@ -2052,7 +2052,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     // ArmNN weights tensor shape is OIHW (out channels, in channels, height, width) for NCHW
     // ArmNN weights tensor shape is OHWI (out channels, height, width, in channels) for NHWC
     // this test is using NHWC, so the weights shape is OHWI
-    TensorInfo weightsTensorInfo(TensorShape({16, 1, 1, 16}), dataType, 0.9f, 0);
+    TensorInfo weightsTensorInfo(TensorShape({16, 1, 1, 16}), dataType, 0.9f, 0, true);
     unsigned int weightsLength = weightsTensorInfo.GetNumElements();
 
     using WeightType = armnn::ResolveType<dataType>;
@@ -2079,7 +2079,7 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
         constexpr armnn::DataType biasDataType = ( dataType == armnn::DataType::QAsymmU8) ?
             armnn::DataType::Signed32 : armnn::DataType::Float32;
 
-        TensorInfo biasTensorInfo(TensorShape({16}), biasDataType, 0.9f * 0.9f, 0);
+        TensorInfo biasTensorInfo(TensorShape({16}), biasDataType, 0.9f * 0.9f, 0, true);
         unsigned int biasLength = biasTensorInfo.GetNumElements();
 
         using BiasType = armnn::ResolveType<biasDataType>;

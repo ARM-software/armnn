@@ -39,7 +39,7 @@ INetworkPtr CreateConcatNetwork(const std::vector<TensorShape>& inputShapes,
 
     for (unsigned int i = 0; i < inputShapes.size(); ++i)
     {
-        TensorInfo inputTensorInfo(inputShapes[i], DataType, qScale, qOffset);
+        TensorInfo inputTensorInfo(inputShapes[i], DataType, qScale, qOffset, true);
         IConnectableLayer* input = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(i));
         Connect(input, concat, inputTensorInfo, 0, i);
     }

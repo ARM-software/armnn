@@ -51,8 +51,10 @@ void PreluEndToEnd(const std::vector<BackendId>& backends,
 
     inputInfo.SetQuantizationOffset(qOffset);
     inputInfo.SetQuantizationScale(qScale);
+    inputInfo.SetConstant(true);
     alphaInfo.SetQuantizationOffset(qOffset);
     alphaInfo.SetQuantizationScale(qScale);
+    alphaInfo.SetConstant(true);
     outputInfo.SetQuantizationOffset(qOffset);
     outputInfo.SetQuantizationScale(qScale);
 

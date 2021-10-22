@@ -43,6 +43,7 @@ void DequantizeEndToEndLayerTestImpl(const std::vector<BackendId>& backends,
 
     inputInfo.SetQuantizationScale(scale);
     inputInfo.SetQuantizationOffset(offset);
+    inputInfo.SetConstant(true);
 
     // Builds up the structure of the network
     armnn::INetworkPtr net = CreateDequantizeNetwork<T>(inputInfo, outputInfo);

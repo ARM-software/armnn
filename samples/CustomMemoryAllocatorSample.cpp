@@ -78,7 +78,7 @@ int main()
     INetworkPtr myNetwork = INetwork::Create();
     armnn::FullyConnectedDescriptor fullyConnectedDesc;
     float weightsData[] = {1.0f}; // Identity
-    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32);
+    TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32, 0.0f, 0, true);
     weightsInfo.SetConstant(true);
     armnn::ConstTensor weights(weightsInfo, weightsData);
     ARMNN_NO_DEPRECATE_WARN_BEGIN
@@ -152,10 +152,11 @@ int main()
     auto* outputPtr = reinterpret_cast<float*>(alignedOutputPtr);
     std::fill_n(outputPtr, numElements, -10.0f);
 
-
+    inputTensorInfo = runtime->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo.SetConstant(true);
     armnn::InputTensors inputTensors
     {
-        {0, armnn::ConstTensor(runtime->GetInputTensorInfo(networkIdentifier, 0), alignedInputPtr)},
+        {0, armnn::ConstTensor(inputTensorInfo, alignedInputPtr)},
     };
     armnn::OutputTensors outputTensors
     {

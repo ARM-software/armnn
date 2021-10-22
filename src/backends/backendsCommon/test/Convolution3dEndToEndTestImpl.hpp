@@ -56,7 +56,7 @@ void Convolution3dEndToEnd(const std::vector<armnn::BackendId>& backends,
     const float   qScale  = IsQuantizedType<T>() ? 0.25f : 1.0f;
     const int32_t qOffset = IsQuantizedType<T>() ? 50    : 0;
 
-    TensorInfo inputInfo({ 1, 5, 5, 5, 1 }, ArmnnType, qScale, qOffset);
+    TensorInfo inputInfo({ 1, 5, 5, 5, 1 }, ArmnnType, qScale, qOffset, true);
     TensorInfo outputInfo({ 1, 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
     TensorInfo weightsInfo({ 3, 3, 3, 1, 1 }, ArmnnType, qScale, qOffset, true);
     TensorInfo biasesInfo({ 1 }, ArmnnBType, qScale * qScale, 0, true);

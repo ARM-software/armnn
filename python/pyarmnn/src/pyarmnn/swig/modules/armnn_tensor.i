@@ -111,7 +111,8 @@ public:
     TensorInfo(const TensorInfo& other);
 
     TensorInfo(const TensorShape& shape, DataType dataType,
-        float quantizationScale = 0.0f, int32_t quantizationOffset = 0);
+        float quantizationScale = 0.0f, int32_t quantizationOffset = 0,
+        bool isConstant = False);
 
     %feature("docstring",
     "
@@ -223,6 +224,26 @@ public:
     ") IsQuantized;
     bool IsQuantized() const;
 
+    %feature("docstring",
+    "
+    Returns true if the tensor info is constant.
+
+    Returns:
+        bool: True if the tensor info is constant.
+
+    ") IsConstant;
+    bool IsConstant() const;
+
+    %feature("docstring",
+    "
+    Sets the tensor info to be constant.
+    
+    Args:
+        IsConstant (bool): Sets tensor info to constant.
+
+    ") SetConstant;
+    void SetConstant(const bool IsConstant = True);
+
 
 
     %feature("docstring",
@@ -254,6 +275,7 @@ public:
                         + ", IsQuantized: " + std::to_string($self->IsQuantized())
                         + ", QuantizationScale: " + std::to_string( $self->GetQuantizationScale())
                         + ", QuantizationOffset: " + std::to_string($self->GetQuantizationOffset())
+                        + ", IsConstant: " + std::to_string($self->IsConstant())
                         + ", NumDimensions: " + std::to_string($self->GetNumDimensions())
                         + ", NumElements: " + std::to_string($self->GetNumElements()) + "}";
         return tmp;

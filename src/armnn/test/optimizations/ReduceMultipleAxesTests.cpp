@@ -94,9 +94,11 @@ void ReduceWithMultipleAxesTest(INetworkPtr& network,
 
     // Create input and output tensors
     std::vector<float> outputData(expectedOutput.size());
+    armnn::TensorInfo inputTensorInfo = run->GetInputTensorInfo(networkIdentifier, 0);
+    inputTensorInfo.SetConstant(true);
     InputTensors inputTensors
         {
-            {0, armnn::ConstTensor(run->GetInputTensorInfo(networkIdentifier, 0), inputData.data())}
+            {0, armnn::ConstTensor(inputTensorInfo, inputData.data())}
         };
     OutputTensors outputTensors
         {

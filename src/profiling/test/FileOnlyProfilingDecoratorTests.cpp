@@ -90,9 +90,11 @@ TEST_CASE("TestFileOnlyProfiling")
             outputData[i] = 3.0;
         }
 
+        TensorInfo inputTensorInfo = runtime.GetInputTensorInfo(netId, 0);
+        inputTensorInfo.SetConstant(true);
         InputTensors inputTensors
         {
-            {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
+            {0, ConstTensor(inputTensorInfo, inputData.data())}
         };
         OutputTensors outputTensors
         {
@@ -213,9 +215,11 @@ TEST_CASE("DumpOutgoingValidFileEndToEnd")
             outputData[i] = 3.0;
         }
 
+        TensorInfo inputTensorInfo = runtime.GetInputTensorInfo(netId, 0);
+        inputTensorInfo.SetConstant(true);
         InputTensors inputTensors
         {
-            {0, ConstTensor(runtime.GetInputTensorInfo(netId, 0), inputData.data())}
+            {0, ConstTensor(inputTensorInfo, inputData.data())}
         };
         OutputTensors outputTensors
         {

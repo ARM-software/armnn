@@ -57,7 +57,7 @@ void ResizeEndToEnd(const std::vector<armnn::BackendId>& backends,
     const float   qScale  = IsQuantizedType<T>() ? 0.25f : 1.0f;
     const int32_t qOffset = IsQuantizedType<T>() ? 50    : 0;
 
-    TensorInfo inputInfo(inputShape, ArmnnType, qScale, qOffset);
+    TensorInfo inputInfo(inputShape, ArmnnType, qScale, qOffset, true);
     TensorInfo outputInfo(outputShape, ArmnnType, qScale, qOffset);
 
     std::vector<float> inputData =

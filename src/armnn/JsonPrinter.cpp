@@ -45,12 +45,29 @@ void JsonPrinter::PrintJsonChildObject(const JsonChildObject& object, size_t& id
     }
     else if (object.GetType() == JsonObjectType::ExecObjectDesc)
     {
+        // Add details opening
+        DecrementNumberOfTabs();
+        PrintTabs();
+        m_OutputStream << std::quoted("Graph") << ":[{";
+        PrintNewLine();
+        IncrementNumberOfTabs();
+
+        // Fill details body
         for (std::string stringLine : object.m_LayerDetailsList)
         {
            PrintTabs();
            m_OutputStream << stringLine;
            PrintNewLine();
         }
+
+        // Close out details
+        DecrementNumberOfTabs();
+        PrintTabs();
+
+        object.IsDetailsOnlyEnabled() ? m_OutputStream << "]" : m_OutputStream << "],";
+
+        PrintNewLine();
+        IncrementNumberOfTabs();
     }
     if (!object.m_Children.empty())
     {

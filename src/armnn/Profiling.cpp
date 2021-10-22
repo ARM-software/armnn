@@ -411,7 +411,12 @@ void ProfilerImpl::Print(std::ostream& outStream) const
          || m_DetailsToStdOutMethod == ProfilingDetailsMethod::DetailsWithEvents))
     {
         JsonChildObject detailsObject{ "layer_details" };
-        ConfigureDetailsObject(detailsObject, m_ProfilingDetails.get()->GetProfilingDetails());
+        if (m_DetailsToStdOutMethod == ProfilingDetailsMethod::DetailsOnly)
+        {
+            detailsObject.EnableDetailsOnly();
+        }
+        detailsObject.SetType(JsonObjectType::ExecObjectDesc);
+        detailsObject.SetAndParseDetails(m_ProfilingDetails.get()->GetProfilingDetails());
 
         size_t id = 0;
         printer.PrintJsonChildObject(detailsObject, id);
@@ -428,9 +433,9 @@ void ProfilerImpl::Print(std::ostream& outStream) const
         printer.PrintSeparator();
         printer.PrintNewLine();
         printer.PrintJsonChildObject(inferenceObject, id);
+        printer.PrintNewLine();
     }
     // end of ArmNN
-    printer.PrintNewLine();
     printer.PrintFooter();
 
     // end of main JSON object

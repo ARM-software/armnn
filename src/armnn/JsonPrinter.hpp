@@ -31,7 +31,8 @@ struct JsonChildObject
         : m_Label(label),
           m_Unit(Measurement::Unit::TIME_MS),
           m_Type(JsonObjectType::Event),
-          m_Guid(armnn::EmptyOptional())
+          m_Guid(armnn::EmptyOptional()),
+          m_DetailsOnly(false)
     {}
     JsonChildObject(const JsonChildObject&) = default;
 
@@ -85,6 +86,16 @@ struct JsonChildObject
         return m_Type;
     }
 
+    void EnableDetailsOnly()
+    {
+        m_DetailsOnly = true;
+    }
+
+    bool IsDetailsOnlyEnabled() const
+    {
+        return m_DetailsOnly;
+    }
+
     ~JsonChildObject() = default;
 
     std::string m_Label;
@@ -96,6 +107,7 @@ struct JsonChildObject
     std::vector<JsonChildObject> m_Children;
 
 private:
+    bool m_DetailsOnly;
     JsonChildObject() = delete;
 };
 

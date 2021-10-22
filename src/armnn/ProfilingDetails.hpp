@@ -36,6 +36,13 @@ public:
                             const WorkloadInfo& infos,
                             const profiling::ProfilingGuid guid)
     {
+        // Once details exist, we can assume we're on the second iteration of details
+        if (m_DetailsExist)
+        {
+            PrintSeparator();
+            PrintNewLine();
+        }
+
         m_ProfilingDetails << std::quoted("Name") << ": " << std::quoted(workloadName) << " ";
         PrintHeader();
 
@@ -78,8 +85,6 @@ public:
         StringifyLayerParameters<DescriptorType>::Serialize(extractParams, desc);
 
         PrintFooter();
-        PrintSeparator();
-        PrintNewLine();
 
         m_DetailsExist = true;
     }

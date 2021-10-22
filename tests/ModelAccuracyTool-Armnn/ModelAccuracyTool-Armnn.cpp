@@ -7,7 +7,9 @@
 #include "../InferenceTest.hpp"
 #include "ModelAccuracyChecker.hpp"
 #include "armnnDeserializer/IDeserializer.hpp"
+
 #include <armnnUtils/Filesystem.hpp>
+#include <armnn/Utils.hpp>
 
 #include <cxxopts/cxxopts.hpp>
 #include <map>
@@ -253,7 +255,6 @@ int main(int argc, char* argv[])
         const map<std::string, std::string> imageNameToLabel = LoadValidationImageFilenamesAndLabels(
             validationLabelPath, pathToDataDir.string(), imageBegIndex, imageEndIndex, blacklistPath);
         armnnUtils::ModelAccuracyChecker checker(imageNameToLabel, modelOutputLabels);
-        using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<uint8_t>>;
 
         if (ValidateDirectory(dataDir))
         {
@@ -324,8 +325,8 @@ int main(int argc, char* argv[])
                 const std::string imageName = imageEntry.first;
                 std::cout << "Processing image: " << imageName << "\n";
 
-                vector<TContainer> inputDataContainers;
-                vector<TContainer> outputDataContainers;
+                vector<armnn::TContainer> inputDataContainers;
+                vector<armnn::TContainer> outputDataContainers;
 
                 auto imagePath = pathToDataDir / fs::path(imageName);
                 switch (inputTensorDataType)
@@ -369,7 +370,7 @@ int main(int argc, char* argv[])
                     ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to enqueue workload for image: " << imageName;
                 }
 
-                checker.AddImageResult<TContainer>(imageName, outputDataContainers);
+                checker.AddImageResult<armnn::TContainer>(imageName, outputDataContainers);
             }
         }
         else

@@ -5,7 +5,9 @@
 
 #pragma once
 
+
 #include <armnn/ArmNN.hpp>
+#include <armnn/Utils.hpp>
 #include <armnn/Threadpool.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
@@ -371,8 +373,7 @@ public:
     using DataType           = TDataType;
     using Params             = InferenceModelInternal::Params;
     using QuantizationParams = InferenceModelInternal::QuantizationParams;
-    using TContainer
-        = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
+
 
     struct CommandLineOptions
     {
@@ -583,8 +584,8 @@ public:
     }
 
     std::chrono::duration<double, std::milli> Run(
-            const std::vector<TContainer>& inputContainers,
-            std::vector<TContainer>& outputContainers)
+            const std::vector<armnn::TContainer>& inputContainers,
+            std::vector<armnn::TContainer>& outputContainers)
     {
         for (unsigned int i = 0; i < outputContainers.size(); ++i)
         {
@@ -632,8 +633,8 @@ public:
 
     std::tuple<unsigned int, std::chrono::duration<double, std::milli>> RunAsync(
         armnn::experimental::IWorkingMemHandle& workingMemHandleRef,
-        const std::vector<TContainer>& inputContainers,
-        std::vector<TContainer>& outputContainers,
+        const std::vector<armnn::TContainer>& inputContainers,
+        std::vector<armnn::TContainer>& outputContainers,
         unsigned int inferenceID)
     {
         for (unsigned int i = 0; i < outputContainers.size(); ++i)
@@ -683,8 +684,8 @@ public:
         }
     }
 
-    void RunAsync(const std::vector<TContainer>& inputContainers,
-                  std::vector<TContainer>& outputContainers,
+    void RunAsync(const std::vector<armnn::TContainer>& inputContainers,
+                  std::vector<armnn::TContainer>& outputContainers,
                   std::shared_ptr<armnn::IAsyncExecutionCallback> cb)
     {
         for (unsigned int i = 0; i < outputContainers.size(); ++i)

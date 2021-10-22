@@ -228,11 +228,7 @@ void TensorPrinter::WriteToFile(const std::vector<T>& values)
     }
 }
 
-using TContainer  =
-        mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
-using QuantizationParams = std::pair<float, int32_t>;
-
-void PopulateTensorWithData(TContainer& tensorData,
+void PopulateTensorWithData(armnn::TContainer& tensorData,
                             unsigned int numElements,
                             const std::string& dataTypeStr,
                             const armnn::Optional<QuantizationParams>& qParams,

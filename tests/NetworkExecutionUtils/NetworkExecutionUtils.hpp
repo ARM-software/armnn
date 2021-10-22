@@ -9,8 +9,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/StringUtils.hpp>
-
-#include <mapbox/variant.hpp>
+#include <armnn/Utils.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -52,11 +51,9 @@ private:
     bool m_PrintToConsole;
 };
 
-using TContainer =
-        mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 using QuantizationParams = std::pair<float, int32_t>;
 
-void PopulateTensorWithData(TContainer& tensorData,
+void PopulateTensorWithData(armnn::TContainer& tensorData,
                             unsigned int numElements,
                             const std::string& dataTypeStr,
                             const armnn::Optional<QuantizationParams>& qParams,

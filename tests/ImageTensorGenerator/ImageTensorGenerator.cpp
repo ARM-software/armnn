@@ -9,7 +9,6 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnnUtils/Filesystem.hpp>
 
-#include <mapbox/variant.hpp>
 #include <cxxopts/cxxopts.hpp>
 
 #include <algorithm>
@@ -297,9 +296,7 @@ int main(int argc, char* argv[])
     const unsigned int batchSize = 1;
     const armnn::DataLayout outputLayout(cmdline.GetLayout());
 
-    using TContainer = mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<uint8_t>,
-                                             std::vector<int8_t>>;
-    std::vector<TContainer> imageDataContainers;
+    std::vector<armnn::TContainer> imageDataContainers;
     const NormalizationParameters& normParams = GetNormalizationParameters(modelFormat, outputType);
     try
     {

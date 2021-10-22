@@ -4,6 +4,7 @@
 //
 #include "InferenceTest.hpp"
 
+#include <armnn/Utils.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include "CxxoptsUtils.hpp"
@@ -26,9 +27,6 @@ namespace armnn
 namespace test
 {
 
-using TContainer =
-        mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
-
 template <typename TTestCaseDatabase, typename TModel>
 ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
     int& numInferencesRef,
@@ -40,7 +38,7 @@ ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
     unsigned int label,
     std::vector<typename TModel::DataType> modelInput)
     : InferenceModelTestCase<TModel>(
-            model, testCaseId, std::vector<TContainer>{ modelInput }, { model.GetOutputSize() })
+            model, testCaseId, std::vector<armnn::TContainer>{ modelInput }, { model.GetOutputSize() })
     , m_Label(label)
     , m_QuantizationParams(model.GetQuantizationParams())
     , m_NumInferencesRef(numInferencesRef)

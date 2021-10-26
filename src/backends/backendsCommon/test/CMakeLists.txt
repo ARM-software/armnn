@@ -142,6 +142,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/PermuteTestImpl.hpp
     layerTests/Pooling2dTestImpl.cpp
     layerTests/Pooling2dTestImpl.hpp
+    layerTests/Pooling3dTestImpl.cpp
+    layerTests/Pooling3dTestImpl.hpp
     layerTests/PreluTestImpl.hpp
     layerTests/QuantizeTestImpl.cpp
     layerTests/QuantizeTestImpl.hpp

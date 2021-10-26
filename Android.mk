@@ -205,6 +205,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/PadLayer.cpp \
         src/armnn/layers/PermuteLayer.cpp \
         src/armnn/layers/Pooling2dLayer.cpp \
+        src/armnn/layers/Pooling3dLayer.cpp \
         src/armnn/layers/PreCompiledLayer.cpp \
         src/armnn/layers/PreluLayer.cpp \
         src/armnn/layers/QLstmLayer.cpp \

@@ -435,6 +435,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(UnidirectionalSequenceLstm) \
     X(ChannelShuffle) \
     X(Convolution3d) \
+    X(Pooling3d) \
 
 // New layers should be added at last to minimize instability.
 

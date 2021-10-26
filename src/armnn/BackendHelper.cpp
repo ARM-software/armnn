@@ -646,6 +646,14 @@ bool LayerSupportHandle::IsPooling2dSupported(const TensorInfo& input,
     return m_LayerSupport->IsPooling2dSupported(input, output, descriptor, reasonIfUnsupported.value());
 }
 
+bool LayerSupportHandle::IsPooling3dSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const Pooling3dDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported)
+{
+    return m_LayerSupport->IsPooling3dSupported(input, output, descriptor, reasonIfUnsupported.value());
+}
+
 bool LayerSupportHandle::IsPreCompiledSupported(const TensorInfo& input,
                                                 const PreCompiledDescriptor& descriptor,
                                                 Optional<std::string&> reasonIfUnsupported)

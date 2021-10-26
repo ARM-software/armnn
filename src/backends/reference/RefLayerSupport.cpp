@@ -1721,6 +1721,38 @@ bool RefLayerSupport::IsPooling2dSupported(const TensorInfo& input,
     return supported;
 }
 
+bool RefLayerSupport::IsPooling3dSupported(const TensorInfo& input,
+                                           const TensorInfo& output,
+                                           const Pooling3dDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+    bool supported = true;
+
+    // Define supported output and inputs types.
+    std::array<DataType,6> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS16
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Reference poolind3d: input is not a supported type.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference poolind3d: output is not a supported type.");
+
+    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                  "Reference poolind3d: input and output types are mismatched.");
+
+    return supported;
+}
+
+
 bool RefLayerSupport::IsQLstmSupported(const TensorInfo& input,
                                        const TensorInfo& previousOutputIn,
                                        const TensorInfo& previousCellStateIn,

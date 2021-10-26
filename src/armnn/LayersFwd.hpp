@@ -53,6 +53,7 @@
 #include "layers/PadLayer.hpp"
 #include "layers/PermuteLayer.hpp"
 #include "layers/Pooling2dLayer.hpp"
+#include "layers/Pooling3dLayer.hpp"
 #include "layers/PreCompiledLayer.hpp"
 #include "layers/PreluLayer.hpp"
 #include "layers/QuantizeLayer.hpp"
@@ -152,6 +153,7 @@ DECLARE_LAYER(Output)
 DECLARE_LAYER(Pad)
 DECLARE_LAYER(Permute)
 DECLARE_LAYER(Pooling2d)
+DECLARE_LAYER(Pooling3d)
 DECLARE_LAYER(PreCompiled)
 DECLARE_LAYER(Prelu)
 DECLARE_LAYER(Quantize)

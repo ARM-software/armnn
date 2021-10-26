@@ -281,6 +281,11 @@ public:
                                       const Pooling2dDescriptor& descriptor,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
 
+    virtual bool IsPooling3dSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const Pooling3dDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;
+
     virtual bool IsPreCompiledSupported(const TensorInfo& input,
                                         const PreCompiledDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const = 0;

@@ -200,6 +200,10 @@ public:
                                                const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    std::unique_ptr<IWorkload> CreatePooling3d(const Pooling3dQueueDescriptor& /*descriptor*/,
+                                               const WorkloadInfo& /*info*/) const override
+    { return nullptr; }
+
     std::unique_ptr<IWorkload> CreatePreCompiled(const PreCompiledQueueDescriptor& /*descriptor*/,
                                                  const WorkloadInfo& /*info*/) const override
     { return nullptr; }

@@ -371,11 +371,18 @@ public:
     IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                               const char* name = nullptr);
 
-    /// Adds a pooling layer to the network.
+    /// Adds a 2D pooling layer to the network.
     /// @param pooling2dDescriptor - Pooling2dDescriptor to configure the pooling.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddPooling2dLayer(const Pooling2dDescriptor& pooling2dDescriptor,
+        const char* name = nullptr);
+
+    /// Adds a 3D pooling layer to the network.
+    /// @param pooling3dDescriptor - Pooling3dDescriptor to configure the pooling.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddPooling3dLayer(const Pooling3dDescriptor& pooling3dDescriptor,
         const char* name = nullptr);
 
     /// Adds an activation layer to the network.

@@ -201,6 +201,9 @@ public:
     std::unique_ptr<IWorkload> CreatePooling2d(const Pooling2dQueueDescriptor& descriptor,
                                                const WorkloadInfo& info) const override;
 
+    std::unique_ptr<IWorkload> CreatePooling3d(const Pooling3dQueueDescriptor& descriptor,
+                                            const WorkloadInfo& info) const override;
+
     std::unique_ptr<IWorkload> CreatePreCompiled(const PreCompiledQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info) const override;
 

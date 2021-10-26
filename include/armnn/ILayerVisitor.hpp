@@ -338,6 +338,14 @@ public:
                                      const Pooling2dDescriptor& pooling2dDescriptor,
                                      const char* name = nullptr) = 0;
 
+    /// Function that a pooling layer should call back to when its Accept(ILayerVisitor&) function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param pooling3dDescriptor - Pooling3dDescriptor to configure the pooling.
+    /// @param name - Optional name for the layer.
+    virtual void VisitPooling3dLayer(const IConnectableLayer* layer,
+                                     const Pooling3dDescriptor& pooling3dDescriptor,
+                                     const char* name = nullptr) = 0;
+
     /// Function that a PReLU activation layer should call back to when its Accept(ILayerVisitor&) function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param name - Optional name for the layer.

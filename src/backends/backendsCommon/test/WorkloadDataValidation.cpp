@@ -74,6 +74,27 @@ TEST_CASE("RefPooling2dFloat32Workload_Validate_WrongDimTensor")
     CHECK_THROWS_AS(RefPooling2dWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
 }
 
+TEST_CASE("RefPooling3dFloat32Workload_Validate_WrongDimTensor")
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4, 5}; // <- Invalid - input tensor has to be 5D.
+    unsigned int outputShape[] = {2, 3, 4, 5, 6};
+
+    outputTensorInfo = armnn::TensorInfo(5, outputShape, armnn::DataType::Float32);
+    inputTensorInfo  = armnn::TensorInfo(4, inputShape, armnn::DataType::Float32);
+
+    Pooling3dQueueDescriptor invalidData;
+    WorkloadInfo           invalidInfo;
+
+    AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
+    AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
+
+    // Invalid argument exception is expected, input tensor has to be 5D.
+    CHECK_THROWS_AS(RefPooling3dWorkload(invalidData, invalidInfo), armnn::InvalidArgumentException);
+}
+
 TEST_CASE("SoftmaxQueueDescriptor_Validate_WrongInputHeight")
 {
     unsigned int inputHeight = 1;

@@ -34,6 +34,7 @@ struct OriginsDescriptor;
 struct PadDescriptor;
 struct PermuteDescriptor;
 struct Pooling2dDescriptor;
+struct Pooling3dDescriptor;
 struct PreCompiledDescriptor;
 struct QLstmDescriptor;
 struct ReshapeDescriptor;

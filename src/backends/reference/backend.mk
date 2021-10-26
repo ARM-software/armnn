@@ -44,6 +44,7 @@ BACKEND_SOURCES := \
         workloads/MirrorPad.cpp \
         workloads/Pad.cpp \
         workloads/Pooling2d.cpp \
+        workloads/Pooling3d.cpp \
         workloads/PreluImpl.cpp \
         workloads/Reduce.cpp \
         workloads/RefActivationWorkload.cpp \
@@ -84,6 +85,7 @@ BACKEND_SOURCES := \
         workloads/RefPadWorkload.cpp \
         workloads/RefPermuteWorkload.cpp \
         workloads/RefPooling2dWorkload.cpp \
+        workloads/RefPooling3dWorkload.cpp \
         workloads/RefPreluWorkload.cpp \
         workloads/RefQLstmWorkload.cpp \
         workloads/RefQuantizeWorkload.cpp \

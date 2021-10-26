@@ -565,6 +565,40 @@ void DepthwiseConvolution2dInferOutputShapeTest()
     CHECK(expectedOutputShape == depthwiseConvolution2dLayer->InferOutputShapes(shapes).at(0));
 }
 
+void Pooling3dInferOutputShapeTest()
+{
+    armnn::Graph graph;
+
+    armnn::Pooling3dDescriptor descriptor;
+    descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
+    descriptor.m_PoolDepth = 2;
+    descriptor.m_PoolHeight = 2;
+    descriptor.m_PoolWidth = 2;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 1;
+    descriptor.m_PadLeft = 1;
+    descriptor.m_PadRight = 1;
+    descriptor.m_PadFront = 1;
+    descriptor.m_PadBack = 1;
+    descriptor.m_StrideX = 2;
+    descriptor.m_StrideY = 2;
+    descriptor.m_StrideZ = 2;
+    descriptor.m_DataLayout = armnn::DataLayout::NDHWC;
+
+    armnn::Pooling3dLayer* const pooling3dLayer =
+            graph.AddLayer<armnn::Pooling3dLayer>(descriptor, "pooling3d");
+
+    std::vector<armnn::TensorShape> shapes;
+    const std::vector<unsigned int> inputSize = {1, 4, 4, 4, 1};
+    armnn::TensorShape inputShape(5, inputSize.data());
+    shapes.push_back(inputShape);
+
+    const std::vector<unsigned int> expectedOutputSizes = {1, 3, 3, 3, 1};
+    armnn::TensorShape expectedOutputShape(5, expectedOutputSizes.data());
+
+    CHECK(expectedOutputShape == pooling3dLayer->InferOutputShapes(shapes).at(0));
+}
+
 // QLstm
 void QLstmInferOutputShapeImpl(const armnn::QLstmDescriptor descriptor,
                                const std::vector<armnn::TensorShape>& inputShapes,

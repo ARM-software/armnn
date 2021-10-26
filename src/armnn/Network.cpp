@@ -208,6 +208,12 @@ IConnectableLayer* INetwork::AddPooling2dLayer(const Pooling2dDescriptor& poolin
     return pNetworkImpl->AddPooling2dLayer(pooling2dDescriptor, name);
 }
 
+IConnectableLayer* INetwork::AddPooling3dLayer(const Pooling3dDescriptor& pooling3dDescriptor,
+                                               const char* name)
+{
+    return pNetworkImpl->AddPooling3dLayer(pooling3dDescriptor, name);
+}
+
 IConnectableLayer* INetwork::AddActivationLayer(const ActivationDescriptor& activationDescriptor,
                                                 const char* name)
 {
@@ -2031,6 +2037,12 @@ IConnectableLayer* NetworkImpl::AddPooling2dLayer(const Pooling2dDescriptor& poo
     const char* name)
 {
     return m_Graph->AddLayer<Pooling2dLayer>(pooling2dDescriptor, name);
+}
+
+IConnectableLayer* NetworkImpl::AddPooling3dLayer(const Pooling3dDescriptor& pooling3dDescriptor,
+    const char* name)
+{
+    return m_Graph->AddLayer<Pooling3dLayer>(pooling3dDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddActivationLayer(const ActivationDescriptor& activationDescriptor,

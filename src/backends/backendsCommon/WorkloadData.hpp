@@ -193,6 +193,13 @@ struct Pooling2dQueueDescriptor : QueueDescriptorWithParameters<Pooling2dDescrip
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+// Pooling 3D layer workload data.
+struct Pooling3dQueueDescriptor : QueueDescriptorWithParameters<Pooling3dDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
+
 // Convolution 2D layer workload data.
 struct Convolution2dQueueDescriptor : QueueDescriptorWithParameters<Convolution2dDescriptor>
 {

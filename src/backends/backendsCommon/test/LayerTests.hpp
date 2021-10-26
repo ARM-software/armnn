@@ -50,6 +50,7 @@
 #include <backendsCommon/test/layerTests/PadTestImpl.hpp>
 #include <backendsCommon/test/layerTests/PermuteTestImpl.hpp>
 #include <backendsCommon/test/layerTests/Pooling2dTestImpl.hpp>
+#include <backendsCommon/test/layerTests/Pooling3dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/PreluTestImpl.hpp>
 #include <backendsCommon/test/layerTests/QuantizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/RankTestImpl.hpp>

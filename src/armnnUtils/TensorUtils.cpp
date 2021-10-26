@@ -55,6 +55,27 @@ TensorInfo GetTensorInfo(unsigned int numberOfBatches,
     }
 }
 
+TensorInfo GetTensorInfo(unsigned int numberOfBatches,
+                                unsigned int numberOfChannels,
+                                unsigned int depth,
+                                unsigned int height,
+                                unsigned int width,
+                                const DataLayout dataLayout,
+                                const DataType dataType)
+{
+    switch (dataLayout)
+    {
+        case DataLayout::NDHWC:
+            return TensorInfo({numberOfBatches, depth, height, width, numberOfChannels}, dataType);
+        case DataLayout::NCDHW:
+            return TensorInfo({numberOfBatches, numberOfChannels, depth, height, width}, dataType);
+        default:
+            throw InvalidArgumentException("Unknown data layout ["
+                                                  + std::to_string(static_cast<int>(dataLayout)) +
+                                                  "]", CHECK_LOCATION());
+    }
+}
+
 std::pair<float, float> FindMinMax(ITensorHandle* tensorHandle)
 {
     auto tensor_data = static_cast<const float *>(tensorHandle->Map(true));

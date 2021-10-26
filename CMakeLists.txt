@@ -305,6 +305,8 @@ list(APPEND armnn_sources
     src/armnn/layers/PermuteLayer.cpp
     src/armnn/layers/Pooling2dLayer.hpp
     src/armnn/layers/Pooling2dLayer.cpp
+    src/armnn/layers/Pooling3dLayer.hpp
+    src/armnn/layers/Pooling3dLayer.cpp
     src/armnn/layers/QuantizeLayer.cpp
     src/armnn/layers/QuantizeLayer.hpp
     src/armnn/layers/QLstmLayer.hpp

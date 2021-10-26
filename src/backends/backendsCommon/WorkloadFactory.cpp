@@ -831,6 +831,17 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                              reason);
             break;
         }
+        case LayerType::Pooling3d:
+        {
+            auto cLayer = PolymorphicDowncast<const Pooling3dLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject.IsPooling3dSupported(OverrideDataType(input, dataType),
+                                                             OverrideDataType(output, dataType),
+                                                             cLayer->GetParameters(),
+                                                             reason);
+            break;
+        }
         case LayerType::PreCompiled:
         {
             auto cLayer = PolymorphicDowncast<const PreCompiledLayer*>(&layer);
@@ -1776,6 +1787,12 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreatePermute(const PermuteQueueDes
 }
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreatePooling2d(const Pooling2dQueueDescriptor& /*descriptor*/,
+                                                             const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
+std::unique_ptr<IWorkload> IWorkloadFactory::CreatePooling3d(const Pooling3dQueueDescriptor& /*descriptor*/,
                                                              const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();

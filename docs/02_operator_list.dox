@@ -2242,7 +2242,7 @@ where N = batches, C = channels, H = height, W = width
     </table>
 <tr>
   <td rowspan="3">Pooling2dLayer
-  <td rowspan="3" style="width:200px;"> Layer to perform pooling with the specified pooling operation.
+  <td rowspan="3" style="width:200px;"> Layer to perform 2D pooling with the specified pooling operation.
   <td rowspan="3">
       <ul>
        <li>ANEURALNETWORKS_AVERAGE_POOL_2D
@@ -2294,6 +2294,43 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>FLOAT16
     <tr><td>FLOAT32
     </table>
+<tr>
+  <td rowspan="3">Pooling3dLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform 3D pooling with the specified pooling operation.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_AVERAGE_POOL_3D
+       <li>ANEURALNETWORKS_L2_POOL_3D
+       <li>ANEURALNETWORKS_MAX_POOL_3D
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>NDHWC
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>NA
+      </ul>
+  <td>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>NDHWC
+      </ul>
 <tr>
   <td rowspan="1">PreCompiledLayer
   <td rowspan="1" style="width:200px;"> Opaque layer provided by a backend which provides an executable representation of a subgraph from the original network.

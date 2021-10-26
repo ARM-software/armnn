@@ -22,6 +22,14 @@ armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
                                 const armnn::DataLayout dataLayout,
                                 const armnn::DataType dataType);
 
+armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
+                                unsigned int numberOfChannels,
+                                unsigned int depth,
+                                unsigned int height,
+                                unsigned int width,
+                                const armnn::DataLayout dataLayout,
+                                const armnn::DataType dataType);
+
 std::pair<float, float> FindMinMax(armnn::ITensorHandle* tensorHandle);
 
 armnn::TensorShape ExpandDims(const armnn::TensorShape& tensorShape, int axis);

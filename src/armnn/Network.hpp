@@ -167,6 +167,9 @@ public:
     IConnectableLayer* AddPooling2dLayer(const Pooling2dDescriptor& pooling2dDescriptor,
                                          const char* name = nullptr);
 
+    IConnectableLayer* AddPooling3dLayer(const Pooling3dDescriptor& pooling3dDescriptor,
+                                         const char* name = nullptr);
+
     IConnectableLayer* AddPreluLayer(const char* name = nullptr);
 
     IConnectableLayer* AddQuantizeLayer(const char* name = nullptr);

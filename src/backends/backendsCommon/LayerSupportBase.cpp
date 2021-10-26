@@ -433,6 +433,14 @@ bool LayerSupportBase::IsPooling2dSupported(const TensorInfo&, // input
     return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
 }
 
+bool LayerSupportBase::IsPooling3dSupported(const TensorInfo&, // input
+                                            const TensorInfo&, // output
+                                            const Pooling3dDescriptor&, // descriptor
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    return DefaultLayerSupport(__func__, __FILE__, __LINE__, reasonIfUnsupported);
+}
+
 bool LayerSupportBase::IsPreCompiledSupported(const TensorInfo&, // input
                                               const PreCompiledDescriptor&, // descriptor
                                               Optional<std::string&> reasonIfUnsupported) const

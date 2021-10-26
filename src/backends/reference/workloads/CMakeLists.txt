@@ -58,6 +58,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Pad.hpp
     Pooling2d.cpp
     Pooling2d.hpp
+    Pooling3d.cpp
+    Pooling3d.hpp
     PreluImpl.cpp
     PreluImpl.hpp
     Reduce.cpp
@@ -139,6 +141,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefPermuteWorkload.hpp
     RefPooling2dWorkload.cpp
     RefPooling2dWorkload.hpp
+    RefPooling3dWorkload.cpp
+    RefPooling3dWorkload.hpp
     RefPreluWorkload.cpp
     RefPreluWorkload.hpp
     RefQuantizeWorkload.cpp

@@ -250,6 +250,11 @@ public:
                               const Pooling2dDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsPooling3dSupported(const TensorInfo& input,
+                              const TensorInfo& output,
+                              const Pooling3dDescriptor& descriptor,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
+
     bool IsQuantizeSupported(const TensorInfo& input,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;

@@ -543,6 +543,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePooling2d(const Pooling2dQu
     return std::make_unique<RefPooling2dWorkload>(descriptor, info);
 }
 
+std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePooling3d(const Pooling3dQueueDescriptor& descriptor,
+                                                               const WorkloadInfo& info) const
+{
+    return std::make_unique<RefPooling3dWorkload>(descriptor, info);
+}
+
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreatePreCompiled(const PreCompiledQueueDescriptor& /*descriptor*/,
                                                                  const WorkloadInfo& /*info*/) const
 {

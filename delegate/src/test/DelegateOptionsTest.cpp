@@ -223,6 +223,90 @@ TEST_CASE ("ArmnnDelegateSerializeToDot")
     fs::remove(filename);
 }
 
+void CreateFp16StringParsingTestRun(std::vector<std::string>& keys,
+                                    std::vector<std::string>& values,
+                                    std::stringstream& ss)
+{
+    StreamRedirector redirect(std::cout, ss.rdbuf());
+
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
+    std::vector<float> inputData = { 1, 2, 3, 4 };
+    std::vector<float> divData = { 2, 2, 3, 4 };
+    std::vector<float> expectedResult = { 1, 2, 2, 2 };
+
+    // Create options_keys and options_values char array
+    size_t num_options = keys.size();
+    std::unique_ptr<const char*> options_keys =
+            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*> options_values =
+            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    for (size_t i=0; i<num_options; ++i)
+    {
+        options_keys.get()[i]   = keys[i].c_str();
+        options_values.get()[i] = values[i].c_str();
+    }
+
+    armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(), num_options, nullptr);
+    DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
+                              backends,
+                              tensorShape,
+                              inputData,
+                              inputData,
+                              divData,
+                              expectedResult,
+                              delegateOptions);
+}
+
+TEST_CASE ("ArmnnDelegateStringParsingOptionReduceFp32ToFp16")
+{
+    SUBCASE("Fp16=1")
+    {
+        std::stringstream ss;
+        std::vector<std::string> keys   {  "backends", "debug-data", "reduce-fp32-to-fp16", "logging-severity"};
+        std::vector<std::string> values {    "CpuRef",          "1",                   "1",             "info"};
+        CreateFp16StringParsingTestRun(keys, values, ss);
+        CHECK(ss.str().find("convert_fp32_to_fp16") != std::string::npos);
+        CHECK(ss.str().find("convert_fp16_to_fp32") != std::string::npos);
+    }
+    SUBCASE("Fp16=true")
+    {
+        std::stringstream ss;
+        std::vector<std::string> keys   {  "backends", "debug-data", "reduce-fp32-to-fp16"};
+        std::vector<std::string> values {    "CpuRef",       "TRUE",                "true"};
+        CreateFp16StringParsingTestRun(keys, values, ss);
+        CHECK(ss.str().find("convert_fp32_to_fp16") != std::string::npos);
+        CHECK(ss.str().find("convert_fp16_to_fp32") != std::string::npos);
+    }
+    SUBCASE("Fp16=True")
+    {
+        std::stringstream ss;
+        std::vector<std::string> keys   {  "backends", "debug-data", "reduce-fp32-to-fp16"};
+        std::vector<std::string> values {    "CpuRef",       "true",                "True"};
+        CreateFp16StringParsingTestRun(keys, values, ss);
+        CHECK(ss.str().find("convert_fp32_to_fp16") != std::string::npos);
+        CHECK(ss.str().find("convert_fp16_to_fp32") != std::string::npos);
+    }
+    SUBCASE("Fp16=0")
+    {
+        std::stringstream ss;
+        std::vector<std::string> keys   {  "backends", "debug-data", "reduce-fp32-to-fp16"};
+        std::vector<std::string> values {    "CpuRef",       "true",                   "0"};
+        CreateFp16StringParsingTestRun(keys, values, ss);
+        CHECK(ss.str().find("convert_fp32_to_fp16") == std::string::npos);
+        CHECK(ss.str().find("convert_fp16_to_fp32") == std::string::npos);
+    }
+    SUBCASE("Fp16=false")
+    {
+        std::stringstream ss;
+        std::vector<std::string> keys   {  "backends", "debug-data", "reduce-fp32-to-fp16"};
+        std::vector<std::string> values {    "CpuRef",     "1",               "false"};
+        CreateFp16StringParsingTestRun(keys, values, ss);
+        CHECK(ss.str().find("convert_fp32_to_fp16") == std::string::npos);
+        CHECK(ss.str().find("convert_fp16_to_fp32") == std::string::npos);
+    }
+}
+
 
 }
 

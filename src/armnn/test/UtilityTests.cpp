@@ -3,16 +3,17 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <doctest/doctest.h>
 
 #define ARMNN_POLYMORPHIC_CAST_TESTABLE
 #define ARMNN_NUMERIC_CAST_TESTABLE
 
+#include <armnn/Exceptions.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <armnn/utility/StringUtils.hpp>
 
-#include <armnn/Exceptions.hpp>
+#include <doctest/doctest.h>
 
 #include <limits>
 
@@ -250,4 +251,28 @@ TEST_CASE("NumericCast")
 
     }
 
+TEST_CASE("StringToBool")
+    {
+        CHECK(true == armnn::stringUtils::StringToBool("1"));
+        CHECK(false == armnn::stringUtils::StringToBool("0"));
+        // Any number larger than 1 will be a failure.
+        CHECK_THROWS_AS(armnn::stringUtils::StringToBool("2"), armnn::InvalidArgumentException);
+        CHECK_THROWS_AS(armnn::stringUtils::StringToBool("23456567"), armnn::InvalidArgumentException);
+        CHECK_THROWS_AS(armnn::stringUtils::StringToBool("-23456567"), armnn::InvalidArgumentException);
+        CHECK_THROWS_AS(armnn::stringUtils::StringToBool("Not a number"), armnn::InvalidArgumentException);
+        // Empty string should be a failure.
+        CHECK_THROWS_AS(armnn::stringUtils::StringToBool(""), armnn::InvalidArgumentException);
+        CHECK(true == armnn::stringUtils::StringToBool("true"));
+        CHECK(false == armnn::stringUtils::StringToBool("false"));
+        // Should be case agnostic.
+        CHECK(true == armnn::stringUtils::StringToBool("TrUe"));
+        CHECK(false == armnn::stringUtils::StringToBool("fAlSe"));
+
+        // Same negative test cases with throw_on_error set to false.
+        CHECK(false == armnn::stringUtils::StringToBool("2", false));
+        CHECK(false == armnn::stringUtils::StringToBool("23456567", false));
+        CHECK(false == armnn::stringUtils::StringToBool("-23456567", false));
+        CHECK(false == armnn::stringUtils::StringToBool("Not a number", false));
+        CHECK(false == armnn::stringUtils::StringToBool("", false));
+    }
 }

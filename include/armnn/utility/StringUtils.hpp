@@ -7,6 +7,9 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+#include <vector>
+#include <armnn/Exceptions.hpp>
 
 namespace armnn
 {
@@ -113,6 +116,47 @@ inline void StringReplaceAll(std::string& str,
         str.replace(pos, oldStr.length(), newStr);
         pos += newStr.length();
     }
+}
+
+///
+/// Converts a string to bool.
+/// Accepts "true", "false" (case-insensitive) and numbers, 1 (true) or 0 (false).
+///
+/// \param s               String to convert to bool
+/// \param throw_on_error  Bool variable to suppress error if conversion failed (Will return false in that case)
+/// \return bool value
+///
+inline bool StringToBool(const std::string& s, bool throw_on_error = true)
+{
+    // in case of failure to convert returns false
+    auto result = false;
+
+    // isstringstream fails if parsing didn't work
+    std::istringstream is(s);
+
+    // try integer conversion first. For the case s is a number
+    is >> result;
+
+    if (is.fail())
+    {
+        // transform to lower case to make case-insensitive
+        std::string s_lower = s;
+        std::transform(s_lower.begin(),
+                       s_lower.end(),
+                       s_lower.begin(),
+                       [](unsigned char c){ return std::tolower(c); });
+        is.str(s_lower);
+        // try boolean -> s="false" or "true"
+        is.clear();
+        is >> std::boolalpha >> result;
+    }
+
+    if (is.fail() && throw_on_error)
+    {
+        throw armnn::InvalidArgumentException(s + " is not convertable to bool");
+    }
+
+    return result;
 }
 
 } // namespace stringUtils

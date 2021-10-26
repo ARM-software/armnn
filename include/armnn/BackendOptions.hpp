@@ -6,6 +6,7 @@
 #pragma once
 
 #include "BackendId.hpp"
+#include <armnn/Exceptions.hpp>
 #include <cassert>
 
 namespace armnn
@@ -120,6 +121,18 @@ public:
         unsigned int AsUnsignedInt() const { assert(IsUnsignedInt()); return m_Vals.u; }
         float AsFloat() const { assert(IsFloat()); return m_Vals.f; }
         std::string AsString() const { assert(IsString()); return m_Vals.s; }
+        std::string ToString()
+        {
+            if (IsBool()) { return AsBool() ? "true" : "false"; }
+            else if (IsInt()) { return std::to_string(AsInt()); }
+            else if (IsUnsignedInt()) { return std::to_string(AsUnsignedInt()); }
+            else if (IsFloat()) { return std::to_string(AsFloat()); }
+            else if (IsString()) { return AsString(); }
+            else
+            {
+                throw armnn::InvalidArgumentException("Unknown data type for string conversion");
+            }
+        }
 
         /// Destructor
         ~Var()

@@ -12,6 +12,7 @@
 #include <armnn/NetworkFwd.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/TensorFwd.hpp>
+#include <armnn/Logging.hpp>
 
 #include <memory>
 #include <vector>
@@ -160,6 +161,32 @@ struct OptimizerOptions
         {
             throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
         }
+    }
+
+    const std::string ToString() const
+    {
+        std::stringstream stream;
+        stream << "OptimizerOptions: \n";
+        stream << "\tReduceFp32ToFp16: " << m_ReduceFp32ToFp16 << "\n";
+        stream << "\tReduceFp32ToBf16: " << m_ReduceFp32ToBf16 << "\n";
+        stream << "\tDebug: " <<
+        (m_shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly ? "ValidateOnly" : "InferAndValidate") << "\n";
+        stream << "\tImportEnabled: " << m_ImportEnabled << "\n";
+        stream << "\tProfilingEnabled: " << m_ProfilingEnabled << "\n";
+
+        stream << "\tModelOptions: \n";
+        for (auto optionsGroup : m_ModelOptions)
+        {
+            for (size_t i=0; i < optionsGroup.GetOptionCount(); i++)
+            {
+                const armnn::BackendOptions::BackendOption option = optionsGroup.GetOption(i);
+                stream << "\t\tBackend: "  << optionsGroup.GetBackendId()
+                       << "\t\t\tOption: " << option.GetName()
+                       << "\t\t\tValue: "  << std::string(option.GetValue().ToString());
+            }
+        }
+
+        return stream.str();
     }
 
     /// Reduces all Fp32 operators in the model to Fp16 for faster processing.

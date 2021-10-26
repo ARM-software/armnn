@@ -15,6 +15,7 @@
 #include "ClCastWorkload.hpp"
 #include "ClChannelShuffleWorkload.hpp"
 #include "ClConvolution2dWorkload.hpp"
+#include "ClConvolution3dWorkload.hpp"
 #include "ClDepthToSpaceWorkload.hpp"
 #include "ClDepthwiseConvolutionWorkload.hpp"
 #include "ClDequantizeWorkload.hpp"

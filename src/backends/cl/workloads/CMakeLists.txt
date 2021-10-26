@@ -32,6 +32,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClConvertFp32ToFp16Workload.hpp
     ClConvolution2dWorkload.cpp
     ClConvolution2dWorkload.hpp
+    ClConvolution3dWorkload.cpp
+    ClConvolution3dWorkload.hpp
     ClDepthToSpaceWorkload.cpp
     ClDepthToSpaceWorkload.hpp
     ClDepthwiseConvolutionWorkload.cpp

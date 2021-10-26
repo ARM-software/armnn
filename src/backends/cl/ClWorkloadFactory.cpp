@@ -291,6 +291,28 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvolution2d(const Convolut
                                                  isFastMathEnabled);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateConvolution3d(const Convolution3dQueueDescriptor& descriptor,
+                                                                  const WorkloadInfo& info) const
+{
+    bool isFastMathEnabled = false;
+    if (m_ModelContextPtr)
+    {
+        if (m_ModelContextPtr.get() != nullptr)
+        {
+            auto modelOptions = dynamic_cast<ClBackendModelContext*>(m_ModelContextPtr.get());
+            if (modelOptions)
+            {
+                isFastMathEnabled = modelOptions->IsFastMathEnabled();
+            }
+        }
+    }
+    return MakeWorkload<ClConvolution3dWorkload>(descriptor,
+                                                 info,
+                                                 m_MemoryManager->GetIntraLayerManager(),
+                                                 m_CLCompileContext,
+                                                 isFastMathEnabled);
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateDebug(const DebugQueueDescriptor& descriptor,
                                                           const WorkloadInfo& info) const
 {

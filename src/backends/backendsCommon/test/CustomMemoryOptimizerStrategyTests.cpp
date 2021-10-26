@@ -80,18 +80,18 @@ TEST_CASE("CpuRefSetMemoryOptimizerStrategyTest")
     options.m_BackendOptions.emplace_back(
          BackendOptions{"CpuRef",
          {
-             {"MemoryOptimizerStrategy", "ConstLayerMemoryOptimizerStrategy"}
+             {"MemoryOptimizerStrategy", "ConstantMemoryStrategy"}
          }
     });
 
     IRuntimePtr run = IRuntime::Create(options);
 
-    // ConstLayerMemoryOptimizerStrategy should be registered for CpuRef
+    // ConstantMemoryStrategy should be registered for CpuRef
     CHECK(!BackendRegistryInstance().GetMemoryOptimizerStrategies().empty());
     CHECK(BackendRegistryInstance().GetMemoryOptimizerStrategies().size() == 1);
     CHECK(BackendRegistryInstance().GetMemoryOptimizerStrategies().at(RefBackend::GetIdStatic()));
     auto optimizerStrategy = BackendRegistryInstance().GetMemoryOptimizerStrategies().at(RefBackend::GetIdStatic());
-    CHECK(optimizerStrategy->GetName() == std::string("ConstLayerMemoryOptimizerStrategy"));
+    CHECK(optimizerStrategy->GetName() == std::string("ConstantMemoryStrategy"));
     armnn::BackendRegistryInstance().DeregisterMemoryOptimizerStrategy(RefBackend::GetIdStatic());
 }
 

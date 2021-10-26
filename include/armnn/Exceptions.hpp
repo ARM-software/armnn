@@ -161,6 +161,12 @@ public:
     using Exception::Exception;
 };
 
+class MemoryValidationException : public Exception
+{
+public:
+    using Exception::Exception;
+};
+
 template <typename ExceptionType>
 void ConditionalThrow(bool condition, const std::string& message)
 {

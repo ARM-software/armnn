@@ -18,9 +18,9 @@ public:
     MemoryOptimizerStrategyFactory() {}
 
     template <typename T>
-    std::shared_ptr<IMemoryOptimizerStrategy> CreateMemoryOptimizerStrategy()
+    std::unique_ptr<IMemoryOptimizerStrategy> CreateMemoryOptimizerStrategy()
     {
-        return std::make_shared<T>();
+        return std::make_unique<T>();
     }
 
 };

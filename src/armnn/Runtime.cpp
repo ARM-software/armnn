@@ -12,7 +12,7 @@
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <backendsCommon/DynamicBackendUtils.hpp>
-#include <backendsCommon/MemoryOptimizerStrategyLibrary.hpp>
+#include <backendsCommon/memoryOptimizerStrategyLibrary/MemoryOptimizerStrategyLibrary.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
@@ -425,11 +425,33 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                 });
                 if (memoryOptimizerStrategyName != "")
                 {
-                    MemoryOptimizerStrategyLibrary memoryOptimizerStrategyLibrary;
-                    if (memoryOptimizerStrategyLibrary.SetMemoryOptimizerStrategy(id, memoryOptimizerStrategyName))
+                    std::shared_ptr<IMemoryOptimizerStrategy> strategy =
+                            GetMemoryOptimizerStrategy(memoryOptimizerStrategyName);
+
+                    if (!strategy)
                     {
-                        ARMNN_LOG(info) << "MemoryOptimizerStrategy  "
-                                        << memoryOptimizerStrategyName << " set for the backend " << id << ".";
+                        ARMNN_LOG(warning) << "MemoryOptimizerStrategy: " << memoryOptimizerStrategyName
+                                           << " was not found \n";
+                    }
+                    else
+                    {
+                        using BackendCapability = BackendOptions::BackendOption;
+                        auto strategyType = GetMemBlockStrategyTypeName(strategy->GetMemBlockStrategyType());
+                        BackendCapability memOptimizeStrategyCapability {strategyType, true};
+                        if (HasCapability(memOptimizeStrategyCapability, id))
+                        {
+                            BackendRegistryInstance().RegisterMemoryOptimizerStrategy(id, strategy);
+
+                            ARMNN_LOG(info) << "MemoryOptimizerStrategy: "
+                                            << memoryOptimizerStrategyName << " set for the backend " << id << ".";
+                        }
+                        else
+                        {
+                            ARMNN_LOG(warning) << "Backend "
+                                               << id
+                                               << " does not have multi-axis packing capability and cannot support"
+                                               << "MemoryOptimizerStrategy: " << memoryOptimizerStrategyName << "\n";
+                        }
                     }
                 }
             }

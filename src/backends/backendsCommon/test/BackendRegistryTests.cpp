@@ -7,7 +7,7 @@
 #include <armnn/BackendRegistry.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/memoryOptimizationStrategies/ConstLayerMemoryOptimizerStrategy.hpp>
+#include <backendsCommon/memoryOptimizerStrategyLibrary/strategies/ConstantMemoryStrategy.hpp>
 #include <reference/RefBackend.hpp>
 
 #include <doctest/doctest.h>
@@ -156,7 +156,7 @@ TEST_CASE("RegisterMemoryOptimizerStrategy")
 
     // Register the memory optimizer
     std::shared_ptr<IMemoryOptimizerStrategy> memoryOptimizerStrategy =
-        std::make_shared<ConstLayerMemoryOptimizerStrategy>();
+        std::make_shared<ConstantMemoryStrategy>();
     BackendRegistryInstance().RegisterMemoryOptimizerStrategy(cpuRefBackendId, memoryOptimizerStrategy);
     CHECK(!BackendRegistryInstance().GetMemoryOptimizerStrategies().empty());
     CHECK(BackendRegistryInstance().GetMemoryOptimizerStrategies().size() == 1);

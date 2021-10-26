@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/memoryOptimizationStrategies/MemoryOptimizerStrategyValidator.hpp>
+#include <backendsCommon/memoryOptimizerStrategyLibrary/strategies/StrategyValidator.hpp>
 
 #include <doctest/doctest.h>
 #include <vector>
@@ -75,16 +75,18 @@ TEST_CASE("MemoryOptimizerStrategyValidatorTestOverlapX")
     // Optimize the memory blocks with TestMemoryOptimizerStrategySingle
     TestMemoryOptimizerStrategy testMemoryOptimizerStrategySingle(MemBlockStrategyType::SingleAxisPacking);
     auto ptr = std::make_shared<TestMemoryOptimizerStrategy>(testMemoryOptimizerStrategySingle);
-    MemoryOptimizerValidator validator(std::move(ptr));
+    StrategyValidator validator;
+    validator.SetStrategy(ptr);
     // SingleAxisPacking can overlap on X axis.
-    CHECK(validator.Validate(memBlocks));
+    CHECK_NOTHROW(validator.Optimize(memBlocks));
 
     // Optimize the memory blocks with TestMemoryOptimizerStrategyMulti
     TestMemoryOptimizerStrategy testMemoryOptimizerStrategyMulti(MemBlockStrategyType::MultiAxisPacking);
     auto ptrMulti = std::make_shared<TestMemoryOptimizerStrategy>(testMemoryOptimizerStrategyMulti);
-    MemoryOptimizerValidator validatorMulti(std::move(ptrMulti));
+    StrategyValidator validatorMulti;
+    validatorMulti.SetStrategy(ptrMulti);
     // MultiAxisPacking can overlap on X axis.
-    CHECK(validatorMulti.Validate(memBlocks));
+    CHECK_NOTHROW(validatorMulti.Optimize(memBlocks));
 }
 
 TEST_CASE("MemoryOptimizerStrategyValidatorTestOverlapXAndY")
@@ -107,16 +109,18 @@ TEST_CASE("MemoryOptimizerStrategyValidatorTestOverlapXAndY")
     // Optimize the memory blocks with TestMemoryOptimizerStrategySingle
     TestMemoryOptimizerStrategy testMemoryOptimizerStrategySingle(MemBlockStrategyType::SingleAxisPacking);
     auto ptr = std::make_shared<TestMemoryOptimizerStrategy>(testMemoryOptimizerStrategySingle);
-    MemoryOptimizerValidator validator(std::move(ptr));
+    StrategyValidator validator;
+    validator.SetStrategy(ptr);
     // SingleAxisPacking cannot overlap on both X and Y axis.
-    CHECK(!validator.Validate(memBlocks));
+    CHECK_THROWS(validator.Optimize(memBlocks));
 
     // Optimize the memory blocks with TestMemoryOptimizerStrategyMulti
     TestMemoryOptimizerStrategy testMemoryOptimizerStrategyMulti(MemBlockStrategyType::MultiAxisPacking);
     auto ptrMulti = std::make_shared<TestMemoryOptimizerStrategy>(testMemoryOptimizerStrategyMulti);
-    MemoryOptimizerValidator validatorMulti(std::move(ptrMulti));
+    StrategyValidator validatorMulti;
+    validatorMulti.SetStrategy(ptrMulti);
     // MultiAxisPacking cannot overlap on both X and Y axis.
-    CHECK(!validatorMulti.Validate(memBlocks));
+    CHECK_THROWS(validatorMulti.Optimize(memBlocks));
 }
 
 TEST_CASE("MemoryOptimizerStrategyValidatorTestOverlapY")
@@ -139,16 +143,18 @@ TEST_CASE("MemoryOptimizerStrategyValidatorTestOverlapY")
     // Optimize the memory blocks with TestMemoryOptimizerStrategySingle
     TestMemoryOptimizerStrategy testMemoryOptimizerStrategySingle(MemBlockStrategyType::SingleAxisPacking);
     auto ptr = std::make_shared<TestMemoryOptimizerStrategy>(testMemoryOptimizerStrategySingle);
-    MemoryOptimizerValidator validator(std::move(ptr));
+    StrategyValidator validator;
+    validator.SetStrategy(ptr);
     // SingleAxisPacking cannot overlap on Y axis
-    CHECK(!validator.Validate(memBlocks));
+    CHECK_THROWS(validator.Optimize(memBlocks));
 
     // Optimize the memory blocks with TestMemoryOptimizerStrategyMulti
     TestMemoryOptimizerStrategy testMemoryOptimizerStrategyMulti(MemBlockStrategyType::MultiAxisPacking);
     auto ptrMulti = std::make_shared<TestMemoryOptimizerStrategy>(testMemoryOptimizerStrategyMulti);
-    MemoryOptimizerValidator validatorMulti(std::move(ptrMulti));
+    StrategyValidator validatorMulti;
+    validatorMulti.SetStrategy(ptrMulti);
     // MultiAxisPacking can overlap on Y axis
-    CHECK(validatorMulti.Validate(memBlocks));
+    CHECK_NOTHROW(validatorMulti.Optimize(memBlocks));
 }
 
 // TestMemoryOptimizerStrategyDuplicate: Create a MemBin and put all blocks in it duplicating each so validator
@@ -201,14 +207,16 @@ TEST_CASE("MemoryOptimizerStrategyValidatorTestDuplicateBlocks")
     // Duplicate strategy is invalid as same block is found twice
     TestMemoryOptimizerStrategyDuplicate testMemoryOptimizerStrategySingle(MemBlockStrategyType::SingleAxisPacking);
     auto ptr = std::make_shared<TestMemoryOptimizerStrategyDuplicate>(testMemoryOptimizerStrategySingle);
-    MemoryOptimizerValidator validator(std::move(ptr));
-    CHECK(!validator.Validate(memBlocks));
+    StrategyValidator validator;
+    validator.SetStrategy(ptr);
+    CHECK_THROWS(validator.Optimize(memBlocks));
 
     // Optimize the memory blocks with TestMemoryOptimizerStrategyMulti
     TestMemoryOptimizerStrategyDuplicate testMemoryOptimizerStrategyMulti(MemBlockStrategyType::MultiAxisPacking);
     auto ptrMulti = std::make_shared<TestMemoryOptimizerStrategyDuplicate>(testMemoryOptimizerStrategyMulti);
-    MemoryOptimizerValidator validatorMulti(std::move(ptrMulti));
-    CHECK(!validatorMulti.Validate(memBlocks));
+    StrategyValidator validatorMulti;
+    validatorMulti.SetStrategy(ptrMulti);
+    CHECK_THROWS(validatorMulti.Optimize(memBlocks));
 }
 
 // TestMemoryOptimizerStrategySkip: Create a MemBin and put all blocks in it skipping every other block so validator
@@ -260,14 +268,16 @@ TEST_CASE("MemoryOptimizerStrategyValidatorTestSkipBlocks")
     // Skip strategy is invalid as every second block is not found
     TestMemoryOptimizerStrategySkip testMemoryOptimizerStrategySingle(MemBlockStrategyType::SingleAxisPacking);
     auto ptr = std::make_shared<TestMemoryOptimizerStrategySkip>(testMemoryOptimizerStrategySingle);
-    MemoryOptimizerValidator validator(std::move(ptr));
-    CHECK(!validator.Validate(memBlocks));
+    StrategyValidator validator;
+    validator.SetStrategy(ptr);
+    CHECK_THROWS(validator.Optimize(memBlocks));
 
     // Optimize the memory blocks with TestMemoryOptimizerStrategyMulti
     TestMemoryOptimizerStrategySkip testMemoryOptimizerStrategyMulti(MemBlockStrategyType::MultiAxisPacking);
     auto ptrMulti = std::make_shared<TestMemoryOptimizerStrategySkip>(testMemoryOptimizerStrategyMulti);
-    MemoryOptimizerValidator validatorMulti(std::move(ptrMulti));
-    CHECK(!validatorMulti.Validate(memBlocks));
+    StrategyValidator validatorMulti;
+    validatorMulti.SetStrategy(ptrMulti);
+    CHECK_THROWS(validatorMulti.Optimize(memBlocks));
 }
 
 }

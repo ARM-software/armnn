@@ -221,3 +221,7 @@ if(BUILD_ACCURACY_TOOL)
     target_include_directories(ImageCSVFileGenerator PRIVATE ../src/armnnUtils)
     ImageTensorExecutor(ImageCSVFileGenerator)
 endif()
+
+if(BUILD_MEMORY_STRATEGY_BENCHMARK)
+    add_subdirectory(MemoryStrategyBenchmark)
+endif()

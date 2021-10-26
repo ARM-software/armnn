@@ -10,11 +10,11 @@
 namespace armnn
 {
 // ConstLayerMemoryOptimizer: Create a unique MemBin for each MemBlock and assign it an offset of 0
-class ConstLayerMemoryOptimizerStrategy : public IMemoryOptimizerStrategy
+class ConstantMemoryStrategy : public IMemoryOptimizerStrategy
 {
 public:
-    ConstLayerMemoryOptimizerStrategy()
-    : m_Name(std::string("ConstLayerMemoryOptimizerStrategy"))
+    ConstantMemoryStrategy()
+    : m_Name(std::string("ConstantMemoryStrategy"))
     , m_MemBlockStrategyType(MemBlockStrategyType::SingleAxisPacking) {}
 
     std::string GetName() const override;

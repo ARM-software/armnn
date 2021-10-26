@@ -3,12 +3,14 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/memoryOptimizationStrategies/MemoryOptimizerStrategyValidator.hpp>
+#include <unordered_map>
+#include <iostream>
+#include "StrategyValidator.hpp"
 
 namespace armnn
 {
 
-bool MemoryOptimizerValidator::Validate(std::vector<MemBlock>& memBlocks)
+std::vector<MemBin> StrategyValidator::Optimize(std::vector<MemBlock>& memBlocks)
 {
     // Condition #1: All Memblocks have been assigned to a MemBin
 
@@ -18,36 +20,46 @@ bool MemoryOptimizerValidator::Validate(std::vector<MemBlock>& memBlocks)
     //               Memblocks in a MemBin can overlap on the X axis for SingleAxisPacking
     //               Memblocks in a MemBin can overlap on the Y axis or the X for MultiAxisPacking but not both
 
+    std::unordered_map<unsigned int, bool> validationMap;
+
+    for (auto memBlock : memBlocks)
+    {
+        validationMap[memBlock.m_Index] = false;
+    }
+
     auto memBinVect = m_Strategy->Optimize(memBlocks);
 
     // Compare each of the input memblocks against every assignedBlock in each bin
     // if we get through all bins without finding a block return
     // if at any stage the block is found twice return
 
-    for (auto memBlock : memBlocks)
+    for (auto memBin : memBinVect)
     {
-        auto found = false;
-
-        for (auto bin : memBinVect)
+        for (auto block : memBin.m_MemBlocks)
         {
-            for (auto assignedBlock : bin.m_MemBlocks)
+            try
             {
-                if (memBlock.m_Index == assignedBlock.m_Index)
+                if (!validationMap.at(block.m_Index))
                 {
-                    if (found)
-                    {
-                        // Condition #2: Memblock is assigned to multiple MemBins
-                        return false;
-                    }
-
-                    found = true;
+                    validationMap.at(block.m_Index) = true;
+                }
+                else
+                {
+                    throw MemoryValidationException("Condition #2: Memblock is assigned to multiple MemBins");
                 }
             }
+            catch (const std::out_of_range&)
+            {
+                throw MemoryValidationException("Unknown index ");
+            }
         }
-        // Condition #1: Block not found in any bin so return false as strategy is invalid
-        if (!found)
+    }
+
+    for (auto memBlock : memBlocks)
+    {
+        if (!validationMap.at(memBlock.m_Index))
         {
-            return false;
+            throw MemoryValidationException("Condition #1: Block not found in any bin");
         }
     }
 
@@ -84,7 +96,7 @@ bool MemoryOptimizerValidator::Validate(std::vector<MemBlock>& memBlocks)
                      (assignedIndex != otherIndex))
                 {
                     // Condition #3: two Memblocks overlap on both the X and Y axis
-                    return false;
+                    throw MemoryValidationException("Condition #3: two Memblocks overlap on both the X and Y axis");
                 }
 
                 switch (m_Strategy->GetMemBlockStrategyType())
@@ -96,8 +108,9 @@ bool MemoryOptimizerValidator::Validate(std::vector<MemBlock>& memBlocks)
                             // Cant overlap with itself
                             (assignedIndex != otherIndex))
                         {
-                            // Condition #3: invalid as two Memblocks overlap on the Y axis for SingleAxisPacking
-                            return false;
+                            throw MemoryValidationException("Condition #3: "
+                                        "invalid as two Memblocks overlap on the Y axis for SingleAxisPacking");
+
                         }
                         break;
                     }
@@ -106,16 +119,14 @@ bool MemoryOptimizerValidator::Validate(std::vector<MemBlock>& memBlocks)
                         break;
                     }
                     default:
-                        // Unknown MemBlockStrategyType
-                        return false;
+                        throw MemoryValidationException("Unknown MemBlockStrategyType");
                 }
             }
-
         }
     }
 
     // None of the conditions broken so return true
-    return true;
+    return memBinVect;
 }
 
 } // namespace armnn

@@ -24,9 +24,6 @@ list(APPEND armnnBackendsCommon_sources
     MemCopyWorkload.hpp
     MemImportWorkload.cpp
     MemImportWorkload.hpp
-    MemoryOptimizerStrategyFactory.hpp
-    MemoryOptimizerStrategyLibrary.cpp
-    MemoryOptimizerStrategyLibrary.hpp
     MemoryManager.cpp
     MemoryManager.hpp
     MemSyncWorkload.cpp
@@ -51,7 +48,7 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadUtils.hpp
 )
 
-add_subdirectory(memoryOptimizationStrategies)
+add_subdirectory(memoryOptimizerStrategyLibrary)
 
 if(BUILD_UNIT_TESTS)
     add_subdirectory(test)

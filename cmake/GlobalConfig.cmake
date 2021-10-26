@@ -32,6 +32,7 @@ option(BUILD_PYTHON_SRC "Build Python source package" OFF)
 option(BUILD_STATIC_PIPE_LIBS "Build Static PIPE libraries" OFF)
 option(BUILD_PIPE_ONLY "Build the PIPE libraries only" OFF)
 option(BUILD_ARMNN_TFLITE_DELEGATE "Build the Arm NN TfLite delegate" OFF)
+option(BUILD_MEMORY_STRATEGY_BENCHMARK "Build the MemoryBenchmark" OFF)
 
 include(SelectLibraryConfigurations)
 

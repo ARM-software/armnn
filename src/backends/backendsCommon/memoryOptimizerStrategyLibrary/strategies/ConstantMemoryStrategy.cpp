@@ -3,17 +3,17 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ConstLayerMemoryOptimizerStrategy.hpp"
+#include "ConstantMemoryStrategy.hpp"
 
 namespace armnn
 {
 
-std::string ConstLayerMemoryOptimizerStrategy::GetName() const
+std::string ConstantMemoryStrategy::GetName() const
 {
     return m_Name;
 }
 
-MemBlockStrategyType ConstLayerMemoryOptimizerStrategy::GetMemBlockStrategyType() const
+MemBlockStrategyType ConstantMemoryStrategy::GetMemBlockStrategyType() const
 {
     return m_MemBlockStrategyType;
 }
@@ -22,7 +22,7 @@ MemBlockStrategyType ConstLayerMemoryOptimizerStrategy::GetMemBlockStrategyType(
 // 1: All MemBlocks have been assigned to a MemBin
 // 2: No MemBlock is assigned to multiple MemBins
 // 3: No two Memblocks in a MemBin overlap in both the X and Y axis
-std::vector<MemBin> ConstLayerMemoryOptimizerStrategy::Optimize(std::vector<MemBlock>& memBlocks)
+std::vector<MemBin> ConstantMemoryStrategy::Optimize(std::vector<MemBlock>& memBlocks)
 {
     std::vector<MemBin> memBins;
     memBins.reserve(memBlocks.size());

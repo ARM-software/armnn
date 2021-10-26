@@ -17,7 +17,6 @@ COMMON_SOURCES := \
     MapWorkload.cpp \
     MemCopyWorkload.cpp \
     MemImportWorkload.cpp \
-    MemoryOptimizerStrategyLibrary.cpp \
     MemSyncWorkload.cpp \
     OptimizationViews.cpp \
     TensorHandleFactoryRegistry.cpp \
@@ -25,8 +24,9 @@ COMMON_SOURCES := \
     WorkloadData.cpp \
     WorkloadFactory.cpp \
     WorkloadUtils.cpp \
-    memoryOptimizationStrategies/ConstLayerMemoryOptimizerStrategy.cpp \
-    memoryOptimizationStrategies/MemoryOptimizerStrategyValidator.cpp
+    memoryOptimizerStrategyLibrary/strategies/ConstantMemoryStrategy.cpp \
+    memoryOptimizerStrategyLibrary/strategies/StrategyValidator.cpp \
+
 
 # COMMON_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked
@@ -102,8 +102,8 @@ COMMON_TEST_SOURCES := \
     test/layerTests/SubtractionTestImpl.cpp \
     test/layerTests/TransposeConvolution2dTestImpl.cpp \
     test/layerTests/UnidirectionalSequenceLstmTestImpl.cpp \
-    memoryOptimizationStrategies/test/ConstLayerMemoryOptimizerStrategyTests.cpp \
-    memoryOptimizationStrategies/test/MemoryOptimizerStrategyValidatorTests.cpp
+    memoryOptimizerStrategyLibrary/test/ConstMemoryStrategyTests.cpp \
+    memoryOptimizerStrategyLibrary/test/ValidatorStrategyTests.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \

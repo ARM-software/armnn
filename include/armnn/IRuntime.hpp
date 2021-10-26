@@ -198,7 +198,7 @@ public:
         /// The following backend options are available:
         /// AllBackends:
         ///   "MemoryOptimizerStrategy" : string [stategynameString]
-        ///    (Existing Memory Optimizer Strategies: ConstLayerMemoryOptimizerStrategy)
+        ///    (Existing Memory Optimizer Strategies: ConstantMemoryStrategy)
         /// GpuAcc:
         ///   "TuningLevel" : int [0..3] (0=UseOnly(default) | 1=RapidTuning | 2=NormalTuning | 3=ExhaustiveTuning)
         ///   "TuningFile" : string [filenameString]

@@ -3,18 +3,18 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/memoryOptimizationStrategies/ConstLayerMemoryOptimizerStrategy.hpp>
-#include <backendsCommon/memoryOptimizationStrategies/MemoryOptimizerStrategyValidator.hpp>
+#include <backendsCommon/memoryOptimizerStrategyLibrary/strategies/ConstantMemoryStrategy.hpp>
+#include <backendsCommon/memoryOptimizerStrategyLibrary/strategies/StrategyValidator.hpp>
 
 #include <doctest/doctest.h>
 #include <vector>
 
 using namespace armnn;
 
-TEST_SUITE("ConstLayerMemoryOptimizerStrategyTestSuite")
+TEST_SUITE("ConstMemoryStrategyTestSuite")
 {
 
-TEST_CASE("ConstLayerMemoryOptimizerStrategyTest")
+TEST_CASE("ConstMemoryStrategyTest")
 {
     // create a few memory blocks
     MemBlock memBlock0(0, 2, 20, 0, 0);
@@ -31,9 +31,9 @@ TEST_CASE("ConstLayerMemoryOptimizerStrategyTest")
     memBlocks.push_back(memBlock3);
     memBlocks.push_back(memBlock4);
 
-    // Optimize the memory blocks with ConstLayerMemoryOptimizerStrategy
-    ConstLayerMemoryOptimizerStrategy constLayerMemoryOptimizerStrategy;
-    CHECK_EQ(constLayerMemoryOptimizerStrategy.GetName(), std::string("ConstLayerMemoryOptimizerStrategy"));
+    // Optimize the memory blocks with ConstantMemoryStrategy
+    ConstantMemoryStrategy constLayerMemoryOptimizerStrategy;
+    CHECK_EQ(constLayerMemoryOptimizerStrategy.GetName(), std::string("ConstantMemoryStrategy"));
     CHECK_EQ(constLayerMemoryOptimizerStrategy.GetMemBlockStrategyType(), MemBlockStrategyType::SingleAxisPacking);
     auto memBins = constLayerMemoryOptimizerStrategy.Optimize(memBlocks);
     CHECK(memBins.size() == 5);
@@ -67,11 +67,11 @@ TEST_CASE("ConstLayerMemoryOptimizerStrategyValidatorTest")
     memBlocks.push_back(memBlock4);
 
     // Optimize the memory blocks with ConstLayerMemoryOptimizerStrategy
-    ConstLayerMemoryOptimizerStrategy constLayerMemoryOptimizerStrategy;
-    auto ptr = std::make_shared<ConstLayerMemoryOptimizerStrategy>(constLayerMemoryOptimizerStrategy);
-    MemoryOptimizerValidator validator(std::move(ptr));
+    auto ptr = std::make_shared<ConstantMemoryStrategy>();
+    StrategyValidator validator;
+    validator.SetStrategy(ptr);
     // Ensure ConstLayerMemoryOptimizerStrategy is valid
-    CHECK(validator.Validate(memBlocks));
+    CHECK_NOTHROW(validator.Optimize(memBlocks));
 }
 
 }

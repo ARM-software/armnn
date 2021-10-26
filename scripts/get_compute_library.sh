@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="5601eb1b38a01424578876b466a0a11d44ca40f1" #Reduce size of large conv3d nightly tests
+DEFAULT_CLFRAMEWORKREVISION="f727ef49e2109bdac105dd6575d2e336adf780a3" #Add uint8/int8 support to cpu conv3d
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

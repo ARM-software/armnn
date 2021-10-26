@@ -171,6 +171,8 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
     {
         // (Initializes with CpuRef backend)
         armnnDelegate::DelegateOptions options = armnnDelegate::TfLiteArmnnDelegateOptionsDefault();
+
+        armnn::IRuntime::CreationOptions runtimeOptions;
         armnn::OptimizerOptions optimizerOptions;
         bool internalProfilingState = false;
         armnn::ProfilingDetailsMethod internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
@@ -194,7 +196,7 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
             // Process dynamic-backends-path
             else if (std::string(options_keys[i]) == std::string("dynamic-backends-path"))
             {
-                options.SetDynamicBackendsPath(std::string(options_values[i]));
+                runtimeOptions.m_DynamicBackendsPath = std::string(options_values[i]);
             }
             // Process logging level
             else if (std::string(options_keys[i]) == std::string("logging-severity"))
@@ -205,26 +207,26 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
             else if (std::string(options_keys[i]) == std::string("gpu-tuning-level"))
             {
                 armnn::BackendOptions option("GpuAcc", {{"TuningLevel", atoi(options_values[i])}});
-                options.AddBackendOption(option);
+                runtimeOptions.m_BackendOptions.push_back(option);
             }
             else if (std::string(options_keys[i]) == std::string("gpu-mlgo-tuning-file"))
             {
                 armnn::BackendOptions option("GpuAcc", {{"MLGOTuningFilePath", std::string(options_values[i])}});
-                options.AddBackendOption(option);
+                optimizerOptions.m_ModelOptions.push_back(option);
             }
             else if (std::string(options_keys[i]) == std::string("gpu-tuning-file"))
             {
                 armnn::BackendOptions option("GpuAcc", {{"TuningFile", std::string(options_values[i])}});
-                options.AddBackendOption(option);
+                runtimeOptions.m_BackendOptions.push_back(option);
             }
             else if (std::string(options_keys[i]) == std::string("gpu-enable-profiling"))
             {
-                options.SetGpuProfilingState(*options_values[i] != '0');
+                runtimeOptions.m_EnableGpuProfiling = (*options_values[i] != '0');
             }
             else if (std::string(options_keys[i]) == std::string("gpu-kernel-profiling-enabled"))
             {
                 armnn::BackendOptions option("GpuAcc", {{"KernelProfilingEnabled", (*options_values[i] != '0')}});
-                options.AddBackendOption(option);
+                runtimeOptions.m_BackendOptions.push_back(option);
             }
             else if (std::string(options_keys[i]) == std::string("save-cached-network"))
             {
@@ -340,6 +342,8 @@ TfLiteDelegate* tflite_plugin_create_delegate(char** options_keys,
                 throw armnn::Exception("Unknown option for the ArmNN Delegate given: " + std::string(options_keys[i]));
             }
         }
+
+        options.SetRuntimeOptions(runtimeOptions);
         options.SetOptimizerOptions(optimizerOptions);
         options.SetInternalProfilingParams(internalProfilingState, internalProfilingDetail);
         options.SetExternalProfilingParams(extProfilingParams);

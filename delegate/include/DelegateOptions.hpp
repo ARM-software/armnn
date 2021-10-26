@@ -41,16 +41,34 @@ public:
 
     void SetBackends(const std::vector<armnn::BackendId>& backends) { m_Backends = backends; }
 
-    void SetDynamicBackendsPath(const std::string& dynamicBackendsPath) { m_DynamicBackendsPath = dynamicBackendsPath; }
-    const std::string& GetDynamicBackendsPath() const { return m_DynamicBackendsPath; }
+    void SetDynamicBackendsPath(const std::string& dynamicBackendsPath)
+    {
+        m_RuntimeOptions.m_DynamicBackendsPath = dynamicBackendsPath;
+    }
+    const std::string& GetDynamicBackendsPath() const
+    {
+        return m_RuntimeOptions.m_DynamicBackendsPath;
+    }
 
-    void SetGpuProfilingState(bool gpuProfilingState) { m_EnableGpuProfiling = gpuProfilingState; }
-    bool GetGpuProfilingState() { return m_EnableGpuProfiling; }
+    void SetGpuProfilingState(bool gpuProfilingState)
+    {
+        m_RuntimeOptions.m_EnableGpuProfiling = gpuProfilingState;
+    }
+    bool GetGpuProfilingState()
+    {
+        return m_RuntimeOptions.m_EnableGpuProfiling;
+    }
 
-    const std::vector<armnn::BackendOptions>& GetBackendOptions() const { return m_BackendOptions; }
+    const std::vector<armnn::BackendOptions>& GetBackendOptions() const
+    {
+        return m_RuntimeOptions.m_BackendOptions;
+    }
 
     /// Appends a backend option to the list of backend options
-    void AddBackendOption(const armnn::BackendOptions& option) { m_BackendOptions.push_back(option); }
+    void AddBackendOption(const armnn::BackendOptions& option)
+    {
+        m_RuntimeOptions.m_BackendOptions.push_back(option);
+    }
 
     /// Sets the severity level for logging within ArmNN that will be used on creation of the delegate
     void SetLoggingSeverity(const armnn::LogSeverity& level) { m_LoggingSeverity = level; }
@@ -85,66 +103,32 @@ public:
     void SetSerializeToDot(const std::string& serializeToDotFile) { m_SerializeToDot = serializeToDotFile; }
     const std::string& GetSerializeToDot() const { return m_SerializeToDot; }
 
+    /// @Note: This might overwrite options that were set with other setter functions of DelegateOptions
+    void SetRuntimeOptions(const armnn::IRuntime::CreationOptions& runtimeOptions)
+    {
+        m_RuntimeOptions = runtimeOptions;
+    }
+
+    const armnn::IRuntime::CreationOptions& GetRuntimeOptions()
+    {
+        return m_RuntimeOptions;
+    }
+
 private:
     /// Which backend to run Delegate on.
     /// Examples of possible values are: CpuRef, CpuAcc, GpuAcc.
     /// CpuRef as default.
     std::vector<armnn::BackendId> m_Backends = { armnn::Compute::CpuRef };
 
-    /// Pass backend specific options to Delegate
-    ///
-    /// For example, tuning can be enabled on GpuAcc like below
-    /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    /// m_BackendOptions.emplace_back(
-    ///     BackendOptions{"GpuAcc",
-    ///       {
-    ///         {"TuningLevel", 2},
-    ///         {"TuningFile", filename}
-    ///       }
-    ///     });
-    /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    /// The following backend options are available:
-    /// GpuAcc:
-    ///   "TuningLevel" : int [0..3] (0=UseOnly(default) | 1=RapidTuning | 2=NormalTuning | 3=ExhaustiveTuning)
-    ///   "TuningFile" : string [filenameString]
-    ///   "KernelProfilingEnabled" : bool [true | false]
-    std::vector<armnn::BackendOptions> m_BackendOptions;
+    /// Creation options for the ArmNN runtime
+    /// Contains options for global settings that are valid for the whole lifetime of ArmNN
+    /// i.e. BackendOptions, DynamicBackendPath, ExternalProfilingOptions and more
+    armnn::IRuntime::CreationOptions m_RuntimeOptions;
 
-    /// Dynamic backend path.
-    /// This is the directory that will be searched for any dynamic backends.
-    std::string m_DynamicBackendsPath = "";
-
-    /// Enable Gpu Profiling.
-    bool m_EnableGpuProfiling = false;
-
-    /// OptimizerOptions
-    /// Reduce Fp32 data to Fp16 for faster processing
-    /// bool m_ReduceFp32ToFp16;
-    /// Add debug data for easier troubleshooting
-    /// bool m_Debug;
-    /// Reduce Fp32 data to Bf16 for faster processing
-    /// bool m_ReduceFp32ToBf16;
-    /// Enable Import
-    /// bool m_ImportEnabled;
-    /// Enable Model Options
-    /// ModelOptions m_ModelOptions;
+    /// Options for the optimization step for the network
     armnn::OptimizerOptions m_OptimizerOptions;
 
     /// External profiling options.
-    /// Indicates whether external profiling is enabled or not.
-    /// bool m_EnableProfiling
-    /// Indicates whether external timeline profiling is enabled or not.
-    /// bool m_TimelineEnabled
-    /// Path to a file in which outgoing timeline profiling messages will be stored.
-    /// std::string m_OutgoingCaptureFile
-    /// Path to a file in which incoming timeline profiling messages will be stored.
-    /// std::string m_IncomingCaptureFile
-    /// Enable profiling output to file only.
-    /// bool m_FileOnly
-    /// The duration at which captured profiling messages will be flushed.
-    /// uint32_t m_CapturePeriod
-    /// The format of the file used for outputting profiling data.
-    /// std::string m_FileFormat
     armnn::IRuntime::CreationOptions::ExternalProfilingOptions m_ProfilingOptions;
 
     /// Internal profiling options.

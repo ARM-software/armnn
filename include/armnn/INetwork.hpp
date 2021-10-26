@@ -115,6 +115,8 @@ protected:
 };
 
 
+/// ArmNN performs an optimization on each model/network before it gets loaded for execution. OptimizerOptions provides
+/// a set of features that allows the user to customize this optimization on a per model basis.
 struct OptimizerOptions
 {
     OptimizerOptions()
@@ -160,13 +162,21 @@ struct OptimizerOptions
         }
     }
 
-    // Reduce Fp32 data to Fp16 for faster processing
+    /// Reduces all Fp32 operators in the model to Fp16 for faster processing.
+    /// @Note This feature works best if all operators of the model are in Fp32. ArmNN will add conversion layers
+    ///       between layers that weren't in Fp32 in the first place or if the operator is not supported in Fp16.
+    ///       The overhead of these conversions can lead to a slower overall performance if too many conversions are
+    ///       required.
     bool m_ReduceFp32ToFp16;
 
     // Add debug data for easier troubleshooting
     bool m_Debug;
 
-    // Reduce Fp32 data to Bf16 for faster processing
+    /// Reduces all Fp32 operators in the model to Bf16 for faster processing.
+    /// @Note This feature works best if all operators of the model are in Fp32. ArmNN will add conversion layers
+    ///       between layers that weren't in Fp32 in the first place or if the operator is not supported in Bf16.
+    ///       The overhead of these conversions can lead to a slower overall performance if too many conversions are
+    ///       required.
     bool m_ReduceFp32ToBf16;
 
     // Infer output size when not available

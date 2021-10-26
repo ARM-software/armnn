@@ -119,6 +119,7 @@ public:
 
         /// Setting this value will override the paths set by the DYNAMIC_BACKEND_PATHS compiler directive
         /// Only a single path is allowed for the override
+        /// It defines the path to search for any [dynamic backend libraries](src/dynamic/README.md).
         std::string m_DynamicBackendsPath;
 
         /// Setting this flag will allow the user to create the Runtime in protected mode.
@@ -158,12 +159,19 @@ public:
                 , m_LocalPacketHandlers()
             {}
 
+            /// Indicates whether external profiling is enabled or not.
             bool        m_EnableProfiling;
+            /// Indicates whether external timeline profiling is enabled or not.
             bool        m_TimelineEnabled;
+            /// Path to a file in which outgoing timeline profiling messages will be stored.
             std::string m_OutgoingCaptureFile;
+            /// Path to a file in which incoming timeline profiling messages will be stored.
             std::string m_IncomingCaptureFile;
+            /// Enable profiling output to file only.
             bool        m_FileOnly;
+            /// The duration at which captured profiling messages will be flushed.
             uint32_t    m_CapturePeriod;
+            /// The format of the file used for outputting profiling data.
             std::string m_FileFormat;
             std::vector<armnn::profiling::ILocalPacketHandlerSharedPtr> m_LocalPacketHandlers;
         };

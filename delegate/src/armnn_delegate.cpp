@@ -137,21 +137,7 @@ Delegate::Delegate(armnnDelegate::DelegateOptions options)
     }
 
     // Create ArmNN Runtime
-    armnn::IRuntime::CreationOptions runtimeOptions;
-    runtimeOptions.m_DynamicBackendsPath = m_Options.GetDynamicBackendsPath();
-    runtimeOptions.m_EnableGpuProfiling = m_Options.GetGpuProfilingState();
-    runtimeOptions.m_ProfilingOptions = m_Options.GetExternalProfilingParams();
-
-    auto backendOptions = m_Options.GetBackendOptions();
-    if (!backendOptions.empty())
-    {
-        runtimeOptions.m_BackendOptions = backendOptions;
-    }
-    else if (!m_Options.GetOptimizerOptions().m_ModelOptions.empty())
-    {
-        runtimeOptions.m_BackendOptions = m_Options.GetOptimizerOptions().m_ModelOptions;
-    }
-    m_Runtime = armnn::IRuntime::Create(runtimeOptions);
+    m_Runtime = armnn::IRuntime::Create(options.GetRuntimeOptions());
 
     std::vector<armnn::BackendId> backends;
     if (m_Runtime)

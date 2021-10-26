@@ -201,7 +201,7 @@ enum class OutputShapeRounding
 /// The ShapeInferenceMethod modify how the output shapes are treated.
 /// When ValidateOnly is selected, the output shapes are inferred from the input parameters of the layer
 /// and any mismatch is reported.
-/// When InferAndValidate is selected 2 actions must be performed: (1)infer output shape from inputs and (2)validate the
+/// When InferAndValidate is selected 2 actions are performed: (1)infer output shape from inputs and (2)validate the
 /// shapes as in ValidateOnly. This option has been added to work with tensors which rank or dimension sizes are not
 /// specified explicitly, however this information can be calculated from the inputs.
 ///

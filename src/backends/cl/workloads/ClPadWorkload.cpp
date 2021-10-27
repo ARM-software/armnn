@@ -1,11 +1,12 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ClPadWorkload.hpp"
 
 #include <cl/ClTensorHandle.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <arm_compute/core/Types.h>
 
@@ -43,7 +44,12 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
 
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPadWorkload_configure");
-        m_Layer.configure(clCompileContext, &input, &output, padList, pixelValue);
+        m_Layer.configure(clCompileContext,
+                          &input,
+                          &output,
+                          padList,
+                          pixelValue,
+                          ConvertPaddingModeToAcl(descriptor.m_Parameters.m_PaddingMode));
     }
 }
 
@@ -68,9 +74,14 @@ arm_compute::Status ClPadValidate(const TensorInfo& input,
 
     arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(reversed_PadList);
 
-    const arm_compute::Status aclStatus = arm_compute::CLPadLayer::validate(&aclInputInfo,
-                                                                            &aclOutputInfo,
-                                                                            padList);
+    // PixelValue is currently unused when validating, but it's required to pass in PaddingMode.
+    arm_compute::PixelValue pixelValue = GetPixelValue(&aclInputInfo, descriptor.m_PadValue);
+    const arm_compute::Status aclStatus =
+            arm_compute::CLPadLayer::validate(&aclInputInfo,
+                                              &aclOutputInfo,
+                                              padList,
+                                              pixelValue,
+                                              ConvertPaddingModeToAcl(descriptor.m_PaddingMode));
 
     return aclStatus;
 }

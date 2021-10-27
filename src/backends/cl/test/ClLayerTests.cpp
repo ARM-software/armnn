@@ -946,7 +946,7 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleReshapeUint8, ClContextControlFixture, Si
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Reshape5d, ClContextControlFixture, Reshape5dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ReshapeBoolean, ClContextControlFixture, ReshapeBooleanTest)
 
-// Pad
+// Pad - Constant
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PadFloat322d, ClContextControlFixture, PadFloat322dTest)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PadFloat322dCustomPadding, ClContextControlFixture, PadFloat322dCustomPaddingTest)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PadFloat323d, ClContextControlFixture, PadFloat323dTest)
@@ -963,6 +963,18 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Pad2dQSymm16CustomPadding,
     ClContextControlFixture, Pad2dTestCommon<DataType::QSymmS16>, 2.0f, 0, 1.0f)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Pad3dQSymm16, ClContextControlFixture, Pad3dTestCommon<DataType::QSymmS16>, 2.0f, 0)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Pad4dQSymm16, ClContextControlFixture, Pad4dTestCommon<DataType::QSymmS16>, 2.0f, 0)
+
+// Pad - Symmetric & Reflect
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric2dFloat32, PadSymmetric2dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect2dFloat32, PadReflect2dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric3dFloat32, PadSymmetric3dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect3dFloat32, PadReflect3dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric3dUint8, PadSymmetric3dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect3dUint8, PadReflect3dUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetric3dInt8, PadSymmetric3dInt8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflect3dInt8, PadReflect3dInt8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadSymmetricFloat16, PadSymmetricFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflectFloat16, PadReflectFloat16Test)
 
 // PReLU
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PreluFloat32, ClContextControlFixture, PreluTest<DataType::Float32>)

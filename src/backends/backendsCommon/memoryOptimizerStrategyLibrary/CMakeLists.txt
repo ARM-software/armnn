@@ -10,6 +10,8 @@ list(APPEND armnnMemoryOptimizationStrategies_sources
             strategies/ConstantMemoryStrategy.cpp
             strategies/StrategyValidator.hpp
             strategies/StrategyValidator.cpp
+            strategies/SingleAxisPriorityList.hpp
+            strategies/SingleAxisPriorityList.cpp
 )
 
 if(BUILD_UNIT_TESTS)

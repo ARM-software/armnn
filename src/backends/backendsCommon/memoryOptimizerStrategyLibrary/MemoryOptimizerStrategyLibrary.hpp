@@ -10,6 +10,7 @@
 
 #include "strategies/ConstantMemoryStrategy.hpp"
 #include "strategies/StrategyValidator.hpp"
+#include "strategies/SingleAxisPriorityList.hpp"
 
 namespace
 {
@@ -17,6 +18,7 @@ namespace
 static const std::vector<std::string> memoryOptimizationStrategies(
 {
     "ConstantMemoryStrategy",
+    "SingleAxisPriorityList"
     "StrategyValidator"
 });
 

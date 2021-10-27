@@ -18,9 +18,11 @@
 
 std::vector<TestBlock> testBlocks
 {
+    {"fsrcnn", fsrcnn},
     {"inceptionv4", inceptionv4},
     {"deeplabv3", deeplabv3},
     {"deepspeechv1", deepspeechv1},
+    {"mobilebert", mobilebert},
     {"ssd_mobilenetv2", ssd_mobilenetv2},
     {"resnetv2", resnetv2},
     {"yolov3",yolov3}
@@ -36,9 +38,16 @@ void PrintModels()
     std::cout << "\n";
 }
 
-size_t GetMinPossibleMemorySize(const std::vector<armnn::MemBlock> blocks)
+size_t GetMinPossibleMemorySize(const std::vector<armnn::MemBlock>& blocks)
 {
-   std::vector<size_t> lifetimes(1000);
+    unsigned int maxLifetime = 0;
+    for (auto& block: blocks)
+    {
+        maxLifetime = std::max(maxLifetime, block.m_EndOfLife);
+    }
+    maxLifetime++;
+
+   std::vector<size_t> lifetimes(maxLifetime);
    for (const auto& block : blocks)
    {
        for (auto lifetime = block.m_StartOfLife; lifetime <= block.m_EndOfLife; ++lifetime)

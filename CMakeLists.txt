@@ -108,6 +108,7 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/TensorUtils.cpp
     src/armnnUtils/Threads.cpp
     src/armnnUtils/Transpose.cpp
+    third-party/mapbox/variant.hpp
     )
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})

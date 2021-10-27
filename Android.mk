@@ -45,13 +45,15 @@ endif
 LOCAL_ARM_MODE := arm
 LOCAL_PROPRIETARY_MODULE := true
 
-# placeholder to hold all backend source files, common and specific to the backends
+# Placeholder to hold all backend source files and include paths, common and specific to the backends
 ARMNN_BACKEND_SOURCES :=
+ARMNN_BACKEND_INCLUDES :=
 
 #
-# iterate through the backend common and specific include paths, include them into the
+# Iterate through the backend common and specific include paths, include them into the
 # current makefile and append the sources held by the COMMON_SOURCES and BACKEND_SOURCES variable
 # (included from the given makefile) to the ARMNN_BACKEND_SOURCES list
+# and optional include paths set by BACKEND_INCLUDES to the ARMNN_BACKEND_INCLUDES list
 #
 $(foreach mkPath,$(ARMNN_BACKEND_COMMON_MAKEFILE_DIRS),\
         $(eval include $(LOCAL_PATH)/$(mkPath)/common.mk)\
@@ -62,6 +64,10 @@ $(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
         $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
         $(eval ARMNN_BACKEND_SOURCES := $(ARMNN_BACKEND_SOURCES)\
         $(patsubst %,$(mkPath)/%,$(BACKEND_SOURCES))))
+
+$(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
+        $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
+        $(eval ARMNN_BACKEND_INCLUDES += $(BACKEND_INCLUDES)))
 
 # Mark source files as dependent on Android.mk and backend makefiles
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk \
@@ -94,7 +100,8 @@ LOCAL_C_INCLUDES := \
         $(ARMNN_PROFILING_HEADER_PATH) \
         $(ARMNN_BACKENDS_HEADER_PATH) \
         $(ARMNN_SERIALIZER_HEADER_PATH) \
-        $(ARMNN_DESERIALIZER_HEADER_PATH)
+        $(ARMNN_DESERIALIZER_HEADER_PATH) \
+        $(ARMNN_BACKEND_INCLUDES)
 
 LOCAL_SRC_FILES := \
         $(ARMNN_BACKEND_SOURCES) \

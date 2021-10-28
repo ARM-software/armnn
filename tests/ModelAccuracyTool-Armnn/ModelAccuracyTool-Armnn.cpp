@@ -9,7 +9,7 @@
 #include "armnnDeserializer/IDeserializer.hpp"
 
 #include <armnnUtils/Filesystem.hpp>
-#include <armnn/Utils.hpp>
+#include <armnnUtils/TContainer.hpp>
 
 #include <cxxopts/cxxopts.hpp>
 #include <map>
@@ -325,8 +325,8 @@ int main(int argc, char* argv[])
                 const std::string imageName = imageEntry.first;
                 std::cout << "Processing image: " << imageName << "\n";
 
-                vector<armnn::TContainer> inputDataContainers;
-                vector<armnn::TContainer> outputDataContainers;
+                vector<armnnUtils::TContainer> inputDataContainers;
+                vector<armnnUtils::TContainer> outputDataContainers;
 
                 auto imagePath = pathToDataDir / fs::path(imageName);
                 switch (inputTensorDataType)
@@ -370,7 +370,7 @@ int main(int argc, char* argv[])
                     ARMNN_LOG(fatal) << "armnn::IRuntime: Failed to enqueue workload for image: " << imageName;
                 }
 
-                checker.AddImageResult<armnn::TContainer>(imageName, outputDataContainers);
+                checker.AddImageResult<armnnUtils::TContainer>(imageName, outputDataContainers);
             }
         }
         else

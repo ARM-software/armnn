@@ -7,6 +7,8 @@
 #include <armnn/Utils.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <armnnUtils/TContainer.hpp>
+
 #include "CxxoptsUtils.hpp"
 
 #include <cxxopts/cxxopts.hpp>
@@ -38,7 +40,7 @@ ClassifierTestCase<TTestCaseDatabase, TModel>::ClassifierTestCase(
     unsigned int label,
     std::vector<typename TModel::DataType> modelInput)
     : InferenceModelTestCase<TModel>(
-            model, testCaseId, std::vector<armnn::TContainer>{ modelInput }, { model.GetOutputSize() })
+            model, testCaseId, std::vector<armnnUtils::TContainer>{ modelInput }, { model.GetOutputSize() })
     , m_Label(label)
     , m_QuantizationParams(model.GetQuantizationParams())
     , m_NumInferencesRef(numInferencesRef)

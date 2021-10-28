@@ -5,9 +5,9 @@
 
 #include "../InferenceTestImage.hpp"
 
-#include <armnn/Utils.hpp>
 #include <armnn/TypesUtils.hpp>
 
+#include <armnnUtils/TContainer.hpp>
 #include <armnnUtils/Permute.hpp>
 
 #include <algorithm>

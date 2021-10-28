@@ -296,7 +296,7 @@ int main(int argc, char* argv[])
     const unsigned int batchSize = 1;
     const armnn::DataLayout outputLayout(cmdline.GetLayout());
 
-    std::vector<armnn::TContainer> imageDataContainers;
+    std::vector<armnnUtils::TContainer> imageDataContainers;
     const NormalizationParameters& normParams = GetNormalizationParameters(modelFormat, outputType);
     try
     {

@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 #include "ModelAccuracyChecker.hpp"
-#include <armnn/Utils.hpp>
+#include <armnnUtils/TContainer.hpp>
 
 #include <doctest/doctest.h>
 
@@ -60,12 +60,12 @@ TEST_CASE_FIXTURE(TestHelper, "TestFloat32OutputTensorAccuracy")
 
     // Add image 1 and check accuracy
     std::vector<float> inferenceOutputVector1 = {0.05f, 0.10f, 0.70f, 0.15f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
-    armnn::TContainer inference1Container(inferenceOutputVector1);
-    std::vector<armnn::TContainer> outputTensor1;
+    armnnUtils::TContainer inference1Container(inferenceOutputVector1);
+    std::vector<armnnUtils::TContainer> outputTensor1;
     outputTensor1.push_back(inference1Container);
 
     std::string imageName = "val_01.JPEG";
-    checker.AddImageResult<armnn::TContainer>(imageName, outputTensor1);
+    checker.AddImageResult<armnnUtils::TContainer>(imageName, outputTensor1);
 
     // Top 1 Accuracy
     float totalAccuracy = checker.GetAccuracy(1);
@@ -73,12 +73,12 @@ TEST_CASE_FIXTURE(TestHelper, "TestFloat32OutputTensorAccuracy")
 
     // Add image 2 and check accuracy
     std::vector<float> inferenceOutputVector2 = {0.10f, 0.0f, 0.0f, 0.0f, 0.05f, 0.70f, 0.0f, 0.0f, 0.0f, 0.15f};
-    armnn::TContainer inference2Container(inferenceOutputVector2);
-    std::vector<armnn::TContainer> outputTensor2;
+    armnnUtils::TContainer inference2Container(inferenceOutputVector2);
+    std::vector<armnnUtils::TContainer> outputTensor2;
     outputTensor2.push_back(inference2Container);
 
     imageName = "val_02.JPEG";
-    checker.AddImageResult<armnn::TContainer>(imageName, outputTensor2);
+    checker.AddImageResult<armnnUtils::TContainer>(imageName, outputTensor2);
 
     // Top 1 Accuracy
     totalAccuracy = checker.GetAccuracy(1);
@@ -90,12 +90,12 @@ TEST_CASE_FIXTURE(TestHelper, "TestFloat32OutputTensorAccuracy")
 
     // Add image 3 and check accuracy
     std::vector<float> inferenceOutputVector3 = {0.0f, 0.10f, 0.0f, 0.0f, 0.05f, 0.70f, 0.0f, 0.0f, 0.0f, 0.15f};
-    armnn::TContainer inference3Container(inferenceOutputVector3);
-    std::vector<armnn::TContainer> outputTensor3;
+    armnnUtils::TContainer inference3Container(inferenceOutputVector3);
+    std::vector<armnnUtils::TContainer> outputTensor3;
     outputTensor3.push_back(inference3Container);
 
     imageName = "val_03.JPEG";
-    checker.AddImageResult<armnn::TContainer>(imageName, outputTensor3);
+    checker.AddImageResult<armnnUtils::TContainer>(imageName, outputTensor3);
 
     // Top 1 Accuracy
     totalAccuracy = checker.GetAccuracy(1);

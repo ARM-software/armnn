@@ -9,8 +9,8 @@
 #include <AsyncExecutionCallback.hpp>
 
 #include <armnn/Logging.hpp>
-#include <armnn/Utils.hpp>
 #include <armnnUtils/Filesystem.hpp>
+#include <armnnUtils/TContainer.hpp>
 #include <InferenceTest.hpp>
 
 #if defined(ARMNN_SERIALIZER)
@@ -370,8 +370,8 @@ int MainImpl(const ExecuteNetworkParams& params,
 {
     using namespace std::chrono;
 
-    std::vector<std::vector<armnn::TContainer>> inputs;
-    std::vector<std::vector<armnn::TContainer>> outputs;
+    std::vector<std::vector<armnnUtils::TContainer>> inputs;
+    std::vector<std::vector<armnnUtils::TContainer>> outputs;
 
     try
     {
@@ -436,7 +436,7 @@ int MainImpl(const ExecuteNetworkParams& params,
 
         for(unsigned int j = 0; j < params.m_Iterations ; ++j)
         {
-            std::vector<armnn::TContainer> inputDataContainers;
+            std::vector<armnnUtils::TContainer> inputDataContainers;
             for(unsigned int i = 0; i < numInputs; ++i)
             {
                 // If there are less input files given than required for the execution of
@@ -460,7 +460,7 @@ int MainImpl(const ExecuteNetworkParams& params,
                     numElements = params.m_InputTensorShapes[i]->GetNumElements();
                 }
 
-                armnn::TContainer tensorData;
+                armnnUtils::TContainer tensorData;
                 PopulateTensorWithData(tensorData,
                                        numElements,
                                        params.m_InputTypes[i],
@@ -476,7 +476,7 @@ int MainImpl(const ExecuteNetworkParams& params,
 
         for (unsigned int j = 0; j < params.m_Iterations; ++j)
         {
-            std::vector <armnn::TContainer> outputDataContainers;
+            std::vector <armnnUtils::TContainer> outputDataContainers;
             for (unsigned int i = 0; i < numOutputs; ++i)
             {
                 if (params.m_OutputTypes[i].compare("float") == 0)
@@ -596,7 +596,7 @@ int MainImpl(const ExecuteNetworkParams& params,
             {
                 ARMNN_LOG(info) << "Asynchronous execution with Arm NN thread pool...  \n";
                 armnn::AsyncCallbackManager callbackManager;
-                std::unordered_map<armnn::InferenceId, std::vector<armnn::TContainer>&> inferenceOutputMap;
+                std::unordered_map<armnn::InferenceId, std::vector<armnnUtils::TContainer>&> inferenceOutputMap;
 
                 // Declare the latest and earliest inference times here to be used when calculating overall time
                 std::chrono::high_resolution_clock::time_point earliestStartTime;

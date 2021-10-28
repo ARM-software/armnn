@@ -9,7 +9,7 @@
 #include <armnn/Types.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/StringUtils.hpp>
-#include <armnn/Utils.hpp>
+#include <armnnUtils/TContainer.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -53,7 +53,7 @@ private:
 
 using QuantizationParams = std::pair<float, int32_t>;
 
-void PopulateTensorWithData(armnn::TContainer& tensorData,
+void PopulateTensorWithData(armnnUtils::TContainer& tensorData,
                             unsigned int numElements,
                             const std::string& dataTypeStr,
                             const armnn::Optional<QuantizationParams>& qParams,

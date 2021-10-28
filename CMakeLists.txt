@@ -76,6 +76,7 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/Filesystem.hpp
     include/armnnUtils/FloatingPointComparison.hpp
     include/armnnUtils/FloatingPointConverter.hpp
+    include/armnnUtils/TContainer.hpp
     include/armnnUtils/TensorUtils.hpp
     include/armnnUtils/Threads.hpp
     include/armnnUtils/Transpose.hpp
@@ -108,7 +109,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/TensorUtils.cpp
     src/armnnUtils/Threads.cpp
     src/armnnUtils/Transpose.cpp
-    third-party/mapbox/variant.hpp
     )
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})

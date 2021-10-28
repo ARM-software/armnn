@@ -7,13 +7,15 @@
 
 
 #include <armnn/ArmNN.hpp>
-#include <armnn/Utils.hpp>
 #include <armnn/Threadpool.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
+
+#include <armnnUtils/TContainer.hpp>
+
 #include <common/include/ProfilingGuid.hpp>
 
 #if defined(ARMNN_SERIALIZER)
@@ -584,8 +586,8 @@ public:
     }
 
     std::chrono::duration<double, std::milli> Run(
-            const std::vector<armnn::TContainer>& inputContainers,
-            std::vector<armnn::TContainer>& outputContainers)
+            const std::vector<armnnUtils::TContainer>& inputContainers,
+            std::vector<armnnUtils::TContainer>& outputContainers)
     {
         for (unsigned int i = 0; i < outputContainers.size(); ++i)
         {
@@ -633,8 +635,8 @@ public:
 
     std::tuple<unsigned int, std::chrono::duration<double, std::milli>> RunAsync(
         armnn::experimental::IWorkingMemHandle& workingMemHandleRef,
-        const std::vector<armnn::TContainer>& inputContainers,
-        std::vector<armnn::TContainer>& outputContainers,
+        const std::vector<armnnUtils::TContainer>& inputContainers,
+        std::vector<armnnUtils::TContainer>& outputContainers,
         unsigned int inferenceID)
     {
         for (unsigned int i = 0; i < outputContainers.size(); ++i)
@@ -684,8 +686,8 @@ public:
         }
     }
 
-    void RunAsync(const std::vector<armnn::TContainer>& inputContainers,
-                  std::vector<armnn::TContainer>& outputContainers,
+    void RunAsync(const std::vector<armnnUtils::TContainer>& inputContainers,
+                  std::vector<armnnUtils::TContainer>& outputContainers,
                   std::shared_ptr<armnn::IAsyncExecutionCallback> cb)
     {
         for (unsigned int i = 0; i < outputContainers.size(); ++i)

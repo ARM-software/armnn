@@ -228,7 +228,7 @@ void TensorPrinter::WriteToFile(const std::vector<T>& values)
     }
 }
 
-void PopulateTensorWithData(armnn::TContainer& tensorData,
+void PopulateTensorWithData(armnnUtils::TContainer& tensorData,
                             unsigned int numElements,
                             const std::string& dataTypeStr,
                             const armnn::Optional<QuantizationParams>& qParams,

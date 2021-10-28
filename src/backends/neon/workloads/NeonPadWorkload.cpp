@@ -6,6 +6,7 @@
 #include "NeonPadWorkload.hpp"
 
 #include <neon/NeonTensorHandle.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <arm_compute/core/Types.h>
 #include <arm_compute/runtime/NEON/functions/NEPadLayer.h>
@@ -41,7 +42,11 @@ NeonPadWorkload::NeonPadWorkload(const PadQueueDescriptor& descriptor, const Wor
     arm_compute::PixelValue pixelValue = GetPixelValue(input.info(), descriptor.m_Parameters.m_PadValue);
 
     auto layer = std::make_unique<arm_compute::NEPadLayer>();
-    layer->configure(&input, &output, padList, pixelValue);
+    layer->configure(&input,
+                     &output,
+                     padList,
+                     pixelValue,
+                     ConvertPaddingModeToAcl(descriptor.m_Parameters.m_PaddingMode));
     m_Layer.reset(layer.release());
 }
 
@@ -66,7 +71,13 @@ arm_compute::Status NeonPadWorkloadValidate(const TensorInfo& input,
 
     arm_compute::PaddingList padList = static_cast<arm_compute::PaddingList>(reversed_PadList);
 
-    return arm_compute::NEPadLayer::validate(&aclInputInfo, &aclOutputInfo, padList);
+    // PixelValue is currently unused when validating, but it's required to pass in PaddingMode.
+    arm_compute::PixelValue pixelValue = GetPixelValue(&aclInputInfo, descriptor.m_PadValue);
+    return arm_compute::NEPadLayer::validate(&aclInputInfo,
+                                             &aclOutputInfo,
+                                             padList,
+                                             pixelValue,
+                                             ConvertPaddingModeToAcl(descriptor.m_PaddingMode));
 }
 
 } // namespace armnn

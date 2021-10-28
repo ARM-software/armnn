@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="f727ef49e2109bdac105dd6575d2e336adf780a3" #Add uint8/int8 support to cpu conv3d
+DEFAULT_CLFRAMEWORKREVISION="49956ccf029ff4c1873e3a6702b5bede95d81f7a" #Fixed issue where cppflags were being set incorrectly
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

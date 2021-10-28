@@ -10,14 +10,14 @@ namespace armnn
 {
 
 // add new capabilities here..
-const BackendCapabilities cpuAccCapabilities("GpuAcc",
+const BackendCapabilities cpuAccCapabilities("CpuAcc",
                                              {
                                                      {"NonConstWeights", false},
                                                      {"AsyncExecution", false},
                                                      {"ProtectedContentAllocation", false},
                                                      {"ConstantTensorsAsInputs", false},
                                                      {"PreImportIOTensors", false},
-                                                     {"ExternallyManagedMemory", false},
+                                                     {"ExternallyManagedMemory", true},
                                                      {"MultiAxisPacking", false},
                                                      {"SingleAxisPacking", true}
                                              });

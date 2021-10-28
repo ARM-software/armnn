@@ -17,6 +17,7 @@ COMMON_SOURCES := \
     MapWorkload.cpp \
     MemCopyWorkload.cpp \
     MemImportWorkload.cpp \
+    MemoryManager.cpp \
     MemSyncWorkload.cpp \
     OptimizationViews.cpp \
     TensorHandleFactoryRegistry.cpp \
@@ -25,7 +26,8 @@ COMMON_SOURCES := \
     WorkloadFactory.cpp \
     WorkloadUtils.cpp \
     memoryOptimizerStrategyLibrary/strategies/ConstantMemoryStrategy.cpp \
-    memoryOptimizerStrategyLibrary/strategies/StrategyValidator.cpp \
+	memoryOptimizerStrategyLibrary/strategies/SingleAxisPriorityList.cpp \
+    memoryOptimizerStrategyLibrary/strategies/StrategyValidator.cpp
 
 
 # COMMON_TEST_SOURCES contains the list of files to be included
@@ -104,7 +106,8 @@ COMMON_TEST_SOURCES := \
     test/layerTests/TransposeConvolution2dTestImpl.cpp \
     test/layerTests/UnidirectionalSequenceLstmTestImpl.cpp \
     memoryOptimizerStrategyLibrary/test/ConstMemoryStrategyTests.cpp \
-    memoryOptimizerStrategyLibrary/test/ValidatorStrategyTests.cpp
+    memoryOptimizerStrategyLibrary/test/ValidatorStrategyTests.cpp \
+    memoryOptimizerStrategyLibrary/test/SingleAxisPriorityListTests.cpp
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \

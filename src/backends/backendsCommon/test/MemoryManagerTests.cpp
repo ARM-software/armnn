@@ -59,17 +59,18 @@ TEST_CASE("MemoryManagerTest")
 
     // Create mock up bufferStorageVector with 2 BufferStorage with the same TensorMemory
     size_t numTensors = 5;
-    std::vector<TensorMemory*> tensorMemoryPointerVector(numTensors);
-    std::vector<TensorMemory> tensorMemoryVector;
+    std::vector<std::shared_ptr<TensorMemory>> tensorMemoryPointerVector(numTensors);
+    std::vector<std::shared_ptr<TensorMemory>> tensorMemoryVector;
     tensorMemoryVector.reserve(numTensors);
 
     std::vector<size_t> offsets(numTensors);
     std::iota(std::begin(offsets), std::end(offsets), 0);
 
-    for (uint32_t idx = 0; idx < tensorMemoryPointerVector.size(); ++idx)
+    for (uint idx = 0; idx < tensorMemoryPointerVector.size(); ++idx)
     {
-        tensorMemoryVector.emplace_back(TensorMemory{offsets[idx], nullptr, 0});
-        tensorMemoryPointerVector[idx] = &tensorMemoryVector[idx];
+        tensorMemoryVector.emplace_back(std::make_shared<TensorMemory>(TensorMemory{offsets[idx], 0, nullptr}));
+
+        tensorMemoryPointerVector[idx] = tensorMemoryVector[idx];
     }
 
     std::vector<BufferStorage> bufferStorageVector;
@@ -77,30 +78,31 @@ TEST_CASE("MemoryManagerTest")
     bufferStorageVector.emplace_back(BufferStorage{tensorMemoryPointerVector, numTensors});
 
     // Create an instance of the SampleCustomAllocator
-    SampleCustomAllocator customAllocator = SampleCustomAllocator();
-    customAllocator.m_Values = {10, 11, 12, 13, 14};
-    // Check that the test was set up correctly
-    CHECK(customAllocator.m_Values.size() == numTensors);
+    std::shared_ptr<SampleCustomAllocator> customAllocator =
+            std::make_unique<SampleCustomAllocator>(SampleCustomAllocator());
 
+    customAllocator->m_Values = {10, 11, 12, 13, 14};
+    // Check that the test was set up correctly
+    CHECK(customAllocator->m_Values.size() == numTensors);
+
+    size_t bufferVecSize =  bufferStorageVector.size();
     // Utilise 3 functions in the MemoryManager. Check the counters and the pointer to the values are correct.
     MemoryManager memoryManager;
-    memoryManager.StoreMemToAllocate(bufferStorageVector, &customAllocator);
+    memoryManager.StoreMemToAllocate(bufferStorageVector, customAllocator);
 
     memoryManager.Allocate();
-    CHECK(customAllocator.m_CounterAllocate == bufferStorageVector.size());
-    for (const auto& bufferStorage : bufferStorageVector)
+    CHECK(customAllocator->m_CounterAllocate == bufferVecSize);
+
+    uint idx = 0;
+    for (auto tensorMemory : tensorMemoryVector)
     {
-        uint32_t idx = 0;
-        for (auto tensorMemory : bufferStorage.m_TensorMemoryVector)
-        {
-            auto value = reinterpret_cast<uint8_t *>(tensorMemory->m_Data);
-            CHECK(customAllocator.m_Values[idx] == *value);
-            idx += 1;
-        }
+        auto value = reinterpret_cast<uint8_t *>(tensorMemory->m_Data);
+        CHECK(customAllocator->m_Values[idx] == *value);
+        idx += 1;
     }
 
     memoryManager.Deallocate();
-    CHECK(customAllocator.m_CounterFree == bufferStorageVector.size());
+    CHECK(customAllocator->m_CounterFree == bufferStorageVector.size());
 }
 }
 

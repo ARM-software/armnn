@@ -113,10 +113,14 @@ bool RefWorkloadFactory::IsLayerSupported(const IConnectableLayer& layer,
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
                                                                       const bool isMemoryManaged) const
 {
-    // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
-    // to unmanaged memory. This also ensures memory alignment.
-    IgnoreUnused(isMemoryManaged);
-    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
+    if (isMemoryManaged)
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
+    }
+    else
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, static_cast<unsigned int>(MemorySource::Malloc));
+    }
 }
 
 std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const TensorInfo& tensorInfo,
@@ -126,7 +130,15 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
     // For Ref it is okay to make the TensorHandle memory managed as it can also store a pointer
     // to unmanaged memory. This also ensures memory alignment.
     IgnoreUnused(isMemoryManaged, dataLayout);
-    return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
+
+    if (isMemoryManaged)
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, m_MemoryManager);
+    }
+    else
+    {
+        return std::make_unique<RefTensorHandle>(tensorInfo, static_cast<unsigned int>(MemorySource::Malloc));
+    }
 }
 
 std::unique_ptr<IWorkload> RefWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,

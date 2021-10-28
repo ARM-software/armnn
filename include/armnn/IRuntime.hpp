@@ -43,7 +43,8 @@ struct INetworkProperties
           m_ProfilingEnabled(profilingEnabled),
           m_OutputNetworkDetailsMethod(ProfilingDetailsMethod::Undefined),
           m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined),
-          m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined)
+          m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined),
+          m_ExternalMemoryManagementEnabled(false)
     {}
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Please use INetworkProperties constructor without numThreads argument", "22.02")
@@ -58,7 +59,8 @@ struct INetworkProperties
           m_ProfilingEnabled(profilingEnabled),
           m_OutputNetworkDetailsMethod(ProfilingDetailsMethod::Undefined),
           m_InputSource(inputSource),
-          m_OutputSource(outputSource)
+          m_OutputSource(outputSource),
+          m_ExternalMemoryManagementEnabled(false)
     {
         armnn::IgnoreUnused(numThreads);
     }
@@ -67,14 +69,16 @@ struct INetworkProperties
                        MemorySource inputSource,
                        MemorySource outputSource,
                        bool profilingEnabled = false,
-                       ProfilingDetailsMethod detailsMethod = ProfilingDetailsMethod::Undefined)
+                       ProfilingDetailsMethod detailsMethod = ProfilingDetailsMethod::Undefined,
+                       bool externalMemoryManagementEnabled = false)
         : m_ImportEnabled(inputSource != MemorySource::Undefined),
           m_ExportEnabled(outputSource != MemorySource::Undefined),
           m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
           m_OutputNetworkDetailsMethod(detailsMethod),
           m_InputSource(inputSource),
-          m_OutputSource(outputSource)
+          m_OutputSource(outputSource),
+          m_ExternalMemoryManagementEnabled(externalMemoryManagementEnabled)
     {}
 
     /// Deprecated and will be removed in future release.
@@ -90,6 +94,8 @@ struct INetworkProperties
 
     const MemorySource m_InputSource;
     const MemorySource m_OutputSource;
+
+    const bool m_ExternalMemoryManagementEnabled;
 
     virtual ~INetworkProperties() {}
 };

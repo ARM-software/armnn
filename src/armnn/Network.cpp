@@ -934,6 +934,11 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
     {
         auto layer = *it;
 
+        if (layer->GetType() == LayerType::Input)
+        {
+            continue;
+        }
+
         DataType dataTypeIn  = layer->GetNumInputSlots() == 0 ? DataType::Float32 :
             layer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo().GetDataType();
         DataType dataTypeOut = layer->GetNumOutputSlots() == 0 ? DataType::Float32 :
@@ -1024,6 +1029,17 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
             {
                 return ReturnError(layer);
             }
+        }
+    }
+
+    for (auto it = firstLayer; it != lastLayer; ++it)
+    {
+        auto layer = *it;
+
+        if(layer->GetType() == LayerType::Input)
+        {
+            BackendId connectedBackendId = layer->GetOutputSlot(0).GetConnection(0)->GetOwningLayer().GetBackendId();
+            layer->SetBackendId(connectedBackendId);
         }
     }
 

@@ -11,7 +11,7 @@ namespace armnn
 {
 
 void MemoryManager::StoreMemToAllocate(std::vector<BufferStorage> bufferStorageVector,
-                                       ICustomAllocator* customAllocator,
+                                       std::shared_ptr<ICustomAllocator> customAllocator,
                                        const size_t typeAlignment)
 {
     IgnoreUnused(typeAlignment);

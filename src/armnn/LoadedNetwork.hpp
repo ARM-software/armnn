@@ -10,9 +10,15 @@
 
 #include <armnn/Tensor.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/IMemoryOptimizerStrategy.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/Workload.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
+#include <backendsCommon/DefaultAllocator.hpp>
+#include <backendsCommon/MemoryManager.hpp>
+#include <backendsCommon/memoryOptimizerStrategyLibrary/strategies/SingleAxisPriorityList.hpp>
+
+
 #include <ProfilingService.hpp>
 #include <TimelineUtilityMethods.hpp>
 
@@ -89,16 +95,16 @@ public:
     profiling::ProfilingGuid GetNetworkGuid();
 
 private:
-    using WorkloadFactoryWithMemoryManager =
-    std::pair<IBackendInternal::IWorkloadFactoryPtr, IBackendInternal::IMemoryManagerSharedPtr>;
 
-    using WorkloadFactoryMap = std::unordered_map<BackendId, WorkloadFactoryWithMemoryManager>;
 
     void AllocateWorkingMemory(std::lock_guard<std::mutex>& lock);
     void AllocateAndExecuteConstantWorkloads();
+    void AllocateAndExecuteConstantWorkloadsAsync();
 
-    std::unordered_map<LayerGuid, ITensorHandle* > m_ConstantTensorHandles;
-    std::unordered_map<LayerGuid, std::unique_ptr<IWorkload> > m_ConstantWorkloads;
+    std::unordered_map<LayerGuid, std::unique_ptr<IWorkload>> m_ConstantWorkloads;
+    std::unordered_map<LayerGuid, ITensorHandle*> m_ConstantTensorHandles;
+
+    std::unique_ptr<IMemoryOptimizerStrategy> m_ConstantStrategy = std::make_unique<SingleAxisPriorityList>();
 
     LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                   const INetworkProperties& networkProperties,
@@ -120,9 +126,18 @@ private:
     inline LayerBindingId ValidateImportedInputID(ImportedInputId id);
     inline LayerBindingId ValidateImportedOutputID(ImportedOutputId id);
 
+    void CreateMemoryProfile();
+    void CreateMemoryProfileAsync();
+
+    std::unique_ptr<MemoryManager> CreateExternalMemoryManger(
+            std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>>& tensorMemory);
+
     using BackendPtrMap = std::unordered_map<BackendId, IBackendInternalUniquePtr>;
 
-    BackendPtrMap       m_Backends;
+    BackendPtrMap  m_Backends;
+    std::vector<IBackendInternal::IMemoryManagerSharedPtr> m_BackendMemoryMangers;
+
+    using WorkloadFactoryMap = std::unordered_map<BackendId, IBackendInternal::IWorkloadFactoryPtr>;
     WorkloadFactoryMap  m_WorkloadFactories;
 
     std::unique_ptr<IOptimizedNetwork> m_OptimizedNetwork;
@@ -171,6 +186,17 @@ private:
 
     ImportedInputId m_CurImportedInputId = 0;
     ImportedInputId m_CurImportedOutputId = 0;
+
+    std::unordered_map<BackendId, std::vector<MemBlock>> m_MemBlockMap;
+    std::unordered_map<BackendId, std::vector<MemBin>> m_MemBinMap;
+
+    std::vector<ITensorHandle*> m_Tensorhandles;
+
+    std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>> m_TensorMemory;
+
+    std::unique_ptr<MemoryManager> m_ExternalMemoryManager;
+
+    std::unordered_map<BackendId, bool> m_SupportsExternallyManagedMemory;
 };
 
 }

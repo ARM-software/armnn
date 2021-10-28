@@ -14,6 +14,7 @@
 
 #include <unordered_map>
 #include <mutex>
+#include <backendsCommon/MemoryManager.hpp>
 
 namespace armnn
 {
@@ -45,11 +46,13 @@ public:
 
     WorkingMemHandle(NetworkId networkId,
                      std::vector<InputMemDescriptorCoords> inputLayerInfo,
-                     std::vector<OutputMemDescriptorCoords> ouputLayerInfo,
+                     std::vector<OutputMemDescriptorCoords> outputLayerInfo,
                      std::vector<WorkingMemDescriptor> workingMemDescriptors,
                      std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap,
-                     std::vector<std::shared_ptr<IMemoryManager>> memoryManagers,
-                     std::unordered_map<LayerGuid, std::vector<std::unique_ptr<ITensorHandle> > > ownedTensorHandles);
+                     std::unique_ptr<MemoryManager> memoryManager,
+                     std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>> tensorMemory,
+                     std::vector<std::unique_ptr<ITensorHandle>> managedTensorHandles,
+                     std::vector<std::unique_ptr<ITensorHandle>> unmanagedTensorHandles);
 
     ~WorkingMemHandle()
     { Free(); }
@@ -128,11 +131,17 @@ private:
     std::vector<WorkingMemDescriptor> m_WorkingMemDescriptors;
     std::unordered_map<LayerGuid, WorkingMemDescriptor> m_WorkingMemDescriptorMap;
 
-    // Vector of IMemoryManagers that manage the WorkingMemHandle's memory
-    std::vector<std::shared_ptr<IMemoryManager>> m_MemoryManagers;
-    // TensorHandles owned by this WorkingMemHandle
-    // constant tensor's can be shared by multiple WorkingMemHandles and so will not be stored here
-    std::unordered_map<LayerGuid, std::vector<std::unique_ptr<ITensorHandle> > >  m_OwnedTensorHandles;
+    std::unique_ptr<MemoryManager> m_MemoryManager;
+
+    // Memory to be imported into the tensorHandles after allocation
+    std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>> m_TensorMemory;
+
+
+    // Tensors that will need to be allocated internally within armnn
+    std::vector<std::unique_ptr<ITensorHandle>> m_ManagedTensorHandles;
+
+    // Tensors that will be allocated externally by the user
+    std::vector<std::unique_ptr<ITensorHandle>> m_UnmanagedTensorHandles;
 
     std::unordered_map<LayerBindingId, bool> m_InputValidationMap;
     std::unordered_map<LayerBindingId, bool> m_OutputValidationMap;

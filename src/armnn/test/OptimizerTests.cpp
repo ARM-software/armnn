@@ -714,7 +714,8 @@ TEST_CASE("BackendHintTest")
                 case armnn::LayerType::Input:
                 {
                     auto inputLayer = PolymorphicDowncast<const InputLayer*>(layer);
-                    CHECK((inputLayer->GetBackendId() == "MockBackend"));
+                    const auto connectedLayerBackendId = inputLayer->GetOutputSlot(0).GetOwningLayer().GetBackendId();
+                    CHECK((inputLayer->GetBackendId() == connectedLayerBackendId));
                     break;
                 }
                 case armnn::LayerType::Output:

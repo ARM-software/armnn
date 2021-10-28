@@ -22,12 +22,12 @@ public:
     void* allocate(size_t size, size_t alignment = 0) override
     {
         IgnoreUnused(alignment);
-        return ::operator new(size);
+        return ::operator new(size_t(size));
     }
 
     void free(void* ptr) override
     {
-        std::free(ptr);
+        ::operator delete(ptr);
     }
 
     armnn::MemorySource GetMemorySourceType() override

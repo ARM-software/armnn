@@ -19,8 +19,8 @@ struct MemBlock
              const unsigned int index)
     : m_StartOfLife(startOfLife), m_EndOfLife(endOfLife), m_MemSize(memSize), m_Offset(offset), m_Index(index) {}
 
-    const unsigned int m_StartOfLife; // Y start
-    const unsigned int m_EndOfLife; // Y end
+    const unsigned int m_StartOfLife; // Y start inclusive
+    const unsigned int m_EndOfLife; // Y end inclusive
 
     const size_t m_MemSize; // Offset + Memsize = X end
     size_t m_Offset; // X start

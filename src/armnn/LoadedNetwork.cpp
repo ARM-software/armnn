@@ -131,11 +131,14 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
     profiler->EnableNetworkDetailsToStdOut(networkProperties.m_OutputNetworkDetailsMethod);
 
-    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     //First create tensor handlers, backends and workload factories.
     //Handlers are created before workloads are.
     //Because workload creation can modify some of the handlers,
     //(for example the splitter and concat layers).
+
+    bool useExternalMemoryManager = false;
+    bool useInternalMemoryManager = false;
+    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     for (auto&& layer : order)
     {
         auto const& backendId = layer->GetBackendId();
@@ -154,25 +157,44 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                 throw BackendCapabilityException(er);
             }
 
+            if (networkProperties.m_AsyncEnabled &&
+                !HasCapability(BackendOptions::BackendOption{"ExternallyManagedMemory", true},
+                backend->GetCapabilities()))
+            {
+                std::string er = backend->GetId();
+                er += " does not support ExternallyManagedMemory\n";
+                er += "AsyncEnabled networks require all backends to support ExternallyManagedMemory";
+                throw BackendCapabilityException(er);
+            }
+
+            if (HasCapability(BackendOptions::BackendOption{"ExternallyManagedMemory", true},backend->GetCapabilities())
+                && (m_NetworkProperties.m_ExternalMemoryManagementEnabled ||  m_NetworkProperties.m_AsyncEnabled))
+            {
+                m_SupportsExternallyManagedMemory[backend->GetId()] = true;
+                useExternalMemoryManager = true;
+            }
+            else
+            {
+                m_SupportsExternallyManagedMemory[backend->GetId()] = false;
+                useInternalMemoryManager = true;
+            }
+
+            IBackendInternal::IWorkloadFactoryPtr workloadFactory;
             if (backend->SupportsTensorAllocatorAPI())
             {
-                auto workloadFactory = backend->CreateWorkloadFactory(
+                workloadFactory = backend->CreateWorkloadFactory(
                     m_TensorHandleFactoryRegistry,
                     m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions(),
                     static_cast<MemorySourceFlags>(m_NetworkProperties.m_InputSource),
                     static_cast<MemorySourceFlags>(m_NetworkProperties.m_OutputSource));
-                m_WorkloadFactories.emplace(
-                    std::make_pair(backendId, std::make_pair(std::move(workloadFactory), nullptr)));
             }
             else
             {
-                IBackendInternal::IMemoryManagerSharedPtr memoryManager = backend->CreateMemoryManager();
-                auto workloadFactory = backend->CreateWorkloadFactory(
-                    memoryManager, m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions());
-
-                m_WorkloadFactories.emplace(
-                    std::make_pair(backendId, std::make_pair(std::move(workloadFactory), memoryManager)));
+                m_BackendMemoryMangers.emplace_back(backend->CreateMemoryManager());
+                workloadFactory = backend->CreateWorkloadFactory(
+                        m_BackendMemoryMangers.back(), m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions());
             }
+            m_WorkloadFactories[backendId ] = std::move(workloadFactory);
         }
     }
 
@@ -181,6 +203,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
         for (auto&& layer : order)
         {
             auto& workloadFactory = GetWorkloadFactory(*layer);
+            bool supportsExternalManager = m_SupportsExternallyManagedMemory[layer->GetBackendId()];
 
             switch (layer->GetType())
             {
@@ -191,7 +214,12 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     // to false when creating TensorHandles
                     layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
                                                workloadFactory,
-                                               !m_NetworkProperties.m_ImportEnabled);
+                                               !supportsExternalManager && !m_NetworkProperties.m_ImportEnabled);
+                    break;
+                }
+                case LayerType::Constant:
+                {
+                    layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory, true);
                     break;
                 }
                 default:
@@ -199,16 +227,18 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     // Look for a layer with 1 OutputSlot which has 1 connection and that connection is an Output Layer
                     // If Export is enabled disable memory management so we can export, otherwise we do a copy
                     if ((layer->GetNumOutputSlots() == 1) &&
-                        (layer->GetOutputSlots()[0].GetNumConnections() == 1) &&
-                        (layer->GetOutputSlots()[0].GetConnection(0)->GetOwningLayer().GetType() == LayerType::Output))
+                       (layer->GetOutputSlots()[0].GetNumConnections() == 1) &&
+                       (layer->GetOutputSlots()[0].GetConnection(0)->GetOwningLayer().GetType() == LayerType::Output))
                     {
                         layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
                                                    workloadFactory,
-                                                   !m_NetworkProperties.m_ExportEnabled);
+                                                   !supportsExternalManager && !m_NetworkProperties.m_ExportEnabled);
                     }
                     else
                     {
-                        layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory);
+                        layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
+                                                   workloadFactory,
+                                                   !supportsExternalManager);
                     }
                 }
             }
@@ -251,7 +281,8 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput().
                     break;
                 }
-                default: {
+                default:
+                {
                     auto workload = layer->CreateWorkload(workloadFactory);
 
                     if (!workload)
@@ -272,11 +303,16 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
                     // For async networks ConstantWorkloads are managed exclusively by LoadedNetwork
                     // and are separated out from the other workloads
-                    if (networkProperties.m_AsyncEnabled && layer->GetType() == LayerType::Constant)
+                    if((networkProperties.m_AsyncEnabled  || useExternalMemoryManager) &&
+                        layer->GetType() == LayerType::Constant)
                     {
+                        m_ConstantTensorHandles[layer->GetGuid()] =
+                                layer->GetOutputSlot(0).GetOutputHandler().GetData();
                         m_ConstantWorkloads[layer->GetGuid()] = std::move(workload);
-                    } else {
-                        m_WorkloadQueue.push_back(move(workload));
+                    }
+                    else
+                    {
+                        m_WorkloadQueue.push_back(std::move(workload));
                     }
 
                     // release the constant data in the layer..
@@ -289,7 +325,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
     for (auto&& workloadFactory : m_WorkloadFactories)
     {
-        workloadFactory.second.first->AfterWorkloadsCreated();
+        workloadFactory.second->AfterWorkloadsCreated();
     }
 
     if (timelineUtils)
@@ -298,26 +334,88 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
         timelineUtils->Commit();
     }
 
+    if (useExternalMemoryManager)
+    {
+        if (networkProperties.m_AsyncEnabled)
+        {
+            CreateMemoryProfileAsync();
+        }
+        else
+        {
+            CreateMemoryProfile();
+        }
+
+        auto backendStrategyMap = BackendRegistryInstance().GetMemoryOptimizerStrategies();
+        for (auto& backendMemoryProfile : m_MemBlockMap)
+        {
+            const BackendId& backendId = backendMemoryProfile.first;
+            if (backendStrategyMap.find(backendId) != backendStrategyMap.end())
+            {
+                m_MemBinMap[backendId] = backendStrategyMap[backendId]->Optimize(backendMemoryProfile.second);
+            }
+            else
+            {
+                m_MemBinMap[backendId] = m_ConstantStrategy->Optimize(backendMemoryProfile.second);
+            }
+        }
+
+        if (!networkProperties.m_AsyncEnabled)
+        {
+            m_ExternalMemoryManager = CreateExternalMemoryManger(m_TensorMemory);
+
+            // Sort m_TensorMemory, so it's order matches m_Tensorhandles
+            std::sort(m_TensorMemory.begin(), m_TensorMemory.end(),
+                      [](const std::pair<std::shared_ptr<TensorMemory>, MemorySource>& lhs,
+                         const std::pair<std::shared_ptr<TensorMemory>, MemorySource>& rhs)
+                      {
+                          return lhs.first->m_OutputSlotId < rhs.first->m_OutputSlotId;
+                      });
+        }
+    }
+
+    // Now that the intermediate tensor memory has been set-up,
+    // do any post allocation configuration for each workload.
     if (!networkProperties.m_AsyncEnabled)
     {
-        // Set up memory.
-        m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().AllocateDynamicBuffers();
+        if (useInternalMemoryManager)
+        {
+            // Set up memory.
+            m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().AllocateDynamicBuffers();
+        }
 
-        // Now that the intermediate tensor memory has been set-up,
-        // do any post allocation configuration for each workload.
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_PostAllocationConfigure");
         for (auto &workload : m_WorkloadQueue)
         {
             workload->PostAllocationConfigure();
         }
     }
-    else
+
+    if (useExternalMemoryManager)
     {
-        AllocateAndExecuteConstantWorkloads();
+        if (!networkProperties.m_AsyncEnabled)
+        {
+            AllocateAndExecuteConstantWorkloads();
+        }
+        else
+        {
+            AllocateAndExecuteConstantWorkloadsAsync();
+        }
     }
 }
 
 void LoadedNetwork::AllocateAndExecuteConstantWorkloads()
+{
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_AllocateAndExecuteConstants");
+    for (auto& pair : m_ConstantWorkloads)
+    {
+        auto tensorHandle = m_ConstantTensorHandles[pair.first];
+        tensorHandle->Allocate();
+        pair.second->Execute();
+    }
+}
+
+
+
+void LoadedNetwork::AllocateAndExecuteConstantWorkloadsAsync()
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_AllocateAndExecuteConstants");
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph();
@@ -342,7 +440,6 @@ void LoadedNetwork::AllocateAndExecuteConstantWorkloads()
         }
     }
 }
-
 
 void LoadedNetwork::SendNetworkStructure()
 {
@@ -429,7 +526,7 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
                                            CHECK_LOCATION());
     }
 
-    workloadFactory = it->second.first.get();
+    workloadFactory = it->second.get();
 
     ARMNN_ASSERT_MSG(workloadFactory, "No workload factory");
 
@@ -780,9 +877,19 @@ void LoadedNetwork::AllocateWorkingMemory(std::lock_guard<std::mutex>& lock)
     {
         return;
     }
-    for (auto&& workloadFactory : m_WorkloadFactories)
+
+    if (m_ExternalMemoryManager)
     {
-        IBackendInternal::IMemoryManagerSharedPtr memoryManager = workloadFactory.second.second;
+        m_ExternalMemoryManager->Allocate();
+
+        for (unsigned int i = 0; i < m_TensorMemory.size(); ++i)
+        {
+            m_Tensorhandles[i]->Import(m_TensorMemory[i].first->m_Data, m_TensorMemory[i].second);
+        }
+    }
+
+    for (auto&& memoryManager : m_BackendMemoryMangers)
+    {
         if (memoryManager)
         {
             memoryManager->Acquire();
@@ -795,14 +902,20 @@ void LoadedNetwork::AllocateWorkingMemory(std::lock_guard<std::mutex>& lock)
 void LoadedNetwork::FreeWorkingMemory()
 {
     std::lock_guard<std::mutex> lockGuard(m_WorkingMemMutex);
+
     if (!m_IsWorkingMemAllocated)
     {
         return;
     }
-    // Informs the memory managers to release memory in it's respective memory group
-    for (auto&& workloadFactory : m_WorkloadFactories)
+
+    if (m_ExternalMemoryManager)
     {
-        IBackendInternal::IMemoryManagerSharedPtr memoryManager = workloadFactory.second.second;
+        m_ExternalMemoryManager->Deallocate();
+    }
+
+    // Informs the memory managers to release memory in its respective memory group
+    for (auto&& memoryManager : m_BackendMemoryMangers)
+    {
         if (memoryManager)
         {
             memoryManager->Release();
@@ -1392,37 +1505,16 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
 std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(NetworkId networkId)
 {
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph();
-    std::unordered_map<LayerGuid, std::vector<std::unique_ptr<ITensorHandle> > > tensorHandleMap;
+
+    // Tensors that will need to be allocated internally within armnn
+    std::vector<std::unique_ptr<ITensorHandle>> managedTensorHandles;
+    // Tensors that will be allocated externally by the user
+    std::vector<std::unique_ptr<ITensorHandle>> unmanagedTensorHandles;
+
     std::vector<WorkingMemDescriptor> workingMemDescriptors;
     std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap;
-    TensorHandleFactoryRegistry tensorHandleFactoryRegistry;
-    WorkloadFactoryMap workloadFactoryMap;
 
-    std::vector<std::shared_ptr<IMemoryManager>> memoryManagers;
-
-    for (auto const& backend : m_Backends)
-    {
-        if (backend.second->SupportsTensorAllocatorAPI())
-        {
-            backend.second->RegisterTensorHandleFactories(
-                tensorHandleFactoryRegistry,
-                static_cast<MemorySourceFlags>(m_NetworkProperties.m_InputSource),
-                static_cast<MemorySourceFlags>(m_NetworkProperties.m_OutputSource));
-            memoryManagers.emplace_back(tensorHandleFactoryRegistry.GetMemoryManagers().back());
-        }
-        else
-        {
-            std::shared_ptr<IMemoryManager> memoryManager = backend.second->CreateMemoryManager();
-            auto workloadFactory = backend.second->CreateWorkloadFactory(
-                    memoryManager, m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions());
-
-            workloadFactoryMap.emplace(
-                    std::make_pair(backend.first, std::make_pair(std::move(workloadFactory), memoryManager)));
-            memoryManagers.emplace_back(memoryManager);
-        }
-    }
-
-    auto GetTensorHandle = [&](Layer* layer, const OutputSlot& outputSlot, bool isMemoryManaged)
+    auto GetTensorHandle = [&](Layer* layer, const OutputSlot& outputSlot)
     {
         ITensorHandleFactory::FactoryId factoryId = outputSlot.GetTensorHandleFactoryId();
         const TensorInfo& tensorInfo = outputSlot.GetTensorInfo();
@@ -1431,28 +1523,30 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
         {
             BackendId id = layer->GetBackendId();
             ARMNN_NO_DEPRECATE_WARN_BEGIN
-            return workloadFactoryMap.at(id).first->CreateTensorHandle(tensorInfo, isMemoryManaged);
+            return m_WorkloadFactories.at(id)->CreateTensorHandle(tensorInfo, false);
             ARMNN_NO_DEPRECATE_WARN_END
         }
         else
         {
-            ITensorHandleFactory* handleFactory = tensorHandleFactoryRegistry.GetFactory(factoryId);
+            ITensorHandleFactory* handleFactory = m_TensorHandleFactoryRegistry.GetFactory(factoryId);
             ARMNN_ASSERT(handleFactory);
-            return handleFactory->CreateTensorHandle(tensorInfo, isMemoryManaged);
+            return handleFactory->CreateTensorHandle(tensorInfo, false);
         }
     };
 
     struct HandleInfo
     {
-        unsigned int m_ReferenceCount = 0;
-        bool isInputLayerHandle = false;
-        bool isOutputLayerHandle = false;
+        ITensorHandle* m_TensorHandle;
+
+        bool m_IsInputLayerHandle = false;
+        bool m_IsOutputLayerHandle = false;
 
         WorkingMemHandle::InputMemDescriptorCoords m_InputMemDescriptorCoords;
         WorkingMemHandle::OutputMemDescriptorCoords m_OutputMemDescriptorCoords;
     };
 
-    std::unordered_map<const ITensorHandle*, HandleInfo> handleReferenceCounts;
+    std::unordered_map<const OutputSlot*, HandleInfo> outputToHandleInfoMap;
+
     unsigned int layerIndex = 0;
     for (auto&& layer : order)
     {
@@ -1508,27 +1602,33 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
                 }
             }
 
-            tensorHandleMap[layer->GetGuid()].emplace_back(GetTensorHandle(layer, slot, isMemoryManaged));
-            ITensorHandle* tensorHandle = tensorHandleMap[layer->GetGuid()].back().get();
+            ITensorHandle* tensorHandle;
+            if (isMemoryManaged)
+            {
+                managedTensorHandles.emplace_back(GetTensorHandle(layer, slot));
+                tensorHandle = managedTensorHandles.back().get();
+            }
+            else
+            {
+                unmanagedTensorHandles.emplace_back(GetTensorHandle(layer, slot));
+                tensorHandle = unmanagedTensorHandles.back().get();
+            }
 
             workingMemDescriptor.m_Outputs.push_back(tensorHandle);
-            tensorHandle->Manage();
-            unsigned int numConnections = slot.GetNumConnections();
-            ARMNN_ASSERT(numConnections != 0);
 
-            HandleInfo& handleInfo = handleReferenceCounts[tensorHandle];
-            handleInfo.m_ReferenceCount = numConnections;
+            HandleInfo& handleInfo = outputToHandleInfoMap[&slot];
+            handleInfo.m_TensorHandle = tensorHandle;
 
             // Store the coordinates of the current layer's OutputSlot that is connected to the OutputLayer
             if (isConnectedToOutputLayer)
             {
-                handleInfo.isOutputLayerHandle = true;
+                handleInfo.m_IsOutputLayerHandle = true;
                 handleInfo.m_OutputMemDescriptorCoords.m_OutputSlotCoords = {layerIndex, slotIndex};
             }
             // Store the LayerBindingId of the InputLayer
             if (isInputLayer)
             {
-                handleInfo.isInputLayerHandle = true;
+                handleInfo.m_IsInputLayerHandle = true;
                 LayerBindingId bindingId = static_cast<BindableLayer*>(layer)->GetBindingId();
                 handleInfo.m_InputMemDescriptorCoords.m_LayerBindingId = bindingId;
             }
@@ -1557,20 +1657,19 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
                 {
                     LayerBindingId bindingId = static_cast<BindableLayer*>(layer)->GetBindingId();
 
-                    HandleInfo& handleInfo = handleReferenceCounts[tensorHandle];
-                    handleInfo.isOutputLayerHandle = true;
+                    HandleInfo& handleInfo = outputToHandleInfoMap[outputSlot];
+                    handleInfo.m_TensorHandle = tensorHandle;
+                    handleInfo.m_IsOutputLayerHandle = true;
                     handleInfo.m_OutputMemDescriptorCoords.m_LayerBindingIds.push_back(bindingId);
                     handleInfo.m_OutputMemDescriptorCoords.m_InputSlotCoords.push_back({layerIndex, 0});
                 }
                 continue;
             }
 
-            auto search = tensorHandleMap.find(key);
-            unsigned int index = outputSlot->CalculateIndexOnOwner();
-            ITensorHandle* inputTensorHandle = search->second[index].get();
-            workingMemDescriptor.m_Inputs.push_back(inputTensorHandle);
+            HandleInfo& handleInfo = outputToHandleInfoMap.at(outputSlot);
 
-            HandleInfo& handleInfo = handleReferenceCounts.at(inputTensorHandle);
+            ITensorHandle* inputTensorHandle = handleInfo.m_TensorHandle;
+            workingMemDescriptor.m_Inputs.push_back(inputTensorHandle);
 
             // Store the LayerBindingId of the OutputLayer
             if (isOutputLayer)
@@ -1581,24 +1680,17 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
             }
             // In this case the layer is not an Output Layer but shares its input tensorhandle with an OutputLayer
             // It will need to be updated as well, if we swap out the tensorhandle
-            else if (handleInfo.isOutputLayerHandle)
+            else if (handleInfo.m_IsOutputLayerHandle)
             {
                 handleInfo.m_OutputMemDescriptorCoords.m_InputSlotCoords.push_back({layerIndex, slot.GetSlotIndex()});
             }
 
             // Store the coordinates of the InputSlots connected to the InputLayer
             // There can be more than one InputSlot connected to an InputLayer, so we use a vector
-            if (handleInfo.isInputLayerHandle)
+            if (handleInfo.m_IsInputLayerHandle)
             {
                 std::pair<LayerGuid, unsigned int> connectionLocation{layerIndex, slot.GetSlotIndex()};
                 handleInfo.m_InputMemDescriptorCoords.m_InputSlotCoords.emplace_back(connectionLocation);
-            }
-
-            --handleInfo.m_ReferenceCount;
-            if (handleInfo.m_ReferenceCount == 0u)
-            {
-                // Stop managing lifetime of tensor handle
-                inputTensorHandle->Allocate();
             }
         }
         workingMemDescriptorMap.insert({layer->GetGuid(), workingMemDescriptor});
@@ -1612,17 +1704,29 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
         }
     }
 
+    std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>> tensorMemory;
+
+    auto externalMemoryManager = CreateExternalMemoryManger(tensorMemory);
+
+    // Sort m_TensorMemory, so it's order matches the outputSlot order
+    std::sort(tensorMemory.begin(), tensorMemory.end(),
+              [](const std::pair<std::shared_ptr<TensorMemory>, MemorySource>& lhs,
+                 const std::pair<std::shared_ptr<TensorMemory>, MemorySource>& rhs)
+              {
+                  return lhs.first->m_OutputSlotId < rhs.first->m_OutputSlotId;
+              });
+
     std::vector<WorkingMemHandle::InputMemDescriptorCoords> inputConnectionsInfo;
     std::vector<WorkingMemHandle::OutputMemDescriptorCoords> outputConnectionsInfo;
 
-    for (const auto& handleInfo: handleReferenceCounts)
+    for (const auto& handleInfo: outputToHandleInfoMap)
     {
-        if (handleInfo.second.isOutputLayerHandle)
+        if (handleInfo.second.m_IsOutputLayerHandle)
         {
             outputConnectionsInfo.emplace_back(handleInfo.second.m_OutputMemDescriptorCoords);
         }
 
-        if (handleInfo.second.isInputLayerHandle)
+        if (handleInfo.second.m_IsInputLayerHandle)
         {
             inputConnectionsInfo.emplace_back(handleInfo.second.m_InputMemDescriptorCoords);
         }
@@ -1633,8 +1737,10 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
                                               outputConnectionsInfo,
                                               workingMemDescriptors,
                                               workingMemDescriptorMap,
-                                              memoryManagers,
-                                              std::move(tensorHandleMap));
+                                              std::move(externalMemoryManager),
+                                              std::move(tensorMemory),
+                                              std::move(managedTensorHandles),
+                                              std::move(unmanagedTensorHandles));
 }
 
 void LoadedNetwork::RegisterDebugCallback(const DebugCallbackFunction& func)
@@ -1643,6 +1749,312 @@ void LoadedNetwork::RegisterDebugCallback(const DebugCallbackFunction& func)
     {
         workloadPtr.get()->RegisterDebugCallback(func);
     }
+}
+
+
+void LoadedNetwork::CreateMemoryProfileAsync()
+{
+    struct PartialBlock
+    {
+        unsigned int m_StartOfLife;
+        unsigned int m_Lifetime;
+
+        size_t m_MemSize;
+        unsigned int m_Index;
+
+        BackendId m_BackendId;
+    };
+
+    auto align = [](size_t numToAlign)
+    {
+        const size_t alignment = sizeof(float);
+        return ((numToAlign + alignment - 1) / alignment) * alignment;
+    };
+
+    std::unordered_map<const OutputSlot*, PartialBlock> memBlockTrackerMap;
+
+    const bool inputImportingEnabled = m_NetworkProperties.m_InputSource != MemorySource::Undefined;
+    const bool outputImportingEnabled = m_NetworkProperties.m_OutputSource != MemorySource::Undefined;
+
+    unsigned int timestep = 0;
+    unsigned int outputIndex = 0;
+    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
+
+    for (auto&& layer : order)
+    {
+        const LayerType& layerType = layer->GetType();
+        // Don't manage memory if importing.
+        if (layerType == LayerType::Input && inputImportingEnabled)
+        {
+            continue;
+        }
+        // Don't manage memory if importing.
+        if (layerType == LayerType::Output && outputImportingEnabled
+            && layer->GetInputSlot(0).GetConnectedOutputSlot()->GetNumConnections() == 1)
+        {
+            continue;
+        }
+        // Because Constant Layer memory can not be shared, the memory must persist for the lifetime of execution,
+        // management is done separately.
+        if (layerType == LayerType::Constant)
+        {
+            continue;
+        }
+
+        BackendId backendId = layer->GetBackendId();
+        for (auto& outputSlot : layer->GetOutputSlots())
+        {
+            if (!m_SupportsExternallyManagedMemory[backendId])
+            {
+                continue;
+            }
+
+            PartialBlock partialBlock;
+
+            partialBlock.m_StartOfLife = timestep;
+
+            size_t alignedSize = align(outputSlot.GetOutputHandler().GetTensorInfo().GetNumBytes());
+            partialBlock.m_MemSize = alignedSize;
+            partialBlock.m_Index = outputIndex++;
+            partialBlock.m_Lifetime = outputSlot.GetNumConnections();
+            partialBlock.m_BackendId = backendId;
+
+            if (partialBlock.m_Lifetime == 0)
+            {
+                m_MemBlockMap[partialBlock.m_BackendId].emplace_back(partialBlock.m_StartOfLife,
+                                                                     partialBlock.m_StartOfLife,
+                                                                     partialBlock.m_MemSize,
+                                                                     0,
+                                                                     partialBlock.m_Index);
+            }
+            else
+            {
+                memBlockTrackerMap[&outputSlot] = partialBlock;
+            }
+        }
+
+        for (auto& inputSlot : layer->GetInputSlots())
+        {
+            const Layer& connectedInputLayer = inputSlot.GetConnectedOutputSlot()->GetOwningLayer();
+            const LayerType& owningLayerType = connectedInputLayer.GetType();
+
+            if (owningLayerType == LayerType::Constant)
+            {
+                continue;
+            }
+            if (inputImportingEnabled && owningLayerType == LayerType::Input)
+            {
+                continue;
+            }
+
+            auto outputSlot = inputSlot.GetConnectedOutputSlot();
+
+            PartialBlock& partialBlock = memBlockTrackerMap.at(outputSlot);
+
+            auto& lifetime = partialBlock.m_Lifetime;
+            --lifetime;
+
+            if (lifetime == 0)
+            {
+                m_MemBlockMap[partialBlock.m_BackendId].emplace_back(partialBlock.m_StartOfLife,
+                                                                     timestep,
+                                                                     partialBlock.m_MemSize,
+                                                                     0,
+                                                                     partialBlock.m_Index);
+            }
+        }
+        ++timestep;
+    }
+}
+
+void LoadedNetwork::CreateMemoryProfile()
+{
+    // Finds the first TensorHandle ancestor of a SubTensorHandle. If the ITensorHandle provided
+    // is a TensorHandle, the function just returns it
+    auto TraceSubTensorHandleAncestry = [](ITensorHandle* const subTensorHandle)
+    {
+        ITensorHandle* ancestor = subTensorHandle;
+        while (ancestor && ancestor->GetParent())
+        {
+            ancestor = ancestor->GetParent();
+        }
+        return ancestor;
+    };
+
+    struct PartialBlock
+    {
+        unsigned int m_StartOfLife;
+        unsigned int m_Lifetime;
+
+        size_t m_MemSize;
+        unsigned int m_Index;
+
+        BackendId m_BackendId;
+    };
+
+    auto align = [](size_t numToAlign)
+    {
+        const size_t alignment = sizeof(float);
+        return ((numToAlign + alignment - 1) / alignment) * alignment;
+    };
+
+    std::unordered_map<ITensorHandle*, PartialBlock> memBlockTrackerMap;
+
+    const bool inputImportingEnabled = m_NetworkProperties.m_InputSource != MemorySource::Undefined;
+    const bool outputImportingEnabled = m_NetworkProperties.m_OutputSource != MemorySource::Undefined;
+
+    unsigned int timestep = 0;
+    unsigned int outputIndex = 0;
+    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
+
+    for (auto&& layer : order)
+    {
+        const LayerType& layerType = layer->GetType();
+        // Don't manage memory if importing.
+        if (layerType == LayerType::Input && inputImportingEnabled)
+        {
+            continue;
+        }
+        // Don't manage memory if importing.
+        if (layerType == LayerType::Output && outputImportingEnabled
+            && layer->GetInputSlot(0).GetConnectedOutputSlot()->GetNumConnections() == 1)
+        {
+            continue;
+        }
+        // Because Constant Layer memory can not be shared, the memory must persist for the lifetime of execution,
+        // management is done separately.
+        if (layerType == LayerType::Constant)
+        {
+            continue;
+        }
+
+        BackendId backendId = layer->GetBackendId();
+        for (auto& outputSlot : layer->GetOutputSlots())
+        {
+            if (!m_SupportsExternallyManagedMemory[backendId])
+            {
+                continue;
+            }
+
+            ITensorHandle* tensorHandle = outputSlot.GetOutputHandler().GetData();
+            tensorHandle = TraceSubTensorHandleAncestry(tensorHandle);
+
+            if (memBlockTrackerMap.find(tensorHandle) == memBlockTrackerMap.end())
+            {
+                PartialBlock partialBlock;
+
+                partialBlock.m_StartOfLife = timestep;
+
+                size_t alignedSize = align(outputSlot.GetOutputHandler().GetTensorInfo().GetNumBytes());
+                partialBlock.m_MemSize = alignedSize;
+                partialBlock.m_Index = outputIndex++;
+                partialBlock.m_Lifetime = outputSlot.GetNumConnections();
+                partialBlock.m_BackendId = backendId;
+
+                if (partialBlock.m_Lifetime == 0)
+                {
+                    m_MemBlockMap[partialBlock.m_BackendId].emplace_back(partialBlock.m_StartOfLife,
+                                                                         partialBlock.m_StartOfLife,
+                                                                         partialBlock.m_MemSize,
+                                                                         0,
+                                                                         partialBlock.m_Index);
+                }
+                else
+                {
+                    memBlockTrackerMap[tensorHandle] = partialBlock;
+                }
+                m_Tensorhandles.push_back(tensorHandle);
+
+            }
+            else
+            {
+                memBlockTrackerMap.at(tensorHandle).m_Lifetime += outputSlot.GetNumConnections();
+            }
+        }
+
+        for (auto& inputSlot : layer->GetInputSlots())
+        {
+            const Layer& connectedInputLayer = inputSlot.GetConnectedOutputSlot()->GetOwningLayer();
+            const LayerType& owningLayerType = connectedInputLayer.GetType();
+
+            if (owningLayerType == LayerType::Constant)
+            {
+                continue;
+            }
+            if (inputImportingEnabled && owningLayerType == LayerType::Input)
+            {
+                continue;
+            }
+            if (!m_SupportsExternallyManagedMemory[connectedInputLayer.GetBackendId()])
+            {
+                continue;
+            }
+
+            auto outputSlot = inputSlot.GetConnectedOutputSlot();
+
+            ITensorHandle* tensorHandle = outputSlot->GetOutputHandler().GetData();
+            tensorHandle = TraceSubTensorHandleAncestry(tensorHandle);
+
+            PartialBlock& partialBlock = memBlockTrackerMap.at(tensorHandle);
+
+            auto& lifetime = partialBlock.m_Lifetime;
+            --lifetime;
+
+            if (lifetime == 0)
+            {
+                m_MemBlockMap[partialBlock.m_BackendId].emplace_back(partialBlock.m_StartOfLife,
+                                                                     timestep,
+                                                                     partialBlock.m_MemSize,
+                                                                     0,
+                                                                     partialBlock.m_Index);
+            }
+        }
+        ++timestep;
+    }
+
+}
+
+std::unique_ptr<MemoryManager> LoadedNetwork::CreateExternalMemoryManger(
+        std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>>& tensorMemoryVec)
+{
+    std::unique_ptr<MemoryManager> memoryManager = std::make_unique<MemoryManager>();
+    auto allocatorMap = BackendRegistryInstance().GetAllocators();
+
+    for (auto& backend : m_MemBinMap)
+    {
+        std::vector<BufferStorage> bufferStorageVec;
+
+        std::shared_ptr<ICustomAllocator> backendAllocator;
+        if (allocatorMap.find(backend.first) != allocatorMap.end())
+        {
+            backendAllocator = allocatorMap[backend.first];
+        }
+        else
+        {
+            backendAllocator = m_Backends[backend.first]->GetDefaultAllocator();
+        }
+
+        for (auto& memBin : backend.second)
+        {
+            BufferStorage bufferStorage;
+            bufferStorage.m_BufferSize = memBin.m_MemSize;
+            bufferStorage.m_TensorMemoryVector.reserve(memBin.m_MemBlocks.size());
+
+            for (auto& memBlock : memBin.m_MemBlocks)
+            {
+                auto tensorMemory = std::make_shared<TensorMemory>(TensorMemory{memBlock.m_Offset, memBlock.m_Index});
+
+                tensorMemoryVec.emplace_back(tensorMemory, backendAllocator->GetMemorySourceType());
+                bufferStorage.m_TensorMemoryVector.emplace_back(tensorMemory);
+            }
+
+            bufferStorageVec.emplace_back(std::move(bufferStorage));
+        }
+
+        memoryManager->StoreMemToAllocate(bufferStorageVec, backendAllocator, 4);
+    }
+
+    return memoryManager;
 }
 
 LayerBindingId LoadedNetwork::ValidateImportedInputID(ImportedInputId id)

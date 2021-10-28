@@ -138,7 +138,7 @@ TEST_CASE("OptimizeValidateDeviceNonSupportLayerWithFallback")
         // the other layers are supported by CpuRef.
         // If NEON is not enabled, all layers are supported by CpuRef.
 #if defined(ARMCOMPUTENEON_ENABLED)
-        if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
+        if (layer->GetType() == armnn::LayerType::Output)
         {
             CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         }
@@ -337,7 +337,7 @@ TEST_CASE("OptimizeValidateWorkloadsDuplicateComputeDeviceWithFallback")
         // the other layers are supported by CpuRef.
         // If neither NEON, nor CL is enabled, all layers are supported by CpuRef.
 #if defined(ARMCOMPUTENEON_ENABLED)
-        if (layer->GetType() == armnn::LayerType::Input || layer->GetType() == armnn::LayerType::Output)
+        if (layer->GetType() == armnn::LayerType::Output)
         {
             CHECK(layer->GetBackendId() == armnn::Compute::CpuAcc);
         }

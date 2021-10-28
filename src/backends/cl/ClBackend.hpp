@@ -29,7 +29,7 @@ const BackendCapabilities gpuAccCapabilities("GpuAcc",
                                                      {"ProtectedContentAllocation", true},
                                                      {"ConstantTensorsAsInputs", false},
                                                      {"PreImportIOTensors", false},
-                                                     {"ExternallyManagedMemory", false},
+                                                     {"ExternallyManagedMemory", true},
                                                      {"MultiAxisPacking", false},
                                                      {"SingleAxisPacking", true}
                                              });

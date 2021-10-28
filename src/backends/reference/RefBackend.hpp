@@ -16,7 +16,7 @@ const BackendCapabilities cpuRefCapabilities("CpuRef",
                                                     {"ProtectedContentAllocation", false},
                                                     {"ConstantTensorsAsInputs", true},
                                                     {"PreImportIOTensors", true},
-                                                    {"ExternallyManagedMemory", false},
+                                                    {"ExternallyManagedMemory", true},
                                                     {"MultiAxisPacking", false},
                                                     {"SingleAxisPacking", true}
                                              });

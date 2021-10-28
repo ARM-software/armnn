@@ -2,6 +2,7 @@
 // Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+#pragma once
 
 #include <armnn/backends/ICustomAllocator.hpp>
 
@@ -10,7 +11,7 @@ namespace armnn
 struct Allocator
 {
     /// Pointer to @ICustomAllocator.
-    ICustomAllocator* m_CustomAllocator{};
+    std::shared_ptr<ICustomAllocator> m_CustomAllocator{};
     /// Value which the size of each buffer (actual data size + padding) has to be a multiple of.
     size_t m_Alignment = 0 ;
 };
@@ -19,16 +20,16 @@ struct TensorMemory
 {
     /// Number of bytes the value is away from the @BufferStorage.m_Buffer.
     size_t m_Offset{};
-    /// Pointer to the tensor value.
-    void* m_Data = nullptr;
     /// Identifier to be used by the @LoadedNetwork to order the tensors.
     unsigned int m_OutputSlotId{};
+    /// Pointer to the tensor value.
+    void* m_Data = nullptr;
 };
 
 struct BufferStorage
 {
     /// Vector of pointer to @TensorMemory.
-    std::vector<TensorMemory*> m_TensorMemoryVector;
+    std::vector<std::shared_ptr<TensorMemory>> m_TensorMemoryVector;
     /// Total size of the buffer.
     size_t m_BufferSize;
     /// Pointer to the first element of the buffer.
@@ -43,7 +44,7 @@ public:
     /// @param[in] customAllocator - Pointer to @ICustomAllocator.
     /// @param[in] typeAlignment - Optional parameter. Value of which the size of each value has to be multiple of.
     void StoreMemToAllocate(std::vector<BufferStorage> bufferStorageVector,
-                            ICustomAllocator* customAllocator,
+                            std::shared_ptr<ICustomAllocator> customAllocator,
                             size_t typeAlignment = 0);
 
     /// Allocate the amount of memory indicated by @m_BufferSize, and

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="49956ccf029ff4c1873e3a6702b5bede95d81f7a" #Fixed issue where cppflags were being set incorrectly
+DEFAULT_CLFRAMEWORKREVISION="1af5416917268692fcd4b34b1d7ffebd3a2aea8a" #Add experimental PostOp interface to ClGemmMatrixMultiplyReshapedKernel Part 1
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -11,6 +11,7 @@
 #include <Layer.hpp>
 
 #include <armnn/Exceptions.hpp>
+#include <armnn/Logging.hpp>
 #include <armnn/Utils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
@@ -83,7 +84,11 @@ void ClWorkloadFactory::AfterWorkloadsCreated()
                     std::copy(serializedString.begin(),
                               serializedString.end(),
                               std::back_inserter(compiledContextData));
-                    write(cachedFd, compiledContextData.data(), compiledContextData.size());
+                    auto success = write(cachedFd, compiledContextData.data(), compiledContextData.size());
+                    if (success == -1)
+                    {
+                        ARMNN_LOG(info) << "ClWorkloadFactory:: Could not cache the compiled context!";
+                    }
                 }
             }
 
@@ -157,11 +162,14 @@ void ClWorkloadFactory::InitializeCLCompileContext()
                         if (offset == 0)
                         {
                             std::vector <uint8_t> compiledContextData(static_cast<unsigned int>(dataSize));
-                            pread(cachedFd, compiledContextData.data(), compiledContextData.size(), 0);
-                            deserializer.DeserializeFromBinary(m_CLCompileContext,
-                                                               context,
-                                                               device,
-                                                               compiledContextData);
+                            auto success = pread(cachedFd, compiledContextData.data(), compiledContextData.size(), 0);
+                            if (success != -1)
+                            {
+                                deserializer.DeserializeFromBinary(m_CLCompileContext,
+                                                                   context,
+                                                                   device,
+                                                                   compiledContextData);
+                            }
                         }
                     }
 

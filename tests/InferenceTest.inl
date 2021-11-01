@@ -67,6 +67,14 @@ struct ClassifierResultProcessor
                                 });
     }
 
+    void operator()(const std::vector<armnn::Half>& values)
+    {
+        SortPredictions(values, [](armnn::Half value)
+                                {
+                                    return value;
+                                });
+    }
+
     void operator()(const std::vector<int8_t>& values)
     {
         SortPredictions(values, [](int8_t value)

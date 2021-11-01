@@ -36,6 +36,8 @@ struct TensorPrinter
 
     void operator()(const std::vector<int8_t>& values);
 
+    void operator()(const std::vector<armnn::Half>& values);
+
 private:
     template<typename Container, typename Delegate>
     void ForEachValue(const Container& c, Delegate delegate);

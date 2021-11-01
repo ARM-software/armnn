@@ -12,6 +12,7 @@
 #include <armnnUtils/Filesystem.hpp>
 #include <armnnUtils/TContainer.hpp>
 #include <InferenceTest.hpp>
+#include <Half.hpp>
 
 #if defined(ARMNN_SERIALIZER)
 #include "armnnDeserializer/IDeserializer.hpp"
@@ -484,11 +485,19 @@ int MainImpl(const ExecuteNetworkParams& params,
             armnn::DataType type = model.GetOutputBindingInfo(outputIdx).second.GetDataType();
             switch (type)
             {
-                // --output-type only supports float, int,  qasymms8 or qasymmu8.
+                // --output-type only supports float, float16, int,  qasymms8 or qasymmu8.
                 case armnn::DataType::Float32:
                     if (params.m_OutputTypes[outputIdx].compare("float") != 0)
                     {
                         ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type Float32. The " <<
+                                           "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
+                                           ". This may cause unexpected problems or random failures.";
+                    }
+                    break;
+                case armnn::DataType::Float16:
+                    if (params.m_OutputTypes[outputIdx].compare("float16") != 0)
+                    {
+                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type Float16. The " <<
                                            "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
                                            ". This may cause unexpected problems or random failures.";
                     }
@@ -529,6 +538,10 @@ int MainImpl(const ExecuteNetworkParams& params,
                 if (params.m_OutputTypes[i].compare("float") == 0)
                 {
                     outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
+                }
+                else if (params.m_OutputTypes[i].compare("float16") == 0)
+                {
+                    outputDataContainers.push_back(std::vector<armnn::Half>(model.GetOutputSize(i)));
                 }
                 else if (params.m_OutputTypes[i].compare("int") == 0)
                 {

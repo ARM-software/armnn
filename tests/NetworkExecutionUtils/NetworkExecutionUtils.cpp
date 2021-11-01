@@ -34,6 +34,15 @@ auto ParseDataArray<armnn::DataType::Float32>(std::istream& stream)
 }
 
 template<>
+auto ParseDataArray<armnn::DataType::Float16>(std::istream& stream)
+{
+    return ParseArrayImpl<armnn::Half>(stream, [](const std::string& s)
+    {
+        return armnn::Half(std::stof(s));
+    });
+}
+
+template<>
 auto ParseDataArray<armnn::DataType::Signed32>(std::istream& stream)
 {
     return ParseArrayImpl<int>(stream, [](const std::string& s) { return std::stoi(s); });
@@ -133,6 +142,20 @@ void TensorPrinter::operator()(const std::vector<float>& values)
         ForEachValue(values, [](float value)
         {
             printf("%f ", value);
+        });
+        printf("\n");
+    }
+    WriteToFile(values);
+}
+
+void TensorPrinter::operator()(const std::vector<armnn::Half>& values)
+{
+    if (m_PrintToConsole)
+    {
+        std::cout << m_OutputBinding << ": ";
+        ForEachValue(values, [](armnn::Half value)
+        {
+            printf("%f ", static_cast<float>(value));
         });
         printf("\n");
     }
@@ -260,6 +283,12 @@ void PopulateTensorWithData(armnnUtils::TContainer& tensorData,
                          ParseDataArray<armnn::DataType::Float32>(inputTensorFile) :
                          GenerateDummyTensorData<armnn::DataType::Float32>(numElements);
         }
+    }
+    else if (dataTypeStr.compare("float16") == 0)
+    {
+        tensorData = readFromFile ?
+                     ParseDataArray<armnn::DataType::Float16>(inputTensorFile) :
+                     GenerateDummyTensorData<armnn::DataType::Float16>(numElements);
     }
     else if (dataTypeStr.compare("int") == 0)
     {

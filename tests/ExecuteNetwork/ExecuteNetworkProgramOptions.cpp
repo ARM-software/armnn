@@ -294,13 +294,13 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                 ("y,input-type",
                  "The type of the input tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined inputs. "
-                 "Accepted values (float, int, qasymms8 or qasymmu8).",
+                 "Accepted values (float, float16, int, qasymms8 or qasymmu8).",
                  cxxopts::value<std::string>())
 
                 ("z,output-type",
                  "The type of the output tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined outputs. "
-                 "Accepted values (float, int,  qasymms8 or qasymmu8).",
+                 "Accepted values (float, float16, int,  qasymms8 or qasymmu8).",
                  cxxopts::value<std::string>())
 
                 ("T,tflite-executor",

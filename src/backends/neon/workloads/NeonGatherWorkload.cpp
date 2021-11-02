@@ -34,7 +34,7 @@ NeonGatherWorkload::NeonGatherWorkload(const GatherQueueDescriptor& descriptor,
                                          info,
                                          this->GetGuid());
 
-    m_Data.ValidateInputsOutputs("NeonGatherWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("NeonGatherWorkload", 2, 1);
 
     arm_compute::ITensor& input   = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& indices = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();

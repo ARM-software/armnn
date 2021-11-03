@@ -22,7 +22,7 @@ class ProfilingDetails : public JsonUtils
 {
 public:
     /// Constructor
-    ProfilingDetails() : JsonUtils(m_ProfilingDetails), m_DetailsExist(false)
+    ProfilingDetails() : JsonUtils(m_ProfilingDetails), m_DetailsExist(false), m_PrintSeparator(false)
     {}
 
     /// Destructor
@@ -43,9 +43,11 @@ public:
             PrintNewLine();
         }
 
-        m_ProfilingDetails << std::quoted("Name") << ": " << std::quoted(workloadName) << " ";
         PrintHeader();
-
+        PrintTabs();
+        m_ProfilingDetails << std::quoted("Name") << ": " << std::quoted(workloadName);
+        PrintSeparator();
+        PrintNewLine();
         PrintTabs();
         m_ProfilingDetails << std::quoted("GUID") << ": " << std::quoted(std::to_string(guid));
         PrintSeparator();
@@ -76,17 +78,23 @@ public:
         }
 
         ParameterStringifyFunction extractParams = [this](const std::string& name, const std::string& value) {
+            if (m_PrintSeparator)
+            {
+                PrintSeparator();
+                PrintNewLine();
+            }
             PrintTabs();
             m_ProfilingDetails << std::quoted(name) << " : " << std::quoted(value);
-            if (name != "DataLayout") PrintSeparator();
-            PrintNewLine();
+            m_PrintSeparator = true;
         };
 
         StringifyLayerParameters<DescriptorType>::Serialize(extractParams, desc);
 
+        PrintNewLine();
         PrintFooter();
 
         m_DetailsExist = true;
+        m_PrintSeparator = false;
     }
 
     /// Get the ProfilingDetails
@@ -158,6 +166,7 @@ private:
     /// Stores ProfilingDetails
     std::ostringstream m_ProfilingDetails;
     bool m_DetailsExist;
+    bool m_PrintSeparator;
 
 };
 

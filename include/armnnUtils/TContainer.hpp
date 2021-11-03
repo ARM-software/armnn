@@ -6,20 +6,15 @@
 #pragma once
 
 #include <armnn/TypesUtils.hpp>
-#include <Half.hpp>
 
 #include <mapbox/variant.hpp>
 
 namespace armnnUtils
 {
 
-// Standard declaration of TContainer used by ArmNN
-// Changes to this declaration constitute an api/abi break, new types should be added as a separate declaration and
-// merged on the next planned api/abi update.
-using TContainer = mapbox::util::variant<std::vector<float>,
-                                         std::vector<int>,
-                                         std::vector<uint8_t>,
-                                         std::vector<int8_t>,
-                                         std::vector<armnn::Half>>;
+// Standard definition of TContainer used by ArmNN, use this definition or add alternative definitions here instead of
+// defining your own.
+    using TContainer =
+    mapbox::util::variant<std::vector<float>, std::vector<int>, std::vector<unsigned char>, std::vector<int8_t>>;
 
 } // namespace armnnUtils

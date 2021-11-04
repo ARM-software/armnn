@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_08" # Release 21.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="bc788389dcc7bd682f53a85803f6a202d42ac828" #Fix GEMMMatrixMultiplyReshapedOnlyRHSKernel tests to use InitializerListDataset
+DEFAULT_CLFRAMEWORKREVISION="71cbd28b7cf5115b0451d43e5c84cce4ae4d8ec7" #Fix out-of-bound reads in cl gemm kernels
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

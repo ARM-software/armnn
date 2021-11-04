@@ -265,8 +265,53 @@ TEST_CASE ("Conv3DFp32Small_Fp32_CpuRef_Test")
     Conv3DFp32SmallTest(backends);
 }
 
-
 } //End of TEST_SUITE("Convolution3dTest_CpuRefTests")
+
+TEST_SUITE("Convolution3dTest_CpuAccTests")
+{
+
+TEST_CASE ("Conv3DWithBiasesSimpleWithPadding_Fp32_CpuAcc_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    Conv3DWithBiasesSimpleWithPaddingFp32Test(backends);
+}
+
+TEST_CASE ("Conv3DWithBiasesStrides_Fp32_CpuAcc_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    Conv3DWithBiasesStridesFp32Test(backends);
+}
+
+TEST_CASE ("Conv3DFp32Small_Fp32_CpuAcc_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    Conv3DFp32SmallTest(backends);
+}
+
+} //End of TEST_SUITE("Convolution3dTest_CpuAccTests")
+
+TEST_SUITE("Convolution3dTest_GpuAccTests")
+{
+
+TEST_CASE ("Conv3DWithBiasesSimpleWithPadding_Fp32_GpuAcc_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    Conv3DWithBiasesSimpleWithPaddingFp32Test(backends);
+}
+
+TEST_CASE ("Conv3DWithBiasesStrides_Fp32_GpuAcc_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    Conv3DWithBiasesStridesFp32Test(backends);
+}
+
+TEST_CASE ("Conv3DFp32Small_Fp32_GpuAcc_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    Conv3DFp32SmallTest(backends);
+}
+
+} //End of TEST_SUITE("Convolution3dTest_GpuAccTests")
 
 #endif
 

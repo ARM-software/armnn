@@ -35,6 +35,16 @@ public:
         }
         return allocatedMemPtr;
     }
+
+    void free(void* ptr) override
+    {
+        std::free(ptr);
+    }
+
+    armnn::MemorySource GetMemorySourceType() override
+    {
+        return armnn::MemorySource::Malloc;
+    }
 };
 
 

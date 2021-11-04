@@ -36,8 +36,7 @@ public:
      *  Supported types are:
      *       MemorySource::Malloc
      *       MemorySource::DmaBuf
-     *   Unsupported types are:
-     *      MemorySource::DmaBufProtected
+     *       MemorySource::DmaBufProtected
      */
     virtual armnn::MemorySource GetMemorySourceType() = 0;
 

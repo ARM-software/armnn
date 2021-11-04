@@ -23,6 +23,7 @@ if(ARMCOMPUTECL)
         ClBackend.hpp
         ClBackendContext.cpp
         ClBackendContext.hpp
+        ClBackendDefaultAllocator.hpp
         ClBackendId.hpp
         ClBackendModelContext.cpp
         ClBackendModelContext.hpp

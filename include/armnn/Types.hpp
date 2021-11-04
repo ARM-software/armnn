@@ -219,7 +219,8 @@ enum class MemorySource : uint32_t
     Undefined = 0,
     Malloc = 1,
     DmaBuf = 2,
-    DmaBufProtected = 4
+    DmaBufProtected = 4,
+    Gralloc = 5
 };
 
 enum class MemBlockStrategyType

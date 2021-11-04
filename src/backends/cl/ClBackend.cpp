@@ -5,6 +5,7 @@
 
 #include "ClBackend.hpp"
 #include "ClBackendContext.hpp"
+#include "ClBackendDefaultAllocator.hpp"
 #include "ClBackendId.hpp"
 #include "ClBackendModelContext.hpp"
 #include "ClImportTensorHandleFactory.hpp"
@@ -214,6 +215,11 @@ IBackendInternal::ILayerSupportSharedPtr ClBackend::GetLayerSupport(const ModelO
         new ClLayerSupport(CreateBackendSpecificModelContext(modelOptions))
     };
     return layerSupport;
+}
+
+std::unique_ptr<ICustomAllocator> ClBackend::GetDefaultAllocator() const
+{
+    return std::make_unique<ClBackendDefaultAllocator>();
 }
 
 OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,

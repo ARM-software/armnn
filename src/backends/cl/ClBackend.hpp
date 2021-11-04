@@ -88,6 +88,8 @@ public:
     IBackendInternal::IBackendSpecificModelContextPtr CreateBackendSpecificModelContext(
         const ModelOptions& modelOptions) const override;
 
+    std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
+
     BackendCapabilities GetCapabilities() const override
     {
         return gpuAccCapabilities;

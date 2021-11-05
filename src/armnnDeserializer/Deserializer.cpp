@@ -249,6 +249,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_PadLayer]                    = &DeserializerImpl::ParsePad;
     m_ParserFunctions[Layer_PermuteLayer]                = &DeserializerImpl::ParsePermute;
     m_ParserFunctions[Layer_Pooling2dLayer]              = &DeserializerImpl::ParsePooling2d;
+    m_ParserFunctions[Layer_Pooling3dLayer]              = &DeserializerImpl::ParsePooling3d;
     m_ParserFunctions[Layer_PreluLayer]                  = &DeserializerImpl::ParsePrelu;
     m_ParserFunctions[Layer_QLstmLayer]                  = &DeserializerImpl::ParseQLstm;
     m_ParserFunctions[Layer_QuantizeLayer]               = &DeserializerImpl::ParseQuantize;
@@ -365,6 +366,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_PermuteLayer()->base();
         case Layer::Layer_Pooling2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_Pooling2dLayer()->base();
+        case Layer::Layer_Pooling3dLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_Pooling3dLayer()->base();
         case Layer::Layer_PreluLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_PreluLayer()->base();
         case Layer::Layer_QLstmLayer:
@@ -2130,7 +2133,7 @@ void IDeserializer::DeserializerImpl::ParsePermute(GraphPtr graph, unsigned int 
     RegisterOutputSlots(graph, layerIndex, layer);
 }
 
-armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPoolingDescriptor(PoolingDescriptor pooling2dDesc,
+armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPooling2dDescriptor(Pooling2dDescriptor pooling2dDesc,
                                                               unsigned int layerIndex)
 {
     IgnoreUnused(layerIndex);
@@ -2225,7 +2228,104 @@ armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPoolingDescriptor
     return desc;
 }
 
+armnn::Pooling3dDescriptor IDeserializer::DeserializerImpl::GetPooling3dDescriptor(Pooling3dDescriptor pooling3dDesc,
+                                                              unsigned int layerIndex)
+{
+    IgnoreUnused(layerIndex);
+    armnn::Pooling3dDescriptor desc;
 
+    switch (pooling3dDesc->poolType())
+    {
+        case PoolingAlgorithm_Average:
+        {
+            desc.m_PoolType = armnn::PoolingAlgorithm::Average;
+            break;
+        }
+        case PoolingAlgorithm_Max:
+        {
+            desc.m_PoolType = armnn::PoolingAlgorithm::Max;
+            break;
+        }
+        case PoolingAlgorithm_L2:
+        {
+            desc.m_PoolType = armnn::PoolingAlgorithm::L2;
+            break;
+        }
+        default:
+        {
+            ARMNN_ASSERT_MSG(false, "Unsupported pooling algorithm");
+        }
+    }
+
+    switch (pooling3dDesc->outputShapeRounding())
+    {
+        case OutputShapeRounding_Floor:
+        {
+            desc.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+            break;
+        }
+        case OutputShapeRounding_Ceiling:
+        {
+            desc.m_OutputShapeRounding = armnn::OutputShapeRounding::Ceiling;
+            break;
+        }
+        default:
+        {
+            ARMNN_ASSERT_MSG(false, "Unsupported output shape rounding");
+        }
+    }
+
+    switch (pooling3dDesc->paddingMethod())
+    {
+        case PaddingMethod_Exclude:
+        {
+            desc.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+            break;
+        }
+        case PaddingMethod_IgnoreValue:
+        {
+            desc.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
+            break;
+        }
+        default:
+        {
+            ARMNN_ASSERT_MSG(false, "Unsupported padding method");
+        }
+    }
+
+    switch (pooling3dDesc->dataLayout())
+    {
+        case DataLayout_NCDHW:
+        {
+            desc.m_DataLayout = armnn::DataLayout::NCDHW;
+            break;
+        }
+        case DataLayout_NDHWC:
+        {
+            desc.m_DataLayout = armnn::DataLayout::NDHWC;
+            break;
+        }
+        default:
+        {
+            ARMNN_ASSERT_MSG(false, "Unsupported data layout");
+        }
+    }
+
+    desc.m_PadRight   = pooling3dDesc->padRight();
+    desc.m_PadLeft    = pooling3dDesc->padLeft();
+    desc.m_PadBottom  = pooling3dDesc->padBottom();
+    desc.m_PadTop     = pooling3dDesc->padTop();
+    desc.m_PadFront   = pooling3dDesc->padFront();
+    desc.m_PadBack    = pooling3dDesc->padBack();
+    desc.m_StrideX    = pooling3dDesc->strideX();
+    desc.m_StrideY    = pooling3dDesc->strideY();
+    desc.m_StrideZ    = pooling3dDesc->strideZ();
+    desc.m_PoolWidth  = pooling3dDesc->poolWidth();
+    desc.m_PoolHeight = pooling3dDesc->poolHeight();
+    desc.m_PoolDepth  = pooling3dDesc->poolDepth();
+
+    return desc;
+}
 
 void IDeserializer::DeserializerImpl::ParsePooling2d(GraphPtr graph, unsigned int layerIndex)
 {
@@ -2239,9 +2339,30 @@ void IDeserializer::DeserializerImpl::ParsePooling2d(GraphPtr graph, unsigned in
     CHECK_VALID_SIZE(outputs.size(), 1);
     auto outputInfo = ToTensorInfo(outputs[0]);
 
-    auto pooling2dDescriptor = GetPoolingDescriptor(pooling2dDes, layerIndex);
+    auto pooling2dDescriptor = GetPooling2dDescriptor(pooling2dDes, layerIndex);
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddPooling2dLayer(pooling2dDescriptor, layerName.c_str());
+    layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParsePooling3d(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto pooling3dDes = graph->layers()->Get(layerIndex)->layer_as_Pooling3dLayer()->descriptor();
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+    auto outputInfo = ToTensorInfo(outputs[0]);
+
+    auto pooling3dDescriptor = GetPooling3dDescriptor(pooling3dDes, layerIndex);
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddPooling3dLayer(pooling3dDescriptor, layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);

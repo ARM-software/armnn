@@ -173,8 +173,14 @@ struct MultiplicationLayerBuilder;
 struct Pooling2dLayer;
 struct Pooling2dLayerBuilder;
 
+struct Pooling3dLayer;
+struct Pooling3dLayerBuilder;
+
 struct Pooling2dDescriptor;
 struct Pooling2dDescriptorBuilder;
+
+struct Pooling3dDescriptor;
+struct Pooling3dDescriptorBuilder;
 
 struct QuantizeLayer;
 struct QuantizeLayerBuilder;
@@ -770,11 +776,12 @@ enum LayerType {
   LayerType_UnidirectionalSequenceLstm = 63,
   LayerType_ChannelShuffle = 64,
   LayerType_Convolution3d = 65,
+  LayerType_Pooling3d = 66,
   LayerType_MIN = LayerType_Addition,
-  LayerType_MAX = LayerType_Convolution3d
+  LayerType_MAX = LayerType_Pooling3d
 };
 
-inline const LayerType (&EnumValuesLayerType())[66] {
+inline const LayerType (&EnumValuesLayerType())[67] {
   static const LayerType values[] = {
     LayerType_Addition,
     LayerType_Input,
@@ -841,13 +848,14 @@ inline const LayerType (&EnumValuesLayerType())[66] {
     LayerType_Shape,
     LayerType_UnidirectionalSequenceLstm,
     LayerType_ChannelShuffle,
-    LayerType_Convolution3d
+    LayerType_Convolution3d,
+    LayerType_Pooling3d
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayerType() {
-  static const char * const names[67] = {
+  static const char * const names[68] = {
     "Addition",
     "Input",
     "Multiplication",
@@ -914,13 +922,14 @@ inline const char * const *EnumNamesLayerType() {
     "UnidirectionalSequenceLstm",
     "ChannelShuffle",
     "Convolution3d",
+    "Pooling3d",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayerType(LayerType e) {
-  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_Convolution3d)) return "";
+  if (flatbuffers::IsOutRange(e, LayerType_Addition, LayerType_Pooling3d)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayerType()[index];
 }
@@ -1299,11 +1308,12 @@ enum Layer {
   Layer_UnidirectionalSequenceLstmLayer = 64,
   Layer_ChannelShuffleLayer = 65,
   Layer_Convolution3dLayer = 66,
+  Layer_Pooling3dLayer = 67,
   Layer_MIN = Layer_NONE,
-  Layer_MAX = Layer_Convolution3dLayer
+  Layer_MAX = Layer_Pooling3dLayer
 };
 
-inline const Layer (&EnumValuesLayer())[67] {
+inline const Layer (&EnumValuesLayer())[68] {
   static const Layer values[] = {
     Layer_NONE,
     Layer_ActivationLayer,
@@ -1371,13 +1381,14 @@ inline const Layer (&EnumValuesLayer())[67] {
     Layer_ShapeLayer,
     Layer_UnidirectionalSequenceLstmLayer,
     Layer_ChannelShuffleLayer,
-    Layer_Convolution3dLayer
+    Layer_Convolution3dLayer,
+    Layer_Pooling3dLayer
   };
   return values;
 }
 
 inline const char * const *EnumNamesLayer() {
-  static const char * const names[68] = {
+  static const char * const names[69] = {
     "NONE",
     "ActivationLayer",
     "AdditionLayer",
@@ -1445,13 +1456,14 @@ inline const char * const *EnumNamesLayer() {
     "UnidirectionalSequenceLstmLayer",
     "ChannelShuffleLayer",
     "Convolution3dLayer",
+    "Pooling3dLayer",
     nullptr
   };
   return names;
 }
 
 inline const char *EnumNameLayer(Layer e) {
-  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_Convolution3dLayer)) return "";
+  if (flatbuffers::IsOutRange(e, Layer_NONE, Layer_Pooling3dLayer)) return "";
   const size_t index = static_cast<size_t>(e);
   return EnumNamesLayer()[index];
 }
@@ -1722,6 +1734,10 @@ template<> struct LayerTraits<armnnSerializer::ChannelShuffleLayer> {
 
 template<> struct LayerTraits<armnnSerializer::Convolution3dLayer> {
   static const Layer enum_value = Layer_Convolution3dLayer;
+};
+
+template<> struct LayerTraits<armnnSerializer::Pooling3dLayer> {
+  static const Layer enum_value = Layer_Pooling3dLayer;
 };
 
 bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer type);
@@ -4874,6 +4890,60 @@ inline flatbuffers::Offset<Pooling2dLayer> CreatePooling2dLayer(
   return builder_.Finish();
 }
 
+struct Pooling3dLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef Pooling3dLayerBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_BASE = 4,
+    VT_DESCRIPTOR = 6
+  };
+  const armnnSerializer::LayerBase *base() const {
+    return GetPointer<const armnnSerializer::LayerBase *>(VT_BASE);
+  }
+  const armnnSerializer::Pooling3dDescriptor *descriptor() const {
+    return GetPointer<const armnnSerializer::Pooling3dDescriptor *>(VT_DESCRIPTOR);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_BASE) &&
+           verifier.VerifyTable(base()) &&
+           VerifyOffset(verifier, VT_DESCRIPTOR) &&
+           verifier.VerifyTable(descriptor()) &&
+           verifier.EndTable();
+  }
+};
+
+struct Pooling3dLayerBuilder {
+  typedef Pooling3dLayer Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_base(flatbuffers::Offset<armnnSerializer::LayerBase> base) {
+    fbb_.AddOffset(Pooling3dLayer::VT_BASE, base);
+  }
+  void add_descriptor(flatbuffers::Offset<armnnSerializer::Pooling3dDescriptor> descriptor) {
+    fbb_.AddOffset(Pooling3dLayer::VT_DESCRIPTOR, descriptor);
+  }
+  explicit Pooling3dLayerBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Pooling3dLayerBuilder &operator=(const Pooling3dLayerBuilder &);
+  flatbuffers::Offset<Pooling3dLayer> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Pooling3dLayer>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Pooling3dLayer> CreatePooling3dLayer(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<armnnSerializer::LayerBase> base = 0,
+    flatbuffers::Offset<armnnSerializer::Pooling3dDescriptor> descriptor = 0) {
+  Pooling3dLayerBuilder builder_(_fbb);
+  builder_.add_descriptor(descriptor);
+  builder_.add_base(base);
+  return builder_.Finish();
+}
+
 struct Pooling2dDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef Pooling2dDescriptorBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
@@ -5015,6 +5085,198 @@ inline flatbuffers::Offset<Pooling2dDescriptor> CreatePooling2dDescriptor(
   builder_.add_strideX(strideX);
   builder_.add_poolHeight(poolHeight);
   builder_.add_poolWidth(poolWidth);
+  builder_.add_padBottom(padBottom);
+  builder_.add_padTop(padTop);
+  builder_.add_padRight(padRight);
+  builder_.add_padLeft(padLeft);
+  builder_.add_dataLayout(dataLayout);
+  builder_.add_paddingMethod(paddingMethod);
+  builder_.add_outputShapeRounding(outputShapeRounding);
+  builder_.add_poolType(poolType);
+  return builder_.Finish();
+}
+
+struct Pooling3dDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef Pooling3dDescriptorBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_POOLTYPE = 4,
+    VT_PADLEFT = 6,
+    VT_PADRIGHT = 8,
+    VT_PADTOP = 10,
+    VT_PADBOTTOM = 12,
+    VT_PADFRONT = 14,
+    VT_PADBACK = 16,
+    VT_POOLWIDTH = 18,
+    VT_POOLHEIGHT = 20,
+    VT_POOLDEPTH = 22,
+    VT_STRIDEX = 24,
+    VT_STRIDEY = 26,
+    VT_STRIDEZ = 28,
+    VT_OUTPUTSHAPEROUNDING = 30,
+    VT_PADDINGMETHOD = 32,
+    VT_DATALAYOUT = 34
+  };
+  armnnSerializer::PoolingAlgorithm poolType() const {
+    return static_cast<armnnSerializer::PoolingAlgorithm>(GetField<int8_t>(VT_POOLTYPE, 0));
+  }
+  uint32_t padLeft() const {
+    return GetField<uint32_t>(VT_PADLEFT, 0);
+  }
+  uint32_t padRight() const {
+    return GetField<uint32_t>(VT_PADRIGHT, 0);
+  }
+  uint32_t padTop() const {
+    return GetField<uint32_t>(VT_PADTOP, 0);
+  }
+  uint32_t padBottom() const {
+    return GetField<uint32_t>(VT_PADBOTTOM, 0);
+  }
+  uint32_t padFront() const {
+    return GetField<uint32_t>(VT_PADFRONT, 0);
+  }
+  uint32_t padBack() const {
+    return GetField<uint32_t>(VT_PADBACK, 0);
+  }
+  uint32_t poolWidth() const {
+    return GetField<uint32_t>(VT_POOLWIDTH, 0);
+  }
+  uint32_t poolHeight() const {
+    return GetField<uint32_t>(VT_POOLHEIGHT, 0);
+  }
+  uint32_t poolDepth() const {
+    return GetField<uint32_t>(VT_POOLDEPTH, 0);
+  }
+  uint32_t strideX() const {
+    return GetField<uint32_t>(VT_STRIDEX, 0);
+  }
+  uint32_t strideY() const {
+    return GetField<uint32_t>(VT_STRIDEY, 0);
+  }
+  uint32_t strideZ() const {
+    return GetField<uint32_t>(VT_STRIDEZ, 0);
+  }
+  armnnSerializer::OutputShapeRounding outputShapeRounding() const {
+    return static_cast<armnnSerializer::OutputShapeRounding>(GetField<int8_t>(VT_OUTPUTSHAPEROUNDING, 0));
+  }
+  armnnSerializer::PaddingMethod paddingMethod() const {
+    return static_cast<armnnSerializer::PaddingMethod>(GetField<int8_t>(VT_PADDINGMETHOD, 0));
+  }
+  armnnSerializer::DataLayout dataLayout() const {
+    return static_cast<armnnSerializer::DataLayout>(GetField<int8_t>(VT_DATALAYOUT, 0));
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int8_t>(verifier, VT_POOLTYPE) &&
+           VerifyField<uint32_t>(verifier, VT_PADLEFT) &&
+           VerifyField<uint32_t>(verifier, VT_PADRIGHT) &&
+           VerifyField<uint32_t>(verifier, VT_PADTOP) &&
+           VerifyField<uint32_t>(verifier, VT_PADBOTTOM) &&
+           VerifyField<uint32_t>(verifier, VT_PADFRONT) &&
+           VerifyField<uint32_t>(verifier, VT_PADBACK) &&
+           VerifyField<uint32_t>(verifier, VT_POOLWIDTH) &&
+           VerifyField<uint32_t>(verifier, VT_POOLHEIGHT) &&
+           VerifyField<uint32_t>(verifier, VT_POOLDEPTH) &&
+           VerifyField<uint32_t>(verifier, VT_STRIDEX) &&
+           VerifyField<uint32_t>(verifier, VT_STRIDEY) &&
+           VerifyField<uint32_t>(verifier, VT_STRIDEZ) &&
+           VerifyField<int8_t>(verifier, VT_OUTPUTSHAPEROUNDING) &&
+           VerifyField<int8_t>(verifier, VT_PADDINGMETHOD) &&
+           VerifyField<int8_t>(verifier, VT_DATALAYOUT) &&
+           verifier.EndTable();
+  }
+};
+
+struct Pooling3dDescriptorBuilder {
+  typedef Pooling3dDescriptor Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_poolType(armnnSerializer::PoolingAlgorithm poolType) {
+    fbb_.AddElement<int8_t>(Pooling3dDescriptor::VT_POOLTYPE, static_cast<int8_t>(poolType), 0);
+  }
+  void add_padLeft(uint32_t padLeft) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_PADLEFT, padLeft, 0);
+  }
+  void add_padRight(uint32_t padRight) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_PADRIGHT, padRight, 0);
+  }
+  void add_padTop(uint32_t padTop) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_PADTOP, padTop, 0);
+  }
+  void add_padBottom(uint32_t padBottom) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_PADBOTTOM, padBottom, 0);
+  }
+  void add_padFront(uint32_t padFront) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_PADFRONT, padFront, 0);
+  }
+  void add_padBack(uint32_t padBack) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_PADBACK, padBack, 0);
+  }
+  void add_poolWidth(uint32_t poolWidth) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_POOLWIDTH, poolWidth, 0);
+  }
+  void add_poolHeight(uint32_t poolHeight) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_POOLHEIGHT, poolHeight, 0);
+  }
+  void add_poolDepth(uint32_t poolDepth) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_POOLDEPTH, poolDepth, 0);
+  }
+  void add_strideX(uint32_t strideX) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_STRIDEX, strideX, 0);
+  }
+  void add_strideY(uint32_t strideY) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_STRIDEY, strideY, 0);
+  }
+  void add_strideZ(uint32_t strideZ) {
+    fbb_.AddElement<uint32_t>(Pooling3dDescriptor::VT_STRIDEZ, strideZ, 0);
+  }
+  void add_outputShapeRounding(armnnSerializer::OutputShapeRounding outputShapeRounding) {
+    fbb_.AddElement<int8_t>(Pooling3dDescriptor::VT_OUTPUTSHAPEROUNDING, static_cast<int8_t>(outputShapeRounding), 0);
+  }
+  void add_paddingMethod(armnnSerializer::PaddingMethod paddingMethod) {
+    fbb_.AddElement<int8_t>(Pooling3dDescriptor::VT_PADDINGMETHOD, static_cast<int8_t>(paddingMethod), 0);
+  }
+  void add_dataLayout(armnnSerializer::DataLayout dataLayout) {
+    fbb_.AddElement<int8_t>(Pooling3dDescriptor::VT_DATALAYOUT, static_cast<int8_t>(dataLayout), 0);
+  }
+  explicit Pooling3dDescriptorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  Pooling3dDescriptorBuilder &operator=(const Pooling3dDescriptorBuilder &);
+  flatbuffers::Offset<Pooling3dDescriptor> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Pooling3dDescriptor>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Pooling3dDescriptor> CreatePooling3dDescriptor(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    armnnSerializer::PoolingAlgorithm poolType = armnnSerializer::PoolingAlgorithm_Max,
+    uint32_t padLeft = 0,
+    uint32_t padRight = 0,
+    uint32_t padTop = 0,
+    uint32_t padBottom = 0,
+    uint32_t padFront = 0,
+    uint32_t padBack = 0,
+    uint32_t poolWidth = 0,
+    uint32_t poolHeight = 0,
+    uint32_t poolDepth = 0,
+    uint32_t strideX = 0,
+    uint32_t strideY = 0,
+    uint32_t strideZ = 0,
+    armnnSerializer::OutputShapeRounding outputShapeRounding = armnnSerializer::OutputShapeRounding_Floor,
+    armnnSerializer::PaddingMethod paddingMethod = armnnSerializer::PaddingMethod_IgnoreValue,
+    armnnSerializer::DataLayout dataLayout = armnnSerializer::DataLayout_NHWC) {
+  Pooling3dDescriptorBuilder builder_(_fbb);
+  builder_.add_strideZ(strideZ);
+  builder_.add_strideY(strideY);
+  builder_.add_strideX(strideX);
+  builder_.add_poolDepth(poolDepth);
+  builder_.add_poolHeight(poolHeight);
+  builder_.add_poolWidth(poolWidth);
+  builder_.add_padBack(padBack);
+  builder_.add_padFront(padFront);
   builder_.add_padBottom(padBottom);
   builder_.add_padTop(padTop);
   builder_.add_padRight(padRight);
@@ -10269,6 +10531,9 @@ struct AnyLayer FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const armnnSerializer::Convolution3dLayer *layer_as_Convolution3dLayer() const {
     return layer_type() == armnnSerializer::Layer_Convolution3dLayer ? static_cast<const armnnSerializer::Convolution3dLayer *>(layer()) : nullptr;
   }
+  const armnnSerializer::Pooling3dLayer *layer_as_Pooling3dLayer() const {
+    return layer_type() == armnnSerializer::Layer_Pooling3dLayer ? static_cast<const armnnSerializer::Pooling3dLayer *>(layer()) : nullptr;
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<uint8_t>(verifier, VT_LAYER_TYPE) &&
@@ -10540,6 +10805,10 @@ template<> inline const armnnSerializer::ChannelShuffleLayer *AnyLayer::layer_as
 
 template<> inline const armnnSerializer::Convolution3dLayer *AnyLayer::layer_as<armnnSerializer::Convolution3dLayer>() const {
   return layer_as_Convolution3dLayer();
+}
+
+template<> inline const armnnSerializer::Pooling3dLayer *AnyLayer::layer_as<armnnSerializer::Pooling3dLayer>() const {
+  return layer_as_Pooling3dLayer();
 }
 
 struct AnyLayerBuilder {
@@ -11034,6 +11303,10 @@ inline bool VerifyLayer(flatbuffers::Verifier &verifier, const void *obj, Layer 
     }
     case Layer_Convolution3dLayer: {
       auto ptr = reinterpret_cast<const armnnSerializer::Convolution3dLayer *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
+    case Layer_Pooling3dLayer: {
+      auto ptr = reinterpret_cast<const armnnSerializer::Pooling3dLayer *>(obj);
       return verifier.VerifyTable(ptr);
     }
     default: return true;

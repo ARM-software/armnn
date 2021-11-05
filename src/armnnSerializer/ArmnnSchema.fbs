@@ -180,6 +180,7 @@ enum LayerType : uint {
     UnidirectionalSequenceLstm = 63,
     ChannelShuffle = 64,
     Convolution3d = 65,
+    Pooling3d = 66,
 }
 
 // Base layer table to be used as part of other layers
@@ -453,6 +454,11 @@ table Pooling2dLayer {
     descriptor:Pooling2dDescriptor;
 }
 
+table Pooling3dLayer {
+    base:LayerBase;
+    descriptor:Pooling3dDescriptor;
+}
+
 enum PoolingAlgorithm : byte {
     Max = 0,
     Average = 1,
@@ -479,6 +485,25 @@ table Pooling2dDescriptor {
     poolHeight:uint;
     strideX:uint;
     strideY:uint;
+    outputShapeRounding:OutputShapeRounding;
+    paddingMethod:PaddingMethod;
+    dataLayout:DataLayout;
+}
+
+table Pooling3dDescriptor {
+    poolType:PoolingAlgorithm;
+    padLeft:uint;
+    padRight:uint;
+    padTop:uint;
+    padBottom:uint;
+    padFront:uint;
+    padBack:uint;
+    poolWidth:uint;
+    poolHeight:uint;
+    poolDepth:uint;
+    strideX:uint;
+    strideY:uint;
+    strideZ:uint;
     outputShapeRounding:OutputShapeRounding;
     paddingMethod:PaddingMethod;
     dataLayout:DataLayout;
@@ -1046,6 +1071,7 @@ union Layer {
     UnidirectionalSequenceLstmLayer,
     ChannelShuffleLayer,
     Convolution3dLayer,
+    Pooling3dLayer,
 }
 
 table AnyLayer {

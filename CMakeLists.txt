@@ -821,6 +821,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializePad.cpp
             src/armnnDeserializer/test/DeserializePermute.cpp
             src/armnnDeserializer/test/DeserializePooling2d.cpp
+            src/armnnDeserializer/test/DeserializePooling3d.cpp
             src/armnnDeserializer/test/DeserializeRank.cpp
             src/armnnDeserializer/test/DeserializeReduceSum.cpp
             src/armnnDeserializer/test/DeserializeReshape.cpp

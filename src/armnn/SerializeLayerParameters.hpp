@@ -124,6 +124,11 @@ template <> struct StringifyLayerParameters<Pooling2dDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const Pooling2dDescriptor& desc);
 };
 
+template <> struct StringifyLayerParameters<Pooling3dDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const Pooling3dDescriptor& desc);
+};
+
 template <> struct StringifyLayerParameters<PreCompiledDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const PreCompiledDescriptor& desc);

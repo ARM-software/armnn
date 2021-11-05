@@ -248,6 +248,10 @@ private:
                                  const armnn::Pooling2dDescriptor& pooling2dDescriptor,
                                  const char* name = nullptr);
 
+    void SerializePooling3dLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::Pooling3dDescriptor& pooling3dDescriptor,
+                                 const char* name = nullptr);
+
     void SerializePreluLayer(const armnn::IConnectableLayer* layer,
                              const char* name = nullptr);
 

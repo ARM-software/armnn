@@ -1079,6 +1079,39 @@ void SerializerStrategy::SerializePooling2dLayer(const armnn::IConnectableLayer*
     CreateAnyLayer(fbPooling2dLayer.o, serializer::Layer::Layer_Pooling2dLayer);
 }
 
+void SerializerStrategy::SerializePooling3dLayer(const armnn::IConnectableLayer* layer,
+                                            const armnn::Pooling3dDescriptor& pooling3dDescriptor,
+                                            const char* name)
+{
+    IgnoreUnused(name);
+
+    auto fbPooling3dBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_Pooling3d);
+    auto fbPooling3dDescriptor = serializer::CreatePooling3dDescriptor(
+        m_flatBufferBuilder,
+        GetFlatBufferPoolingAlgorithm(pooling3dDescriptor.m_PoolType),
+        pooling3dDescriptor.m_PadLeft,
+        pooling3dDescriptor.m_PadRight,
+        pooling3dDescriptor.m_PadTop,
+        pooling3dDescriptor.m_PadBottom,
+        pooling3dDescriptor.m_PadFront,
+        pooling3dDescriptor.m_PadBack,
+        pooling3dDescriptor.m_PoolWidth,
+        pooling3dDescriptor.m_PoolHeight,
+        pooling3dDescriptor.m_PoolDepth,
+        pooling3dDescriptor.m_StrideX,
+        pooling3dDescriptor.m_StrideY,
+        pooling3dDescriptor.m_StrideZ,
+        GetFlatBufferOutputShapeRounding(pooling3dDescriptor.m_OutputShapeRounding),
+        GetFlatBufferPaddingMethod(pooling3dDescriptor.m_PaddingMethod),
+        GetFlatBufferDataLayout(pooling3dDescriptor.m_DataLayout));
+
+    auto fbPooling3dLayer = serializer::CreatePooling3dLayer(m_flatBufferBuilder,
+                                                             fbPooling3dBaseLayer,
+                                                             fbPooling3dDescriptor);
+
+    CreateAnyLayer(fbPooling3dLayer.o, serializer::Layer::Layer_Pooling3dLayer);
+}
+
 void SerializerStrategy::SerializePreluLayer(const armnn::IConnectableLayer* layer,
                                         const char* name)
 {
@@ -2206,6 +2239,13 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
             const armnn::Pooling2dDescriptor& layerDescriptor =
                     static_cast<const armnn::Pooling2dDescriptor&>(descriptor);
             SerializePooling2dLayer(layer, layerDescriptor, name);
+            break;
+        }
+        case armnn::LayerType::Pooling3d :
+        {
+            const armnn::Pooling3dDescriptor& layerDescriptor =
+                    static_cast<const armnn::Pooling3dDescriptor&>(descriptor);
+            SerializePooling3dLayer(layer, layerDescriptor, name);
             break;
         }
         case armnn::LayerType::Prelu :

@@ -121,7 +121,7 @@ void StringifyLayerParameters<Convolution3dDescriptor>::Serialize(ParameterStrin
     {
         std::stringstream ss;
         ss << "(" << desc.m_DilationX << "," << desc.m_DilationY << "," << desc.m_DilationZ << ")";
-        fn("Dilation(X,Y)", ss.str());
+        fn("Dilation(X,Y,Z)", ss.str());
     }
 
     fn("BiasEnabled",(desc.m_BiasEnabled ? "true" : "false"));
@@ -324,6 +324,35 @@ void StringifyLayerParameters<Pooling2dDescriptor>::Serialize(ParameterStringify
         std::stringstream ss;
         ss << "(" << desc.m_StrideX <<  "," << desc.m_StrideY << ")";
         fn("Stride(X,Y)", ss.str());
+    }
+
+    fn("OutputShapeRounding", GetOutputShapeRoundingAsCString(desc.m_OutputShapeRounding));
+    fn("PaddingMethod", GetPaddingMethodAsCString(desc.m_PaddingMethod));
+    fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
+}
+
+void StringifyLayerParameters<Pooling3dDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                              const Pooling3dDescriptor& desc)
+{
+    fn("Type", GetPoolingAlgorithmAsCString(desc.m_PoolType));
+    {
+        std::stringstream ss;
+        ss << "(" << desc.m_PadTop    << "," << desc.m_PadLeft
+           << "," << desc.m_PadBottom << "," << desc.m_PadRight
+           << "," << desc.m_PadFront  << "," << desc.m_PadBack << ")";
+        fn("Padding(T,L,B,R,F,B)", ss.str());
+    }
+
+    {
+        std::stringstream ss;
+        ss << "(" << desc.m_PoolWidth    << "," << desc.m_PoolHeight << "," << desc.m_PoolDepth << ")";
+        fn("(Width,Height,Depth)", ss.str());
+    }
+
+    {
+        std::stringstream ss;
+        ss << "(" << desc.m_StrideX <<  "," << desc.m_StrideY << "," << desc.m_StrideZ << ")";
+        fn("Stride(X,Y,Z)", ss.str());
     }
 
     fn("OutputShapeRounding", GetOutputShapeRoundingAsCString(desc.m_OutputShapeRounding));

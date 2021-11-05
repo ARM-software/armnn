@@ -1,0 +1,25 @@
+/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+@page quickstart Quick Start Guide
+
+On this page you can find guides which allow you to get setup and ready to run models with Arm NN quickly.
+These guides rely on using the apt packages or prebuilt binaries from our release notes. We only have added a quick start guide that uses TfLite-Delegate.
+More guides will be added in the future.
+
+ - @subpage md_delegate_DelegateQuickStartGuide
+**/
+}
+
+namespace armnn
+{
+/**
+
+@page md_delegate_DelegateQuickStartGuide TfLite Delegate Quick Start Guide
+**/
+}

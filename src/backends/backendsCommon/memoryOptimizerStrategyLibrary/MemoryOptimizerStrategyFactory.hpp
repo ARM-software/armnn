@@ -12,17 +12,19 @@
 namespace armnn
 {
 
-class MemoryOptimizerStrategyFactory
+struct IMemoryOptimizerStrategyFactory
 {
-public:
-    MemoryOptimizerStrategyFactory() {}
+    virtual ~IMemoryOptimizerStrategyFactory() = default;
+    virtual std::unique_ptr<IMemoryOptimizerStrategy> CreateMemoryOptimizerStrategy() = 0;
+};
 
-    template <typename T>
-    std::unique_ptr<IMemoryOptimizerStrategy> CreateMemoryOptimizerStrategy()
+template <typename T>
+struct StrategyFactory : public IMemoryOptimizerStrategyFactory
+{
+    std::unique_ptr<IMemoryOptimizerStrategy> CreateMemoryOptimizerStrategy() override
     {
         return std::make_unique<T>();
     }
-
 };
 
 } // namespace armnn

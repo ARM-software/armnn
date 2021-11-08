@@ -6,49 +6,52 @@
 
 #include <armnn/backends/IMemoryOptimizerStrategy.hpp>
 #include "MemoryOptimizerStrategyFactory.hpp"
-#include <algorithm>
 
 #include "strategies/ConstantMemoryStrategy.hpp"
 #include "strategies/StrategyValidator.hpp"
 #include "strategies/SingleAxisPriorityList.hpp"
 
-namespace
-{
-// Default Memory Optimizer Strategies
-static const std::vector<std::string> memoryOptimizationStrategies(
-{
-    "ConstantMemoryStrategy",
-    "SingleAxisPriorityList"
-    "StrategyValidator"
-});
+#include <map>
 
-#define CREATE_MEMORY_OPTIMIZER_STRATEGY(strategyName, memoryOptimizerStrategy)                                  \
-{                                                                                                                \
-    MemoryOptimizerStrategyFactory memoryOptimizerStrategyFactory;                                               \
-    memoryOptimizerStrategy = memoryOptimizerStrategyFactory.CreateMemoryOptimizerStrategy<strategyName>();      \
-}                                                                                                                \
-
-} // anonymous namespace
 namespace armnn
 {
-    std::unique_ptr<IMemoryOptimizerStrategy> GetMemoryOptimizerStrategy(const std::string& strategyName)
-    {
-        auto doesStrategyExist = std::find(memoryOptimizationStrategies.begin(),
-                                           memoryOptimizationStrategies.end(),
-                                           strategyName) != memoryOptimizationStrategies.end();
-        if (doesStrategyExist)
-        {
-            std::unique_ptr<IMemoryOptimizerStrategy> memoryOptimizerStrategy = nullptr;
-            CREATE_MEMORY_OPTIMIZER_STRATEGY(armnn::ConstantMemoryStrategy,
-                                             memoryOptimizerStrategy);
-            return  memoryOptimizerStrategy;
-        }
-        return nullptr;
-    }
+namespace
+{
 
+static std::map<std::string, std::unique_ptr<IMemoryOptimizerStrategyFactory>>& GetStrategyFactories()
+{
+    static std::map<std::string, std::unique_ptr<IMemoryOptimizerStrategyFactory>> strategies;
 
-    const std::vector<std::string>& GetMemoryOptimizerStrategyNames()
+    if (strategies.size() == 0)
     {
-        return memoryOptimizationStrategies;
+        strategies["ConstantMemoryStrategy"] = std::make_unique<StrategyFactory<ConstantMemoryStrategy>>();
+        strategies["SingleAxisPriorityList"] = std::make_unique<StrategyFactory<SingleAxisPriorityList>>();
+        strategies["StrategyValidator"]      = std::make_unique<StrategyFactory<StrategyValidator>>();
     }
+    return strategies;
+}
+
+} // anonymous namespace
+
+std::unique_ptr<IMemoryOptimizerStrategy> GetMemoryOptimizerStrategy(const std::string& strategyName)
+{
+     const auto& strategyFactoryMap = GetStrategyFactories();
+     auto strategyFactory = strategyFactoryMap.find(strategyName);
+     if (strategyFactory != GetStrategyFactories().end())
+     {
+         return  strategyFactory->second->CreateMemoryOptimizerStrategy();
+     }
+    return nullptr;
+}
+
+const std::vector<std::string> GetMemoryOptimizerStrategyNames()
+{
+    const auto& strategyFactoryMap = GetStrategyFactories();
+    std::vector<std::string> strategyNames;
+    for (const auto& strategyFactory : strategyFactoryMap)
+    {
+        strategyNames.emplace_back(strategyFactory.first);
+    }
+    return strategyNames;
+}
 } // namespace armnn

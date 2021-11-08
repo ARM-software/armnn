@@ -7,6 +7,7 @@ list(APPEND armnnMemoryOptimizationStrategiesUnitTests_sources
             ConstMemoryStrategyTests.cpp
             ValidatorStrategyTests.cpp
             SingleAxisPriorityListTests.cpp
+            MemoryOptimizerStrategyLibraryTests.cpp
 )
 
 add_library(armnnMemoryOptimizationStrategiesUnitTests OBJECT ${armnnMemoryOptimizationStrategiesUnitTests_sources})

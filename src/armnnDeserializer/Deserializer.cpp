@@ -1652,7 +1652,8 @@ void IDeserializer::DeserializerImpl::ParseFill(GraphPtr graph, unsigned int lay
     CHECK_VALID_SIZE(outputs.size(), 1);
 
     auto layerName = GetLayerName(graph, layerIndex);
-    armnn::FillDescriptor descriptor(1.0f);
+    armnn::FillDescriptor descriptor;
+    descriptor.m_Value = graph->layers()->Get(layerIndex)->layer_as_FillLayer()->descriptor()->value();
     IConnectableLayer* layer = m_Network->AddFillLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
@@ -2484,6 +2485,7 @@ void IDeserializer::DeserializerImpl::ParseSoftmax(GraphPtr graph, unsigned int 
 
     armnn::SoftmaxDescriptor descriptor;
     descriptor.m_Beta = graph->layers()->Get(layerIndex)->layer_as_SoftmaxLayer()->descriptor()->beta();
+    descriptor.m_Axis = graph->layers()->Get(layerIndex)->layer_as_SoftmaxLayer()->descriptor()->axis();
     auto layerName = GetLayerName(graph, layerIndex);
 
     IConnectableLayer* layer = m_Network->AddSoftmaxLayer(descriptor, layerName.c_str());

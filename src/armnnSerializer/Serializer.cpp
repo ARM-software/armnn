@@ -1037,7 +1037,9 @@ void SerializerStrategy::SerializeSoftmaxLayer(const armnn::IConnectableLayer* l
 
     // Create the FlatBuffer SoftmaxDescriptor
     auto flatBufferSoftmaxDesc =
-        serializer::CreateSoftmaxDescriptor(m_flatBufferBuilder, softmaxDescriptor.m_Beta);
+        serializer::CreateSoftmaxDescriptor(m_flatBufferBuilder,
+                                            softmaxDescriptor.m_Beta,
+                                            softmaxDescriptor.m_Axis);
 
     // Create the FlatBuffer SoftmaxLayer
     auto flatBufferSoftmaxLayer =

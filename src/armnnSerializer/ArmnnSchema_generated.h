@@ -5126,14 +5126,19 @@ inline flatbuffers::Offset<SoftmaxLayer> CreateSoftmaxLayer(
 struct SoftmaxDescriptor FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   typedef SoftmaxDescriptorBuilder Builder;
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_BETA = 4
+    VT_BETA = 4,
+    VT_AXIS = 6
   };
   float beta() const {
     return GetField<float>(VT_BETA, 0.0f);
   }
+  int32_t axis() const {
+    return GetField<int32_t>(VT_AXIS, -1);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<float>(verifier, VT_BETA) &&
+           VerifyField<int32_t>(verifier, VT_AXIS) &&
            verifier.EndTable();
   }
 };
@@ -5144,6 +5149,9 @@ struct SoftmaxDescriptorBuilder {
   flatbuffers::uoffset_t start_;
   void add_beta(float beta) {
     fbb_.AddElement<float>(SoftmaxDescriptor::VT_BETA, beta, 0.0f);
+  }
+  void add_axis(int32_t axis) {
+    fbb_.AddElement<int32_t>(SoftmaxDescriptor::VT_AXIS, axis, -1);
   }
   explicit SoftmaxDescriptorBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -5159,8 +5167,10 @@ struct SoftmaxDescriptorBuilder {
 
 inline flatbuffers::Offset<SoftmaxDescriptor> CreateSoftmaxDescriptor(
     flatbuffers::FlatBufferBuilder &_fbb,
-    float beta = 0.0f) {
+    float beta = 0.0f,
+    int32_t axis = -1) {
   SoftmaxDescriptorBuilder builder_(_fbb);
+  builder_.add_axis(axis);
   builder_.add_beta(beta);
   return builder_.Finish();
 }

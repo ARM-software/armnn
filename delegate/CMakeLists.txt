@@ -118,11 +118,13 @@ target_include_directories(thirdparty_headers INTERFACE $<BUILD_INTERFACE:${ARMN
                                                         $<INSTALL_INTERFACE:include/thirdparty_headers>)
 
 target_compile_options(thirdparty_headers INTERFACE -Wno-old-style-cast)
+target_link_libraries(armnnDelegate PUBLIC thirdparty_headers)
 
 add_library(profiling_library_headers INTERFACE)
 target_include_directories(profiling_library_headers INTERFACE $<BUILD_INTERFACE:${ARMNN_SOURCE_DIR}/profiling>
                                                               $<INSTALL_INTERFACE:include/profiling_library_headers>)
-
+target_link_libraries(armnnDelegate PUBLIC profiling_library_headers)
+target_link_libraries(armnnDelegate PUBLIC Armnn::armnnUtils)
 
 set_target_properties(armnnDelegate PROPERTIES VERSION ${DELEGATE_LIB_VERSION} SOVERSION ${DELEGATE_LIB_SOVERSION})
 
@@ -253,7 +255,9 @@ set(armnn_delegate_export_targets)
 list(APPEND armnn_delegate_export_targets
             armnnDelegate
             tflite_headers
-            flatbuffer_headers)
+            flatbuffer_headers
+            profiling_library_headers
+            thirdparty_headers)
 
 install(
         TARGETS ${armnn_delegate_export_targets}

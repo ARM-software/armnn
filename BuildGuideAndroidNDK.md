@@ -11,7 +11,7 @@
 
 ## Introduction
 These are step by step instructions for using the Android NDK to build Arm NN.
-They have been tested on a clean install of Ubuntu 16.04 and 18.04, and should also work with other OS versions.
+They have been tested on a clean install of Ubuntu 18.04, and should also work with other OS versions.
 The instructions show how to build the Arm NN core library.
 Building protobuf is optional. We have given steps should the user wish to build it (i.e. as an Onnx dependency).
 All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` directory.

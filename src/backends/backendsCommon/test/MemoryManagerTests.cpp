@@ -66,7 +66,7 @@ TEST_CASE("MemoryManagerTest")
     std::vector<size_t> offsets(numTensors);
     std::iota(std::begin(offsets), std::end(offsets), 0);
 
-    for (uint idx = 0; idx < tensorMemoryPointerVector.size(); ++idx)
+    for (uint32_t idx = 0; idx < tensorMemoryPointerVector.size(); ++idx)
     {
         tensorMemoryVector.emplace_back(std::make_shared<TensorMemory>(TensorMemory{offsets[idx], 0, nullptr}));
 
@@ -93,7 +93,7 @@ TEST_CASE("MemoryManagerTest")
     memoryManager.Allocate();
     CHECK(customAllocator->m_CounterAllocate == bufferVecSize);
 
-    uint idx = 0;
+    uint32_t idx = 0;
     for (auto tensorMemory : tensorMemoryVector)
     {
         auto value = reinterpret_cast<uint8_t *>(tensorMemory->m_Data);

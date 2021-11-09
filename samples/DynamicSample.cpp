@@ -67,7 +67,7 @@ int main()
     InputTensors inputTensors
         {
             {0,armnn::ConstTensor(inputTensorInfo, input0Data.data())},
-            {1,armnn::ConstTensor(inputTensorInfo, 0), input1Data.data())}
+            {1,armnn::ConstTensor(inputTensorInfo, input1Data.data())}
         };
     OutputTensors outputTensors
         {

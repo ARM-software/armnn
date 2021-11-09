@@ -4205,7 +4205,10 @@ BindingPointInfo TfLiteParserImpl::GetNetworkInputBindingInfo(size_t subgraphId,
         if (input.second->name == name)
         {
             auto bindingId = GenerateLayerBindingId(subgraphId, input.first);
-            return std::make_pair(bindingId, ToTensorInfo(input.second));
+            auto inputTensorInfo = ToTensorInfo(input.second);
+            // Input tensors are always treated as constant tensors during network execution.
+            inputTensorInfo.SetConstant(true);
+            return std::make_pair(bindingId, inputTensorInfo);
         }
     }
 

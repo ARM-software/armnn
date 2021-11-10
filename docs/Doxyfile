@@ -817,12 +817,11 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./docs/01_01_delegate_start_guide.dox \
                          ./docs/02_operator_list.dox \
                          ./docs/03_build_guides.dox \
-                         ./docs/04_use_guides.dox \
-                         ./docs/05_contributor.dox \
-                         ./docs/06_00_software_tools.dox \
-                         ./docs/06_01_parsers.dox \
-                         ./docs/06_02_deserializer_serializer.dox \
-                         ./docs/06_03_delegate.dox \
+                         ./docs/04_contributor.dox \
+                         ./docs/05_00_software_components.dox \
+                         ./docs/05_01_parsers.dox \
+                         ./docs/05_02_deserializer_serializer.dox \
+                         ./docs/05_03_delegate.dox \
                          ./docs/FAQ.md \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \

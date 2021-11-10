@@ -237,7 +237,7 @@ public:
     %feature("docstring",
     "
     Sets the tensor info to be constant.
-    
+
     Args:
         IsConstant (bool): Sets tensor info to constant.
 

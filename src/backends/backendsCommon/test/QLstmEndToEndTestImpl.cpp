@@ -80,22 +80,26 @@ void QLstmEndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
                                              armnn::DataType::QSymmS8,
                                              weightsScale,
-                                             weightsOffset, true);
+                                             weightsOffset,
+                                             true);
 
     const armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
                                                  armnn::DataType::QSymmS8,
                                                  weightsScale,
-                                                 weightsOffset, true);
+                                                 weightsOffset,
+                                                 true);
 
     const armnn::TensorInfo biasInfo({outputSize},
                                      armnn::DataType::Signed32,
                                      biasScale,
-                                     biasOffset, true);
+                                     biasOffset,
+                                     true);
 
     const armnn::TensorInfo layerNormWeightsInfo({numUnits},
                                                  armnn::DataType::QSymmS16,
                                                  layerNormScale,
-                                                 layerNormOffset, true);
+                                                 layerNormOffset,
+                                                 true);
 
     // Mandatory params
     const std::vector<int8_t> inputToForgetWeightsVector =
@@ -179,17 +183,20 @@ void QLstmEndToEnd(const std::vector<armnn::BackendId>& backends)
     const armnn::TensorInfo inputInfo({numBatches , inputSize},
                                       armnn::DataType::QAsymmS8,
                                       inputScale,
-                                      inputOffset, true);
+                                      inputOffset,
+                                      true);
 
     const armnn::TensorInfo cellStateInfo({numBatches , numUnits},
                                           armnn::DataType::QSymmS16,
                                           cellStateScale,
-                                          cellStateOffset, true);
+                                          cellStateOffset,
+                                          true);
 
     const armnn::TensorInfo outputStateInfo({numBatches , outputSize},
                                             armnn::DataType::QAsymmS8,
                                             outputScale,
-                                            outputOffset, true);
+                                            outputOffset,
+                                            true);
 
     // Input tensor data
     const std::vector<int8_t> inputVector         = {90, 102, 13, 26, 38, 102, 13, 26, 51, 64};

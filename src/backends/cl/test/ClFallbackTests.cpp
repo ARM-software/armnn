@@ -540,7 +540,6 @@ TEST_CASE("ClImportDisableFallbackSubgraphToNeon")
 
     std::vector<float> expectedOutput{ 11.0f, -1.0f };
 
-
     InputTensors inputTensors
     {
         { 0, armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData0.data()) },

@@ -422,7 +422,7 @@ TEST_CASE("SplitteronXorYNoPaddingRequiredTest")
         TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(networkIdentifier, it.first);
         inputTensorInfo.SetConstant(true);
         inputTensors.push_back({it.first,
-                              ConstTensor(inputTensorInfo, it.second.data())});
+                                ConstTensor(inputTensorInfo, it.second.data())});
     }
     OutputTensors outputTensors;
     outputTensors.reserve(expectedOutputData.size());

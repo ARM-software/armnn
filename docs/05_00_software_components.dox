@@ -6,9 +6,9 @@
 namespace armnn
 {
 /**
-@page swtools Software Tools
+@page swtools Software Components
 
-On this page you can find all software tools contained in the Arm NN repository. You will find links to how-to guides and
+On this page you can find all software components contained in the Arm NN repository. You will find links to how-to guides and
 other helpful information in each section.
 
  - @subpage delegate

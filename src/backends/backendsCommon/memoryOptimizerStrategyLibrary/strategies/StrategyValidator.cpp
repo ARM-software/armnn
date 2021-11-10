@@ -68,45 +68,28 @@ std::vector<MemBin> StrategyValidator::Optimize(std::vector<MemBlock>& memBlocks
     {
         for (unsigned int i = 0; i < bin.m_MemBlocks.size(); ++i)
         {
-            auto assignedBlock = bin.m_MemBlocks[i];
-            auto xStart = assignedBlock.m_Offset;
-            auto xEnd = assignedBlock.m_Offset + assignedBlock.m_MemSize;
+            auto Block1 = bin.m_MemBlocks[i];
+            auto B1Left = Block1.m_Offset;
+            auto B1Right = Block1.m_Offset + Block1.m_MemSize;
 
-            auto yStart = assignedBlock.m_StartOfLife;
-            auto yEnd = assignedBlock.m_EndOfLife;
-            auto assignedIndex = assignedBlock.m_Index;
+            auto B1Top = Block1.m_StartOfLife;
+            auto B1Bottom = Block1.m_EndOfLife;
 
             // Only compare with blocks after the current one as previous have already been checked
             for (unsigned int j = i + 1; j < bin.m_MemBlocks.size(); ++j)
             {
-                auto otherAssignedBlock = bin.m_MemBlocks[j];
-                auto xStartAssigned = otherAssignedBlock.m_Offset;
-                auto xEndAssigned = otherAssignedBlock.m_Offset + otherAssignedBlock.m_MemSize;
+                auto Block2 = bin.m_MemBlocks[j];
+                auto B2Left = Block2.m_Offset;
+                auto B2Right = Block2.m_Offset + Block2.m_MemSize;
 
-                auto yStartAssigned = otherAssignedBlock.m_StartOfLife;
-                auto yEndAssigned = otherAssignedBlock.m_EndOfLife;
-                auto otherIndex = otherAssignedBlock.m_Index;
-
-                // If overlapping on both X and Y then invalid
-                // Inside left of rectangle & Inside right of rectangle
-                if ((((xStart >= xStartAssigned) && (xEnd <= xEndAssigned)) &&
-                     // Inside bottom of rectangle & Inside top of rectangle
-                     ((yStart >= yStartAssigned) && (yEnd <= yEndAssigned))) &&
-                     // Cant overlap with itself
-                     (assignedIndex != otherIndex))
-                {
-                    // Condition #3: two Memblocks overlap on both the X and Y axis
-                    throw MemoryValidationException("Condition #3: two Memblocks overlap on both the X and Y axis");
-                }
+                auto B2Top = Block2.m_StartOfLife;
+                auto B2Bottom = Block2.m_EndOfLife;
 
                 switch (m_Strategy->GetMemBlockStrategyType())
                 {
                     case (MemBlockStrategyType::SingleAxisPacking):
                     {
-                        // Inside bottom of rectangle  & Inside top of rectangle
-                        if (((yStart >= yStartAssigned) && (yEnd <= yEndAssigned)) &&
-                            // Cant overlap with itself
-                            (assignedIndex != otherIndex))
+                        if (B1Top <= B2Bottom && B1Bottom >= B2Top)
                         {
                             throw MemoryValidationException("Condition #3: "
                                         "invalid as two Memblocks overlap on the Y axis for SingleAxisPacking");
@@ -116,6 +99,14 @@ std::vector<MemBin> StrategyValidator::Optimize(std::vector<MemBlock>& memBlocks
                     }
                     case (MemBlockStrategyType::MultiAxisPacking):
                     {
+                        // If overlapping on both X and Y then invalid
+                        if (B1Left <= B2Right && B1Right >= B2Left &&
+                            B1Top <= B2Bottom && B1Bottom >= B2Top)
+                        {
+                            // Condition #3: two Memblocks overlap on both the X and Y axis
+                            throw MemoryValidationException("Condition #3: "
+                                                            "two Memblocks overlap on both the X and Y axis");
+                        }
                         break;
                     }
                     default:

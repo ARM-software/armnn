@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-
+#include <iostream>
 
 namespace armnn
 {
@@ -155,10 +155,8 @@ void SingleAxisPriorityList::PlaceBlocks(const std::list<MemBlock*>& priorityLis
 
         // The indexes don't match we need at least two words
         // Zero the bits to the right of curBlock->m_EndOfLife
-        remainder = (curBlock->m_EndOfLife - lastWordIndex * wordSize);
-
-        size_t lastWord = (1ul << remainder) - 1;
-        lastWord = lastWord << (wordSize - remainder);
+        remainder = (curBlock->m_EndOfLife + 1 - lastWordIndex * wordSize);
+        size_t lastWord = std::numeric_limits<size_t>::max() << (wordSize - remainder);
 
         if(firstWordIndex + 1 == lastWordIndex)
         {

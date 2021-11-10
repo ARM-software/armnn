@@ -59,10 +59,10 @@ TEST_CASE("MemoryOptimizerStrategyValidatorTestOverlapX")
 {
     // create a few memory blocks
     MemBlock memBlock0(0, 5, 20, 0, 0);
-    MemBlock memBlock1(5, 10, 10, 0, 1);
-    MemBlock memBlock2(10, 15, 15, 0, 2);
-    MemBlock memBlock3(15, 20, 20, 0, 3);
-    MemBlock memBlock4(20, 25, 5, 0, 4);
+    MemBlock memBlock1(6, 10, 10, 0, 1);
+    MemBlock memBlock2(11, 15, 15, 0, 2);
+    MemBlock memBlock3(16, 20, 20, 0, 3);
+    MemBlock memBlock4(21, 25, 5, 0, 4);
 
     std::vector<MemBlock> memBlocks;
     memBlocks.reserve(5);
@@ -127,10 +127,10 @@ TEST_CASE("MemoryOptimizerStrategyValidatorTestOverlapY")
 {
     // create a few memory blocks
     MemBlock memBlock0(0, 2, 20, 0, 0);
-    MemBlock memBlock1(0, 3, 10, 20, 1);
-    MemBlock memBlock2(0, 5, 15, 30, 2);
-    MemBlock memBlock3(0, 6, 20, 50, 3);
-    MemBlock memBlock4(0, 8, 5, 70, 4);
+    MemBlock memBlock1(0, 3, 10, 21, 1);
+    MemBlock memBlock2(0, 5, 15, 37, 2);
+    MemBlock memBlock3(0, 6, 20, 58, 3);
+    MemBlock memBlock4(0, 8, 5, 79, 4);
 
     std::vector<MemBlock> memBlocks;
     memBlocks.reserve(5);

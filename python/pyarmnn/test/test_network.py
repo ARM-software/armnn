@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 import os
 import stat
+import numpy as np
 
 import pytest
 import pyarmnn as ann
@@ -244,27 +245,27 @@ def test_network_method_exists(method):
 
 def test_fullyconnected_layer_optional_none():
     net = ann.INetwork()
-    layer = net.AddFullyConnectedLayer(fullyConnectedDescriptor=ann.FullyConnectedDescriptor(),
-                               weights=ann.ConstTensor())
+    layer = net.AddFullyConnectedLayer(ann.FullyConnectedDescriptor(),
+                                       ann.ConstTensor())
 
     assert layer
 
 
 def test_fullyconnected_layer_optional_provided():
     net = ann.INetwork()
-    layer = net.AddFullyConnectedLayer(fullyConnectedDescriptor=ann.FullyConnectedDescriptor(),
-                               weights=ann.ConstTensor(),
-                               biases=ann.ConstTensor())
+    layer = net.AddFullyConnectedLayer(ann.FullyConnectedDescriptor(),
+                                       ann.ConstTensor(),
+                                       ann.ConstTensor())
 
     assert layer
 
 
 def test_fullyconnected_layer_all_args():
     net = ann.INetwork()
-    layer = net.AddFullyConnectedLayer(fullyConnectedDescriptor=ann.FullyConnectedDescriptor(),
-                                       weights=ann.ConstTensor(),
-                                       biases=ann.ConstTensor(),
-                                       name='NAME1')
+    layer = net.AddFullyConnectedLayer(ann.FullyConnectedDescriptor(),
+                                       ann.ConstTensor(),
+                                       ann.ConstTensor(),
+                                       'NAME1')
 
     assert layer
     assert 'NAME1' == layer.GetName()
@@ -273,7 +274,7 @@ def test_fullyconnected_layer_all_args():
 def test_DepthwiseConvolution2d_layer_optional_none():
     net = ann.INetwork()
     layer = net.AddDepthwiseConvolution2dLayer(convolution2dDescriptor=ann.DepthwiseConvolution2dDescriptor(),
-                               weights=ann.ConstTensor())
+                                               weights=ann.ConstTensor())
 
     assert layer
 
@@ -281,8 +282,8 @@ def test_DepthwiseConvolution2d_layer_optional_none():
 def test_DepthwiseConvolution2d_layer_optional_provided():
     net = ann.INetwork()
     layer = net.AddDepthwiseConvolution2dLayer(convolution2dDescriptor=ann.DepthwiseConvolution2dDescriptor(),
-                               weights=ann.ConstTensor(),
-                               biases=ann.ConstTensor())
+                                               weights=ann.ConstTensor(),
+                                               biases=ann.ConstTensor())
 
     assert layer
 
@@ -290,9 +291,9 @@ def test_DepthwiseConvolution2d_layer_optional_provided():
 def test_DepthwiseConvolution2d_layer_all_args():
     net = ann.INetwork()
     layer = net.AddDepthwiseConvolution2dLayer(convolution2dDescriptor=ann.DepthwiseConvolution2dDescriptor(),
-                                       weights=ann.ConstTensor(),
-                                       biases=ann.ConstTensor(),
-                                       name='NAME1')
+                                               weights=ann.ConstTensor(),
+                                               biases=ann.ConstTensor(),
+                                               name='NAME1')
 
     assert layer
     assert 'NAME1' == layer.GetName()
@@ -301,7 +302,7 @@ def test_DepthwiseConvolution2d_layer_all_args():
 def test_Convolution2d_layer_optional_none():
     net = ann.INetwork()
     layer = net.AddConvolution2dLayer(convolution2dDescriptor=ann.Convolution2dDescriptor(),
-                               weights=ann.ConstTensor())
+                                      weights=ann.ConstTensor())
 
     assert layer
 
@@ -309,8 +310,8 @@ def test_Convolution2d_layer_optional_none():
 def test_Convolution2d_layer_optional_provided():
     net = ann.INetwork()
     layer = net.AddConvolution2dLayer(convolution2dDescriptor=ann.Convolution2dDescriptor(),
-                               weights=ann.ConstTensor(),
-                               biases=ann.ConstTensor())
+                                      weights=ann.ConstTensor(),
+                                      biases=ann.ConstTensor())
 
     assert layer
 
@@ -318,9 +319,96 @@ def test_Convolution2d_layer_optional_provided():
 def test_Convolution2d_layer_all_args():
     net = ann.INetwork()
     layer = net.AddConvolution2dLayer(convolution2dDescriptor=ann.Convolution2dDescriptor(),
-                                       weights=ann.ConstTensor(),
-                                       biases=ann.ConstTensor(),
-                                       name='NAME1')
+                                      weights=ann.ConstTensor(),
+                                      biases=ann.ConstTensor(),
+                                      name='NAME1')
 
     assert layer
     assert 'NAME1' == layer.GetName()
+
+
+def test_add_constant_layer_to_fully_connected():
+
+    inputWidth = 1
+    inputHeight = 1
+    inputChannels = 5
+    inputNum = 2
+
+    outputChannels = 3
+    outputNum = 2
+
+    inputShape   = ( inputNum, inputChannels, inputHeight, inputWidth )
+    outputShape  = ( outputNum, outputChannels )
+    weightsShape = ( inputChannels, outputChannels )
+    biasShape    = ( outputChannels, )
+
+    input = np.array([
+        [1.0, 2.0, 3.0, 4.0, 5.0],
+        [5.0, 4.0, 3.0, 2.0, 1.0]
+    ], dtype=np.float32)
+
+    weights = np.array([
+        [.5, 2., .5],
+        [.5, 2., 1.],
+        [.5, 2., 2.],
+        [.5, 2., 3.],
+        [.5, 2., 4.]
+    ], dtype=np.float32)
+
+    biasValues = np.array([10, 20, 30], dtype=np.float32)
+
+    expectedOutput = np.array([
+        [0.5 + 1.0 + 1.5 + 2.0 + 2.5 + biasValues[0],
+         2.0 + 4.0 + 6.0 + 8.0 + 10. + biasValues[1],
+         0.5 + 2.0 + 6.0 + 12. + 20. + biasValues[2]],
+        [2.5 + 2.0 + 1.5 + 1.0 + 0.5 + biasValues[0],
+         10.0 + 8.0 + 6.0 + 4.0 + 2. + biasValues[1],
+         2.5 + 4.0 + 6.0 + 6. + 4.   + biasValues[2]]
+    ], dtype=np.float32)
+
+    network = ann.INetwork()
+
+    input_info = ann.TensorInfo(ann.TensorShape(inputShape), ann.DataType_Float32, 0, 0, True)
+    input_tensor = ann.ConstTensor(input_info, input)
+    input_layer = network.AddInputLayer(0, "input")
+
+    w_info = ann.TensorInfo(ann.TensorShape(weightsShape), ann.DataType_Float32, 0, 0, True)
+    w_tensor = ann.ConstTensor(w_info, weights)
+    w_layer = network.AddConstantLayer(w_tensor, "weights")
+
+    b_info = ann.TensorInfo(ann.TensorShape(biasShape), ann.DataType_Float32, 0, 0, True)
+    b_tensor = ann.ConstTensor(b_info, biasValues)
+    b_layer = network.AddConstantLayer(b_tensor, "bias")
+
+    fc_descriptor = ann.FullyConnectedDescriptor()
+    fc_descriptor.m_BiasEnabled = True
+    fc_descriptor.m_ConstantWeights = True
+    fully_connected = network.AddFullyConnectedLayer(fc_descriptor, "fc")
+
+    output_info = ann.TensorInfo(ann.TensorShape(outputShape), ann.DataType_Float32)
+    output_tensor = ann.Tensor(output_info, np.zeros([1, 1], dtype=np.float32))
+    output = network.AddOutputLayer(0, "output")
+
+    input_layer.GetOutputSlot(0).Connect(fully_connected.GetInputSlot(0))
+    w_layer.GetOutputSlot(0).Connect(fully_connected.GetInputSlot(1))
+    b_layer.GetOutputSlot(0).Connect(fully_connected.GetInputSlot(2))
+    fully_connected.GetOutputSlot(0).Connect(output.GetInputSlot(0))
+
+    input_layer.GetOutputSlot(0).SetTensorInfo(input_info)
+    w_layer.GetOutputSlot(0).SetTensorInfo(w_info)
+    b_layer.GetOutputSlot(0).SetTensorInfo(b_info)
+    fully_connected.GetOutputSlot(0).SetTensorInfo(output_info)
+
+    preferred_backends = [ann.BackendId('CpuRef')]
+    options = ann.CreationOptions()
+    runtime = ann.IRuntime(options)
+    opt_network, messages = ann.Optimize(network, preferred_backends, runtime.GetDeviceSpec(), ann.OptimizerOptions())
+    net_id, messages = runtime.LoadNetwork(opt_network)
+
+    input_tensors = [(0, input_tensor)]
+    output_tensors = [(0, output_tensor)]
+    runtime.EnqueueWorkload(net_id, input_tensors, output_tensors)
+
+    output_vectors = ann.workload_tensors_to_ndarray(output_tensors)
+
+    assert (output_vectors==expectedOutput).all()

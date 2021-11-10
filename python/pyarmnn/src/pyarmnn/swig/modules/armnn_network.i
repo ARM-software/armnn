@@ -597,7 +597,7 @@ public:
     armnn::IConnectableLayer* AddInstanceNormalizationLayer(const armnn::InstanceNormalizationDescriptor& desc,
                                                              const char* name = nullptr);
 
-   %feature("docstring",
+    %feature("docstring",
         "
         Adds a Log Softmax layer to the network.
 
@@ -611,7 +611,7 @@ public:
     armnn::IConnectableLayer* AddLogSoftmaxLayer(const armnn::LogSoftmaxDescriptor& logSoftmaxDescriptor,
                                                   const char* name = nullptr);
 
-   %feature("docstring",
+    %feature("docstring",
         "
         Adds an L2 Normalization layer to the network.
         Normalization is performed along dimension 1, but requires a 4d input.
@@ -642,7 +642,7 @@ public:
                                             const armnn::LstmInputParams& params,
                                             const char* name = nullptr);
 
-   %feature("docstring",
+    %feature("docstring",
         "
         Add a Maximum layer to the network.
 
@@ -979,6 +979,20 @@ public:
         ") AddSwitchLayer;
     armnn::IConnectableLayer* AddSwitchLayer(const char* name = nullptr);
 
+    %feature("docstring",
+        "
+        Adds a Fully Connected layer to the network. Also known as a Linear or Dense layer.
+
+        Args:
+            fullyConnectedDescriptor (FullyConnectedDescriptor): Description of the fully connected layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddFullyConnectedLayer;
+    armnn::IConnectableLayer* AddFullyConnectedLayer(const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
+                                                     const char* name = nullptr);
+
 };
 
 %extend INetwork {
@@ -992,17 +1006,18 @@ public:
     }
 
     %feature("docstring",
-    "
-    Adds a Fully Connected layer to the network. Also known as a Linear or Dense layer.
+        "
+        Adds a Fully Connected layer to the network with input weights and optional bias.
+        Also known as a Linear or Dense layer.
 
-    Args:
-        fullyConnectedDescriptor (FullyConnectedDescriptor): Description of the fully connected layer.
-        weights (ConstTensor): Tensor for the weights data.
-        biases (ConstTensor): Optional tensor for the bias data.
-        name (str): Optional name for the layer.
+        Args:
+            fullyConnectedDescriptor (FullyConnectedDescriptor): Description of the fully connected layer.
+            weights (ConstTensor): Tensor for the weights data.
+            biases (ConstTensor): Optional tensor for the bias data.
+            name (str): Optional name for the layer.
 
-    Returns:
-        IConnectableLayer: Interface for configuring the layer.
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
     ") AddFullyConnectedLayer;
     armnn::IConnectableLayer* AddFullyConnectedLayer(const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                      const armnn::ConstTensor& weights,
@@ -1020,22 +1035,22 @@ public:
     }
 
     %feature("docstring",
-    "
-    Adds a 2D Transpose Convolution layer to the network.
+        "
+        Adds a 2D Transpose Convolution layer to the network.
 
-    Args:
-        descriptor (TransposeConvolution2dDescriptor): Descriptor containing all parameters to configure this layer.
-        weights (ConstTensor): Tensor for the weights data.
-        biases (ConstTensor): Optional tensor for the bias data.
-        name (str): Optional name for the layer.
+        Args:
+            descriptor (TransposeConvolution2dDescriptor): Descriptor containing all parameters to configure this layer.
+            weights (ConstTensor): Tensor for the weights data.
+            biases (ConstTensor): Optional tensor for the bias data.
+            name (str): Optional name for the layer.
 
-    Returns:
-        IConnectableLayer: Interface for configuring the layer.
-    ") AddTransposeConvolution2dLayer;
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddTransposeConvolution2dLayer;
     armnn::IConnectableLayer* AddTransposeConvolution2dLayer(const armnn::TransposeConvolution2dDescriptor& descriptor,
                                                              const armnn::ConstTensor& weights,
                                                              armnn::ConstTensor* biases = nullptr,
-                                                             const char* name = nullptr){
+                                                             const char* name = nullptr) {
 
         if (biases) {
             return $self->AddTransposeConvolution2dLayer(descriptor, weights,

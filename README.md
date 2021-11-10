@@ -1,5 +1,6 @@
 # Introduction
 
+* [Quick Start Guides](#quick-start-guides)
 * [Software tools overview](#software-tools-overview)
 * [Where to find more information](#where-to-find-more-information)
 * [Contributions](#contributions)
@@ -20,35 +21,38 @@ Arm NN SDK utilizes the Compute Library to target programmable cores, such as Co
 as efficiently as possible. To target Ethos NPUs the NPU-Driver is utilized. We also welcome new contributors to provide
 their [own driver and backend](src/backends/README.md). Note, Arm NN does not provide support for Cortex-M CPUs.
 
-The latest release supports models created with **TensorFlow Lite** (TfLite) and **ONNX**.
+Arm NN support models created with **TensorFlow Lite** (TfLite) and **ONNX**.
 Arm NN analysis a given model and replaces the operations within it with implementations particularly designed for the
 hardware you want to execute it on. This results in a great boost of execution speed. How much faster your neural
 network can be executed depends on the operations it contains and the available hardware. Below you can see the speedup
 we've been experiencing in our experiments with a few common networks.
 
-<img align="center" width="700" src="https://developer.arm.com/-/media/developer/Other Images/Arm_NN_performance_relative_to_other_NN_frameworks_diagram.png"/>
+\image html docs/PerformanceChart.odt
 
 Arm NN is written using portable C++14 and the build system uses [CMake](https://cmake.org/), therefore it is possible
 to build for a wide variety of target platforms, from a wide variety of host environments.
 
 
-## Getting started: Software tools overview
+## Getting started: Quick Start Guides 
+Arm NN has added some quick start guides that will help you to setup Arm NN and run models quickly. The quickest way to build Arm NN is to either use our **Debian package** or use the prebuilt binaries available in the [Assets](https://github.com/ARM-software/armnn/releases) section of every Arm NN release. 
+There is an installation guide available [here](InstallationViaAptRepository.md) which provides step by step instructions on how to install the Arm NN Core,
+the TfLite Parser and PyArmNN for Ubuntu 20.04. These guides can be used with the **prebuilt binaries**. 
+At present we have added a [quick start guide](delegate/DelegateQuickStartGuide.md) that will show you how to integrate the delegate into TfLite to run models using python.
+More guides will be added here in the future.
+
+
+## Software Components overview
 Depending on what kind of framework (Tensorflow Lite, ONNX) you've been using to create your model there are multiple
 software tools available within Arm NN that can serve your needs.
 
-Generally, there is a **parser** available **for each supported framework**. Each parser allows you to run models from
-one framework e.g. the TfLite-Parser lets you run TfLite models. You can integrate these parsers into your own
-application to load, optimize and execute your model. We also provide **python bindings** for our parsers and the Arm NN core.
+Generally, there is a **parser** available **for each supported framework**. ArmNN-Parsers are C++ libraries that you can integrate into your application to load, optimize and execute your model.
+Each parser allows you to run models from one framework. If you would like to run an ONNX model you can make use of the **Onnx-Parser**. There also is a parser available for TfLite models but the preferred way to execute TfLite models is using our TfLite-Delegate. We also provide **python bindings** for our parsers and the Arm NN core.
 We call the result **PyArmNN**. Therefore your application can be conveniently written in either C++ using the "original"
 Arm NN library or in Python using PyArmNN. You can find tutorials on how to setup and use our parsers in our doxygen
 documentation. The latest version can be found in the [wiki section](https://github.com/ARM-software/armnn/wiki/Documentation)
 of this repository.
 
-Admittedly, building Arm NN and its parsers from source is not always easy to accomplish. We are trying to increase our
-usability by providing Arm NN as a **Debian package**. Our debian package is the most easy way to install the Arm NN Core,
-the TfLite Parser and PyArmNN (More support is about to come): [Installation via Apt Repository](InstallationViaAptRepository.md)
-
-The newest member in Arm NNs software toolkit is the **TfLite Delegate**. The delegate can be integrated in TfLite.
+Arm NN's software toolkit comes with the **TfLite Delegate** which can be integrated into TfLite.
 TfLite will then delegate operations, that can be accelerated with Arm NN, to Arm NN. Every other operation will still be
 executed with the usual TfLite runtime. This is our **recommended way to accelerate TfLite models**. As with our parsers
 there are tutorials in our doxygen documentation that can be found in the [wiki section](https://github.com/ARM-software/armnn/wiki/Documentation).
@@ -60,7 +64,7 @@ integrated into Android it will automatically run neural networks with Arm NN.
 
 
 ## Where to find more information
-The section above introduces the most important tools that Arm NN provides.
+The section above introduces the most important components that Arm NN provides.
 You can find a complete list in our **doxygen documentation**. The
 latest version can be found in the [wiki section](https://github.com/ARM-software/armnn/wiki/Documentation) of our github
 repository.
@@ -70,14 +74,14 @@ or take a look at previous [github issues](https://github.com/ARM-software/armnn
 
 
 ## Note
-1. The following tools have been removed in 21.05:
+1. The following tools were removed in 21.05 release:
     * TensorFlow Parser
     * Caffe Parser
     * Quantizer
 
 2. Ubuntu Linux 16.04 LTS is no longer supported from April 30, 2021.
    As a result Ubuntu 16.04 LTS will no longer receive security patches or other software updates.
-   Consequently Arm NN will from the 21.08 Release at the end of August 2021 no longer be officially
+   Consequently Arm NN, from the 21.08 Release at the end of August 2021, is no longer officially
    supported on Ubuntu 16.04 LTS but will instead be supported on Ubuntu 18.04 LTS.
 
 
@@ -129,3 +133,17 @@ Third party tools used by Arm NN:
 | half           | MIT               | IEEE 754 conformant 16-bit half-precision floating point library | 1.12.0 | http://half.sourceforge.net
 | mapbox/variant | BSD               | A header-only alternative to 'boost::variant' | 1.1.3 | https://github.com/mapbox/variant
 | stb            | MIT               | Image loader, resize and writer | 2.16 | https://github.com/nothings/stb
+
+
+## Build process
+Arm NN uses the following security related build flags in their code:
+
+| Build flags	      |
+|---------------------|
+| -Wall	              |
+| -Wextra             |
+| -Wold-style-cast    |
+| -Wno-missing-braces |
+| -Wconversion        |
+| -Wsign-conversion   |
+| -Werror             |

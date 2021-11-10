@@ -1156,7 +1156,7 @@ void TfLiteParserImpl::ParseExpandDims(size_t subgraphIndex, size_t operatorInde
     }
     else
     {
-        int32_t axis = inputs[1]->shape[0];
+        int32_t axis = inputs[0]->shape[0];
 
         int32_t inputDimSize = static_cast<int32_t>(inputTensorInfo.GetShape().GetNumDimensions());
 

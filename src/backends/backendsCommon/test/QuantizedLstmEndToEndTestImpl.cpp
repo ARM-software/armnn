@@ -46,12 +46,14 @@ armnn::INetworkPtr CreateQuantizedLstmNetwork(armnn::TensorShape& inputShape,
     armnn::TensorInfo inputWeightsInfo({outputSize, inputSize},
                                        armnn::DataType::QAsymmU8,
                                        weightsScale,
-                                       weightsOffset, true);
+                                       weightsOffset,
+                                       true);
 
     armnn::TensorInfo recurrentWeightsInfo({outputSize, outputSize},
                                            armnn::DataType::QAsymmU8,
                                            weightsScale,
-                                           weightsOffset, true);
+                                           weightsOffset,
+                                           true);
 
     armnn::TensorInfo biasInfo({outputSize}, armnn::DataType::Signed32, biasScale, biasOffset, true);
 

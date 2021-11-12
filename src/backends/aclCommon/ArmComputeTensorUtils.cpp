@@ -266,6 +266,7 @@ arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo
             return arm_compute::PixelValue(static_cast<uint8_t>(pixelValue));
         case arm_compute::DataType::QSYMM16:
             return arm_compute::PixelValue(static_cast<int16_t>(pixelValue));
+        case arm_compute::DataType::QSYMM8:
         case arm_compute::DataType::QASYMM8_SIGNED:
         case arm_compute::DataType::QSYMM8_PER_CHANNEL:
             return arm_compute::PixelValue(static_cast<int8_t>(pixelValue));

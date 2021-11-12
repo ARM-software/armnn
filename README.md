@@ -27,7 +27,7 @@ hardware you want to execute it on. This results in a great boost of execution s
 network can be executed depends on the operations it contains and the available hardware. Below you can see the speedup
 we've been experiencing in our experiments with a few common networks.
 
-\image html docs/PerformanceChart.odt
+\image html PerformanceChart.png
 
 Arm NN is written using portable C++14 and the build system uses [CMake](https://cmake.org/), therefore it is possible
 to build for a wide variety of target platforms, from a wide variety of host environments.

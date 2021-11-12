@@ -10,7 +10,7 @@ delegated to the Arm NN library.
 The [SWIG](http://www.swig.org/) project is used to generate the Arm NN python shadow classes and C wrapper.
 
 The following diagram shows the conceptual architecture of this library:
-![PyArmNN](./images/pyarmnn.png)
+![PyArmNN](docs/pyarmnn.png)
 
 # Setup development environment
 

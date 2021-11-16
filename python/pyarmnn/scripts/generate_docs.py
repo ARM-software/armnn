@@ -29,8 +29,8 @@ def __copy_file_to_dir(file_paths: Union[List[str], str], target_dir_path: str):
 
 
 def copy_doc_images():
-    __copy_file_to_dir(file_paths=['./images/pyarmnn.png'],
-                       target_dir_path='docs/pyarmnn/images')
+    __copy_file_to_dir(file_paths=['docs/pyarmnn.png'],
+                       target_dir_path='docs')
 
 
 def archive_docs(path, version):

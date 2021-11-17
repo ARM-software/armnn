@@ -24,7 +24,7 @@ To build ModelAccuracyTool, pass the following options to Cmake:
 | -l | --data-layout ]          | Data layout. Supported value: NHWC, NCHW. Default: NHWC
 | -c | --compute                | Which device to run layers on by default. Possible choices: CpuRef, CpuAcc, GpuAcc. Default: CpuAcc, CpuRef |
 | -r | --validation-range       | The range of the images to be evaluated. Specified in the form <begin index>:<end index>. The index starts at 1 and the range is inclusive. By default the evaluation will be performed on all images. |
-| -b | --blacklist-path         | Path to a blacklist file where each line denotes the index of an image to be excluded from evaluation. |
+| -e | --excludelist-path       | Path to a excludelist file where each line denotes the index of an image to be excluded from evaluation. |
 
 Example usage: <br>
 <code>./ModelAccuracyTool -m /path/to/model/model.armnn -f tflite -i input -o output -d /path/to/test/directory/ -p /path/to/model-output-labels -v /path/to/file/val.txt -c CpuRef -r 1:100</code>

@@ -28,17 +28,17 @@ using namespace armnn::test;
  * @param[in] imageDirectoryPath  Path to directory containing validation images
  * @param[in] begIndex            Begin index of images to be loaded. Inclusive
  * @param[in] endIndex            End index of images to be loaded. Inclusive
- * @param[in] blacklistPath       Path to blacklist file
+ * @param[in] excludelistPath     Path to excludelist file
  * @return A map mapping image file names to their corresponding ground-truth labels
  */
 map<std::string, std::string> LoadValidationImageFilenamesAndLabels(const string& validationLabelPath,
                                                                     const string& imageDirectoryPath,
                                                                     size_t begIndex             = 0,
                                                                     size_t endIndex             = 0,
-                                                                    const string& blacklistPath = "");
+                                                                    const string& excludelistPath = "");
 
 /** Load model output labels from file
- * 
+ *
  * @pre \p modelOutputLabelsPath exists and is a regular file
  *
  * @param[in] modelOutputLabelsPath path to model output labels file
@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
         std::string inputLayout;
         std::vector<armnn::BackendId> computeDevice;
         std::string validationRange;
-        std::string blacklistPath;
+        std::string excludelistPath;
 
         const std::string backendsMessage = "Which device to run layers on by default. Possible choices: "
                                             + armnn::BackendRegistryInstance().GetBackendIdsAsString();
@@ -106,10 +106,15 @@ int main(int argc, char* argv[])
                     "The index starts at 1 and the range is inclusive."
                     "By default the evaluation will be performed on all images.",
                     cxxopts::value<std::string>(validationRange)->default_value("1:0"))
-                ("b,blacklist-path",
-                    "Path to a blacklist file where each line denotes the index of an image to be "
+                ("e,excludelist-path",
+                    "Path to a excludelist file where each line denotes the index of an image to be "
                     "excluded from evaluation.",
-                    cxxopts::value<std::string>(blacklistPath)->default_value(""));
+                    cxxopts::value<std::string>(excludelistPath)->default_value(""));
+                ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This b,blacklist-path command is deprecated", "22.08")
+                ("b,blacklist-path",
+                     "Path to a blacklist file where each line denotes the index of an image to be "
+                     "excluded from evaluation. This command will be deprecated in favor of: --excludelist-path ",
+                     cxxopts::value<std::string>(excludelistPath)->default_value(""));
 
             auto result = options.parse(argc, argv);
 
@@ -243,17 +248,17 @@ int main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        // Validate  blacklist file if it's specified
-        if (!blacklistPath.empty() &&
-            !(fs::exists(blacklistPath) && fs::is_regular_file(blacklistPath)))
+        // Validate  excludelist file if it's specified
+        if (!excludelistPath.empty() &&
+            !(fs::exists(excludelistPath) && fs::is_regular_file(excludelistPath)))
         {
-            ARMNN_LOG(fatal) << "Invalid path to blacklist file at " << blacklistPath;
+            ARMNN_LOG(fatal) << "Invalid path to excludelist file at " << excludelistPath;
             return EXIT_FAILURE;
         }
 
         fs::path pathToDataDir(dataDir);
         const map<std::string, std::string> imageNameToLabel = LoadValidationImageFilenamesAndLabels(
-            validationLabelPath, pathToDataDir.string(), imageBegIndex, imageEndIndex, blacklistPath);
+            validationLabelPath, pathToDataDir.string(), imageBegIndex, imageEndIndex, excludelistPath);
         armnnUtils::ModelAccuracyChecker checker(imageNameToLabel, modelOutputLabels);
 
         if (ValidateDirectory(dataDir))
@@ -407,7 +412,7 @@ map<std::string, std::string> LoadValidationImageFilenamesAndLabels(const string
                                                                     const string& imageDirectoryPath,
                                                                     size_t begIndex,
                                                                     size_t endIndex,
-                                                                    const string& blacklistPath)
+                                                                    const string& excludelistPath)
 {
     // Populate imageFilenames with names of all .JPEG, .PNG images
     std::vector<std::string> imageFilenames;
@@ -445,15 +450,15 @@ map<std::string, std::string> LoadValidationImageFilenamesAndLabels(const string
         throw armnn::Exception("Invalid image index range");
     }
 
-    // Load blacklist if there is one
-    std::vector<unsigned int> blacklist;
-    if (!blacklistPath.empty())
+    // Load excludelist if there is one
+    std::vector<unsigned int> excludelist;
+    if (!excludelistPath.empty())
     {
-        std::ifstream blacklistFile(blacklistPath);
+        std::ifstream excludelistFile(excludelistPath);
         unsigned int index;
-        while (blacklistFile >> index)
+        while (excludelistFile >> index)
         {
-            blacklist.push_back(index);
+            excludelist.push_back(index);
         }
     }
 
@@ -462,25 +467,25 @@ map<std::string, std::string> LoadValidationImageFilenamesAndLabels(const string
     map<std::string, std::string> imageNameToLabel;
     ifstream infile(validationLabelPath);
     size_t imageIndex          = begIndex;
-    size_t blacklistIndexCount = 0;
+    size_t excludelistIndexCount = 0;
     while (std::getline(infile, classification))
     {
         if (imageIndex > endIndex)
         {
             break;
         }
-        // If current imageIndex is included in blacklist, skip the current image
-        if (blacklistIndexCount < blacklist.size() && imageIndex == blacklist[blacklistIndexCount])
+        // If current imageIndex is included in excludelist, skip the current image
+        if (excludelistIndexCount < excludelist.size() && imageIndex == excludelist[excludelistIndexCount])
         {
             ++imageIndex;
-            ++blacklistIndexCount;
+            ++excludelistIndexCount;
             continue;
         }
         imageNameToLabel.insert(std::pair<std::string, std::string>(imageFilenames[imageIndex - 1], classification));
         ++imageIndex;
     }
-    std::cout << blacklistIndexCount << " images blacklisted" << std::endl;
-    std::cout << imageIndex - begIndex - blacklistIndexCount << " images to be loaded" << std::endl;
+    std::cout << excludelistIndexCount << " images in excludelist" << std::endl;
+    std::cout << imageIndex - begIndex - excludelistIndexCount << " images to be loaded" << std::endl;
     return imageNameToLabel;
 }
 

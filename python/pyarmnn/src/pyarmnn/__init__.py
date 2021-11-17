@@ -68,7 +68,7 @@ from ._generated.pyarmnn import IProfiler
 from ._generated.pyarmnn import DataType_Float16, DataType_Float32, DataType_QAsymmU8, DataType_Signed32, \
     DataType_Boolean, DataType_QSymmS16, DataType_QSymmS8, DataType_QAsymmS8, ShapeInferenceMethod_ValidateOnly, \
     ShapeInferenceMethod_InferAndValidate
-from ._generated.pyarmnn import DataLayout_NCHW, DataLayout_NHWC
+from ._generated.pyarmnn import DataLayout_NCHW, DataLayout_NHWC, DataLayout_NCDHW, DataLayout_NDHWC
 from ._generated.pyarmnn import MemorySource_Malloc, MemorySource_Undefined, MemorySource_DmaBuf, \
     MemorySource_DmaBufProtected
 from ._generated.pyarmnn import ProfilingDetailsMethod_Undefined, ProfilingDetailsMethod_DetailsWithEvents, \
@@ -86,9 +86,10 @@ from ._generated.pyarmnn import UnaryOperation_Abs, UnaryOperation_Exp, UnaryOpe
     UnaryOperation_Neg, ElementwiseUnaryDescriptor
 from ._generated.pyarmnn import LogicalBinaryOperation_LogicalAnd, LogicalBinaryOperation_LogicalOr, \
     LogicalBinaryDescriptor
-from ._generated.pyarmnn import Convolution2dDescriptor, DepthToSpaceDescriptor, DepthwiseConvolution2dDescriptor, \
-    DetectionPostProcessDescriptor, FakeQuantizationDescriptor, FillDescriptor, FullyConnectedDescriptor, \
-    GatherDescriptor, InstanceNormalizationDescriptor, LstmDescriptor, L2NormalizationDescriptor, MeanDescriptor
+from ._generated.pyarmnn import Convolution2dDescriptor, Convolution3dDescriptor, DepthToSpaceDescriptor, \
+    DepthwiseConvolution2dDescriptor, DetectionPostProcessDescriptor, FakeQuantizationDescriptor, FillDescriptor, \
+    FullyConnectedDescriptor, GatherDescriptor, InstanceNormalizationDescriptor, LstmDescriptor, \
+    L2NormalizationDescriptor, MeanDescriptor
 from ._generated.pyarmnn import NormalizationAlgorithmChannel_Across, NormalizationAlgorithmChannel_Within, \
     NormalizationAlgorithmMethod_LocalBrightness, NormalizationAlgorithmMethod_LocalContrast, NormalizationDescriptor
 from ._generated.pyarmnn import PaddingMode_Constant, PaddingMode_Reflect, PaddingMode_Symmetric, PadDescriptor

@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 import os
 import stat
@@ -197,6 +197,7 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddConcatLayer',
     'AddConstantLayer',
     'AddConvolution2dLayer',
+    'AddConvolution3dLayer',
     'AddDepthToSpaceLayer',
     'AddDepthwiseConvolution2dLayer',
     'AddDequantizeLayer',

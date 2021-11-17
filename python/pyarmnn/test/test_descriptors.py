@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 import inspect
 
@@ -100,6 +100,23 @@ def test_convolution2d_descriptor_default_values():
     assert desc.m_DilationY == 1
     assert desc.m_BiasEnabled == False
     assert desc.m_DataLayout == ann.DataLayout_NCHW
+
+def test_convolution3d_descriptor_default_values():
+    desc = ann.Convolution3dDescriptor()
+    assert desc.m_PadLeft == 0
+    assert desc.m_PadTop == 0
+    assert desc.m_PadRight == 0
+    assert desc.m_PadBottom == 0
+    assert desc.m_PadFront == 0
+    assert desc.m_PadBack == 0
+    assert desc.m_StrideX == 1
+    assert desc.m_StrideY == 1
+    assert desc.m_StrideZ == 1
+    assert desc.m_DilationX == 1
+    assert desc.m_DilationY == 1
+    assert desc.m_DilationZ == 1
+    assert desc.m_BiasEnabled == False
+    assert desc.m_DataLayout == ann.DataLayout_NDHWC
 
 
 def test_depthtospace_descriptor_default_values():
@@ -486,6 +503,7 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'Pooling2dDescriptor',
                                        'FullyConnectedDescriptor',
                                        'Convolution2dDescriptor',
+                                       'Convolution3dDescriptor',
                                        'DepthwiseConvolution2dDescriptor',
                                        'DetectionPostProcessDescriptor',
                                        'NormalizationDescriptor',
@@ -532,6 +550,7 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'Pooling2dDescriptor',
                                        'FullyConnectedDescriptor',
                                        'Convolution2dDescriptor',
+                                       'Convolution3dDescriptor',
                                        'DepthwiseConvolution2dDescriptor',
                                        'DetectionPostProcessDescriptor',
                                        'NormalizationDescriptor',

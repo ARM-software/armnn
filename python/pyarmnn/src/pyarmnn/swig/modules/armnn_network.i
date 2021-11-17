@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 %{
@@ -467,7 +467,7 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddConcatLayer;
     armnn::IConnectableLayer* AddConcatLayer(const armnn::ConcatDescriptor& concatDescriptor,
-                                              const char* name = nullptr);
+                                             const char* name = nullptr);
 
 
     %feature("docstring",
@@ -484,7 +484,24 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddConstantLayer;
     armnn::IConnectableLayer* AddConstantLayer(const armnn::ConstTensor& input,
-                                                const char* name = nullptr);
+                                               const char* name = nullptr);
+
+
+    %feature("docstring",
+             "
+    Adds a 3D Convolution layer to the network.
+
+            Args:
+    convolution3dDescriptor (Convolution3dDescriptor): Description of the 3D convolution layer.
+            name (str): Optional name for the layer.
+
+            Returns:
+    IConnectableLayer: Interface for configuring the layer.
+    ") AddConvolution3dLayer;
+
+    armnn::IConnectableLayer* AddConvolution3dLayer(const armnn::Convolution3dDescriptor& convolution3dDescriptor,
+    const char* name = nullptr);
+
 
     %feature("docstring",
         "
@@ -498,7 +515,7 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddDepthToSpaceLayer;
     armnn::IConnectableLayer* AddDepthToSpaceLayer(const armnn::DepthToSpaceDescriptor& depthToSpaceDescriptor,
-                                                    const char* name = nullptr);
+                                                   const char* name = nullptr);
 
     %feature("docstring",
         "
@@ -609,7 +626,7 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddInstanceNormalizationLayer;
     armnn::IConnectableLayer* AddInstanceNormalizationLayer(const armnn::InstanceNormalizationDescriptor& desc,
-                                                             const char* name = nullptr);
+                                                            const char* name = nullptr);
 
     %feature("docstring",
         "
@@ -1129,9 +1146,9 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddConvolution2dLayer;
     armnn::IConnectableLayer* AddConvolution2dLayer(const armnn::Convolution2dDescriptor& convolution2dDescriptor,
-                                                     const armnn::ConstTensor& weights,
-                                                     armnn::ConstTensor* biases = nullptr,
-                                                     const char* name = nullptr) {
+                                                    const armnn::ConstTensor& weights,
+                                                    armnn::ConstTensor* biases = nullptr,
+                                                    const char* name = nullptr) {
 
         if (biases) {
             return $self->AddConvolution2dLayer(convolution2dDescriptor, weights,
@@ -1141,6 +1158,7 @@ public:
                                                  armnn::Optional<armnn::ConstTensor>(), name);
         }
     }
+
 
     %feature("docstring",
         "

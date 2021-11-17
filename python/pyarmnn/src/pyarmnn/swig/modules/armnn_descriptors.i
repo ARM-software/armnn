@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 %{
@@ -274,6 +274,48 @@ struct Convolution2dDescriptor
     bool operator ==(const Convolution2dDescriptor& rhs) const;
 };
 
+%feature("docstring",
+    "
+    A descriptor for the Convolution3d layer.  See `INetwork.AddConvolution3dLayer()`.
+
+    Contains:
+        m_PadLeft (int): Underlying C++ data type is uint32_t. Padding left value in the width dimension. Default: 0.
+        m_PadRight (int): Underlying C++ data type is uint32_t. Padding right value in the width dimension. Default: 0.
+        m_PadTop (int): Underlying C++ data type is uint32_t. Padding top value in the height dimension. Default: 0.
+        m_PadBottom (int): Underlying C++ data type is uint32_t. Padding bottom value in the height dimension. Default: 0.
+        m_PadFront (int): Underlying C++ data type is uint32_t. Padding front value in the depth dimension. Default: 0.
+        m_PadBack (int): Underlying C++ data type is uint32_t. Padding back value in the depth dimension. Default: 0.
+        m_StrideX (int): Underlying C++ data type is uint32_t. Stride value when proceeding through input for the width dimension. Default: 0.
+        m_StrideY (int): Underlying C++ data type is uint32_t. Stride value when proceeding through input for the height dimension. Default: 0.
+        m_StrideZ (int): Underlying C++ data type is uint32_t. Stride value when proceeding through input for the depth dimension. Default: 0.
+        m_DilationX (int): Underlying C++ data type is uint32_t. Dilation along x axis. Default: 1.
+        m_DilationY (int): Underlying C++ data type is uint32_t. Dilation along y axis. Default: 1.
+        m_DilationZ (int): Underlying C++ data type is uint32_t. Dilation along z axis. Default: 1.
+        m_BiasEnabled (bool): Enable/disable bias. Default: false.
+        m_DataLayout (int): The data layout to be used (`DataLayout_NDHWC`, `DataLayout_NCDHW`). Default: 3 `DataLayout_NDHWC`.
+
+    ") Convolution3dDescriptor;
+struct Convolution3dDescriptor
+{
+    Convolution3dDescriptor();
+
+    uint32_t             m_PadLeft;
+    uint32_t             m_PadRight;
+    uint32_t             m_PadTop;
+    uint32_t             m_PadBottom;
+    uint32_t             m_PadFront;
+    uint32_t             m_PadBack;
+    uint32_t             m_StrideX;
+    uint32_t             m_StrideY;
+    uint32_t             m_StrideZ;
+    uint32_t             m_DilationX;
+    uint32_t             m_DilationY;
+    uint32_t             m_DilationZ;
+    bool                 m_BiasEnabled;
+    DataLayout           m_DataLayout;
+
+    bool operator ==(const Convolution3dDescriptor& rhs) const;
+};
 
 %feature("docstring",
     "

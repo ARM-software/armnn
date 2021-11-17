@@ -144,6 +144,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Utils.cpp \
         src/armnn/WallClockTimer.cpp \
         src/armnn/WorkingMemHandle.cpp \
+        src/armnnUtils/CompatibleTypes.cpp \
         src/armnnUtils/DataLayoutIndexed.cpp \
         src/armnnUtils/DotSerializer.cpp \
         src/armnnUtils/FloatingPointConverter.cpp \

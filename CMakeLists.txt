@@ -71,6 +71,7 @@ add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
 
 set(armnnUtils_sources)
 list(APPEND armnnUtils_sources
+    include/armnnUtils/CompatibleTypes.hpp
     include/armnnUtils/DataLayoutIndexed.hpp
     include/armnnUtils/Permute.hpp
     include/armnnUtils/Filesystem.hpp
@@ -81,6 +82,7 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/Threads.hpp
     include/armnnUtils/Transpose.hpp
     src/armnnUtils/BFloat16.hpp
+    src/armnnUtils/CompatibleTypes.cpp
     src/armnnUtils/Filesystem.cpp
     src/armnnUtils/GraphTopologicalSort.hpp
     src/armnnUtils/Half.hpp
@@ -362,7 +364,6 @@ list(APPEND armnn_sources
     src/armnn/BackendRegistry.cpp
     src/armnn/BackendSettings.hpp
     src/armnn/BackendHelper.cpp
-    src/armnn/CompatibleTypes.hpp
     src/armnn/Descriptors.cpp
     src/armnn/DeviceSpec.hpp
     src/armnn/DllExport.hpp

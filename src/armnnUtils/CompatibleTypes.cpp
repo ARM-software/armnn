@@ -1,16 +1,16 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-
-#pragma once
-
 #include <armnn/Types.hpp>
+#include <armnnUtils/CompatibleTypes.hpp>
 
-#include <BFloat16.hpp>
-#include <Half.hpp>
+#include "BFloat16.hpp"
+#include "Half.hpp"
 
-namespace armnn
+using namespace armnn;
+
+namespace armnnUtils
 {
 
 template<typename T>
@@ -20,46 +20,46 @@ bool CompatibleTypes(DataType)
 }
 
 template<>
-inline bool CompatibleTypes<float>(DataType dataType)
+bool CompatibleTypes<float>(DataType dataType)
 {
     return dataType == DataType::Float32;
 }
 
 template<>
-inline bool CompatibleTypes<Half>(DataType dataType)
+bool CompatibleTypes<Half>(DataType dataType)
 {
     return dataType == DataType::Float16;
 }
 
 template<>
-inline bool CompatibleTypes<BFloat16>(DataType dataType)
+bool CompatibleTypes<BFloat16>(DataType dataType)
 {
     return dataType == DataType::BFloat16;
 }
 
 template<>
-inline bool CompatibleTypes<uint8_t>(DataType dataType)
+bool CompatibleTypes<uint8_t>(DataType dataType)
 {
     return dataType == DataType::Boolean || dataType == DataType::QAsymmU8;
 }
 
 template<>
-inline bool CompatibleTypes<int8_t>(DataType dataType)
+bool CompatibleTypes<int8_t>(DataType dataType)
 {
     return dataType == DataType::QSymmS8
         || dataType == DataType::QAsymmS8;
 }
 
 template<>
-inline bool CompatibleTypes<int16_t>(DataType dataType)
+bool CompatibleTypes<int16_t>(DataType dataType)
 {
     return dataType == DataType::QSymmS16;
 }
 
 template<>
-inline bool CompatibleTypes<int32_t>(DataType dataType)
+bool CompatibleTypes<int32_t>(DataType dataType)
 {
     return dataType == DataType::Signed32;
 }
 
-} //namespace armnn
+} //namespace armnnUtils

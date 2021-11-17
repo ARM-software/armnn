@@ -10,7 +10,7 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <CompatibleTypes.hpp>
+#include <armnnUtils/CompatibleTypes.hpp>
 
 #include <algorithm>
 
@@ -30,8 +30,14 @@ public:
     template <typename T>
     const T* GetConstTensor() const
     {
-        ARMNN_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
-        return reinterpret_cast<const T*>(m_Memory);
+        if (armnnUtils::CompatibleTypes<T>(GetTensorInfo().GetDataType()))
+        {
+            return reinterpret_cast<const T*>(m_Memory);
+        }
+        else
+        {
+            throw armnn::Exception("Attempting to get not compatible type tensor!");
+        }
     }
 
     const TensorInfo& GetTensorInfo() const
@@ -79,8 +85,14 @@ public:
     template <typename T>
     T* GetTensor() const
     {
-        ARMNN_ASSERT(CompatibleTypes<T>(GetTensorInfo().GetDataType()));
-        return reinterpret_cast<T*>(m_MutableMemory);
+        if (armnnUtils::CompatibleTypes<T>(GetTensorInfo().GetDataType()))
+        {
+            return reinterpret_cast<T*>(m_MutableMemory);
+        }
+        else
+        {
+            throw armnn::Exception("Attempting to get not compatible type tensor!");
+        }
     }
 
 protected:

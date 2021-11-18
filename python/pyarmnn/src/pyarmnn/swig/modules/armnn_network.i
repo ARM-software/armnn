@@ -425,7 +425,22 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddBatchToSpaceNdLayer;
     armnn::IConnectableLayer* AddBatchToSpaceNdLayer(const armnn::BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
-                                                      const char* name = nullptr);
+                                                     const char* name = nullptr);
+
+    %feature("docstring",
+         "
+        Adds a ChannelShuffle layer to the network.
+
+        Args:
+            channelShuffleDescriptor (ChannelShuffleDescriptor): Configuration parameters for the layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddChannelShuffleLayer;
+    armnn::IConnectableLayer* AddChannelShuffleLayer(const armnn::ChannelShuffleDescriptor& channelShuffleDescriptor,
+                                                     const char* name = nullptr);
+
 
 
     %feature("docstring",

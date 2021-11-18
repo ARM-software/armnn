@@ -133,6 +133,26 @@ struct BatchToSpaceNdDescriptor
 
 %feature("docstring",
     "
+    A descriptor for the ChannelShuffle layer.  See `INetwork.AddChannelShuffleLayer()`.
+
+    Contains:
+        m_NumGroups (int): Underlying C++ type is uint32_t. Number of groups for the shuffle operation. Default: 0.
+        m_Axis (int): Underlying C++ type is uint32_t. 0-based axis along which shuffle is performed. Default: 0.
+
+    ") ChannelShuffleDescriptor;
+struct ChannelShuffleDescriptor
+{
+    ChannelShuffleDescriptor();
+    ChannelShuffleDescriptor(int numGroups, int axis);
+
+    int m_NumGroups;
+    int m_Axis;
+
+    bool operator ==(const ChannelShuffleDescriptor &rhs) const;
+};
+
+%feature("docstring",
+    "
     A descriptor for the Comparison layer.  See `INetwork.AddComparisonLayer()`.
 
     Contains:

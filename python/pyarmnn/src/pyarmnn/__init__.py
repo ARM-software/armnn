@@ -79,8 +79,8 @@ from ._generated.pyarmnn import ActivationFunction_Abs, ActivationFunction_Bound
     ActivationFunction_Sqrt, ActivationFunction_Square, ActivationFunction_TanH, ActivationDescriptor
 from ._generated.pyarmnn import ArgMinMaxFunction_Max, ArgMinMaxFunction_Min, ArgMinMaxDescriptor
 from ._generated.pyarmnn import BatchNormalizationDescriptor, BatchToSpaceNdDescriptor
-from ._generated.pyarmnn import ComparisonDescriptor, ComparisonOperation_Equal, ComparisonOperation_Greater, \
-    ComparisonOperation_GreaterOrEqual, ComparisonOperation_Less, \
+from ._generated.pyarmnn import ChannelShuffleDescriptor, ComparisonDescriptor, ComparisonOperation_Equal, \
+    ComparisonOperation_Greater, ComparisonOperation_GreaterOrEqual, ComparisonOperation_Less, \
     ComparisonOperation_LessOrEqual, ComparisonOperation_NotEqual
 from ._generated.pyarmnn import UnaryOperation_Abs, UnaryOperation_Exp, UnaryOperation_Sqrt, UnaryOperation_Rsqrt, \
     UnaryOperation_Neg, ElementwiseUnaryDescriptor

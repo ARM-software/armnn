@@ -579,15 +579,23 @@ struct NormalizationDescriptor
                                    The second tuple value is the number of values to add after the tensor in the dimension.
                                    The number of pairs should match the number of dimensions in the input tensor.
         m_PadValue (bool): Optional value to use for padding. Default: 0.
+        m_PaddingMode (int): The padding mode controls whether the padding should be filled
+                             with constant values (`PaddingMode_Constant`), or reflect the input,
+                             either excluding the border values (`PaddingMode_Reflect`)
+                             or including them (`PaddingMode_Symmetric`).
+                             Default: 0 (`PaddingMode_Constant`).
 
     ") PadDescriptor;
 struct PadDescriptor
 {
     PadDescriptor();
-    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList, const float& padValue = 0);
+    PadDescriptor(const std::vector<std::pair<unsigned int, unsigned int>>& padList,
+                  const float& padValue = 0,
+                  const PaddingMode& paddingMode = PaddingMode_Constant);
 
     std::vector<std::pair<unsigned int, unsigned int>> m_PadList;
     float m_PadValue;
+    PaddingMode m_PaddingMode;
 
     bool operator ==(const PadDescriptor& rhs) const;
 };

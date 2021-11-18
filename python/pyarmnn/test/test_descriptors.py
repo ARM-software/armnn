@@ -232,6 +232,7 @@ def test_origin_descriptor_ctor():
 def test_pad_descriptor_default_values():
     desc = ann.PadDescriptor()
     assert desc.m_PadValue == 0
+    assert desc.m_PaddingMode == ann.PaddingMode_Constant
 
 
 def test_permute_descriptor_default_values():

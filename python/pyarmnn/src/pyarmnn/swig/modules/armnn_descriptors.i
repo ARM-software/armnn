@@ -1036,6 +1036,25 @@ struct TransposeConvolution2dDescriptor
     bool operator ==(const TransposeConvolution2dDescriptor& rhs) const;
 };
 
+%feature("docstring",
+    "
+    A descriptor for the LogicalBinary layer. See `INetwork.AddLogicalBinaryLayer()`.
+
+    Contains:
+        m_Operation (int): Specifies the logical operation to execute.
+                           (0: `LogicalBinaryOperation_LogicalAnd`, 1: `LogicalBinaryOperation_LogicalOr`)
+                           Default: 0: `LogicalBinaryOperation_LogicalAnd`.
+
+    ") LogicalBinaryDescriptor;
+struct LogicalBinaryDescriptor
+{
+    LogicalBinaryDescriptor();
+    LogicalBinaryDescriptor(LogicalBinaryOperation operation);
+
+    LogicalBinaryOperation m_Operation;
+
+    bool operator ==(const LogicalBinaryDescriptor &rhs) const;
+};
 
 using ConcatDescriptor = OriginsDescriptor;
 using LogSoftmaxDescriptor = SoftmaxDescriptor;

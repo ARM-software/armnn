@@ -993,6 +993,19 @@ public:
     armnn::IConnectableLayer* AddFullyConnectedLayer(const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
                                                      const char* name = nullptr);
 
+    %feature("docstring",
+        "
+        Adds a LogicalBinary layer to the network.
+
+        Args:
+            logicalBinaryDescriptor (LogicalBinaryDescriptor): Description of the LogicalBinary layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddLogicalBinaryLayer;
+    armnn::IConnectableLayer* AddLogicalBinaryLayer(const armnn::LogicalBinaryDescriptor& logicalBinaryDescriptor,
+                                                    const char* name = nullptr);
 };
 
 %extend INetwork {

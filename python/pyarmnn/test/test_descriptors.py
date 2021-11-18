@@ -403,6 +403,10 @@ def test_elementwise_unary_descriptor_default_values():
     assert desc.m_Operation == ann.UnaryOperation_Abs
 
 
+def test_logical_binary_descriptor_default_values():
+    desc = ann.LogicalBinaryDescriptor()
+    assert desc.m_Operation == ann.LogicalBinaryOperation_LogicalAnd
+
 def test_view_descriptor_incorrect_input():
     desc = ann.SplitterDescriptor(2, 3)
     with pytest.raises(RuntimeError) as err:
@@ -493,7 +497,8 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'TransposeConvolution2dDescriptor',
                                        'ElementwiseUnaryDescriptor',
                                        'FillDescriptor',
-                                       'GatherDescriptor'])
+                                       'GatherDescriptor',
+                                       'LogicalBinaryDescriptor'])
 class TestDescriptorMassChecks:
 
     def test_desc_implemented(self, desc_name):
@@ -537,7 +542,8 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'TransposeConvolution2dDescriptor',
                                        'ElementwiseUnaryDescriptor',
                                        'FillDescriptor',
-                                       'GatherDescriptor'])
+                                       'GatherDescriptor',
+                                       'LogicalBinaryDescriptor'])
 class TestDescriptorMassChecks:
 
     def test_desc_implemented(self, desc_name):

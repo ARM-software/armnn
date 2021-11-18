@@ -208,6 +208,7 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddGatherLayer',
     'AddInputLayer',
     'AddInstanceNormalizationLayer',
+    'AddLogicalBinaryLayer',
     'AddLogSoftmaxLayer',
     'AddL2NormalizationLayer',
     'AddLstmLayer',

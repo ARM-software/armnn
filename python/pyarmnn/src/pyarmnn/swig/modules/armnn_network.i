@@ -810,7 +810,7 @@ public:
         ") AddRankLayer;
     armnn::IConnectableLayer* AddRankLayer(const char* name = nullptr);
 
-    
+
     %feature("docstring",
         "
         Adds a Reshape layer to the network.
@@ -1006,6 +1006,20 @@ public:
         ") AddLogicalBinaryLayer;
     armnn::IConnectableLayer* AddLogicalBinaryLayer(const armnn::LogicalBinaryDescriptor& logicalBinaryDescriptor,
                                                     const char* name = nullptr);
+
+    %feature("docstring",
+        "
+        Adds a Transpose layer to the network.
+
+        Args:
+            transposeDescriptor (TransposeDescriptor): Description of the transpose layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddTransposeLayer;
+    armnn::IConnectableLayer* AddTransposeLayer(const armnn::TransposeDescriptor& transposeDescriptor,
+                                                const char* name = nullptr);
 };
 
 %extend INetwork {

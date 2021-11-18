@@ -99,7 +99,7 @@ from ._generated.pyarmnn import OutputShapeRounding_Ceiling, OutputShapeRounding
 from ._generated.pyarmnn import ResizeMethod_Bilinear, ResizeMethod_NearestNeighbor, ResizeDescriptor, \
     ReshapeDescriptor, SliceDescriptor, SpaceToBatchNdDescriptor, SpaceToDepthDescriptor, StandInDescriptor, \
     StackDescriptor, StridedSliceDescriptor, SoftmaxDescriptor, TransposeConvolution2dDescriptor, \
-    SplitterDescriptor
+    TransposeDescriptor, SplitterDescriptor
 from ._generated.pyarmnn import ConcatDescriptor, CreateDescriptorForConcatenation
 
 from ._generated.pyarmnn import LstmInputParams, QuantizedLstmInputParams

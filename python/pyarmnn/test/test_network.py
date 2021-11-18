@@ -238,7 +238,8 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddStridedSliceLayer',
     'AddSubtractionLayer',
     'AddSwitchLayer',
-    'AddTransposeConvolution2dLayer'
+    'AddTransposeConvolution2dLayer',
+    'AddTransposeLayer'
 ])
 def test_network_method_exists(method):
     assert getattr(ann.INetwork, method, None)

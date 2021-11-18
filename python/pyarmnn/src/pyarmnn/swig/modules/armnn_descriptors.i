@@ -1000,7 +1000,6 @@ struct SoftmaxDescriptor
     bool operator ==(const SoftmaxDescriptor& rhs) const;
 };
 
-
 %feature("docstring",
     "
     A descriptor for the TransposeConvolution2d layer. See `INetwork.AddTransposeConvolution2dLayer()`.
@@ -1055,6 +1054,26 @@ struct LogicalBinaryDescriptor
 
     bool operator ==(const LogicalBinaryDescriptor &rhs) const;
 };
+
+%feature("docstring",
+    "
+    A descriptor for the Transpose layer. See `INetwork.AddTransposeLayer()`.
+
+    Contains:
+        m_DimMappings (PermutationVector): Indicates how to translate tensor elements from a given source into the target destination,
+                                           when source and target potentially have different memory layouts e.g. {0U, 3U, 1U, 2U}.
+
+    ") TransposeDescriptor;
+struct TransposeDescriptor
+{
+    TransposeDescriptor();
+    TransposeDescriptor(const PermutationVector& dimMappings);
+
+    PermutationVector m_DimMappings;
+
+    bool operator ==(const TransposeDescriptor &rhs) const;
+};
+
 
 using ConcatDescriptor = OriginsDescriptor;
 using LogSoftmaxDescriptor = SoftmaxDescriptor;

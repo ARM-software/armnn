@@ -391,6 +391,15 @@ def test_transpose_convolution2d_descriptor_default_values():
     assert desc.m_DataLayout == ann.DataLayout_NCHW
     assert desc.m_OutputShapeEnabled == False
 
+def test_transpose_descriptor_default_values():
+    pv = ann.PermutationVector((0, 3, 2, 1, 4))
+    desc = ann.TransposeDescriptor(pv)
+    assert desc.m_DimMappings.GetSize() == 5
+    assert desc.m_DimMappings[0] == 0
+    assert desc.m_DimMappings[1] == 3
+    assert desc.m_DimMappings[2] == 2
+    assert desc.m_DimMappings[3] == 1
+    assert desc.m_DimMappings[4] == 4
 
 def test_view_descriptor_default_values():
     desc = ann.SplitterDescriptor()
@@ -495,6 +504,7 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'StackDescriptor',
                                        'StridedSliceDescriptor',
                                        'TransposeConvolution2dDescriptor',
+                                       'TransposeDescriptor',
                                        'ElementwiseUnaryDescriptor',
                                        'FillDescriptor',
                                        'GatherDescriptor',
@@ -540,6 +550,7 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'StackDescriptor',
                                        'StridedSliceDescriptor',
                                        'TransposeConvolution2dDescriptor',
+                                       'TransposeDescriptor',
                                        'ElementwiseUnaryDescriptor',
                                        'FillDescriptor',
                                        'GatherDescriptor',

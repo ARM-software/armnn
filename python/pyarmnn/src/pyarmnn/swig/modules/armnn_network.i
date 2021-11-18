@@ -856,6 +856,19 @@ public:
         ") AddRankLayer;
     armnn::IConnectableLayer* AddRankLayer(const char* name = nullptr);
 
+    %feature("docstring",
+        "
+        Adds a Reduce layer to the network.
+
+        Args:
+            reduceDescriptor (ReduceDescriptor): Parameters for the reduce operation.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddReduceLayer;
+    armnn::IConnectableLayer* AddReduceLayer(const armnn::ReduceDescriptor& reduceDescriptor,
+                                             const char* name = nullptr);
 
     %feature("docstring",
         "

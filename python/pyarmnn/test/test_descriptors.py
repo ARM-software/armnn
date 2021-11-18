@@ -288,6 +288,11 @@ def test_reshape_descriptor_default_values():
     # check the empty Targetshape
     assert desc.m_TargetShape.GetNumDimensions() == 0
 
+def test_reduce_descriptor_default_values():
+    desc = ann.ReduceDescriptor()
+    assert desc.m_KeepDims == False
+    assert desc.m_vAxis == []
+    assert desc.m_ReduceOperation == ann.ReduceOperation_Sum
 
 def test_slice_descriptor_default_values():
     desc = ann.SliceDescriptor()
@@ -517,6 +522,7 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'InstanceNormalizationDescriptor',
                                        'BatchToSpaceNdDescriptor',
                                        'FakeQuantizationDescriptor',
+                                       'ReduceDescriptor',
                                        'ResizeDescriptor',
                                        'ReshapeDescriptor',
                                        'SpaceToBatchNdDescriptor',
@@ -565,6 +571,7 @@ generated_classes_names = list(map(lambda x: x[0], generated_classes))
                                        'InstanceNormalizationDescriptor',
                                        'BatchToSpaceNdDescriptor',
                                        'FakeQuantizationDescriptor',
+                                       'ReduceDescriptor',
                                        'ResizeDescriptor',
                                        'ReshapeDescriptor',
                                        'SpaceToBatchNdDescriptor',

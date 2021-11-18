@@ -745,6 +745,28 @@ struct Pooling2dDescriptor
 
 %feature("docstring",
     "
+    A ReduceDescriptor for the REDUCE operators.
+
+    Contains:
+        m_KeepDims(bool): If true then output shape has no change.
+        m_vAxis (list of int): The indices of the dimensions to reduce.
+        m_ReduceOperation (int): Specifies the reduction operation to execute ('ReduceOperation_Sum',
+                                             'ReduceOperation_Max', 'ReduceOperation_Mean', 'ReduceOperation_Min',
+                                             'ReduceOperation_Prod'). Default: 0 ('ReduceOperation_Sum').
+        ") ReduceDescriptor;
+struct ReduceDescriptor
+{
+    ReduceDescriptor();
+
+    bool m_KeepDims;
+    std::vector<uint32_t> m_vAxis;
+    ReduceOperation m_ReduceOperation;
+
+    bool operator ==(const ReduceDescriptor& rhs) const;
+};
+
+%feature("docstring",
+    "
     A descriptor for the Reshape layer. See `INetwork.AddReshapeLayer()`.
 
     Contains:

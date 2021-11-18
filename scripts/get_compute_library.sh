@@ -7,10 +7,10 @@
 CMD=$( basename $0 )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="71cbd28b7cf5115b0451d43e5c84cce4ae4d8ec7" #Fix out-of-bound reads in cl gemm kernels
+DEFAULT_CLFRAMEWORKREVISION="e330fb41d85d7058f74902ce1d47b2dc00b10a52" #Improve start-up timer for ClIm2Col
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

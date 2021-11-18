@@ -842,6 +842,18 @@ public:
 
     %feature("docstring",
         "
+        Adds a Shape layer to the network.
+
+        Args:
+            name(str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer
+        ") AddShapeLayer;
+    armnn::IConnectableLayer* AddShapeLayer(const char* name = nullptr);
+
+    %feature("docstring",
+        "
         Adds a Slice layer to the network.
 
         Args:

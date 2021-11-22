@@ -427,6 +427,20 @@ public:
     armnn::IConnectableLayer* AddBatchToSpaceNdLayer(const armnn::BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                                       const char* name = nullptr);
 
+
+    %feature("docstring",
+        "
+        Adds a Cast layer to the network.
+
+        Args:
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddCastLayer;
+    armnn::IConnectableLayer* AddCastLayer(const char* name = nullptr);
+
+
     %feature("docstring",
         "
         Adds a Comparison layer to the network.

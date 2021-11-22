@@ -192,6 +192,7 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddArgMinMaxLayer',
     'AddBatchNormalizationLayer',
     'AddBatchToSpaceNdLayer',
+    'AddCastLayer',
     'AddComparisonLayer',
     'AddConcatLayer',
     'AddConstantLayer',

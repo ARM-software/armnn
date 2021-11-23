@@ -718,6 +718,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Prelu.cpp
              src/armnnTfLiteParser/test/Reduce.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
+             src/armnnTfLiteParser/test/ReshapeDynamic.cpp
              src/armnnTfLiteParser/test/ResizeBilinear.cpp
              src/armnnTfLiteParser/test/ResizeNearestNeighbor.cpp
              src/armnnTfLiteParser/test/Quantize.cpp

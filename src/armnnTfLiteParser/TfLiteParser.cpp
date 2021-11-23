@@ -2545,9 +2545,11 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
     // If there is no built-in option given or if the built-in new_shape parameter was empty
     if (!targetShapeFound)
     {
-        // Check for a second input tensor
-        if (inputs.size() > 1 && inputs[1] != nullptr)
+        bool secondInputTensorExists = inputs.size() > 1 && inputs[1] != nullptr;
+        if (secondInputTensorExists)
         {
+            armnn::TensorInfo shapeInfo  = ToTensorInfo(inputs[1]);
+
             if (inputs[1]->is_variable)
             {
                 ARMNN_THROW_PARSE_EXCEPTION( "Target shapes defined in non-const input tensors is not supported");
@@ -2563,16 +2565,47 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
                 ARMNN_THROW_PARSE_EXCEPTION("Target 'shape' input is not an int32 type");
             }
 
-            // Extract target shape from input
-            auto bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
-            auto values = reinterpret_cast<const int32_t*>(bufferPtr->data.data());
-            if (!values)
+            // If the provided shape is constant, we can load in from the buffer ...
+            if (shapeInfo.IsConstant())
             {
-                ARMNN_THROW_PARSE_EXCEPTION("Reshape operator target shape input buffer data is null");
+                // Extract target shape from input
+                auto bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+                auto values = reinterpret_cast<const int32_t*>(bufferPtr->data.data());
+                if (!values)
+                {
+                    ARMNN_THROW_PARSE_EXCEPTION("Reshape operator target shape input buffer data is null");
+                }
+                for (int i=0; i < inputs[1]->shape[0]; ++i)
+                {
+                    targetShape.push_back(values[i]);
+                }
             }
-            for (int i=0; i < inputs[1]->shape[0]; ++i)
+            // ... otherwise, we have to infer it during Runtime.
+            else
             {
-                targetShape.push_back(values[i]);
+                // The parser only supports shape (batch, -1) or (-1) for non-constant shape input.
+                unsigned int dims = shapeInfo.GetNumDimensions();
+                TensorShape shapes = shapeInfo.GetShape();
+                if (dims != 1 || shapes[0] > 2)
+                {
+                    throw ParseException(fmt::format("Invalid input shape '{}' in Reshape layer '{}' {}. "
+                                                    "The parser only supports shape (batch, -1) or (-1) for "
+                                                    "non-constant shape input.",
+                                                    shapes[0],
+                                                    layerName,
+                                                    CHECK_LOCATION().AsString()));
+                }
+
+                const int32_t numInputElements = inputTensorInfo.GetNumElements();
+                const int32_t inputTensorShape = inputTensorInfo.GetShape()[0];
+                if (shapes[0] == 1)
+                {
+                    targetShape = { numInputElements };
+                }
+                else if (shapes[0] == 2)
+                {
+                    targetShape = { inputTensorShape , numInputElements / inputTensorShape };
+                }
             }
         }
         else

@@ -306,7 +306,21 @@ public:
 
     PermutationVector(std::initializer_list<ValueType> dimMappings);
 
-    ValueType operator[](SizeType i) const { return m_DimMappings.at(i); }
+    ///
+    /// Indexing method with out-of-bounds error checking for the m_DimMappings array.
+    /// @param i - integer value corresponding to index of m_DimMappings array to retrieve element from.
+    /// @return element at index i of m_DimMappings array.
+    /// @throws InvalidArgumentException when indexing out-of-bounds index of m_DimMappings array.
+    ///
+    ValueType operator[](SizeType i) const
+    {
+        if (i >= GetSize())
+        {
+            throw InvalidArgumentException("Invalid indexing of PermutationVector of size " + std::to_string(GetSize())
+                                            + " at location [" + std::to_string(i) + "].");
+        }
+        return m_DimMappings.at(i);
+    }
 
     SizeType GetSize() const { return m_NumDimMappings; }
 

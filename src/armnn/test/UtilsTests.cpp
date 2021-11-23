@@ -269,6 +269,28 @@ TEST_CASE("PermuteQuantizationDim")
     CHECK(permuted.GetQuantizationDim().value() == 3U);
 }
 
+TEST_CASE("EmptyPermuteVectorIndexOutOfBounds")
+{
+    armnn::PermutationVector pv = armnn::PermutationVector({});
+    CHECK_THROWS_AS(pv[0], armnn::InvalidArgumentException);
+}
+
+TEST_CASE("PermuteDescriptorIndexOutOfBounds")
+{
+    armnn::PermutationVector pv = armnn::PermutationVector({ 1u, 2u, 0u });
+    armnn::PermuteDescriptor desc = armnn::PermuteDescriptor(pv);
+    CHECK_THROWS_AS(desc.m_DimMappings[3], armnn::InvalidArgumentException);
+    CHECK(desc.m_DimMappings[0] == 1u);
+}
+
+TEST_CASE("TransposeDescriptorIndexOutOfBounds")
+{
+    armnn::PermutationVector pv = armnn::PermutationVector({ 2u, 1u, 0u });
+    armnn::TransposeDescriptor desc = armnn::TransposeDescriptor(pv);
+    CHECK_THROWS_AS(desc.m_DimMappings[3], armnn::InvalidArgumentException);
+    CHECK(desc.m_DimMappings[2] == 0u);
+}
+
 TEST_CASE("PermuteVectorIterator")
 {
     // We're slightly breaking the spirit of std::array.end() because we're using it as a

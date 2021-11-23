@@ -27,3 +27,8 @@ def test_permutation_vector():
 
     pv4 = ann.PermutationVector((0, 3, 1, 2))
     assert pv.IsInverse(pv4)
+
+    with pytest.raises(ValueError) as err:
+        pv4[4]
+
+    assert err.type is ValueError

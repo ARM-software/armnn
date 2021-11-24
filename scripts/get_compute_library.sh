@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="9cca592c13f1e688a35698641069bcd37a525f0c" #Improve start-up timer for GeMM (floating-point)
+DEFAULT_CLFRAMEWORKREVISION="9e8a7701532377073220613b3642468f96cba62f" #Decouple data type for NERangeKernel
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

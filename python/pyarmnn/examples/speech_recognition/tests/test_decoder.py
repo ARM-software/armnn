@@ -25,4 +25,4 @@ def test_decoder(test_data_folder):
     output_tensor = os.path.join(test_data_folder, "inf_out.npy")
     encoded = np.load(output_tensor)
     decoded_text = audio_utils.decode(encoded, labels)
-    assert decoded_text == "and he walkd immediately out of the apartiment by anothe"
+    assert decoded_text == "and they walkd immediately out of the apartiment by anothe"

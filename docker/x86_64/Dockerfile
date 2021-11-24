@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 ENV TERM linux
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -103,18 +103,9 @@ RUN apt-get update && apt-get install -y \
 # ENV PATH=$HOME/armnn-devenv/google/x86_64_pb_install/bin/:$PATH
 # ENV LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:$LD_LIBRARY_PATH
 
-
-# Build Boost library for arm64
-RUN cd $HOME && wget http://downloads.sourceforge.net/project/boost/boost/1.64.0/boost_1_64_0.tar.gz && \
-    tar xfz boost_1_64_0.tar.gz && \
-    rm boost_1_64_0.tar.gz && \
-    cd boost_1_64_0 && \
-    echo "using gcc : arm : aarch64-linux-gnu-g++ ;" > user_config.jam && \
-    ./bootstrap.sh --prefix=$HOME/armnn-devenv/boost_arm64_install && \
-    ./b2 install toolset=gcc-arm link=static cxxflags=-fPIC --with-filesystem --with-test --with-log --with-program_options -j$(nproc) --user-config=user_config.jam
-
 # Download ArmNN
-RUN cd $HOME/armnn-devenv && git clone https://github.com/ARM-software/armnn.git
+RUN cd $HOME/armnn-devenv && git clone "https://review.mlplatform.org/ml/armnn" && \
+    cd armnn && git checkout remotes/origin/branches/armnn_21_11
 
 # Build Compute Library
 RUN cd $HOME/armnn-devenv/ && git clone https://review.mlplatform.org/ml/ComputeLibrary && \
@@ -180,7 +171,6 @@ RUN cd $HOME/armnn-devenv && \
     -DBUILD_TESTS=1 \
     -DARMCOMPUTE_ROOT=$HOME/armnn-devenv/ComputeLibrary \
     -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build/ \
-    -DBOOST_ROOT=$HOME/armnn-devenv/boost_arm64_install/ \
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
     -DONNX_GENERATED_SOURCES=$HOME/armnn-devenv/onnx \
     -DBUILD_ONNX_PARSER=1 \

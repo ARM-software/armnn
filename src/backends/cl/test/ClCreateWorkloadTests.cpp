@@ -10,8 +10,8 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
-#include <backendsCommon/test/TensorCopyUtils.hpp>
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
 #include <aclCommon/test/CreateWorkloadClNeon.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>

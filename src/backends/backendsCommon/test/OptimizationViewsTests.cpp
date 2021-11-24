@@ -4,7 +4,7 @@
 //
 
 
-#include "CommonTestUtils.hpp"
+#include <CommonTestUtils.hpp>
 #include "MockBackend.hpp"
 
 #include <armnn/backends/OptimizationViews.hpp>

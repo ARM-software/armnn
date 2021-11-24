@@ -5,8 +5,9 @@
 
 #include "NeonWorkloadFactoryHelper.hpp"
 
+#include <UnitTests.hpp>
+#include <backendsCommon/test/LayerTests.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
-#include <test/UnitTests.hpp>
 
 #include <doctest/doctest.h>
 

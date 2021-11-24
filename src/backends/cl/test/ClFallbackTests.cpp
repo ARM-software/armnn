@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/test/CommonTestUtils.hpp>
+#include <CommonTestUtils.hpp>
 
-#include <test/GraphUtils.hpp>
+#include <GraphUtils.hpp>
 
 #include <doctest/doctest.h>
 

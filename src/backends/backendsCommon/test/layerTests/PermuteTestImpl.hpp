@@ -11,9 +11,9 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 template<typename T>
 LayerTestResult<T, 4> SimplePermuteTestImpl(

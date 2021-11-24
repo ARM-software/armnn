@@ -7,7 +7,7 @@
 
 #include <Network.hpp>
 
-#include <test/GraphUtils.hpp>
+#include <GraphUtils.hpp>
 
 #include <cl/ClWorkloadFactory.hpp>
 #include <cl/ClBackendContext.hpp>

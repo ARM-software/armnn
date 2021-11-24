@@ -16,7 +16,7 @@
 
 #include <common/include/LabelsAndEventClasses.hpp>
 
-#include <test/TestUtils.hpp>
+#include <TestUtils.hpp>
 
 #include <doctest/doctest.h>
 

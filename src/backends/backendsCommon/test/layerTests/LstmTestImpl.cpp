@@ -11,14 +11,14 @@
 
 #include <backendsCommon/TensorHandle.hpp>
 
-#include <backendsCommon/test/TensorCopyUtils.hpp>
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
 #include <reference/workloads/Decoders.hpp>
 #include <reference/workloads/Encoders.hpp>
 #include <reference/workloads/LstmUtils.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 #include <doctest/doctest.h>
 namespace

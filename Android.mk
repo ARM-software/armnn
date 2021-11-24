@@ -16,6 +16,7 @@ ARMNN_THIRD_PARTY_INCLUDE_PATH := $(LOCAL_PATH)/third-party
 ARMNN_MAIN_HEADER_PATH := $(LOCAL_PATH)/src
 ARMNN_SOURCE_HEADER_PATH := $(LOCAL_PATH)/src/armnn
 ARMNN_SOURCE_UTILS_HEADER_PATH := $(LOCAL_PATH)/src/armnnUtils
+ARMNN_TEST_UTILS_SOURCE_PATH := $(LOCAL_PATH)/src/armnnTestUtils
 ARMNN_BACKENDS_HEADER_PATH := $(LOCAL_PATH)/src/backends
 ARMNN_PROFILING_HEADER_PATH := $(LOCAL_PATH)/src/profiling
 ARMNN_SERIALIZER_HEADER_PATH := $(LOCAL_PATH)/src/armnnSerializer
@@ -347,6 +348,7 @@ LOCAL_C_INCLUDES := \
         $(ARMNN_MAIN_HEADER_PATH) \
         $(ARMNN_SOURCE_HEADER_PATH) \
         $(ARMNN_SOURCE_UTILS_HEADER_PATH) \
+        $(ARMNN_TEST_UTILS_SOURCE_PATH) \
         $(ARMNN_PROFILING_HEADER_PATH) \
         $(ARMNN_BACKENDS_HEADER_PATH) \
         $(ARMNN_SERIALIZER_HEADER_PATH) \
@@ -382,7 +384,6 @@ LOCAL_SRC_FILES := \
         src/armnn/test/FloatingPointConverterTest.cpp \
         src/armnn/test/FlowControl.cpp \
         src/armnn/test/GraphTests.cpp \
-        src/armnn/test/GraphUtils.cpp \
         src/armnn/test/InferOutputTests.cpp \
         src/armnn/test/InstrumentTests.cpp \
         src/armnnUtils/ModelAccuracyChecker.cpp \
@@ -419,12 +420,15 @@ LOCAL_SRC_FILES := \
         src/armnn/test/TestLayerVisitor.cpp \
         src/armnn/test/TestNameAndDescriptorLayerVisitor.cpp \
         src/armnn/test/TestNameOnlyLayerVisitor.cpp \
-        src/armnn/test/TestUtils.cpp \
-        src/armnn/test/UnitTests.cpp \
         src/armnn/test/UtilsTests.cpp \
         src/armnnUtils/test/ParserHelperTest.cpp \
         src/armnnUtils/test/QuantizeHelperTest.cpp \
         src/armnnUtils/test/TensorUtilsTest.cpp \
+        src/armnnTestUtils/CommonTestUtils.cpp \
+        src/armnnTestUtils/GraphUtils.cpp \
+        src/armnnTestUtils/TensorCopyUtils.cpp \
+        src/armnnTestUtils/TestUtils.cpp \
+        src/armnnTestUtils/UnitTests.cpp \
         src/profiling/test/BufferTests.cpp \
         src/profiling/test/FileOnlyProfilingDecoratorTests.cpp \
         src/profiling/test/PrintPacketHeaderHandler.cpp \

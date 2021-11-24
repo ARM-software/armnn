@@ -12,7 +12,7 @@
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <backendsCommon/test/CommonTestUtils.hpp>
+#include <CommonTestUtils.hpp>
 
 #include <map>
 #include <vector>

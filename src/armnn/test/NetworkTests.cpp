@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "GraphUtils.hpp"
+#include <GraphUtils.hpp>
 
 #include <armnn/LayerVisitorBase.hpp>
 

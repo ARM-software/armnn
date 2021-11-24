@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "CommonTestUtils.hpp"
+#include <CommonTestUtils.hpp>
 
 #include <Graph.hpp>
 #include <Network.hpp>

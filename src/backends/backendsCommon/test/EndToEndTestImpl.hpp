@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "CommonTestUtils.hpp"
+#include <CommonTestUtils.hpp>
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/INetwork.hpp>

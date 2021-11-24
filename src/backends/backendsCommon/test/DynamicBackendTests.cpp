@@ -5,7 +5,7 @@
 
 #include "DynamicBackendTests.hpp"
 
-#include <test/UnitTests.hpp>
+#include <UnitTests.hpp>
 
 #include <doctest/doctest.h>
 

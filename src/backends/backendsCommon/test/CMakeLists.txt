@@ -10,12 +10,15 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     BackendIdTests.cpp
     BackendProfilingTests.cpp
     BackendRegistryTests.cpp
+    CommonTestUtils.hpp
     ChannelShuffleEndToEndTestImpl.hpp
     ComparisonEndToEndTestImpl.hpp
     CompatibilityTests.cpp
     ConcatEndToEndTestImpl.hpp
     Convolution3dEndToEndTestImpl.hpp
     CustomMemoryOptimizerStrategyTests.cpp
+    DataLayoutUtils.hpp
+    DataTypeUtils.hpp
     DefaultAsyncExecuteTest.cpp
     DepthToSpaceEndToEndTestImpl.hpp
     DequantizeEndToEndTestImpl.hpp
@@ -54,7 +57,9 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
     StridedSliceAsyncEndToEndTest.hpp
+    TensorCopyUtils.hpp
     WorkloadFactoryHelper.hpp
+    WorkloadTestUtils.hpp
     layerTests/AbsTestImpl.cpp
     layerTests/AbsTestImpl.hpp
     layerTests/ActivationTestImpl.cpp
@@ -116,6 +121,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/InstanceNormalizationTestImpl.hpp
     layerTests/L2NormalizationTestImpl.cpp
     layerTests/L2NormalizationTestImpl.hpp
+    layerTests/LayerTestResult.hpp
     layerTests/LogTestImpl.cpp
     layerTests/LogTestImpl.hpp
     layerTests/LogicalTestImpl.cpp
@@ -200,6 +206,7 @@ endif()
 add_library(armnnBackendsCommonUnitTests OBJECT ${armnnBackendsCommonUnitTests_sources})
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
+target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnTestUtils)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
 target_include_directories(armnnBackendsCommonUnitTests PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)

@@ -6,8 +6,8 @@
 #include "ClContextControlFixture.hpp"
 #include "ClWorkloadFactoryHelper.hpp"
 
-#include "test/TensorHelpers.hpp"
-#include "test/UnitTests.hpp"
+#include <TensorHelpers.hpp>
+#include <UnitTests.hpp>
 
 #include <cl/ClLayerSupport.hpp>
 #include <cl/ClWorkloadFactory.hpp>

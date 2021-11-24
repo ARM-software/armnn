@@ -7,7 +7,7 @@
 #include <Network.hpp>
 
 #include <reference/RefWorkloadFactory.hpp>
-#include <test/GraphUtils.hpp>
+#include <GraphUtils.hpp>
 
 #include <doctest/doctest.h>
 

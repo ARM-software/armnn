@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "LayerTestResult.hpp"
+#include <armnnTestUtils/LayerTestResult.hpp>
 
 #include <Half.hpp>
 

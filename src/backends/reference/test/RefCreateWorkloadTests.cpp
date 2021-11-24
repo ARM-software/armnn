@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <test/CreateWorkload.hpp>
+#include <CreateWorkload.hpp>
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <reference/RefTensorHandle.hpp>

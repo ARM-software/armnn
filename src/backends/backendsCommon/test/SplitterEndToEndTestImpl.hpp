@@ -10,7 +10,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <backendsCommon/test/CommonTestUtils.hpp>
+#include <CommonTestUtils.hpp>
 
 #include <doctest/doctest.h>
 

@@ -5,7 +5,7 @@
 
 #include "InferOutputTests.hpp"
 
-#include <test/UnitTests.hpp>
+#include <UnitTests.hpp>
 
 TEST_SUITE("LayerValidateOutput")
 {

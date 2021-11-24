@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "CommonTestUtils.hpp"
+#include <CommonTestUtils.hpp>
 
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>

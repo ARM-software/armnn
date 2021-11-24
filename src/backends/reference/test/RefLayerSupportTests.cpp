@@ -5,7 +5,8 @@
 
 #include <layers/ConvertFp16ToFp32Layer.hpp>
 #include <layers/ConvertFp32ToFp16Layer.hpp>
-#include <test/TensorHelpers.hpp>
+
+#include <TensorHelpers.hpp>
 
 #include <backendsCommon/TensorHandle.hpp>
 #include <reference/RefWorkloadFactory.hpp>

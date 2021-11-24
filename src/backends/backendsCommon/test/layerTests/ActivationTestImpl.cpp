@@ -9,13 +9,13 @@
 #include <ResolveType.hpp>
 
 #include <backendsCommon/test/ActivationFixture.hpp>
-#include <backendsCommon/test/TensorCopyUtils.hpp>
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 #include <reference/test/RefWorkloadFactoryHelper.hpp>
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 #include <algorithm>
 

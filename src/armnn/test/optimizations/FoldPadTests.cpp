@@ -5,7 +5,7 @@
 
 #include "LayersFwd.hpp"
 #include <Network.hpp>
-#include <test/TestUtils.hpp>
+#include <TestUtils.hpp>
 #include <doctest/doctest.h>
 #include <backendsCommon/TensorHandle.hpp>
 #include <Optimizer.hpp>

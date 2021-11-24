@@ -12,9 +12,9 @@
 #include <armnnUtils/Permute.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
-#include <backendsCommon/test/DataLayoutUtils.hpp>
+#include <armnnTestUtils/DataLayoutUtils.hpp>
 
-#include <test/TestUtils.hpp>
+#include <TestUtils.hpp>
 
 #include <doctest/doctest.h>
 

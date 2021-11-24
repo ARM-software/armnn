@@ -8,7 +8,7 @@
 
 #include <armnn/INetwork.hpp>
 
-#include <test/TestUtils.hpp>
+#include <TestUtils.hpp>
 
 #include <doctest/doctest.h>
 

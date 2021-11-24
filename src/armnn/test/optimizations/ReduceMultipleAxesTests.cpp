@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../GraphUtils.hpp"
-#include "../TestUtils.hpp"
+#include <GraphUtils.hpp>
+#include <TestUtils.hpp>
 
 #include <armnn/INetwork.hpp>
 

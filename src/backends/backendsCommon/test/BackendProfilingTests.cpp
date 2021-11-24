@@ -14,7 +14,7 @@
 #include "ProfilingUtils.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 
-#include <test/TestUtils.hpp>
+#include <TestUtils.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/BackendId.hpp>

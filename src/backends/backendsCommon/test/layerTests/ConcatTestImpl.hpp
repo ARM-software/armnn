@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "LayerTestResult.hpp"
+#include <armnnTestUtils/LayerTestResult.hpp>
 
 #include <BFloat16.hpp>
 #include <Half.hpp>

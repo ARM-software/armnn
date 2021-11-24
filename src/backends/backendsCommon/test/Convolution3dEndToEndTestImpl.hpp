@@ -9,8 +9,8 @@
 
 #include <ResolveType.hpp>
 
-#include <backendsCommon/test/CommonTestUtils.hpp>
-#include <backendsCommon/test/DataLayoutUtils.hpp>
+#include <CommonTestUtils.hpp>
+#include <armnnTestUtils/DataLayoutUtils.hpp>
 
 #include <map>
 #include <vector>

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/IRuntime.hpp>
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 #include <Network.hpp>
 #include <VerificationHelpers.hpp>

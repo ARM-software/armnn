@@ -6,7 +6,7 @@
 #pragma once
 
 #include "SchemaSerialize.hpp"
-#include "test/TensorHelpers.hpp"
+#include "TensorHelpers.hpp"
 
 #include "flatbuffers/idl.h"
 #include "flatbuffers/util.h"

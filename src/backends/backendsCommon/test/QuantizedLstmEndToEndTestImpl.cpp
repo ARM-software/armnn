@@ -5,7 +5,7 @@
 
 #include "QuantizedLstmEndToEndTestImpl.hpp"
 
-#include "CommonTestUtils.hpp"
+#include <CommonTestUtils.hpp>
 #include "EndToEndTestImpl.hpp"
 
 #include <ResolveType.hpp>
@@ -15,7 +15,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 #include <doctest/doctest.h>
 

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "TestUtils.hpp"
+#include <TestUtils.hpp>
 
 #include <Graph.hpp>
 #include <layers/ArgMinMaxLayer.hpp>

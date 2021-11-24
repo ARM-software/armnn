@@ -8,8 +8,8 @@
 #include <Network.hpp>
 #include <ResolveType.hpp>
 #include <armnn/INetwork.hpp>
-#include "test/GraphUtils.hpp"
-#include <test/TestUtils.hpp>
+#include <GraphUtils.hpp>
+#include <TestUtils.hpp>
 
 #include <doctest/doctest.h>
 

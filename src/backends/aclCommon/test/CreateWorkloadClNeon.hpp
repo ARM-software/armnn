@@ -4,8 +4,8 @@
 //
 #pragma once
 
-#include <test/CreateWorkload.hpp>
-#include <test/PredicateResult.hpp>
+#include <CreateWorkload.hpp>
+#include <armnnTestUtils/PredicateResult.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/MemCopyWorkload.hpp>
 #include <reference/RefWorkloadFactory.hpp>

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "LayerTestResult.hpp"
+#include <armnnTestUtils/LayerTestResult.hpp>
 
 #include <QuantizeHelper.hpp>
 #include <ResolveType.hpp>
@@ -14,11 +14,11 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/WorkloadFactory.hpp>
 
-#include <backendsCommon/test/TensorCopyUtils.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> PreluTest(

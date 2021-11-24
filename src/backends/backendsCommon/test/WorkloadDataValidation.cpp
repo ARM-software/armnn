@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "WorkloadTestUtils.hpp"
+#include <WorkloadTestUtils.hpp>
 
 #include <armnn/Exceptions.hpp>
 

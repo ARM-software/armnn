@@ -8,7 +8,7 @@
 #include <Network.hpp>
 #include <ResolveType.hpp>
 #include <armnn/INetwork.hpp>
-#include <test/TestUtils.hpp>
+#include <TestUtils.hpp>
 
 #include <doctest/doctest.h>
 

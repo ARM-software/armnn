@@ -13,7 +13,7 @@
 #include <armnn/IAsyncExecutionCallback.hpp>
 
 #include <AsyncExecutionCallback.hpp>
-#include <backendsCommon/test/CommonTestUtils.hpp>
+#include <CommonTestUtils.hpp>
 
 #include <doctest/doctest.h>
 

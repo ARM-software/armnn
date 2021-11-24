@@ -5,15 +5,14 @@
 #pragma once
 
 #include <ResolveType.hpp>
-
 #include <armnn/backends/IBackendInternal.hpp>
 
-#include <backendsCommon/test/LayerTests.hpp>
-#include <backendsCommon/test/TensorCopyUtils.hpp>
-#include <backendsCommon/test/WorkloadFactoryHelper.hpp>
+#include <test/TensorHelpers.hpp>
 #include <backendsCommon/test/WorkloadTestUtils.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <armnnTestUtils/LayerTestResult.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
 namespace
 {

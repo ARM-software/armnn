@@ -9,8 +9,8 @@
 
 #include <backendsCommon/TensorHandle.hpp>
 
-#include <backendsCommon/test/TensorCopyUtils.hpp>
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
 #include <ResolveType.hpp>
 

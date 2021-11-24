@@ -6,7 +6,7 @@
 #include "ParserFlatbuffersFixture.hpp"
 #include "ParserPrototxtFixture.hpp"
 #include "ParserHelper.hpp"
-#include "test/GraphUtils.hpp"
+#include <GraphUtils.hpp>
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <QuantizeHelper.hpp>

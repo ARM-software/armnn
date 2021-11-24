@@ -9,7 +9,7 @@
 
 #include <reference/RefWorkloadFactory.hpp>
 
-#include <test/UnitTests.hpp>
+#include <UnitTests.hpp>
 
 TEST_SUITE("Compute_Reference")
 {

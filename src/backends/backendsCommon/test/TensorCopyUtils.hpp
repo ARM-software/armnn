@@ -1,15 +1,9 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#pragma once
 
-#include <armnn/Tensor.hpp>
-
-#include <armnn/backends/ITensorHandle.hpp>
-
-void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* memory);
-
-void CopyDataFromITensorHandle(void* mem, const armnn::ITensorHandle* tensorHandle);
-
-void AllocateAndCopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* memory);
+// This file is deprecated and will be removed soon.
+// Please use the new header in armnnTestUtils instead.
+// This will use the new armnnTestUtils header.
+#include <armnnTestUtils/TesnorCopyUtils.hpp>

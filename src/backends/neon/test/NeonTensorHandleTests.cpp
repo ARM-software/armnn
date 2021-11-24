@@ -11,9 +11,9 @@
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <test/GraphUtils.hpp>
+#include <GraphUtils.hpp>
 #include <arm_compute/runtime/Allocator.h>
-#include <backendsCommon/test/CommonTestUtils.hpp>
+#include <CommonTestUtils.hpp>
 
 #include <doctest/doctest.h>
 #include <armnn/utility/Assert.hpp>

@@ -35,7 +35,6 @@ COMMON_SOURCES := \
 # up by the Android.mk file in the root of ArmNN
 
 COMMON_TEST_SOURCES := \
-    test/CommonTestUtils.cpp \
     test/CustomMemoryOptimizerStrategyTests.cpp \
     test/InstanceNormalizationEndToEndTestImpl.cpp \
     test/JsonPrinterTestImpl.cpp \
@@ -43,7 +42,6 @@ COMMON_TEST_SOURCES := \
     test/QLstmEndToEndTestImpl.cpp \
     test/QuantizedLstmEndToEndTestImpl.cpp \
     test/SpaceToDepthEndToEndTestImpl.cpp \
-    test/TensorCopyUtils.cpp \
     test/layerTests/AbsTestImpl.cpp \
     test/layerTests/ActivationTestImpl.cpp \
     test/layerTests/AdditionTestImpl.cpp \

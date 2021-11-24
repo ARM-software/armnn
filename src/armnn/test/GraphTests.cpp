@@ -2,7 +2,7 @@
 // Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "GraphUtils.hpp"
+#include <GraphUtils.hpp>
 
 #include <Graph.hpp>
 #include <Layer.hpp>

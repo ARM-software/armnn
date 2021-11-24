@@ -10,7 +10,7 @@
 
 #include <QuantizeHelper.hpp>
 
-#include <backendsCommon/test/DataLayoutUtils.hpp>
+#include <armnnTestUtils/DataLayoutUtils.hpp>
 
 namespace
 {

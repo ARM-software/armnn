@@ -17,7 +17,7 @@
 
 #include <ResolveType.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 #include <fmt/format.h>
 #include <doctest/doctest.h>

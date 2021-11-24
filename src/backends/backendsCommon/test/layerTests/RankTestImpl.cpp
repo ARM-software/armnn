@@ -5,11 +5,11 @@
 
 #include "RankTestImpl.hpp"
 
-#include <backendsCommon/test/DataTypeUtils.hpp>
-#include <backendsCommon/test/TensorCopyUtils.hpp>
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <DataTypeUtils.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 template<typename T, std::size_t n>
 LayerTestResult<int32_t, 1> RankTest(

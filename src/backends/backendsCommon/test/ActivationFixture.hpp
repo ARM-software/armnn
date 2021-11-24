@@ -4,12 +4,12 @@
 //
 #pragma once
 
-#include "TensorCopyUtils.hpp"
-#include "WorkloadTestUtils.hpp"
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 struct ActivationFixture
 {

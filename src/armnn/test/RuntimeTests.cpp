@@ -22,7 +22,7 @@
 
 #include <doctest/doctest.h>
 #include "RuntimeTests.hpp"
-#include "TestUtils.hpp"
+#include <TestUtils.hpp>
 
 namespace armnn
 {

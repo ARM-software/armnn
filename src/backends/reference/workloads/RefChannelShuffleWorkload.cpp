@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/test/DataTypeUtils.hpp>
 #include <armnn/backends/ITensorHandleFactory.hpp>
 #include <armnnUtils/Transpose.hpp>
 #include "RefChannelShuffleWorkload.hpp"

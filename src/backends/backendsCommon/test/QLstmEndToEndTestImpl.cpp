@@ -5,7 +5,7 @@
 
 #include "QLstmEndToEndTestImpl.hpp"
 
-#include "CommonTestUtils.hpp"
+#include <CommonTestUtils.hpp>
 #include "EndToEndTestImpl.hpp"
 
 #include <armnn/INetwork.hpp>

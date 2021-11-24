@@ -5,8 +5,8 @@
 
 #include "NeonWorkloadFactoryHelper.hpp"
 
-#include <test/TensorHelpers.hpp>
-#include <test/UnitTests.hpp>
+#include <TensorHelpers.hpp>
+#include <UnitTests.hpp>
 
 #include <neon/NeonLayerSupport.hpp>
 #include <neon/NeonWorkloadFactory.hpp>

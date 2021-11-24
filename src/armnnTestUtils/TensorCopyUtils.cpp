@@ -1,9 +1,9 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "TensorCopyUtils.hpp"
+#include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <Half.hpp>
 
 void CopyDataToITensorHandle(armnn::ITensorHandle* tensorHandle, const void* memory)

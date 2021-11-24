@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../TestUtils.hpp"
+#include <TestUtils.hpp>
 
 #include <BFloat16.hpp>
 #include <Optimizer.hpp>

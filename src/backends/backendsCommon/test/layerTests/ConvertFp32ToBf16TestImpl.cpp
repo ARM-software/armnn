@@ -5,10 +5,10 @@
 
 #include "ConvertFp32ToBf16TestImpl.hpp"
 
-#include <backendsCommon/test/TensorCopyUtils.hpp>
-#include <backendsCommon/test/WorkloadTestUtils.hpp>
+#include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <WorkloadTestUtils.hpp>
 
-#include <test/TensorHelpers.hpp>
+#include <TensorHelpers.hpp>
 
 LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
     armnn::IWorkloadFactory& workloadFactory,

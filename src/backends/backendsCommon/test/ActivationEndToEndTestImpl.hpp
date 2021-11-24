@@ -8,7 +8,9 @@
 
 #include <armnn/INetwork.hpp>
 #include <armnn/TypesUtils.hpp>
-#include <backendsCommon/test/CommonTestUtils.hpp>
+
+#include <CommonTestUtils.hpp>
+
 #include <ResolveType.hpp>
 
 namespace

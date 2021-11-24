@@ -54,6 +54,7 @@ add_subdirectory(samples)
 add_subdirectory(src/armnnTfLiteParser)
 add_subdirectory(src/armnnSerializer)
 add_subdirectory(src/armnnDeserializer)
+add_subdirectory(src/armnnTestUtils)
 
 
 if (BUILD_ARMNN_TFLITE_DELEGATE)
@@ -115,33 +116,6 @@ list(APPEND armnnUtils_sources
 
 add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
 target_include_directories(armnnUtils PRIVATE src/backends)
-
-# armnnTestUtils library provides useful test functions for backend developers.
-set(armnnTestUtils_sources)
-list(APPEND armnnTestUtils_sources
-     src/armnn/test/CreateWorkload.hpp
-     src/armnn/test/GraphUtils.hpp
-     src/armnn/test/GraphUtils.cpp
-     src/armnn/test/PredicateResult.hpp
-     src/armnn/test/TensorHelpers.hpp
-     src/armnn/test/TestUtils.hpp
-     src/armnn/test/TestUtils.cpp
-     src/armnn/test/UnitTests.hpp
-     src/backends/backendsCommon/test/CommonTestUtils.hpp
-     src/backends/backendsCommon/test/CommonTestUtils.cpp
-     src/backends/backendsCommon/test/DataLayoutUtils.hpp
-     src/backends/backendsCommon/test/DataTypeUtils.hpp
-     src/backends/backendsCommon/test/TensorCopyUtils.hpp
-     src/backends/backendsCommon/test/TensorCopyUtils.cpp
-     src/backends/backendsCommon/test/WorkloadTestUtils.hpp
-     src/backends/backendsCommon/test/layerTests/LayerTestResult.hpp
-     )
-
-add_library_ex(armnnTestUtils STATIC ${armnnTestUtils_sources})
-target_include_directories(armnnTestUtils PRIVATE src/armnn)
-target_include_directories(armnnTestUtils PRIVATE src/armnnUtils)
-target_include_directories(armnnTestUtils PRIVATE src/backends)
-target_include_directories(armnnTestUtils PRIVATE src/profiling)
 
 if(BUILD_ONNX_PARSER)
     set(armnn_onnx_parser_sources)
@@ -552,7 +526,6 @@ target_include_directories(armnn
 )
 
 target_link_libraries(armnn armnnUtils)
-target_link_libraries(armnn armnnTestUtils)
 # only link pipeCommon if it has been built
 if(BUILD_TIMELINE_DECODER)
     target_link_libraries(armnn pipeCommon)
@@ -591,11 +564,13 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/CloneTests.cpp
         src/armnn/test/ConstTensorLayerVisitor.hpp
         src/armnn/test/ConstTensorLayerVisitor.cpp
+        src/armnn/test/CreateWorkload.hpp
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/ExecutionFrameTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
         src/armnn/test/FlowControl.cpp
         src/armnn/test/GraphTests.cpp
+        src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/InferOutputTests.cpp
         src/armnn/test/InferOutputTests.hpp
@@ -625,11 +600,13 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp
         src/armnn/test/optimizations/TransposeAsReshapeTests.cpp
         src/armnn/test/OptionalTest.cpp
+        src/armnn/test/PredicateResult.hpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/ProfilingEventTest.cpp
         src/armnn/test/ShapeInferenceTests.cpp
         src/armnn/test/SubgraphViewTests.cpp
         src/armnn/test/TensorHandleStrategyTest.cpp
+        src/armnn/test/TensorHelpers.hpp
         src/armnn/test/TensorTest.cpp
         src/armnn/test/TestInputOutputLayerVisitor.cpp
         src/armnn/test/TestInputOutputLayerVisitor.hpp
@@ -637,9 +614,10 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/TestLayerVisitor.hpp
         src/armnn/test/TestNameOnlyLayerVisitor.cpp
         src/armnn/test/TestNameOnlyLayerVisitor.hpp
+        src/armnn/test/TestUtils.hpp
+        src/armnn/test/UnitTests.hpp
         src/armnn/test/TestNameAndDescriptorLayerVisitor.hpp
         src/armnn/test/TestNameAndDescriptorLayerVisitor.cpp
-        src/armnn/test/UnitTests.cpp
         src/armnn/test/UtilityTests.cpp
         src/armnn/test/UtilsTests.cpp
         src/armnnUtils/test/FloatingPointComparisonTest.cpp
@@ -866,6 +844,7 @@ if(BUILD_UNIT_TESTS)
     add_executable(UnitTests ${unittest_sources})
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
+    target_include_directories(UnitTests PRIVATE src/armnnTestUtils)
     target_include_directories(UnitTests PRIVATE src/backends)
     target_include_directories(UnitTests PRIVATE src/profiling)
 
@@ -1017,7 +996,6 @@ set(armnn_export_targets)
 list(APPEND armnn_export_targets
     armnn
     armnnUtils
-    armnnTestUtils
 )
 
 install(
@@ -1073,7 +1051,6 @@ export(
 
 add_library(Armnn::Armnn ALIAS armnn)
 add_library(Armnn::armnnUtils ALIAS armnnUtils)
-add_library(Armnn::armnnTestUtils ALIAS armnnTestUtils)
 
 ####################################################
 ## Build Python bindings

@@ -73,18 +73,6 @@ For FAQs and troubleshooting advice, see [FAQ.md](docs/FAQ.md)
 or take a look at previous [github issues](https://github.com/ARM-software/armnn/issues).
 
 
-## Note
-1. The following tools were removed in 21.05 release:
-    * TensorFlow Parser
-    * Caffe Parser
-    * Quantizer
-
-2. Ubuntu Linux 16.04 LTS is no longer supported from April 30, 2021.
-   As a result Ubuntu 16.04 LTS will no longer receive security patches or other software updates.
-   Consequently Arm NN, from the 21.08 Release at the end of August 2021, is no longer officially
-   supported on Ubuntu 16.04 LTS but will instead be supported on Ubuntu 18.04 LTS.
-
-
 ## How to get involved
 If you would like to get involved but don't know where to start, a good place to look is in our Github Issues.
 

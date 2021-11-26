@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="48f261526b77f61607478f3f809dd8647e626f2b" #Fixed build errors
+DEFAULT_CLFRAMEWORKREVISION="1d4a320b7c638936a8b4a5c55ac59c61f63791a1" #Fix node fusion mutator ordering
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

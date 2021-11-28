@@ -70,6 +70,7 @@ bool CheckInferenceTimeThreshold(const std::chrono::duration<double, std::milli>
 #if defined(ARMNN_TFLITE_DELEGATE)
 int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRuntime::CreationOptions runtimeOptions)
 {
+    // Build model and corresponding interpreter
     using namespace tflite;
 
     std::unique_ptr<tflite::FlatBufferModel> model = tflite::FlatBufferModel::BuildFromFile(params.m_ModelPath.c_str());
@@ -82,6 +83,8 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
     tfLiteInterpreter->AllocateTensors();
 
     int status = 0;
+
+    // Create & populate Armnn Delegate, then register it to TfLiteInterpreter
     if (params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate)
     {
         // Create the Armnn Delegate
@@ -105,12 +108,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
         std::cout << "Running on TfLite without ArmNN delegate\n";
     }
 
+    // Load (or generate) input data for inference
     armnn::Optional<std::string> dataFile = params.m_GenerateTensorData
                                             ? armnn::EmptyOptional()
                                             : armnn::MakeOptional<std::string>(params.m_InputTensorDataFilePaths[0]);
 
     const size_t numInputs = params.m_InputNames.size();
 
+    // Populate input tensor of interpreter
     for(unsigned int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
     {
         int input = tfLiteInterpreter->inputs()[inputIndex];
@@ -237,6 +242,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
         }
     }
 
+    // Run inference, print the output of the inference
     for (size_t x = 0; x < params.m_Iterations; x++)
     {
         // Start timer to record inference time in milliseconds.
@@ -245,9 +251,30 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
         status = tfLiteInterpreter->Invoke();
         const auto duration = armnn::GetTimeDuration(start_time);
 
-        // Print out the output
-        for (unsigned int outputIndex = 0; outputIndex < params.m_OutputNames.size(); ++outputIndex)
+        // The TFLite interpreter's outputs might be in a different order than the user inputted output names.
+        std::map<unsigned int, int> paramToTfliteOutputIndex;
+        for (unsigned int paramIndex = 0; paramIndex < params.m_OutputNames.size(); ++paramIndex)
         {
+            paramToTfliteOutputIndex[paramIndex] = -1;
+            for (unsigned int tfLiteIndex = 0; tfLiteIndex < tfLiteInterpreter->outputs().size(); ++tfLiteIndex)
+            {
+                if (params.m_OutputNames[paramIndex] == tfLiteInterpreter->GetOutputName(tfLiteIndex))
+                {
+                    paramToTfliteOutputIndex[paramIndex] = tfLiteIndex;
+                }
+            }
+        }
+
+        // Print out the output
+        for (unsigned int paramOutputIndex = 0; paramOutputIndex < params.m_OutputNames.size(); ++paramOutputIndex)
+        {
+            int outputIndex = paramToTfliteOutputIndex[paramOutputIndex];
+            if (outputIndex == -1)
+            {
+                std::cout << fmt::format("Output name: {} doesn't exist.", params.m_OutputNames[paramOutputIndex]) <<
+                std::endl;
+                continue;
+            }
             auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[outputIndex];
             TfLiteIntArray* outputDims = tfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
             // If we've been asked to write to a file then set a file output stream. Otherwise use stdout.
@@ -275,7 +302,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
                 outputSize *=  outputDims->data[dim];
             }
 
-            std::cout << params.m_OutputNames[outputIndex] << ": ";
+            std::cout << tfLiteInterpreter->GetOutputName(outputIndex) << ": ";
             if (params.m_OutputTypes[outputIndex].compare("float") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
@@ -439,7 +466,7 @@ int MainImpl(const ExecuteNetworkParams& params,
             std::vector<armnnUtils::TContainer> inputDataContainers;
             for(unsigned int i = 0; i < numInputs; ++i)
             {
-                // If there are less input files given than required for the execution of
+                // If there are fewer input files given than required for the execution of
                 // params.m_Iterations we simply start with the first input file again
                 size_t inputFileIndex = j * numInputs + i;
                 if (!params.m_InputTensorDataFilePaths.empty())

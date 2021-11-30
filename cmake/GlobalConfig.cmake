@@ -295,7 +295,7 @@ if(ARMCOMPUTECL)
     message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
 
     # Always use Arm compute library OpenCL headers
-    find_path(OPENCL_INCLUDE CL/cl2.hpp
+    find_path(OPENCL_INCLUDE CL/opencl.hpp
               PATHS ${ARMCOMPUTE_ROOT}/include
               NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 

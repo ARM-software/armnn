@@ -11,7 +11,6 @@
 
 #include <ISubgraphViewConverter.hpp>
 #include <SubgraphView.hpp>
-#include <optimizations/Optimization.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
@@ -89,8 +88,6 @@ public:
     /// This is the bridge between backend and backend profiling we'll keep it in the backend namespace.
     using IBackendProfilingContextPtr = std::shared_ptr<armnn::profiling::IBackendProfilingContext>;
     using IBackendProfilingPtr = std::unique_ptr<armnn::profiling::IBackendProfiling>;
-    using OptimizationPtr = std::unique_ptr<Optimization>;
-    using Optimizations = std::vector<OptimizationPtr>;
     using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
 
     using IBackendSpecificModelContextPtr = std::shared_ptr<IBackendModelContext>;

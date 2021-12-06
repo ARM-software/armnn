@@ -899,15 +899,13 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
-    // Create runtime
-    std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(ProgramOptions.m_RuntimeOptions));
-
     std::string modelFormat = ProgramOptions.m_ExNetParams.m_ModelFormat;
 
     // Forward to implementation based on the parser type
     if (modelFormat.find("armnn") != std::string::npos)
     {
     #if defined(ARMNN_SERIALIZER)
+        std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(ProgramOptions.m_RuntimeOptions));
         return MainImpl<armnnDeserializer::IDeserializer, float>(ProgramOptions.m_ExNetParams, runtime);
     #else
         ARMNN_LOG(fatal) << "Not built with serialization support.";
@@ -917,6 +915,7 @@ int main(int argc, const char* argv[])
     else if (modelFormat.find("onnx") != std::string::npos)
     {
     #if defined(ARMNN_ONNX_PARSER)
+        std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(ProgramOptions.m_RuntimeOptions));
         return MainImpl<armnnOnnxParser::IOnnxParser, float>(ProgramOptions.m_ExNetParams, runtime);
     #else
         ARMNN_LOG(fatal) << "Not built with Onnx parser support.";
@@ -928,10 +927,11 @@ int main(int argc, const char* argv[])
         if (ProgramOptions.m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteParser)
         {
             #if defined(ARMNN_TF_LITE_PARSER)
-                        return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(ProgramOptions.m_ExNetParams, runtime);
+                std::shared_ptr<armnn::IRuntime> runtime(armnn::IRuntime::Create(ProgramOptions.m_RuntimeOptions));
+                return MainImpl<armnnTfLiteParser::ITfLiteParser, float>(ProgramOptions.m_ExNetParams, runtime);
             #else
-                        ARMNN_LOG(fatal) << "Not built with Tensorflow-Lite parser support.";
-                        return EXIT_FAILURE;
+                ARMNN_LOG(fatal) << "Not built with Tensorflow-Lite parser support.";
+                return EXIT_FAILURE;
             #endif
         }
         else if (ProgramOptions.m_ExNetParams.m_TfLiteExecutor ==

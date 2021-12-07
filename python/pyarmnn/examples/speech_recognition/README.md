@@ -151,7 +151,7 @@ for i in range(features.shape[1]):
 # audio_utils.py
 # Quantize the input data and create input tensors with PyArmNN
 input_tensor = quantize_input(input_tensor, input_binding_info)
-input_tensors = ann.make_input_tensors([input_binding_info], [input_tensor])
+input_tensors = ann.make_input_tensors([input_binding_info], [input_data])
 ```
 
 Note: `ArmnnNetworkExecutor` has already created the output tensors for you.

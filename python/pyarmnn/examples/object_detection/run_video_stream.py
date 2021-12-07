@@ -9,20 +9,20 @@ and displays a window with the latest processed frame.
 
 import os
 import sys
+
 script_dir = os.path.dirname(__file__)
 sys.path.insert(1, os.path.join(script_dir, '..', 'common'))
 
 import cv2
 from argparse import ArgumentParser
-
 from ssd import ssd_processing, ssd_resize_factor
 from yolo import yolo_processing, yolo_resize_factor
-from utils import dict_labels
+from utils import dict_labels, Profiling
 from cv_utils import init_video_stream_capture, preprocess, draw_bounding_boxes
-from network_executor import ArmnnNetworkExecutor
+import style_transfer
 
 
-def get_model_processing(model_name: str, video: cv2.VideoCapture, input_binding_info: tuple):
+def get_model_processing(model_name: str, video: cv2.VideoCapture, input_data_shape: tuple):
     """
     Gets model-specific information such as model labels and decoding and processing functions.
     The user can include their own network and functions by adding another statement.
@@ -30,7 +30,7 @@ def get_model_processing(model_name: str, video: cv2.VideoCapture, input_binding
     Args:
         model_name: Name of type of supported model.
         video: Video capture object, contains information about data source.
-        input_binding_info: Contains shape of model input layer, used for scaling bounding boxes.
+        input_data_shape: Contains shape of model input layer, used for scaling bounding boxes.
 
     Returns:
         Model labels, decoding and processing functions.
@@ -38,18 +38,44 @@ def get_model_processing(model_name: str, video: cv2.VideoCapture, input_binding
     if model_name == 'ssd_mobilenet_v1':
         return ssd_processing, ssd_resize_factor(video)
     elif model_name == 'yolo_v3_tiny':
-        return yolo_processing, yolo_resize_factor(video, input_binding_info)
+        return yolo_processing, yolo_resize_factor(video, input_data_shape)
     else:
         raise ValueError(f'{model_name} is not a valid model name')
 
 
 def main(args):
-    video = init_video_stream_capture(args.video_source)
-    executor = ArmnnNetworkExecutor(args.model_file_path, args.preferred_backends)
 
+    enable_profile = args.profiling_enabled == "true"
+    action_profiler = Profiling(enable_profile)
+    action_profiler.profiling_start()
+
+    if args.tflite_delegate_path is not None:
+        from network_executor_tflite import TFLiteNetworkExecutor as NetworkExecutor
+        exec_input_args = (args.model_file_path, args.preferred_backends, args.tflite_delegate_path)
+    else:
+        from network_executor import ArmnnNetworkExecutor as NetworkExecutor
+        exec_input_args = (args.model_file_path, args.preferred_backends)
+
+    executor = NetworkExecutor(*exec_input_args)
+    action_profiler.profiling_stop_and_print_us("Executor initialization")
+
+    action_profiler.profiling_start()
+    video = init_video_stream_capture(args.video_source)
+    action_profiler.profiling_stop_and_print_us("Video initialization")
     model_name = args.model_name
-    process_output, resize_factor = get_model_processing(args.model_name, video, executor.input_binding_info)
+    process_output, resize_factor = get_model_processing(args.model_name, video, executor.get_shape())
     labels = dict_labels(args.label_path, include_rgb=True)
+
+    if all(element is not None for element in [args.style_predict_model_file_path,
+                                               args.style_transfer_model_file_path,
+                                               args.style_image_path, args.style_transfer_class]):
+        style_image = cv2.imread(args.style_image_path)
+        action_profiler.profiling_start()
+        style_transfer_executor = style_transfer.StyleTransfer(args.style_predict_model_file_path,
+                                                               args.style_transfer_model_file_path,
+                                                               style_image, args.preferred_backends,
+                                                               args.tflite_delegate_path)
+        action_profiler.profiling_stop_and_print_us("Style Transfer Executor initialization")
 
     while True:
         frame_present, frame = video.read()
@@ -57,14 +83,26 @@ def main(args):
         if not frame_present:
             raise RuntimeError('Error reading frame from video stream')
 
+        action_profiler.profiling_start()
         if model_name == "ssd_mobilenet_v1":
-            input_tensors = preprocess(frame, executor.input_binding_info, True)
+            input_data = preprocess(frame, executor.get_data_type(), executor.get_shape(), True)
         else:
-            input_tensors = preprocess(frame, executor.input_binding_info, False)
-        print("Running inference...")
-        output_result = executor.run(input_tensors)
+            input_data = preprocess(frame, executor.get_data_type(), executor.get_shape(), False)
+
+        output_result = executor.run([input_data])
+        if not enable_profile:
+            print("Running inference...")
+        action_profiler.profiling_stop_and_print_us("Running inference...")
         detections = process_output(output_result)
-        draw_bounding_boxes(frame, detections, resize_factor, labels)
+        if all(element is not None for element in [args.style_predict_model_file_path,
+                                                   args.style_transfer_model_file_path,
+                                                   args.style_image_path, args.style_transfer_class]):
+            action_profiler.profiling_start()
+            frame = style_transfer.create_stylized_detection(style_transfer_executor, args.style_transfer_class,
+                                                             frame, detections, resize_factor, labels)
+            action_profiler.profiling_stop_and_print_us("Running Style Transfer")
+        else:
+            draw_bounding_boxes(frame, detections, resize_factor, labels)
         cv2.imshow('PyArmNN Object Detection Demo', frame)
         if cv2.waitKey(1) == 27:
             print('\nExit key activated. Closing video...')
@@ -86,5 +124,21 @@ if __name__ == '__main__':
                         help='Takes the preferred backends in preference order, separated by whitespace, '
                              'for example: CpuAcc GpuAcc CpuRef. Accepted options: [CpuAcc, CpuRef, GpuAcc]. '
                              'Defaults to [CpuAcc, CpuRef]')
+    parser.add_argument('--tflite_delegate_path', type=str,
+                        help='Enter TensorFlow Lite Delegate file path (.so file). If not entered,'
+                             'will use armnn executor')
+    parser.add_argument('--profiling_enabled', type=str,
+                        help='[OPTIONAL] Enabling this option will print important ML related milestones timing'
+                             'information in micro-seconds. By default, this option is disabled.'
+                             'Accepted options are true/false.')
+    parser.add_argument('--style_predict_model_file_path', type=str,
+                        help='Path to the style prediction model to use')
+    parser.add_argument('--style_transfer_model_file_path', type=str,
+                        help='Path to the style transfer model to use')
+    parser.add_argument('--style_image_path', type=str,
+                        help='Path to the style image to create stylized frames')
+    parser.add_argument('--style_transfer_class', type=str,
+                        help='A class to transform its style')
+
     args = parser.parse_args()
     main(args)

@@ -1,4 +1,4 @@
-# Copyright © 2020-2021 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020-2022 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 """
@@ -11,29 +11,35 @@ import os
 import cv2
 import numpy as np
 
-import pyarmnn as ann
 
-
-def preprocess(frame: np.ndarray, input_binding_info: tuple, is_normalised: bool):
+def preprocess(frame: np.ndarray, input_data_type, input_data_shape: tuple, is_normalised: bool,
+               keep_aspect_ratio: bool=True):
     """
     Takes a frame, resizes, swaps channels and converts data type to match
-    model input layer. The converted frame is wrapped in a const tensor
-    and bound to the input tensor.
+    model input layer.
 
     Args:
         frame: Captured frame from video.
-        input_binding_info:  Contains shape and data type of model input layer.
+        input_data_type:  Contains data type of model input layer.
+        input_data_shape: Contains shape of model input layer.
         is_normalised: if the input layer expects normalised data
+        keep_aspect_ratio: Network executor's input data aspect ratio
 
     Returns:
         Input tensor.
     """
-    # Swap channels and resize frame to model resolution
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    resized_frame = resize_with_aspect_ratio(frame, input_binding_info)
 
+    if keep_aspect_ratio:
+        # Swap channels and resize frame to model resolution
+        resized_frame = resize_with_aspect_ratio(frame, input_data_shape)
+    else:
+        # select the height and width from input_data_shape
+        frame_height = input_data_shape[1]
+        frame_width = input_data_shape[2]
+        resized_frame = cv2.resize(frame, (frame_width, frame_height))
     # Expand dimensions and convert data type to match model input
-    if input_binding_info[1].GetDataType() == ann.DataType_Float32:
+    if np.float32 == input_data_type:
         data_type = np.float32
         if is_normalised:
             resized_frame = resized_frame.astype("float32")/255
@@ -41,26 +47,24 @@ def preprocess(frame: np.ndarray, input_binding_info: tuple, is_normalised: bool
         data_type = np.uint8
 
     resized_frame = np.expand_dims(np.asarray(resized_frame, dtype=data_type), axis=0)
-    assert resized_frame.shape == tuple(input_binding_info[1].GetShape())
+    assert resized_frame.shape == input_data_shape
 
-    input_tensors = ann.make_input_tensors([input_binding_info], [resized_frame])
-    return input_tensors
-
+    return resized_frame
 
 
-def resize_with_aspect_ratio(frame: np.ndarray, input_binding_info: tuple):
+def resize_with_aspect_ratio(frame: np.ndarray, input_data_shape: tuple):
     """
     Resizes frame while maintaining aspect ratio, padding any empty space.
 
     Args:
         frame: Captured frame.
-        input_binding_info: Contains shape of model input layer.
+        input_data_shape: Contains shape of model input layer.
 
     Returns:
         Frame resized to the size of model input layer.
     """
     aspect_ratio = frame.shape[1] / frame.shape[0]
-    model_height, model_width = list(input_binding_info[1].GetShape())[1:3]
+    _, model_height, model_width, _ = input_data_shape
 
     if aspect_ratio >= 1.0:
         new_height, new_width = int(model_width / aspect_ratio), model_width
@@ -173,14 +177,14 @@ def draw_bounding_boxes(frame: np.ndarray, detections: list, resize_factor, labe
 
         # Create label for detected object class
         label = f'{label} {confidence * 100:.1f}%'
-        label_color = (0, 0, 0) if sum(color)>200 else (255, 255, 255)
+        label_color = (0, 0, 0) if sum(color) > 200 else (255, 255, 255)
 
         # Make sure label always stays on-screen
         x_text, y_text = cv2.getTextSize(label, cv2.FONT_HERSHEY_DUPLEX, 1, 1)[0][:2]
 
         lbl_box_xy_min = (x_min, y_min if y_min<25 else y_min - y_text)
         lbl_box_xy_max = (x_min + int(0.55 * x_text), y_min + y_text if y_min<25 else y_min)
-        lbl_text_pos = (x_min + 5, y_min + 16 if y_min<25 else y_min - 5)
+        lbl_text_pos = (x_min + 5, y_min + 16 if y_min < 25 else y_min - 5)
 
         # Add label and confidence value
         cv2.rectangle(frame, lbl_box_xy_min, lbl_box_xy_max, color, -1)
@@ -190,3 +194,19 @@ def draw_bounding_boxes(frame: np.ndarray, detections: list, resize_factor, labe
 
 def get_source_encoding_int(video_capture):
     return int(video_capture.get(cv2.CAP_PROP_FOURCC))
+
+
+def crop_bounding_box_object(input_frame: np.ndarray, x_min: float, y_min: float, x_max: float, y_max: float):
+    """
+        Creates a cropped image based on x and y coordinates.
+
+        Args:
+            input_frame: Image to crop
+            x_min, y_min, x_max, y_max: Coordinates of the bounding box
+
+        Returns:
+            Cropped image
+    """
+    # Adding +1 to exclude the bounding box pixels.
+    cropped_image = input_frame[int(y_min) + 1:int(y_max), int(x_min) + 1:int(x_max)]
+    return cropped_image

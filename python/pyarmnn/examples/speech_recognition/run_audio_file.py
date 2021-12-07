@@ -12,7 +12,7 @@ sys.path.insert(1, os.path.join(script_dir, '..', 'common'))
 
 from argparse import ArgumentParser
 from network_executor import ArmnnNetworkExecutor
-from utils import prepare_input_tensors
+from utils import prepare_input_data
 from audio_capture import AudioCaptureParams, capture_audio
 from audio_utils import decode_text, display_text
 from wav2letter_mfcc import Wav2LetterMFCC, W2LAudioPreprocessor
@@ -78,10 +78,11 @@ def main(args):
     print("Processing Audio Frames...")
     for audio_data in buffer:
         # Prepare the input Tensors
-        input_tensors = prepare_input_tensors(audio_data, network.input_binding_info, preprocessor)
+        input_data = prepare_input_data(audio_data, network.get_data_type(), network.get_input_quantization_scale(0),
+                                        network.get_input_quantization_offset(0), preprocessor)
 
         # Run inference
-        output_result = network.run(input_tensors)
+        output_result = network.run([input_data])
 
         # Slice and Decode the text, and store the right context
         current_r_context, text = decode_text(is_first_window, labels, output_result)

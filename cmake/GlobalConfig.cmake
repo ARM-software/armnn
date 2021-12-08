@@ -35,6 +35,9 @@ option(BUILD_PIPE_ONLY "Build the PIPE libraries only" OFF)
 option(BUILD_ARMNN_TFLITE_DELEGATE "Build the Arm NN TfLite delegate" OFF)
 option(BUILD_MEMORY_STRATEGY_BENCHMARK "Build the MemoryBenchmark" OFF)
 option(BUILD_BARE_METAL "Disable features requiring operating system support" OFF)
+option(BUILD_SHARED_LIBS "Determines if Armnn will be built statically or dynamically.
+                          This is an experimental feature and not fully supported.
+                          Only the ArmNN core and the Delegate can be built statically." ON)
 
 include(SelectLibraryConfigurations)
 

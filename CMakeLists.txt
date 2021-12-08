@@ -60,13 +60,6 @@ add_subdirectory(src/armnnSerializer)
 add_subdirectory(src/armnnDeserializer)
 add_subdirectory(src/armnnTestUtils)
 
-
-if (BUILD_ARMNN_TFLITE_DELEGATE)
-    set(ARMNN_SUB_PROJECT ON)
-    add_subdirectory(delegate)
-    add_definitions(-DARMNN_TF_LITE_DELEGATE)
-endif()
-
 if (BUILD_TESTS)
     add_subdirectory(tests)
 endif()
@@ -443,20 +436,35 @@ foreach(lib ${armnnLibraries})
     list(APPEND armnn_sources $<TARGET_OBJECTS:${lib}>)
 endforeach()
 
+# The delegate needs to be placed after armnnLibraries has been fully populated. The armnn_delegate_jni library
+# requires a static armnn build.
+# Explanation:
+# Because backends are added as object libraries they won't be linked to armnn when building armnn statically.
+# A target that uses a static armnn library has to link to the object libraries in the variable armnnLibraries
+# manually to include all symbols from backends.
+if (BUILD_ARMNN_TFLITE_DELEGATE)
+    set(ARMNN_SUB_PROJECT ON)
+    set(ARMNN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    add_subdirectory(delegate)
+    add_definitions(-DARMNN_TF_LITE_DELEGATE)
+endif()
+
 if(BUILD_BARE_METAL)
     add_library_ex(armnn STATIC ${armnn_sources})
 else()
-    add_library_ex(armnn SHARED ${armnn_sources})
+    if (BUILD_SHARED_LIBS)
+        add_library_ex(armnn SHARED ${armnn_sources})
+    else()
+        add_library(armnn ${armnn_sources})
+    endif()
 endif()
 
 target_compile_definitions(armnn PRIVATE "ARMNN_COMPILING_DLL")
 
 # Generate a map file for debug mode only
-if(CMAKE_BUILD_TYPE MATCHES debug)
-    set_property(TARGET armnn APPEND_STRING PROPERTY
+set_property(TARGET armnn APPEND_STRING PROPERTY
         LINK_FLAGS " -Wl,-Map=libarmnnMapFile.map")
-    message(STATUS "Linker will generate mapfile " )
-endif()
+message(STATUS "Linker will generate mapfile ")
 
 target_include_directories(armnn
     PUBLIC

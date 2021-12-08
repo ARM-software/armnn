@@ -1,0 +1,15 @@
+/*
+ Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+ SPDX-License-Identifier: MIT
+*/
+
+LIBARMNN_DELEGATE_JNI {
+global:
+    Java_com_arm_armnn_delegate_ArmnnDelegate_createDelegate;
+    Java_com_arm_armnn_delegate_ArmnnDelegate_deleteDelegate;
+    Java_com_arm_armnn_delegate_ArmnnUtils_IsGpuAccSupported;
+    Java_com_arm_armnn_delegate_ArmnnUtils_IsNeonDetected;
+local:
+    *;
+
+};

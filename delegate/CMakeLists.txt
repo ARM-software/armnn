@@ -54,7 +54,7 @@ list(APPEND armnnDelegate_sources
         src/Unpack.hpp
         src/Transpose.hpp)
 
-add_library(armnnDelegate SHARED ${armnnDelegate_sources})
+add_library(armnnDelegate ${armnnDelegate_sources})
 
 target_include_directories(armnnDelegate
         PUBLIC
@@ -252,6 +252,12 @@ if(BUILD_UNIT_TESTS)
     target_link_libraries(DelegateUnitTests PRIVATE flatbuffer_headers)
     target_link_libraries(DelegateUnitTests PRIVATE profiling_library_headers)
 
+endif()
+
+option(BUILD_DELEGATE_JNI_INTERFACE "Builds a library to allow accessing the Arm NN delegate from Java code.
+                                     This is an experimental feature." Off)
+if(BUILD_DELEGATE_JNI_INTERFACE)
+    add_subdirectory(armnnDelegateJNI)
 endif()
 
 ####################################################

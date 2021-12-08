@@ -169,7 +169,8 @@ struct OptimizerOptions
         stream << "OptimizerOptions: \n";
         stream << "\tReduceFp32ToFp16: " << m_ReduceFp32ToFp16 << "\n";
         stream << "\tReduceFp32ToBf16: " << m_ReduceFp32ToBf16 << "\n";
-        stream << "\tDebug: " <<
+        stream << "\tDebug: " << m_Debug << "\n";
+        stream << "\tShapeInferenceMethod: " <<
         (m_shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly ? "ValidateOnly" : "InferAndValidate") << "\n";
         stream << "\tImportEnabled: " << m_ImportEnabled << "\n";
         stream << "\tProfilingEnabled: " << m_ProfilingEnabled << "\n";
@@ -180,9 +181,9 @@ struct OptimizerOptions
             for (size_t i=0; i < optionsGroup.GetOptionCount(); i++)
             {
                 const armnn::BackendOptions::BackendOption option = optionsGroup.GetOption(i);
-                stream << "\t\tBackend: "  << optionsGroup.GetBackendId()
-                       << "\t\t\tOption: " << option.GetName()
-                       << "\t\t\tValue: "  << std::string(option.GetValue().ToString());
+                stream << "\t\tBackend: "  << optionsGroup.GetBackendId() << "\n"
+                       << "\t\t\tOption: " << option.GetName() << "\n"
+                       << "\t\t\tValue: "  << std::string(option.GetValue().ToString()) << "\n";
             }
         }
 

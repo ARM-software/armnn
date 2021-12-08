@@ -47,7 +47,7 @@
 bool CheckInferenceTimeThreshold(const std::chrono::duration<double, std::milli>& duration,
                                  const double& thresholdTime)
 {
-    ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+    ARMNN_LOG(info) << "Inference time: " << std::setprecision(2)
                     << std::fixed << duration.count() << " ms\n";
     // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
     if (thresholdTime != 0.0)

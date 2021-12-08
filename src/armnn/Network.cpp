@@ -1614,7 +1614,7 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                               const OptimizerOptions& options,
                               Optional<std::vector<std::string>&> messages)
 {
-    ARMNN_LOG(info) << options.ToString();
+    ARMNN_LOG(debug) << options.ToString();
 
     // Enable profiling
     auto profiler = inNetwork.pNetworkImpl->GetGraph().GetProfiler();

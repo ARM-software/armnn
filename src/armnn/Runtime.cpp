@@ -502,7 +502,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
 
 RuntimeImpl::~RuntimeImpl()
 {
-    const auto start_time = armnn::GetTimeNow();
+    const auto startTime = armnn::GetTimeNow();
     std::vector<int> networkIDs;
     try
     {
@@ -547,7 +547,7 @@ RuntimeImpl::~RuntimeImpl()
 
     BackendRegistryInstance().SetProfilingService(armnn::EmptyOptional());
     ARMNN_LOG(info) << "Shutdown time: " << std::setprecision(2)
-                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms\n";
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
 }
 
 LoadedNetwork* RuntimeImpl::GetLoadedNetworkPtr(NetworkId networkId) const
@@ -589,6 +589,8 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
                                 const InputTensors& inputTensors,
                                 const OutputTensors& outputTensors)
 {
+    const auto startTime = armnn::GetTimeNow();
+
     LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
 
     if (!loadedNetwork)
@@ -615,7 +617,12 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
     }
     lastId=networkId;
 
-    return loadedNetwork->EnqueueWorkload(inputTensors, outputTensors);
+    auto status = loadedNetwork->EnqueueWorkload(inputTensors, outputTensors);
+
+    ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
+
+    return status;
 }
 
 Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
@@ -624,6 +631,8 @@ Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
                             std::vector<ImportedInputId> preImportedInputs,
                             std::vector<ImportedOutputId> preImportedOutputs)
 {
+    const auto startTime = armnn::GetTimeNow();
+
     NetworkId networkId = iWorkingMemHandle.GetNetworkId();
     LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
 
@@ -641,11 +650,16 @@ Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
 
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
 
-    return loadedNetwork->Execute(inputTensors,
-                                  outputTensors,
-                                  iWorkingMemHandle,
-                                  preImportedInputs,
-                                  preImportedOutputs);
+    auto status = loadedNetwork->Execute(inputTensors,
+                                         outputTensors,
+                                         iWorkingMemHandle,
+                                         preImportedInputs,
+                                         preImportedOutputs);
+
+    ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
+
+    return status;
 }
 
 /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have

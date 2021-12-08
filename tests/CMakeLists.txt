@@ -133,7 +133,11 @@ if (BUILD_ONNX_PARSER)
     OnnxParserTest(OnnxMobileNet-Armnn "${OnnxMobileNet-Armnn_sources}")
 endif()
 
-if (BUILD_ARMNN_SERIALIZER OR BUILD_TF_PARSER OR BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER)
+if (BUILD_ARMNN_SERIALIZER
+        OR BUILD_TF_PARSER
+        OR BUILD_TF_LITE_PARSER
+        OR BUILD_ONNX_PARSER
+        OR BUILD_ARMNN_TFLITE_DELEGATE)
     set(ExecuteNetwork_sources
         ExecuteNetwork/ExecuteNetwork.cpp
         ExecuteNetwork/ExecuteNetworkProgramOptions.cpp

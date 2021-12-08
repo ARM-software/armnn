@@ -40,6 +40,7 @@
 #include "Unpack.hpp"
 
 #include <armnnUtils/Filesystem.hpp>
+#include <armnn/utility/Timer.hpp>
 #include <flatbuffers/flatbuffers.h>
 #include <tensorflow/lite/context_util.h>
 #include <tensorflow/lite/schema/schema_generated.h>
@@ -281,6 +282,9 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
                                      const TfLiteDelegateParams* parameters,
                                      const Delegate* delegate)
 {
+    const auto startTime = armnn::GetTimeNow();
+    ARMNN_LOG(info) << "ArmnnSubgraph creation";
+
     TfLiteIntArray* executionPlan;
     if (tfLiteContext->GetExecutionPlan(tfLiteContext, &executionPlan) != kTfLiteOk)
     {
@@ -308,6 +312,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     }
 
     // Parse TfLite delegate nodes to ArmNN
+    const auto parseStartTime = armnn::GetTimeNow();
     for (int i = 0; i < parameters->nodes_to_replace->size; ++i)
     {
         const int nodeIndex = parameters->nodes_to_replace->data[i];
@@ -325,6 +330,8 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
             throw armnn::Exception(&"TfLiteArmnnDelegate: Unable to parse node: " [ nodeIndex]);
         }
     }
+    ARMNN_LOG(info) << "Parse nodes to ArmNN time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(parseStartTime).count() << " ms";
 
     // Add Output layer
     status = AddOutputLayer(delegateData, tfLiteContext, parameters->output_tensors, outputBindings);
@@ -337,10 +344,13 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     armnn::IOptimizedNetworkPtr optNet(nullptr, nullptr);
     try
     {
+        const auto optimizeStartTime = armnn::GetTimeNow();
         optNet = armnn::Optimize(*(delegateData.m_Network.get()),
                                  delegate->m_Options.GetBackends(),
                                  delegate->m_Runtime->GetDeviceSpec(),
                                  delegate->m_Options.GetOptimizerOptions());
+        ARMNN_LOG(info) << "Optimize ArmnnSubgraph time: " << std::setprecision(2)
+                        << std::fixed << armnn::GetTimeDuration(optimizeStartTime).count() << " ms";
     }
     catch (std::exception &ex)
     {
@@ -358,6 +368,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     const std::string serializeToDotFile = delegate->m_Options.GetSerializeToDot();
     if (!serializeToDotFile.empty())
     {
+        ARMNN_LOG(info) << "Writing graph to dot file: " << serializeToDotFile;
         fs::path filename = serializeToDotFile;
         std::fstream file(filename.c_str(), std::ios_base::out);
         optNet->SerializeToDot(file);
@@ -365,6 +376,8 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
 
     try
     {
+        const auto loadStartTime = armnn::GetTimeNow();
+
         // Load graph into runtime
         std::string errorMessage;
         armnn::Status loadingStatus;
@@ -387,6 +400,9 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
             // Network load failed.
             throw armnn::Exception("TfLiteArmnnDelegate: Network could not be loaded:" + errorMessage);
         }
+
+        ARMNN_LOG(info) << "Load ArmnnSubgraph time: " << std::setprecision(2)
+                        << std::fixed << armnn::GetTimeDuration(loadStartTime).count() << " ms";
     }
     catch (std::exception& ex)
     {
@@ -400,6 +416,9 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     {
         delegate->m_Runtime->RegisterDebugCallback(networkId, delegate->m_Options.GetDebugCallbackFunction().value());
     }
+
+    ARMNN_LOG(info) << "Overall ArmnnSubgraph creation time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
 
     // Create a new SubGraph with networkId and runtime
     return new ArmnnSubgraph(networkId, delegate->m_Runtime.get(), inputBindings, outputBindings);

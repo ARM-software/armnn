@@ -10,10 +10,10 @@
 
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <TensorHelpers.hpp>
 

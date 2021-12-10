@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/Descriptors.hpp>
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>

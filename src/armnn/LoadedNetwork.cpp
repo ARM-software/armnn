@@ -15,9 +15,9 @@
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Assert.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
-#include <backendsCommon/MemCopyWorkload.hpp>
+#include <armnn/backends/MemCopyWorkload.hpp>
 #include <backendsCommon/MemSyncWorkload.hpp>
 #include <armnn/BackendHelper.hpp>
 

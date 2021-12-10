@@ -15,10 +15,8 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/utility/TransformIterator.hpp>
 
-#include <backendsCommon/WorkloadFactory.hpp>
-#include <backendsCommon/TensorHandle.hpp>
-
-//#include <WorkloadTestUtils.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <sstream>
 

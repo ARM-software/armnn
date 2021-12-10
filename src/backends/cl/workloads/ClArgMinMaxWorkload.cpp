@@ -8,7 +8,7 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <armnnUtils/TensorUtils.hpp>
 #include <armnn/utility/NumericCast.hpp>

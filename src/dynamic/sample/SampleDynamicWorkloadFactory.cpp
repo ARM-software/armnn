@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/MemCopyWorkload.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/MemCopyWorkload.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include "SampleDynamicAdditionWorkload.hpp"
 #include "SampleDynamicBackend.hpp"

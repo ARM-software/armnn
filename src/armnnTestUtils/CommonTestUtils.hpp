@@ -13,9 +13,8 @@
 #include <ResolveType.hpp>
 
 #include <armnn/BackendRegistry.hpp>
-
 #include <armnn/Types.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <algorithm>
 #include <random>

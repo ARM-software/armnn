@@ -10,7 +10,7 @@
 #include <ResolveType.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> SimpleTransposeConvolution2dTest(

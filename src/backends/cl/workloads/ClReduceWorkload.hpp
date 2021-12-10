@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLReductionOperation.h>
 

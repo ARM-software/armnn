@@ -6,8 +6,8 @@
 #pragma once
 
 #include <armnn/Types.hpp>
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/Workload.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 #include "BaseIterator.hpp"
 #include "ElementwiseFunction.hpp"
 #include "Maximum.hpp"

@@ -5,7 +5,7 @@
 
 #include "ClFullyConnectedWorkload.hpp"
 #include <cl/ClTensorHandle.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <cl/ClLayerSupport.hpp>

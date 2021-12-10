@@ -7,7 +7,7 @@
 
 #include "LstmUtils.hpp"
 #include "BaseIterator.hpp"
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 
 // Helper functions ported from the Android code base

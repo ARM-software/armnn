@@ -7,8 +7,8 @@
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/LstmParams.hpp>
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/Workload.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 #include "arm_compute/graph/Tensor.h"
 #include "arm_compute/runtime/NEON/functions/NEQLSTMLayer.h"

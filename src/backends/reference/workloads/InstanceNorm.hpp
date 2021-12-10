@@ -8,7 +8,7 @@
 #include "Encoders.hpp"
 #include "Decoders.hpp"
 
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {

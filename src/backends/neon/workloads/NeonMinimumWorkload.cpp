@@ -7,7 +7,7 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 namespace armnn
 {

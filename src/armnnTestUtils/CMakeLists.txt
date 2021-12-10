@@ -10,6 +10,7 @@ list(APPEND armnnTestUtils_sources
         ../../include/armnnTestUtils/LayerTestResult.hpp
         ../../include/armnnTestUtils/PredicateResult.hpp
         ../../include/armnnTestUtils/TensorCopyUtils.hpp
+        ../../include/armnnTestUtils/WorkloadTestUtils.hpp
         TensorHelpers.hpp
         CreateWorkload.hpp
         CommonTestUtils.cpp
@@ -22,7 +23,6 @@ list(APPEND armnnTestUtils_sources
         TestUtils.hpp
         UnitTests.cpp
         UnitTests.hpp
-        WorkloadTestUtils.hpp
         )
 
 add_library_ex(armnnTestUtils SHARED ${armnnTestUtils_sources})

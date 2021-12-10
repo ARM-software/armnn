@@ -8,8 +8,8 @@
 #include "Decoders.hpp"
 #include "Encoders.hpp"
 
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/Workload.hpp>
 
 namespace armnn
 {

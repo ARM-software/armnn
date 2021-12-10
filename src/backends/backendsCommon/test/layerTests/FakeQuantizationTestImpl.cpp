@@ -6,10 +6,10 @@
 #include "FakeQuantizationTestImpl.hpp"
 
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <TensorHelpers.hpp>
 

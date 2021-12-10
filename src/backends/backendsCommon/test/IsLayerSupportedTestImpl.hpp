@@ -8,7 +8,7 @@
 
 #include <backendsCommon/MapWorkload.hpp>
 #include <backendsCommon/UnmapWorkload.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
 

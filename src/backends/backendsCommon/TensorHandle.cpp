@@ -5,7 +5,7 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <cstring>
 

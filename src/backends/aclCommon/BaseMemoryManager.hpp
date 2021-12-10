@@ -5,7 +5,7 @@
 #pragma once
 
 #include <armnn/backends/IMemoryManager.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 #include <arm_compute/runtime/MemoryGroup.h>

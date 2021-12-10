@@ -6,9 +6,9 @@
 
 #include "Optimization.hpp"
 
+#include <armnn/backends/TensorHandle.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
 
 namespace armnn
 {

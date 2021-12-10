@@ -10,7 +10,7 @@
 #include <aclCommon/ArmComputeUtils.hpp>
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEArithmeticAddition.h>
 

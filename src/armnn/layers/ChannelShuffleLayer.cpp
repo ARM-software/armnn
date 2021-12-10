@@ -9,8 +9,8 @@
 
 #include  <armnn/TypesUtils.hpp>
 
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/Workload.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 namespace armnn
 {

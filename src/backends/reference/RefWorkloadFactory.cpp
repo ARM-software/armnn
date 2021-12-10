@@ -3,10 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 #include <Layer.hpp>
-#include <backendsCommon/MemCopyWorkload.hpp>
+#include <armnn/backends/MemCopyWorkload.hpp>
 #include <backendsCommon/MemImportWorkload.hpp>
 #include <backendsCommon/MakeWorkloadHelper.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include "RefWorkloadFactory.hpp"
 #include "RefBackendId.hpp"
 #include "workloads/RefWorkloads.hpp"

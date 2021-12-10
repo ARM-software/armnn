@@ -4,10 +4,10 @@
 //
 #pragma once
 
-#include "Workload.hpp"
 #include "WorkloadUtils.hpp"
 
 #include <armnn/backends/TensorHandleFwd.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <utility>
 

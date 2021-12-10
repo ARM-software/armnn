@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <armnn/Exceptions.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <reference/workloads/RefWorkloads.hpp>
 #include <reference/RefWorkloadFactory.hpp>

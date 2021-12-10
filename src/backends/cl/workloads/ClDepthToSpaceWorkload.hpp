@@ -7,7 +7,7 @@
 
 #include <armnn/Descriptors.hpp>
 
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLDepthToSpaceLayer.h>
 

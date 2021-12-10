@@ -8,7 +8,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 #include <arm_compute/core/Types.h>
 #include <arm_compute/runtime/FunctionDescriptors.h>

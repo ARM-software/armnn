@@ -7,7 +7,7 @@
 
 #include <armnn/backends/ITensorHandle.hpp>
 #include <backendsCommon/WorkloadDataCollector.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 namespace armnn
 {

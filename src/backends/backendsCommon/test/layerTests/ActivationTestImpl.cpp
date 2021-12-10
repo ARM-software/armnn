@@ -10,7 +10,7 @@
 
 #include <backendsCommon/test/ActivationFixture.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 #include <reference/test/RefWorkloadFactoryHelper.hpp>
 
 #include <armnn/utility/NumericCast.hpp>

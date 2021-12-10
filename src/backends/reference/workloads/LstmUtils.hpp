@@ -6,7 +6,7 @@
 #pragma once
 
 #include "BaseIterator.hpp"
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 // Helper functions ported from the Android code base
 // Refer to: android/external/tensorflow/tensorflow/contrib/lite/kernels/internal/reference/portable_tensor_utils.cc

@@ -7,7 +7,7 @@
 
 #include "RefWorkloadUtils.hpp"
 
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 

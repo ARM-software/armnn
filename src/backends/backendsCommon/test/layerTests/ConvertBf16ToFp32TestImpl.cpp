@@ -6,7 +6,7 @@
 #include "ConvertBf16ToFp32TestImpl.hpp"
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <TensorHelpers.hpp>
 

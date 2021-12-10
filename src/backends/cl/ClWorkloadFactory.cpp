@@ -18,9 +18,9 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <backendsCommon/MakeWorkloadHelper.hpp>
-#include <backendsCommon/MemCopyWorkload.hpp>
+#include <armnn/backends/MemCopyWorkload.hpp>
 #include <backendsCommon/MemImportWorkload.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <cl/ClTensorHandle.hpp>
 #include <cl/workloads/ClWorkloads.hpp>

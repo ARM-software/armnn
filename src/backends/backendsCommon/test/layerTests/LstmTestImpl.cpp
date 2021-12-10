@@ -9,10 +9,10 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <reference/workloads/Decoders.hpp>
 #include <reference/workloads/Encoders.hpp>

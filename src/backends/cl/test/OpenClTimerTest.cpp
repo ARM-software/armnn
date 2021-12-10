@@ -9,15 +9,15 @@
 
 #include <TensorHelpers.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 #include <cl/ClContextControl.hpp>
 #include <cl/ClWorkloadFactory.hpp>
 #include <cl/OpenClTimer.hpp>
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <arm_compute/runtime/CL/CLScheduler.h>
 

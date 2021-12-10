@@ -8,15 +8,15 @@
 
 #include <TensorHelpers.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 #include <neon/NeonTimer.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
 
 #include <backendsCommon/test/LayerTests.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <doctest/doctest.h>
 

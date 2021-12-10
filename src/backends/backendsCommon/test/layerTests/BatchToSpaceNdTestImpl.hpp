@@ -8,13 +8,13 @@
 #include <ResolveType.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 #include <armnnTestUtils/LayerTestResult.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <DataTypeUtils.hpp>
 #include <TensorHelpers.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 namespace
 {

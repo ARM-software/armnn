@@ -10,7 +10,7 @@
 #include <armnn/Types.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<float,   5> SimpleMaxPooling3dSize2x2x2Stride1x1x1Test(
     armnn::IWorkloadFactory& workloadFactory,

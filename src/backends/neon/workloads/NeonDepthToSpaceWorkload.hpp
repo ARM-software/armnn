@@ -7,7 +7,7 @@
 
 #include <armnn/Descriptors.hpp>
 
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEDepthToSpaceLayer.h>
 

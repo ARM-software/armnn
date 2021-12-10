@@ -7,7 +7,7 @@
 
 #include "LayerCloneBase.hpp"
 
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <armnn/TypesUtils.hpp>
 

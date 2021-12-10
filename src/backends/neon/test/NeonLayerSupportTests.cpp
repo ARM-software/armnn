@@ -9,7 +9,7 @@
 #include <layers/ConvertFp32ToFp16Layer.hpp>
 #include <TensorHelpers.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <neon/NeonWorkloadFactory.hpp>
 #include <backendsCommon/test/IsLayerSupportedTestImpl.hpp>
 #include <backendsCommon/test/LayerTests.hpp>

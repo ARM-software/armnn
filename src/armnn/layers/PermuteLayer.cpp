@@ -11,8 +11,8 @@
 
 #include <armnnUtils/Permute.hpp>
 
-#include <backendsCommon/WorkloadData.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadData.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 namespace armnn
 {

@@ -5,7 +5,6 @@
 #pragma once
 
 #include "TensorHelpers.hpp"
-#include "WorkloadTestUtils.hpp"
 
 #include <armnn/Logging.hpp>
 #include <armnn/Utils.hpp>
@@ -16,6 +15,7 @@
 
 #include <armnnTestUtils/LayerTestResult.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <doctest/doctest.h>
 

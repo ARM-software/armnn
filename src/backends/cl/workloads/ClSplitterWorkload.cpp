@@ -10,7 +10,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <cl/ClTensorHandle.hpp>
 
 

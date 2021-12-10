@@ -12,9 +12,9 @@
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <cl/ClTensorHandle.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLDepthwiseConvolutionLayer.h>
 

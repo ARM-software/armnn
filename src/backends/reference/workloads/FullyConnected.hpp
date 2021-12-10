@@ -9,7 +9,7 @@
 #include "Decoders.hpp"
 #include "Encoders.hpp"
 #include <armnn/Tensor.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {

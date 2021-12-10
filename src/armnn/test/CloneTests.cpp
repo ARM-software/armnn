@@ -10,9 +10,8 @@
 #include <armnn/Exceptions.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-
-#include <backendsCommon/TensorHandle.hpp>
 #include <backendsCommon/WorkloadFactoryBase.hpp>
 
 #include <doctest/doctest.h>

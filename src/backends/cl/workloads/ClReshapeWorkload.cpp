@@ -5,7 +5,7 @@
 
 #include "ClReshapeWorkload.hpp"
 #include <cl/ClTensorHandle.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include "ClWorkloadUtils.hpp"
 

@@ -8,7 +8,7 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
 #include <cl/ClTensorHandle.hpp>
 

@@ -5,8 +5,10 @@
 
 #include <ResolveType.hpp>
 
-#include <backendsCommon/MemCopyWorkload.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include "WorkloadUtils.hpp"
+
+#include <armnn/backends/MemCopyWorkload.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 

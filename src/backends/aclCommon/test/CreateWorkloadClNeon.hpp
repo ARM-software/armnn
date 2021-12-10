@@ -7,7 +7,7 @@
 #include <CreateWorkload.hpp>
 #include <armnnTestUtils/PredicateResult.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/MemCopyWorkload.hpp>
+#include <armnn/backends/MemCopyWorkload.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 #include <reference/RefTensorHandle.hpp>
 

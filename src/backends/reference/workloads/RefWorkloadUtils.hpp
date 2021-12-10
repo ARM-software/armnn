@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>

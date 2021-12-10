@@ -7,8 +7,8 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/Workload.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {

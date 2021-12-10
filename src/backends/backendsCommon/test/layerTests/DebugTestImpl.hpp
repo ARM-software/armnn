@@ -10,7 +10,7 @@
 #include <BFloat16.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<float, 4> Debug4dFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,

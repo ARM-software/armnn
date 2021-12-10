@@ -14,7 +14,7 @@
 
 #include <neon/NeonLayerSupport.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <backendsCommon/WorkloadUtils.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEDepthwiseConvolutionLayer.h>

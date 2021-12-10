@@ -8,8 +8,8 @@
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 using namespace armnnUtils;
 

@@ -6,7 +6,7 @@
 #include "ClBatchToSpaceNdWorkload.hpp"
 
 #include <cl/ClTensorHandle.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <armnn/utility/NumericCast.hpp>

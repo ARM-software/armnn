@@ -8,7 +8,7 @@
 
 #include <TensorHelpers.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <reference/RefWorkloadFactory.hpp>
 #include <reference/RefLayerSupport.hpp>
 #include <backendsCommon/test/LayerTests.hpp>

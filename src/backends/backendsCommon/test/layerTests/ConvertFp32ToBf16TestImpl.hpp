@@ -10,7 +10,7 @@
 #include <BFloat16.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
     armnn::IWorkloadFactory& workloadFactory,

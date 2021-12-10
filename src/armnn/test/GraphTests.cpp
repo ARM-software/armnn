@@ -14,7 +14,7 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 #include <doctest/doctest.h>

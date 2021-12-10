@@ -8,7 +8,7 @@
 #include <armnnTestUtils/LayerTestResult.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 // Float32 tests
 LayerTestResult<float, 4> Slice4dFloat32Test(armnn::IWorkloadFactory& workloadFactory,

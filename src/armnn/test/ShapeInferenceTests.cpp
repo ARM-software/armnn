@@ -9,8 +9,8 @@
 #include <Graph.hpp>
 #include <InternalTypes.hpp>
 #include <layers/FullyConnectedLayer.hpp>
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 #include <string>
 

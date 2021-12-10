@@ -12,7 +12,7 @@
 #include <armnn/Types.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<float, 4> InstanceNormFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,

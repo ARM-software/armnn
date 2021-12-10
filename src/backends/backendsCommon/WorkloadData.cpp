@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/WorkloadData.hpp>
+#include <armnn/backends/WorkloadInfo.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 #include <armnn/utility/NumericCast.hpp>

@@ -6,7 +6,7 @@
 #pragma once
 
 #include "LayerWithParameters.hpp"
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 #include <armnn/Descriptors.hpp>
 

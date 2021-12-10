@@ -20,7 +20,7 @@
 #include <armnn/backends/IBackendInternal.hpp>
 
 #include <backendsCommon/LayerSupportBase.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <doctest/doctest.h>
 

@@ -12,8 +12,8 @@
 #include "BackendSettings.hpp"
 #include "optimizations/All.hpp"
 
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 

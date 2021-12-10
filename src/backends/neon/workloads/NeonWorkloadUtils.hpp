@@ -4,11 +4,11 @@
 //
 #pragma once
 
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonTensorHandle.hpp>
 #include <neon/NeonTimer.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <armnn/Utils.hpp>
 

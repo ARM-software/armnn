@@ -11,7 +11,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>

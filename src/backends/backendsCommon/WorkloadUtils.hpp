@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include "TensorHandle.hpp"
-
 #include <armnn/backends/ITensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnUtils/Permute.hpp>

@@ -8,7 +8,7 @@
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 using namespace armnnUtils;
 

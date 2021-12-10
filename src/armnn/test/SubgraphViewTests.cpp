@@ -11,7 +11,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <fstream>
 #include <map>
 #include <queue>

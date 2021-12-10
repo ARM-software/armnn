@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/TypesUtils.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 #include "Encoders.hpp"
 #include "Decoders.hpp"

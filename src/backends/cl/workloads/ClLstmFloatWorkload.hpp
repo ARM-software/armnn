@@ -7,8 +7,8 @@
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/LstmParams.hpp>
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/Workload.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 #include <arm_compute/runtime/CL/functions/CLLSTMLayer.h>
 

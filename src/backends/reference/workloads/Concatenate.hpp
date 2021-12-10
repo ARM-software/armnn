@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 #include <armnn/Tensor.hpp>
 
 namespace armnn

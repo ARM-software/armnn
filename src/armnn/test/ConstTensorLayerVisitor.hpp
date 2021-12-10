@@ -10,7 +10,7 @@
 #include <armnn/LstmParams.hpp>
 #include <armnn/QuantizedLstmParams.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <doctest/doctest.h>
 

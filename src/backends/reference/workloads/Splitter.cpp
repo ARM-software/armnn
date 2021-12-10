@@ -4,7 +4,7 @@
 //
 
 #include "RefWorkloadUtils.hpp"
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/utility/Assert.hpp>
 #include "Splitter.hpp"

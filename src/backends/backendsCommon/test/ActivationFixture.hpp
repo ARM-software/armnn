@@ -5,7 +5,7 @@
 #pragma once
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <WorkloadTestUtils.hpp>
+#include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <armnn/utility/NumericCast.hpp>
 

@@ -10,7 +10,7 @@
 #include <ResolveType.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 template<typename T , std::size_t n>
 LayerTestResult<int32_t, 1> ShapeTest(

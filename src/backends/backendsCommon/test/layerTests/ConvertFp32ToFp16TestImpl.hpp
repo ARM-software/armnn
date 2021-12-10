@@ -10,7 +10,7 @@
 #include <Half.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<armnn::Half, 4> SimpleConvertFp32ToFp16Test(
     armnn::IWorkloadFactory& workloadFactory,

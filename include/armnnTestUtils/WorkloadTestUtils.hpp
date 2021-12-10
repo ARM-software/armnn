@@ -8,8 +8,8 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadInfo.hpp>
+#include <armnn/backends/Workload.hpp>
+#include <armnn/backends/WorkloadInfo.hpp>
 
 namespace armnn
 {

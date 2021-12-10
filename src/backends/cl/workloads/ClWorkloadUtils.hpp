@@ -8,7 +8,7 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <cl/OpenClTimer.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <armnn/Utils.hpp>
 

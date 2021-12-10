@@ -12,8 +12,8 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/IMemoryOptimizerStrategy.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
-#include <backendsCommon/Workload.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/Workload.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 #include <backendsCommon/DefaultAllocator.hpp>
 #include <backendsCommon/MemoryManager.hpp>
 #include <backendsCommon/memoryOptimizerStrategyLibrary/strategies/SingleAxisPriorityList.hpp>

@@ -9,7 +9,7 @@
 #include <Half.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<uint8_t, 4> SpaceToDepthNchwAsymmQ8Test(
     armnn::IWorkloadFactory& workloadFactory,

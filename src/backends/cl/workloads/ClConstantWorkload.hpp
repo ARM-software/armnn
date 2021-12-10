@@ -6,7 +6,7 @@
 #pragma once
 
 #include <arm_compute/core/Error.h>
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 
 #include <arm_compute/core/CL/CLCompileContext.h>
 

@@ -6,7 +6,7 @@
 #pragma once
 
 #include <cl/ClContextControl.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 template<bool ProfilingEnabled>
 struct ClContextControlFixtureBase

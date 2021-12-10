@@ -10,7 +10,7 @@
 #include <Half.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<float, 1> Gather1dParamsFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,

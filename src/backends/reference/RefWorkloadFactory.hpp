@@ -7,7 +7,7 @@
 #include "RefMemoryManager.hpp"
 
 #include <armnn/Optional.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 

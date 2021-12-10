@@ -8,7 +8,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 
 #include <arm_compute/runtime/NEON/functions/NEConv3D.h>

@@ -7,7 +7,7 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
 #include <armnn/IRuntime.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 // Requires the OpenCl backend to be included (GpuAcc)
 #include <cl/ClBackend.hpp>
 #include <doctest/doctest.h>

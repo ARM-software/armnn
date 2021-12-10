@@ -6,7 +6,7 @@
 #include "ClMultiplicationWorkload.hpp"
 
 #include <aclCommon/ArmComputeUtils.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <cl/ClTensorHandle.hpp>
 

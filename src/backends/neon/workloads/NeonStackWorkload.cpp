@@ -8,7 +8,7 @@
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <neon/NeonTensorHandle.hpp>
 
 namespace armnn

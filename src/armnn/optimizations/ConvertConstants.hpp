@@ -8,9 +8,7 @@
 #include "Optimization.hpp"
 
 #include <armnnUtils/FloatingPointConverter.hpp>
-
-#include <backendsCommon/TensorHandle.hpp>
-
+#include <armnn/backends/TensorHandle.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <BFloat16.hpp>

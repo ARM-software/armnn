@@ -6,7 +6,7 @@
 
 #include <armnn/StrategyBase.hpp>
 #include <armnn/Descriptors.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 namespace armnn
 {

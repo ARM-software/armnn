@@ -11,7 +11,7 @@
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
 #include <arm_compute/runtime/CL/functions/CLSoftmaxLayer.h>
 
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/Workload.hpp>
 
 namespace armnn
 {

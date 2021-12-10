@@ -7,7 +7,7 @@
 #include <Network.hpp>
 #include <TestUtils.hpp>
 #include <doctest/doctest.h>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <Optimizer.hpp>
 
 TEST_SUITE("Optimizer")

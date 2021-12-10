@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <backendsCommon/WorkloadData.hpp>
-#include <backendsCommon/Workload.hpp>
+#include <armnn/backends/WorkloadData.hpp>
+#include <armnn/backends/Workload.hpp>
 #include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/core/Error.h>
 

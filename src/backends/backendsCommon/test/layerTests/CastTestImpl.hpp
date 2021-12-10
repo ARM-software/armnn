@@ -10,7 +10,7 @@
 #include <ResolveType.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 #include <Half.hpp>
 
 template<armnn::DataType inputDataType, armnn::DataType outputDataType,

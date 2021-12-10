@@ -7,8 +7,8 @@
 #include "Graph.hpp"
 #include <ProfilingService.hpp>
 #include <armnn/utility/NumericCast.hpp>
-#include <backendsCommon/TensorHandle.hpp>
-#include <backendsCommon/WorkloadData.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/WorkloadData.hpp>
 
 #include <fmt/format.h>
 

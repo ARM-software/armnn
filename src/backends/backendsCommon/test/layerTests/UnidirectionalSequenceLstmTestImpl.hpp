@@ -8,7 +8,7 @@
 #include <armnnTestUtils/LayerTestResult.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
-#include <backendsCommon/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,

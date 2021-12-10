@@ -6,7 +6,7 @@
 #include <ResolveType.hpp>
 
 #include <backendsCommon/MemImportWorkload.hpp>
-#include <backendsCommon/TensorHandle.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <cstring>
 

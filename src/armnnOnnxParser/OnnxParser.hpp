@@ -203,7 +203,7 @@ private:
     /// Map of the tensor names to their node and index in graph.node()
     std::unordered_map<std::string, std::pair<const onnx::NodeProto*, int>> m_OutputsMap;
 
-    /// Number of times a specific node (identified by his index number) was used as input
+    /// Number of times a specific node (identified by its index number) was used as input
     /// and list of the nodes it was fused with
     struct UsageSummary
     {

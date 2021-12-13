@@ -53,6 +53,8 @@ public:
 
     virtual LayerGuid GetOwningLayerGuid() const = 0;
 
+    virtual const IConnectableLayer& GetOwningIConnectableLayer() const = 0;
+
 protected:
     /// Not user deletable.
     ~IOutputSlot() {}

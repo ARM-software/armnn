@@ -18,7 +18,7 @@ You can also verify it by running the following and getting output similar to be
 
 ```bash
 $ python -c "import pyarmnn as ann;print(ann.GetVersion())"
-'27.0.0'
+'28.0.0'
 ```
 
 ### Dependencies

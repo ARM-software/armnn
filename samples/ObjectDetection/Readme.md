@@ -168,10 +168,10 @@ From the build directory, copy the following to the host platform:
 The full list of libs after cross-compilation to copy on your board:
 ```
 libarmnn.so
-libarmnn.so.27
-libarmnn.so.27.0
+libarmnn.so.28
+libarmnn.so.28.0
 libarmnnTfLiteParser.so
-libarmnnTfLiteParser.so.24.3
+libarmnnTfLiteParser.so.24.4
 libavcodec.so
 libavcodec.so.58
 libavcodec.so.58.54.100

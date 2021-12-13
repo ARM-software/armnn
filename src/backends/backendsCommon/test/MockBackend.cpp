@@ -130,21 +130,21 @@ OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph
     OptimizationViews optimizationViews;
 
     // Get the layers of the input sub-graph
-    const SubgraphView::Layers& subgraphLayers = subgraph.GetLayers();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraph.GetIConnectableLayers();
 
     // Parse the layers
-    SubgraphView::Layers supportedLayers;
-    SubgraphView::Layers unsupportedLayers;
-    SubgraphView::Layers untouchedLayers;
+    SubgraphView::IConnectableLayers supportedLayers;
+    SubgraphView::IConnectableLayers unsupportedLayers;
+    SubgraphView::IConnectableLayers untouchedLayers;
     std::for_each(subgraphLayers.begin(),
                   subgraphLayers.end(),
-                  [&](Layer* layer)
+                  [&](IConnectableLayer* layer)
     {
-        bool supported = IsLayerSupported(layer);
+        bool supported = IsLayerSupported(PolymorphicDowncast<Layer*>(layer));
         if (supported)
         {
             // Layer supported, check if it's optimizable
-            bool optimizable = IsLayerOptimizable(layer);
+            bool optimizable = IsLayerOptimizable(PolymorphicDowncast<Layer*>(layer));
             if (optimizable)
             {
                 // Layer fully supported

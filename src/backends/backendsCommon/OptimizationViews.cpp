@@ -17,24 +17,28 @@ bool OptimizationViews::Validate(const armnn::SubgraphView& originalSubgraph) co
     bool valid = true;
 
     // Create a copy of the layer list from the original subgraph and sort it
-    SubgraphView::Layers originalLayers = originalSubgraph.GetLayers();
+    SubgraphView::IConnectableLayers originalLayers = originalSubgraph.GetIConnectableLayers();
     originalLayers.sort();
 
     // Create a new list based on the sum of all the subgraphs and sort it
-    SubgraphView::Layers countedLayers;
+    SubgraphView::IConnectableLayers countedLayers;
     for (auto& failed : m_FailedOptimizations)
     {
-        countedLayers.insert(countedLayers.end(), failed.GetLayers().begin(), failed.GetLayers().end());
+        countedLayers.insert(countedLayers.end(),
+                             failed.GetIConnectableLayers().begin(),
+                             failed.GetIConnectableLayers().end());
     }
     for (auto& untouched : m_UntouchedSubgraphs)
     {
-        countedLayers.insert(countedLayers.end(), untouched.GetLayers().begin(), untouched.GetLayers().end());
+        countedLayers.insert(countedLayers.end(),
+                             untouched.GetIConnectableLayers().begin(),
+                             untouched.GetIConnectableLayers().end());
     }
     for (auto& successful : m_SuccesfulOptimizations)
     {
         countedLayers.insert(countedLayers.end(),
-                             successful.m_SubstitutableSubgraph.GetLayers().begin(),
-                             successful.m_SubstitutableSubgraph.GetLayers().end());
+                             successful.m_SubstitutableSubgraph.GetIConnectableLayers().begin(),
+                             successful.m_SubstitutableSubgraph.GetIConnectableLayers().end());
     }
     countedLayers.sort();
 
@@ -56,8 +60,8 @@ bool OptimizationViews::Validate(const armnn::SubgraphView& originalSubgraph) co
             bool validSubstitution = true;
             const SubgraphView& replacement = substitution.m_ReplacementSubgraph;
             const SubgraphView& old = substitution.m_SubstitutableSubgraph;
-            validSubstitution &= replacement.GetInputSlots().size() == old.GetInputSlots().size();
-            validSubstitution &= replacement.GetOutputSlots().size() == old.GetOutputSlots().size();
+            validSubstitution &= replacement.GetIInputSlots().size() == old.GetIInputSlots().size();
+            validSubstitution &= replacement.GetIOutputSlots().size() == old.GetIOutputSlots().size();
             valid &= validSubstitution;
         }
     }

@@ -480,4 +480,9 @@ void Layer::ExecuteStrategy(IStrategy& strategy) const
     strategy.ExecuteStrategy(this, BaseDescriptor(), {}, GetName());
 }
 
+const IConnectableLayer& OutputSlot::GetOwningIConnectableLayer() const
+{
+    return m_OwningLayer;
+}
+
 } // namespace armnn

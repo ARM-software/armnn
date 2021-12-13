@@ -56,6 +56,18 @@ std::vector<SlotType*> ConvertReferenceTypeToPointerType(const std::vector<SlotT
     return output;
 }
 
+// Convert from vector of Slots* (Input/Output) to vector of ISlots* (IInput/IOutput)
+template <typename SlotType, typename ResultSlotType>
+std::vector<ResultSlotType*> ConvertSlotsToISlots(const std::vector<SlotType*> input)
+{
+    std::vector<ResultSlotType*> output;
+    for (auto slot : input)
+    {
+        output.push_back(PolymorphicDowncast<ResultSlotType*>(slot));
+    }
+    return output;
+}
+
 // Convenience function to add an input layer to a graph
 Layer* AddInputLayer(Graph& graph,
                      const std::string& layerName,
@@ -125,19 +137,20 @@ AdditionLayer* AddAdditionaLayer(Graph& graph,
 void CheckSubstitution(const OptimizationViews::SubstitutionPair& substitution,
                        const ExpectedSubgraphSize& expectedSubstitutableSubgraphSize,
                        const ExpectedSubgraphSize& expectedReplacementSubgraphSize,
-                       const SubgraphView::InputSlots& expectedSubstitutableInputSlots,
-                       const SubgraphView::OutputSlots& expectedSubstitutableOutputSlots,
-                       const SubgraphView::Layers& expectedSubstitutableLayers)
+                       const SubgraphView::IInputSlots& expectedSubstitutableInputSlots,
+                       const SubgraphView::IOutputSlots& expectedSubstitutableOutputSlots,
+                       const SubgraphView::IConnectableLayers& expectedSubstitutableLayers)
 {
-    const SubgraphView&              substitutableSubgraph            = substitution.m_SubstitutableSubgraph;
-    const SubgraphView::InputSlots&  substitutableSubgraphInputSlots  = substitutableSubgraph.GetInputSlots();
-    const SubgraphView::OutputSlots& substitutableSubgraphOutputSlots = substitutableSubgraph.GetOutputSlots();
-    const SubgraphView::Layers&      substitutableSubgraphLayers      = substitutableSubgraph.GetLayers();
+    const SubgraphView& substitutableSubgraph = substitution.m_SubstitutableSubgraph;
+    const SubgraphView::IInputSlots& substitutableSubgraphInputSlots = substitutableSubgraph.GetIInputSlots();
+    const SubgraphView::IOutputSlots& substitutableSubgraphOutputSlots = substitutableSubgraph.GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& substitutableSubgraphLayers =
+            substitutableSubgraph.GetIConnectableLayers();
 
-    const SubgraphView&              replacementSubgraph            = substitution.m_ReplacementSubgraph;
-    const SubgraphView::InputSlots&  replacementSubgraphInputSlots  = replacementSubgraph.GetInputSlots();
-    const SubgraphView::OutputSlots& replacementSubgraphOutputSlots = replacementSubgraph.GetOutputSlots();
-    const SubgraphView::Layers&      replacementSubgraphLayers      = replacementSubgraph.GetLayers();
+    const SubgraphView& replacementSubgraph                          = substitution.m_ReplacementSubgraph;
+    const SubgraphView::IInputSlots& replacementSubgraphInputSlots   = replacementSubgraph.GetIInputSlots();
+    const SubgraphView::IOutputSlots& replacementSubgraphOutputSlots = replacementSubgraph.GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& replacementSubgraphLayers = replacementSubgraph.GetIConnectableLayers();
 
     CHECK(substitutableSubgraphInputSlots.size()  == expectedSubstitutableSubgraphSize.m_NumInputSlots);
     CHECK(substitutableSubgraphOutputSlots.size() == expectedSubstitutableSubgraphSize.m_NumOutputSlots);
@@ -157,7 +170,7 @@ void CheckSubstitution(const OptimizationViews::SubstitutionPair& substitution,
 
     CHECK(std::all_of(replacementSubgraphLayers.begin(),
                            replacementSubgraphLayers.end(),
-                           [](const Layer* layer)
+                           [](const IConnectableLayer* layer)
     {
         return layer->GetType() == LayerType::PreCompiled;
     }));
@@ -166,13 +179,13 @@ void CheckSubstitution(const OptimizationViews::SubstitutionPair& substitution,
 // Convenience function to check that the given failed subgraph matches the specified expected values
 void CheckFailedSubgraph(const SubgraphView& failedSubgraph,
                          const ExpectedSubgraphSize& expectedFailedSubgraphSize,
-                         const SubgraphView::InputSlots& expectedFailedInputSlots,
-                         const SubgraphView::OutputSlots& expectedFailedOutputSlots,
-                         const SubgraphView::Layers& expectedFailedLayers)
+                         const SubgraphView::IInputSlots& expectedFailedInputSlots,
+                         const SubgraphView::IOutputSlots& expectedFailedOutputSlots,
+                         const SubgraphView::IConnectableLayers& expectedFailedLayers)
 {
-    const SubgraphView::InputSlots&  failedSubgraphInputSlots  = failedSubgraph.GetInputSlots();
-    const SubgraphView::OutputSlots& failedSubgraphOutputSlots = failedSubgraph.GetOutputSlots();
-    const SubgraphView::Layers&      failedSubgraphLayers      = failedSubgraph.GetLayers();
+    const SubgraphView::IInputSlots&  failedSubgraphInputSlots  = failedSubgraph.GetIInputSlots();
+    const SubgraphView::IOutputSlots& failedSubgraphOutputSlots = failedSubgraph.GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& failedSubgraphLayers = failedSubgraph.GetIConnectableLayers();
 
     CHECK(failedSubgraphInputSlots.size()  == expectedFailedSubgraphSize.m_NumInputSlots);
     CHECK(failedSubgraphOutputSlots.size() == expectedFailedSubgraphSize.m_NumOutputSlots);
@@ -186,13 +199,13 @@ void CheckFailedSubgraph(const SubgraphView& failedSubgraph,
 // Convenience function to check that the given untouched subgraph matches the specified expected values
 void CheckUntouchedSubgraph(const SubgraphView& untouchedSubgraph,
                             const ExpectedSubgraphSize& expectedUntouchedSubgraphSize,
-                            const SubgraphView::InputSlots& expectedUntouchedInputSlots,
-                            const SubgraphView::OutputSlots& expectedUntouchedOutputSlots,
-                            const SubgraphView::Layers& expectedUntouchedLayers)
+                            const SubgraphView::IInputSlots& expectedUntouchedInputSlots,
+                            const SubgraphView::IOutputSlots& expectedUntouchedOutputSlots,
+                            const SubgraphView::IConnectableLayers& expectedUntouchedLayers)
 {
-    const SubgraphView::InputSlots&  untouchedSubgraphInputSlots  = untouchedSubgraph.GetInputSlots();
-    const SubgraphView::OutputSlots& untouchedSubgraphOutputSlots = untouchedSubgraph.GetOutputSlots();
-    const SubgraphView::Layers&      untouchedSubgraphLayers      = untouchedSubgraph.GetLayers();
+    const SubgraphView::IInputSlots& untouchedSubgraphInputSlots = untouchedSubgraph.GetIInputSlots();
+    const SubgraphView::IOutputSlots& untouchedSubgraphOutputSlots = untouchedSubgraph.GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& untouchedSubgraphLayers = untouchedSubgraph.GetIConnectableLayers();
 
     CHECK(untouchedSubgraphInputSlots.size()  == expectedUntouchedSubgraphSize.m_NumInputSlots);
     CHECK(untouchedSubgraphOutputSlots.size() == expectedUntouchedSubgraphSize.m_NumOutputSlots);
@@ -552,9 +565,9 @@ void FullyUnsupporteSubgraphTestImpl1()
     SubgraphView::SubgraphViewPtr subgraphPtr = BuildFullyUnsupportedSubgraph1(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
     CHECK(subgraphInputSlots.size()  == 1);
     CHECK(subgraphOutputSlots.size() == 1);
@@ -616,9 +629,9 @@ void FullyUnsupporteSubgraphTestImpl2()
     SubgraphView::SubgraphViewPtr subgraphPtr = BuildFullyUnsupportedSubgraph2(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
     CHECK(subgraphInputSlots.size()  == 1);
     CHECK(subgraphOutputSlots.size() == 1);
@@ -659,7 +672,7 @@ void FullyUnsupporteSubgraphTestImpl2()
     const OptimizationViews::Subgraphs& failedSubgraphs = optimizationViews.GetFailedSubgraphs();
     CHECK(failedSubgraphs.size() == 1);
 
-    std::list<Layer*> expectedFailedLayers{ layersInGraph.at("pooling1 layer"),
+    std::list<IConnectableLayer*> expectedFailedLayers{ layersInGraph.at("pooling1 layer"),
                                             layersInGraph.at("pooling2 layer"),
                                             layersInGraph.at("pooling3 layer") };
 
@@ -671,7 +684,7 @@ void FullyUnsupporteSubgraphTestImpl2()
                         subgraphOutputSlots,
                         subgraphLayers);
 
-    const SubgraphView::Layers& failedSubgraphLayers = failedSubgraph.GetLayers();
+    const SubgraphView::IConnectableLayers& failedSubgraphLayers = failedSubgraph.GetIConnectableLayers();
 
     CHECK_EQ(failedSubgraphLayers.front() + 0, expectedFailedLayers.front() + 0);
     CHECK_EQ(failedSubgraphLayers.front() + 1, expectedFailedLayers.front() + 1);
@@ -694,9 +707,9 @@ void FullyOptimizableSubgraphTestImpl1()
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph1(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
     CHECK(subgraphInputSlots.size()  == 1);
     CHECK(subgraphOutputSlots.size() == 1);
@@ -759,13 +772,13 @@ void FullyOptimizableSubgraphTestImpl2()
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph2(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
-    CHECK(subgraphPtr->GetInputSlots().size()  == 1);
-    CHECK(subgraphPtr->GetOutputSlots().size() == 1);
-    CHECK(subgraphPtr->GetLayers().size()      == 5);
+    CHECK(subgraphPtr->GetIInputSlots().size()  == 1);
+    CHECK(subgraphPtr->GetIOutputSlots().size() == 1);
+    CHECK(subgraphPtr->GetIConnectableLayers().size() == 5);
 
     CHECK(Contains(layersInGraph, "conv1 layer"));
     CHECK(Contains(layersInGraph, "conv2 layer"));
@@ -798,7 +811,7 @@ void FullyOptimizableSubgraphTestImpl2()
     const OptimizationViews::Substitutions& substitutions = optimizationViews.GetSubstitutions();
     CHECK(substitutions.size() == 1);
 
-    std::list<Layer*> expectedSubstitutableLayers{ layersInGraph.at("conv1 layer"),
+    std::list<IConnectableLayer*> expectedSubstitutableLayers{ layersInGraph.at("conv1 layer"),
                                                    layersInGraph.at("conv2 layer"),
                                                    layersInGraph.at("conv3 layer"),
                                                    layersInGraph.at("conv4 layer"),
@@ -813,7 +826,8 @@ void FullyOptimizableSubgraphTestImpl2()
                       subgraphOutputSlots,
                       expectedSubstitutableLayers);
 
-    const SubgraphView::Layers& substitutableSubgraphLayers = substitution.m_SubstitutableSubgraph.GetLayers();
+    const SubgraphView::IConnectableLayers& substitutableSubgraphLayers =
+            substitution.m_SubstitutableSubgraph.GetIConnectableLayers();
 
     CHECK_EQ(substitutableSubgraphLayers.front() + 0, expectedSubstitutableLayers.front() + 0);
     CHECK_EQ(substitutableSubgraphLayers.front() + 1, expectedSubstitutableLayers.front() + 1);
@@ -845,9 +859,9 @@ void PartiallySupportedSubgraphTestImpl()
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallySupportedSubgraph(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
     CHECK(subgraphInputSlots.size()  == 1);
     CHECK(subgraphOutputSlots.size() == 1);
@@ -885,25 +899,30 @@ void PartiallySupportedSubgraphTestImpl()
     CHECK(substitutions.size() == 2);
     // Sort into a consistent order
     std::sort(substitutions.begin(), substitutions.end(), [](auto s1, auto s2) {
-        return strcmp(s1.m_SubstitutableSubgraph.GetLayers().front()->GetName(),
-                      s2.m_SubstitutableSubgraph.GetLayers().front()->GetName()) < 0;
+        return strcmp(s1.m_SubstitutableSubgraph.GetIConnectableLayers().front()->GetName(),
+                      s2.m_SubstitutableSubgraph.GetIConnectableLayers().front()->GetName()) < 0;
     });
 
     std::vector<ExpectedSubgraphSize> expectedSubstitutableSubgraphSizes{ { 1, 1, 1 },
                                                                           { 1, 1, 1 } };
     std::vector<ExpectedSubgraphSize> expectedReplacementSubgraphSizes{ { 1, 1, 1 },
                                                                         { 1, 1, 1 } };
-    std::vector<SubgraphView::InputSlots> expectedSubstitutableInputSlots
+    std::vector<SubgraphView::IInputSlots> expectedSubstitutableInputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetInputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer")->GetInputSlots())
+            ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetInputSlots())),
+            ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer")->GetInputSlots()))
     };
-    std::vector<SubgraphView::OutputSlots> expectedSubstitutableOutputSlots
+
+    std::vector<SubgraphView::IOutputSlots> expectedSubstitutableOutputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetOutputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer")->GetOutputSlots())
+        ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+                ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetOutputSlots())),
+        ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+                ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer")->GetOutputSlots()))
     };
-    std::vector<SubgraphView::Layers> expectedSubstitutableLayers
+    std::vector<SubgraphView::IConnectableLayers> expectedSubstitutableLayers
     {
         { layersInGraph.at("conv1 layer") },
         { layersInGraph.at("conv2 layer") }
@@ -927,22 +946,27 @@ void PartiallySupportedSubgraphTestImpl()
     CHECK(failedSubgraphs.size() == 2);
     // Sort into a consistent order
     std::sort(failedSubgraphs.begin(), failedSubgraphs.end(), [](auto s1, auto s2) {
-        return strcmp(s1.GetLayers().front()->GetName(), s2.GetLayers().front()->GetName()) < 0;
+        return strcmp(s1.GetIConnectableLayers().front()->GetName(),
+                      s2.GetIConnectableLayers().front()->GetName()) < 0;
     });
 
     std::vector<ExpectedSubgraphSize> expectedFailedSubgraphSizes{ { 1, 1, 2 },
                                                                    { 1, 1, 1 } };
-    std::vector<SubgraphView::InputSlots> expectedFailedInputSlots
+    std::vector<SubgraphView::IInputSlots> expectedFailedInputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling1 layer")->GetInputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling3 layer")->GetInputSlots())
+        ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling1 layer")->GetInputSlots())),
+        ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling3 layer")->GetInputSlots()))
     };
-    std::vector<SubgraphView::OutputSlots> expectedFailedOutputSlots
+    std::vector<SubgraphView::IOutputSlots> expectedFailedOutputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling2 layer")->GetOutputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling3 layer")->GetOutputSlots())
+        ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling2 layer")->GetOutputSlots())),
+        ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("pooling3 layer")->GetOutputSlots()))
     };
-    std::vector<SubgraphView::Layers> expectedFailedLayers
+    std::vector<SubgraphView::IConnectableLayers> expectedFailedLayers
     {
         { layersInGraph.at("pooling1 layer"),
           layersInGraph.at("pooling2 layer") },
@@ -975,9 +999,9 @@ void FullyUnoptimizableSubgraphTestImpl1()
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyUnoptimizableSubgraph1(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
     CHECK(subgraphInputSlots.size()  == 1);
     CHECK(subgraphOutputSlots.size() == 1);
@@ -1039,9 +1063,9 @@ void PartiallyOptimizableSubgraphTestImpl1()
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph1(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
     CHECK(subgraphInputSlots.size()  == 1);
     CHECK(subgraphOutputSlots.size() == 1);
@@ -1079,8 +1103,9 @@ void PartiallyOptimizableSubgraphTestImpl1()
     CHECK(substitutions.size() == 3);
     // Sort into a consistent order
     std::sort(substitutions.begin(), substitutions.end(),
-        [](auto s1, auto s2) { return strcmp(s1.m_SubstitutableSubgraph.GetLayers().front()->GetName(),
-                                             s2.m_SubstitutableSubgraph.GetLayers().front()->GetName()) < 0; });
+        [](auto s1, auto s2)
+        { return strcmp(s1.m_SubstitutableSubgraph.GetIConnectableLayers().front()->GetName(),
+                        s2.m_SubstitutableSubgraph.GetIConnectableLayers().front()->GetName()) < 0; });
 
     std::vector<ExpectedSubgraphSize> expectedSubstitutableSubgraphSizes{ { 1, 1, 1 },
                                                                           { 1, 1, 1 },
@@ -1088,19 +1113,25 @@ void PartiallyOptimizableSubgraphTestImpl1()
     std::vector<ExpectedSubgraphSize> expectedReplacementSubgraphSizes{ { 1, 1, 1 },
                                                                         { 1, 1, 1 },
                                                                         { 1, 1, 1 } };
-    std::vector<SubgraphView::InputSlots> expectedSubstitutableInputSlots
+    std::vector<SubgraphView::IInputSlots> expectedSubstitutableInputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetInputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv3 layer")->GetInputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv5 layer")->GetInputSlots())
+        ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetInputSlots())),
+        ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv3 layer")->GetInputSlots())),
+        ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv5 layer")->GetInputSlots()))
     };
-    std::vector<SubgraphView::OutputSlots> expectedSubstitutableOutputSlots
+    std::vector<SubgraphView::IOutputSlots> expectedSubstitutableOutputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetOutputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv3 layer")->GetOutputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv5 layer")->GetOutputSlots())
+        ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetOutputSlots())),
+        ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv3 layer")->GetOutputSlots())),
+        ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv5 layer")->GetOutputSlots()))
     };
-    std::vector<SubgraphView::Layers> expectedSubstitutableLayers
+    std::vector<SubgraphView::IConnectableLayers> expectedSubstitutableLayers
     {
         { layersInGraph.at("conv1 layer") },
         { layersInGraph.at("conv3 layer") },
@@ -1131,22 +1162,27 @@ void PartiallyOptimizableSubgraphTestImpl1()
     CHECK(untouchedSubgraphs.size() == 2);
     // Sort into a consistent order
     std::sort(untouchedSubgraphs.begin(), untouchedSubgraphs.end(), [](auto s1, auto s2) {
-        return strcmp(s1.GetLayers().front()->GetName(), s2.GetLayers().front()->GetName()) < 0;
+        return strcmp(s1.GetIConnectableLayers().front()->GetName(),
+                      s2.GetIConnectableLayers().front()->GetName()) < 0;
     });
 
     std::vector<ExpectedSubgraphSize> expectedUntouchedSubgraphSizes{ { 1, 1, 1 },
                                                                       { 1, 1, 1 } };
-    std::vector<SubgraphView::InputSlots> expectedUntouchedInputSlots
+    std::vector<SubgraphView::IInputSlots> expectedUntouchedInputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetInputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv4 layer unoptimizable")->GetInputSlots())
+            ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetInputSlots())),
+            ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv4 layer unoptimizable")->GetInputSlots()))
     };
-    std::vector<SubgraphView::OutputSlots> expectedUntouchedOutputSlots
+    std::vector<SubgraphView::IOutputSlots> expectedUntouchedOutputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetOutputSlots()),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv4 layer unoptimizable")->GetOutputSlots())
+            ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetOutputSlots())),
+            ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv4 layer unoptimizable")->GetOutputSlots()))
     };
-    std::vector<SubgraphView::Layers> expectedUntouchedLayers
+    std::vector<SubgraphView::IConnectableLayers> expectedUntouchedLayers
     {
         { layersInGraph.at("conv2 layer unoptimizable") },
         { layersInGraph.at("conv4 layer unoptimizable") }
@@ -1173,9 +1209,9 @@ void PartiallyOptimizableSubgraphTestImpl2()
     SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph2(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
-    const SubgraphView::InputSlots&  subgraphInputSlots  = subgraphPtr->GetInputSlots();
-    const SubgraphView::OutputSlots& subgraphOutputSlots = subgraphPtr->GetOutputSlots();
-    const SubgraphView::Layers&      subgraphLayers      = subgraphPtr->GetLayers();
+    const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
+    const SubgraphView::IOutputSlots& subgraphOutputSlots = subgraphPtr->GetIOutputSlots();
+    const SubgraphView::IConnectableLayers& subgraphLayers = subgraphPtr->GetIConnectableLayers();
 
     CHECK(subgraphInputSlots.size()  == 2);
     CHECK(subgraphOutputSlots.size() == 1);
@@ -1214,15 +1250,21 @@ void PartiallyOptimizableSubgraphTestImpl2()
     ExpectedSubgraphSize expectedSubstitutableSubgraphSizes{ 2, 1, 3 };
     ExpectedSubgraphSize expectedReplacementSubgraphSizes{ 2, 1, 1 };
 
-    SubgraphView::InputSlots expectedSubstitutableInputSlots = {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetInputSlots()[0]),
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv3 layer")->GetInputSlots()[0])
-    };
-    SubgraphView::OutputSlots expectedSubstitutableOutputSlots =
+    SubgraphView::IInputSlots expectedSubstitutableInputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("add layer")->GetOutputSlots()[0])
+            ConvertSlotsToISlots<InputSlot, IInputSlot>({
+                    ConvertReferenceTypeToPointerType(layersInGraph.at("conv1 layer")->GetInputSlots()[0])})[0],
+            ConvertSlotsToISlots<InputSlot, IInputSlot>({
+                    ConvertReferenceTypeToPointerType(layersInGraph.at("conv3 layer")->GetInputSlots()[0])})[0]
     };
-    SubgraphView::Layers expectedSubstitutableLayers
+
+    SubgraphView::IOutputSlots expectedSubstitutableOutputSlots
+    {
+            ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+                    ConvertReferenceTypeToPointerType(layersInGraph.at("add layer")->GetOutputSlots()))
+    };
+
+    SubgraphView::IConnectableLayers expectedSubstitutableLayers
     {
         layersInGraph.at("conv1 layer"),
         layersInGraph.at("conv3 layer"),
@@ -1250,15 +1292,17 @@ void PartiallyOptimizableSubgraphTestImpl2()
     CHECK(untouchedSubgraphs.size() == 1);
 
     std::vector<ExpectedSubgraphSize> expectedUntouchedSubgraphSizes{ { 1, 1, 1 } };
-    std::vector<SubgraphView::InputSlots> expectedUntouchedInputSlots
+    std::vector<SubgraphView::IInputSlots> expectedUntouchedInputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetInputSlots())
+            ConvertSlotsToISlots<InputSlot, IInputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetInputSlots()))
     };
-    std::vector<SubgraphView::OutputSlots> expectedUntouchedOutputSlots
+    std::vector<SubgraphView::IOutputSlots> expectedUntouchedOutputSlots
     {
-        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetOutputSlots())
+            ConvertSlotsToISlots<OutputSlot, IOutputSlot>(
+        ConvertReferenceTypeToPointerType(layersInGraph.at("conv2 layer unoptimizable")->GetOutputSlots()))
     };
-    std::vector<SubgraphView::Layers> expectedUntouchedLayers
+    std::vector<SubgraphView::IConnectableLayers> expectedUntouchedLayers
     {
         { layersInGraph.at("conv2 layer unoptimizable") }
     };

@@ -19,14 +19,15 @@ namespace
 //
 // this helper only works if all layers where the inputs connect to are not selected
 //
-SubgraphView::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers)
+
+SubgraphView::IInputSlots CreateIInputsFrom(const std::vector<armnn::IConnectableLayer*>& layers)
 {
-    SubgraphView::InputSlots result;
+    SubgraphView::IInputSlots result;
     for (auto&& layer : layers)
     {
-        for (auto&& it = layer->BeginInputSlots(); it != layer->EndInputSlots(); ++it)
+        for (unsigned int i = 0 ; i < layer->GetNumInputSlots(); ++i)
         {
-            result.push_back(&(*it));
+            result.push_back(&(layer->GetInputSlot(i)));
         }
     }
     return result;
@@ -35,14 +36,15 @@ SubgraphView::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers)
 //
 // this helper only works if all layers where the outputs connect to are not selected
 //
-SubgraphView::OutputSlots CreateOutputsFrom(const std::vector<Layer*>& layers)
+
+SubgraphView::IOutputSlots CreateIOutputsFrom(const std::vector<armnn::IConnectableLayer*>& layers)
 {
-    SubgraphView::OutputSlots result;
-    for (auto&& layer : layers)
+    SubgraphView::IOutputSlots result;
+    for (auto &&layer: layers)
     {
-        for (auto&& it = layer->BeginOutputSlots(); it != layer->EndOutputSlots(); ++it)
+        for (unsigned int i = 0; i < layer->GetNumOutputSlots(); ++i)
         {
-            result.push_back(&(*it));
+            result.push_back(&(layer->GetOutputSlot(i)));
         }
     }
     return result;
@@ -83,9 +85,9 @@ inline void ReportUntouchedLayers(OptimizationViews& optimizationViews, std::map
     for (const auto& pair : untouched)
     {
         Layer* layer = pair.second;
-        SubgraphView subgraphView(CreateInputsFrom({layer}),
-                                  CreateOutputsFrom({layer}),
-                                  {layer});
+        SubgraphView subgraphView({layer},
+                                  CreateIInputsFrom({layer}),
+                                  CreateIOutputsFrom({layer}));
         optimizationViews.AddUntouchedSubgraph(std::move(subgraphView));
     }
 }
@@ -100,9 +102,9 @@ LayerType* FuseLayer(OptimizationViews& optimizationViews,
     replacementLayer->SetAdditionalInfoForObject(
         std::make_shared<ActivationDescriptor>(activationDesc));
 
-    SubgraphView substitutionSubgraph(CreateInputsFrom({baseLayer}),
-                                      CreateOutputsFrom({activationLayer}),
-                                      {baseLayer, activationLayer});
+    SubgraphView substitutionSubgraph({baseLayer, activationLayer},
+                                      CreateIInputsFrom({baseLayer}),
+                                      CreateIOutputsFrom({activationLayer}));
     SubgraphView replacementSubgraph(replacementLayer);
 
     optimizationViews.AddSubstitution({substitutionSubgraph, replacementSubgraph});
@@ -207,6 +209,11 @@ LayerType* FuseBatchNormalizationLayer(OptimizationViews& optimizationViews,
               replacementLayer,
               activationLayer,
               activationDesc);
+
+    SubgraphView substitutionSubgraph({baseLayer, activationLayer},
+                                      CreateIInputsFrom({baseLayer}),
+                                      CreateIOutputsFrom({activationLayer}));
+    SubgraphView replacementSubgraph(replacementLayer);
 
     return replacementLayer;
 }
@@ -316,12 +323,12 @@ LayerType* FuseFullyConnectedLayer(OptimizationViews& optimizationViews,
 // as currently only one axis is supported.
 //
 template<typename LayerType>
-std::vector<Layer*> ChainReduceLayers(OptimizationViews& optimizationViews,
+std::vector<IConnectableLayer*> ChainReduceLayers(OptimizationViews& optimizationViews,
                                       LayerType* baseLayer,
                                       ReduceDescriptor& desc)
 {
     // Vector of new chained layers, used for substitution.
-    std::vector<Layer*> layers;
+    std::vector<IConnectableLayer*> layers;
 
     // Vector of axes so each layer is reshaped correctly.
     std::vector<uint32_t> axes;
@@ -348,9 +355,11 @@ std::vector<Layer*> ChainReduceLayers(OptimizationViews& optimizationViews,
 
         // Add new layer to graph.
         std::string layerName = "reduce_layer_" + std::to_string(i);
+
         Layer* replacementLayer = PolymorphicDowncast<Layer*>(
             optimizationViews.GetINetwork()->AddReduceLayer(newReduceDescriptor,
                                                             layerName.c_str()));
+
         // Connect previous layer with new layer.
         // The first and last layer will be connected when the subgraph is replaced.
         if (!layers.empty())
@@ -370,7 +379,8 @@ std::vector<Layer*> ChainReduceLayers(OptimizationViews& optimizationViews,
     }
 
     // Check if the TensorInfo from the last layer equals the inferred output from the original layer.
-    ARMNN_ASSERT(baseLayer->GetOutputSlot(0).GetTensorInfo() == layers.back()->GetOutputSlot().GetTensorInfo());
+    ARMNN_ASSERT(baseLayer->GetOutputSlot(0).GetTensorInfo() ==
+                 PolymorphicDowncast<Layer*>(layers.back())->GetOutputSlot().GetTensorInfo());
 
     return layers;
 }
@@ -381,14 +391,14 @@ std::vector<Layer*> ChainReduceLayers(OptimizationViews& optimizationViews,
 template<typename LayerType>
 void ReplaceLayers(OptimizationViews& optimizationViews,
                    LayerType* baseLayer,
-                   std::vector<Layer*>& layers)
+                   std::vector<IConnectableLayer*>& layers)
 {
-    std::list<Layer*> replacementLayers(layers.begin(), layers.end());
+    std::list<IConnectableLayer*> replacementLayers(layers.begin(), layers.end());
 
     SubgraphView substitutionSubgraph(baseLayer);
-    SubgraphView replacementSubgraph(CreateInputsFrom({replacementLayers.front()}),
-                                     CreateOutputsFrom({replacementLayers.back()}),
-                                     std::move(replacementLayers));
+    SubgraphView replacementSubgraph(std::move(replacementLayers),
+                                     CreateIInputsFrom({replacementLayers.front()}),
+                                     CreateIOutputsFrom({replacementLayers.back()}));
 
     optimizationViews.AddSubstitution({substitutionSubgraph, replacementSubgraph});
 }

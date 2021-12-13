@@ -916,6 +916,120 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
     }
 }
 
+// Refactor to allow passing the IConnectableLayer* rather than Layer Iterator
+// on Graph and SubgraphView which are different types.
+void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
+                                IConnectableLayer* it,
+                                Optional<std::vector<std::string>&> errMessages,
+                                OptimizationResult& result,
+                                BackendSettings& backendSettings,
+                                std::vector<BackendId>& availablePreferredBackends)
+{
+    auto ReturnError = [&](const Layer* layer)
+    {
+        return ReturnWithError(result, layer, backendSettings, errMessages);
+    };
+
+    auto layer = PolymorphicDowncast<Layer*>(it);
+
+    if (layer->GetType() == LayerType::Input)
+    {
+        return;
+    }
+
+    DataType dataTypeIn  = layer->GetNumInputSlots() == 0 ? DataType::Float32 :
+                           layer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo().GetDataType();
+    DataType dataTypeOut = layer->GetNumOutputSlots() == 0 ? DataType::Float32 :
+                           layer->GetOutputSlot(0).GetTensorInfo().GetDataType();
+
+    std::string reasonIfUnsupported;
+    bool found = false;
+    if (!CheckScaleSetOnQuantizedType(layer, errMessages))
+    {
+        // don't bomb immediately, find all the quantized outputs
+        // which haven't had a scale set and report them all back.
+        result.m_Error = true;
+    }
+
+    // First try assign layer to hint backend
+    if (layer->GetBackendHint().has_value() &&
+        backendSettings.IsBackendSupported(layer->GetBackendHint().value()) &&
+        AttemptBackendAssignment(backendSettings,
+                                 optNetObjPtr->GetGraph(),
+                                 layer,
+                                 layer->GetBackendHint().value(),
+                                 dataTypeIn,
+                                 dataTypeOut,
+                                 availablePreferredBackends,
+                                 reasonIfUnsupported,
+                                 errMessages).IsOk())
+    {
+        found = true;
+        backendSettings.m_SelectedBackends.insert(layer->GetBackendHint().value());
+    }
+    else
+    {
+        // Try assign layer to prefered list of backends
+        for (const auto& backend : availablePreferredBackends)
+        {
+            if (layer->GetBackendHint().has_value() &&
+                layer->GetBackendHint().value() == backend)
+            {
+                continue; //Don't re-test the backend hint
+            }
+
+            OptimizationResult res = AttemptBackendAssignment(backendSettings,
+                                                              optNetObjPtr->GetGraph(),
+                                                              layer,
+                                                              backend,
+                                                              dataTypeIn,
+                                                              dataTypeOut,
+                                                              availablePreferredBackends,
+                                                              reasonIfUnsupported,
+                                                              errMessages);
+
+            if (res.IsOk())
+            {
+                found = true;
+                backendSettings.m_SelectedBackends.insert(backend);
+                break;
+            }
+            else if (res.IsError())
+            {
+                result = res;  // Cannot continue.
+                // Note: we don't need to log the error as it would already
+                // be logged in AttemptBackendAssignment().
+            }
+            else
+            {
+                ARMNN_ASSERT_MSG(res.IsWarningOnly(), "OptimizationResult in unexpected state.");
+            }
+        }
+    }
+
+    // If the layer is unsupported by any devices, log and return a null network.
+    if (!found)
+    {
+        // NOTE: if the layer is not an operation queue type AND we have not got CpuRef as a
+        //       fallback we should set the compute device on the layer to CpuRef (these are not
+        //       available as accelerated operations, or are only available under certain
+        //       conditions, currently they comprise MemCopy, Constant, Permute)
+        armnn::LayerType layerType = layer->GetType();
+        if (!backendSettings.IsCpuRefUsed() && (layerType == armnn::LayerType::MemCopy ||
+                                                layerType == armnn::LayerType::Constant ||
+                                                layerType == armnn::LayerType::Permute))
+        {
+            BackendId cpuBackendId(armnn::Compute::CpuRef);
+            layer->SetBackendId(cpuBackendId);
+            backendSettings.m_SelectedBackends.insert(cpuBackendId);
+        }
+        else
+        {
+            result = ReturnError(layer);
+        }
+    }
+
+}
 
 OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   BackendSettings& backendSettings,
@@ -925,13 +1039,6 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_AssignBackends");
     OptimizationResult result;
-
-    // Helper lambda to compose meaningful error message before returning with error
-    auto ReturnError = [&](const Layer* layer)
-        {
-            return ReturnWithError(result, layer, backendSettings, errMessages);
-        };
-
 
     auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
     if (availablePreferredBackends.empty())
@@ -946,109 +1053,61 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
 
     for (auto it = firstLayer; it != lastLayer; ++it)
     {
-        auto layer = *it;
-
-        if (layer->GetType() == LayerType::Input)
-        {
-            continue;
-        }
-
-        DataType dataTypeIn  = layer->GetNumInputSlots() == 0 ? DataType::Float32 :
-            layer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo().GetDataType();
-        DataType dataTypeOut = layer->GetNumOutputSlots() == 0 ? DataType::Float32 :
-            layer->GetOutputSlot(0).GetTensorInfo().GetDataType();
-
-        std::string reasonIfUnsupported;
-        bool found = false;
-        if (!CheckScaleSetOnQuantizedType(layer, errMessages))
-        {
-            // don't bomb immediately, find all the quantized outputs
-            // which haven't had a scale set and report them all back.
-            result.m_Error = true;
-        }
-
-        // First try assign layer to hint backend
-        if (layer->GetBackendHint().has_value() &&
-            backendSettings.IsBackendSupported(layer->GetBackendHint().value()) &&
-            AttemptBackendAssignment(backendSettings,
-                                     optNetObjPtr->GetGraph(),
-                                     layer,
-                                     layer->GetBackendHint().value(),
-                                     dataTypeIn,
-                                     dataTypeOut,
-                                     availablePreferredBackends,
-                                     reasonIfUnsupported,
-                                     errMessages).IsOk())
-        {
-            found = true;
-            backendSettings.m_SelectedBackends.insert(layer->GetBackendHint().value());
-        }
-        else
-        {
-            // Try assign layer to prefered list of backends
-            for (const auto& backend : availablePreferredBackends)
-            {
-                if (layer->GetBackendHint().has_value() &&
-                    layer->GetBackendHint().value() == backend)
-                {
-                    continue; //Don't re-test the backend hint
-                }
-
-                OptimizationResult res = AttemptBackendAssignment(backendSettings,
-                                                                  optNetObjPtr->GetGraph(),
-                                                                  layer,
-                                                                  backend,
-                                                                  dataTypeIn,
-                                                                  dataTypeOut,
-                                                                  availablePreferredBackends,
-                                                                  reasonIfUnsupported,
-                                                                  errMessages);
-
-                if (res.IsOk())
-                {
-                    found = true;
-                    backendSettings.m_SelectedBackends.insert(backend);
-                    break;
-                }
-                else if (res.IsError())
-                {
-                   return res;  // Cannot continue.
-                   // Note: we don't need to log the error as it would already
-                   // be logged in AttemptBackendAssignment().
-                }
-                else
-                {
-                    ARMNN_ASSERT_MSG(res.IsWarningOnly(), "OptimizationResult in unexpected state.");
-                }
-            }
-        }
-
-        // If the layer is unsupported by any devices, log and return a null network.
-        if (!found)
-        {
-            // NOTE: if the layer is not an operation queue type AND we have not got CpuRef as a
-            //       fallback we should set the compute device on the layer to CpuRef (these are not
-            //       available as accelerated operations, or are only available under certain
-            //       conditions, currently they comprise MemCopy, Constant, Permute)
-            armnn::LayerType layerType = layer->GetType();
-            if (!backendSettings.IsCpuRefUsed() && (layerType == armnn::LayerType::MemCopy ||
-                                                    layerType == armnn::LayerType::Constant ||
-                                                    layerType == armnn::LayerType::Permute))
-            {
-                BackendId cpuBackendId(armnn::Compute::CpuRef);
-                layer->SetBackendId(cpuBackendId);
-                backendSettings.m_SelectedBackends.insert(cpuBackendId);
-            }
-            else
-            {
-                return ReturnError(layer);
-            }
-        }
+        AssignBackendsIConnectable(optNetObjPtr,
+                                   *it,
+                                   errMessages,
+                                   result,
+                                   backendSettings,
+                                   availablePreferredBackends);
     }
 
     for (auto it = firstLayer; it != lastLayer; ++it)
     {
-        auto layer = *it;
+        auto layer = PolymorphicDowncast<Layer*>(*it);
+
+        if(layer->GetType() == LayerType::Input)
+        {
+            BackendId connectedBackendId = layer->GetOutputSlot(0).GetConnection(0)->GetOwningLayer().GetBackendId();
+            layer->SetBackendId(connectedBackendId);
+        }
+    }
+
+    return result;
+}
+
+OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
+                                  BackendSettings& backendSettings,
+                                  SubgraphView::IConnectableLayerIterator& firstLayer,
+                                  SubgraphView::IConnectableLayerIterator& lastLayer,
+                                  Optional<std::vector<std::string>&> errMessages)
+{
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_AssignBackends");
+    OptimizationResult result;
+
+    auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
+    if (availablePreferredBackends.empty())
+    {
+        std::stringstream failureMsg;
+        failureMsg << "No preferred backends are available";
+        ReportError(failureMsg.str(), errMessages);
+
+        result.m_Error = true;
+        return result;
+    }
+
+    for (auto it = firstLayer; it != lastLayer; ++it)
+    {
+        AssignBackendsIConnectable(optNetObjPtr,
+                                   *it,
+                                   errMessages,
+                                   result,
+                                   backendSettings,
+                                   availablePreferredBackends);
+    }
+
+    for (auto it = firstLayer; it != lastLayer; ++it)
+    {
+        auto layer = PolymorphicDowncast<Layer*>(*it);
 
         if(layer->GetType() == LayerType::Input)
         {
@@ -1065,8 +1124,8 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   SubgraphView& subgraph,
                                   Optional<std::vector<std::string>&> errMessages)
 {
-    Graph::Iterator firstLayer = subgraph.begin();
-    Graph::Iterator lastLayer  = subgraph.end();
+    SubgraphView::IConnectableLayerIterator firstLayer = subgraph.beginIConnectable();
+    SubgraphView::IConnectableLayerIterator lastLayer  = subgraph.endIConnectable();
     return AssignBackends(optNetObjPtr,
                           backendSettings,
                           firstLayer,
@@ -1118,6 +1177,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                                                       // Select layers assigned to the requested backend
                                                       [&backendObjPtr](const Layer& layer)
                                                       {
+
                                                           return layer.GetType() != LayerType::Input &&
                                                                  layer.GetType() != LayerType::Output &&
                                                                  layer.GetBackendId() == backendObjPtr->GetId();
@@ -1145,10 +1205,11 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                 optGraph.SubstituteSubgraph(substitutableSubgraph, replacementSubgraph);
 
                 // Assign the current backend to the optimized sub-graph
-                std::for_each(replacementSubgraph.begin(), replacementSubgraph.end(), [&selectedBackend](Layer* l)
+                const SubgraphView::IConnectableLayers& subgraphLayers = replacementSubgraph.GetIConnectableLayers();
+                std::for_each(subgraphLayers.begin(), subgraphLayers.end(), [&selectedBackend](IConnectableLayer* l)
                     {
                         ARMNN_ASSERT(l);
-                        l->SetBackendId(selectedBackend);
+                        PolymorphicDowncast<Layer*>(l)->SetBackendId(selectedBackend);
                     });
             }
 
@@ -1171,7 +1232,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                 {
                     // An error occurred: the optimization was attempted but not performed, try different backends
                     std::stringstream subgraphMsg;
-                    subgraphMsg << "Re-assigning backends to " << failedSubgraph.GetLayers().size()
+                    subgraphMsg << "Re-assigning backends to " << failedSubgraph.GetIConnectableLayers().size()
                                 << " layers inside sub-graph " << count++;
                     ReportWarning(subgraphMsg.str(), errMessages);
 

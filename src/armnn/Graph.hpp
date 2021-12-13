@@ -48,7 +48,9 @@ public:
     }
 
     using LayerList = std::list<Layer*>;
-    using Iterator = LayerList::const_iterator; // Const so pointers in the list can't be modified externally.
+
+    // Const so pointers in the list can't be modified externally.
+    using Iterator = LayerList::const_iterator;
     using IteratorDifference = Iterator::difference_type;
 
     using ConstIterator        = TransformIterator<decltype(&PtrCast<const Layer>),       Iterator>;

@@ -132,21 +132,21 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 {
     OptimizationViews optimizationViews;
 
-    auto it = subgraph.end();
+    auto it = subgraph.endIConnectable();
     std::map<LayerGuid, Layer*> untouched;
 
-    while (it != subgraph.begin())
+    while (it != subgraph.beginIConnectable())
     {
         --it;
-        Layer& base = **it;
+        Layer& base = *(PolymorphicDowncast<Layer*>(*it));
         untouched.insert({base.GetGuid(), &base});
     }
 
-    it = subgraph.end();
-    while (it != subgraph.begin())
+    it = subgraph.endIConnectable();
+    while (it != subgraph.beginIConnectable())
     {
         --it;
-        Layer& base = **it;
+        Layer& base = *(PolymorphicDowncast<Layer*>(*it));
 
         // Fuse activation into previous layer if supported by backend
         if ((base.GetType() == LayerType::DepthwiseConvolution2d || base.GetType() == LayerType::Convolution2d
@@ -390,9 +390,9 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
             if (!reduceDescriptor.m_vAxis.empty() && reduceDescriptor.m_vAxis.size() > 1)
             {
                 // Add new layers to the graph and connect them.
-                std::vector<Layer*> layers = ChainReduceLayers<ReduceLayer>(optimizationViews,
-                                                                            baseLayer,
-                                                                            reduceDescriptor);
+                std::vector<IConnectableLayer*> layers = ChainReduceLayers<ReduceLayer>(optimizationViews,
+                                                                                        baseLayer,
+                                                                                        reduceDescriptor);
 
                 // Replace existing baselayer with new subgraph.
                 ReplaceLayers<ReduceLayer>(optimizationViews, baseLayer, layers);

@@ -20,6 +20,7 @@
 #include "Graph.hpp"
 #include "Layer.hpp"
 #include "OptimizedNetworkImpl.hpp"
+#include "SubgraphView.hpp"
 
 namespace armnn
 {
@@ -299,6 +300,13 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   BackendSettings& backendSettings,
                                   Graph::Iterator& firstLayer,
                                   Graph::Iterator& lastLayer,
+                                  Optional<std::vector<std::string>&> errMessages);
+
+
+OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
+                                  BackendSettings& backendSettings,
+                                  SubgraphView::IConnectableLayerIterator& firstLayer,
+                                  SubgraphView::IConnectableLayerIterator& lastLayer,
                                   Optional<std::vector<std::string>&> errMessages);
 
 } // namespace armnn

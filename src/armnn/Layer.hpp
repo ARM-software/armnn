@@ -114,6 +114,8 @@ public:
 
     Layer& GetOwningLayer() const { return m_OwningLayer; }
 
+    const IConnectableLayer& GetOwningIConnectableLayer() const override;
+
     LayerGuid GetOwningLayerGuid() const override;
 
     const OutputHandler& GetOutputHandler() const { return m_OutputHandler; }

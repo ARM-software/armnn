@@ -170,6 +170,10 @@ public:
     IConnectableLayer* AddPooling3dLayer(const Pooling3dDescriptor& pooling3dDescriptor,
                                          const char* name = nullptr);
 
+    IConnectableLayer* AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
+                                           CompiledBlobPtr& compiledBlobPtr,
+                                           const Optional<BackendId>& backend);
+
     IConnectableLayer* AddPreluLayer(const char* name = nullptr);
 
     IConnectableLayer* AddQuantizeLayer(const char* name = nullptr);

@@ -263,7 +263,6 @@ private:
     std::unordered_set<LayerBindingId> m_OutputIds;
     std::unordered_map<const Layer*, Iterator> m_PosInGraphMap;
 
-    void ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectableLayer* substituteLayer);
     void ReplaceSubgraphConnections(const SubgraphView& subgraph, const SubgraphView& substituteSubgraph);
     void EraseSubgraphLayers(SubgraphView &subgraph);
 

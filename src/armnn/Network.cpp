@@ -214,6 +214,13 @@ IConnectableLayer* INetwork::AddPooling3dLayer(const Pooling3dDescriptor& poolin
     return pNetworkImpl->AddPooling3dLayer(pooling3dDescriptor, name);
 }
 
+IConnectableLayer* INetwork::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
+                                                    CompiledBlobPtr& compiledBlobPtr,
+                                                    const Optional<BackendId>& backend)
+{
+    return pNetworkImpl->AddPrecompiledLayer(preCompiledDescriptor, compiledBlobPtr, backend);
+}
+
 IConnectableLayer* INetwork::AddActivationLayer(const ActivationDescriptor& activationDescriptor,
                                                 const char* name)
 {
@@ -2760,6 +2767,30 @@ IConnectableLayer* NetworkImpl::AddUnidirectionalSequenceLstmLayer(
         layer->m_LayerNormParameters.m_OutputLayerNormWeights =
                 std::make_shared<ScopedTensorHandle>(*(params.m_OutputLayerNormWeights));
     }
+    return layer;
+}
+
+IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
+                                                    CompiledBlobPtr& compiledBlobPtr,
+                                                    const Optional<BackendId>& backend)
+{
+    // Method use is for backend users.
+    const auto layer = m_Graph->AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+
+    // Assign the pre-compiled object to layer
+    // Pass only one compiled network, Arm NN does not handle multiple
+    // pre-compiled objects in a single pre-compiled layer currently
+    layer->SetPreCompiledObject(std::move(compiledBlobPtr));
+
+    if (backend.has_value())
+    {
+        layer->SetBackendId(backend.value());
+    }
+    else
+    {
+        layer->SetBackendId(layer->GetBackendHint().value());
+    }
+
     return layer;
 }
 

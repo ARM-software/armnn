@@ -225,6 +225,9 @@ class NetworkImpl;
 using INetworkPtr = std::unique_ptr<INetwork, void(*)(INetwork* network)>;
 using IOptimizedNetworkPtr = std::unique_ptr<IOptimizedNetwork, void(*)(IOptimizedNetwork* network)>;
 
+using CompiledBlobDeleter = std::function<void(const void*)>;
+using CompiledBlobPtr = std::unique_ptr<void, CompiledBlobDeleter>;
+
 /// Main network class which provides the interface for building up a neural network.
 /// This object is subsequently required by the IRuntime::Load() method.
 class INetwork
@@ -412,6 +415,16 @@ public:
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddPooling3dLayer(const Pooling3dDescriptor& pooling3dDescriptor,
         const char* name = nullptr);
+
+    /// Adds a Precompiled layer to the network.
+    /// Method use is for backend users.
+    /// @param preCompiledDescriptor - PreCompiledDescriptor contains parameters for the Precompiled layer.
+    /// @param compiledBlobPtr - CompiledBlobPtr pre-compiled object set for the Precompiled layer.
+    /// @param backend - optional BackendId set for the Precompiled layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
+                                           CompiledBlobPtr& compiledBlobPtr,
+                                           const Optional<BackendId>& backend);
 
     /// Adds an activation layer to the network.
     /// @param activationDescriptor - ActivationDescriptor to configure the activation.

@@ -435,8 +435,11 @@ void Graph::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substi
 {
     ARMNN_ASSERT(substituteLayer != nullptr);
 
-    ReplaceSubgraphConnections(subgraph, substituteLayer);
-    EraseSubgraphLayers(subgraph);
+    // Create a new sub-graph with only the given layer, using
+    // the given sub-graph as a reference of which parent graph to use
+    SubgraphView substituteSubgraph(substituteLayer);
+
+    SubstituteSubgraph(subgraph, substituteSubgraph);
 }
 
 void Graph::SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& substituteSubgraph)
@@ -454,16 +457,6 @@ void Graph::SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& subst
     ReplaceSubgraphConnections(subgraph, substituteSubgraph);
     EraseSubgraphLayers(subgraph);
     TopologicalSort();
-}
-
-void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, IConnectableLayer* substituteLayer)
-{
-    ARMNN_ASSERT(substituteLayer != nullptr);
-
-    // Create a new sub-graph with only the given layer, using
-    // the given sub-graph as a reference of which parent graph to use
-    SubgraphView substituteSubgraph(substituteLayer);
-    ReplaceSubgraphConnections(subgraph, substituteSubgraph);
 }
 
 void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const SubgraphView& substituteSubgraph)

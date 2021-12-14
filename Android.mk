@@ -318,6 +318,7 @@ LOCAL_PROPRIETARY_MODULE := true
 
 # placeholder to hold all backend unit test source files
 ARMNN_BACKEND_TEST_SOURCES :=
+ARMNN_BACKEND_TEST_INCLUDES :=
 
 #
 # iterate through the backend common and specific include paths, include them into the current
@@ -333,6 +334,29 @@ $(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS), \
         $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk) \
         $(eval ARMNN_BACKEND_TEST_SOURCES := $(ARMNN_BACKEND_TEST_SOURCES) \
         $(patsubst %,$(mkPath)/%,$(BACKEND_TEST_SOURCES))))
+
+$(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
+        $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
+        $(eval ARMNN_BACKEND_TEST_INCLUDES += $(BACKEND_TEST_INCLUDES)))
+
+# Placeholder to hold all backend link files.
+ARMNN_BACKEND_TEST_STATIC_LIBRARIES :=
+ARMNN_BACKEND_TEST_SHARED_LIBRARIES :=
+
+# Iterate through the Arm NN backends and specific include paths, include them into the
+# current makefile and append the linkfiles held by
+# the optional BACKEND_STATIC_LIBRARIES and optional BACKEND_SHARED_LIBRARIES variable
+# (included from the given makefile) to
+# the ARMNN_BACKEND_STATIC_LIBRARIES and ARMNN_BACKEND_SHARED_LIBRARIES lists
+
+$(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
+        $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
+        $(eval ARMNN_BACKEND_TEST_STATIC_LIBRARIES += $(BACKEND_TEST_STATIC_LIBRARIES)))
+
+$(foreach mkPath,$(ARMNN_BACKEND_MAKEFILE_DIRS),\
+        $(eval include $(LOCAL_PATH)/$(mkPath)/backend.mk)\
+        $(eval ARMNN_BACKEND_TEST_SHARED_LIBRARIES += $(BACKEND_TEST_SHARED_LIBRARIES)))
+
 
 # Mark source files as dependent on Android.mk
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
@@ -352,7 +376,9 @@ LOCAL_C_INCLUDES := \
         $(ARMNN_PROFILING_HEADER_PATH) \
         $(ARMNN_BACKENDS_HEADER_PATH) \
         $(ARMNN_SERIALIZER_HEADER_PATH) \
-        $(ARMNN_DESERIALIZER_HEADER_PATH)
+        $(ARMNN_DESERIALIZER_HEADER_PATH) \
+        $(ARMNN_BACKEND_INCLUDES)
+
 
 LOCAL_CFLAGS := \
         -std=$(CPP_VERSION) \
@@ -457,7 +483,8 @@ endif
 LOCAL_STATIC_LIBRARIES := \
         libneuralnetworks_common \
         libflatbuffers-framework \
-        arm_compute_library
+        arm_compute_library \
+        $(ARMNN_BACKEND_TEST_STATIC_LIBRARIES)
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libarmnn
 
@@ -470,7 +497,8 @@ LOCAL_SHARED_LIBRARIES := \
         libutils \
         android.hardware.neuralnetworks@1.0 \
         android.hidl.allocator@1.0 \
-        android.hidl.memory@1.0
+        android.hidl.memory@1.0 \
+        $(ARMNN_BACKEND_TEST_SHARED_LIBRARIES)
 
 ifeq ($(ARMNN_INCLUDE_LIBOPENCL),1)
 LOCAL_SHARED_LIBRARIES += \

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="cff6f3b3d6750c47e9f8616bb8b2ec671cfe33d3" #Fix 300% Regression CPU - Change default mws value in Kernel files
+DEFAULT_CLFRAMEWORKREVISION="30124354c6848c49f9740d1944d2445782255a85" #Remove padding from ClDirectConv2dKernel
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

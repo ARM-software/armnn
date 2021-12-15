@@ -196,11 +196,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
                                 if (status)
                                 {
-                                    FuseLayerWithWeightsAndBiases<Convolution2dLayer>(optimizationViews,
-                                                                                      baseLayer,
-                                                                                      activationLayer,
-                                                                                      activationDesc,
-                                                                                      name);
+                                    FuseConvolution2dLayer<Convolution2dLayer>(optimizationViews,
+                                                                               baseLayer,
+                                                                               activationLayer,
+                                                                               activationDesc,
+                                                                               name);
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -227,11 +227,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
                                 if (status)
                                 {
-                                    FuseLayerWithWeightsAndBiases<DepthwiseConvolution2dLayer>(optimizationViews,
-                                                                                               baseLayer,
-                                                                                               activationLayer,
-                                                                                               activationDesc,
-                                                                                               name);
+                                    FuseDepthwiseConvolution2dLayer<DepthwiseConvolution2dLayer>(optimizationViews,
+                                                                                                 baseLayer,
+                                                                                                 activationLayer,
+                                                                                                 activationDesc,
+                                                                                                 name);
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -250,11 +250,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
                                 if (status)
                                 {
-                                    FuseLayerWithWeightsAndBiases<FullyConnectedLayer>(optimizationViews,
-                                                                                       baseLayer,
-                                                                                       activationLayer,
-                                                                                       activationDesc,
-                                                                                       name);
+                                    FuseFullyConnectedLayer<FullyConnectedLayer>(optimizationViews,
+                                                                                 baseLayer,
+                                                                                 activationLayer,
+                                                                                 activationDesc,
+                                                                                 name);
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -277,12 +277,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                                 if (status)
                                 {
                                     BatchNormalizationLayer* replacementLayer =
-                                            FuseLayerWithParameters<BatchNormalizationLayer>(
-                                                    optimizationViews,
-                                                    baseLayer,
-                                                    activationLayer,
-                                                    activationDesc,
-                                                    name);
+                                        FuseBatchNormalizationLayer<BatchNormalizationLayer>(optimizationViews,
+                                                                                             baseLayer,
+                                                                                             activationLayer,
+                                                                                             activationDesc,
+                                                                                             name);
 
                                     replacementLayer->m_Beta     = std::move(baseLayer->m_Beta);
                                     replacementLayer->m_Gamma    = std::move(baseLayer->m_Gamma);
@@ -304,11 +303,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
                                 if (status)
                                 {
-                                    FuseLayerWithoutParameters<AdditionLayer>(optimizationViews,
-                                                                              baseLayer,
-                                                                              activationLayer,
-                                                                              activationDesc,
-                                                                              name);
+                                    FuseAdditionLayer<AdditionLayer>(optimizationViews,
+                                                                     baseLayer,
+                                                                     activationLayer,
+                                                                     activationDesc,
+                                                                     name);
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -325,11 +324,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
                                 if (status)
                                 {
-                                    FuseLayerWithoutParameters<DivisionLayer>(optimizationViews,
-                                                                              baseLayer,
-                                                                              activationLayer,
-                                                                              activationDesc,
-                                                                              name);
+                                    FuseDivisionLayer<DivisionLayer>(optimizationViews,
+                                                                     baseLayer,
+                                                                     activationLayer,
+                                                                     activationDesc,
+                                                                     name);
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -346,11 +345,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
                                 if (status)
                                 {
-                                    FuseLayerWithoutParameters<MultiplicationLayer>(optimizationViews,
-                                                                                    baseLayer,
-                                                                                    activationLayer,
-                                                                                    activationDesc,
-                                                                                    name);
+                                    FuseMultiplicationLayer<MultiplicationLayer>(optimizationViews,
+                                                                                 baseLayer,
+                                                                                 activationLayer,
+                                                                                 activationDesc,
+                                                                                 name);
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -367,11 +366,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 
                                 if (status)
                                 {
-                                    FuseLayerWithoutParameters<SubtractionLayer>(optimizationViews,
-                                                                                 baseLayer,
-                                                                                 activationLayer,
-                                                                                 activationDesc,
-                                                                                 name);
+                                    FuseSubtractionLayer<SubtractionLayer>(optimizationViews,
+                                                                           baseLayer,
+                                                                           activationLayer,
+                                                                           activationDesc,
+                                                                           name);
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }

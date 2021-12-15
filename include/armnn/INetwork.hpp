@@ -424,7 +424,8 @@ public:
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
                                            CompiledBlobPtr& compiledBlobPtr,
-                                           const Optional<BackendId>& backend);
+                                           const Optional<BackendId>& backend,
+                                           const char* name = nullptr);
 
     /// Adds an activation layer to the network.
     /// @param activationDescriptor - ActivationDescriptor to configure the activation.

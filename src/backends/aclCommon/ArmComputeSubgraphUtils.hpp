@@ -91,15 +91,14 @@ inline void ReportUntouchedLayers(OptimizationViews& optimizationViews, std::map
 }
 
 template<typename LayerType>
-LayerType* FuseLayerWithoutParameters(OptimizationViews& optimizationViews,
-                                      LayerType* baseLayer,
-                                      ActivationLayer* activationLayer,
-                                      ActivationDescriptor& activationDesc,
-                                      std::string name)
+LayerType* FuseLayer(OptimizationViews& optimizationViews,
+                     LayerType* baseLayer,
+                     LayerType* replacementLayer,
+                     ActivationLayer* activationLayer,
+                     ActivationDescriptor& activationDesc)
 {
-    LayerType* replacementLayer = optimizationViews.GetGraph().AddLayer<LayerType>(name.c_str());
-
-    replacementLayer->SetAdditionalInfoForObject(std::make_shared<ActivationDescriptor>(activationDesc));
+    replacementLayer->SetAdditionalInfoForObject(
+        std::make_shared<ActivationDescriptor>(activationDesc));
 
     SubgraphView substitutionSubgraph(CreateInputsFrom({baseLayer}),
                                       CreateOutputsFrom({activationLayer}),
@@ -107,42 +106,204 @@ LayerType* FuseLayerWithoutParameters(OptimizationViews& optimizationViews,
     SubgraphView replacementSubgraph(replacementLayer);
 
     optimizationViews.AddSubstitution({substitutionSubgraph, replacementSubgraph});
+
     return replacementLayer;
 }
 
 template<typename LayerType>
-LayerType* FuseLayerWithParameters(OptimizationViews& optimizationViews,
+LayerType* FuseAdditionLayer(OptimizationViews& optimizationViews,
+                             LayerType* baseLayer,
+                             ActivationLayer* activationLayer,
+                             ActivationDescriptor& activationDesc,
+                             std::string name)
+{
+    IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddAdditionLayer(name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
+
+    return replacementLayer;
+}
+
+template<typename LayerType>
+LayerType* FuseSubtractionLayer(OptimizationViews& optimizationViews,
+                                LayerType* baseLayer,
+                                ActivationLayer* activationLayer,
+                                ActivationDescriptor& activationDesc,
+                                std::string name)
+{
+    IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddSubtractionLayer(name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
+
+    return replacementLayer;
+}
+
+template<typename LayerType>
+LayerType* FuseDivisionLayer(OptimizationViews& optimizationViews,
+                             LayerType* baseLayer,
+                             ActivationLayer* activationLayer,
+                             ActivationDescriptor& activationDesc,
+                             std::string name)
+{
+    IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddDivisionLayer(name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
+
+    return replacementLayer;
+}
+
+template<typename LayerType>
+LayerType* FuseMultiplicationLayer(OptimizationViews& optimizationViews,
                                    LayerType* baseLayer,
                                    ActivationLayer* activationLayer,
                                    ActivationDescriptor& activationDesc,
                                    std::string name)
 {
-    LayerType* replacementLayer = optimizationViews.GetGraph().AddLayer<LayerType>(baseLayer->GetParameters(),
-                                                                                   name.c_str());
+    IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddMultiplicationLayer(name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
-    replacementLayer->SetAdditionalInfoForObject(std::make_shared<ActivationDescriptor>(activationDesc));
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
 
-    SubgraphView substitutionSubgraph(CreateInputsFrom({baseLayer}),
-                                      CreateOutputsFrom({activationLayer}),
-                                      {baseLayer, activationLayer});
-    SubgraphView replacementSubgraph(replacementLayer);
-
-    optimizationViews.AddSubstitution({substitutionSubgraph, replacementSubgraph});
     return replacementLayer;
 }
 
 template<typename LayerType>
-LayerType* FuseLayerWithWeightsAndBiases(OptimizationViews& optimizationViews,
-                                         LayerType* baseLayer,
-                                         ActivationLayer* activationLayer,
-                                         ActivationDescriptor& activationDesc,
-                                         std::string name)
+LayerType* FuseBatchNormalizationLayer(OptimizationViews& optimizationViews,
+                                       LayerType* baseLayer,
+                                       ActivationLayer* activationLayer,
+                                       ActivationDescriptor& activationDesc,
+                                       std::string name)
 {
-    LayerType* replacementLayer = FuseLayerWithParameters(optimizationViews,
-                                                          baseLayer,
-                                                          activationLayer,
-                                                          activationDesc,
-                                                          name);
+    IConnectableLayer* replacement =
+        optimizationViews.GetINetwork()->AddBatchNormalizationLayer(baseLayer->GetParameters(),
+                                                                    ConstTensor(),
+                                                                    ConstTensor(),
+                                                                    ConstTensor(),
+                                                                    ConstTensor(),
+                                                                    name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
+
+    return replacementLayer;
+}
+
+template<typename LayerType>
+LayerType* FuseConvolution2dLayer(OptimizationViews& optimizationViews,
+                                  LayerType* baseLayer,
+                                  ActivationLayer* activationLayer,
+                                  ActivationDescriptor& activationDesc,
+                                  std::string name)
+{
+    std::shared_ptr<ConstTensorHandle> weightHandle = baseLayer->m_Weight;
+    TensorInfo weightInfo = weightHandle->GetTensorInfo();
+
+    std::shared_ptr<ConstTensorHandle> biasHandle = baseLayer->m_Bias;
+    ConstTensor biasTensor;
+    if (!biasHandle)
+    {
+        biasTensor = ConstTensor();
+    }
+    else
+    {
+        biasTensor = ConstTensor(biasHandle->GetTensorInfo(), biasHandle->Map(true));
+    }
+
+    IConnectableLayer* replacement =
+        optimizationViews.GetINetwork()->
+            AddConvolution2dLayer(baseLayer->GetParameters(),
+                                  ConstTensor(weightInfo, weightHandle->Map(true)),
+                                  Optional<ConstTensor>(biasTensor),
+                                  name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
+
+    return replacementLayer;
+}
+
+template<typename LayerType>
+LayerType* FuseDepthwiseConvolution2dLayer(OptimizationViews& optimizationViews,
+                                           LayerType* baseLayer,
+                                           ActivationLayer* activationLayer,
+                                           ActivationDescriptor& activationDesc,
+                                           std::string name)
+{
+    std::shared_ptr<ConstTensorHandle> weightHandle = baseLayer->m_Weight;
+    TensorInfo weightInfo = weightHandle->GetTensorInfo();
+
+    std::shared_ptr<ConstTensorHandle> biasHandle = baseLayer->m_Bias;
+    ConstTensor biasTensor;
+    if (!biasHandle)
+    {
+        biasTensor = ConstTensor();
+    }
+    else
+    {
+        biasTensor = ConstTensor(biasHandle->GetTensorInfo(), biasHandle->Map(true));
+    }
+
+    IConnectableLayer* replacement =
+        optimizationViews.GetINetwork()->
+            AddDepthwiseConvolution2dLayer(baseLayer->GetParameters(),
+                                           ConstTensor(weightInfo, weightHandle->Map(true)),
+                                           Optional<ConstTensor>(biasTensor),
+                                           name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
+
+    return replacementLayer;
+}
+
+template<typename LayerType>
+LayerType* FuseFullyConnectedLayer(OptimizationViews& optimizationViews,
+                                   LayerType* baseLayer,
+                                   ActivationLayer* activationLayer,
+                                   ActivationDescriptor& activationDesc,
+                                   std::string name)
+{
+    IConnectableLayer* replacement =
+        optimizationViews.GetINetwork()->AddFullyConnectedLayer(baseLayer->GetParameters(),
+                                                                name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
 
     replacementLayer->m_Weight = std::move(baseLayer->m_Weight);
     replacementLayer->m_Bias   = std::move(baseLayer->m_Bias);
@@ -187,8 +348,9 @@ std::vector<Layer*> ChainReduceLayers(OptimizationViews& optimizationViews,
 
         // Add new layer to graph.
         std::string layerName = "reduce_layer_" + std::to_string(i);
-        Layer* replacementLayer = optimizationViews.GetGraph().AddLayer<LayerType>(newReduceDescriptor,
-                                                                                   layerName.c_str());
+        Layer* replacementLayer = PolymorphicDowncast<Layer*>(
+            optimizationViews.GetINetwork()->AddReduceLayer(newReduceDescriptor,
+                                                            layerName.c_str()));
         // Connect previous layer with new layer.
         // The first and last layer will be connected when the subgraph is replaced.
         if (!layers.empty())

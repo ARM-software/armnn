@@ -200,7 +200,9 @@ TEST_CASE("SingleInputSingleOutputAddPrecompiledLayerSubstituteSubgraph1")
 
     // Construct dummy pre-compiled layer
     INetworkPtr network = INetwork::Create();
-    IConnectableLayer* preCompiledLayer = network->AddPrecompiledLayer(preCompiledDescriptor, compiledBlobPtr, backend);
+    IConnectableLayer* preCompiledLayer = network->AddPrecompiledLayer(preCompiledDescriptor,
+                                                                       compiledBlobPtr,
+                                                                       backend);
 
     // Substitute sub-graph with pre-compiled layer
     graph.SubstituteSubgraph(*subgraph, preCompiledLayer);
@@ -242,7 +244,9 @@ TEST_CASE("SingleInputSingleOutputAddPrecompiledLayerSubstituteSubgraph2")
 
     // Construct dummy pre-compiled layer
     INetworkPtr network = INetwork::Create();
-    IConnectableLayer* preCompiledLayer = network->AddPrecompiledLayer(preCompiledDescriptor, compiledBlobPtr, backend);
+    IConnectableLayer* preCompiledLayer = network->AddPrecompiledLayer(preCompiledDescriptor,
+                                                                       compiledBlobPtr,
+                                                                       backend);
     SubgraphView substituteSubgraph(preCompiledLayer);
 
     // Substitute sub-graph with pre-compiled layer

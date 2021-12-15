@@ -172,7 +172,8 @@ public:
 
     IConnectableLayer* AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
                                            CompiledBlobPtr& compiledBlobPtr,
-                                           const Optional<BackendId>& backend);
+                                           const Optional<BackendId>& backend,
+                                           const char* name = nullptr);
 
     IConnectableLayer* AddPreluLayer(const char* name = nullptr);
 

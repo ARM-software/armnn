@@ -187,12 +187,16 @@ OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph
         {
             ARMNN_ASSERT(supportedSubgraph != nullptr);
 
-            PreCompiledLayer* preCompiledLayer =
-                optimizationViews.GetGraph().AddLayer<PreCompiledLayer>(
+            CompiledBlobPtr blobPtr;
+            BackendId backend = MockBackendId();
+
+            IConnectableLayer* preCompiledLayer =
+                optimizationViews.GetINetwork()->AddPrecompiledLayer(
                         PreCompiledDescriptor(supportedSubgraph->GetNumInputSlots(),
                                               supportedSubgraph->GetNumOutputSlots()),
-                        "pre-compiled");
-            preCompiledLayer->SetBackendId(MockBackendId());
+                                              blobPtr,
+                                              backend,
+                                              nullptr);
 
             SubgraphView substitutionSubgraph(*supportedSubgraph);
             SubgraphView replacementSubgraph(preCompiledLayer);

@@ -215,10 +215,11 @@ IConnectableLayer* INetwork::AddPooling3dLayer(const Pooling3dDescriptor& poolin
 }
 
 IConnectableLayer* INetwork::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
-                                                    CompiledBlobPtr& compiledBlobPtr,
-                                                    const Optional<BackendId>& backend)
+                                                 CompiledBlobPtr& compiledBlobPtr,
+                                                 const Optional<BackendId>& backend,
+                                                 const char* name)
 {
-    return pNetworkImpl->AddPrecompiledLayer(preCompiledDescriptor, compiledBlobPtr, backend);
+    return pNetworkImpl->AddPrecompiledLayer(preCompiledDescriptor, compiledBlobPtr, backend, name);
 }
 
 IConnectableLayer* INetwork::AddActivationLayer(const ActivationDescriptor& activationDescriptor,
@@ -2772,10 +2773,19 @@ IConnectableLayer* NetworkImpl::AddUnidirectionalSequenceLstmLayer(
 
 IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
                                                     CompiledBlobPtr& compiledBlobPtr,
-                                                    const Optional<BackendId>& backend)
+                                                    const Optional<BackendId>& backend,
+                                                    const char* name)
 {
     // Method use is for backend users.
-    const auto layer = m_Graph->AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+    PreCompiledLayer* layer;
+    if (name)
+    {
+        layer = m_Graph->AddLayer<PreCompiledLayer>(preCompiledDescriptor, name);
+    }
+    else
+    {
+        layer = m_Graph->AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
+    }
 
     // Assign the pre-compiled object to layer
     // Pass only one compiled network, Arm NN does not handle multiple

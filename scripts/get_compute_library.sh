@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="30124354c6848c49f9740d1944d2445782255a85" #Remove padding from ClDirectConv2dKernel
+DEFAULT_CLFRAMEWORKREVISION="b6e49ebb5b83edbf45513978c0c77a8871c6b36c" #Update A510 arm_gemm cpu Kernels
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

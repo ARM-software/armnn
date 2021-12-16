@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b6e49ebb5b83edbf45513978c0c77a8871c6b36c" #Update A510 arm_gemm cpu Kernels
+DEFAULT_CLFRAMEWORKREVISION="40a245f943330219e59adaf9c0d23139d674a5b5" #Unify Cpu Max pool 2d minimum value to be -inf for floating point
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

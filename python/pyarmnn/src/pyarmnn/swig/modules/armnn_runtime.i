@@ -312,27 +312,5 @@ public:
 
 }
 
-%extend INetworkProperties {
-    %feature("docstring",
-             "
-    Structure for holding network properties.
-
-            Contains:
-    m_ImportEnabled (bool): Enable import.
-
-            m_ExportEnabled (bool): Enable export.
-
-    ") INetworkProperties;
-    INetworkProperties(bool importEnabled = false, bool exportEnabled = false) {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        return new INetworkProperties(importEnabled, exportEnabled);
-        ARMNN_NO_DEPRECATE_WARN_END
-    }
-    %pythonprepend INetworkProperties(bool, bool) %{
-        import warnings
-        warnings.warn("Deprecated: Use constructor with MemorySource argument instead.", DeprecationWarning)
-    %}
-}
-
 }
 

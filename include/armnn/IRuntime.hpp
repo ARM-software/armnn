@@ -31,40 +31,7 @@ class IRuntime;
 using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
 struct INetworkProperties
-{
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Please use INetworkProperties constructor with MemorySource argument", "22.02")
-    INetworkProperties(bool importEnabled = false,
-                       bool exportEnabled = false,
-                       bool asyncEnabled = false,
-                       bool profilingEnabled = false)
-        : m_ImportEnabled(importEnabled),
-          m_ExportEnabled(exportEnabled),
-          m_AsyncEnabled(asyncEnabled),
-          m_ProfilingEnabled(profilingEnabled),
-          m_OutputNetworkDetailsMethod(ProfilingDetailsMethod::Undefined),
-          m_InputSource(m_ImportEnabled ? MemorySource::Malloc : MemorySource::Undefined),
-          m_OutputSource(m_ExportEnabled ? MemorySource::Malloc : MemorySource::Undefined),
-          m_ExternalMemoryManagementEnabled(false)
-    {}
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Please use INetworkProperties constructor without numThreads argument", "22.02")
-    INetworkProperties(bool asyncEnabled,
-                       MemorySource inputSource,
-                       MemorySource outputSource,
-                       size_t numThreads,
-                       bool profilingEnabled = false)
-        : m_ImportEnabled(inputSource != MemorySource::Undefined),
-          m_ExportEnabled(outputSource != MemorySource::Undefined),
-          m_AsyncEnabled(asyncEnabled),
-          m_ProfilingEnabled(profilingEnabled),
-          m_OutputNetworkDetailsMethod(ProfilingDetailsMethod::Undefined),
-          m_InputSource(inputSource),
-          m_OutputSource(outputSource),
-          m_ExternalMemoryManagementEnabled(false)
-    {
-        armnn::IgnoreUnused(numThreads);
-    }
-
+{   
     INetworkProperties(bool asyncEnabled,
                        MemorySource inputSource,
                        MemorySource outputSource,

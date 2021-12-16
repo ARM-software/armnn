@@ -156,7 +156,9 @@ def test_load_network_properties_provided(random_runtime):
     opt_network, _ = ann.Optimize(network, preferred_backends,
                                   runtime.GetDeviceSpec(), ann.OptimizerOptions())
 
-    properties = ann.INetworkProperties(True, True)
+    inputSource = ann.MemorySource_Malloc
+    outputSource = ann.MemorySource_Malloc
+    properties = ann.INetworkProperties(False, inputSource, outputSource)
     net_id, messages = runtime.LoadNetwork(opt_network, properties)
     assert "" == messages
     assert net_id == 0
@@ -182,11 +184,6 @@ def test_network_properties_constructor(random_runtime):
     net_id, messages = runtime.LoadNetwork(opt_network, properties)
     assert "" == messages
     assert net_id == 0
-
-
-def test_network_properties_deprecated_constructor():
-    with pytest.warns(DeprecationWarning):
-        warnings.warn("Deprecated: Use constructor with MemorySource argument instead.", DeprecationWarning)
 
 
 def test_unload_network_fails_for_invalid_net_id(random_runtime):

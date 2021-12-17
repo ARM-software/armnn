@@ -392,4 +392,18 @@ TEST_CASE("TensorHandleSelectionStrategy")
     CHECK(importCount == 1);
 }
 
+TEST_CASE("RegisterCopyAndImportFactoryPairTest")
+{
+    TensorHandleFactoryRegistry registry;
+    ITensorHandleFactory::FactoryId copyId = "CopyFactoryId";
+    ITensorHandleFactory::FactoryId importId = "ImportFactoryId";
+    registry.RegisterCopyAndImportFactoryPair(copyId, importId);
+
+    // Get mathing import factory id correctly
+    CHECK((registry.GetMatchingImportFactoryId(copyId) == importId));
+
+    // Return empty id when Invailid Id is given
+    CHECK((registry.GetMatchingImportFactoryId("InvalidFactoryId") == ""));
+}
+
 }

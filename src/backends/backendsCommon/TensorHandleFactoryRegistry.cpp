@@ -63,6 +63,18 @@ ITensorHandleFactory* TensorHandleFactoryRegistry::GetFactory(ITensorHandleFacto
     return nullptr;
 }
 
+void TensorHandleFactoryRegistry::RegisterCopyAndImportFactoryPair(ITensorHandleFactory::FactoryId copyFactoryId,
+                                                                   ITensorHandleFactory::FactoryId importFactoryId)
+{
+    m_FactoryMappings[copyFactoryId] = importFactoryId;
+}
+
+ITensorHandleFactory::FactoryId TensorHandleFactoryRegistry::GetMatchingImportFactoryId(
+    ITensorHandleFactory::FactoryId copyFactoryId)
+{
+    return m_FactoryMappings[copyFactoryId];
+}
+
 void TensorHandleFactoryRegistry::AquireMemory()
 {
     for (auto& mgr : m_MemoryManagers)

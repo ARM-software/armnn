@@ -593,9 +593,12 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling3dInt16, SimpleAveragePooling3
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling3dUint8NCDHW, SimpleAveragePooling3dUint8Test, DataLayout::NCDHW)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling3dInt16NCDHW, SimpleAveragePooling3dInt16Test, DataLayout::NCDHW)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3d, LargeTensorsAveragePooling3dTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dUint8, LargeTensorsAveragePooling3dUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dInt16, LargeTensorsAveragePooling3dInt16Test)
+// Due to the size of the input each of these test cases takes about 3 minutes
+// to execute in an x86 environment.  We'll disable but not remove them for the
+// moment.
+//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3d, LargeTensorsAveragePooling3dTest)
+//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dUint8, LargeTensorsAveragePooling3dUint8Test)
+//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dInt16, LargeTensorsAveragePooling3dInt16Test)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3d, IgnorePaddingSimpleAveragePooling3dTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3dUint8, IgnorePaddingSimpleAveragePooling3dUint8Test)

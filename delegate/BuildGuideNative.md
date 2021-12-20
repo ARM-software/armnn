@@ -11,6 +11,7 @@ natively (no cross-compilation required). This is to keep this guide simple.
 **Table of content:**
 - [Delegate build guide introduction](#delegate-build-guide-introduction)
 - [Dependencies](#dependencies)
+   * [Download Arm NN](#download-arm-nn)
    * [Build Tensorflow Lite for C++](#build-tensorflow-lite-for-c--)
    * [Build Flatbuffers](#build-flatbuffers)
    * [Build the Arm Compute Library](#build-the-arm-compute-library)
@@ -23,7 +24,7 @@ natively (no cross-compilation required). This is to keep this guide simple.
 # Dependencies
 
 Build Dependencies:
- * Tensorflow Lite: this guide uses version 2.5.1 . Other versions may work.
+ * Tensorflow Lite: this guide uses version 2.5.0. Other versions may work.
  * Flatbuffers 1.12.0
  * Arm NN 21.11 or higher
 
@@ -45,6 +46,18 @@ mkdir $BASEDIR
 cd $BASEDIR
 apt-get update && apt-get install git wget unzip zip python git cmake scons
 ```
+
+## Download Arm NN
+
+First clone Arm NN using Git.
+
+```bash
+cd $BASEDIR
+git clone "https://review.mlplatform.org/ml/armnn" 
+cd armnn
+git checkout <branch_name> # e.g. branches/armnn_21_11
+```
+
 ## Build Tensorflow Lite for C++
 Tensorflow has a few dependencies on it's own. It requires the python packages pip3, numpy,
 and also Bazel or CMake which are used to compile Tensorflow. A description on how to build bazel can be
@@ -65,13 +78,14 @@ sudo make install
 ```
 
 ### Download and build Tensorflow Lite
-
+Arm NN provides a script, armnn/scripts/get_tensorflow.sh, that can be used to download the version of TensorFlow that Arm NN was tested with:
 ```bash
 cd $BASEDIR
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/
-git checkout tags/v2.5.1 # Minimum version required for the delegate is v2.3.1
+git checkout $(../armnn/scripts/get_tensorflow.sh -p) # Minimum version required for the delegate is v2.3.1
 ```
+
 Now the build process can be started. When calling "cmake", as below, you can specify a number of build
 flags. But if you have no need to configure your tensorflow build, you can follow the exact commands below:
 ```bash
@@ -100,17 +114,19 @@ The Arm NN library depends on the Arm Compute Library (ACL). It provides a set o
 both Arm CPUs and GPUs. The Arm Compute Library is used directly by Arm NN to run machine learning workloads on 
 Arm CPUs and GPUs.
 
-It is important to have the right version of ACL and Arm NN to make it work. Luckily, Arm NN and ACL are developed 
-very closely and released together. If you would like to use the Arm NN version "20.11" you should use the same "20.11"
-version for ACL too.
+It is important to have the right version of ACL and Arm NN to make it work. Arm NN and ACL are developed very closely 
+and released together. If you would like to use the Arm NN version "21.11" you should use the same "21.11" version for 
+ACL too. Arm NN provides a script, armnn/scripts/get_compute_library.sh, that can be used to download the exact version 
+of Arm Compute Library that Arm NN was tested with.
 
-To build the Arm Compute Library on your platform, download the Arm Compute Library and checkout the tag 
-that contains the version you want to use. Build it using `scons`.
+To build the Arm Compute Library on your platform, download the Arm Compute Library and checkout the tag that contains 
+the version you want to use. Build it using `scons`.
+
 ```bash
-cd $BASEDIR
+cd $HOME/armnn-devenv
 git clone https://review.mlplatform.org/ml/ComputeLibrary 
 cd ComputeLibrary/
-git checkout <tag_name> # e.g. v20.11
+git checkout $(../armnn/scripts/get_compute_library.sh -p) # e.g. v21.11
 # The machine used for this guide only has a Neon CPU which is why I only have "neon=1" but if 
 # your machine has an arm Gpu you can enable that by adding `opencl=1 embed_kernels=1 to the command below
 scons arch=arm64-v8a neon=1 extra_cxx_flags="-fPIC" benchmark_tests=0 validation_tests=0 
@@ -118,13 +134,10 @@ scons arch=arm64-v8a neon=1 extra_cxx_flags="-fPIC" benchmark_tests=0 validation
 
 ## Build the Arm NN Library
 
-With ACL built we can now continue to building Arm NN. To do so, download the repository and checkout the matching 
-version as you did for ACL. Create a build directory and use `cmake` to build it.
+With ACL built we can now continue to build Arm NN. Create a build directory and use `cmake` to build it.
 ```bash
 cd $BASEDIR
-git clone "https://review.mlplatform.org/ml/armnn" 
 cd armnn
-git checkout <branch_name> # e.g. branches/armnn_20_11
 mkdir build && cd build
 # if you've got an arm Gpu add `-DARMCOMPUTECL=1` to the command below
 cmake .. -DARMCOMPUTE_ROOT=$BASEDIR/ComputeLibrary -DARMCOMPUTENEON=1 -DBUILD_UNIT_TESTS=0 
@@ -172,7 +185,7 @@ Download Arm NN if you have not already done so:
 cd $BASEDIR
 git clone "https://review.mlplatform.org/ml/armnn" 
 cd armnn
-git checkout <branch_name> # e.g. branches/armnn_20_11
+git checkout <branch_name> # e.g. branches/armnn_21_11
 ```
 Build Arm NN with the delegate included
 ```bash

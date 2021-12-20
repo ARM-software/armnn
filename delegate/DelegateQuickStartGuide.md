@@ -47,7 +47,7 @@ you can download the binaries [here](https://github.com/ARM-software/armnn/relea
 
 We recommend creating a virtual environment for this tutorial. For the following code to work python3 is needed. Please
 also check the documentation of the TfLite version you want to use. There might be additional prerequisites for the python
-version. We will use Tensorflow Lite 2.5.1 for this guide.
+version. We will use Tensorflow Lite 2.5.0 for this guide.
 ```bash
 # Install python3 (We ended up with python3.5.3) and virtualenv
 sudo apt-get install python3-pip
@@ -71,7 +71,7 @@ mobile and embedded devices.
 The TfLite [website](https://www.tensorflow.org/lite/guide/python) shows you two methods to download the `tflite_runtime`  package. 
 In our experience, the use of the pip command works for most systems including debian. However, if you're using an older version of Tensorflow, 
 you may need to build the pip package from source. You can find more information [here](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/tools/pip_package/README.md).
-But in our case, with Tensorflow Lite 2.5.1, we can install through:
+But in our case, with Tensorflow Lite 2.5.0, we can install through:
 
 ```
 pip3 install --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime

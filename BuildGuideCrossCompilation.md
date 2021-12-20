@@ -3,8 +3,8 @@
 - [Introduction](#introduction)
 - [Cross-compiling ToolChain](#cross-compiling-toolchain)
 - [Build and install Google's Protobuf library](#build-and-install-google-s-protobuf-library)
-- [Build Compute Library](#build-compute-library)
-- [Download ArmNN](#download-armnn)
+- [Download Arm NN](#download-arm-nn)
+- [Build Arm Compute Library](#build-arm-compute-library)
 - [Build Flatbuffer](#build-flatbuffer)
 - [Build Onnx](#build-onnx)
 - [Build TfLite](#build-tflite)
@@ -23,7 +23,6 @@ mkdir $HOME/armnn-devenv
 cd $HOME/armnn-devenv
 '''
 
-
 ## Cross-compiling ToolChain
 * Install the standard cross-compilation libraries for arm64:
 ```
@@ -33,7 +32,8 @@ sudo apt install crossbuild-essential-arm64
 ## Build and install Google's Protobuf library
 
 We support protobuf version 3.12.0
-* Get protobuf from here: https://github.com/protocolbuffers/protobuf : 
+* Get protobuf from here: https://github.com/protocolbuffers/protobuf: 
+  (Requires Git if not previously installed: `sudo apt install git`) 
 ```bash
 git clone -b v3.12.0 https://github.com/google/protobuf.git protobuf
 cd protobuf
@@ -62,40 +62,54 @@ make install -j16
 cd ..
 ```
 
-
-## Build Compute Library
-* Building the Arm Compute Library:
-```bash
-cd $HOME/armnn-devenv
-git clone https://github.com/ARM-software/ComputeLibrary.git
-cd ComputeLibrary/
-git checkout <tag_name>
-scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j4 internal_only=0
-```
-
-For example, if you want to checkout release tag of 21.02:
-```bash
-git checkout v21.02
-```
-
-## Download ArmNN
-
+## Download Arm NN
+* Clone Arm NN:
 ```bash
 cd $HOME/armnn-devenv
 git clone https://github.com/ARM-software/armnn.git
+```
+
+* Checkout Arm NN branch:
+```bash
 cd armnn
 git checkout <branch_name>
 git pull
 ```
-
-For example, if you want to checkout release branch of 21.02:
+For example, if you want to check out the 21.11 release branch:
 ```bash
-git checkout branches/armnn_21_02
+git checkout branches/armnn_21_11
 git pull
+```
+
+## Build Arm Compute Library
+* Clone Arm Compute Library:
+
+```bash
+cd $HOME/armnn-devenv
+git clone https://github.com/ARM-software/ComputeLibrary.git
+```
+* Checkout Arm Compute Library release tag:
+```bash
+cd ComputeLibrary
+git checkout <tag_name>
+```
+Arm NN and Arm Compute Library are developed closely together. If you would like to use the Arm NN 21.11 release you will need the 21.11 release of ACL too. For example, if you want to checkout the 21.11 release tag:
+```bash
+git checkout v21.11
+```
+Arm NN provides a script that downloads the version of Arm Compute Library that Arm NN was tested with:
+```bash
+git checkout $(../armnn/scripts/get_compute_library.sh -p) 
+```
+* Build the Arm Compute Library:  
+  (Requires SCons if not previously installed: `sudo apt install scons`)
+```bash
+scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j4 internal_only=0
 ```
 
 ## Build Flatbuffer
 * Building Flatbuffer version 1.12.0
+  (Requires CMake if not previously installed: `sudo apt install cmake`)
 ```bash
 cd $HOME/armnn-devenv
 wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz
@@ -137,13 +151,12 @@ onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include 
 ```
 
 ## Build TfLite
-* Building TfLite (Tensorflow version 2.5.1)
+* Arm NN provides a script, armnn/scripts/get_tensorflow.sh, that can be used to check out the version of TensorFlow that Arm NN was tested with:
 ```bash
 cd $HOME/armnn-devenv
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/
-git checkout tags/v2.5.1
-cd ..
+git checkout $(../armnn/scripts/get_tensorflow.sh -p) # Checks out the latest tested version of TF
 mkdir tflite
 cd tflite
 cp ../tensorflow/tensorflow/lite/schema/schema.fbs .

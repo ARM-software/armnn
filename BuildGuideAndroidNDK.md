@@ -2,9 +2,10 @@
 
 - [Introduction](#introduction)
 - [Download the Android NDK and make a standalone toolchain](#download-the-android-ndk-and-make-a-standalone-toolchain)
-- [Build the Compute Library](#build-the-compute-library)
 - [Build Google's Protobuf library](#build-google-s-protobuf-library)
-- [Build Arm NN](#build-armnn)
+- [Download Arm NN](#download-arm-nn)
+- [Build Arm Compute Library](#build-arm-compute-library)
+- [Build Arm NN](#build-arm-nn)
 - [Build Standalone Sample Dynamic Backend](#build-standalone-sample-dynamic-backend)
 - [Run the Arm NN unit tests on an Android device](#run-the-armnn-unit-tests-on-an-android-device)
 
@@ -34,36 +35,10 @@ All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` 
 
 * With the android ndk-20b, you don't need to use the make_standalone_toolchain script to create a toolchain for a specific version of android. Android's current preference is for you to just specify the architecture and operating system while setting the compiler and just use the ndk directory.
 
-## Build the Compute Library
-* Clone the Compute Library:
-
-	(Requires Git if not previously installed: `sudo apt install git`)
-``` bash
-cd $HOME/armnn-devenv
-git clone https://github.com/ARM-software/ComputeLibrary.git
-```
-
-* Checkout ComputeLibrary release tag:
-```bash
-cd ComputeLibrary
-git checkout <tag_name>
-```
-For example, if you want to checkout release tag of 21.02:
-```bash
-git checkout v21.02
-```
-
-* Build:
-
-	(Requires SCons if not previously installed: `sudo apt install scons`)
-```bash
-scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
- benchmark_tests=0 validation_tests=0 os=android -j16
-```
-
 ## Build Google's Protobuf library (Optional)
 
-* Clone protobuf:
+* Clone protobuf:  
+  (Requires Git if not previously installed: `sudo apt install git`)
 ```bash
 mkdir $HOME/armnn-devenv/google
 cd $HOME/armnn-devenv/google
@@ -72,9 +47,8 @@ cd protobuf
 git checkout -b v3.12.0 v3.12.0
 ```
 
-* Build a native (x86) version of the protobuf libraries and compiler (protoc):
-
-	(Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: `sudo apt install curl autoconf libtool build-essential g++`)
+* Build a native (x86) version of the protobuf libraries and compiler (protoc):  
+  (Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: `sudo apt install curl autoconf libtool build-essential g++`)
 ```bash
 ./autogen.sh
 mkdir x86_build
@@ -102,11 +76,12 @@ cd ..
 
 Note: The ANDROID_API variable should be set to the Android API version number you are using. E.g. "30" for Android R.
 
-## Build Arm NN
+## Download Arm NN
+* Clone Arm NN:  
+  (Requires Git if not previously installed: `sudo apt install git`)
 
-* Clone Arm NN source code:
 ```bash
-cd $HOME/armnn-devenv/
+cd $HOME/armnn-devenv
 git clone https://github.com/ARM-software/armnn.git
 ```
 
@@ -117,15 +92,43 @@ git checkout <branch_name>
 git pull
 ```
 
-For example, if you want to checkout release branch of 21.02:
+For example, if you want to check out the 21.11 release branch:
 ```bash
-git checkout branches/armnn_21_02
+git checkout branches/armnn_21_11
 git pull
 ```
 
-* Build Arm NN:
+## Build Arm Compute Library
+* Clone Arm Compute Library:
 
- 	(Requires CMake if not previously installed: `sudo apt install cmake`)
+```bash
+cd $HOME/armnn-devenv
+git clone https://github.com/ARM-software/ComputeLibrary.git
+```
+* Checkout Arm Compute Library release tag:
+```bash
+cd ComputeLibrary
+git checkout <tag_name>
+```
+Arm NN and Arm Compute Library are developed closely together. If you would like to use the Arm NN 21.11 release you will need the 21.11 release of ACL too. For example, if you want to checkout the 21.11 release tag:
+```bash
+git checkout v21.11
+```
+Arm NN provides a script that downloads the version of Arm Compute Library that Arm NN was tested with:
+```bash
+git checkout $(../armnn/scripts/get_compute_library.sh -p) 
+```
+* the Arm Compute Library:  
+  (Requires SCons if not previously installed: `sudo apt install scons`)
+```bash
+scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
+ benchmark_tests=0 validation_tests=0 os=android -j16
+```
+
+## Build Arm NN
+
+* Build Arm NN:  
+  (Requires CMake if not previously installed: `sudo apt install cmake`)
 ```bash
 mkdir $HOME/armnn-devenv/armnn/build
 cd $HOME/armnn-devenv/armnn/build

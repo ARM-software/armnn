@@ -41,6 +41,8 @@ target_include_directories(armnnTestUtils PRIVATE ../armnnUtils)
 target_include_directories(armnnTestUtils PRIVATE ../backends)
 target_include_directories(armnnTestUtils PRIVATE ../profiling)
 
+target_link_libraries(armnnTestUtils armnn)
+
 install(TARGETS armnnTestUtils
         EXPORT  armnn-targets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

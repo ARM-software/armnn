@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="3229171402dcb9a63d63380865ba18477b81ff89" #Decouple CpuActivationKernel
+DEFAULT_CLFRAMEWORKREVISION="2761993cdb5b2f9bb1ca50dc6d803b3f4c4b0f14" #Crop Kernel Decoupling
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

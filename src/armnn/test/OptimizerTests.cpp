@@ -142,6 +142,29 @@ void CreateLSTMLayerHelper(Graph &graph, bool CifgEnabled)
 class MockLayerSupport : public LayerSupportBase
 {
 public:
+    bool IsLayerSupported(const LayerType& type,
+                          const std::vector<TensorInfo>& infos,
+                          const BaseDescriptor& descriptor,
+                          const Optional<LstmInputParamsInfo>& /*lstmParamsInfo*/,
+                          const Optional<QuantizedLstmInputParamsInfo>& /*quantizedLstmParamsInfo*/,
+                          Optional<std::string&> reasonIfUnsupported) const override
+    {
+        switch (type)
+        {
+            case LayerType::Input:
+                return IsInputSupported(infos[0], reasonIfUnsupported);
+            case LayerType::Output:
+                return IsOutputSupported(infos[0], reasonIfUnsupported);
+            case LayerType::Activation:
+                return IsActivationSupported(infos[0],
+                                             infos[1],
+                                             *(PolymorphicDowncast<const ActivationDescriptor*>(&descriptor)),
+                                             reasonIfUnsupported);
+            default:
+                return false;
+        }
+    }
+
     bool IsInputSupported(const TensorInfo& /*input*/,
                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
     {

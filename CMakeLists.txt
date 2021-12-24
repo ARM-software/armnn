@@ -347,6 +347,7 @@ list(APPEND armnn_sources
     src/armnn/Graph.cpp
     src/armnn/Graph.hpp
     src/armnn/IGraphObservable.hpp
+    src/armnn/ILayerSupport.cpp
     src/armnn/Instrument.hpp
     src/armnn/InternalTypes.cpp
     src/armnn/InternalTypes.hpp

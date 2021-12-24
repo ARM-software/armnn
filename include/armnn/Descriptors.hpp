@@ -19,7 +19,10 @@ namespace armnn
 {
 
 /// Base class for all descriptors.
-struct BaseDescriptor {};
+struct BaseDescriptor
+{
+    virtual ~BaseDescriptor() = default;
+};
 
 /// An ActivationDescriptor for the ActivationLayer.
 struct ActivationDescriptor : BaseDescriptor

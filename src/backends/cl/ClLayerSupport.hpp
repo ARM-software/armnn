@@ -18,6 +18,13 @@ public:
     ClLayerSupport();
     ~ClLayerSupport() {}
 
+    bool IsLayerSupported(const LayerType& type,
+                          const std::vector<TensorInfo>& infos,
+                          const BaseDescriptor& descriptor,
+                          const Optional<LstmInputParamsInfo>& lstmParamsInfo,
+                          const Optional<QuantizedLstmInputParamsInfo>& quantizedLstmParamsInfo,
+                          Optional<std::string&> reasonIfUnsupported) const override;
+
     bool IsActivationSupported(const TensorInfo& input,
                                const TensorInfo& output,
                                const ActivationDescriptor& descriptor,
@@ -64,7 +71,7 @@ public:
 
     bool IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
-                           const ConcatDescriptor& descriptor,
+                           const OriginsDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsConstantSupported(const TensorInfo& output,

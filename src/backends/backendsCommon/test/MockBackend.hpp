@@ -172,6 +172,55 @@ public:
 class MockLayerSupport : public LayerSupportBase
 {
 public:
+    bool IsLayerSupported(const LayerType& type,
+                          const std::vector<TensorInfo>& infos,
+                          const BaseDescriptor& descriptor,
+                          const Optional<LstmInputParamsInfo>& /*lstmParamsInfo*/,
+                          const Optional<QuantizedLstmInputParamsInfo>& /*quantizedLstmParamsInfo*/,
+                          Optional<std::string&> reasonIfUnsupported) const override
+    {
+        switch(type)
+        {
+            case LayerType::Input:
+                return IsInputSupported(infos[0], reasonIfUnsupported);
+            case LayerType::Output:
+                return IsOutputSupported(infos[0], reasonIfUnsupported);
+            case LayerType::Addition:
+                return IsAdditionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            case LayerType::Convolution2d:
+            {
+                if (infos.size() != 4)
+                {
+                    throw InvalidArgumentException("Invalid number of TransposeConvolution2d "
+                                                   "TensorInfos. TensorInfos should be of format: "
+                                                   "{input, output, weights, biases}.");
+                }
+
+                auto desc = *(PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor));
+                if (infos[3] == TensorInfo())
+                {
+                    return IsConvolution2dSupported(infos[0],
+                                                    infos[1],
+                                                    desc,
+                                                    infos[2],
+                                                    EmptyOptional(),
+                                                    reasonIfUnsupported);
+                }
+                else
+                {
+                    return IsConvolution2dSupported(infos[0],
+                                                    infos[1],
+                                                    desc,
+                                                    infos[2],
+                                                    infos[3],
+                                                    reasonIfUnsupported);
+                }
+            }
+            default:
+                return false;
+        }
+    }
+
     bool IsInputSupported(const TensorInfo& /*input*/,
                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
     {

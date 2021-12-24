@@ -148,12 +148,21 @@ bool LayerSupportHandle::IsBackendRegistered() const
     return false;
 }
 
+using TensorInfos = std::vector<TensorInfo>;
+
 bool LayerSupportHandle::IsActivationSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const ActivationDescriptor& descriptor,
                                                Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsActivationSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Activation,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsAdditionSupported(const TensorInfo& input0,
@@ -161,7 +170,14 @@ bool LayerSupportHandle::IsAdditionSupported(const TensorInfo& input0,
                                              const TensorInfo& output,
                                              Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsAdditionSupported(input0, input1, output, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Addition,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsArgMinMaxSupported(const TensorInfo& input,
@@ -169,7 +185,14 @@ bool LayerSupportHandle::IsArgMinMaxSupported(const TensorInfo& input,
                                               const ArgMinMaxDescriptor& descriptor,
                                               Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsArgMinMaxSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ArgMinMax,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsBatchNormalizationSupported(const TensorInfo& input,
@@ -181,14 +204,14 @@ bool LayerSupportHandle::IsBatchNormalizationSupported(const TensorInfo& input,
                                                        const BatchNormalizationDescriptor& descriptor,
                                                        Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsBatchNormalizationSupported(input,
-                                                         output,
-                                                         mean,
-                                                         var,
-                                                         beta,
-                                                         gamma,
-                                                         descriptor,
-                                                         reasonIfUnsupported.value());
+    TensorInfos infos{input, output, mean, var, beta, gamma};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::BatchNormalization,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsBatchToSpaceNdSupported(const TensorInfo& input,
@@ -196,27 +219,43 @@ bool LayerSupportHandle::IsBatchToSpaceNdSupported(const TensorInfo& input,
                                                    const BatchToSpaceNdDescriptor& descriptor,
                                                    Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsBatchToSpaceNdSupported(input,
-                                                     output,
-                                                     descriptor,
-                                                     reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::BatchToSpaceNd,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsCastSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsCastSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Cast,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
-bool LayerSupportHandle::IsChannelShuffleSupported(const TensorInfo &input, const TensorInfo &output,
+bool LayerSupportHandle::IsChannelShuffleSupported(const TensorInfo &input,
+                                                   const TensorInfo &output,
                                                    const ChannelShuffleDescriptor &descriptor,
                                                    Optional<std::string &> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsChannelShuffleSupported(input,
-                                                     output,
-                                                     descriptor,
-                                                     reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ChannelShuffle,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsComparisonSupported(const TensorInfo& input0,
@@ -225,7 +264,14 @@ bool LayerSupportHandle::IsComparisonSupported(const TensorInfo& input0,
                                                const ComparisonDescriptor& descriptor,
                                                Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsComparisonSupported(input0, input1, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Comparison,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
@@ -233,41 +279,88 @@ bool LayerSupportHandle::IsConcatSupported(const std::vector<const TensorInfo*> 
                                            const OriginsDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConcatSupported(inputs, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos;
+    for (const TensorInfo* inputInfo : inputs)
+    {
+        infos.push_back(*inputInfo);
+    }
+    infos.push_back(output);
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Concat,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConstantSupported(const TensorInfo& output,
                                              Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConstantSupported(output, reasonIfUnsupported.value());
+    TensorInfos infos{output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Constant,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConvertBf16ToFp32Supported(const TensorInfo& input,
                                                       const TensorInfo& output,
                                                       Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConvertBf16ToFp32Supported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ConvertBf16ToFp32,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConvertFp32ToBf16Supported(const TensorInfo& input,
                                                       const TensorInfo& output,
                                                       Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConvertFp32ToBf16Supported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ConvertFp32ToBf16,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                                       const TensorInfo& output,
                                                       Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConvertFp16ToFp32Supported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ConvertFp16ToFp32,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConvertFp32ToFp16Supported(const TensorInfo& input,
                                                       const TensorInfo& output,
                                                       Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConvertFp32ToFp16Supported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ConvertFp32ToFp16,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConvolution2dSupported(const TensorInfo& input,
@@ -277,12 +370,15 @@ bool LayerSupportHandle::IsConvolution2dSupported(const TensorInfo& input,
                                                   const Optional<TensorInfo>& biases,
                                                   Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConvolution2dSupported(input,
-                                                    output,
-                                                    descriptor,
-                                                    weights,
-                                                    biases,
-                                                    reasonIfUnsupported.value());
+    TensorInfo biasesVal =  biases.has_value() ? biases.value() : TensorInfo();
+    TensorInfos infos{input, output, weights, biasesVal};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Convolution2d,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsConvolution3dSupported(const TensorInfo& input,
@@ -292,19 +388,29 @@ bool LayerSupportHandle::IsConvolution3dSupported(const TensorInfo& input,
                                                   const Optional<TensorInfo>& biases,
                                                   Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsConvolution3dSupported(input,
-                                                    output,
-                                                    descriptor,
-                                                    weights,
-                                                    biases,
-                                                    reasonIfUnsupported.value());
+    TensorInfo biasesVal =  biases.has_value() ? biases.value() : TensorInfo();
+    TensorInfos infos{input, output, weights, biasesVal};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Convolution3d,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsDebugSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsDebugSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Debug,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsDepthToSpaceSupported(const TensorInfo& input,
@@ -312,7 +418,14 @@ bool LayerSupportHandle::IsDepthToSpaceSupported(const TensorInfo& input,
                                                  const DepthToSpaceDescriptor& descriptor,
                                                  Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsDepthToSpaceSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::DepthToSpace,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsDepthwiseConvolutionSupported(
@@ -323,19 +436,29 @@ bool LayerSupportHandle::IsDepthwiseConvolutionSupported(
         const Optional<TensorInfo>& biases,
         Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsDepthwiseConvolutionSupported(input,
-                                                           output,
-                                                           descriptor,
-                                                           weights,
-                                                           biases,
-                                                           reasonIfUnsupported.value());
+    TensorInfo biasesVal =  biases.has_value() ? biases.value() : TensorInfo();
+    TensorInfos infos{input, output, weights, biasesVal};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::DepthwiseConvolution2d,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsDequantizeSupported(const TensorInfo& input,
                                                const TensorInfo& output,
                                                Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsDequantizeSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Dequantize,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
@@ -348,15 +471,14 @@ bool LayerSupportHandle::IsDetectionPostProcessSupported(const TensorInfo& boxEn
                                                          const DetectionPostProcessDescriptor& descriptor,
                                                          Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsDetectionPostProcessSupported(boxEncodings,
-                                                           scores,
-                                                           anchors,
-                                                           detectionBoxes,
-                                                           detectionClasses,
-                                                           detectionScores,
-                                                           numDetections,
-                                                           descriptor,
-                                                           reasonIfUnsupported);
+    TensorInfos infos{boxEncodings, scores, anchors, detectionBoxes, detectionClasses, detectionScores, numDetections};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::DetectionPostProcess,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsDilatedDepthwiseConvolutionSupported(
@@ -367,12 +489,15 @@ bool LayerSupportHandle::IsDilatedDepthwiseConvolutionSupported(
         const Optional<TensorInfo>& biases,
         Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsDilatedDepthwiseConvolutionSupported(input,
-                                                                  output,
-                                                                  descriptor,
-                                                                  weights,
-                                                                  biases,
-                                                                  reasonIfUnsupported);
+    TensorInfo biasesVal =  biases.has_value() ? biases.value() : TensorInfo();
+    TensorInfos infos{input, output, weights, biasesVal};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::DepthwiseConvolution2d,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsDivisionSupported(const TensorInfo& input0,
@@ -380,7 +505,14 @@ bool LayerSupportHandle::IsDivisionSupported(const TensorInfo& input0,
                                              const TensorInfo& output,
                                              Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsDivisionSupported(input0, input1, output, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Division,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsElementwiseUnarySupported(const TensorInfo& input,
@@ -388,14 +520,28 @@ bool LayerSupportHandle::IsElementwiseUnarySupported(const TensorInfo& input,
                                                      const ElementwiseUnaryDescriptor& descriptor,
                                                      Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsElementwiseUnarySupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ElementwiseUnary,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsFakeQuantizationSupported(const TensorInfo& input,
                                                      const FakeQuantizationDescriptor& descriptor,
                                                      Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsFakeQuantizationSupported(input, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::FakeQuantization,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsFillSupported(const TensorInfo& input,
@@ -403,14 +549,28 @@ bool LayerSupportHandle::IsFillSupported(const TensorInfo& input,
                                          const FillDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsFillSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Fill,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsFloorSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsFloorSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Floor,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
@@ -462,12 +622,14 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
         }
     }
 
-    return m_LayerSupport->IsFullyConnectedSupported(input,
-                                                     output,
-                                                     weights,
-                                                     biases,
-                                                     descriptor,
-                                                     reasonIfUnsupported.value());
+    TensorInfos infos{input, output, weights, biases};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::FullyConnected,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
@@ -476,13 +638,27 @@ bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
                                            const GatherDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsGatherSupported(input0, input1, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Gather,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsInputSupported(const TensorInfo& input,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsInputSupported(input, reasonIfUnsupported.value());
+    TensorInfos infos{input};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Input,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsInstanceNormalizationSupported(
@@ -491,7 +667,14 @@ bool LayerSupportHandle::IsInstanceNormalizationSupported(
         const InstanceNormalizationDescriptor& descriptor,
         Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsInstanceNormalizationSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::InstanceNormalization,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsL2NormalizationSupported(const TensorInfo& input,
@@ -499,7 +682,14 @@ bool LayerSupportHandle::IsL2NormalizationSupported(const TensorInfo& input,
                                                     const L2NormalizationDescriptor& descriptor,
                                                     Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsL2NormalizationSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::L2Normalization,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsLogicalBinarySupported(const TensorInfo& input0,
@@ -508,11 +698,14 @@ bool LayerSupportHandle::IsLogicalBinarySupported(const TensorInfo& input0,
                                                   const LogicalBinaryDescriptor& descriptor,
                                                   Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsLogicalBinarySupported(input0,
-                                                    input1,
-                                                    output,
-                                                    descriptor,
-                                                    reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::LogicalBinary,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsLogicalUnarySupported(const TensorInfo& input,
@@ -520,7 +713,14 @@ bool LayerSupportHandle::IsLogicalUnarySupported(const TensorInfo& input,
                                                  const ElementwiseUnaryDescriptor& descriptor,
                                                  Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsLogicalUnarySupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ElementwiseUnary,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsLogSoftmaxSupported(const TensorInfo& input,
@@ -528,7 +728,14 @@ bool LayerSupportHandle::IsLogSoftmaxSupported(const TensorInfo& input,
                                                const LogSoftmaxDescriptor& descriptor,
                                                Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsLogSoftmaxSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::LogSoftmax,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsLstmSupported(const TensorInfo& input,
@@ -542,16 +749,14 @@ bool LayerSupportHandle::IsLstmSupported(const TensorInfo& input,
                                          const LstmInputParamsInfo& paramsInfo,
                                          Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsLstmSupported(input,
-                                           outputStateIn,
-                                           cellStateIn,
-                                           scratchBuffer,
-                                           outputStateOut,
-                                           cellStateOut,
-                                           output,
-                                           descriptor,
-                                           paramsInfo,
-                                           reasonIfUnsupported);
+    TensorInfos infos{input, outputStateIn, cellStateIn, scratchBuffer, outputStateOut, cellStateOut, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Lstm,
+                                            infos,
+                                            descriptor,
+                                            paramsInfo,
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMaximumSupported(const TensorInfo& input0,
@@ -559,7 +764,14 @@ bool LayerSupportHandle::IsMaximumSupported(const TensorInfo& input0,
                                             const TensorInfo& output,
                                             Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsMaximumSupported(input0, input1, output, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Maximum,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMeanSupported(const TensorInfo& input,
@@ -567,21 +779,42 @@ bool LayerSupportHandle::IsMeanSupported(const TensorInfo& input,
                                          const MeanDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsMeanSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Mean,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMemCopySupported(const TensorInfo& input,
                                             const TensorInfo& output,
                                             Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsMemCopySupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::MemCopy,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMemImportSupported(const TensorInfo& input,
                                               const TensorInfo& output,
                                               Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsMemImportSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::MemImport,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMergeSupported(const TensorInfo& input0,
@@ -589,7 +822,14 @@ bool LayerSupportHandle::IsMergeSupported(const TensorInfo& input0,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsMergeSupported(input0, input1, output, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Merge,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMinimumSupported(const TensorInfo& input0,
@@ -597,7 +837,14 @@ bool LayerSupportHandle::IsMinimumSupported(const TensorInfo& input0,
                                             const TensorInfo& output,
                                             Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsMinimumSupported(input0, input1, output, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Minimum,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsMultiplicationSupported(const TensorInfo& input0,
@@ -605,7 +852,14 @@ bool LayerSupportHandle::IsMultiplicationSupported(const TensorInfo& input0,
                                                    const TensorInfo& output,
                                                    Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsMultiplicationSupported(input0, input1, output, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Multiplication,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsNormalizationSupported(const TensorInfo& input,
@@ -613,13 +867,27 @@ bool LayerSupportHandle::IsNormalizationSupported(const TensorInfo& input,
                                                   const NormalizationDescriptor& descriptor,
                                                   Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsNormalizationSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Normalization,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsOutputSupported(const TensorInfo& output,
                                            Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsOutputSupported(output, reasonIfUnsupported.value());
+    TensorInfos infos{output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Output,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsPadSupported(const TensorInfo& input,
@@ -627,7 +895,14 @@ bool LayerSupportHandle::IsPadSupported(const TensorInfo& input,
                                         const PadDescriptor& descriptor,
                                         Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsPadSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Pad,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsPermuteSupported(const TensorInfo& input,
@@ -635,7 +910,14 @@ bool LayerSupportHandle::IsPermuteSupported(const TensorInfo& input,
                                             const PermuteDescriptor& descriptor,
                                             Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsPermuteSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Permute,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsPooling2dSupported(const TensorInfo& input,
@@ -643,7 +925,14 @@ bool LayerSupportHandle::IsPooling2dSupported(const TensorInfo& input,
                                               const Pooling2dDescriptor& descriptor,
                                               Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsPooling2dSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Pooling2d,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsPooling3dSupported(const TensorInfo& input,
@@ -651,14 +940,28 @@ bool LayerSupportHandle::IsPooling3dSupported(const TensorInfo& input,
                                               const Pooling3dDescriptor& descriptor,
                                               Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsPooling3dSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Pooling3d,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsPreCompiledSupported(const TensorInfo& input,
                                                 const PreCompiledDescriptor& descriptor,
                                                 Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsPreCompiledSupported(input, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::PreCompiled,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsPreluSupported(const TensorInfo& input,
@@ -666,14 +969,28 @@ bool LayerSupportHandle::IsPreluSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsPreluSupported(input, alpha, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, alpha, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Prelu,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsQuantizeSupported(const TensorInfo& input,
                                              const TensorInfo& output,
                                              Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsQuantizeSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Quantize,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsQLstmSupported(const TensorInfo& input,
@@ -686,15 +1003,14 @@ bool LayerSupportHandle::IsQLstmSupported(const TensorInfo& input,
                                           const LstmInputParamsInfo& paramsInfo,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsQLstmSupported(input,
-                                            previousOutputIn,
-                                            previousCellStateIn,
-                                            outputStateOut,
-                                            cellStateOut,
-                                            output,
+    TensorInfos infos{input, previousOutputIn, previousCellStateIn, outputStateOut, cellStateOut, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::QLstm,
+                                            infos,
                                             descriptor,
                                             paramsInfo,
-                                            reasonIfUnsupported);
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsQuantizedLstmSupported(const TensorInfo& input,
@@ -705,20 +1021,28 @@ bool LayerSupportHandle::IsQuantizedLstmSupported(const TensorInfo& input,
                                                   const QuantizedLstmInputParamsInfo& paramsInfo,
                                                   Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsQuantizedLstmSupported(input,
-                                                    previousCellStateIn,
-                                                    previousOutputIn,
-                                                    cellStateOut,
-                                                    output,
-                                                    paramsInfo,
-                                                    reasonIfUnsupported);
+    TensorInfos infos{input, previousCellStateIn, previousOutputIn, cellStateOut, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::QuantizedLstm,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            paramsInfo,
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsRankSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsRankSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Rank,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsReduceSupported(const TensorInfo& input,
@@ -726,7 +1050,14 @@ bool LayerSupportHandle::IsReduceSupported(const TensorInfo& input,
                                            const ReduceDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsReduceSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Reduce,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsReshapeSupported(const TensorInfo& input,
@@ -734,7 +1065,14 @@ bool LayerSupportHandle::IsReshapeSupported(const TensorInfo& input,
                                             const ReshapeDescriptor& descriptor,
                                             Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsReshapeSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Reshape,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsResizeSupported(const TensorInfo& input,
@@ -742,14 +1080,28 @@ bool LayerSupportHandle::IsResizeSupported(const TensorInfo& input,
                                            const ResizeDescriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsResizeSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Resize,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsShapeSupported(const TensorInfo& input,
                                           const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsShapeSupported(input, output, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Shape,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSliceSupported(const TensorInfo& input,
@@ -757,7 +1109,14 @@ bool LayerSupportHandle::IsSliceSupported(const TensorInfo& input,
                                           const SliceDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsSliceSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Slice,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSoftmaxSupported(const TensorInfo& input,
@@ -765,7 +1124,14 @@ bool LayerSupportHandle::IsSoftmaxSupported(const TensorInfo& input,
                                             const SoftmaxDescriptor& descriptor,
                                             Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsSoftmaxSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Softmax,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSpaceToBatchNdSupported(const TensorInfo& input,
@@ -773,7 +1139,14 @@ bool LayerSupportHandle::IsSpaceToBatchNdSupported(const TensorInfo& input,
                                                    const SpaceToBatchNdDescriptor& descriptor,
                                                    Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsSpaceToBatchNdSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::SpaceToBatchNd,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSpaceToDepthSupported(const TensorInfo& input,
@@ -781,7 +1154,14 @@ bool LayerSupportHandle::IsSpaceToDepthSupported(const TensorInfo& input,
                                                  const SpaceToDepthDescriptor& descriptor,
                                                  Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsSpaceToDepthSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::SpaceToDepth,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSplitterSupported(const TensorInfo& input,
@@ -789,7 +1169,18 @@ bool LayerSupportHandle::IsSplitterSupported(const TensorInfo& input,
                                              const ViewsDescriptor& descriptor,
                                              Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsSplitterSupported(input, outputs, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input};
+    for (TensorInfo outInfo : outputs)
+    {
+        infos.push_back(outInfo);
+    }
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Splitter,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsStackSupported(const std::vector<const TensorInfo*>& inputs,
@@ -797,7 +1188,19 @@ bool LayerSupportHandle::IsStackSupported(const std::vector<const TensorInfo*>& 
                                           const StackDescriptor& descriptor,
                                           Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsStackSupported(inputs, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos;
+    for (const TensorInfo* inputInfo : inputs)
+    {
+        infos.push_back(*inputInfo);
+    }
+    infos.push_back(output);
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Stack,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsStandInSupported(const std::vector<const TensorInfo*>& inputs,
@@ -805,7 +1208,22 @@ bool LayerSupportHandle::IsStandInSupported(const std::vector<const TensorInfo*>
                                             const StandInDescriptor& descriptor,
                                             Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsStandInSupported(inputs, outputs, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos;
+    for (const TensorInfo* inputInfo : inputs)
+    {
+        infos.push_back(*inputInfo);
+    }
+    for (const TensorInfo* outputInfo : outputs)
+    {
+        infos.push_back(*outputInfo);
+    }
+
+    return m_LayerSupport->IsLayerSupported(LayerType::StandIn,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 
@@ -814,7 +1232,14 @@ bool LayerSupportHandle::IsStridedSliceSupported(const TensorInfo& input,
                                                  const StridedSliceDescriptor& descriptor,
                                                  Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsStridedSliceSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::StridedSlice,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSubtractionSupported(const TensorInfo& input0,
@@ -822,7 +1247,14 @@ bool LayerSupportHandle::IsSubtractionSupported(const TensorInfo& input0,
                                                 const TensorInfo& output,
                                                 Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsSubtractionSupported(input0, input1, output, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Subtraction,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsSwitchSupported(const TensorInfo& input0,
@@ -831,7 +1263,14 @@ bool LayerSupportHandle::IsSwitchSupported(const TensorInfo& input0,
                                            const TensorInfo& output1,
                                            Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsSwitchSupported(input0, input1, output0, output1, reasonIfUnsupported.value());
+    TensorInfos infos{input0, input1, output0, output1};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Switch,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsTransposeConvolution2dSupported(
@@ -842,12 +1281,15 @@ bool LayerSupportHandle::IsTransposeConvolution2dSupported(
         const Optional<TensorInfo>& biases,
         Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsTransposeConvolution2dSupported(input,
-                                                             output,
-                                                             descriptor,
-                                                             weights,
-                                                             biases,
-                                                             reasonIfUnsupported.value());
+    TensorInfo biasesVal =  biases.has_value() ? biases.value() : TensorInfo();
+    TensorInfos infos{input, output, weights, biasesVal};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::TransposeConvolution2d,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsTransposeSupported(const TensorInfo& input,
@@ -855,7 +1297,14 @@ bool LayerSupportHandle::IsTransposeSupported(const TensorInfo& input,
                                               const TransposeDescriptor& descriptor,
                                               Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsTransposeSupported(input, output, descriptor, reasonIfUnsupported.value());
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Transpose,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 bool LayerSupportHandle::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
@@ -868,15 +1317,16 @@ bool LayerSupportHandle::IsUnidirectionalSequenceLstmSupported(const TensorInfo&
                                                                const LstmInputParamsInfo& paramsInfo,
                                                                Optional<std::string&> reasonIfUnsupported)
 {
-    return m_LayerSupport->IsUnidirectionalSequenceLstmSupported(input,
-                                                                 outputStateIn,
-                                                                 cellStateIn,
-                                                                 output,
-                                                                 hiddenStateOutput,
-                                                                 cellStateOutput,
-                                                                 descriptor,
-                                                                 paramsInfo,
-                                                                 reasonIfUnsupported);
+    TensorInfo hiddenStateOutputVal =  hiddenStateOutput.has_value() ? hiddenStateOutput.value() : TensorInfo();
+    TensorInfo cellStateOutputVal   =  cellStateOutput.has_value() ? cellStateOutput.value() : TensorInfo();
+    TensorInfos infos{input, outputStateIn, cellStateIn, hiddenStateOutputVal, cellStateOutputVal, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::UnidirectionalSequenceLstm,
+                                            infos,
+                                            descriptor,
+                                            paramsInfo,
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
 }
 
 }

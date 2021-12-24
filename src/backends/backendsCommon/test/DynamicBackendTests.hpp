@@ -1450,12 +1450,11 @@ void CreateReferenceDynamicBackendTestImpl()
     TensorInfo outputInfo(outputShape, DataType::Float32);
     TensorInfo weightInfo(weightShape, DataType::Float32);
     Convolution2dDescriptor convolution2dDescriptor;
+    std::vector<TensorInfo> infos = {inputInfo, outputInfo, weightInfo, TensorInfo()};
     bool referenceConvolution2dSupported =
-            referenceLayerSupport->IsConvolution2dSupported(inputInfo,
-                                                            outputInfo,
-                                                            convolution2dDescriptor,
-                                                            weightInfo,
-                                                            EmptyOptional());
+             referenceLayerSupport->IsLayerSupported(LayerType::Convolution2d,
+                                                     infos,
+                                                     convolution2dDescriptor);
     CHECK(referenceConvolution2dSupported);
 
     // Test the backend instance by creating a workload
@@ -1535,12 +1534,11 @@ void CreateSampleDynamicBackendTestImpl()
     TensorInfo outputInfo(outputShape, DataType::Float32);
     TensorInfo weightInfo(weightShape, DataType::Float32);
     Convolution2dDescriptor convolution2dDescriptor;
-    bool sampleConvolution2dSupported =
-            sampleLayerSupport->IsConvolution2dSupported(inputInfo,
-                                                         outputInfo,
-                                                         convolution2dDescriptor,
-                                                         weightInfo,
-                                                         EmptyOptional());
+    std::vector<TensorInfo> infos = {inputInfo, outputInfo, weightInfo, TensorInfo()};
+    bool referenceConvolution2dSupported =
+             referenceLayerSupport->IsLayerSupported(LayerType::Convolution2d,
+                                                     infos,
+                                                     convolution2dDescriptor);
     CHECK(!sampleConvolution2dSupported);
 
     // Test the backend instance by creating a workload

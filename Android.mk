@@ -122,6 +122,7 @@ LOCAL_SRC_FILES := \
         src/armnn/Descriptors.cpp \
         src/armnn/Exceptions.cpp \
         src/armnn/Graph.cpp \
+        src/armnn/ILayerSupport.cpp \
         src/armnn/InternalTypes.cpp \
         src/armnn/JsonPrinter.cpp \
         src/armnn/Layer.cpp \

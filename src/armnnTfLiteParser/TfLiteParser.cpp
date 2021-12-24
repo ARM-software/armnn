@@ -2906,6 +2906,7 @@ void TfLiteParserImpl::ParseDetectionPostProcess(size_t subgraphIndex, size_t op
 
     for (unsigned int i = 0 ; i < outputs.size() ; ++i)
     {
+        m_OverridenOutputShapesMappedByName[outputs[i]->name] = m_OverridenOutputShapes[i]; 
         armnn::TensorInfo detectionBoxOutputTensorInfo = ToTensorInfo(outputs[i], m_OverridenOutputShapes[i]);
         layer->GetOutputSlot(i).SetTensorInfo(detectionBoxOutputTensorInfo);
     }
@@ -4238,8 +4239,8 @@ BindingPointInfo TfLiteParserImpl::GetNetworkOutputBindingInfo(size_t subgraphId
         if (output.second->name == name)
         {
             auto bindingId = GenerateLayerBindingId(subgraphId, output.first);
-            std::vector<unsigned int> shape = m_OverridenOutputShapes.size() > 0 ?
-                                                m_OverridenOutputShapes[i] : AsUnsignedVector(output.second->shape);
+            std::vector<unsigned int> shape = m_OverridenOutputShapesMappedByName.empty() > 0 ?
+                                                AsUnsignedVector(output.second->shape) : m_OverridenOutputShapesMappedByName.at(name);
             return std::make_pair(bindingId, ToTensorInfo(output.second, shape));
         }
     }

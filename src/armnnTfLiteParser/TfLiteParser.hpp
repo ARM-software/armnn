@@ -273,6 +273,8 @@ private:
     /// This is used in case that the model does not speciry the output.
     /// The shape can be calculated from the options.
     std::vector<std::vector<unsigned int>> m_OverridenOutputShapes;
+    std::map<std::string, std::vector<unsigned int>> m_OverridenOutputShapesMappedByName;
+
 };
 
 }

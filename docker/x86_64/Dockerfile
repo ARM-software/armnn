@@ -66,11 +66,20 @@ RUN apt-get update && apt-get install -y \
     autoconf \
     libtool \
     build-essential \
-    g++ \ 
-    cmake && rm -rf /var/lib/apt/lists/*
+    libssl-dev \
+    g++ && rm -rf /var/lib/apt/lists/*
 
 # Install Cross-compiling ToolChain
 RUN apt-get update && apt-get install -y crossbuild-essential-arm64
+
+# Install Cmake 3.19
+RUN cd $HOME && \
+    wget -O cmake-3.19.0.tar.gz https://cmake.org/files/v3.19/cmake-3.19.0.tar.gz && \
+    tar -xzf cmake-3.19.0.tar.gz && \
+    cd $HOME/cmake-3.19.0 && \
+    ./bootstrap && \
+    make && \
+    make install
 
 # Build and install Google's Protobuf library
 # Download and Extract
@@ -105,28 +114,46 @@ RUN apt-get update && apt-get install -y \
 
 # Download ArmNN
 RUN cd $HOME/armnn-devenv && git clone "https://review.mlplatform.org/ml/armnn" && \
-    cd armnn && git checkout remotes/origin/branches/armnn_21_11
+    cd armnn && git checkout master
 
 # Build Compute Library
 RUN cd $HOME/armnn-devenv/ && git clone https://review.mlplatform.org/ml/ComputeLibrary && \
     cd ComputeLibrary && \
     git checkout $($HOME/armnn-devenv/armnn/scripts/get_compute_library.sh -p) && \
-    scons Werror=0 arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j$(nproc) internal_only=0
+    scons Werror=0 arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j$(nproc)
 
-# Build Tensorflow 2.5.1
-RUN cd $HOME/armnn-devenv && git clone https://github.com/tensorflow/tensorflow.git && \
+# Download Tensorflow (Checkout latest tested version of TF using get_tensorflow.sh)
+RUN cd $HOME/armnn-devenv && \
+    git clone https://github.com/tensorflow/tensorflow.git && \
     cd tensorflow && \
-    git checkout a4dfb8d1a71385bd6d122e4f27f86dcebb96712d && \
-    ../armnn/scripts/generate_tensorflow_protobuf.sh ../tensorflow-protobuf ../google/x86_64_pb_install
+    git checkout $($HOME/armnn-devenv/armnn/scripts/get_tensorflow.sh -p)
 
-# Download Flatbuffer
+# Build TF Lite
+RUN cd $HOME/armnn-devenv && \
+    curl -LO https://storage.googleapis.com/mirror.tensorflow.org/developer.arm.com/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz && \
+    mkdir tflite-toolchains && \
+    tar xvf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz -C tflite-toolchains && \
+    mkdir -p tflite/build && \
+    cd tflite/build && \
+    ARMCC_PREFIX=$HOME/armnn-devenv/tflite-toolchains/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu- && \
+    ARMCC_FLAGS="-funsafe-math-optimizations" && \
+    cmake -DCMAKE_C_COMPILER=${ARMCC_PREFIX}gcc \
+          -DCMAKE_CXX_COMPILER=${ARMCC_PREFIX}g++ \
+          -DCMAKE_C_FLAGS="${ARMCC_FLAGS}" -DCMAKE_CXX_FLAGS="${ARMCC_FLAGS}" \
+          -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON  -DCMAKE_SYSTEM_NAME=Linux \
+          -DTFLITE_ENABLE_XNNPACK=OFF \
+          -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+          $HOME/armnn-devenv/tensorflow/tensorflow/lite/ && \
+    cmake --build .
+
+# Download Flatbuffers
 RUN cd $HOME/armnn-devenv && \
     wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz && \
     tar xf flatbuffers-1.12.0.tar.gz && \
     cd flatbuffers-1.12.0 && \
     rm -f CMakeCache.txt
 
-# Build a native (x86_64) version
+# Build native x86_64 version of Flatbuffers
 RUN cd $HOME/armnn-devenv && cd flatbuffers-1.12.0 && \
     mkdir build && \
     cd build && \
@@ -135,7 +162,7 @@ RUN cd $HOME/armnn-devenv && cd flatbuffers-1.12.0 && \
          -DFLATBUFFERS_BUILD_TESTS=0 && \
     make all install -j$(nproc)
 
-# Build arm64 version of flatbuffer
+# Build arm64 version of Flatbuffers
 RUN cd $HOME/armnn-devenv&& cd flatbuffers-1.12.0  && \
     mkdir build-arm64 && \
     cd build-arm64 && \
@@ -154,9 +181,8 @@ RUN cd $HOME/armnn-devenv && git clone https://github.com/onnx/onnx.git && \
     $HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc \
     onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out $HOME/armnn-devenv/onnx
 
-# Build TfLite
+# Generate TF Lite Schema
 RUN cd $HOME/armnn-devenv && \
-    mkdir tflite && \
     cd tflite && \
     cp ../tensorflow/tensorflow/lite/schema/schema.fbs . && \
     ../flatbuffers-1.12.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
@@ -175,7 +201,10 @@ RUN cd $HOME/armnn-devenv && \
     -DONNX_GENERATED_SOURCES=$HOME/armnn-devenv/onnx \
     -DBUILD_ONNX_PARSER=1 \
     -DBUILD_TF_LITE_PARSER=1 \
-    -DTF_LITE_GENERATED_PATH=$HOME/armnn-devenv/tflite \
+    -DBUILD_ARMNN_TFLITE_DELEGATE=1 \
+    -DTENSORFLOW_ROOT=$HOME/armnn-devenv/tensorflow \
+    -DTFLITE_LIB_ROOT=$HOME/armnn-devenv/tflite/build \
+    -DTF_LITE_SCHEMA_INCLUDE_PATH=$HOME/armnn-devenv/tflite \
     -DFLATBUFFERS_ROOT=$HOME/armnn-devenv/flatbuffers-arm64 \
     -DFLATC_DIR=$HOME/armnn-devenv/flatbuffers-1.12.0/build \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install \

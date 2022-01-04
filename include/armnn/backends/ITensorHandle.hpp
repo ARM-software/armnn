@@ -77,6 +77,17 @@ public:
         IgnoreUnused(memory, source);
         return false;
     };
+
+    /// Implementations must determine if this memory block can be imported.
+    /// This might be based on alignment or memory source type.
+    /// \return true if this memory can be imported.
+    /// \return false by default, cannot be imported.
+    virtual bool CanBeImported(void* memory, MemorySource source)
+    {
+        IgnoreUnused(memory, source);
+        return false;
+    };
+
     /// Unimport externally allocated memory
     virtual void Unimport()
     {};

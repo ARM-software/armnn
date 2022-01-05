@@ -57,6 +57,7 @@ public:
     }
 
     virtual bool Import(void* memory, MemorySource source) override;
+    virtual bool CanBeImported(void* memory, MemorySource source) override;
 
 private:
     // Only used for testing

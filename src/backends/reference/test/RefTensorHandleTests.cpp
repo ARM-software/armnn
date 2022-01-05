@@ -253,6 +253,39 @@ TEST_CASE("MisalignedPointer")
     delete[] testPtr;
 }
 
+TEST_CASE("CheckCanBeImported")
+{
+    TensorInfo info({1}, DataType::Float32);
+    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+
+    int* testPtr = new int(4);
+
+    // Not supported
+    CHECK(!handle.CanBeImported(static_cast<void *>(testPtr), MemorySource::DmaBuf));
+
+    // Supported
+    CHECK(handle.CanBeImported(static_cast<void *>(testPtr), MemorySource::Malloc));
+
+    delete testPtr;
+
+}
+
+TEST_CASE("MisalignedCanBeImported")
+{
+    TensorInfo info({2}, DataType::Float32);
+    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+
+    // Allocate a 2 int array
+    int* testPtr = new int[2];
+
+    // Increment pointer by 1 byte
+    void* misalignedPtr = static_cast<void*>(reinterpret_cast<char*>(testPtr) + 1);
+
+    CHECK(!handle.Import(misalignedPtr, MemorySource::Malloc));
+
+    delete[] testPtr;
+}
+
 #endif
 
 }

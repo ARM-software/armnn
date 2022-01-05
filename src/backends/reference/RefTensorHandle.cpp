@@ -122,8 +122,7 @@ bool RefTensorHandle::Import(void* memory, MemorySource source)
         if (m_IsImportEnabled && source == MemorySource::Malloc)
         {
             // Check memory alignment
-            uintptr_t alignment = GetDataTypeSize(m_TensorInfo.GetDataType());
-            if (reinterpret_cast<uintptr_t>(memory) % alignment)
+            if(!CanBeImported(memory, source))
             {
                 if (m_Imported)
                 {
@@ -157,6 +156,26 @@ bool RefTensorHandle::Import(void* memory, MemorySource source)
         }
     }
 
+    return false;
+}
+
+bool RefTensorHandle::CanBeImported(void *memory, MemorySource source)
+{
+    if (m_ImportFlags & static_cast<MemorySourceFlags>(source))
+    {
+        if (m_IsImportEnabled && source == MemorySource::Malloc)
+        {
+            uintptr_t alignment = GetDataTypeSize(m_TensorInfo.GetDataType());
+            if (reinterpret_cast<uintptr_t>(memory) % alignment)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
+    }
     return false;
 }
 

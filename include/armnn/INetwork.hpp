@@ -423,7 +423,7 @@ public:
     /// @param backend - optional BackendId set for the Precompiled layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
-                                           CompiledBlobPtr& compiledBlobPtr,
+                                           CompiledBlobPtr compiledBlobPtr,
                                            const Optional<BackendId>& backend,
                                            const char* name = nullptr);
 

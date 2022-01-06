@@ -161,7 +161,7 @@ TEST_CASE("OptimizedViewsSubgraphLayerCountUsingGetINetwork")
     // Create a Network containing a layer to substitute in
     NetworkImpl net;
     Layer* substitutionpreCompiledLayer = PolymorphicDowncast<Layer*>(
-        net.AddPrecompiledLayer(substitutionLayerDescriptor, blobPtr, backend));
+        net.AddPrecompiledLayer(substitutionLayerDescriptor, std::move(blobPtr), backend));
 
     // Subgraph for a substitution layer
     SubgraphViewSelector::SubgraphViewPtr substitutionSubgraph =

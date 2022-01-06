@@ -194,7 +194,7 @@ OptimizationViews MockBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                 optimizationViews.GetINetwork()->AddPrecompiledLayer(
                         PreCompiledDescriptor(supportedSubgraph->GetNumInputSlots(),
                                               supportedSubgraph->GetNumOutputSlots()),
-                                              blobPtr,
+                                              std::move(blobPtr),
                                               backend,
                                               nullptr);
 

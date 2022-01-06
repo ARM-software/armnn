@@ -215,11 +215,11 @@ IConnectableLayer* INetwork::AddPooling3dLayer(const Pooling3dDescriptor& poolin
 }
 
 IConnectableLayer* INetwork::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
-                                                 CompiledBlobPtr& compiledBlobPtr,
+                                                 CompiledBlobPtr compiledBlobPtr,
                                                  const Optional<BackendId>& backend,
                                                  const char* name)
 {
-    return pNetworkImpl->AddPrecompiledLayer(preCompiledDescriptor, compiledBlobPtr, backend, name);
+    return pNetworkImpl->AddPrecompiledLayer(preCompiledDescriptor, std::move(compiledBlobPtr), backend, name);
 }
 
 IConnectableLayer* INetwork::AddActivationLayer(const ActivationDescriptor& activationDescriptor,
@@ -2772,7 +2772,7 @@ IConnectableLayer* NetworkImpl::AddUnidirectionalSequenceLstmLayer(
 }
 
 IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,
-                                                    CompiledBlobPtr& compiledBlobPtr,
+                                                    CompiledBlobPtr compiledBlobPtr,
                                                     const Optional<BackendId>& backend,
                                                     const char* name)
 {

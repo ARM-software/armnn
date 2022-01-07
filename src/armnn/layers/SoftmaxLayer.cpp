@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> SoftmaxLayer::CreateWorkload(const IWorkloadFactory& 
     SoftmaxQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateSoftmax(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Softmax, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SoftmaxLayer* SoftmaxLayer::Clone(Graph& graph) const

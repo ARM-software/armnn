@@ -44,7 +44,9 @@ LayerTestResult<armnn::Half, 4> SimpleConvertFp32ToFp16Test(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvertFp32ToFp16(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::ConvertFp32ToFp16,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

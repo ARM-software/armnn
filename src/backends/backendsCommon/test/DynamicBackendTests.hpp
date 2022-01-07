@@ -1474,7 +1474,9 @@ void CreateReferenceDynamicBackendTestImpl()
     convolution2dQueueDescriptor.m_Weight = weights.get();
 
     // Create a convolution workload with the dummy settings
-    auto workload = referenceWorkloadFactory->CreateConvolution2d(convolution2dQueueDescriptor, workloadInfo);
+    auto workload = referenceWorkloadFactory->CreateWorkload(LayerType::Convolution2d,
+                                                             convolution2dQueueDescriptor,
+                                                             workloadInfo);
     CHECK((workload != nullptr));
     CHECK(workload.get() == PolymorphicDowncast<RefConvolution2dWorkload*>(workload.get()));
 }

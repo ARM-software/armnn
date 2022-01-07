@@ -27,6 +27,8 @@ struct QueueDescriptor
     std::vector<ITensorHandle*> m_Outputs;
     void* m_AdditionalInfoObject;
 
+    virtual ~QueueDescriptor() = default;
+
     void ValidateInputsOutputs(const std::string& descName,
                                unsigned int numExpectedIn,
                                unsigned int numExpectedOut) const;
@@ -38,7 +40,6 @@ struct QueueDescriptor
     }
 
 protected:
-    ~QueueDescriptor() = default;
     QueueDescriptor()
         : m_AdditionalInfoObject(nullptr)
     {}
@@ -52,8 +53,9 @@ struct QueueDescriptorWithParameters : public QueueDescriptor
 {
     LayerDescriptor m_Parameters;
 
+    virtual ~QueueDescriptorWithParameters() = default;
+
 protected:
-    ~QueueDescriptorWithParameters() = default;
     QueueDescriptorWithParameters() = default;
     QueueDescriptorWithParameters(QueueDescriptorWithParameters const&) = default;
     QueueDescriptorWithParameters& operator=(QueueDescriptorWithParameters const&) = default;

@@ -65,7 +65,9 @@ LayerTestResult<T, outputDimLength> StackTestHelper(
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
     outputHandle->Allocate();
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateStack(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Stack,
+                                                                                descriptor,
+                                                                                info);
 
     workload->Execute();
 

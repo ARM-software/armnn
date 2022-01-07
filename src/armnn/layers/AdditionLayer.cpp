@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> AdditionLayer::CreateWorkload(const IWorkloadFactory&
     AdditionQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateAddition(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Addition, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 AdditionLayer* AdditionLayer::Clone(Graph& graph) const

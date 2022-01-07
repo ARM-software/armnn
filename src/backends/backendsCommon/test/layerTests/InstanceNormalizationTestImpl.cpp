@@ -48,7 +48,8 @@ LayerTestResult<T, 4> InstanceNormTestImpl(
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateInstanceNormalization(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::InstanceNormalization, descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

@@ -207,7 +207,9 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateSplitter(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Splitter,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle1->Allocate();
@@ -230,7 +232,9 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
     data2.m_ViewOrigins.push_back(window3);
     data2.m_ViewOrigins.push_back(window4);
 
-    std::unique_ptr<armnn::IWorkload> workload2 = workloadFactory.CreateSplitter(data2, info2);
+    std::unique_ptr<armnn::IWorkload> workload2 = workloadFactory.CreateWorkload(armnn::LayerType::Splitter,
+                                                                                 data2,
+                                                                                 info2);
 
     outputHandle3->Allocate();
     outputHandle4->Allocate();
@@ -305,7 +309,9 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
 
     data.m_ViewOrigins.push_back(window);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateSplitter(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Splitter,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

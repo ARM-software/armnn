@@ -63,7 +63,7 @@ std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const IWorkloadFac
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Convolution2d, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 Convolution2dLayer* Convolution2dLayer::Clone(Graph& graph) const

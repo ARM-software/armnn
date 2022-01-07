@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> GatherLayer::CreateWorkload(const armnn::IWorkloadFac
     GatherQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateGather(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Gather, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 GatherLayer* GatherLayer::Clone(Graph& graph) const

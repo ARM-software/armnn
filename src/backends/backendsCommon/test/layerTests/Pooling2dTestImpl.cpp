@@ -100,7 +100,9 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
         return result;
     }
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePooling2d(queueDescriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Pooling2d,
+                                                                                queueDescriptor,
+                                                                                workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -830,8 +832,10 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePooling2d(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreatePooling2d(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::Pooling2d, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef
+            = refWorkloadFactory.CreateWorkload(armnn::LayerType::Pooling2d, refData, refInfo);
 
     outputHandleRef->Allocate();
     inputHandleRef->Allocate();

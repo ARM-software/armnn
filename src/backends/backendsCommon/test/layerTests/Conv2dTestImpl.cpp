@@ -344,7 +344,9 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     data.m_Parameters.m_DilationX = dilationX;
     data.m_Parameters.m_DilationY = dilationY;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution2d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d,
+                                                                                data,
+                                                                                info);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -444,7 +446,9 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution2d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d,
+                                                                                data,
+                                                                                info);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -570,7 +574,9 @@ LayerTestResult<T,4> Convolution1dTestImpl(
     data.m_Parameters.m_PadBottom      = padSize;
     data.m_Parameters.m_BiasEnabled    = biasEnabled;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution2d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d,
+                                                                                data,
+                                                                                info);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -1388,8 +1394,10 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload    = workloadFactory.CreateConvolution2d(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateConvolution2d(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef
+            = refWorkloadFactory.CreateWorkload(armnn::LayerType::Convolution2d, refData, refInfo);
 
     outputHandleRef->Allocate();
     inputHandleRef->Allocate();
@@ -1756,7 +1764,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d, data, info);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -1905,7 +1914,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     data.m_Parameters.m_BiasEnabled = biasEnabled;
     data.m_Parameters.m_DataLayout = layout;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d, data, info);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -2100,7 +2110,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     data.m_Parameters.m_BiasEnabled = biasEnabled;
     data.m_Parameters.m_DataLayout = layout;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d, data, info);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -2266,7 +2277,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     data.m_Parameters.m_DilationX = dilationX;
     data.m_Parameters.m_DilationY = dilationY;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d, data, info);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -2989,8 +3001,10 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateDepthwiseConvolution2d(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef
+            = refWorkloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d, refData, refInfo);
 
     outputHandleRef->Allocate();
     inputHandleRef->Allocate();
@@ -3474,7 +3488,9 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConvolution2d(queueDescriptor, workloadInfo);
+    std::unique_ptr<IWorkload> workload= workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d,
+                                                                        queueDescriptor,
+                                                                        workloadInfo);
     inputHandle->Allocate();
     outputHandle->Allocate();
 
@@ -3740,7 +3756,9 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateDepthwiseConvolution2d(queueDescriptor, workloadInfo);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d,
+                                                                         queueDescriptor,
+                                                                         workloadInfo);
     inputHandle->Allocate();
     outputHandle->Allocate();
 

@@ -22,7 +22,7 @@ std::unique_ptr<IWorkload> RankLayer::CreateWorkload(const IWorkloadFactory& fac
     RankQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateRank(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Rank, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 Layer* RankLayer::Clone(Graph& graph) const

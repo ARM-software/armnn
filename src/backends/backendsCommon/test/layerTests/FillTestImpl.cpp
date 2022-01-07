@@ -40,7 +40,7 @@ LayerTestResult<T, 4> SimpleFillTest(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateFill(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Fill, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

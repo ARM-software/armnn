@@ -39,7 +39,7 @@ LayerTestResult<T, 4> SimplePermuteTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePermute(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Permute, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

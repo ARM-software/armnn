@@ -26,7 +26,7 @@ std::unique_ptr<IWorkload> ShapeLayer::CreateWorkload(const IWorkloadFactory& fa
     ShapeQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateShape(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Shape, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ShapeLayer* ShapeLayer::Clone(Graph& graph) const

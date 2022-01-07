@@ -74,7 +74,7 @@ std::unique_ptr<IWorkload> UnidirectionalSequenceLstmLayer::CreateWorkload(const
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateUnidirectionalSequenceLstm(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::UnidirectionalSequenceLstm, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 UnidirectionalSequenceLstmLayer* UnidirectionalSequenceLstmLayer::Clone(Graph& graph) const

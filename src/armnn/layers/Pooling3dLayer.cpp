@@ -29,7 +29,7 @@ std::unique_ptr<IWorkload> Pooling3dLayer::CreateWorkload(const IWorkloadFactory
     Pooling3dQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreatePooling3d(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Pooling3d, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 Pooling3dLayer* Pooling3dLayer::Clone(Graph& graph) const

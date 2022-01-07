@@ -46,7 +46,7 @@ LayerTestResult<T, OutputDim> GatherTestImpl(
     AddInputToWorkload(data, info, indicesInfo, indicesHandle.get());
     AddOutputToWorkload(data, info, outputInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateGather(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Gather, data, info);
 
     paramsHandle->Allocate();
     indicesHandle->Allocate();

@@ -21,7 +21,7 @@ std::unique_ptr<IWorkload> SwitchLayer::CreateWorkload(const IWorkloadFactory& f
     SwitchQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateSwitch(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Switch, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SwitchLayer* SwitchLayer::Clone(Graph& graph) const

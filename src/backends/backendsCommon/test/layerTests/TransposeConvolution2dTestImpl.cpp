@@ -96,7 +96,7 @@ void TransposeConvolution2dTestImpl(armnn::IWorkloadFactory& workloadFactory,
     AddOutputToWorkload(queueDescriptor, workloadInfo, output.first, outputHandle.get());
 
     std::unique_ptr<armnn::IWorkload> workload =
-            workloadFactory.CreateTransposeConvolution2d(queueDescriptor, workloadInfo);
+            workloadFactory.CreateWorkload(armnn::LayerType::TransposeConvolution2d, queueDescriptor, workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -658,7 +658,9 @@ LayerTestResult<uint8_t, 4> TransposeConvolution2dPerAxisQuantTest(
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateTransposeConvolution2d(queueDescriptor, workloadInfo);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::TransposeConvolution2d,
+                                                                         queueDescriptor,
+                                                                         workloadInfo);
     inputHandle->Allocate();
     outputHandle->Allocate();
 

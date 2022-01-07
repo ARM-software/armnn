@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> StackLayer::CreateWorkload(const IWorkloadFactory& fa
     StackQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateStack(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Stack, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 StackLayer* StackLayer::Clone(Graph& graph) const

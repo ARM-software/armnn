@@ -23,7 +23,7 @@ LogicalBinaryLayer::LogicalBinaryLayer(const LogicalBinaryDescriptor& param, con
 std::unique_ptr<IWorkload> LogicalBinaryLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     LogicalBinaryQueueDescriptor descriptor;
-    return factory.CreateLogicalBinary(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::LogicalBinary, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 LogicalBinaryLayer* LogicalBinaryLayer::Clone(Graph& graph) const

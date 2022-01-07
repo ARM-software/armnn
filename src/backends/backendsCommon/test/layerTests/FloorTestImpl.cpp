@@ -47,7 +47,7 @@ LayerTestResult<T, 4> SimpleFloorTest(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateFloor(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Floor, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

@@ -41,7 +41,7 @@ LayerTestResult<TOutput, 4> CastTest(armnn::IWorkloadFactory& workloadFactory,
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateCast(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Cast, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

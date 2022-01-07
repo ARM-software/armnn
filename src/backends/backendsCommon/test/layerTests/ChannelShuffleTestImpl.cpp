@@ -35,7 +35,8 @@ LayerTestResult<T, NumDims> ChannelShuffleTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateChannelShuffle(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::ChannelShuffle, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

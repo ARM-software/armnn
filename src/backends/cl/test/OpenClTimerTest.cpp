@@ -99,7 +99,7 @@ TEST_CASE_FIXTURE(OpenClFixture, "OpenClTimerBatchNorm")
     // for each channel:
     // substract mean, divide by standard deviation (with an epsilon to avoid div by 0)
     // multiply by gamma and add beta
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateBatchNormalization(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::BatchNormalization, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

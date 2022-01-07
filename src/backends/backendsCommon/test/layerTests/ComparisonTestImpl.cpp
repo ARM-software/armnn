@@ -66,7 +66,8 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     AddInputToWorkload(qDescriptor, info, inputTensorInfo1, inputHandle1.get());
     AddOutputToWorkload(qDescriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateComparison(qDescriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::Comparison, qDescriptor, info);
 
     inputHandle0->Allocate();
     inputHandle1->Allocate();

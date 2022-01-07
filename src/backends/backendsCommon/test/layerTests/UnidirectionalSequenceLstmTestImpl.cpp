@@ -169,7 +169,8 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     data.m_Parameters.m_ProjectionEnabled = false;
     data.m_Parameters.m_TimeMajor = false;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -344,7 +345,8 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     data.m_Parameters.m_ProjectionEnabled = false;
     data.m_Parameters.m_TimeMajor = true;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -624,7 +626,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     data.m_Parameters.m_ClippingThresCell = 10.0f;
 
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -848,7 +851,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     data.m_Parameters.m_TimeMajor = false;
     data.m_Parameters.m_ClippingThresCell = 10.0f;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -1008,7 +1012,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjec
     data.m_Parameters.m_ProjectionEnabled = false;
     data.m_Parameters.m_TimeMajor = false;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -1147,7 +1152,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8Test(
     data.m_Parameters.m_ProjectionEnabled = false;
     data.m_Parameters.m_TimeMajor = false;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -1286,7 +1292,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8TimeMajorTest(
     data.m_Parameters.m_ProjectionEnabled = false;
     data.m_Parameters.m_TimeMajor = true;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -1449,7 +1456,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     data.m_Parameters.m_ClippingThresCell = 10.0f;
 
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -1640,7 +1648,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     data.m_Parameters.m_TimeMajor = false;
     data.m_Parameters.m_ClippingThresCell = 10.0f;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
@@ -1776,7 +1785,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoPr
     data.m_Parameters.m_ProjectionEnabled = false;
     data.m_Parameters.m_TimeMajor = false;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateUnidirectionalSequenceLstm(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();

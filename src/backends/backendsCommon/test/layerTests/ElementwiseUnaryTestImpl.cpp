@@ -10,5 +10,5 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload(
     const armnn::WorkloadInfo& info,
     const armnn::ElementwiseUnaryQueueDescriptor& descriptor)
 {
-    return workloadFactory.CreateElementwiseUnary(descriptor, info);
+    return workloadFactory.CreateWorkload(armnn::LayerType::ElementwiseUnary, descriptor, info);
 }

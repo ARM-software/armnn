@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> MaximumLayer::CreateWorkload(const IWorkloadFactory& 
     MaximumQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateMaximum(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Maximum, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MaximumLayer* MaximumLayer::Clone(Graph& graph) const

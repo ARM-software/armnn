@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> ConvertFp32ToFp16Layer::CreateWorkload(const IWorkloa
     ConvertFp32ToFp16QueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateConvertFp32ToFp16(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::ConvertFp32ToFp16, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ConvertFp32ToFp16Layer* ConvertFp32ToFp16Layer::Clone(Graph& graph) const

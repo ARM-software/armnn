@@ -33,7 +33,7 @@ std::unique_ptr<IWorkload> ConcatLayer::CreateWorkload(const IWorkloadFactory& f
     }
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateConcat(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Concat, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 template<typename FactoryType>

@@ -37,7 +37,7 @@ std::unique_ptr<IWorkload> TransposeConvolution2dLayer::CreateWorkload(const IWo
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateTransposeConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::TransposeConvolution2d, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 TransposeConvolution2dLayer* TransposeConvolution2dLayer::Clone(Graph& graph) const

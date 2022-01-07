@@ -36,7 +36,7 @@ std::unique_ptr<IWorkload> StridedSliceLayer::CreateWorkload(const IWorkloadFact
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateStridedSlice(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::StridedSlice, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 StridedSliceLayer* StridedSliceLayer::Clone(Graph& graph) const

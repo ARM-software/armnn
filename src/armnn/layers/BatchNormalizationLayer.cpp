@@ -34,7 +34,7 @@ std::unique_ptr<IWorkload> BatchNormalizationLayer::CreateWorkload(const IWorklo
     descriptor.m_Beta = m_Beta.get();
     descriptor.m_Gamma = m_Gamma.get();
 
-    return factory.CreateBatchNormalization(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::BatchNormalization, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 BatchNormalizationLayer* BatchNormalizationLayer::Clone(Graph& graph) const

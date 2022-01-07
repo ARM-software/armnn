@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> ConstantLayer::CreateWorkload(const IWorkloadFactory&
     descriptor.m_LayerOutput = m_LayerOutput.get();
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateConstant(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Constant, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ConstantLayer* ConstantLayer::Clone(Graph& graph) const

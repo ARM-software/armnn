@@ -33,7 +33,7 @@ std::unique_ptr<IWorkload> BatchToSpaceNdLayer::CreateWorkload(const IWorkloadFa
     BatchToSpaceNdQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateBatchToSpaceNd(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::BatchToSpaceNd, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 BatchToSpaceNdLayer* BatchToSpaceNdLayer::Clone(Graph& graph) const

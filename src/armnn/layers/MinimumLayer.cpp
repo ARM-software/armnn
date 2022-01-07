@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> MinimumLayer::CreateWorkload(const IWorkloadFactory& 
     MinimumQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateMinimum(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Minimum, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MinimumLayer* MinimumLayer::Clone(Graph& graph) const

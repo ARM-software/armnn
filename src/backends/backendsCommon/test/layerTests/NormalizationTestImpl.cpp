@@ -82,7 +82,9 @@ LayerTestResult<float,4> SimpleNormalizationTestImpl(
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, &refHandle);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateNormalization(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Normalization,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -237,7 +239,9 @@ LayerTestResult<float,4> SimpleNormalizationNhwcTestImpl(
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, &refHandle);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateNormalization(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Normalization,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -355,8 +359,10 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
         return ret;
     }
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateNormalization(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateNormalization(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::Normalization, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef
+            = refWorkloadFactory.CreateWorkload(armnn::LayerType::Normalization, refData, refInfo);
 
     outputHandleRef->Allocate();
     inputHandleRef->Allocate();
@@ -438,7 +444,9 @@ LayerTestResult<float,4> AcrossChannelNormalizationTestImpl(
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, &refHandle);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateNormalization(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Normalization,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

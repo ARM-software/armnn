@@ -28,7 +28,7 @@ std::unique_ptr<IWorkload> ResizeLayer::CreateWorkload(const IWorkloadFactory& f
     ResizeQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateResize(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Resize, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ResizeLayer* ResizeLayer::Clone(Graph& graph) const

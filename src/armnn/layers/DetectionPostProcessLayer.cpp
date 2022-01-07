@@ -26,7 +26,7 @@ std::unique_ptr<IWorkload> DetectionPostProcessLayer::CreateWorkload(const armnn
     descriptor.m_Anchors = m_Anchors.get();
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateDetectionPostProcess(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::DetectionPostProcess, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DetectionPostProcessLayer* DetectionPostProcessLayer::Clone(Graph& graph) const

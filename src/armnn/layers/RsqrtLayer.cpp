@@ -21,10 +21,11 @@ RsqrtLayer::RsqrtLayer(const char* name)
 
 std::unique_ptr<IWorkload> RsqrtLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    RsqrtQueueDescriptor descriptor;
+    ElementwiseUnaryQueueDescriptor descriptor;
+    descriptor.m_Parameters.m_Operation = UnaryOperation::Rsqrt;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateRsqrt(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::ElementwiseUnary, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 RsqrtLayer* RsqrtLayer::Clone(Graph& graph) const

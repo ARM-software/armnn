@@ -28,7 +28,7 @@ std::unique_ptr<IWorkload> MeanLayer::CreateWorkload(const armnn::IWorkloadFacto
     descriptor.m_Parameters.m_KeepDims = m_Param.m_KeepDims;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateMean(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Mean, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MeanLayer* MeanLayer::Clone(Graph& graph) const

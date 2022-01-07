@@ -55,7 +55,7 @@ LayerTestResult<T, OutputDim> MeanTestHelper(
     AddInputToWorkload(data,  info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateMean(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Mean, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

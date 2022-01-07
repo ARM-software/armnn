@@ -63,7 +63,9 @@ LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvertFp32ToBf16(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::ConvertFp32ToBf16,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

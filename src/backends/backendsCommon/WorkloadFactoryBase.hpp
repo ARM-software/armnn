@@ -34,6 +34,11 @@ public:
                                                       const bool /*IsMemoryManaged*/) const override
     { return nullptr; }
 
+    std::unique_ptr<IWorkload> CreateWorkload(LayerType /*type*/,
+                                              const QueueDescriptor& /*descriptor*/,
+                                              const WorkloadInfo& /*info*/) const override
+    { return nullptr; }
+
     std::unique_ptr<IWorkload> CreateActivation(const ActivationQueueDescriptor& /*descriptor*/,
                                                 const WorkloadInfo& /*info*/) const override
     { return nullptr; }
@@ -105,19 +110,14 @@ public:
     std::unique_ptr<IWorkload> CreateElementwiseUnary(const ElementwiseUnaryQueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const override
     {
-        if (descriptor.m_Parameters.m_Operation == UnaryOperation::Abs)
+        if (descriptor.m_Parameters.m_Operation == UnaryOperation::LogicalNot)
+        {
+            return CreateWorkload(armnn::LayerType::ElementwiseUnary, descriptor, info);
+        }
+        else
         {
             { return nullptr; }
         }
-        else if (descriptor.m_Parameters.m_Operation == UnaryOperation::Rsqrt)
-        {
-            { return nullptr; }
-        }
-        else if (descriptor.m_Parameters.m_Operation == UnaryOperation::LogicalNot)
-        {
-            return CreateLogicalUnary(descriptor, info);
-        }
-        { return nullptr; }
     }
 
     std::unique_ptr<IWorkload> CreateFakeQuantization(const FakeQuantizationQueueDescriptor& /*descriptor*/,

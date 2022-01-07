@@ -98,7 +98,7 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateSoftmax(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Softmax, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -283,8 +283,10 @@ LayerTestResult<T, 2> CompareSoftmaxTestImpl(
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateSoftmax(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateSoftmax(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Softmax, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateWorkload(armnn::LayerType::Softmax,
+                                                                                      refData,
+                                                                                      refInfo);
 
     outputHandleRef->Allocate();
     inputHandleRef->Allocate();

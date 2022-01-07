@@ -94,7 +94,8 @@ LayerTestResult<T, 4> BatchNormTestImpl(
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateBatchNormalization(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::BatchNormalization, descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -192,7 +193,8 @@ LayerTestResult<T,4> BatchNormTestNhwcImpl(
         },
         qScale, qOffset);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateBatchNormalization(data, info);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::BatchNormalization, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -672,8 +674,10 @@ LayerTestResult<float,4> CompareBatchNormTest(
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateBatchNormalization(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateBatchNormalization(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::BatchNormalization, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef
+            = refWorkloadFactory.CreateWorkload(armnn::LayerType::BatchNormalization, refData, refInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

@@ -32,7 +32,7 @@ std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFa
     }
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateFullyConnected(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::FullyConnected, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 FullyConnectedLayer* FullyConnectedLayer::Clone(Graph& graph) const

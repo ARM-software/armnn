@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> ChannelShuffleLayer::CreateWorkload(const IWorkloadFa
     ChannelShuffleQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateChannelShuffle(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::ChannelShuffle, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ChannelShuffleLayer* ChannelShuffleLayer::Clone(Graph& graph) const

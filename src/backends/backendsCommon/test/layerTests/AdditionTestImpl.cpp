@@ -16,7 +16,7 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::AdditionQueueDescriptor>
     const armnn::WorkloadInfo& info,
     const armnn::AdditionQueueDescriptor& descriptor)
 {
-    return workloadFactory.CreateAddition(descriptor, info);
+    return workloadFactory.CreateWorkload(armnn::LayerType::Addition, descriptor, info);
 }
 
 LayerTestResult<float,4> AdditionTest(
@@ -231,7 +231,8 @@ LayerTestResult<T, 4> AdditionBroadcastTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateAddition(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Addition,
+                                                                                data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -314,7 +315,8 @@ LayerTestResult<T, 4> AdditionBroadcast1ElementTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateAddition(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Addition,
+                                                                                data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -580,7 +582,9 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     AddOutputToWorkload(queueDescriptor, workloadInfo, poolingOutputTensorInfo, poolingOutputHandle.get());
 
     // Create the MaxPool
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePooling2d(queueDescriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Pooling2d,
+                                                                                queueDescriptor,
+                                                                                workloadInfo);
 
     std::vector<float> resultMaxPool(poolingOutputTensorInfo.GetNumElements());
 
@@ -611,7 +615,8 @@ LayerTestResult<float, 4> AdditionAfterMaxPoolTest(
     AddInputToWorkload(data, info, addInputTensorInfo, addInputHandle.get());
     AddOutputToWorkload(data, info, addOutputTensorInfo, addOutputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> addWorkload = workloadFactory.CreateAddition(data, info);
+    std::unique_ptr<armnn::IWorkload> addWorkload = workloadFactory.CreateWorkload(armnn::LayerType::Addition,
+                                                                                   data, info);
 
     poolingInputHandle->Allocate();
     poolingOutputHandle->Allocate();
@@ -685,8 +690,10 @@ LayerTestResult<float,4> CompareAdditionTest(
     SetWorkloadInput(refData, refInfo, 1, inputTensorInfo2, inputHandle2Ref.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateAddition(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateAddition(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Addition,
+                                                                                data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateWorkload(armnn::LayerType::Addition,
+                                                                                      refData, refInfo);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();

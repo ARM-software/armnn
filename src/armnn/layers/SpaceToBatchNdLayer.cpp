@@ -31,7 +31,7 @@ std::unique_ptr<IWorkload> SpaceToBatchNdLayer::CreateWorkload(const IWorkloadFa
     descriptor.m_Parameters.m_PadList    = m_Param.m_PadList;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateSpaceToBatchNd(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::SpaceToBatchNd, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SpaceToBatchNdLayer* SpaceToBatchNdLayer::Clone(Graph& graph) const

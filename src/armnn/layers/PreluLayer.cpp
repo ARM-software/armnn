@@ -25,7 +25,7 @@ std::unique_ptr<IWorkload> PreluLayer::CreateWorkload(const IWorkloadFactory& fa
     PreluQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreatePrelu(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Prelu, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 PreluLayer* PreluLayer::Clone(Graph& graph) const

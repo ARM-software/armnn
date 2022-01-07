@@ -1538,6 +1538,366 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                          outReasonIfUnsupported,
                                          modelOptions);
 }
+ARMNN_NO_DEPRECATE_WARN_BEGIN
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateWorkload(LayerType type,
+                                                            const QueueDescriptor& descriptor,
+                                                            const WorkloadInfo& info) const
+{
+    switch(type)
+    {
+        case LayerType::Activation :
+        {
+            auto activationQueueDescriptor = PolymorphicDowncast<const ActivationQueueDescriptor*>(&descriptor);
+            return CreateActivation(*activationQueueDescriptor, info);
+        }
+        case LayerType::Addition :
+        {
+            auto additionQueueDescriptor = PolymorphicDowncast<const AdditionQueueDescriptor*>(&descriptor);
+            return CreateAddition(*additionQueueDescriptor, info);
+        }
+        case LayerType::ArgMinMax :
+        {
+            auto argMinMaxQueueDescriptor = PolymorphicDowncast<const ArgMinMaxQueueDescriptor*>(&descriptor);
+            return CreateArgMinMax(*argMinMaxQueueDescriptor, info);
+        }
+        case LayerType::BatchNormalization :
+        {
+            auto batchNormQueueDescriptor = PolymorphicDowncast<const BatchNormalizationQueueDescriptor*>(&descriptor);
+            return CreateBatchNormalization(*batchNormQueueDescriptor, info);
+        }
+        case LayerType::BatchToSpaceNd :
+        {
+            auto batchToSpaceNdQueueDescriptor
+                    = PolymorphicDowncast<const BatchToSpaceNdQueueDescriptor*>(&descriptor);
+            return CreateBatchToSpaceNd(*batchToSpaceNdQueueDescriptor, info);
+        }
+        case LayerType::Cast :
+        {
+            auto castQueueDescriptor = PolymorphicDowncast<const CastQueueDescriptor*>(&descriptor);
+            return CreateCast(*castQueueDescriptor, info);
+        }
+        case LayerType::ChannelShuffle :
+        {
+            auto channelShuffleQueueDescriptor
+                    = PolymorphicDowncast<const ChannelShuffleQueueDescriptor*>(&descriptor);
+            return CreateChannelShuffle(*channelShuffleQueueDescriptor, info);
+        }
+        case LayerType::Comparison :
+        {
+            auto comparisonQueueDescriptor = PolymorphicDowncast<const ComparisonQueueDescriptor*>(&descriptor);
+            return CreateComparison(*comparisonQueueDescriptor, info);
+        }
+        case LayerType::Concat :
+        {
+            auto concatQueueDescriptor = PolymorphicDowncast<const ConcatQueueDescriptor*>(&descriptor);
+            return CreateConcat(*concatQueueDescriptor, info);
+        }
+        case LayerType::Constant :
+        {
+            auto constantQueueDescriptor = PolymorphicDowncast<const ConstantQueueDescriptor*>(&descriptor);
+            return CreateConstant(*constantQueueDescriptor, info);
+        }
+        case LayerType::ConvertBf16ToFp32 :
+        {
+            auto convertBf16ToFp32QueueDescriptor
+                    = PolymorphicDowncast<const ConvertBf16ToFp32QueueDescriptor*>(&descriptor);
+            return CreateConvertBf16ToFp32(*convertBf16ToFp32QueueDescriptor, info);
+        }
+        case LayerType::ConvertFp16ToFp32:
+        {
+            auto convertFp16ToFp32QueueDescriptor
+                    = PolymorphicDowncast<const ConvertFp16ToFp32QueueDescriptor*>(&descriptor);
+            return CreateConvertFp16ToFp32(*convertFp16ToFp32QueueDescriptor, info);
+        }
+        case LayerType::ConvertFp32ToBf16:
+        {
+            auto convertFp32ToBf16QueueDescriptor
+                    = PolymorphicDowncast<const ConvertFp32ToBf16QueueDescriptor*>(&descriptor);
+            return CreateConvertFp32ToBf16(*convertFp32ToBf16QueueDescriptor, info);
+        }
+        case LayerType::ConvertFp32ToFp16:
+        {
+            auto convertFp32ToFp16QueueDescriptor
+                    = PolymorphicDowncast<const ConvertFp32ToFp16QueueDescriptor*>(&descriptor);
+            return CreateConvertFp32ToFp16(*convertFp32ToFp16QueueDescriptor, info);
+        }
+        case LayerType::Convolution2d:
+        {
+            auto convolution2dQueueDescriptor = PolymorphicDowncast<const Convolution2dQueueDescriptor*>(&descriptor);
+            return CreateConvolution2d(*convolution2dQueueDescriptor, info);
+        }
+        case LayerType::Convolution3d:
+        {
+            auto convolution3dQueueDescriptor = PolymorphicDowncast<const Convolution3dQueueDescriptor*>(&descriptor);
+            return CreateConvolution3d(*convolution3dQueueDescriptor, info);
+        }
+        case LayerType::Debug:
+        {
+            auto debugQueueDescriptor = PolymorphicDowncast<const DebugQueueDescriptor*>(&descriptor);
+            return CreateDebug(*debugQueueDescriptor, info);
+        }
+        case LayerType::DepthToSpace:
+        {
+            auto depthToSpaceQueueDescriptor = PolymorphicDowncast<const DepthToSpaceQueueDescriptor*>(&descriptor);
+            return CreateDepthToSpace(*depthToSpaceQueueDescriptor, info);
+        }
+        case LayerType::DepthwiseConvolution2d:
+        {
+            auto depthwiseConvolution2DQueueDescriptor
+                    = PolymorphicDowncast<const DepthwiseConvolution2dQueueDescriptor*>(&descriptor);
+            return CreateDepthwiseConvolution2d(*depthwiseConvolution2DQueueDescriptor, info);
+        }
+        case LayerType::Dequantize:
+        {
+            auto dequantizeQueueDescriptor = PolymorphicDowncast<const DequantizeQueueDescriptor*>(&descriptor);
+            return CreateDequantize(*dequantizeQueueDescriptor, info);
+        }
+        case LayerType::DetectionPostProcess:
+        {
+            auto detectionPostProcessQueueDescriptor
+                    = PolymorphicDowncast<const DetectionPostProcessQueueDescriptor*>(&descriptor);
+            return CreateDetectionPostProcess(*detectionPostProcessQueueDescriptor, info);
+        }
+        case LayerType::Division:
+        {
+            auto divisionQueueDescriptor = PolymorphicDowncast<const DivisionQueueDescriptor*>(&descriptor);
+            return CreateDivision(*divisionQueueDescriptor, info);
+        }
+        case LayerType::ElementwiseUnary:
+        {
+            auto elementwiseUnaryQueueDescriptor
+                    = PolymorphicDowncast<const ElementwiseUnaryQueueDescriptor*>(&descriptor);
+            return CreateElementwiseUnary(*elementwiseUnaryQueueDescriptor, info);
+
+        }
+        case LayerType::FakeQuantization:
+        {
+            auto fakeQuantizationQueueDescriptor
+                    = PolymorphicDowncast<const FakeQuantizationQueueDescriptor*>(&descriptor);
+            return CreateFakeQuantization(*fakeQuantizationQueueDescriptor, info);
+        }
+        case LayerType::Fill:
+        {
+            auto fillQueueDescriptor = PolymorphicDowncast<const FillQueueDescriptor*>(&descriptor);
+            return CreateFill(*fillQueueDescriptor, info);
+        }
+        case LayerType::Floor:
+        {
+            auto floorQueueDescriptor = PolymorphicDowncast<const FloorQueueDescriptor*>(&descriptor);
+            return CreateFloor(*floorQueueDescriptor, info);
+        }
+        case LayerType::FullyConnected:
+        {
+            auto fullyConnectedQueueDescriptor
+                    = PolymorphicDowncast<const FullyConnectedQueueDescriptor*>(&descriptor);
+            return CreateFullyConnected(*fullyConnectedQueueDescriptor, info);
+        }
+        case LayerType::Gather:
+        {
+            auto gatherQueueDescriptor = PolymorphicDowncast<const GatherQueueDescriptor*>(&descriptor);
+            return CreateGather(*gatherQueueDescriptor, info);
+        }
+        case LayerType::Input:
+        {
+            auto inputQueueDescriptor = PolymorphicDowncast<const InputQueueDescriptor*>(&descriptor);
+            return CreateInput(*inputQueueDescriptor, info);
+        }
+        case LayerType::InstanceNormalization:
+        {
+            auto instanceNormalizationQueueDescriptor
+                    = PolymorphicDowncast<const InstanceNormalizationQueueDescriptor*>(&descriptor);
+            return CreateInstanceNormalization(*instanceNormalizationQueueDescriptor, info);
+        }
+        case LayerType::L2Normalization:
+        {
+            auto l2NormalizationQueueDescriptor
+                    = PolymorphicDowncast<const L2NormalizationQueueDescriptor*>(&descriptor);
+            return CreateL2Normalization(*l2NormalizationQueueDescriptor, info);
+        }
+        case LayerType::LogicalBinary:
+        {
+            auto logicalBinaryQueueDescriptor = PolymorphicDowncast<const LogicalBinaryQueueDescriptor*>(&descriptor);
+            return CreateLogicalBinary(*logicalBinaryQueueDescriptor, info);
+        }
+        case LayerType::LogSoftmax:
+        {
+            auto logSoftmaxQueueDescriptor = PolymorphicDowncast<const LogSoftmaxQueueDescriptor*>(&descriptor);
+            return CreateLogSoftmax(*logSoftmaxQueueDescriptor, info);
+        }
+        case LayerType::Lstm:
+        {
+            auto lstmQueueDescriptor = PolymorphicDowncast<const LstmQueueDescriptor*>(&descriptor);
+            return CreateLstm(*lstmQueueDescriptor, info);
+        }
+        case LayerType::Maximum:
+        {
+            auto maximumQueueDescriptor = PolymorphicDowncast<const MaximumQueueDescriptor*>(&descriptor);
+            return CreateMaximum(*maximumQueueDescriptor, info);
+        }
+        case LayerType::Mean:
+        {
+            auto meanQueueDescriptor = PolymorphicDowncast<const MeanQueueDescriptor*>(&descriptor);
+            return CreateMean(*meanQueueDescriptor, info);
+        }
+        case LayerType::MemCopy:
+        {
+            auto memCopyQueueDescriptor = PolymorphicDowncast<const MemCopyQueueDescriptor*>(&descriptor);
+            return CreateMemCopy(*memCopyQueueDescriptor, info);
+        }
+        case LayerType::MemImport:
+        {
+            auto memImportQueueDescriptor = PolymorphicDowncast<const MemImportQueueDescriptor*>(&descriptor);
+            return CreateMemImport(*memImportQueueDescriptor, info);
+        }
+        case LayerType::Minimum:
+        {
+            auto minimumQueueDescriptor = PolymorphicDowncast<const MinimumQueueDescriptor*>(&descriptor);
+            return CreateMinimum(*minimumQueueDescriptor, info);
+        }
+        case LayerType::Multiplication:
+        {
+            auto multiplicationQueueDescriptor
+                    = PolymorphicDowncast<const MultiplicationQueueDescriptor*>(&descriptor);
+            return CreateMultiplication(*multiplicationQueueDescriptor, info);
+        }
+        case LayerType::Normalization:
+        {
+            auto normalizationQueueDescriptor = PolymorphicDowncast<const NormalizationQueueDescriptor*>(&descriptor);
+            return CreateNormalization(*normalizationQueueDescriptor, info);
+        }
+        case LayerType::Output:
+        {
+            auto outputQueueDescriptor = PolymorphicDowncast<const OutputQueueDescriptor*>(&descriptor);
+            return CreateOutput(*outputQueueDescriptor, info);
+        }
+        case LayerType::Pad:
+        {
+            auto padQueueDescriptor = PolymorphicDowncast<const PadQueueDescriptor*>(&descriptor);
+            return CreatePad(*padQueueDescriptor, info);
+        }
+        case LayerType::Permute:
+        {
+            auto permuteQueueDescriptor = PolymorphicDowncast<const PermuteQueueDescriptor*>(&descriptor);
+            return CreatePermute(*permuteQueueDescriptor, info);
+        }
+        case LayerType::Pooling2d:
+        {
+            auto pooling2dQueueDescriptor = PolymorphicDowncast<const Pooling2dQueueDescriptor*>(&descriptor);
+            return CreatePooling2d(*pooling2dQueueDescriptor, info);
+        }
+        case LayerType::Pooling3d:
+        {
+            auto pooling3dQueueDescriptor = PolymorphicDowncast<const Pooling3dQueueDescriptor*>(&descriptor);
+            return CreatePooling3d(*pooling3dQueueDescriptor, info);
+        }
+        case LayerType::PreCompiled:
+        {
+            auto preCompiledQueueDescriptor = PolymorphicDowncast<const PreCompiledQueueDescriptor*>(&descriptor);
+            return CreatePreCompiled(*preCompiledQueueDescriptor, info);
+        }
+        case LayerType::Prelu:
+        {
+            auto preluQueueDescriptor = PolymorphicDowncast<const PreluQueueDescriptor*>(&descriptor);
+            return CreatePrelu(*preluQueueDescriptor, info);
+        }
+        case LayerType::QLstm:
+        {
+            auto qlstmQueueDescriptor = PolymorphicDowncast<const QLstmQueueDescriptor*>(&descriptor);
+            return CreateQLstm(*qlstmQueueDescriptor, info);
+        }
+        case LayerType::Quantize:
+        {
+            auto quantizeQueueDescriptor = PolymorphicDowncast<const QuantizeQueueDescriptor*>(&descriptor);
+            return CreateQuantize(*quantizeQueueDescriptor, info);
+        }
+        case LayerType::Rank:
+        {
+            auto rankQueueDescriptor = PolymorphicDowncast<const RankQueueDescriptor*>(&descriptor);
+            return CreateRank(*rankQueueDescriptor, info);
+        }
+        case LayerType::Reduce:
+        {
+            auto reduceQueueDescriptor = PolymorphicDowncast<const ReduceQueueDescriptor*>(&descriptor);
+            return CreateReduce(*reduceQueueDescriptor, info);
+        }
+        case LayerType::Reshape:
+        {
+            auto reshapeQueueDescriptor = PolymorphicDowncast<const ReshapeQueueDescriptor*>(&descriptor);
+            return CreateReshape(*reshapeQueueDescriptor, info);
+        }
+        case LayerType::Resize:
+        {
+            auto resizeQueueDescriptor = PolymorphicDowncast<const ResizeQueueDescriptor*>(&descriptor);
+            return CreateResize(*resizeQueueDescriptor, info);
+        }
+        case LayerType::Shape:
+        {
+            auto shapeQueueDescriptor = PolymorphicDowncast<const ShapeQueueDescriptor*>(&descriptor);
+            return CreateShape(*shapeQueueDescriptor, info);
+        }
+        case LayerType::Slice:
+        {
+            auto sliceQueueDescriptor = PolymorphicDowncast<const SliceQueueDescriptor*>(&descriptor);
+            return CreateSlice(*sliceQueueDescriptor, info);
+        }
+        case LayerType::Softmax:
+        {
+            auto softmaxQueueDescriptor = PolymorphicDowncast<const SoftmaxQueueDescriptor*>(&descriptor);
+            return CreateSoftmax(*softmaxQueueDescriptor, info);
+        }
+        case LayerType::SpaceToBatchNd:
+        {
+            auto spaceToBatchNdQueueDescriptor
+                    = PolymorphicDowncast<const SpaceToBatchNdQueueDescriptor*>(&descriptor);
+            return CreateSpaceToBatchNd(*spaceToBatchNdQueueDescriptor, info);
+        }
+        case LayerType::SpaceToDepth:
+        {
+            auto spaceToDepthQueueDescriptor = PolymorphicDowncast<const SpaceToDepthQueueDescriptor*>(&descriptor);
+            return CreateSpaceToDepth(*spaceToDepthQueueDescriptor, info);
+        }
+        case LayerType::Splitter:
+        {
+            auto splitterQueueDescriptor = PolymorphicDowncast<const SplitterQueueDescriptor*>(&descriptor);
+            return CreateSplitter(*splitterQueueDescriptor, info);
+        }
+        case LayerType::Stack:
+        {
+            auto stackQueueDescriptor = PolymorphicDowncast<const StackQueueDescriptor*>(&descriptor);
+            return CreateStack(*stackQueueDescriptor, info);
+        }
+        case LayerType::StridedSlice:
+        {
+            auto stridedSliceQueueDescriptor = PolymorphicDowncast<const StridedSliceQueueDescriptor*>(&descriptor);
+            return CreateStridedSlice(*stridedSliceQueueDescriptor, info);
+        }
+        case LayerType::Subtraction:
+        {
+            auto subtractionQueueDescriptor = PolymorphicDowncast<const SubtractionQueueDescriptor*>(&descriptor);
+            return CreateSubtraction(*subtractionQueueDescriptor, info);
+        }
+        case LayerType::Transpose:
+        {
+            auto transposeQueueDescriptor = PolymorphicDowncast<const TransposeQueueDescriptor*>(&descriptor);
+            return CreateTranspose(*transposeQueueDescriptor, info);
+        }
+        case LayerType::TransposeConvolution2d:
+        {
+            auto transposeConvolution2dQueueDescriptor
+                    = PolymorphicDowncast<const TransposeConvolution2dQueueDescriptor*>(&descriptor);
+            return CreateTransposeConvolution2d(*transposeConvolution2dQueueDescriptor, info);
+        }
+        case LayerType::UnidirectionalSequenceLstm:
+        {
+            auto unidirectionalSequenceLstmQueueDescriptor
+                    = PolymorphicDowncast<const UnidirectionalSequenceLstmQueueDescriptor*>(&descriptor);
+            return CreateUnidirectionalSequenceLstm(*unidirectionalSequenceLstmQueueDescriptor, info);
+        }
+        default:
+            return nullptr;
+    }
+}
+ARMNN_NO_DEPRECATE_WARN_END
 
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& /*descriptor*/,
                                                               const WorkloadInfo& /*info*/) const

@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> ReshapeLayer::CreateWorkload(const IWorkloadFactory& 
     ReshapeQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateReshape(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Reshape, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ReshapeLayer* ReshapeLayer::Clone(Graph& graph) const

@@ -64,7 +64,8 @@ LayerTestResult<T, OutputDim> BatchToSpaceNdHelper(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateBatchToSpaceNd(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::BatchToSpaceNd,
+                                                                                data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

@@ -27,7 +27,7 @@ std::unique_ptr<IWorkload> PermuteLayer::CreateWorkload(const IWorkloadFactory& 
     PermuteQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreatePermute(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Permute, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 PermuteLayer* PermuteLayer::Clone(Graph& graph) const

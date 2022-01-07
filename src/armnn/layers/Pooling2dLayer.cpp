@@ -29,7 +29,7 @@ std::unique_ptr<IWorkload> Pooling2dLayer::CreateWorkload(const IWorkloadFactory
     Pooling2dQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreatePooling2d(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Pooling2d, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 Pooling2dLayer* Pooling2dLayer::Clone(Graph& graph) const

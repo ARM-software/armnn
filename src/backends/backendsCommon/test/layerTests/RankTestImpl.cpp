@@ -35,7 +35,7 @@ LayerTestResult<int32_t, 1> RankTest(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateRank(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Rank, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

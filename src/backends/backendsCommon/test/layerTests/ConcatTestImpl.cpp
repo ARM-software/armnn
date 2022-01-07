@@ -147,7 +147,9 @@ template<typename T> void PermuteTensorData(
     AddInputToWorkload(queueDescriptor, workloadInfo, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreatePermute(queueDescriptor, workloadInfo);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Permute,
+                                                                         queueDescriptor,
+                                                                         workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -379,7 +381,8 @@ template<typename T> void Concatenate(
 
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(queueDescriptor, workloadInfo);
+    std::unique_ptr<IWorkload> workload
+            = workloadFactory.CreateWorkload(LayerType::Concat, queueDescriptor, workloadInfo);
 
     for (auto& inputHandle : inputHandles)
     {
@@ -2069,7 +2072,7 @@ LayerTestResult<T, 3> ConcatDifferentInputOutputQParamTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Concat, data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2217,7 +2220,7 @@ LayerTestResult<float,3> ConcatTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Concat, data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2549,7 +2552,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8DifferentQParamsTest(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Concat, data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2687,7 +2690,7 @@ LayerTestResult<uint8_t, 3> ConcatUint8Test(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Concat, data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();
@@ -2826,7 +2829,7 @@ LayerTestResult<uint16_t, 3> ConcatUint16Test(
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
 
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateConcat(data, info);
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Concat, data, info);
 
     inputHandle1->Allocate();
     inputHandle2->Allocate();

@@ -549,7 +549,7 @@ struct LayerTypePolicy<armnn::LayerType::name, DataType> \
     { \
         QueueDesc desc; \
         armnn::WorkloadInfo info = MakeDummyWorkloadInfo<DataType>(nIn, nOut); \
-        return factory->Create##name(desc, info); \
+        return factory->CreateWorkload(armnn::LayerType::name, desc, info); \
     } \
 };
 

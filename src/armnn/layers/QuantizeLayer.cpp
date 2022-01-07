@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> QuantizeLayer::CreateWorkload(const IWorkloadFactory&
 
     WorkloadInfo info = PrepInfoAndDesc(descriptor);
 
-    return factory.CreateQuantize(descriptor, info);
+    return factory.CreateWorkload(LayerType::Quantize, descriptor, info);
 }
 
 Layer* QuantizeLayer::Clone(Graph& graph) const

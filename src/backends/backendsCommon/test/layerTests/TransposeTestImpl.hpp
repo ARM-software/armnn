@@ -39,7 +39,9 @@ LayerTestResult<T, 4> SimpleTransposeTestImpl(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateTranspose(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Transpose,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

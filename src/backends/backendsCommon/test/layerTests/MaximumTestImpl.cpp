@@ -13,7 +13,7 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MaximumQueueDescriptor>(
     const armnn::WorkloadInfo& info,
     const armnn::MaximumQueueDescriptor& descriptor)
 {
-    return workloadFactory.CreateMaximum(descriptor, info);
+    return workloadFactory.CreateWorkload(armnn::LayerType::Maximum, descriptor, info);
 }
 
 LayerTestResult<float, 4> MaximumSimpleTest(

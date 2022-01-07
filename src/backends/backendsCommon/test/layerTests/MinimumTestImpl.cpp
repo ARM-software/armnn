@@ -13,7 +13,7 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MinimumQueueDescriptor>(
     const armnn::WorkloadInfo& info,
     const armnn::MinimumQueueDescriptor& descriptor)
 {
-    return workloadFactory.CreateMinimum(descriptor, info);
+    return workloadFactory.CreateWorkload(armnn::LayerType::Minimum, descriptor, info);
 }
 
 LayerTestResult<float, 4> MinimumBroadcast1ElementTest1(

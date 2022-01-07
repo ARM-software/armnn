@@ -33,7 +33,7 @@ LayerTestResult<int32_t, 1> ShapeTest(
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateShape(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Shape, data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

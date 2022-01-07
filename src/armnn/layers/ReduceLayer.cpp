@@ -27,7 +27,7 @@ std::unique_ptr<IWorkload> ReduceLayer::CreateWorkload(const IWorkloadFactory& f
     descriptor.m_Parameters.m_ReduceOperation = m_Param.m_ReduceOperation;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateReduce(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Reduce, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ReduceLayer* ReduceLayer::Clone(Graph& graph) const

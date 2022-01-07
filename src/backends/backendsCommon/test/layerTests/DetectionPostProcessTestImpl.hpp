@@ -200,7 +200,9 @@ void DetectionPostProcessImpl(const armnn::TensorInfo& boxEncodingsInfo,
     AddOutputToWorkload(data, info, detectionScoresInfo, outputScoresHandle.get());
     AddOutputToWorkload(data, info, numDetectionInfo, numDetectionHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateDetectionPostProcess(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::DetectionPostProcess,
+                                                                                data,
+                                                                                info);
 
     boxedHandle->Allocate();
     scoreshandle->Allocate();

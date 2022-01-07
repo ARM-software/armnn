@@ -26,7 +26,7 @@ std::unique_ptr<IWorkload> SliceLayer::CreateWorkload(const IWorkloadFactory& fa
     SliceQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateSlice(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Slice, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SliceLayer* SliceLayer::Clone(Graph& graph) const

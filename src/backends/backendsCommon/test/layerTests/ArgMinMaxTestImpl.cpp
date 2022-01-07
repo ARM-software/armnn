@@ -41,7 +41,8 @@ LayerTestResult<int32_t, 3> ArgMinMaxTestCommon(
     AddInputToWorkload(descriptor, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateArgMinMax(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::ArgMinMax,
+                                                                                descriptor, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

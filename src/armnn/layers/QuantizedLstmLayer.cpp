@@ -41,7 +41,7 @@ std::unique_ptr<IWorkload> QuantizedLstmLayer::CreateWorkload(const IWorkloadFac
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateQuantizedLstm(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::QuantizedLstm, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 QuantizedLstmLayer* QuantizedLstmLayer::Clone(Graph& graph) const

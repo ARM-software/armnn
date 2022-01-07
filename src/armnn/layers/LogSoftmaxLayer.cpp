@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> LogSoftmaxLayer::CreateWorkload(const IWorkloadFactor
     LogSoftmaxQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateLogSoftmax(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::LogSoftmax, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 LogSoftmaxLayer* LogSoftmaxLayer::Clone(Graph& graph) const

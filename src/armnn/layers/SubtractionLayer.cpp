@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> SubtractionLayer::CreateWorkload(const IWorkloadFacto
     SubtractionQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateSubtraction(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Subtraction, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 SubtractionLayer* SubtractionLayer::Clone(Graph& graph) const

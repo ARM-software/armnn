@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> FloorLayer::CreateWorkload(const IWorkloadFactory& fa
     FloorQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateFloor(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Floor, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 FloorLayer* FloorLayer::Clone(Graph& graph) const

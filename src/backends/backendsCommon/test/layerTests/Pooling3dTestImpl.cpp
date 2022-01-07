@@ -104,7 +104,9 @@ LayerTestResult<T, 5> SimplePooling3dTestImpl(
         return result;
     }
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePooling3d(queueDescriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Pooling3d,
+                                                                                queueDescriptor,
+                                                                                workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -1035,8 +1037,10 @@ LayerTestResult<T, 5> ComparePooling3dTestCommon(
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePooling3d(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreatePooling3d(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(armnn::LayerType::Pooling3d, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef
+            = refWorkloadFactory.CreateWorkload(armnn::LayerType::Pooling3d, refData, refInfo);
 
     outputHandleRef->Allocate();
     inputHandleRef->Allocate();

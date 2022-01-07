@@ -31,7 +31,7 @@ std::unique_ptr<IWorkload> SplitterLayer::CreateWorkload(const IWorkloadFactory&
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateSplitter(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Splitter, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 template<typename FactoryType>

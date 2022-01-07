@@ -26,7 +26,7 @@ std::unique_ptr<IWorkload> ArgMinMaxLayer::CreateWorkload(const IWorkloadFactory
     ArgMinMaxQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateArgMinMax(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::ArgMinMax, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ArgMinMaxLayer* ArgMinMaxLayer::Clone(Graph& graph) const

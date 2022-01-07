@@ -48,7 +48,7 @@ LayerTestResult<uint8_t, NumDims> LogicalUnaryTestHelper(
     AddInputToWorkload(qDesc, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(qDesc, info, outputTensorInfo, outputHandle.get());
 
-    auto workload = workloadFactory.CreateElementwiseUnary(qDesc, info);
+    auto workload = workloadFactory.CreateWorkload(armnn::LayerType::ElementwiseUnary, qDesc, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -104,7 +104,7 @@ LayerTestResult<uint8_t, NumDims> LogicalBinaryTestHelper(
     AddInputToWorkload(qDesc, info, inputTensorInfo1, inputHandle1.get());
     AddOutputToWorkload(qDesc, info, outputTensorInfo, outputHandle.get());
 
-    auto workload = workloadFactory.CreateLogicalBinary(qDesc, info);
+    auto workload = workloadFactory.CreateWorkload(armnn::LayerType::LogicalBinary, qDesc, info);
 
     inputHandle0->Allocate();
     inputHandle1->Allocate();

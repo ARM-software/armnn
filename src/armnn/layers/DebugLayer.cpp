@@ -28,7 +28,7 @@ std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const IWorkloadFactory& fa
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateDebug(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Debug, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DebugLayer* DebugLayer::Clone(Graph& graph) const

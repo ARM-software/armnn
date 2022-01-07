@@ -108,7 +108,9 @@ LayerTestResult<T, 4> ConstantTestImpl(
     armnn::WorkloadInfo info;
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConstant(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Constant,
+                                                                                descriptor,
+                                                                                info);
 
     outputHandle->Allocate();
 

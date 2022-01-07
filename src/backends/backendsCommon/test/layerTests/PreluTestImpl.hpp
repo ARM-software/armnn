@@ -84,7 +84,9 @@ LayerTestResult<T, 4> PreluTest(
     AddInputToWorkload (descriptor, info, alphaTensorInfo,  alphaHandle.get());
     AddOutputToWorkload(descriptor, info, outputTensorInfo, outputHandle.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreatePrelu(descriptor, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Prelu,
+                                                                                descriptor,
+                                                                                info);
 
     inputHandle->Allocate();
     alphaHandle->Allocate();

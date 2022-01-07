@@ -30,7 +30,7 @@ std::unique_ptr<IWorkload> DepthToSpaceLayer::CreateWorkload(const IWorkloadFact
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateDepthToSpace(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::DepthToSpace, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DepthToSpaceLayer* DepthToSpaceLayer::Clone(Graph& graph) const

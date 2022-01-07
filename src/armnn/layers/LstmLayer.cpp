@@ -74,7 +74,7 @@ std::unique_ptr<IWorkload> LstmLayer::CreateWorkload(const IWorkloadFactory& fac
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateLstm(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Lstm, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 LstmLayer* LstmLayer::Clone(Graph& graph) const

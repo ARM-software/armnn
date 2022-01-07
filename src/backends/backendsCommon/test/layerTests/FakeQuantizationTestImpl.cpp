@@ -54,7 +54,9 @@ LayerTestResult<float, 2> FakeQuantizationTest(
     armnn::WorkloadInfo refInfo = info;
     SetWorkloadOutput(refData, refInfo, 0, tensorInfo, &refHandle);
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateFakeQuantization(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::FakeQuantization,
+                                                                                data,
+                                                                                info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

@@ -65,7 +65,7 @@ std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWo
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateDepthwiseConvolution2d(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::DepthwiseConvolution2d, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DepthwiseConvolution2dLayer* DepthwiseConvolution2dLayer::Clone(Graph& graph) const

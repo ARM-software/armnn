@@ -14,7 +14,7 @@ std::unique_ptr<armnn::IWorkload> CreateWorkload<armnn::MultiplicationQueueDescr
     const armnn::WorkloadInfo& info,
     const armnn::MultiplicationQueueDescriptor& descriptor)
 {
-    return workloadFactory.CreateMultiplication(descriptor, info);
+    return workloadFactory.CreateWorkload(armnn::LayerType::Multiplication, descriptor, info);
 }
 
 LayerTestResult<float, 4> MultiplicationTest(armnn::IWorkloadFactory& workloadFactory,
@@ -571,8 +571,10 @@ LayerTestResult<float,4> CompareMultiplicationTest(
     SetWorkloadInput(refData, refInfo, 1, inputTensorInfo1, inputHandle1Ref.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload    = workloadFactory.CreateMultiplication(data, info);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateMultiplication(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+                = workloadFactory.CreateWorkload(armnn::LayerType::Multiplication, data, info);
+    std::unique_ptr<armnn::IWorkload> workloadRef
+                = refWorkloadFactory.CreateWorkload(armnn::LayerType::Multiplication, refData, refInfo);
 
     inputHandle0->Allocate();
     inputHandle1->Allocate();

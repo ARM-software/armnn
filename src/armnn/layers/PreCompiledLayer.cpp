@@ -34,7 +34,7 @@ std::unique_ptr<IWorkload> PreCompiledLayer::CreateWorkload(const armnn::IWorklo
     descriptor.m_PreCompiledObject = m_PreCompiledObject.get();
     SetAdditionalInfo(descriptor);
 
-    return factory.CreatePreCompiled(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::PreCompiled, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 void PreCompiledLayer::ValidateTensorShapesFromInputs()

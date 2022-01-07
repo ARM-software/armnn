@@ -244,6 +244,451 @@ std::unique_ptr<ITensorHandle> ClWorkloadFactory::CreateSubTensorHandle(ITensorH
         PolymorphicDowncast<IClTensorHandle*>(&parent), shape, coords);
 }
 
+std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
+                                                             const QueueDescriptor& descriptor,
+                                                             const WorkloadInfo& info) const
+{
+    switch(type)
+    {
+        case LayerType::Activation :
+        {
+            auto activationQueueDescriptor = PolymorphicDowncast<const ActivationQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClActivationWorkload>(*activationQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Addition :
+        {
+            auto additionQueueDescriptor = PolymorphicDowncast<const AdditionQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClAdditionWorkload>(*additionQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::ArgMinMax :
+        {
+            auto argMinMaxQueueDescriptor = PolymorphicDowncast<const ArgMinMaxQueueDescriptor*>(&descriptor);
+            return std::make_unique<ClArgMinMaxWorkload>(*argMinMaxQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::BatchNormalization :
+        {
+            auto batchNormalizationQueueDescriptor
+                    = PolymorphicDowncast<const BatchNormalizationQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClBatchNormalizationFloatWorkload, NullWorkload>
+                    (*batchNormalizationQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::BatchToSpaceNd :
+        {
+            auto batchToSpaceNdQueueDescriptor
+                    = PolymorphicDowncast<const BatchToSpaceNdQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClBatchToSpaceNdWorkload>(*batchToSpaceNdQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Cast :
+        {
+            auto castQueueDescriptor = PolymorphicDowncast<const CastQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClCastWorkload>(*castQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::ChannelShuffle :
+        {
+            auto channelShuffleQueueDescriptor
+                    = PolymorphicDowncast<const ChannelShuffleQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClChannelShuffleWorkload>(*channelShuffleQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Comparison :
+        {
+            auto comparisonQueueDescriptor = PolymorphicDowncast<const ComparisonQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClComparisonWorkload>(*comparisonQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Concat :
+        {
+            auto concatQueueDescriptor = PolymorphicDowncast<const ConcatQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClConcatWorkload>(*concatQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Constant :
+        {
+            auto constantQueueDescriptor = PolymorphicDowncast<const ConstantQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClConstantWorkload>(*constantQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::ConvertFp16ToFp32 :
+        {
+            auto convertFp16ToFp32QueueDescriptor
+                    = PolymorphicDowncast<const ConvertFp16ToFp32QueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClConvertFp16ToFp32Workload>(*convertFp16ToFp32QueueDescriptor,
+                                                             info,
+                                                             m_CLCompileContext);
+        }
+        case LayerType::ConvertFp32ToFp16 :
+        {
+            auto convertFp32ToFp16QueueDescriptor
+                    = PolymorphicDowncast<const ConvertFp32ToFp16QueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClConvertFp32ToFp16Workload>(*convertFp32ToFp16QueueDescriptor,
+                                                             info,
+                                                             m_CLCompileContext);
+        }
+        case LayerType::Convolution2d :
+        {
+            auto convolution2dQueueDescriptor = PolymorphicDowncast<const Convolution2dQueueDescriptor*>(&descriptor);
+
+            bool isFastMathEnabled = false;
+            if (m_ModelContextPtr)
+            {
+                if (m_ModelContextPtr.get() != nullptr)
+                {
+                    auto modelOptions = dynamic_cast<ClBackendModelContext*>(m_ModelContextPtr.get());
+                    if (modelOptions)
+                    {
+                        isFastMathEnabled = modelOptions->IsFastMathEnabled();
+                    }
+                }
+            }
+            return MakeWorkload<ClConvolution2dWorkload>(*convolution2dQueueDescriptor,
+                                                         info,
+                                                         m_MemoryManager->GetIntraLayerManager(),
+                                                         m_CLCompileContext,
+                                                         isFastMathEnabled);
+        }
+        case LayerType::Convolution3d :
+        {
+            auto convolution3dQueueDescriptor = PolymorphicDowncast<const Convolution3dQueueDescriptor*>(&descriptor);
+
+            bool isFastMathEnabled = false;
+            if (m_ModelContextPtr)
+            {
+                if (m_ModelContextPtr.get() != nullptr)
+                {
+                    auto modelOptions = dynamic_cast<ClBackendModelContext*>(m_ModelContextPtr.get());
+                    if (modelOptions)
+                    {
+                        isFastMathEnabled = modelOptions->IsFastMathEnabled();
+                    }
+                }
+            }
+            return MakeWorkload<ClConvolution3dWorkload>(*convolution3dQueueDescriptor,
+                                                         info,
+                                                         m_MemoryManager->GetIntraLayerManager(),
+                                                         m_CLCompileContext,
+                                                         isFastMathEnabled);
+        }
+        case LayerType::Debug :
+        {
+            auto debugQueueDescriptor = PolymorphicDowncast<const DebugQueueDescriptor*>(&descriptor);
+            return MakeWorkload<NullWorkload, NullWorkload>(*debugQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::DepthToSpace :
+        {
+            auto depthToSpaceQueueDescriptor = PolymorphicDowncast<const DepthToSpaceQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClDepthToSpaceWorkload>(*depthToSpaceQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::DepthwiseConvolution2d :
+        {
+            auto depthwiseConvolution2dQueueDescriptor
+                    = PolymorphicDowncast<const DepthwiseConvolution2dQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClDepthwiseConvolutionWorkload>(*depthwiseConvolution2dQueueDescriptor,
+                                                                info,
+                                                                m_CLCompileContext);
+        }
+        case LayerType::Dequantize :
+        {
+            auto dequantizeQueueDescriptor = PolymorphicDowncast<const DequantizeQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClDequantizeWorkload>(*dequantizeQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::DetectionPostProcess :
+        {
+            auto detectionPostProcessQueueDescriptor
+                    = PolymorphicDowncast<const DetectionPostProcessQueueDescriptor*>(&descriptor);
+            return MakeWorkload<NullWorkload, NullWorkload>(*detectionPostProcessQueueDescriptor,
+                                                            info,
+                                                            m_CLCompileContext);
+        }
+        case LayerType::Division :
+        {
+            auto divisionQueueDescriptor = PolymorphicDowncast<const DivisionQueueDescriptor*>(&descriptor);
+            return std::make_unique<ClDivisionWorkload>(*divisionQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::ElementwiseUnary :
+        {
+            auto elementwiseUnaryQueueDescriptor
+                    = PolymorphicDowncast<const ElementwiseUnaryQueueDescriptor*>(&descriptor);
+
+            switch(elementwiseUnaryQueueDescriptor->m_Parameters.m_Operation)
+            {
+                case UnaryOperation::Abs:
+                {
+                    AbsQueueDescriptor absQueueDescriptor;
+                    absQueueDescriptor.m_Inputs  = elementwiseUnaryQueueDescriptor->m_Inputs;
+                    absQueueDescriptor.m_Outputs = elementwiseUnaryQueueDescriptor->m_Outputs;
+
+                    return  std::make_unique<ClAbsWorkload>(absQueueDescriptor, info, m_CLCompileContext);
+                }
+                case UnaryOperation::Exp:
+                    return std::make_unique<ClExpWorkload>(*elementwiseUnaryQueueDescriptor, info, m_CLCompileContext);
+                case UnaryOperation::Log:
+                    return std::make_unique<ClLogWorkload>(*elementwiseUnaryQueueDescriptor, info, m_CLCompileContext);
+                case UnaryOperation::LogicalNot:
+                    return std::make_unique<ClLogicalNotWorkload>(*elementwiseUnaryQueueDescriptor,
+                                                                  info,
+                                                                  m_CLCompileContext);
+                case UnaryOperation::Neg:
+                    return std::make_unique<ClNegWorkload>(*elementwiseUnaryQueueDescriptor, info, m_CLCompileContext);
+                case UnaryOperation::Rsqrt:
+                {
+                    RsqrtQueueDescriptor rsqrtQueueDescriptor;
+                    rsqrtQueueDescriptor.m_Inputs  = elementwiseUnaryQueueDescriptor->m_Inputs;
+                    rsqrtQueueDescriptor.m_Outputs = elementwiseUnaryQueueDescriptor->m_Outputs;
+
+                    return std::make_unique<ClRsqrtWorkload>(rsqrtQueueDescriptor, info, m_CLCompileContext);
+                }
+                case UnaryOperation::Sin:
+                    return std::make_unique<ClSinWorkload>(*elementwiseUnaryQueueDescriptor, info, m_CLCompileContext);
+                default:
+                    return nullptr;
+            }
+        }
+        case LayerType::Fill :
+        {
+            auto fillQueueDescriptor = PolymorphicDowncast<const FillQueueDescriptor*>(&descriptor);
+            return std::make_unique<ClFillWorkload>(*fillQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Floor :
+        {
+            auto floorQueueDescriptor = PolymorphicDowncast<const FloorQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClFloorFloatWorkload, NullWorkload>(*floorQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::FullyConnected :
+        {
+            auto fullyConnectedQueueDescriptor
+                    = PolymorphicDowncast<const FullyConnectedQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClFullyConnectedWorkload>(*fullyConnectedQueueDescriptor,
+                                                          info,
+                                                          m_MemoryManager->GetIntraLayerManager(),
+                                                          m_CLCompileContext);
+        }
+        case LayerType::Gather :
+        {
+            auto gatherQueueDescriptor = PolymorphicDowncast<const GatherQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClGatherWorkload>(*gatherQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Input :
+        {
+            auto inputQueueDescriptor = PolymorphicDowncast<const InputQueueDescriptor*>(&descriptor);
+            return std::make_unique<CopyMemGenericWorkload>(*inputQueueDescriptor, info);
+        }
+        case LayerType::InstanceNormalization :
+        {
+            auto instanceNormalizationQueueDescriptor
+                    = PolymorphicDowncast<const InstanceNormalizationQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClInstanceNormalizationWorkload>(*instanceNormalizationQueueDescriptor,
+                                                                 info,
+                                                                 m_CLCompileContext);
+        }
+        case LayerType::L2Normalization :
+        {
+            auto l2NormalizationQueueDescriptor
+                    = PolymorphicDowncast<const L2NormalizationQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClL2NormalizationFloatWorkload, NullWorkload>(*l2NormalizationQueueDescriptor,
+                                                                              info,
+                                                                              m_CLCompileContext);
+        }
+        case LayerType::LogicalBinary :
+        {
+            auto logicalBinaryQueueDescriptor = PolymorphicDowncast<const LogicalBinaryQueueDescriptor*>(&descriptor);
+
+            switch(logicalBinaryQueueDescriptor->m_Parameters.m_Operation)
+            {
+                case LogicalBinaryOperation::LogicalAnd:
+                    return std::make_unique<ClLogicalAndWorkload>(*logicalBinaryQueueDescriptor,
+                                                                  info,
+                                                                  m_CLCompileContext);
+                case LogicalBinaryOperation::LogicalOr:
+                    return std::make_unique<ClLogicalOrWorkload>(*logicalBinaryQueueDescriptor,
+                                                                 info,
+                                                                 m_CLCompileContext);
+                default:
+                    return nullptr;
+            }
+        }
+        case LayerType::LogSoftmax :
+        {
+            auto logSoftmaxQueueDescriptor = PolymorphicDowncast<const LogSoftmaxQueueDescriptor*>(&descriptor);
+
+            return MakeWorkload<ClLogSoftmaxWorkload>(*logSoftmaxQueueDescriptor,
+                                                      info,
+                                                      m_MemoryManager->GetIntraLayerManager(),
+                                                      m_CLCompileContext);
+        }
+        case LayerType::Lstm :
+        {
+            auto lstmQueueDescriptor = PolymorphicDowncast<const LstmQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClLstmFloatWorkload, NullWorkload>(*lstmQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Maximum :
+        {
+            auto maximumQueueDescriptor = PolymorphicDowncast<const MaximumQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClMaximumWorkload>(*maximumQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Mean :
+        {
+            auto meanQueueDescriptor = PolymorphicDowncast<const MeanQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClMeanWorkload>(*meanQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::MemCopy :
+        {
+            auto memCopyQueueDescriptor = PolymorphicDowncast<const MemCopyQueueDescriptor*>(&descriptor);
+            if (memCopyQueueDescriptor->m_Inputs.empty() || !memCopyQueueDescriptor->m_Inputs[0])
+            {
+                throw InvalidArgumentException("ClWorkloadFactory: Invalid null input for MemCopy workload");
+            }
+            return MakeWorkload<CopyMemGenericWorkload>(*memCopyQueueDescriptor, info);
+        }
+        case LayerType::MemImport :
+        {
+            auto memImportQueueDescriptor = PolymorphicDowncast<const MemImportQueueDescriptor*>(&descriptor);
+            if (memImportQueueDescriptor->m_Inputs.empty() || !memImportQueueDescriptor->m_Inputs[0])
+            {
+                throw InvalidArgumentException("ClWorkloadFactory: Invalid null input for MemImport workload");
+            }
+            return std::make_unique<ImportMemGenericWorkload>(*memImportQueueDescriptor, info);
+        }
+        case LayerType::Minimum :
+        {
+            auto minimumQueueDescriptor = PolymorphicDowncast<const MinimumQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClMinimumWorkload>(*minimumQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Multiplication :
+        {
+            auto multiplicationQueueDescriptor = PolymorphicDowncast<const MultiplicationQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClMultiplicationWorkload>(*multiplicationQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Normalization :
+        {
+            auto normalizationQueueDescriptor = PolymorphicDowncast<const NormalizationQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClNormalizationFloatWorkload, NullWorkload>(*normalizationQueueDescriptor,
+                                                                            info,
+                                                                            m_CLCompileContext);
+        }
+        case LayerType::Output :
+        {
+            auto outputQueueDescriptor = PolymorphicDowncast<const OutputQueueDescriptor*>(&descriptor);
+            return std::make_unique<CopyMemGenericWorkload>(*outputQueueDescriptor, info);
+        }
+        case LayerType::Pad :
+        {
+            auto padQueueDescriptor = PolymorphicDowncast<const PadQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClPadWorkload>(*padQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Permute :
+        {
+            auto permuteQueueDescriptor = PolymorphicDowncast<const PermuteQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClPermuteWorkload>(*permuteQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Pooling2d :
+        {
+            auto pooling2dQueueDescriptor = PolymorphicDowncast<const Pooling2dQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClPooling2dWorkload>(*pooling2dQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::PreCompiled :
+        {
+            auto preCompiledQueueDescriptor = PolymorphicDowncast<const PreCompiledQueueDescriptor*>(&descriptor);
+            return MakeWorkload<NullWorkload, NullWorkload>(*preCompiledQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Prelu :
+        {
+            auto preluQueueDescriptor = PolymorphicDowncast<const PreluQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClPreluWorkload>(*preluQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::QLstm :
+        {
+            auto qLstmQueueDescriptor = PolymorphicDowncast<const QLstmQueueDescriptor*>(&descriptor);
+            return std::make_unique<ClQLstmWorkload>(*qLstmQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Quantize :
+        {
+            auto quantizeQueueDescriptor = PolymorphicDowncast<const QuantizeQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClQuantizeWorkload>(*quantizeQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::QuantizedLstm :
+        {
+            auto quantizedLstmQueueDescriptor = PolymorphicDowncast<const QuantizedLstmQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClQuantizedLstmWorkload>(*quantizedLstmQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Rank :
+        {
+            auto rankQueueDescriptor = PolymorphicDowncast<const RankQueueDescriptor*>(&descriptor);
+            return std::make_unique<ClRankWorkload>(*rankQueueDescriptor, info);
+        }
+        case LayerType::Reduce :
+        {
+            auto reduceQueueDescriptor = PolymorphicDowncast<const ReduceQueueDescriptor*>(&descriptor);
+            return std::make_unique<ClReduceWorkload>(*reduceQueueDescriptor, info);
+        }
+        case LayerType::Reshape :
+        {
+            auto reshapeQueueDescriptor = PolymorphicDowncast<const ReshapeQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClReshapeWorkload>(*reshapeQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Resize :
+        {
+            auto resizeQueueDescriptor = PolymorphicDowncast<const ResizeQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClResizeWorkload>(*resizeQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Slice :
+        {
+            auto sliceQueueDescriptor = PolymorphicDowncast<const SliceQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClSliceWorkload>(*sliceQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Softmax :
+        {
+            auto softmaxQueueDescriptor = PolymorphicDowncast<const SoftmaxQueueDescriptor*>(&descriptor);
+            return std::make_unique<ClSoftmaxWorkload>(*softmaxQueueDescriptor,
+                                                       info,
+                                                       m_MemoryManager->GetIntraLayerManager(),
+                                                       m_CLCompileContext);
+        }
+        case LayerType::SpaceToBatchNd :
+        {
+            auto spaceToBatchNdQueueDescriptor
+                    = PolymorphicDowncast<const SpaceToBatchNdQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClSpaceToBatchNdWorkload>(*spaceToBatchNdQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::SpaceToDepth :
+        {
+            auto spaceToDepthQueueDescriptor = PolymorphicDowncast<const SpaceToDepthQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClSpaceToDepthWorkload>(*spaceToDepthQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Splitter :
+        {
+            auto splitterQueueDescriptor = PolymorphicDowncast<const SplitterQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClSplitterWorkload>(*splitterQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Stack :
+        {
+            auto stackQueueDescriptor = PolymorphicDowncast<const StackQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClStackWorkload>(*stackQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::StridedSlice :
+        {
+            auto stridedSliceQueueDescriptor = PolymorphicDowncast<const StridedSliceQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClStridedSliceWorkload>(*stridedSliceQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Subtraction :
+        {
+            auto subtractionQueueDescriptor = PolymorphicDowncast<const SubtractionQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClSubtractionWorkload>(*subtractionQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::Transpose :
+        {
+            auto transposeQueueDescriptor = PolymorphicDowncast<const TransposeQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClTransposeWorkload>(*transposeQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::TransposeConvolution2d :
+        {
+            auto transposeConvolution2dQueueDescriptor
+                    = PolymorphicDowncast<const TransposeConvolution2dQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClTransposeConvolution2dWorkload>(*transposeConvolution2dQueueDescriptor,
+                                                                  info,
+                                                                  m_MemoryManager->GetIntraLayerManager(),
+                                                                  m_CLCompileContext);
+        }
+        default:
+            return nullptr;
+    }
+}
+
 std::unique_ptr<IWorkload> ClWorkloadFactory::CreateActivation(const ActivationQueueDescriptor& descriptor,
                                                                const WorkloadInfo& info) const
 {

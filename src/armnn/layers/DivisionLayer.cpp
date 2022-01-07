@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> DivisionLayer::CreateWorkload(const IWorkloadFactory&
     DivisionQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateDivision(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Division, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DivisionLayer* DivisionLayer::Clone(Graph& graph) const

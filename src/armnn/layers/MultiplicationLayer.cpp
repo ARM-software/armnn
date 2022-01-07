@@ -24,7 +24,7 @@ std::unique_ptr<IWorkload> MultiplicationLayer::CreateWorkload(const IWorkloadFa
     MultiplicationQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateMultiplication(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Multiplication, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 MultiplicationLayer* MultiplicationLayer::Clone(Graph& graph) const

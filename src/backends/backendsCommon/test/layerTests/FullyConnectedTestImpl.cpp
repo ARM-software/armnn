@@ -69,7 +69,9 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
         AddInputToWorkload(data, info, biasesTensorInfo, input2Handle.get());
     }
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateFullyConnected(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::FullyConnected,
+                                                                                data,
+                                                                                info);
     LayerTestResult<T, 2> result(outputTensorInfo);
 
     input0Handle->Allocate();

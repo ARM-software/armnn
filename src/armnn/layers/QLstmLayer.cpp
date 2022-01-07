@@ -75,7 +75,7 @@ std::unique_ptr<IWorkload> QLstmLayer::CreateWorkload(const IWorkloadFactory& fa
 
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateQLstm(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::QLstm, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 QLstmLayer* QLstmLayer::Clone(Graph& graph) const

@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> FakeQuantizationLayer::CreateWorkload(const IWorkload
     FakeQuantizationQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateFakeQuantization(descriptor, PrepInfoAndDesc(descriptor) );
+    return factory.CreateWorkload(LayerType::FakeQuantization, descriptor, PrepInfoAndDesc(descriptor) );
 }
 
 FakeQuantizationLayer* FakeQuantizationLayer::Clone(Graph& graph) const

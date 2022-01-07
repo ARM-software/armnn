@@ -71,7 +71,8 @@ LayerTestResult<T, 4> BoundedReLuTestCommon(
     descriptor.m_Parameters.m_A = upperBound;
     descriptor.m_Parameters.m_B = lowerBound;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(descriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Activation,
+                                                                                descriptor, workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -269,7 +270,8 @@ std::vector<float> BoundedReLuRandomInputTest(
     AddOutputToWorkload(descriptor, workloadInfo, outputTensorInfo, outputHandle.get());
     descriptor.m_Parameters = activationDescriptor;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(descriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Activation,
+                                                                                descriptor, workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -352,7 +354,8 @@ LayerTestResult<T, 4> ConstantLinearActivationTestCommon(
     data.m_Parameters.m_B = 0.0f;
     data.m_Parameters.m_Function = armnn::ActivationFunction::Linear;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Activation,
+                                                                                data, info);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -458,7 +461,8 @@ LayerTestResult<T, 4> SimpleActivationTest(
     descriptor.m_Parameters.m_A = activationParameterA;
     descriptor.m_Parameters.m_B = activationParameterB;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(descriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Activation,
+                                                                                descriptor, workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -875,7 +879,8 @@ LayerTestResult<float, 5> SqrtNNTest(
 
     descriptor.m_Parameters.m_Function = armnn::ActivationFunction::Sqrt;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(descriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Activation,
+                                                                                descriptor, workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();
@@ -1278,9 +1283,11 @@ LayerTestResult<T, 4> CompareActivationTestImpl(
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Activation,
+                                                                                data, info);
     ARMNN_ASSERT(workload != nullptr);
-    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateActivation(refData, refInfo);
+    std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateWorkload(armnn::LayerType::Activation,
+                                                                                      refData, refInfo);
     ARMNN_ASSERT(workloadRef != nullptr);
 
     inputHandle->Allocate();

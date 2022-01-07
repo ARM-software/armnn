@@ -27,7 +27,7 @@ std::unique_ptr<IWorkload> TransposeLayer::CreateWorkload(const IWorkloadFactory
     TransposeQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateTranspose(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Transpose, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 TransposeLayer* TransposeLayer::Clone(Graph& graph) const

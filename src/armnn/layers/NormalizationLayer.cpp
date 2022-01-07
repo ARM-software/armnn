@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> NormalizationLayer::CreateWorkload(const IWorkloadFac
     NormalizationQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateNormalization(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Normalization, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 NormalizationLayer* NormalizationLayer::Clone(Graph& graph) const

@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> FillLayer::CreateWorkload(const IWorkloadFactory& fac
     FillQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateFill(descriptor, PrepInfoAndDesc(descriptor) );
+    return factory.CreateWorkload(LayerType::Fill, descriptor, PrepInfoAndDesc(descriptor) );
 }
 
 FillLayer* FillLayer::Clone(Graph& graph) const

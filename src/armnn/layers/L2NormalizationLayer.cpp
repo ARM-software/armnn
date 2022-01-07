@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> L2NormalizationLayer::CreateWorkload(const IWorkloadF
     L2NormalizationQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateL2Normalization(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::L2Normalization, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 L2NormalizationLayer* L2NormalizationLayer::Clone(Graph& graph) const

@@ -25,7 +25,7 @@ std::unique_ptr<IWorkload> ComparisonLayer::CreateWorkload(const IWorkloadFactor
     ComparisonQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateComparison(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Comparison,descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ComparisonLayer* ComparisonLayer::Clone(Graph& graph) const

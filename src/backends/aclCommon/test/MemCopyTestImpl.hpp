@@ -65,7 +65,7 @@ LayerTestResult<T, 4> MemCopyTest(armnn::IWorkloadFactory& srcWorkloadFactory,
     AddInputToWorkload(memCopyQueueDesc, workloadInfo, tensorInfo, workloadInput.get());
     AddOutputToWorkload(memCopyQueueDesc, workloadInfo, tensorInfo, workloadOutput.get());
 
-    dstWorkloadFactory.CreateMemCopy(memCopyQueueDesc, workloadInfo)->Execute();
+    dstWorkloadFactory.CreateWorkload(armnn::LayerType::MemCopy, memCopyQueueDesc, workloadInfo)->Execute();
 
     CopyDataFromITensorHandle(actualOutput.data(), workloadOutput.get());
     ret.m_ActualData = actualOutput;

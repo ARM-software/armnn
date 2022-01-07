@@ -50,7 +50,8 @@ TEST_CASE("QueueDescriptor_Validate_WrongNumOfInputsOutputs")
     InputQueueDescriptor invalidData;
     WorkloadInfo invalidInfo;
     //Invalid argument exception is expected, because no inputs and no outputs were defined.
-    CHECK_THROWS_AS(RefWorkloadFactory().CreateInput(invalidData, invalidInfo), armnn::InvalidArgumentException);
+    CHECK_THROWS_AS(RefWorkloadFactory().CreateWorkload(LayerType::Input, invalidData, invalidInfo),
+                    armnn::InvalidArgumentException);
 }
 
 TEST_CASE("RefPooling2dFloat32Workload_Validate_WrongDimTensor")

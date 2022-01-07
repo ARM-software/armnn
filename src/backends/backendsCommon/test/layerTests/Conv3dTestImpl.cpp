@@ -275,7 +275,9 @@ LayerTestResult<T, 5> SimpleConvolution3dTestImpl(
         AddInputToWorkload(data, info, biasDesc, input2Handle.get());
     }
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateConvolution3d(data, info);
+    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Convolution3d,
+                                                                                data,
+                                                                                info);
     input0Handle->Allocate();
     input1Handle->Allocate();
     outputHandle->Allocate();

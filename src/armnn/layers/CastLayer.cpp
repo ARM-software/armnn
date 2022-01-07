@@ -23,7 +23,7 @@ std::unique_ptr<IWorkload> CastLayer::CreateWorkload(const IWorkloadFactory& fac
     CastQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateCast(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Cast, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 CastLayer* CastLayer::Clone(Graph& graph) const

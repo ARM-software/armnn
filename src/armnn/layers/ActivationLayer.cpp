@@ -22,7 +22,7 @@ std::unique_ptr<IWorkload> ActivationLayer::CreateWorkload(const IWorkloadFactor
     ActivationQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateActivation(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Activation, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 ActivationLayer* ActivationLayer::Clone(Graph& graph) const

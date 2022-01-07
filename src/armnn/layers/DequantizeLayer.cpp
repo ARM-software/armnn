@@ -22,7 +22,7 @@ std::unique_ptr<IWorkload> DequantizeLayer::CreateWorkload(
     DequantizeQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateDequantize(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Dequantize, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 DequantizeLayer* DequantizeLayer::Clone(Graph& graph) const

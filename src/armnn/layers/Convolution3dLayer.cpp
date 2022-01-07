@@ -50,7 +50,7 @@ std::unique_ptr<IWorkload> Convolution3dLayer::CreateWorkload(const IWorkloadFac
     Convolution3dQueueDescriptor descriptor;
     SetAdditionalInfo(descriptor);
 
-    return factory.CreateConvolution3d(descriptor, PrepInfoAndDesc(descriptor));
+    return factory.CreateWorkload(LayerType::Convolution3d, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 Convolution3dLayer* Convolution3dLayer::Clone(Graph& graph) const

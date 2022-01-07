@@ -78,7 +78,8 @@ TEST_CASE("NeonTimerMeasure")
     descriptor.m_Parameters.m_A = upperBound;
     descriptor.m_Parameters.m_B = lowerBound;
 
-    std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateActivation(descriptor, workloadInfo);
+    std::unique_ptr<armnn::IWorkload> workload
+            = workloadFactory.CreateWorkload(LayerType::Activation, descriptor, workloadInfo);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

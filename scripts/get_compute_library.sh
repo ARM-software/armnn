@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c4270cf958e85e0c41590030e1f9e228493a5ba0" #Add tests for FP Cpu Pooling where pool region is completely outside the input
+DEFAULT_CLFRAMEWORKREVISION="143310c6ec5e7c9f6035e9357bf0faa4020f2412" #Decouple NEMaxUnpoolingLayerKernel
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

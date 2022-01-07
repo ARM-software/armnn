@@ -155,6 +155,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - NOT_EQUAL
 - PACK
 - PAD
+- PADV2
 - PRELU
 - QUANTIZE
 - RELU

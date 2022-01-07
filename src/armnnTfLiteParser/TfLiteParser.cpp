@@ -76,7 +76,7 @@ armnn::INetworkPtr ITfLiteParser::CreateNetworkFromBinaryFile(const char* graphF
     return pTfLiteParserImpl->CreateNetworkFromBinaryFile(graphFile);
 }
 
-armnn::INetworkPtr ITfLiteParser::CreateNetworkFromBinary(const std::vector<uint8_t> & binaryContent)
+armnn::INetworkPtr ITfLiteParser::CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent)
 {
     return pTfLiteParserImpl->CreateNetworkFromBinary(binaryContent);
 }
@@ -113,9 +113,9 @@ namespace
 
 const uint32_t VIRTUAL_OPERATOR_ID = std::numeric_limits<uint32_t>::max();
 
-void CheckSubgraph(const TfLiteParserImpl::ModelPtr & model,
+void CheckSubgraph(const TfLiteParserImpl::ModelPtr& model,
                    size_t subgraphIndex,
-                   const CheckLocation & location)
+                   const CheckLocation& location)
 {
     if (model.get() == nullptr)
     {
@@ -141,10 +141,10 @@ void CheckSubgraph(const TfLiteParserImpl::ModelPtr & model,
 #define CHECK_SUBGRAPH(MODEL, SUBGRAPH_INDEX) \
     CheckSubgraph(MODEL, SUBGRAPH_INDEX, CHECK_LOCATION())
 
-void CheckModel(const TfLiteParserImpl::ModelPtr & model,
+void CheckModel(const TfLiteParserImpl::ModelPtr& model,
                 size_t subgraphIndex,
                 size_t operatorIndex,
-                const CheckLocation & location)
+                const CheckLocation& location)
 {
     if (model.get() == nullptr)
     {
@@ -183,10 +183,10 @@ void CheckModel(const TfLiteParserImpl::ModelPtr & model,
 #define CHECK_MODEL(MODEL, SUBGRAPH_INDEX, OPERATOR_INDEX) \
     CheckModel(MODEL, SUBGRAPH_INDEX, OPERATOR_INDEX, CHECK_LOCATION())
 
-void CheckTensor(const TfLiteParserImpl::ModelPtr & model,
+void CheckTensor(const TfLiteParserImpl::ModelPtr& model,
                  size_t subgraphIndex,
                  size_t tensorIndex,
-                 const CheckLocation & location)
+                 const CheckLocation& location)
 {
     // not checking model, because I assume CHECK_MODEL already run
     // and checked that. An assert would do.
@@ -213,7 +213,7 @@ void CheckTensor(const TfLiteParserImpl::ModelPtr & model,
     CheckTensor(MODEL, SUBGRAPH_INDEX, TENSOR_INDEX, CHECK_LOCATION())
 
 void CheckTensorPtr(TfLiteParserImpl::TensorRawPtr rawPtr,
-                    const CheckLocation & location)
+                    const CheckLocation& location)
 {
     if (rawPtr == nullptr)
     {
@@ -225,9 +225,9 @@ void CheckTensorPtr(TfLiteParserImpl::TensorRawPtr rawPtr,
 #define CHECK_TENSOR_PTR(TENSOR_PTR) \
     CheckTensorPtr(TENSOR_PTR, CHECK_LOCATION())
 
-void CheckBuffer(const TfLiteParserImpl::ModelPtr & model,
+void CheckBuffer(const TfLiteParserImpl::ModelPtr& model,
                  size_t bufferIndex,
-                 const CheckLocation & location)
+                 const CheckLocation& location)
 {
     if (model.get() == nullptr)
     {
@@ -261,9 +261,9 @@ void CheckBuffer(const TfLiteParserImpl::ModelPtr & model,
     CheckBuffer(MODEL, BUFFER_INDEX, CHECK_LOCATION())
 
 void CheckBufferSize(TfLiteParserImpl::BufferRawPtr bufferPtr,
-                     const armnn::TensorInfo & tensorInfo,
+                     const armnn::TensorInfo& tensorInfo,
                      uint32_t bufferId,
-                     const CheckLocation & location)
+                     const CheckLocation& location)
 {
     if (bufferPtr == nullptr)
     {
@@ -282,6 +282,42 @@ void CheckBufferSize(TfLiteParserImpl::BufferRawPtr bufferPtr,
            << tensorInfo.GetNumElements() << " elements. " << location.AsString();
         throw ParseException(ss.str());
     }
+}
+
+
+tflite::BuiltinOperator GetOpCode(const TfLiteParserImpl::ModelPtr& model, size_t subgraphIndex, size_t operatorIndex)
+{
+    const auto& operatorPtr = model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    auto opcodeIndex = operatorPtr->opcode_index;
+
+// work around the introduction of the deprecated_builtin_code introduced in 2.4 in a backwards compatible manner
+#if defined(ARMNN_POST_TFLITE_2_3)
+    auto opcode = std::max(model->operator_codes[opcodeIndex]->builtin_code,
+            static_cast<tflite::BuiltinOperator>(model->operator_codes[opcodeIndex]->deprecated_builtin_code));
+#else
+    auto opcode = model->operator_codes[opcodeIndex]->builtin_code;
+#endif
+    return opcode;
+}
+
+std::vector<unsigned int> GetUIntBuffer(armnn::TensorInfo info,
+                                        const TfLiteParserImpl::ModelPtr& model,
+                                        size_t bufferIndex)
+{
+    TfLiteParserImpl::BufferRawPtr bufferPtr = TfLiteParserImpl::GetBuffer(model, bufferIndex);
+    std::vector<unsigned int> buffer(info.GetNumElements());
+
+    if (info.GetDataType() == DataType::Signed32)
+    {
+        ::memcpy(buffer.data(), bufferPtr->data.data(), bufferPtr->data.size());
+    }
+    else if (info.GetDataType() == DataType::Signed64)
+    {
+        std::vector<uint64_t> uint64Buffer(info.GetNumElements());
+        ::memcpy(uint64Buffer.data(), bufferPtr->data.data(), bufferPtr->data.size());
+        buffer.assign(std::begin(uint64Buffer), std::end(uint64Buffer));
+    }
+    return buffer;
 }
 
 #define CHECK_BUFFER_SIZE(BUFFER_PTR, TENSOR_INFO, BUFFER_ID) \
@@ -323,11 +359,11 @@ bool IsActivationSupported(tflite::ActivationFunctionType activationType)
     } while(false)
 
 
-std::vector<unsigned int> AsUnsignedVector(const std::vector<int32_t> & in)
+std::vector<unsigned int> AsUnsignedVector(const std::vector<int32_t>& in)
 {
     std::vector<unsigned int> result;
     result.reserve(in.size());
-    for (auto & i : in)
+    for (auto& i : in)
     {
         // If the location of the input data is -1 then the input should be ignored.
         if (i == -1)
@@ -519,14 +555,14 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
 
 armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr)
 {
-    auto const & dimensions = AsUnsignedVector(tensorPtr->shape);
+    auto const& dimensions = AsUnsignedVector(tensorPtr->shape);
     return ToTensorInfo(tensorPtr, dimensions);
 }
 
 armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
                                const bool outputTensor)
 {
-    auto const & dimensions = AsUnsignedVector(tensorPtr->shape);
+    auto const& dimensions = AsUnsignedVector(tensorPtr->shape);
     return ToTensorInfo(tensorPtr, dimensions, outputTensor);
 }
 
@@ -676,6 +712,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_NOT_EQUAL]               = &TfLiteParserImpl::ParseNotEqual;
     m_ParserFunctions[tflite::BuiltinOperator_PACK]                    = &TfLiteParserImpl::ParsePack;
     m_ParserFunctions[tflite::BuiltinOperator_PAD]                     = &TfLiteParserImpl::ParsePad;
+    m_ParserFunctions[tflite::BuiltinOperator_PADV2]                   = &TfLiteParserImpl::ParsePad;
     m_ParserFunctions[tflite::BuiltinOperator_PRELU]                   = &TfLiteParserImpl::ParsePrelu;
     m_ParserFunctions[tflite::BuiltinOperator_QUANTIZE]                = &TfLiteParserImpl::ParseQuantize;
     m_ParserFunctions[tflite::BuiltinOperator_RELU]                    = &TfLiteParserImpl::ParseRelu;
@@ -720,7 +757,7 @@ INetworkPtr TfLiteParserImpl::CreateNetworkFromBinaryFile(const char* graphFile)
     return CreateNetworkFromModel();
 }
 
-INetworkPtr TfLiteParserImpl::CreateNetworkFromBinary(const std::vector<uint8_t> & binaryContent)
+INetworkPtr TfLiteParserImpl::CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent)
 {
     ResetParser();
     m_Model = LoadModelFromBinary(binaryContent.data(), binaryContent.size());
@@ -976,8 +1013,8 @@ void TfLiteParserImpl::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsConv2DOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsConv2DOptions();
 
     CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
 
@@ -1135,8 +1172,8 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsDepthwiseConv2DOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsDepthwiseConv2DOptions();
 
     CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
 
@@ -1345,8 +1382,8 @@ void TfLiteParserImpl::ParseTransposeConv(size_t subgraphIndex, size_t operatorI
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsTransposeConvOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsTransposeConvOptions();
 
     TransposeConvolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
@@ -1604,8 +1641,8 @@ void TfLiteParserImpl::ParsePool(size_t subgraphIndex,
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsPool2DOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsPool2DOptions();
 
     CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
 
@@ -1743,8 +1780,8 @@ void TfLiteParserImpl::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
 void TfLiteParserImpl::ParseSoftmax(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsSoftmaxOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsSoftmaxOptions();
 
     SoftmaxDescriptor desc;
     desc.m_Beta = options->beta;
@@ -1822,7 +1859,7 @@ void TfLiteParserImpl::ParseSpaceToBatchND(size_t subgraphIndex, size_t operator
 }
 
 armnn::TensorInfo TfLiteParserImpl::OutputShapeOfSqueeze(std::vector<uint32_t> squeezeDims,
-                                                         const armnn::TensorInfo & inputTensorInfo)
+                                                         const armnn::TensorInfo& inputTensorInfo)
 {
     CHECK_VALID_SIZE(squeezeDims.size(), 0, 1, 2, 3, 4);
     static const uint32_t dimensionSequence[] = { 0, 1, 2, 3 };
@@ -1964,8 +2001,8 @@ void TfLiteParserImpl::ParseStridedSlice(size_t subgraphIndex, size_t operatorIn
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsStridedSliceOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsStridedSliceOptions();
 
     StridedSliceDescriptor desc;
     desc.m_BeginMask = options->begin_mask;
@@ -2015,8 +2052,8 @@ void TfLiteParserImpl::ParseSub(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsSubOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsSubOptions();
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2);
@@ -2047,8 +2084,8 @@ void TfLiteParserImpl::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsDivOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsDivOptions();
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2);
@@ -2078,8 +2115,8 @@ void TfLiteParserImpl::ParseAdd(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsAddOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsAddOptions();
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2);
@@ -2109,8 +2146,8 @@ void TfLiteParserImpl::ParseMul(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsMulOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsMulOptions();
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2);
@@ -2183,25 +2220,82 @@ void TfLiteParserImpl::ParsePad(size_t subgraphIndex, size_t operatorIndex)
     CHECK_VALID_SIZE(outputs.size(), 1);
 
     armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
-
     armnn::TensorInfo padTensorInfo = ToTensorInfo(inputs[1]);
-    BufferRawPtr bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
 
-    std::vector<unsigned int> padBuffer(padTensorInfo.GetNumElements());
-    ::memcpy(padBuffer.data(), bufferPtr->data.data(), padTensorInfo.GetNumBytes());
+    std::vector<unsigned int> padBuffer = GetUIntBuffer(padTensorInfo, m_Model, inputs[1]->buffer);
 
     size_t step = 2;
     armnn::PadDescriptor desc;
-    if (inputTensorInfo.IsQuantized())
+    auto opcode = GetOpCode(m_Model, subgraphIndex, operatorIndex);
+
+    if (opcode == tflite::BuiltinOperator_PAD)
     {
-        desc.m_PadValue = static_cast<float>(inputTensorInfo.GetQuantizationOffset());
+        CHECK_VALID_SIZE(inputs.size(), 2);
+
+        if (inputTensorInfo.IsQuantized())
+        {
+            desc.m_PadValue = static_cast<float>(inputTensorInfo.GetQuantizationOffset());
+        }
     }
+    else if (opcode == tflite::BuiltinOperator_PADV2)
+    {
+        CHECK_VALID_SIZE(inputs.size(), 3);
+
+        armnn::TensorInfo padValueTensorInfo = ToTensorInfo(inputs[2]);
+
+        if (padValueTensorInfo.GetNumElements() != 1)
+        {
+            ARMNN_THROW_PARSE_EXCEPTION("Multiple padding values are not supported in PADV2");
+        }
+        BufferRawPtr padValueBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+
+        // Get the pad value from the input tensor
+        if (padValueBufferPtr->data.size() > 0)
+        {
+            switch (padValueTensorInfo.GetDataType())
+            {
+                case armnn::DataType::Float32:
+                {
+                    std::vector<float> padValueBuffer(padValueTensorInfo.GetNumElements());
+                    ::memcpy(padValueBuffer.data(), padValueBufferPtr->data.data(), padValueBufferPtr->data.size());
+                    desc.m_PadValue = padValueBuffer[0];
+                    break;
+                }
+                case armnn::DataType::QAsymmU8:
+                {
+                    std::vector<uint8_t> padValueBuffer(padValueTensorInfo.GetNumElements());
+                    ::memcpy(padValueBuffer.data(), padValueBufferPtr->data.data(), padValueBufferPtr->data.size());
+                    desc.m_PadValue = armnn::Dequantize<uint8_t>(padValueBuffer[0],
+                                                                 padValueTensorInfo.GetQuantizationScale(),
+                                                                 padValueTensorInfo.GetQuantizationOffset());
+                    break;
+                }
+                case armnn::DataType::QAsymmS8:
+                case armnn::DataType::QSymmS8:
+                {
+                    std::vector<int8_t> padValueBuffer(padValueTensorInfo.GetNumElements());
+                    ::memcpy(padValueBuffer.data(), padValueBufferPtr->data.data(), padValueBufferPtr->data.size());
+                    desc.m_PadValue = armnn::Dequantize<int8_t>(padValueBuffer[0],
+                                                                padValueTensorInfo.GetQuantizationScale(),
+                                                                padValueTensorInfo.GetQuantizationOffset());
+                    break;
+                }
+                default: ARMNN_THROW_PARSE_EXCEPTION("Unsupported DataType");
+            }
+        }
+        else if (inputTensorInfo.IsQuantized())
+        {
+            desc.m_PadValue = static_cast<float>(inputTensorInfo.GetQuantizationOffset());
+        }
+    }
+
     for (unsigned int i = 0; i < padTensorInfo.GetNumElements() / step; ++i)
     {
         desc.m_PadList.emplace_back(padBuffer[i * step], padBuffer[i * step + 1]);
     }
 
-    auto layerName = fmt::format("Pad:{}:{}", subgraphIndex, operatorIndex);
+    auto layerName = (opcode == tflite::BuiltinOperator_PAD) ? fmt::format("Pad:{}:{}", subgraphIndex, operatorIndex)
+            : fmt::format("PadV2:{}:{}", subgraphIndex, operatorIndex);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
 
     IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
@@ -2399,7 +2493,7 @@ void TfLiteParserImpl::ParseHardSwish(size_t subgraphIndex, size_t operatorIndex
 void TfLiteParserImpl::ParseActivation(size_t subgraphIndex, size_t operatorIndex, ActivationFunction activationType)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     IgnoreUnused(operatorPtr);
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
@@ -2441,7 +2535,7 @@ void TfLiteParserImpl::ParseActivation(size_t subgraphIndex, size_t operatorInde
         case ActivationFunction::LeakyReLu:
         {
             layerName += fmt::format("LEAKYRELU:{}:{}", subgraphIndex, operatorIndex);
-            const auto * options = operatorPtr->builtin_options.AsLeakyReluOptions();
+            const auto* options = operatorPtr->builtin_options.AsLeakyReluOptions();
             activationDesc.m_A = options->alpha;
             break;
         }
@@ -2478,8 +2572,8 @@ void TfLiteParserImpl::ParseActivation(size_t subgraphIndex, size_t operatorInde
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
-armnn::TensorInfo TfLiteParserImpl::OutputShapeOfReshape(const armnn::TensorInfo & inputTensorInfo,
-                                                         const std::vector<int32_t> & targetDimsIn)
+armnn::TensorInfo TfLiteParserImpl::OutputShapeOfReshape(const armnn::TensorInfo& inputTensorInfo,
+                                                         const std::vector<int32_t>& targetDimsIn)
 {
     std::vector<unsigned int> outputDims(targetDimsIn.begin(), targetDimsIn.end());
     const auto stretchDim = std::find(targetDimsIn.begin(), targetDimsIn.end(), -1);
@@ -2517,8 +2611,8 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsReshapeOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsReshapeOptions();
     auto layerName = fmt::format("Reshape:{}:{}", subgraphIndex, operatorIndex);
 
     armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
@@ -2727,8 +2821,8 @@ void TfLiteParserImpl::ParseConcatenation(size_t subgraphIndex, size_t operatorI
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsConcatenationOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsConcatenationOptions();
 
     CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
 
@@ -2777,7 +2871,7 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorRfr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto& operatorRfr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     const auto options = operatorRfr->builtin_options.AsFullyConnectedOptions();
 
     CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
@@ -2884,7 +2978,7 @@ void TfLiteParserImpl::ParseDetectionPostProcess(size_t subgraphIndex, size_t op
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
@@ -3001,8 +3095,8 @@ void TfLiteParserImpl::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsUnpackOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsUnpackOptions();
 
     // This unpackAxis indicates the axis to unpack
     const unsigned int unpackAxis = CHECKED_NON_NEGATIVE(options->axis);
@@ -3114,8 +3208,8 @@ void TfLiteParserImpl::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsSplitOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsSplitOptions();
 
     const unsigned int numSplits = CHECKED_NON_NEGATIVE(options->num_splits);
 
@@ -3226,8 +3320,8 @@ void TfLiteParserImpl::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsSplitVOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsSplitVOptions();
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 3);
@@ -3472,8 +3566,8 @@ void TfLiteParserImpl::ParseGather(size_t subgraphIndex, size_t operatorIndex)
 
     armnn::GatherDescriptor gatherDescriptor;
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsGatherOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsGatherOptions();
     auto axis = options->axis;
 
     auto inputDimensions = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
@@ -3521,8 +3615,8 @@ void TfLiteParserImpl::ParseDepthToSpace(size_t subgraphIndex, size_t operatorIn
 
     armnn::DepthToSpaceDescriptor descriptor;
 
-    const auto & operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto * options = operatorPtr->builtin_options.AsDepthToSpaceOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsDepthToSpaceOptions();
     auto blockSize = options->block_size;
     if (blockSize < 2)
     {
@@ -3570,8 +3664,8 @@ void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, R
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
 
-    const auto &operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
-    const auto *options = operatorPtr->builtin_options.AsReducerOptions();
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsReducerOptions();
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2);
@@ -3614,7 +3708,7 @@ void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, R
     desc.m_ReduceOperation = reduceOperation;
 
     // Register a new layer object, Sum.
-    IConnectableLayer *layer = m_Network->AddReduceLayer(desc, layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddReduceLayer(desc, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -3849,7 +3943,7 @@ armnn::IConnectableLayer* TfLiteParserImpl::AddFusedActivationLayer(armnn::IConn
     return activationLayer;
 }
 
-TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromFile(const char * fileName)
+TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromFile(const char* fileName)
 {
     if (fileName == nullptr)
     {
@@ -3873,7 +3967,7 @@ TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromFile(const char * file
                                fileContent.size());
 }
 
-TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromBinary(const uint8_t * binaryContent, size_t len)
+TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromBinary(const uint8_t* binaryContent, size_t len)
 {
     if (binaryContent == nullptr)
      {
@@ -3892,18 +3986,18 @@ TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromBinary(const uint8_t *
     return tflite::UnPackModel(binaryContent);
 }
 
-TfLiteParserImpl::TensorRawPtrVector TfLiteParserImpl::GetInputs(const ModelPtr & model,
+TfLiteParserImpl::TensorRawPtrVector TfLiteParserImpl::GetInputs(const ModelPtr& model,
                                                                  size_t subgraphIndex,
                                                                  size_t operatorIndex)
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
 
-    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
+    const auto& subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto& operatorPtr = subgraphPtr->operators[operatorIndex];
 
     size_t inputCount = operatorPtr->inputs.size();
     TensorRawPtrVector result;
-    for (size_t i=0; i<inputCount; ++i)
+    for (size_t i = 0; i < inputCount; ++i)
     {
         // If the input location is -1 then assume input is turned off.
         if (operatorPtr->inputs[i] == -1)
@@ -3919,18 +4013,18 @@ TfLiteParserImpl::TensorRawPtrVector TfLiteParserImpl::GetInputs(const ModelPtr 
     return result;
 }
 
-TfLiteParserImpl::TensorRawPtrVector TfLiteParserImpl::GetOutputs(const ModelPtr & model,
+TfLiteParserImpl::TensorRawPtrVector TfLiteParserImpl::GetOutputs(const ModelPtr& model,
                                                                   size_t subgraphIndex,
                                                                   size_t operatorIndex)
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
 
-    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
+    const auto& subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto& operatorPtr = subgraphPtr->operators[operatorIndex];
 
     size_t outputCount = operatorPtr->outputs.size();
     TensorRawPtrVector result(outputCount);
-    for (size_t i=0; i<outputCount; ++i)
+    for (size_t i = 0; i < outputCount; ++i)
     {
         uint32_t outputId = CHECKED_NON_NEGATIVE(operatorPtr->outputs[i]);
         CHECK_TENSOR(model, subgraphIndex, outputId);
@@ -3939,15 +4033,15 @@ TfLiteParserImpl::TensorRawPtrVector TfLiteParserImpl::GetOutputs(const ModelPtr
     return result;
 }
 
-TfLiteParserImpl::TensorIdRawPtrVector TfLiteParserImpl::GetSubgraphInputs(const ModelPtr & model,
+TfLiteParserImpl::TensorIdRawPtrVector TfLiteParserImpl::GetSubgraphInputs(const ModelPtr& model,
                                                                            size_t subgraphIndex)
 {
     CHECK_SUBGRAPH(model, subgraphIndex);
-    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto& subgraphPtr = model->subgraphs[subgraphIndex];
 
     size_t inputCount = subgraphPtr->inputs.size();
     TensorIdRawPtrVector result(inputCount);
-    for (size_t i=0; i<inputCount; ++i)
+    for (size_t i = 0; i < inputCount; ++i)
     {
         uint32_t inputId = CHECKED_NON_NEGATIVE(subgraphPtr->inputs[i]);
         CHECK_TENSOR(model, subgraphIndex, inputId);
@@ -3956,15 +4050,15 @@ TfLiteParserImpl::TensorIdRawPtrVector TfLiteParserImpl::GetSubgraphInputs(const
     return result;
 }
 
-TfLiteParserImpl::TensorIdRawPtrVector TfLiteParserImpl::GetSubgraphOutputs(const ModelPtr & model,
+TfLiteParserImpl::TensorIdRawPtrVector TfLiteParserImpl::GetSubgraphOutputs(const ModelPtr& model,
                                                                             size_t subgraphIndex)
 {
     CHECK_SUBGRAPH(model, subgraphIndex);
-    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto& subgraphPtr = model->subgraphs[subgraphIndex];
 
     size_t outputCount = subgraphPtr->outputs.size();
     TensorIdRawPtrVector result(outputCount);
-    for (size_t i=0; i<outputCount; ++i)
+    for (size_t i = 0; i < outputCount; ++i)
     {
         uint32_t outputId = CHECKED_NON_NEGATIVE(subgraphPtr->outputs[i]);
         result[i] = std::make_pair(outputId, subgraphPtr->tensors[outputId].get());
@@ -3977,8 +4071,8 @@ std::vector<int32_t>& TfLiteParserImpl::GetInputTensorIds(const ModelPtr& model,
                                                           size_t operatorIndex)
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
-    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
+    const auto& subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto& operatorPtr = subgraphPtr->operators[operatorIndex];
     return operatorPtr->inputs;
 }
 
@@ -3987,8 +4081,8 @@ std::vector<int32_t>& TfLiteParserImpl::GetOutputTensorIds(const ModelPtr& model
                                                            size_t operatorIndex)
 {
     CHECK_MODEL(model, subgraphIndex, operatorIndex);
-    const auto & subgraphPtr = model->subgraphs[subgraphIndex];
-    const auto & operatorPtr = subgraphPtr->operators[operatorIndex];
+    const auto& subgraphPtr = model->subgraphs[subgraphIndex];
+    const auto& operatorPtr = subgraphPtr->operators[operatorIndex];
     return operatorPtr->outputs;
 }
 
@@ -4053,7 +4147,7 @@ void TfLiteParserImpl::SetupInputLayers(size_t subgraphIndex)
     CHECK_SUBGRAPH(m_Model, subgraphIndex);
 
     auto inputs = GetSubgraphInputs(m_Model, subgraphIndex);
-    for (auto const & tensorIdAndPtr : inputs)
+    for (auto const& tensorIdAndPtr : inputs)
     {
         auto bindingId = GenerateLayerBindingId(subgraphIndex, tensorIdAndPtr.first);
         IConnectableLayer* layer =
@@ -4074,7 +4168,7 @@ void TfLiteParserImpl::SetupOutputLayers(size_t subgraphIndex)
     CHECK_SUBGRAPH(m_Model, subgraphIndex);
 
     auto outputs = GetSubgraphOutputs(m_Model, subgraphIndex);
-    for (auto const & tensorIdAndPtr : outputs)
+    for (auto const& tensorIdAndPtr : outputs)
     {
         auto bindingId = GenerateLayerBindingId(subgraphIndex, tensorIdAndPtr.first);
         IConnectableLayer* layer =
@@ -4091,7 +4185,7 @@ void TfLiteParserImpl::SetupConstantLayers(size_t subgraphIndex)
 {
     CHECK_SUBGRAPH(m_Model, subgraphIndex);
 
-    const auto & subgraphPtr = m_Model->subgraphs[subgraphIndex];
+    const auto& subgraphPtr = m_Model->subgraphs[subgraphIndex];
     for (unsigned int subgraphIndex = 0; subgraphIndex < m_SubgraphConnections.size(); ++subgraphIndex)
     {
         for (unsigned int tensorIndex = 0; tensorIndex < m_SubgraphConnections[subgraphIndex].size(); ++tensorIndex)
@@ -4107,7 +4201,7 @@ void TfLiteParserImpl::SetupConstantLayers(size_t subgraphIndex)
                     auto tensorAndData = CreateConstTensorNonPermuted(tensorPtr, tensorInfo);
 
                     std::string layerName = fmt::format("Constant:{}", tensorPtr->name);
-                    IConnectableLayer *layer = m_Network->AddConstantLayer(tensorAndData, layerName.c_str());
+                    IConnectableLayer* layer = m_Network->AddConstantLayer(tensorAndData, layerName.c_str());
 
                     layer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
                     RegisterOutputSlots(subgraphIndex,
@@ -4234,7 +4328,7 @@ BindingPointInfo TfLiteParserImpl::GetNetworkInputBindingInfo(size_t subgraphId,
 {
     CHECK_SUBGRAPH(m_Model, subgraphId);
     auto inputs = GetSubgraphInputs(m_Model, subgraphId);
-    for (auto const & input : inputs)
+    for (auto const& input : inputs)
     {
         if (input.second->name == name)
         {
@@ -4247,7 +4341,7 @@ BindingPointInfo TfLiteParserImpl::GetNetworkInputBindingInfo(size_t subgraphId,
     }
 
     std::stringstream bindings;
-    for (auto const & input : inputs)
+    for (auto const& input : inputs)
     {
         bindings << "'" << input.second->name << "' ";
     }
@@ -4279,7 +4373,7 @@ BindingPointInfo TfLiteParserImpl::GetNetworkOutputBindingInfo(size_t subgraphId
     }
 
     std::stringstream bindings;
-    for (auto const & output : outputs)
+    for (auto const& output : outputs)
     {
         bindings << "'" << output.second->name << "' ";
     }
@@ -4304,7 +4398,7 @@ std::vector<std::string> TfLiteParserImpl::GetSubgraphInputTensorNames(size_t su
     auto inputs = GetSubgraphInputs(m_Model, subgraphId);
     std::vector<std::string> result;
     result.reserve(inputs.size());
-    for (auto const & input : inputs)
+    for (auto const& input : inputs)
     {
         result.push_back(input.second->name);
     }
@@ -4317,7 +4411,7 @@ std::vector<std::string> TfLiteParserImpl::GetSubgraphOutputTensorNames(size_t s
     auto outputs = GetSubgraphOutputs(m_Model, subgraphId);
     std::vector<std::string> result;
     result.reserve(outputs.size());
-    for (auto const & output : outputs)
+    for (auto const& output : outputs)
     {
         result.push_back(output.second->name);
     }
@@ -4329,7 +4423,7 @@ const std::string TfLiteParserImpl::GetVersion()
     return TFLITE_PARSER_VERSION;
 }
 
-TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<float[]> && data)
+TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<float[]>&& data)
 : m_FloatData(std::move(data))
 , m_Uint8Data(nullptr)
 , m_Int8Data(nullptr)
@@ -4337,7 +4431,7 @@ TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<flo
 {
 }
 
-TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<uint8_t[]> && data)
+TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<uint8_t[]>&& data)
 : m_FloatData(nullptr)
 , m_Uint8Data(std::move(data))
 , m_Int8Data(nullptr)
@@ -4345,7 +4439,7 @@ TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<uin
 {
 }
 
-TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<int8_t[]> && data)
+TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<int8_t[]>&& data)
 : m_FloatData(nullptr)
 , m_Uint8Data(nullptr)
 , m_Int8Data(std::move(data))
@@ -4353,7 +4447,7 @@ TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<int
 {
 }
 
-TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<int32_t[]> && data)
+TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<int32_t[]>&& data)
 : m_FloatData(nullptr)
 , m_Uint8Data(nullptr)
 , m_Int8Data(nullptr)

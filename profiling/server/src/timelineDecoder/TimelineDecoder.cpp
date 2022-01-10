@@ -20,8 +20,9 @@ TimelineDecoder::TimelineStatus TimelineDecoder::CreateEntity(const Entity &enti
     {
         return TimelineStatus::TimelineStatus_Fail;
     }
-    m_OnNewEntityCallback(m_Model, entity);
-
+    ApplyToModel([&](Model& m){
+        m_OnNewEntityCallback(m, entity);
+    });
     return TimelineStatus::TimelineStatus_Success;
 }
 
@@ -31,7 +32,9 @@ TimelineDecoder::TimelineStatus TimelineDecoder::CreateEventClass(const EventCla
     {
         return TimelineStatus::TimelineStatus_Fail;
     }
-    m_OnNewEventClassCallback(m_Model, eventClass);
+    ApplyToModel([&](Model& m){
+        m_OnNewEventClassCallback(m, eventClass);
+    });
 
     return TimelineStatus::TimelineStatus_Success;
 }
@@ -42,7 +45,9 @@ TimelineDecoder::TimelineStatus TimelineDecoder::CreateEvent(const Event &event)
     {
         return TimelineStatus::TimelineStatus_Fail;
     }
-    m_OnNewEventCallback(m_Model, event);
+    ApplyToModel([&](Model& m){
+        m_OnNewEventCallback(m, event);
+    });
 
     return TimelineStatus::TimelineStatus_Success;
 }
@@ -53,7 +58,9 @@ TimelineDecoder::TimelineStatus TimelineDecoder::CreateLabel(const Label &label)
     {
         return TimelineStatus::TimelineStatus_Fail;
     }
-    m_OnNewLabelCallback(m_Model, label);
+    ApplyToModel([&](Model& m){
+        m_OnNewLabelCallback(m, label);
+    });
 
     return TimelineStatus::TimelineStatus_Success;
 }
@@ -64,13 +71,10 @@ TimelineDecoder::TimelineStatus TimelineDecoder::CreateRelationship(const Relati
     {
         return TimelineStatus::TimelineStatus_Fail;
     }
-    m_OnNewRelationshipCallback(m_Model, relationship);
+    ApplyToModel([&](Model& m){
+        m_OnNewRelationshipCallback(m, relationship);
+    });
     return TimelineStatus::TimelineStatus_Success;
-}
-
-const TimelineDecoder::Model &TimelineDecoder::GetModel()
-{
-    return m_Model;
 }
 
 TimelineDecoder::TimelineStatus TimelineDecoder::SetEntityCallback(OnNewEntityCallback cb)

@@ -113,7 +113,7 @@ private:
     IBackendInternal::IBackendProfilingPtr m_BackendProfiling;
     uint32_t m_CapturePeriod;
     std::vector<uint16_t> m_ActiveCounters;
-    bool m_IsTimelineEnabled;
+    std::atomic<bool> m_IsTimelineEnabled;
 };
 
 class MockBackendProfilingService

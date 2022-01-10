@@ -186,53 +186,55 @@ void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& c
 void CheckTimelinePackets(arm::pipe::TimelineDecoder& timelineDecoder)
 {
     unsigned int i = 0; // Use a postfix increment to avoid changing indexes each time the packet gets updated.
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NAME_LABEL);
+    timelineDecoder.ApplyToModel([&](arm::pipe::TimelineDecoder::Model& m) {
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NAME_LABEL);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::TYPE_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::TYPE_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::TYPE_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::TYPE_LABEL);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INDEX_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INDEX_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INDEX_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INDEX_LABEL);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::BACKENDID_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::BACKENDID_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::BACKENDID_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::BACKENDID_LABEL);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CHILD_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CHILD_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CHILD_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CHILD_LABEL);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::EXECUTION_OF_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
-                profiling::LabelsAndEventClasses::EXECUTION_OF_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::EXECUTION_OF_GUID);
+        CHECK(m.m_Labels[i++].m_Name ==
+                    profiling::LabelsAndEventClasses::EXECUTION_OF_LABEL);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::PROCESS_ID_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
-                profiling::LabelsAndEventClasses::PROCESS_ID_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::PROCESS_ID_GUID);
+        CHECK(m.m_Labels[i++].m_Name ==
+                    profiling::LabelsAndEventClasses::PROCESS_ID_LABEL);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::LAYER_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::LAYER);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::LAYER_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::LAYER);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::WORKLOAD_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::WORKLOAD);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::WORKLOAD_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::WORKLOAD);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NETWORK_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NETWORK);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NETWORK_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NETWORK);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CONNECTION_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CONNECTION);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CONNECTION_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CONNECTION);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INFERENCE_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INFERENCE);
+        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INFERENCE_GUID);
+        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INFERENCE);
 
-    CHECK(timelineDecoder.GetModel().m_Labels[i].m_Guid ==
-                profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
-    CHECK(timelineDecoder.GetModel().m_Labels[i++].m_Name ==
-                profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION);
+        CHECK(m.m_Labels[i].m_Guid ==
+                    profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
+        CHECK(m.m_Labels[i++].m_Name ==
+                    profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION);
 
-    CHECK(timelineDecoder.GetModel().m_EventClasses[0].m_Guid ==
-                profiling::LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
-    CHECK(timelineDecoder.GetModel().m_EventClasses[1].m_Guid ==
-                profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+        CHECK(m.m_EventClasses[0].m_Guid ==
+                    profiling::LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
+        CHECK(m.m_EventClasses[1].m_Guid ==
+                    profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+    });
 }
 
 TEST_CASE("GatorDMockEndToEnd")
@@ -294,7 +296,8 @@ TEST_CASE("GatorDMockEndToEnd")
             "MockGatord did not receive counter directory packet");
 
     // Following that we will receive a collection of well known timeline labels and event classes
-    WaitFor([&](){return timelineDecoder.GetModel().m_EventClasses.size() >= 2;},
+    WaitFor([&](){return timelineDecoder.ApplyToModel([&](arm::pipe::TimelineDecoder::Model& m){
+            return m.m_EventClasses.size() >= 2;});},
             "MockGatord did not receive well known timeline labels and event classes");
 
     CheckTimelineDirectory(mockService.GetTimelineDirectoryCaptureCommandHandler());
@@ -446,18 +449,22 @@ TEST_CASE("GatorDMockTimeLineActivation")
 
     arm::pipe::TimelineDecoder& timelineDecoder = mockService.GetTimelineDecoder();
 
-    WaitFor([&](){return timelineDecoder.GetModel().m_EventClasses.size() >= 2;},
+    WaitFor([&](){return timelineDecoder.ApplyToModel([&](arm::pipe::TimelineDecoder::Model& m){
+             return m.m_EventClasses.size() >= 2;});},
             "MockGatord did not receive well known timeline labels");
 
-    WaitFor([&](){return timelineDecoder.GetModel().m_Entities.size() >= 1;},
+    WaitFor([&](){return timelineDecoder.ApplyToModel([&](arm::pipe::TimelineDecoder::Model& m){
+             return m.m_Entities.size() >= 1;});},
             "MockGatord did not receive mock backend test entity");
 
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest
-    CHECK(timelineDecoder.GetModel().m_Entities.size() == 1);
-    CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 2);
-    CHECK(timelineDecoder.GetModel().m_Labels.size()  == 15);
-    CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 0);
-    CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
+    timelineDecoder.ApplyToModel([&](const arm::pipe::TimelineDecoder::Model& m){
+        CHECK(m.m_Entities.size() == 1);
+        CHECK(m.m_EventClasses.size()  == 2);
+        CHECK(m.m_Labels.size()  == 15);
+        CHECK(m.m_Relationships.size()  == 0);
+        CHECK(m.m_Events.size()  == 0);
+    });
 
     mockService.SendDeactivateTimelinePacket();
 
@@ -480,15 +487,18 @@ TEST_CASE("GatorDMockTimeLineActivation")
 
     // Once timeline packets have been reactivated the ActivateTimelineReportingCommandHandler will resend the
     // SendWellKnownLabelsAndEventClasses and then send the structure of any loaded networks
-    WaitFor([&](){return timelineDecoder.GetModel().m_Labels.size() >= 24;},
+    WaitFor([&](){return timelineDecoder.ApplyToModel([&](arm::pipe::TimelineDecoder::Model& m){
+            return m.m_Labels.size() >= 24;});},
             "MockGatord did not receive well known timeline labels");
 
     // Packets we expect from SendWellKnownLabelsAndEventClassesTest * 2 + network above (input, norm, backend, output)
-    CHECK(timelineDecoder.GetModel().m_Entities.size() == 6);
-    CHECK(timelineDecoder.GetModel().m_EventClasses.size()  == 4);
-    CHECK(timelineDecoder.GetModel().m_Labels.size()  == 34);
-    CHECK(timelineDecoder.GetModel().m_Relationships.size()  == 15);
-    CHECK(timelineDecoder.GetModel().m_Events.size()  == 0);
+    timelineDecoder.ApplyToModel([&](const arm::pipe::TimelineDecoder::Model& m){
+        CHECK(m.m_Entities.size() == 6);
+        CHECK(m.m_EventClasses.size()  == 4);
+        CHECK(m.m_Labels.size()  == 34);
+        CHECK(m.m_Relationships.size()  == 15);
+        CHECK(m.m_Events.size()  == 0);
+    });
 
     mockService.WaitForReceivingThread();
     GetProfilingService(&runtime).Disconnect();

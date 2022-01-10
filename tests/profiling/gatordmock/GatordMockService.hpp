@@ -34,7 +34,7 @@ namespace gatordmock
 {
 
 ///  A class that implements a Mock Gatord server. It will listen on a specified Unix domain socket (UDS)
-///  namespace for client connections. It will then allow opertaions to manage coutners while receiving counter data.
+///  namespace for client connections. It will then allow opertaions to manage counters while receiving counter data.
 class GatordMockService
 {
 public:

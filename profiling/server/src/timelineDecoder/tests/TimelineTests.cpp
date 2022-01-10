@@ -154,8 +154,6 @@ TEST_CASE("TimelineCaptureTest")
     arm::pipe::PacketVersionResolver packetVersionResolver;
 
     arm::pipe::TimelineDecoder timelineDecoder;
-    const arm::pipe::TimelineDecoder::Model& model = timelineDecoder.GetModel();
-
 
     arm::pipe::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
@@ -238,25 +236,27 @@ TEST_CASE("TimelineCaptureTest")
                                            timelineCaptureCommandHandler);
     }
 
-    for (unsigned long i = 0; i < 10; ++i)
-    {
-        CHECK(model.m_Entities[i].m_Guid == entityGuid);
+    timelineDecoder.ApplyToModel([&](const arm::pipe::TimelineDecoder::Model& model){
+        for (unsigned long i = 0; i < 10; ++i)
+        {
+            CHECK(model.m_Entities[i].m_Guid == entityGuid);
 
-        CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
+            CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
 
-        CHECK(model.m_Events[i].m_TimeStamp == timestamp);
-        CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
-        CHECK(model.m_Events[i].m_Guid == eventGuid);
+            CHECK(model.m_Events[i].m_TimeStamp == timestamp);
+            CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
+            CHECK(model.m_Events[i].m_Guid == eventGuid);
 
-        CHECK(model.m_Labels[i].m_Guid == labelGuid);
-        CHECK(model.m_Labels[i].m_Name == labelName);
+            CHECK(model.m_Labels[i].m_Guid == labelGuid);
+            CHECK(model.m_Labels[i].m_Name == labelName);
 
-        CHECK(model.m_Relationships[i].m_RelationshipType ==
-            arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
-        CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
-        CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
-        CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
-    }
+            CHECK(model.m_Relationships[i].m_RelationshipType ==
+                arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
+            CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
+            CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
+            CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
+        }
+    });
 }
 
 TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
@@ -270,7 +270,6 @@ TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
     arm::pipe::PacketVersionResolver packetVersionResolver;
 
     arm::pipe::TimelineDecoder timelineDecoder;
-    const arm::pipe::TimelineDecoder::Model& model = timelineDecoder.GetModel();
 
     arm::pipe::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
@@ -343,30 +342,32 @@ TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
     SendTimelinePacketToCommandHandler(bufferManager.GetReadableBuffer()->GetReadableData(),
                                        timelineCaptureCommandHandler);
 
-    for ( unsigned long i = 0; i < 9; ++i )
-    {
-        CHECK(model.m_Entities[i].m_Guid == entityGuid);
+    timelineDecoder.ApplyToModel([&](const arm::pipe::TimelineDecoder::Model& model){
+        for ( unsigned long i = 0; i < 9; ++i )
+        {
+            CHECK(model.m_Entities[i].m_Guid == entityGuid);
 
-        CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
+            CHECK(model.m_EventClasses[i].m_Guid == eventClassGuid);
 
-        CHECK(model.m_Labels[i].m_Guid == labelGuid);
+            CHECK(model.m_Labels[i].m_Guid == labelGuid);
 
-        CHECK(model.m_Events[i].m_TimeStamp == timestamp);
-        CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
-        CHECK(model.m_Events[i].m_Guid == eventGuid);
+            CHECK(model.m_Events[i].m_TimeStamp == timestamp);
+            CHECK(model.m_Events[i].m_ThreadId == uint64ThreadId);
+            CHECK(model.m_Events[i].m_Guid == eventGuid);
 
-        CHECK(model.m_Relationships[i].m_RelationshipType ==
-            arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
-        CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
-        CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
-        CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
-    }
-    for ( unsigned long i = 0; i < 9; i += 3 )
-    {
-        CHECK(model.m_Labels[i].m_Name == labelName);
-        CHECK(model.m_Labels[i+1].m_Name == labelName2);
-        CHECK(model.m_Labels[i+2].m_Name == labelName3);
-    }
+            CHECK(model.m_Relationships[i].m_RelationshipType ==
+                arm::pipe::ITimelineDecoder::RelationshipType::DataLink);
+            CHECK(model.m_Relationships[i].m_Guid == relationshipGuid);
+            CHECK(model.m_Relationships[i].m_HeadGuid == headGuid);
+            CHECK(model.m_Relationships[i].m_TailGuid == tailGuid);
+        }
+        for ( unsigned long i = 0; i < 9; i += 3 )
+        {
+            CHECK(model.m_Labels[i].m_Name == labelName);
+            CHECK(model.m_Labels[i+1].m_Name == labelName2);
+            CHECK(model.m_Labels[i+2].m_Name == labelName3);
+        }
+    });
 }
 
 }

@@ -41,7 +41,6 @@ void AsyncThreadedEndToEndTestImpl(INetworkPtr network,
     // Optimize the Network
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec());
 
-
     // Creates AsyncNetwork
     NetworkId networkId = 0;
     std::string errorMessage;
@@ -128,6 +127,9 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
                            float tolerance = 0.000001f,
                            size_t numThreads = 1)
 {
+    ARMNN_ASSERT(numThreads >= 1);
+    const unsigned int numberOfInferences = numThreads == 1 ? 1 : 1000;
+
     // Create Runtime in which test will run
     IRuntime::CreationOptions options;
     IRuntimePtr               runtime(IRuntime::Create(options));
@@ -154,26 +156,37 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
                                 ConstTensor(inputTensorInfo, it.second.data())});
     }
 
-    OutputTensors outputTensors;
-    outputTensors.reserve(expectedOutputData.size());
-    std::map<int, std::vector<TOutput>> outputStorage;
-    for (auto&& it : expectedOutputData)
+    std::vector<OutputTensors> outputTensorsVec;
+    std::vector<std::map<int, std::vector<TOutput>>> outputStorageVec;
+
+    outputTensorsVec.reserve(numberOfInferences);
+    outputStorageVec.reserve(numberOfInferences);
+    for (unsigned int i = 0; i < numberOfInferences; ++i)
     {
-        std::vector<TOutput> out(it.second.size());
-        outputStorage.emplace(it.first, out);
-        outputTensors.push_back({it.first,
-                                 Tensor(runtime->GetOutputTensorInfo(networkId, it.first),
-                                        outputStorage.at(it.first).data())});
+        OutputTensors outputTensors;
+        outputStorageVec.emplace_back(std::map<int, std::vector<TOutput>>());
+
+        outputTensors.reserve(expectedOutputData.size());
+        for (auto&& it : expectedOutputData)
+        {
+            std::vector<TOutput> out(it.second.size());
+            outputStorageVec[i].emplace(it.first, out);
+            outputTensors.push_back({it.first,
+                                     Tensor(runtime->GetOutputTensorInfo(networkId, it.first),
+                                            outputStorageVec[i].at(it.first).data())});
+        }
+
+        outputTensorsVec.push_back(outputTensors);
     }
 
-    if (numThreads <= 1)
+    if (numThreads == 1)
     {
         // Create WorkingMemHandle for this async network
         std::unique_ptr<IWorkingMemHandle> workingMemHandle = runtime->CreateWorkingMemHandle(networkId);
         IWorkingMemHandle& workingMemHandleRef = *workingMemHandle.get();
 
         // Run the async network
-        runtime->Execute(workingMemHandleRef, inputTensors, outputTensors);
+        runtime->Execute(workingMemHandleRef, inputTensors, outputTensorsVec[0]);
     }
     else
     {
@@ -188,18 +201,18 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
         AsyncCallbackManager callbackManager;
 
         // For the asyncronous execution, we are adding a pool of working memory handles (1 per thread) in the
-        // LoadedNetwork with a each scheduled inference having a spefic priority
-        for (size_t i = 0; i < 1000; ++i)
+        // LoadedNetwork with each scheduled inference having a random priority
+        for (size_t i = 0; i < numberOfInferences; ++i)
         {
             threadpool.Schedule(networkId,
                                 inputTensors,
-                                outputTensors,
+                                outputTensorsVec[i],
                                 static_cast<QosExecPriority>(rand()%3),
                                 callbackManager.GetNewCallback());
         }
 
         // Wait until the execution signals a notify
-        for (size_t i = 0; i < 1000; ++i)
+        for (size_t i = 0; i < numberOfInferences; ++i)
         {
             auto cb = callbackManager.GetNotifiedCallback();
 
@@ -208,13 +221,17 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
         }
     }
 
-    for (auto&& it : expectedOutputData)
+    for (auto&& outputStorage : outputStorageVec)
     {
-        std::vector<TOutput> out = outputStorage.at(it.first);
-
-        for (unsigned int i = 0; i < out.size(); ++i)
+        for (auto&& it : expectedOutputData)
         {
-            CHECK(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true);
+            std::vector<TOutput> out = outputStorage.at(it.first);
+
+            for (unsigned int i = 0; i < out.size(); ++i)
+            {
+                //CHECK(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true);
+                CHECK(it.second[i] == doctest::Approx(out[i]).epsilon(tolerance));
+            }
         }
     }
 }

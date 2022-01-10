@@ -43,6 +43,7 @@ public:
         , m_StateMachine(profilingStateMachine)
         , m_ProfilingServiceStatus(profilingServiceStatus)
         , m_BackendProfilingContext(backendProfilingContexts)
+        , m_TimelineEnabled(false)
     {}
 
     void operator()(const arm::pipe::Packet& packet) override;
@@ -59,7 +60,7 @@ private:
     ProfilingStateMachine&   m_StateMachine;
     IProfilingServiceStatus& m_ProfilingServiceStatus;
     Optional<BackendProfilingContexts> m_BackendProfilingContext;
-    bool m_TimelineEnabled = false;
+    std::atomic<bool> m_TimelineEnabled;
 };
 
 } // namespace profiling

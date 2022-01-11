@@ -66,6 +66,13 @@ void OpenClTimer::Start()
             // Store the Kernel info for later GetMeasurements() call
             m_Kernels.emplace_back(ss.str(), customEvent);
 
+            if(event != nullptr)
+            {
+                //return cl_event from the intercepted call
+                clRetainEvent(customEvent);
+                *event = customEvent;
+            }
+
             return retVal;
         };
 

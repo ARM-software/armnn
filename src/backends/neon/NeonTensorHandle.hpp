@@ -114,13 +114,23 @@ public:
         m_IsImportEnabled = importEnabledFlag;
     }
 
+    bool CanBeImported(void* memory, MemorySource source) override
+    {
+        armnn::IgnoreUnused(source);
+        if (reinterpret_cast<uintptr_t>(memory) % m_TypeAlignment)
+        {
+            return false;
+        }
+        return true;
+    }
+
     virtual bool Import(void* memory, MemorySource source) override
     {
         if (m_ImportFlags & static_cast<MemorySourceFlags>(source))
         {
             if (source == MemorySource::Malloc && m_IsImportEnabled)
             {
-                if (reinterpret_cast<uintptr_t>(memory) % m_TypeAlignment)
+                if (!CanBeImported(memory, source))
                 {
                     throw MemoryImportException("NeonTensorHandle::Import Attempting to import unaligned memory");
                 }

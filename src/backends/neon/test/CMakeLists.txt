@@ -4,6 +4,7 @@
 #
 
 list(APPEND armnnNeonBackendUnitTests_sources
+    NeonBackendTests.cpp
     NeonCreateWorkloadTests.cpp
     NeonEndToEndTests.cpp
     NeonJsonPrinterTests.cpp

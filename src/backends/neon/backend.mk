@@ -106,6 +106,7 @@ ifeq ($(ARMNN_COMPUTE_NEON_ENABLED),1)
 # Include the source files for the NEON backend tests
 
 BACKEND_TEST_SOURCES := \
+        test/NeonBackendTests.cpp \
         test/NeonCreateWorkloadTests.cpp \
         test/NeonEndToEndTests.cpp \
         test/NeonJsonPrinterTests.cpp \

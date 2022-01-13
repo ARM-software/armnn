@@ -5,6 +5,7 @@
 
 list(APPEND armnnRefBackendUnitTests_sources
     ArgMinMaxTests.cpp
+    RefBackendTests.cpp
     RefCreateWorkloadTests.cpp
     RefDetectionPostProcessTests.cpp
     RefEndToEndTests.cpp

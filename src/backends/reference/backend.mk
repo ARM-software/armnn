@@ -133,6 +133,7 @@ ifeq ($(ARMNN_REF_ENABLED),1)
 
 BACKEND_TEST_SOURCES := \
         test/ArgMinMaxTests.cpp \
+        test/RefBackendTests.cpp \
         test/RefCreateWorkloadTests.cpp \
         test/RefDetectionPostProcessTests.cpp \
         test/RefEndToEndTests.cpp \

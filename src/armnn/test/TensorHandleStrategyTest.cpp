@@ -402,7 +402,7 @@ TEST_CASE("RegisterCopyAndImportFactoryPairTest")
     // Get mathing import factory id correctly
     CHECK((registry.GetMatchingImportFactoryId(copyId) == importId));
 
-    // Return empty id when Invailid Id is given
+    // Return empty id when Invalid Id is given
     CHECK((registry.GetMatchingImportFactoryId("InvalidFactoryId") == ""));
 }
 

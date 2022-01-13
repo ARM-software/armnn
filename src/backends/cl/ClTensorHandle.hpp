@@ -138,6 +138,13 @@ public:
         return false;
     }
 
+    virtual bool CanBeImported(void* memory, MemorySource source) override
+    {
+        // This TensorHandle can never import.
+        armnn::IgnoreUnused(memory, source);
+        return false;
+    }
+
 private:
     // Only used for testing
     void CopyOutTo(void* memory) const override

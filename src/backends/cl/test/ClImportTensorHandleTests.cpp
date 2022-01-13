@@ -217,4 +217,61 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClImportEndToEnd")
     }
 }
 
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClCanBeImported")
+{
+    ClImportTensorHandleFactory handleFactory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
+                                              static_cast<MemorySourceFlags>(MemorySource::Malloc));
+
+    TensorInfo info({ 1, 24, 16, 3 }, DataType::Float32);
+
+    // create TensorHandle for memory import
+    auto handle = handleFactory.CreateTensorHandle(info);
+
+    // Get CLtensor
+    arm_compute::CLTensor& tensor = PolymorphicDowncast<ClImportTensorHandle*>(handle.get())->GetTensor();
+
+    // Allocate user memory
+    const size_t totalBytes = tensor.info()->total_size();
+    const size_t alignment =
+            arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
+    size_t space = totalBytes + alignment + alignment;
+    auto testData = std::make_unique<uint8_t[]>(space);
+    void* alignedPtr = testData.get();
+    CHECK(std::align(alignment, totalBytes, alignedPtr, space));
+
+    // Import memory
+    CHECK_THROWS_AS(handle->CanBeImported(alignedPtr, armnn::MemorySource::Undefined), MemoryImportException);
+
+}
+
+TEST_CASE("ClCanBeImportedAlignedMemory")
+{
+    ClImportTensorHandleFactory handleFactory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
+                                              static_cast<MemorySourceFlags>(MemorySource::Malloc));
+
+    TensorInfo info({ 1, 1, 1, 1 }, DataType::Float32);
+
+    // create TensorHandle (Memory Managed status is irrelevant)
+    auto handle = handleFactory.CreateTensorHandle(info);
+    // Get CLtensor
+    arm_compute::CLTensor& tensor = PolymorphicDowncast<ClImportTensorHandle*>(handle.get())->GetTensor();
+
+    // Create an aligned buffer
+    const size_t totalBytes = tensor.info()->total_size();
+    const size_t alignment =
+            arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
+    size_t space = totalBytes + alignment + alignment;
+    auto testData = std::make_unique<uint8_t[]>(space);
+    void* alignedPtr = testData.get();
+    CHECK(std::align(alignment, totalBytes, alignedPtr, space));
+
+    // Check aligned buffers return true
+    CHECK(handle->CanBeImported(alignedPtr, MemorySource::Malloc) == true);
+
+    // Due to the nature of how GPU memory is mapped it is entirely possible for memory which is misaligned on cpu
+    // to be successfully import on GPU. As such there is no way to create a misaligned pointer that will always fail.
+    // Rather it will succeed on some devices and fail on others. As long as a correctly aligned buffer returns true
+    // we can be confident that it will be successfully imported. All other cases will need to be handled by the user.
+}
+
 }

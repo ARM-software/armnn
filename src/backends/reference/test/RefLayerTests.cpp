@@ -2458,6 +2458,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput4DAxis3,   StackOutput4DAxis3Float32Tes
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput3DInputs3, StackOutput3DInputs3Float32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput5D,        StackOutput5DFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackFloat16,         StackFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StackInt32,           StackInt32Test)
 
 // Neg
 ARMNN_AUTO_TEST_CASE_WITH_THF(Neg2d, Neg2dTest<DataType::Float32>)

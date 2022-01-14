@@ -72,20 +72,8 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     for (unsigned int i = 0; i < numInputs; ++i)
     {
         const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[i]];
-        if(!IsValid(&tfLiteInputTensor))
+        if (!IsValid(tfLiteContext, tfLiteInputTensor, tfLiteConcatOperatorCode, nodeIndex))
         {
-            TF_LITE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnDelegate: Invalid input tensor in operator #%d node #%d: ",
-                tfLiteConcatOperatorCode, nodeIndex);
-            return kTfLiteError;
-        }
-        if (IsDynamicTensor(tfLiteInputTensor))
-        {
-            TF_LITE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnDelegate: Dynamic input tensors are not supported in operator #%d node #%d: ",
-                tfLiteConcatOperatorCode, nodeIndex);
             return kTfLiteError;
         }
 
@@ -101,20 +89,8 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
                    [](armnn::TensorInfo& t)->const armnn::TensorInfo*{ return &t; });
 
     const TfLiteTensor& tfLiteOutputTensor = tfLiteTensors[tfLiteNode->outputs->data[0]];
-    if(!IsValid(&tfLiteOutputTensor))
+    if (!IsValid(tfLiteContext, tfLiteOutputTensor, tfLiteConcatOperatorCode, nodeIndex))
     {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Invalid output tensor in operator #%d node #%d: ",
-            tfLiteConcatOperatorCode, nodeIndex);
-        return kTfLiteError;
-    }
-    if (IsDynamicTensor(tfLiteOutputTensor))
-    {
-        TF_LITE_MAYBE_KERNEL_LOG(
-            tfLiteContext,
-            "TfLiteArmnnDelegate: Dynamic output tensors are not supported in operator #%d node #%d: ",
-            tfLiteConcatOperatorCode, nodeIndex);
         return kTfLiteError;
     }
 
@@ -164,6 +140,16 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     // Setup layer and connect.
     armnn::IConnectableLayer* concatenationLayer = delegateData.m_Network->AddConcatLayer(concatDescriptor);
     ARMNN_ASSERT(concatenationLayer != nullptr);
+
+    // Connect the Constant Inputs
+    auto inputsTensorsProcess = ProcessInputs(concatenationLayer,
+                                              delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode);
+    if (inputsTensorsProcess == kTfLiteError)
+    {
+        return inputsTensorsProcess;
+    }
 
     armnn::IOutputSlot& outputSlot = concatenationLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);

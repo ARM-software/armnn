@@ -623,12 +623,6 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                        tfLiteNode,
                                        nodeIndex,
                                        kTfLiteBuiltinGather);
-        case kTfLiteBuiltinGatherNd:
-            return VisitGatherOperator(delegateData,
-                                       tfLiteContext,
-                                       tfLiteNode,
-                                       nodeIndex,
-                                       kTfLiteBuiltinGatherNd);
         case kTfLiteBuiltinGreater:
             return VisitComparisonOperator(delegateData,
                                            tfLiteContext,

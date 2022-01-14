@@ -99,6 +99,16 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddStackLayer(desc);
     ARMNN_ASSERT(layer != nullptr);
 
+    // Connect the Constant Inputs
+    auto inputsTensorsProcess = ProcessInputs(layer,
+                                              delegateData,
+                                              tfLiteContext,
+                                              tfLiteNode);
+    if (inputsTensorsProcess == kTfLiteError)
+    {
+        return inputsTensorsProcess;
+    }
+
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 

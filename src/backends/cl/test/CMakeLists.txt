@@ -4,6 +4,7 @@
 #
 
 list(APPEND armnnClBackendUnitTests_sources
+    ClBackendTests.cpp
     ClContextControlFixture.hpp
     ClContextSerializerTests.cpp
     ClCustomAllocatorTests.cpp

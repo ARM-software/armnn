@@ -84,10 +84,16 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
         memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
     }
 
+    std::unique_ptr<ITensorHandleFactory> factory = std::make_unique<ClTensorHandleFactory>(memoryManager);
+    std::unique_ptr<ITensorHandleFactory> importFactory = std::make_unique<ClImportTensorHandleFactory>(
+        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc));
+
+    registry.RegisterCopyAndImportFactoryPair(factory->GetId(), importFactory->GetId());
+    registry.RegisterCopyAndImportFactoryPair(importFactory->GetId(), factory->GetId());
+
     registry.RegisterMemoryManager(memoryManager);
-    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
-    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(
-        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc)));
+    registry.RegisterFactory(std::move(factory));
+    registry.RegisterFactory(std::move(importFactory));
 
     return std::make_unique<ClWorkloadFactory>(
             PolymorphicPointerDowncast<ClMemoryManager>(memoryManager));
@@ -106,10 +112,16 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
         memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
     }
 
+    std::unique_ptr<ITensorHandleFactory> factory = std::make_unique<ClTensorHandleFactory>(memoryManager);
+    std::unique_ptr<ITensorHandleFactory> importFactory = std::make_unique<ClImportTensorHandleFactory>(
+        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc));
+
+    registry.RegisterCopyAndImportFactoryPair(factory->GetId(), importFactory->GetId());
+    registry.RegisterCopyAndImportFactoryPair(importFactory->GetId(), factory->GetId());
+
     registry.RegisterMemoryManager(memoryManager);
-    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
-    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(
-        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc)));
+    registry.RegisterFactory(std::move(factory));
+    registry.RegisterFactory(std::move(importFactory));
 
     return std::make_unique<ClWorkloadFactory>(
         PolymorphicPointerDowncast<ClMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
@@ -131,9 +143,16 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
         memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
     }
 
+    std::unique_ptr<ITensorHandleFactory> factory = std::make_unique<ClTensorHandleFactory>(memoryManager);
+    std::unique_ptr<ITensorHandleFactory> importFactory = std::make_unique<ClImportTensorHandleFactory>(
+            inputFlags, outputFlags);
+
+    registry.RegisterCopyAndImportFactoryPair(factory->GetId(), importFactory->GetId());
+    registry.RegisterCopyAndImportFactoryPair(importFactory->GetId(), factory->GetId());
+
     registry.RegisterMemoryManager(memoryManager);
-    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
-    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(inputFlags, outputFlags));
+    registry.RegisterFactory(std::move(factory));
+    registry.RegisterFactory(std::move(importFactory));
 
     return std::make_unique<ClWorkloadFactory>(
         PolymorphicPointerDowncast<ClMemoryManager>(memoryManager), CreateBackendSpecificModelContext(modelOptions));
@@ -157,10 +176,17 @@ void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& regis
         memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
     }
 
+    std::unique_ptr<ITensorHandleFactory> factory = std::make_unique<ClTensorHandleFactory>(memoryManager);
+    std::unique_ptr<ITensorHandleFactory> importFactory = std::make_unique<ClImportTensorHandleFactory>(
+        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc));
+
+    registry.RegisterCopyAndImportFactoryPair(factory->GetId(), importFactory->GetId());
+    registry.RegisterCopyAndImportFactoryPair(importFactory->GetId(), factory->GetId());
+
     registry.RegisterMemoryManager(memoryManager);
-    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
-    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(
-        static_cast<MemorySourceFlags>(MemorySource::Malloc), static_cast<MemorySourceFlags>(MemorySource::Malloc)));
+    registry.RegisterFactory(std::move(factory));
+    registry.RegisterFactory(std::move(importFactory));
+
 }
 
 void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& registry,
@@ -177,9 +203,16 @@ void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& regis
         memoryManager = std::make_shared<ClMemoryManager>(std::make_unique<arm_compute::CLBufferAllocator>());
     }
 
+    std::unique_ptr<ITensorHandleFactory> factory = std::make_unique<ClTensorHandleFactory>(memoryManager);
+    std::unique_ptr<ITensorHandleFactory> importFactory = std::make_unique<ClImportTensorHandleFactory>(
+            inputFlags, outputFlags);
+
+    registry.RegisterCopyAndImportFactoryPair(factory->GetId(), importFactory->GetId());
+    registry.RegisterCopyAndImportFactoryPair(importFactory->GetId(), factory->GetId());
+
     registry.RegisterMemoryManager(memoryManager);
-    registry.RegisterFactory(std::make_unique<ClTensorHandleFactory>(memoryManager));
-    registry.RegisterFactory(std::make_unique<ClImportTensorHandleFactory>(inputFlags, outputFlags));
+    registry.RegisterFactory(std::move(factory));
+    registry.RegisterFactory(std::move(importFactory));
 }
 
 IBackendInternal::IBackendContextPtr ClBackend::CreateBackendContext(const IRuntime::CreationOptions& options) const

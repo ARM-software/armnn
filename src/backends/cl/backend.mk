@@ -106,6 +106,7 @@ ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 # Include the source files for the CL backend tests
 
 BACKEND_TEST_SOURCES := \
+        test/ClBackendTests.cpp \
         test/ClContextSerializerTests.cpp \
         test/ClCreateWorkloadTests.cpp \
         test/ClEndToEndTests.cpp \

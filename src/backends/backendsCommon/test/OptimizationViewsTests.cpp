@@ -7,12 +7,13 @@
 #include <CommonTestUtils.hpp>
 #include "MockBackend.hpp"
 
-#include <armnn/backends/OptimizationViews.hpp>
-#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <Graph.hpp>
 #include <Network.hpp>
-#include <SubgraphView.hpp>
 #include <SubgraphViewSelector.hpp>
+
+#include <armnn/backends/OptimizationViews.hpp>
+#include <armnn/backends/SubgraphView.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <doctest/doctest.h>
 

@@ -3,16 +3,15 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "Graph.hpp"
-#include "SubgraphView.hpp"
-#include "LayersFwd.hpp"
+#include <Graph.hpp>
+#include <LayersFwd.hpp>
 
 #include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/SubgraphView.hpp>
 
 #include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/TypesUtils.hpp>
-#include <armnn/Utils.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 

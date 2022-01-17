@@ -5,22 +5,21 @@
 #pragma once
 
 #include <armnn/DescriptorsFwd.hpp>
+#include <armnn/INetwork.hpp>
 #include <armnn/LstmParams.hpp>
 #include <armnn/QuantizedLstmParams.hpp>
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Types.hpp>
 
-#include <armnn/INetwork.hpp>
+#include <Graph.hpp>
+#include <Layer.hpp>
+#include <OptimizedNetworkImpl.hpp>
+#include <armnn/backends/SubgraphView.hpp>
 
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
-
-#include "Graph.hpp"
-#include "Layer.hpp"
-#include "OptimizedNetworkImpl.hpp"
-#include "SubgraphView.hpp"
 
 namespace armnn
 {

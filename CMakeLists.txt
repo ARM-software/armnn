@@ -185,6 +185,7 @@ list(APPEND armnn_sources
     include/armnn/utility/PolymorphicDowncast.hpp
     include/armnn/utility/StringUtils.hpp
     include/armnn/utility/TransformIterator.hpp
+    include/armnn/backends/SubgraphView.hpp
     src/armnn/layers/LayerCloneBase.hpp
     src/armnn/layers/LayerWithParameters.hpp
     src/armnn/layers/ActivationLayer.hpp
@@ -386,7 +387,6 @@ list(APPEND armnn_sources
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp
     src/armnn/SubgraphView.cpp
-    src/armnn/SubgraphView.hpp
     src/armnn/SubgraphViewSelector.cpp
     src/armnn/SubgraphViewSelector.hpp
     src/armnn/Tensor.cpp

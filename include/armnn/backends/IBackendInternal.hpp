@@ -10,12 +10,12 @@
 #include <armnn/Deprecated.hpp>
 
 #include <ISubgraphViewConverter.hpp>
-#include <SubgraphView.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 #include <armnn/backends/ITensorHandleFactory.hpp>
 #include <armnn/backends/OptimizationViews.hpp>
+#include <armnn/backends/SubgraphView.hpp>
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 

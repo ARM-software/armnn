@@ -8,12 +8,12 @@
 #include "TestUtils.hpp"
 
 #include <Graph.hpp>
-#include <SubgraphView.hpp>
-#include <SubgraphViewSelector.hpp>
 #include <ResolveType.hpp>
+#include <SubgraphViewSelector.hpp>
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Types.hpp>
+#include <armnn/backends/SubgraphView.hpp>
 #include <armnn/backends/TensorHandle.hpp>
 
 #include <algorithm>

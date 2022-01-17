@@ -3,15 +3,15 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <doctest/doctest.h>
-
 #include <Graph.hpp>
-#include <SubgraphView.hpp>
 #include <SubgraphViewSelector.hpp>
 
+#include <armnn/backends/SubgraphView.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
-#include <armnn/backends/TensorHandle.hpp>
+#include <doctest/doctest.h>
+
 #include <fstream>
 #include <map>
 #include <queue>

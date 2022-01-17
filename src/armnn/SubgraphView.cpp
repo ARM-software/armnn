@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "SubgraphView.hpp"
-#include "Graph.hpp"
+#include <armnn/backends/SubgraphView.hpp>
+
+#include <Graph.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>

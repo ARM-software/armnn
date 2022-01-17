@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <SubgraphView.hpp>
+#include <armnn/backends/SubgraphView.hpp>
 
 namespace armnn
 {

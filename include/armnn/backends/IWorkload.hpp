@@ -31,6 +31,12 @@ public:
 
     virtual profiling::ProfilingGuid GetGuid() const = 0;
 
+    // Replace input tensor handle with the given TensorHandle
+    virtual void ReplaceInputTensorHandle(ITensorHandle* /*input*/, unsigned int /*slot*/) = 0;
+
+    // Replace output tensor handle with the given TensorHandle
+    virtual void ReplaceOutputTensorHandle(ITensorHandle* /*output*/, unsigned int /*slot*/) = 0;
+
     virtual void RegisterDebugCallback(const DebugCallbackFunction& /*func*/) {}
 };
 

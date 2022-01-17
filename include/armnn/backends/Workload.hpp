@@ -54,6 +54,18 @@ public:
 
     profiling::ProfilingGuid GetGuid() const final { return m_Guid; }
 
+    // Replace input tensor handle with the given TensorHandle
+    void ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override
+    {
+        m_Data.m_Inputs[slot] = tensorHandle;
+    }
+
+    // Replace output tensor handle with the given TensorHandle
+    void ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override
+    {
+        m_Data.m_Outputs[slot] = tensorHandle;
+    }
+
 protected:
     QueueDescriptor m_Data;
     const profiling::ProfilingGuid m_Guid;

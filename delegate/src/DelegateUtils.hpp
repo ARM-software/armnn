@@ -222,6 +222,7 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
                                               reshapedDimensions.data() });
 
     armnn::ReshapeDescriptor reshapeDescriptor;
+    reshapeDescriptor.m_TargetShape = reshapedInfo.GetShape();
     bool isSupported = false;
     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                tfLiteContext,
@@ -238,8 +239,6 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
 
     ARMNN_ASSERT(delegateData.m_Network != nullptr);
     // Add Reshape layer
-    reshapeDescriptor.m_TargetShape = reshapedInfo.GetShape();
-
     armnn::IConnectableLayer* reshapeLayer = delegateData.m_Network->AddReshapeLayer(reshapeDescriptor);
     ARMNN_ASSERT(reshapeLayer != nullptr);
     reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedInfo);

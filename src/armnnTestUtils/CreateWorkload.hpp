@@ -68,7 +68,7 @@ std::unique_ptr<ActivationWorkload> CreateActivationWorkloadTest(armnn::IWorkloa
 {
     // Creates the layer we're testing.
     ActivationDescriptor layerDesc;
-    layerDesc.m_Function = ActivationFunction::Abs;
+    layerDesc.m_Function = ActivationFunction::ReLu;
     layerDesc.m_A        = 3.5f;
     layerDesc.m_B        = -10.0f;
 
@@ -94,7 +94,7 @@ std::unique_ptr<ActivationWorkload> CreateActivationWorkloadTest(armnn::IWorkloa
     CHECK(queueDescriptor.m_Outputs.size() == 1);
     CHECK(queueDescriptor.m_Parameters.m_A == 3.5f);
     CHECK(queueDescriptor.m_Parameters.m_B == -10.0f);
-    CHECK((queueDescriptor.m_Parameters.m_Function == ActivationFunction::Abs));
+    CHECK((queueDescriptor.m_Parameters.m_Function == ActivationFunction::ReLu));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

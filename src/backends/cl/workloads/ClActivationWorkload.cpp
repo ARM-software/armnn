@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,7 @@ arm_compute::Status ClActivationWorkloadValidate(const TensorInfo& input,
 ClActivationWorkload::ClActivationWorkload(const ActivationQueueDescriptor& descriptor,
                                            const WorkloadInfo& info,
                                            const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<ActivationQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ActivationQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClActivationWorkload_Construct",

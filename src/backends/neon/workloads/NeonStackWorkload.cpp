@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "NeonStackWorkload.hpp"
@@ -47,7 +47,7 @@ arm_compute::Status NeonStackWorkloadValidate(const std::vector<const TensorInfo
 }
 
 NeonStackWorkload::NeonStackWorkload(const StackQueueDescriptor& descriptor, const WorkloadInfo& info)
-: BaseWorkload<StackQueueDescriptor>(descriptor, info)
+: NeonBaseWorkload<StackQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonStackWorkload_Construct",

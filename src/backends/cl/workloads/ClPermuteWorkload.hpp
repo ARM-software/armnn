@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include <armnn/TypesUtils.hpp>
@@ -20,7 +20,7 @@ arm_compute::Status ClPermuteWorkloadValidate(const TensorInfo& input,
                                               const TensorInfo& output,
                                               const PermuteDescriptor& descriptor);
 
-class ClPermuteWorkload : public BaseWorkload<PermuteQueueDescriptor>
+class ClPermuteWorkload : public ClBaseWorkload<PermuteQueueDescriptor>
 {
 public:
     static const std::string& GetName()

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -23,7 +23,7 @@ arm_compute::Status NeonNegWorkloadValidate(const TensorInfo& input, const Tenso
 }
 
 NeonNegWorkload::NeonNegWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonNegWorkload", 1, 1);
 

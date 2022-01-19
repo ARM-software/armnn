@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLConv3D.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
@@ -23,7 +23,7 @@ arm_compute::Status ClConvolution3dWorkloadValidate(const TensorInfo& input,
                                                     bool isFastMathEnabled = false,
                                                     const ActivationDescriptor* activationDescriptor = nullptr);
 
-class ClConvolution3dWorkload : public BaseWorkload<Convolution3dQueueDescriptor>
+class ClConvolution3dWorkload : public ClBaseWorkload<Convolution3dQueueDescriptor>
 {
 public:
     ClConvolution3dWorkload(const Convolution3dQueueDescriptor& descriptor,

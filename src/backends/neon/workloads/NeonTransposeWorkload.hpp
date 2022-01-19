@@ -1,11 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 
@@ -19,7 +19,7 @@ namespace armnn
 arm_compute::Status NeonTransposeWorkloadValidate(const TensorInfo& input, const TensorInfo& output,
                                                   const TransposeDescriptor& descriptor);
 
-class NeonTransposeWorkload : public BaseWorkload<TransposeQueueDescriptor>
+class NeonTransposeWorkload : public NeonBaseWorkload<TransposeQueueDescriptor>
 {
 public:
     static const std::string& GetName()

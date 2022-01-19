@@ -1,12 +1,12 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/QuantizedLstmParams.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include <arm_compute/graph/Tensor.h>
@@ -15,7 +15,7 @@
 namespace armnn
 {
 
-class NeonQuantizedLstmWorkload : public BaseWorkload<QuantizedLstmQueueDescriptor>
+class NeonQuantizedLstmWorkload : public NeonBaseWorkload<QuantizedLstmQueueDescriptor>
 {
 public:
     using BaseWorkload<QuantizedLstmQueueDescriptor>::m_Data;

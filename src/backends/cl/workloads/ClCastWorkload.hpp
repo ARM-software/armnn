@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/CL/functions/CLCast.h>
@@ -15,7 +15,7 @@ namespace armnn
 
 arm_compute::Status ClCastValidate(const TensorInfo& input, const TensorInfo& output);
 
-class ClCastWorkload : public BaseWorkload<CastQueueDescriptor>
+class ClCastWorkload : public ClBaseWorkload<CastQueueDescriptor>
 {
 public:
     ClCastWorkload(const CastQueueDescriptor& descriptor,

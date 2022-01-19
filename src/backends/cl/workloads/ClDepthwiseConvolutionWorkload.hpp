@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/core/Error.h>
@@ -21,7 +21,7 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
                                                            const Optional<TensorInfo>& biases,
                                                            const ActivationDescriptor* activationDescriptor = nullptr);
 
-class ClDepthwiseConvolutionWorkload : public BaseWorkload<DepthwiseConvolution2dQueueDescriptor>
+class ClDepthwiseConvolutionWorkload : public ClBaseWorkload<DepthwiseConvolution2dQueueDescriptor>
 {
 public:
     using BaseWorkload<DepthwiseConvolution2dQueueDescriptor>::m_Data;

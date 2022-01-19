@@ -44,7 +44,7 @@ arm_compute::Status ClReduceWorkloadValidate(const TensorInfo& input,
 }
 
 ClReduceWorkload::ClReduceWorkload(const ReduceQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<ReduceQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ReduceQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClReduceWorkload_Construct",

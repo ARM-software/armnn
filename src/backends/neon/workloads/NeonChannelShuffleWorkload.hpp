@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/NEON/functions/NEChannelShuffleLayer.h>
@@ -17,7 +17,7 @@ arm_compute::Status NeonChannelShuffleValidate(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const ChannelShuffleDescriptor& descriptor);
 
-class NeonChannelShuffleWorkload : public BaseWorkload<ChannelShuffleQueueDescriptor>
+class NeonChannelShuffleWorkload : public NeonBaseWorkload<ChannelShuffleQueueDescriptor>
 {
 public:
     NeonChannelShuffleWorkload(const ChannelShuffleQueueDescriptor& descriptor, const WorkloadInfo& info);

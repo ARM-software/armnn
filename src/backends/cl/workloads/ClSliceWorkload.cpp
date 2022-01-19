@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,7 @@ arm_compute::Status ClSliceWorkloadValidate(const TensorInfo& input,
 ClSliceWorkload::ClSliceWorkload(const SliceQueueDescriptor& descriptor,
                                  const WorkloadInfo& info,
                                  const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<SliceQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<SliceQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClSliceWorkload_Construct",

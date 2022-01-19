@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -76,7 +76,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     const DepthwiseConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info,
     const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
     // Add details for profiling output
     WorkloadInfo detailsInfo;

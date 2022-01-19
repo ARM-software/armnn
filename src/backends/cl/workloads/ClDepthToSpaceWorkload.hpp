@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,7 +7,7 @@
 
 #include <armnn/Descriptors.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLDepthToSpaceLayer.h>
 
@@ -18,7 +18,7 @@ arm_compute::Status ClDepthToSpaceWorkloadValidate(const TensorInfo& input,
                                                    const TensorInfo& output,
                                                    const DepthToSpaceDescriptor& descriptor);
 
-class ClDepthToSpaceWorkload : public BaseWorkload<DepthToSpaceQueueDescriptor>
+class ClDepthToSpaceWorkload : public ClBaseWorkload<DepthToSpaceQueueDescriptor>
 {
 public:
     ClDepthToSpaceWorkload(const DepthToSpaceQueueDescriptor& descriptor,

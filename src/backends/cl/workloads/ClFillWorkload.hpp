@@ -6,12 +6,12 @@
 #pragma once
 
 #include <armnn/backends/WorkloadData.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 #include <arm_compute/runtime/CL/functions/CLFill.h>
 
 namespace armnn {
 
-class ClFillWorkload : public BaseWorkload<FillQueueDescriptor>
+class ClFillWorkload : public ClBaseWorkload<FillQueueDescriptor>
 {
 public:
     ClFillWorkload(const FillQueueDescriptor& descriptor,

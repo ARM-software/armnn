@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,7 +44,7 @@ arm_compute::Status ClConstantWorkloadValidate(const TensorInfo& output)
 ClConstantWorkload::ClConstantWorkload(const ConstantQueueDescriptor& descriptor,
                                        const WorkloadInfo& info,
                                        const arm_compute::CLCompileContext&)
-    : BaseWorkload<ConstantQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ConstantQueueDescriptor>(descriptor, info)
     , m_RanOnce(false)
 {
 }

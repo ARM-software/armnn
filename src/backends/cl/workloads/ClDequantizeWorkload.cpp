@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -30,7 +30,7 @@ arm_compute::Status ClDequantizeWorkloadValidate(const TensorInfo& input, const 
 ClDequantizeWorkload::ClDequantizeWorkload(const DequantizeQueueDescriptor& descriptor,
                                            const WorkloadInfo& workloadInfo,
                                            const arm_compute::CLCompileContext& clCompileContext)
-                                           : BaseWorkload<DequantizeQueueDescriptor>(descriptor, workloadInfo)
+                                           : ClBaseWorkload<DequantizeQueueDescriptor>(descriptor, workloadInfo)
 {
     m_Data.ValidateInputsOutputs("ClDequantizeWorkload", 1, 1);
 

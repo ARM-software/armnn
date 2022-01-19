@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,7 +16,7 @@ using namespace armcomputetensorutils;
 
 NeonQuantizedLstmWorkload::NeonQuantizedLstmWorkload(const QuantizedLstmQueueDescriptor &descriptor,
                                                      const WorkloadInfo &info)
-        : BaseWorkload<QuantizedLstmQueueDescriptor>(descriptor, info)
+        : NeonBaseWorkload<QuantizedLstmQueueDescriptor>(descriptor, info)
 {
     // Basic parameters
     m_InputToInputWeightsTensor = std::make_unique<arm_compute::Tensor>();

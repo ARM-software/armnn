@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ClStackWorkload.hpp"
@@ -47,7 +47,7 @@ arm_compute::Status ClStackWorkloadValidate(const std::vector<const TensorInfo*>
 ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor,
                                  const WorkloadInfo& info,
                                  const arm_compute::CLCompileContext& clCompileContext)
-: BaseWorkload<StackQueueDescriptor>(descriptor, info)
+: ClBaseWorkload<StackQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClStackWorkload_Construct",

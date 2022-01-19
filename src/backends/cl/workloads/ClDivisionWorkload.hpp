@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLElementwiseOperations.h>
 
@@ -17,14 +17,14 @@ arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
                                                const TensorInfo& output,
                                                const ActivationDescriptor* activationDescriptor = nullptr);
 
-class ClDivisionWorkload : public BaseWorkload<DivisionQueueDescriptor>
+class ClDivisionWorkload : public ClBaseWorkload<DivisionQueueDescriptor>
 {
 public:
     ClDivisionWorkload(const DivisionQueueDescriptor& descriptor,
                        const WorkloadInfo& info,
                        const arm_compute::CLCompileContext& clCompileContext);
 
-    using BaseWorkload<DivisionQueueDescriptor>::BaseWorkload;
+    using ClBaseWorkload<DivisionQueueDescriptor>::ClBaseWorkload;
     void Execute() const override;
 
 private:

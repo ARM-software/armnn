@@ -26,7 +26,7 @@ arm_compute::Status NeonGatherWorkloadValidate(const TensorInfo& input,
 
 NeonGatherWorkload::NeonGatherWorkload(const GatherQueueDescriptor& descriptor,
                                        const WorkloadInfo& info)
-        : BaseWorkload<GatherQueueDescriptor>(descriptor, info)
+        : NeonBaseWorkload<GatherQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonGatherWorkload_Construct",

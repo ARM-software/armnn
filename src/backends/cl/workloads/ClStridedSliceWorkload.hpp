@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,7 +8,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Descriptors.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLStridedSlice.h>
 
@@ -19,7 +19,7 @@ arm_compute::Status ClStridedSliceWorkloadValidate(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const StridedSliceDescriptor& descriptor);
 
-class ClStridedSliceWorkload : public BaseWorkload<StridedSliceQueueDescriptor>
+class ClStridedSliceWorkload : public ClBaseWorkload<StridedSliceQueueDescriptor>
 {
 public:
     ClStridedSliceWorkload(const StridedSliceQueueDescriptor& descriptor,

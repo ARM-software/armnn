@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include "ClWorkloadUtils.hpp"
@@ -13,10 +13,10 @@
 namespace armnn
 {
 
-struct ClRankWorkload : public BaseWorkload<RankQueueDescriptor>
+struct ClRankWorkload : public ClBaseWorkload<RankQueueDescriptor>
 {
 public:
-    using BaseWorkload<RankQueueDescriptor>::BaseWorkload;
+    using ClBaseWorkload<RankQueueDescriptor>::ClBaseWorkload;
     virtual void Execute() const override
     {
         const ClTensorHandle* clTensorHandle = PolymorphicDowncast<const ClTensorHandle*>(m_Data.m_Inputs[0]);

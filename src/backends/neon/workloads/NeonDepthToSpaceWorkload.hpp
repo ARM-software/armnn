@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,7 +7,7 @@
 
 #include <armnn/Descriptors.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/runtime/NEON/functions/NEDepthToSpaceLayer.h>
 
@@ -18,7 +18,7 @@ arm_compute::Status NeonDepthToSpaceWorkloadValidate(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const DepthToSpaceDescriptor& descriptor);
 
-class NeonDepthToSpaceWorkload : public BaseWorkload<DepthToSpaceQueueDescriptor>
+class NeonDepthToSpaceWorkload : public NeonBaseWorkload<DepthToSpaceQueueDescriptor>
 {
 public:
     NeonDepthToSpaceWorkload(const DepthToSpaceQueueDescriptor& descriptor, const WorkloadInfo& info);

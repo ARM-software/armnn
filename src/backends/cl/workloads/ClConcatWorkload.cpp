@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ClConcatWorkload.hpp"
@@ -48,7 +48,7 @@ arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*
 ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor,
                                    const WorkloadInfo& info,
                                    const arm_compute::CLCompileContext& clCompileContext)
-: BaseWorkload<ConcatQueueDescriptor>(descriptor, info)
+: ClBaseWorkload<ConcatQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClConcatWorkload_Construct",

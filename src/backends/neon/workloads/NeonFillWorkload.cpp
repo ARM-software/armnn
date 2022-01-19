@@ -17,7 +17,7 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 NeonFillWorkload::NeonFillWorkload(const FillQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<FillQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<FillQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonFillWorkload_Construct",

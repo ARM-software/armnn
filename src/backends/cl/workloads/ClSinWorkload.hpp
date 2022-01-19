@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/CL/functions/CLElementwiseUnaryLayer.h>
@@ -15,7 +15,7 @@ namespace armnn
 
 arm_compute::Status ClSinWorkloadValidate(const TensorInfo& input, const TensorInfo& output);
 
-class ClSinWorkload : public BaseWorkload<ElementwiseUnaryQueueDescriptor>
+class ClSinWorkload : public ClBaseWorkload<ElementwiseUnaryQueueDescriptor>
 {
 public:
     ClSinWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,

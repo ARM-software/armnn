@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -75,7 +75,7 @@ arm_compute::Status NeonDetectionPostProcessValidate(const TensorInfo& boxEncodi
 NeonDetectionPostProcessWorkload::NeonDetectionPostProcessWorkload(
     const DetectionPostProcessQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : BaseWorkload<DetectionPostProcessQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<DetectionPostProcessQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonDetectionPostProcessWorkload_Construct",

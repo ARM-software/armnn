@@ -1,17 +1,17 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/backends/WorkloadData.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 #include <arm_compute/runtime/CL/functions/CLPadLayer.h>
 
 namespace armnn {
 
-class ClPadWorkload : public BaseWorkload<PadQueueDescriptor>
+class ClPadWorkload : public ClBaseWorkload<PadQueueDescriptor>
 {
 public:
     ClPadWorkload(const PadQueueDescriptor& descriptor,

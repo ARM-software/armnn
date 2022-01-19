@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,7 +31,7 @@ arm_compute::Status NeonSpaceToDepthWorkloadValidate(const TensorInfo& input,
 
 NeonSpaceToDepthWorkload::NeonSpaceToDepthWorkload(const SpaceToDepthQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info)
-    : BaseWorkload<SpaceToDepthQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<SpaceToDepthQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonSpaceToDepthWorkload_Construct",

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -55,7 +55,7 @@ arm_compute::Status ClArgMinMaxWorkloadValidate(const TensorInfo& input,
 ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descriptor,
                                          const WorkloadInfo& info,
                                          const arm_compute::CLCompileContext& clCompileContext)
-        : BaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info)
+        : ClBaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClArgMinMaxWorkload_Construct",

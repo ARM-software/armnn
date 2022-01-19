@@ -58,7 +58,7 @@ ClConvolution3dWorkload::ClConvolution3dWorkload(const Convolution3dQueueDescrip
                                                  std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
                                                  const arm_compute::CLCompileContext& clCompileContext,
                                                  const bool isFastMathEnabled)
-    : BaseWorkload<Convolution3dQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<Convolution3dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer()
 {
     IgnoreUnused(memoryManager);

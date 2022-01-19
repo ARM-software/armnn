@@ -1,11 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include <armnn/TypesUtils.hpp>
@@ -20,7 +20,7 @@ arm_compute::Status ClTransposeWorkloadValidate(const TensorInfo& input,
                                                 const TensorInfo& output,
                                                 const TransposeDescriptor& descriptor);
 
-class ClTransposeWorkload : public BaseWorkload<TransposeQueueDescriptor>
+class ClTransposeWorkload : public ClBaseWorkload<TransposeQueueDescriptor>
 {
 public:
     static const std::string& GetName()

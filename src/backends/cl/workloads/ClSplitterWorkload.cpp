@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -55,7 +55,7 @@ arm_compute::Status ClSplitterWorkloadValidate(const TensorInfo& input,
 ClSplitterWorkload::ClSplitterWorkload(const SplitterQueueDescriptor& descriptor,
                                        const WorkloadInfo& info,
                                        const arm_compute::CLCompileContext&)
-        : BaseWorkload<SplitterQueueDescriptor>(descriptor, info)
+        : ClBaseWorkload<SplitterQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClSplitterWorkload_Construct",

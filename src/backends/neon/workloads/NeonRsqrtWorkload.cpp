@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,7 +24,7 @@ arm_compute::Status NeonRsqrtWorkloadValidate(const TensorInfo& input, const Ten
 }
 
 NeonRsqrtWorkload::NeonRsqrtWorkload(const RsqrtQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<RsqrtQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<RsqrtQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonRsqrtWorkload", 1, 1);
 

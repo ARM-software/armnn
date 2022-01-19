@@ -18,7 +18,7 @@ using namespace armcomputetensorutils;
 ClFillWorkload::ClFillWorkload(const FillQueueDescriptor& descriptor,
                                const WorkloadInfo& info,
                                const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<FillQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<FillQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClFillWorkload_Construct",

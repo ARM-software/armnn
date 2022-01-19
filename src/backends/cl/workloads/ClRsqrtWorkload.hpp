@@ -1,11 +1,11 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/CL/functions/CLElementwiseUnaryLayer.h>
@@ -15,7 +15,7 @@ namespace armnn
 
 arm_compute::Status ClRsqrtWorkloadValidate(const TensorInfo& input, const TensorInfo& output);
 
-class ClRsqrtWorkload : public BaseWorkload<RsqrtQueueDescriptor>
+class ClRsqrtWorkload : public ClBaseWorkload<RsqrtQueueDescriptor>
 {
 public:
     ClRsqrtWorkload(const RsqrtQueueDescriptor& descriptor,

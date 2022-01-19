@@ -54,7 +54,7 @@ arm_compute::Status ClChannelShuffleValidate(const TensorInfo& input,
 ClChannelShuffleWorkload::ClChannelShuffleWorkload(const ChannelShuffleQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info,
                                                    const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<ChannelShuffleQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ChannelShuffleQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClChannelShufflenWorkload_Construct",

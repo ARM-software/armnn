@@ -29,7 +29,7 @@ arm_compute::Status ClGatherWorkloadValidate(const TensorInfo& input,
 ClGatherWorkload::ClGatherWorkload(const GatherQueueDescriptor& descriptor,
                                    const WorkloadInfo& info,
                                    const arm_compute::CLCompileContext& clCompileContext)
-        : BaseWorkload<GatherQueueDescriptor>(descriptor, info)
+        : ClBaseWorkload<GatherQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClGatherWorkload_Construct",

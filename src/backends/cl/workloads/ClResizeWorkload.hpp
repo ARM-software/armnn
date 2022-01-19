@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLScale.h>
 
@@ -16,7 +16,7 @@ arm_compute::Status ClResizeWorkloadValidate(const TensorInfo& input,
                                              const TensorInfo& output,
                                              const ResizeDescriptor& descriptor);
 
-class ClResizeWorkload : public BaseWorkload<ResizeQueueDescriptor>
+class ClResizeWorkload : public ClBaseWorkload<ResizeQueueDescriptor>
 {
 public:
     ClResizeWorkload(const ResizeQueueDescriptor& descriptor,

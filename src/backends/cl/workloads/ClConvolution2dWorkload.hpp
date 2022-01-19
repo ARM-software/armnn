@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,7 +8,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Descriptors.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
@@ -26,7 +26,7 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                     bool isFastMathEnabled = false,
                                                     const ActivationDescriptor* activationDescriptor = nullptr);
 
-class ClConvolution2dWorkload : public BaseWorkload<Convolution2dQueueDescriptor>
+class ClConvolution2dWorkload : public ClBaseWorkload<Convolution2dQueueDescriptor>
 {
 public:
     ClConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,

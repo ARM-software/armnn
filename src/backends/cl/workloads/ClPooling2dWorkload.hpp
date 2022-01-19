@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLPoolingLayer.h>
 
@@ -16,7 +16,7 @@ arm_compute::Status ClPooling2dWorkloadValidate(const TensorInfo& input,
     const TensorInfo& output,
     const Pooling2dDescriptor& descriptor);
 
-class ClPooling2dWorkload : public BaseWorkload<Pooling2dQueueDescriptor>
+class ClPooling2dWorkload : public ClBaseWorkload<Pooling2dQueueDescriptor>
 {
 public:
     using BaseWorkload<Pooling2dQueueDescriptor>::m_Data;

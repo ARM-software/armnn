@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
@@ -19,7 +19,7 @@ arm_compute::Status NeonPooling2dWorkloadValidate(const TensorInfo& input,
     const TensorInfo& output,
     const Pooling2dDescriptor& descriptor);
 
-class NeonPooling2dWorkload : public BaseWorkload<Pooling2dQueueDescriptor>
+class NeonPooling2dWorkload : public NeonBaseWorkload<Pooling2dQueueDescriptor>
 {
 public:
     using BaseWorkload<Pooling2dQueueDescriptor>::m_Data;

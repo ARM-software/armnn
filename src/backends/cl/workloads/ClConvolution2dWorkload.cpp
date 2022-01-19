@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -67,7 +67,7 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
                                                  std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
                                                  const arm_compute::CLCompileContext& clCompileContext,
                                                  const bool isFastMathEnabled)
-    : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
     , m_ConvolutionLayer(memoryManager)
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload");

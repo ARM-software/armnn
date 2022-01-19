@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -68,7 +68,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     const WorkloadInfo& info,
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
     const bool isFastMathEnabled)
-    : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
     using arm_compute::NEConvolutionLayer;
 

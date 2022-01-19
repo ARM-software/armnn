@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
@@ -19,12 +19,12 @@ arm_compute::Status NeonConcatWorkloadValidate(const std::vector<const TensorInf
                                                const TensorInfo& output,
                                                const OriginsDescriptor& descriptor);
 
-class NeonConcatWorkload : public BaseWorkload<ConcatQueueDescriptor>
+class NeonConcatWorkload : public NeonBaseWorkload<ConcatQueueDescriptor>
 {
 public:
     NeonConcatWorkload(const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info);
 
-    using BaseWorkload<ConcatQueueDescriptor>::BaseWorkload;
+    using NeonBaseWorkload<ConcatQueueDescriptor>::NeonBaseWorkload;
     void Execute() const override;
 
 private:

@@ -29,7 +29,7 @@ arm_compute::Status NeonLogicalNotWorkloadValidate(const TensorInfo& input,
 
 NeonLogicalNotWorkload::NeonLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
                                                const WorkloadInfo& info)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonLogicalNotWorkload_Construct",

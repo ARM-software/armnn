@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -47,7 +47,7 @@ arm_compute::Status ClMultiplicationWorkloadValidate(const TensorInfo& input0,
 ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info,
                                                    const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<MultiplicationQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<MultiplicationQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClMultiplicationWorkload", 2, 1);
 

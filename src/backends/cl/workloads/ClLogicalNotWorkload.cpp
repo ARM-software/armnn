@@ -31,7 +31,7 @@ arm_compute::Status ClLogicalNotWorkloadValidate(const TensorInfo& input,
 ClLogicalNotWorkload::ClLogicalNotWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
                                            const WorkloadInfo& info,
                                            const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClLogicalNotWorkload_Construct",

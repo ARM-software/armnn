@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -25,7 +25,7 @@ arm_compute::Status NeonQuantizeWorkloadValidate(const TensorInfo& input, const 
 
 NeonQuantizeWorkload::NeonQuantizeWorkload(const QuantizeQueueDescriptor& descriptor,
      const WorkloadInfo& workloadInfo)
-     : BaseWorkload<QuantizeQueueDescriptor>(descriptor, workloadInfo)
+     : NeonBaseWorkload<QuantizeQueueDescriptor>(descriptor, workloadInfo)
 {
     m_Data.ValidateInputsOutputs("NeonQuantizeWorkload", 1, 1);
 

@@ -1,11 +1,11 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
@@ -17,7 +17,7 @@ arm_compute::Status NeonArgMinMaxWorkloadValidate(const TensorInfo& input,
                                                   const TensorInfo& output,
                                                   const ArgMinMaxDescriptor& descriptor);
 
-class NeonArgMinMaxWorkload : public BaseWorkload<ArgMinMaxQueueDescriptor>
+class NeonArgMinMaxWorkload : public NeonBaseWorkload<ArgMinMaxQueueDescriptor>
 {
 public:
     NeonArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descriptor, const WorkloadInfo& info);

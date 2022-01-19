@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -26,7 +26,7 @@ arm_compute::Status NeonMaximumWorkloadValidate(const TensorInfo& input0,
 
 NeonMaximumWorkload::NeonMaximumWorkload(const MaximumQueueDescriptor& descriptor,
                                          const WorkloadInfo& info)
-    : BaseWorkload<MaximumQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<MaximumQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonMaximumWorkload", 2, 1);
 

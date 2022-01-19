@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,7 @@ ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
     const InstanceNormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info,
     const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClInstanceNormalizationWorkload_Construct",

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,7 @@ arm_compute::Status NeonSubtractionWorkloadValidate(const TensorInfo& input0,
 
 NeonSubtractionWorkload::NeonSubtractionWorkload(const SubtractionQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info)
-    : BaseWorkload<SubtractionQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<SubtractionQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonSubtractionWorkload", 2, 1);
 

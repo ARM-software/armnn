@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLReductionOperation.h>
 
@@ -16,7 +16,7 @@ arm_compute::Status ClReduceWorkloadValidate(const TensorInfo& input,
                                              const TensorInfo& output,
                                              const ReduceDescriptor& descriptor);
 
-class ClReduceWorkload : public BaseWorkload<ReduceQueueDescriptor>
+class ClReduceWorkload : public ClBaseWorkload<ReduceQueueDescriptor>
 {
 public:
     ClReduceWorkload(const ReduceQueueDescriptor& descriptor, const WorkloadInfo& info);

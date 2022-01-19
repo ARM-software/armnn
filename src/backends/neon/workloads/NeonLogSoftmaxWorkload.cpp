@@ -33,7 +33,7 @@ arm_compute::Status NeonLogSoftmaxWorkloadValidate(const TensorInfo& input,
 NeonLogSoftmaxWorkload::NeonLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& descriptor,
                                                const WorkloadInfo& info,
                                                std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : BaseWorkload<LogSoftmaxQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<LogSoftmaxQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonLogSoftmaxWorkload_Construct",

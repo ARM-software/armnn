@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,7 +8,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Descriptors.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/runtime/NEON/functions/NEBatchToSpaceLayer.h>
 
@@ -19,10 +19,10 @@ arm_compute::Status NeonBatchToSpaceNdWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& output,
                                                        const BatchToSpaceNdDescriptor& descriptor);
 
-class NeonBatchToSpaceNdWorkload : public BaseWorkload<BatchToSpaceNdQueueDescriptor>
+class NeonBatchToSpaceNdWorkload : public NeonBaseWorkload<BatchToSpaceNdQueueDescriptor>
 {
 public:
-    using BaseWorkload<BatchToSpaceNdQueueDescriptor>::BaseWorkload;
+    using NeonBaseWorkload<BatchToSpaceNdQueueDescriptor>::NeonBaseWorkload;
 
     NeonBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDescriptor& descriptor, const WorkloadInfo& info);
 

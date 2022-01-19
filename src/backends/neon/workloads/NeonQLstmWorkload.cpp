@@ -15,7 +15,7 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 NeonQLstmWorkload::NeonQLstmWorkload(const QLstmQueueDescriptor& descriptor, const WorkloadInfo& info)
-        : BaseWorkload<QLstmQueueDescriptor>(descriptor, info)
+        : NeonBaseWorkload<QLstmQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonQLstmWorkload_Construct",

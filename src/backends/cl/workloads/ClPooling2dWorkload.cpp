@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,7 +31,7 @@ ClPooling2dWorkload::ClPooling2dWorkload(
     const Pooling2dQueueDescriptor& descriptor,
     const WorkloadInfo& info,
     const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClPooling2dWorkload_Construct",

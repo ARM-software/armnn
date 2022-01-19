@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,7 +20,7 @@ using namespace armcomputetensorutils;
 ClBatchToSpaceNdWorkload::ClBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDescriptor& descriptor,
                                                    const WorkloadInfo& info,
                                                    const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<BatchToSpaceNdQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<BatchToSpaceNdQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClBatchToSpaceWorkload_Construct",

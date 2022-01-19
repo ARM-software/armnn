@@ -23,7 +23,7 @@ arm_compute::Status NeonLogWorkloadValidate(const TensorInfo& input, const Tenso
 }
 
 NeonLogWorkload::NeonLogWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonLogWorkload", 1, 1);
 

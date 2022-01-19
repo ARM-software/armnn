@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,7 @@ arm_compute::Status NeonInstanceNormalizationWorkloadValidate(const TensorInfo& 
 NeonInstanceNormalizationWorkload::NeonInstanceNormalizationWorkload(
     const InstanceNormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : BaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonInstanceNormalizationWorkload_Construct",

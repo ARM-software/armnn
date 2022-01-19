@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -50,7 +50,7 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
     const WorkloadInfo& info,
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
     const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info), m_FullyConnectedLayer(memoryManager)
+    : ClBaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info), m_FullyConnectedLayer(memoryManager)
 {
     // Add details for profiling output
     WorkloadInfo detailsInfo;

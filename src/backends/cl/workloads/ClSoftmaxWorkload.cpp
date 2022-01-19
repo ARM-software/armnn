@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,7 +29,7 @@ ClSoftmaxWorkload::ClSoftmaxWorkload(const SoftmaxQueueDescriptor& descriptor,
                                      const WorkloadInfo& info,
                                      std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
                                      const arm_compute::CLCompileContext& clCompileContext)
-        : BaseWorkload<SoftmaxQueueDescriptor>(descriptor, info)
+        : ClBaseWorkload<SoftmaxQueueDescriptor>(descriptor, info)
         , m_SoftmaxLayer(memoryManager)
 {
     // Report Profiling Details

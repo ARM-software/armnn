@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLFullyConnectedLayer.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
@@ -22,15 +22,15 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                      const FullyConnectedDescriptor& descriptor,
                                                      const ActivationDescriptor* activationDescriptor = nullptr);
 
-class ClFullyConnectedWorkload : public armnn::BaseWorkload<armnn::FullyConnectedQueueDescriptor>
+class ClFullyConnectedWorkload : public ClBaseWorkload<FullyConnectedQueueDescriptor>
 {
 public:
-    ClFullyConnectedWorkload(const armnn::FullyConnectedQueueDescriptor& descriptor,
-                             const armnn::WorkloadInfo& info,
+    ClFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor,
+                             const WorkloadInfo& info,
                              std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
                              const arm_compute::CLCompileContext& clCompileContext);
 
-    using armnn::BaseWorkload<armnn::FullyConnectedQueueDescriptor>::m_Data;
+    using ClBaseWorkload<FullyConnectedQueueDescriptor>::m_Data;
     void Execute() const override;
 
 private:

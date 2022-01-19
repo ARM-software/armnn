@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/runtime/Tensor.h>
@@ -24,7 +24,7 @@ arm_compute::Status NeonConvolution3dWorkloadValidate(const TensorInfo& input,
                                                       bool isFastMathEnabled = false,
                                                       const ActivationDescriptor* activationDescriptor = nullptr);
 
-class NeonConvolution3dWorkload : public BaseWorkload<Convolution3dQueueDescriptor>
+class NeonConvolution3dWorkload : public NeonBaseWorkload<Convolution3dQueueDescriptor>
 {
 public:
     using BaseWorkload<Convolution3dQueueDescriptor>::m_Data;

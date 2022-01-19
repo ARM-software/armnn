@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLDequantizationLayer.h>
 
@@ -14,7 +14,7 @@ namespace armnn
 
 arm_compute::Status ClDequantizeWorkloadValidate(const TensorInfo& input, const TensorInfo& output);
 
-class ClDequantizeWorkload : public BaseWorkload<DequantizeQueueDescriptor>
+class ClDequantizeWorkload : public ClBaseWorkload<DequantizeQueueDescriptor>
 {
 public:
     ClDequantizeWorkload(const DequantizeQueueDescriptor& descriptor,

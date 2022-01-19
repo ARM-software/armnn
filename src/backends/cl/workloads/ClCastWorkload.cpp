@@ -28,7 +28,7 @@ arm_compute::Status ClCastValidate(const TensorInfo& input, const TensorInfo& ou
 ClCastWorkload::ClCastWorkload(const CastQueueDescriptor& descriptor,
                                const WorkloadInfo& info,
                                const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<CastQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<CastQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClCastWorkload", 1, 1);
 

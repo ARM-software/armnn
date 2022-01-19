@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,7 +42,7 @@ arm_compute::Status ClComparisonWorkloadValidate(const TensorInfo& input0,
 ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& descriptor,
                                            const WorkloadInfo& info,
                                            const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<ComparisonQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ComparisonQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonComparisonWorkload_Construct",

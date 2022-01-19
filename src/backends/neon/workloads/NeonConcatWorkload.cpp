@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -48,7 +48,7 @@ arm_compute::Status NeonConcatWorkloadValidate(const std::vector<const TensorInf
 
 NeonConcatWorkload::NeonConcatWorkload(
 const ConcatQueueDescriptor& descriptor, const WorkloadInfo& info)
-        : BaseWorkload<ConcatQueueDescriptor>(descriptor, info)
+        : NeonBaseWorkload<ConcatQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonConcatWorkload_Construct",

@@ -1,18 +1,18 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/backends/WorkloadData.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 #include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/core/Error.h>
 
 namespace armnn {
 
-class NeonPadWorkload : public BaseWorkload<PadQueueDescriptor>
+class NeonPadWorkload : public NeonBaseWorkload<PadQueueDescriptor>
 {
 public:
     NeonPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info);

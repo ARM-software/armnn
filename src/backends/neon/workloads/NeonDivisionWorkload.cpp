@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -35,7 +35,7 @@ arm_compute::Status NeonDivisionWorkloadValidate(const TensorInfo& input0,
 
 NeonDivisionWorkload::NeonDivisionWorkload(const DivisionQueueDescriptor& descriptor,
                                          const WorkloadInfo& info)
-    : BaseWorkload<DivisionQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<DivisionQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonDivisionWorkload", 2, 1);
 

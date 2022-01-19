@@ -31,7 +31,7 @@ arm_compute::Status NeonLogicalOrWorkloadValidate(const TensorInfo& input0,
 
 NeonLogicalOrWorkload::NeonLogicalOrWorkload(const LogicalBinaryQueueDescriptor& descriptor,
                                              const WorkloadInfo& info)
-    : BaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonLogicalOrWorkload_Construct",

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -35,7 +35,7 @@ arm_compute::Status NeonSliceWorkloadValidate(const TensorInfo& input,
 
 NeonSliceWorkload::NeonSliceWorkload(const SliceQueueDescriptor& descriptor,
                                      const WorkloadInfo& info)
-        : BaseWorkload<SliceQueueDescriptor>(descriptor, info)
+        : NeonBaseWorkload<SliceQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonSliceWorkload_Construct",

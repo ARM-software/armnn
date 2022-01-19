@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLPReluLayer.h>
 
@@ -15,7 +15,7 @@ arm_compute::Status ClPreluWorkloadValidate(const TensorInfo& input,
                                             const TensorInfo& alpha,
                                             const TensorInfo& output);
 
-class ClPreluWorkload : public BaseWorkload<PreluQueueDescriptor>
+class ClPreluWorkload : public ClBaseWorkload<PreluQueueDescriptor>
 {
 public:
     ClPreluWorkload(const PreluQueueDescriptor& descriptor,

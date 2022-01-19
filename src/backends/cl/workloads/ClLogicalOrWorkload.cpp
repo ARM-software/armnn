@@ -34,7 +34,7 @@ arm_compute::Status ClLogicalOrWorkloadValidate(const TensorInfo& input0,
 ClLogicalOrWorkload::ClLogicalOrWorkload(const LogicalBinaryQueueDescriptor& descriptor,
                                          const WorkloadInfo& info,
                                          const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<LogicalBinaryQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClLogicalOrWorkload_Construct",

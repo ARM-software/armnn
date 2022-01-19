@@ -1,18 +1,18 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLElementwiseOperations.h>
 
 namespace armnn
 {
 
-class ClAdditionWorkload : public BaseWorkload<AdditionQueueDescriptor>
+class ClAdditionWorkload : public ClBaseWorkload<AdditionQueueDescriptor>
 {
 public:
     ClAdditionWorkload(const AdditionQueueDescriptor& descriptor,

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,9 +57,9 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
     const TransposeConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info,
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
-    const arm_compute::CLCompileContext& clCompileContext) :
-    BaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info),
-    m_Layer(memoryManager)
+    const arm_compute::CLCompileContext& clCompileContext)
+    : ClBaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info)
+    , m_Layer(memoryManager)
 {
     // Add details for profiling output
     WorkloadInfo detailsInfo;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,7 +18,7 @@ namespace armnn
 using namespace armcomputetensorutils;
 
 NeonPadWorkload::NeonPadWorkload(const PadQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<PadQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<PadQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonPadWorkload_Construct",

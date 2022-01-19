@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLReshapeLayer.h>
 
@@ -15,7 +15,7 @@ namespace armnn
 arm_compute::Status ClReshapeWorkloadValidate(const TensorInfo& input,
                                               const TensorInfo& output);
 
-class ClReshapeWorkload : public BaseWorkload<ReshapeQueueDescriptor>
+class ClReshapeWorkload : public ClBaseWorkload<ReshapeQueueDescriptor>
 {
 public:
     ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor,

@@ -12,7 +12,7 @@
 #include <arm_compute/runtime/CL/functions/CLSoftmaxLayer.h>
 
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 namespace armnn
 {
@@ -21,7 +21,7 @@ arm_compute::Status ClLogSoftmaxWorkloadValidate(const TensorInfo& input,
                                                  const TensorInfo& output,
                                                  const LogSoftmaxDescriptor& descriptor);
 
-class ClLogSoftmaxWorkload : public BaseWorkload<LogSoftmaxQueueDescriptor>
+class ClLogSoftmaxWorkload : public ClBaseWorkload<LogSoftmaxQueueDescriptor>
 {
 public:
     ClLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,

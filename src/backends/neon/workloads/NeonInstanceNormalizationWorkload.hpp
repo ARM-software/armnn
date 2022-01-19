@@ -1,9 +1,11 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
+
+#include "NeonBaseWorkload.hpp"
 
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 
@@ -16,7 +18,7 @@ arm_compute::Status NeonInstanceNormalizationWorkloadValidate(const TensorInfo& 
                                                               const TensorInfo& output,
                                                               const InstanceNormalizationDescriptor& descriptor);
 
-class NeonInstanceNormalizationWorkload : public BaseWorkload<InstanceNormalizationQueueDescriptor>
+class NeonInstanceNormalizationWorkload : public NeonBaseWorkload<InstanceNormalizationQueueDescriptor>
 {
 public:
     NeonInstanceNormalizationWorkload(const InstanceNormalizationQueueDescriptor& descriptor,

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/runtime/NEON/functions/NEReductionOperation.h>
 
@@ -16,7 +16,7 @@ arm_compute::Status NeonReduceWorkloadValidate(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const ReduceDescriptor& descriptor);
 
-class NeonReduceWorkload : public BaseWorkload<ReduceQueueDescriptor>
+class NeonReduceWorkload : public NeonBaseWorkload<ReduceQueueDescriptor>
 {
 public:
     NeonReduceWorkload(const ReduceQueueDescriptor& descriptor, const WorkloadInfo& info);

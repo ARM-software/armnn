@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -39,7 +39,7 @@ arm_compute::Status ClMinimumWorkloadValidate(const TensorInfo& input0,
 ClMinimumWorkload::ClMinimumWorkload(const MinimumQueueDescriptor& descriptor,
                                      const WorkloadInfo& info,
                                      const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<MinimumQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<MinimumQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClMinimumWorkload", 2, 1);
 

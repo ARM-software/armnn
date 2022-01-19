@@ -23,7 +23,7 @@ arm_compute::Status NeonSinWorkloadValidate(const TensorInfo& input, const Tenso
 }
 
 NeonSinWorkload::NeonSinWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonSinWorkload", 1, 1);
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,7 +29,7 @@ arm_compute::Status ClTransposeWorkloadValidate(const TensorInfo& input,
 ClTransposeWorkload::ClTransposeWorkload(const TransposeQueueDescriptor& descriptor,
                                          const WorkloadInfo& info,
                                          const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<TransposeQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<TransposeQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClTransposeWorkload_Construct",

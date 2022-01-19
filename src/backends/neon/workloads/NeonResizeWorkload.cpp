@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -51,7 +51,7 @@ arm_compute::Status NeonResizeWorkloadValidate(const TensorInfo& input,
 
 NeonResizeWorkload::NeonResizeWorkload(const ResizeQueueDescriptor& descriptor,
                                                        const WorkloadInfo& info)
-    : BaseWorkload<ResizeQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<ResizeQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonResizeWorkload_Construct",

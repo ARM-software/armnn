@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,7 +21,7 @@ static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::Co
 ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& descriptor,
                                              const WorkloadInfo& info,
                                              const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<SubtractionQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<SubtractionQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClSubtractionWorkload", 2, 1);
 

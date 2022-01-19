@@ -25,7 +25,7 @@ arm_compute::Status NeonCastValidate(const TensorInfo& input, const TensorInfo& 
 }
 
 NeonCastWorkload::NeonCastWorkload(const CastQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<CastQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<CastQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonCastWorkload", 1, 1);
 

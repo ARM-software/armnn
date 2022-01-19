@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -35,7 +35,7 @@ arm_compute::Status NeonPooling2dWorkloadValidate(const TensorInfo& input,
 
 NeonPooling2dWorkload::NeonPooling2dWorkload(
     const Pooling2dQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<Pooling2dQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonPooling2dWorkload_Construct",

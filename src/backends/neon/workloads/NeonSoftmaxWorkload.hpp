@@ -1,12 +1,12 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/Descriptors.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
@@ -21,7 +21,7 @@ arm_compute::Status NeonSoftmaxWorkloadValidate(const TensorInfo& input,
                                                 const TensorInfo& output,
                                                 const SoftmaxDescriptor& descriptor);
 
-class NeonSoftmaxWorkload : public BaseWorkload<SoftmaxQueueDescriptor>
+class NeonSoftmaxWorkload : public NeonBaseWorkload<SoftmaxQueueDescriptor>
 {
 public:
     NeonSoftmaxWorkload(const SoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,

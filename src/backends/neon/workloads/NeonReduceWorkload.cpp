@@ -45,7 +45,7 @@ arm_compute::Status NeonReduceWorkloadValidate(const TensorInfo& input,
 }
 
 NeonReduceWorkload::NeonReduceWorkload(const ReduceQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<ReduceQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<ReduceQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonReduceWorkload_Construct",

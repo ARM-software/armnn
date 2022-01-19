@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
@@ -18,7 +18,7 @@ arm_compute::Status ClConcatWorkloadValidate(const std::vector<const TensorInfo*
                                              const TensorInfo& output,
                                              const OriginsDescriptor& descriptor);
 
-class ClConcatWorkload : public BaseWorkload<ConcatQueueDescriptor>
+class ClConcatWorkload : public ClBaseWorkload<ConcatQueueDescriptor>
 {
 public:
     ClConcatWorkload(const ConcatQueueDescriptor& descriptor,

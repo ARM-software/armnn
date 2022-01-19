@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "NeonTransposeConvolution2dWorkload.hpp"
@@ -55,7 +55,7 @@ arm_compute::Status NeonTransposeConvolution2dWorkloadValidate(const TensorInfo&
 NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
     const TransposeConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info,
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-    : BaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonTransposeConvolution2dWorkload", 1, 1);
 

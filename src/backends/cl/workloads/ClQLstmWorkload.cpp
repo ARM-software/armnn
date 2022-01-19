@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -17,7 +17,7 @@ using namespace armcomputetensorutils;
 ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
                                  const WorkloadInfo& info,
                                  const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<QLstmQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<QLstmQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClQLstmWorkload_Construct",

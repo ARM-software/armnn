@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/runtime/IFunction.h>
 #include <arm_compute/runtime/Tensor.h>
@@ -24,7 +24,7 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                                       bool isFastMathEnabled = false,
                                                       const ActivationDescriptor* activationDescriptor = nullptr);
 
-class NeonConvolution2dWorkload : public BaseWorkload<Convolution2dQueueDescriptor>
+class NeonConvolution2dWorkload : public NeonBaseWorkload<Convolution2dQueueDescriptor>
 {
 public:
     using BaseWorkload<Convolution2dQueueDescriptor>::m_Data;

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include "NeonWorkloadUtils.hpp"
@@ -13,10 +13,10 @@
 namespace armnn
 {
 
-struct NeonRankWorkload : public BaseWorkload<RankQueueDescriptor>
+struct NeonRankWorkload : public NeonBaseWorkload<RankQueueDescriptor>
 {
 public:
-    using BaseWorkload<RankQueueDescriptor>::BaseWorkload;
+    using NeonBaseWorkload<RankQueueDescriptor>::NeonBaseWorkload;
     virtual void Execute() const override
     {
         const NeonTensorHandle* neonTensorHandle = PolymorphicDowncast<const NeonTensorHandle*>(m_Data.m_Inputs[0]);

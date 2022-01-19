@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -54,7 +54,7 @@ arm_compute::Status NeonArgMinMaxWorkloadValidate(const TensorInfo& input,
 
 NeonArgMinMaxWorkload::NeonArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descriptor,
                                              const WorkloadInfo& info)
-        : BaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info)
+        : NeonBaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonArgMinMaxWorkload_Construct",

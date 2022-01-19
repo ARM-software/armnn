@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -34,7 +34,7 @@ arm_compute::Status ClDivisionWorkloadValidate(const TensorInfo& input0,
 ClDivisionWorkload::ClDivisionWorkload(const DivisionQueueDescriptor& descriptor,
                                        const WorkloadInfo& info,
                                        const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<DivisionQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<DivisionQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClDivisionWorkload", 2, 1);
 

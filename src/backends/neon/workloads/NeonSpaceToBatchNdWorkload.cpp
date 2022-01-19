@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,7 +43,7 @@ arm_compute::Status NeonSpaceToBatchNdWorkloadValidate(const TensorInfo& input,
 
 NeonSpaceToBatchNdWorkload::NeonSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDescriptor& descriptor,
                                                        const WorkloadInfo& info)
-        : BaseWorkload<SpaceToBatchNdQueueDescriptor>(descriptor, info)
+        : NeonBaseWorkload<SpaceToBatchNdQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonSpaceToBatchNdWorkload_Construct",

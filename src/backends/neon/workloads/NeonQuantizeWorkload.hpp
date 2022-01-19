@@ -1,11 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/runtime/NEON/functions/NEQuantizationLayer.h>
 
@@ -13,7 +13,7 @@ namespace armnn {
 
 arm_compute::Status NeonQuantizeWorkloadValidate(const TensorInfo& input, const TensorInfo& output);
 
-class NeonQuantizeWorkload : public BaseWorkload<QuantizeQueueDescriptor>
+class NeonQuantizeWorkload : public NeonBaseWorkload<QuantizeQueueDescriptor>
 {
 public:
     NeonQuantizeWorkload(const QuantizeQueueDescriptor& descriptor, const WorkloadInfo& workloadInfo);

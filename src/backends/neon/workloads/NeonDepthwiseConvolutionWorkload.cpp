@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -76,7 +76,7 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
 NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     const DepthwiseConvolution2dQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
     // ArmNN's weight format for depthwise is [ 1, H, W, I*M ]
     auto& weightInfo = m_Data.m_Weight->GetTensorInfo();

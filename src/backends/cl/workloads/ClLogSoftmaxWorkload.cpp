@@ -29,7 +29,7 @@ ClLogSoftmaxWorkload::ClLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& desc
                                            const WorkloadInfo& info,
                                            std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
                                            const arm_compute::CLCompileContext& clCompileContext)
-        : BaseWorkload<LogSoftmaxQueueDescriptor>(descriptor, info)
+        : ClBaseWorkload<LogSoftmaxQueueDescriptor>(descriptor, info)
         , m_LogSoftmaxLayer(memoryManager)
 {
     // Report Profiling Details

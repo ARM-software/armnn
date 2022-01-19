@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/runtime/NEON/functions/NEGather.h>
 
@@ -16,7 +16,7 @@ arm_compute::Status NeonGatherWorkloadValidate(const TensorInfo& input,
                                                const TensorInfo& output,
                                                const GatherDescriptor& descriptor);
 
-class NeonGatherWorkload : public BaseWorkload<GatherQueueDescriptor>
+class NeonGatherWorkload : public NeonBaseWorkload<GatherQueueDescriptor>
 {
 public:
     NeonGatherWorkload(const GatherQueueDescriptor& descriptor, const WorkloadInfo& info);

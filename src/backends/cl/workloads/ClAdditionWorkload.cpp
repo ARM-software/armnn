@@ -21,7 +21,7 @@ static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::Co
 ClAdditionWorkload::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor,
                                        const WorkloadInfo& info,
                                        const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<AdditionQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<AdditionQueueDescriptor>(descriptor, info)
 {
     this->m_Data.ValidateInputsOutputs("ClAdditionWorkload", 2, 1);
 

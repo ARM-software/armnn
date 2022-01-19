@@ -26,7 +26,7 @@ arm_compute::Status ClSinWorkloadValidate(const TensorInfo& input, const TensorI
 ClSinWorkload::ClSinWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
                              const WorkloadInfo& info,
                              const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClSinWorkload", 1, 1);
 

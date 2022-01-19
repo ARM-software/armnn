@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,7 +8,7 @@
 #include <armnn/Tensor.hpp>
 #include <armnn/Descriptors.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "ClBaseWorkload.hpp"
 
 #include <arm_compute/runtime/CL/functions/CLDeconvolutionLayer.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
@@ -24,7 +24,7 @@ arm_compute::Status ClTransposeConvolution2dWorkloadValidate(const TensorInfo& i
                                                              const TensorInfo& weights,
                                                              const Optional<TensorInfo>& biases);
 
-class ClTransposeConvolution2dWorkload : public BaseWorkload<TransposeConvolution2dQueueDescriptor>
+class ClTransposeConvolution2dWorkload : public ClBaseWorkload<TransposeConvolution2dQueueDescriptor>
 {
 public:
     ClTransposeConvolution2dWorkload(const TransposeConvolution2dQueueDescriptor& descriptor,

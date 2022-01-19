@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -39,7 +39,7 @@ arm_compute::Status NeonAdditionWorkloadValidate(const TensorInfo& input0,
 
 NeonAdditionWorkload::NeonAdditionWorkload(const AdditionQueueDescriptor& descriptor,
                                            const WorkloadInfo& info)
-    : BaseWorkload<AdditionQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<AdditionQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonAdditionWorkload", 2, 1);
 

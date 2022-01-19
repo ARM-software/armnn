@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/Descriptors.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "NeonBaseWorkload.hpp"
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/runtime/IFunction.h>
@@ -21,7 +21,7 @@ arm_compute::Status NeonLogSoftmaxWorkloadValidate(const TensorInfo& input,
                                                    const TensorInfo& output,
                                                    const LogSoftmaxDescriptor& descriptor);
 
-class NeonLogSoftmaxWorkload : public BaseWorkload<LogSoftmaxQueueDescriptor>
+class NeonLogSoftmaxWorkload : public NeonBaseWorkload<LogSoftmaxQueueDescriptor>
 {
 public:
     NeonLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& descriptor, const WorkloadInfo& info,

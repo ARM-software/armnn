@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -26,7 +26,7 @@ arm_compute::Status ClNegWorkloadValidate(const TensorInfo& input, const TensorI
 ClNegWorkload::ClNegWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
                              const WorkloadInfo& info,
                              const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("ClNegWorkload", 1, 1);
 

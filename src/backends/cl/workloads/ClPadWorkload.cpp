@@ -19,7 +19,7 @@ using namespace armcomputetensorutils;
 ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
                              const WorkloadInfo& info,
                              const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<PadQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<PadQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClPadWorkload_Construct",

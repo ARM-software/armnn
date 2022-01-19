@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -53,7 +53,7 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
 NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor,
                                                        const WorkloadInfo& info,
                                                        ACLMemManagerOnDemand& memoryManager)
-    : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
 {
     m_Data.ValidateInputsOutputs("NeonFullyConnectedWorkload", 1, 1);
 

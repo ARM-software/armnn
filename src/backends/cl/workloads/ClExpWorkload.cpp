@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -26,7 +26,7 @@ arm_compute::Status ClExpWorkloadValidate(const TensorInfo& input, const TensorI
 ClExpWorkload::ClExpWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
                              const WorkloadInfo& info,
                              const arm_compute::CLCompileContext& clCompileContext)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
+    : ClBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClExpWorkload_Construct",

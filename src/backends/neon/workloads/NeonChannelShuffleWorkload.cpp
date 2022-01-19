@@ -50,7 +50,7 @@ arm_compute::Status NeonChannelShuffleValidate(const TensorInfo& input,
 
 NeonChannelShuffleWorkload::NeonChannelShuffleWorkload(const ChannelShuffleQueueDescriptor& descriptor, 
                                                        const WorkloadInfo& info)
-    : BaseWorkload<ChannelShuffleQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<ChannelShuffleQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonChannelShufflenWorkload_Construct",

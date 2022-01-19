@@ -57,7 +57,7 @@ NeonConvolution3dWorkload::NeonConvolution3dWorkload(const Convolution3dQueueDes
                                                      const WorkloadInfo& info,
                                                      std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager,
                                                      const bool isFastMathEnabled)
-    : BaseWorkload<Convolution3dQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<Convolution3dQueueDescriptor>(descriptor, info)
 {
     IgnoreUnused(memoryManager);
 

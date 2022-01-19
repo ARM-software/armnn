@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1556,7 +1556,7 @@ void CreateSampleDynamicBackendTestImpl()
     };
 
     // Create a addition workload
-    auto workload = sampleWorkloadFactory->CreateAddition(additionQueueDescriptor, workloadInfo);
+    auto workload = sampleWorkloadFactory->CreateWorkload(LayerType::Addition, additionQueueDescriptor, workloadInfo);
     CHECK((workload != nullptr));
 }
 

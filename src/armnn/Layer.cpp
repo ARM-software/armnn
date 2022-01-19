@@ -488,4 +488,9 @@ const IConnectableLayer& OutputSlot::GetOwningIConnectableLayer() const
     return m_OwningLayer;
 }
 
+const IConnectableLayer& InputSlot::GetOwningIConnectableLayer() const
+{
+    return m_OwningLayer;
+}
+
 } // namespace armnn

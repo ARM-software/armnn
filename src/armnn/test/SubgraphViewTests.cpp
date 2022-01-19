@@ -6,6 +6,7 @@
 #include <Graph.hpp>
 #include <SubgraphViewSelector.hpp>
 
+#include <armnn/backends/OptimizationViews.hpp>
 #include <armnn/backends/SubgraphView.hpp>
 #include <armnn/backends/TensorHandle.hpp>
 #include <armnn/utility/NumericCast.hpp>
@@ -87,7 +88,7 @@ SubgraphView::OutputSlots CreateOutputsFrom(const std::vector<Layer*>& layers)
 SubgraphView::IOutputSlots CreateIOutputsFrom(const std::vector<armnn::IConnectableLayer*>& layers)
 {
     SubgraphView::IOutputSlots result;
-    for (auto &&layer: layers)
+    for (auto&& layer: layers)
     {
         for (unsigned int i = 0; i < layer->GetNumOutputSlots(); ++i)
         {
@@ -1459,14 +1460,14 @@ TEST_CASE("Random")
             for (uint32_t i = 0; i < numConcats; ++i)
             {
                 std::string name = "concat" + std::to_string(i) + (GetRandomFlag(supportedProb) ? "S" : "N");
-                uint32_t numInputs = 1 + GetRandom(3u);
+                numInputs = 1 + GetRandom(3u);
                 OriginsDescriptor concatDesc(numInputs);
                 graph.AddLayer<ConcatLayer>(concatDesc, name.c_str());
             }
             for (uint32_t i = 0; i < numSplits; ++i)
             {
                 std::string name = "split" + std::to_string(i) + (GetRandomFlag(supportedProb) ? "S" : "N");
-                uint32_t numOutputs = 1 + GetRandom(3u);
+                numOutputs = 1 + GetRandom(3u);
                 ViewsDescriptor splitDesc(numOutputs);
                 graph.AddLayer<SplitterLayer>(splitDesc, name.c_str());
             }
@@ -1888,6 +1889,363 @@ TEST_CASE("SubgraphOrder")
             CHECK((expectedSorted[idx] == l->GetType()));
             idx++;
         }
+    );
+}
+
+TEST_CASE("SubgraphViewWorkingCopy")
+{
+    Graph graph;
+
+    auto input      = graph.AddLayer<InputLayer>(0, "Input");
+    auto activation = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "Activation");
+    auto output     = graph.AddLayer<OutputLayer>(1, "Output");
+
+    input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Add in out of order
+    auto view = CreateSubgraphViewFrom({output, input, activation},
+                                       {},
+                                       {});
+
+    SubgraphView workingCopy = view->GetWorkingCopy();
+
+    // Check the layers are sorted topologically in the view
+    int idx=0;
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Activation, LayerType::Output};
+    workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
+        {
+            CHECK((expectedSorted[idx] == l->GetType()));
+            idx++;
+        }
+    );
+}
+
+bool ReplaceConstantMultiplicationWithDepthwise(SubgraphView& subgraph,
+                                                IConnectableLayer* layer)
+{
+    if (layer->GetType() == LayerType::Multiplication)
+    {
+        IInputSlot* patternSubgraphInput = &layer->GetInputSlot(0);
+
+        const IConnectableLayer* inputLayer    = &patternSubgraphInput->GetConnection()->GetOwningIConnectableLayer();
+        const IConnectableLayer* constantLayer = &layer->GetInputSlot(1).GetConnection()->GetOwningIConnectableLayer();
+
+        // Figure out which of the two inputs is the constant
+        if (constantLayer->GetType() != LayerType::Constant)
+        {
+            patternSubgraphInput = &layer->GetInputSlot(1);
+            std::swap(inputLayer, constantLayer);
+        }
+
+        if (constantLayer->GetType() == LayerType::Constant)
+        {
+            const TensorInfo& inputInfo = inputLayer->GetOutputSlot(0).GetTensorInfo();
+            const TensorInfo& constInfo = constantLayer->GetOutputSlot(0).GetTensorInfo();
+
+            // Add a Depthwise only where the constant input is a scalar that takes the form { 1, 1, 1, C }.
+            // The scalar is used as weights for the convolution.
+            if (constInfo.GetShape() == TensorShape({ 1, 1, 1, inputInfo.GetShape()[3] }))
+            {
+                auto replacementGraph = INetwork::Create();
+
+                DepthwiseConvolution2dDescriptor desc;
+                desc.m_DataLayout = DataLayout::NHWC;
+
+                TensorInfo weightInfo        = constInfo;
+                const TensorInfo& outputInfo = layer->GetOutputSlot(0).GetTensorInfo();
+                unsigned int M               = outputInfo.GetShape()[3] / inputInfo.GetShape()[3];
+                ARMNN_ASSERT_MSG(M == 1, "Constant multiplication only support 1x1x1xC, so M should always be 1 here");
+                weightInfo.SetShape({ 1, 1, 1, constInfo.GetShape()[3] * M });    //1HW(I*M)
+
+                const void* weightData =  PolymorphicPointerDowncast<const ConstantLayer>(constantLayer)
+                        ->m_LayerOutput->GetConstTensor<void>();
+                TensorInfo            weightsInfo = constInfo;
+                ConstTensor           weights(weightsInfo, weightData);
+
+                const auto depthwiseLayer = replacementGraph->AddDepthwiseConvolution2dLayer(
+                        desc, weights, armnn::EmptyOptional(), "Replacement for Constant-Multiplication");
+
+                auto& outslot = layer->GetOutputSlot(0);
+                SubgraphView::IOutputSlots outputs{ &outslot };
+                SubgraphView::IConnectableLayers layers;
+                layers.push_back(layer);
+                layers.push_back(const_cast<IConnectableLayer*>(constantLayer));
+
+                SubgraphView patternSubgraph(std::move(layers), {patternSubgraphInput}, {&layer->GetOutputSlot(0)});
+
+                subgraph.SubstituteSubgraph(patternSubgraph, depthwiseLayer );
+
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool ReplaceTestMultiplication(SubgraphView& subgraph,
+                           IConnectableLayer* layer)
+{
+    if (layer->GetType() == LayerType::Multiplication)
+    {
+
+        switch (layer->GetType())
+        {
+            case LayerType::Multiplication:
+                return ReplaceConstantMultiplicationWithDepthwise(subgraph, layer);
+                break;
+            default:
+                throw Exception("Found unknown MultiplicationSupportedMode value");
+                break;
+        }
+    }
+    return false;
+}
+
+void ReplaceUnsupportedLayers(SubgraphView& subgraph)
+{
+    using ReplacementFunc                    = bool (*)(SubgraphView&, IConnectableLayer*);
+    const ReplacementFunc replacementFuncs[] = {
+            &ReplaceTestMultiplication,
+    };
+
+    subgraph.ForEachLayer([replacementFuncs, &subgraph](IConnectableLayer* layer)
+           {
+               auto madeChange = false;
+               for (const ReplacementFunc f : replacementFuncs)
+               {
+                   madeChange = f(subgraph, layer);
+                   if (madeChange)
+                   {
+                       goto nextIteration;
+                   }
+               }
+               nextIteration:;
+           }
+    );
+}
+
+TEST_CASE("SubgraphViewWorkingCopyReplacementFunc")
+{
+    Graph graph;
+
+    const TensorInfo inputInfo({ 1, 8, 8, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo constInfo({ 1, 1, 1, 16 }, DataType::QAsymmU8, 0.9f, 0, true);
+    const TensorInfo outputInfo({ 1, 8, 8, 16 }, DataType::QAsymmU8, 1.0f, 0);
+
+    std::vector<uint8_t> constData(constInfo.GetNumElements(), 0);
+    std::iota(constData.begin(), constData.end(), 0);
+    ConstTensor constTensor(constInfo, constData);
+
+    // Add the original pattern
+    IConnectableLayer* input = graph.AddLayer<InputLayer>(0, "input");
+    auto constant = graph.AddLayer<ConstantLayer>("const");
+
+    constant->m_LayerOutput = std::make_shared<ScopedTensorHandle>(constTensor);
+    IConnectableLayer* mul      = graph.AddLayer<MultiplicationLayer>("mul");
+    IConnectableLayer* output   = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Create connections between layers
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    constant->GetOutputSlot(0).SetTensorInfo(constInfo);
+    mul->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    input->GetOutputSlot(0).Connect(mul->GetInputSlot(0));
+    constant->GetOutputSlot(0).Connect(mul->GetInputSlot(1));
+    mul->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Add in out of order
+    auto view = CreateSubgraphViewFrom({output, input, mul, constant},
+                                       {},
+                                       {});
+
+    SubgraphView workingCopy = view->GetWorkingCopy();
+
+    // Check the WorkingCopy is as expected before replacement
+    CHECK(workingCopy.GetIConnectableLayers().size() == 4);
+    int idx=0;
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Constant, LayerType::Multiplication, LayerType::Output};
+    workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
+                                         {
+                                             CHECK((expectedSorted[idx] == l->GetType()));
+                                             idx++;
+                                         }
+    );
+
+    // Replace Multiplication and Constant with Depthwise
+    ReplaceUnsupportedLayers(workingCopy);
+
+    // Check the layers are as expected
+    CHECK(workingCopy.GetIConnectableLayers().size() == 3);
+    idx=0;
+    LayerType expectedSortedReplaced[] = {LayerType::Input, LayerType::DepthwiseConvolution2d, LayerType::Output};
+    workingCopy.ForEachIConnectableLayer([&idx, &expectedSortedReplaced](const IConnectableLayer* l)
+                                         {
+                                             CHECK((expectedSortedReplaced[idx] == l->GetType()));
+                                             idx++;
+                                         }
+    );
+}
+
+TEST_CASE("SubgraphViewWorkingCopySubstituteSubgraph")
+{
+    Graph graph;
+
+    auto input = graph.AddLayer<InputLayer>(0, "Input");
+    auto activation = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "Activation");
+    auto output = graph.AddLayer<OutputLayer>(1, "Output");
+
+    input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Add in out of order
+    auto view = CreateSubgraphViewFrom({output, input, activation},
+                                       {},
+                                       {});
+
+    // Check SubstituteSubgraphView throws when called on original SubgraphView
+    SubgraphView temp(input);
+    CHECK_THROWS_AS(view->SubstituteSubgraph(temp, input), NullPointerException);
+
+    // Check that GetWorkingCopy() being called on a working copy throws an exception
+    auto workingCopy = view->GetWorkingCopy();
+    CHECK_THROWS_AS(workingCopy.GetWorkingCopy(), Exception);
+}
+
+TEST_CASE("SubgraphViewWorkingCopyOptimizationViews")
+{
+    Graph graph;
+
+    const TensorInfo inputInfo({ 1, 8, 8, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo constInfo({ 1, 1, 1, 16 }, DataType::QAsymmU8, 0.9f, 0, true);
+    const TensorInfo outputInfo({ 1, 8, 8, 16 }, DataType::QAsymmU8, 1.0f, 0);
+
+    std::vector<uint8_t> constData(constInfo.GetNumElements(), 0);
+    std::iota(constData.begin(), constData.end(), 0);
+    ConstTensor constTensor(constInfo, constData);
+
+    // Add the original pattern
+    IConnectableLayer* input = graph.AddLayer<InputLayer>(0, "input");
+    auto constant = graph.AddLayer<ConstantLayer>("const");
+
+    constant->m_LayerOutput = std::make_shared<ScopedTensorHandle>(constTensor);
+    IConnectableLayer* mul      = graph.AddLayer<MultiplicationLayer>("mul");
+    IConnectableLayer* output   = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Create connections between layers
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    constant->GetOutputSlot(0).SetTensorInfo(constInfo);
+    mul->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    input->GetOutputSlot(0).Connect(mul->GetInputSlot(0));
+    constant->GetOutputSlot(0).Connect(mul->GetInputSlot(1));
+    mul->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Add in out of order
+    auto view = CreateSubgraphViewFrom({output, input, mul, constant},
+                                       {},
+                                       {});
+
+    SubgraphView workingCopy = view->GetWorkingCopy();
+
+    // Check the WorkingCopy is as expected before replacement
+    int idx=0;
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Constant, LayerType::Multiplication, LayerType::Output};
+    workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
+                                         {
+                                             CHECK((expectedSorted[idx] == l->GetType()));
+                                             idx++;
+                                         }
+    );
+
+    // Replace Multiplication and Constant with Depthwise
+    ReplaceUnsupportedLayers(workingCopy);
+
+    // Check the layers are as expected
+    idx=0;
+    LayerType expectedSortedReplaced[] = {LayerType::Input, LayerType::DepthwiseConvolution2d, LayerType::Output};
+    workingCopy.ForEachIConnectableLayer([&idx, &expectedSortedReplaced](const IConnectableLayer* l)
+                                         {
+                                             CHECK((expectedSortedReplaced[idx] == l->GetType()));
+                                             idx++;
+                                         }
+    );
+
+
+    // At this stage NPU would take the working copy and create CompiledBlocPtr with it.
+
+    // We will just check that the procompiledLayer can still be added to the optimizationViews via a SubgraphView.
+    OptimizationViews optimizationViews;
+
+    CompiledBlobPtr ptr;
+    IConnectableLayer* preCompiledLayer = optimizationViews.GetINetwork()->AddPrecompiledLayer(
+            PreCompiledDescriptor(view->GetNumInputSlots(), view->GetNumOutputSlots()),
+            std::move(ptr),
+            EmptyOptional(),
+            "pre-compiled");
+
+
+    optimizationViews.AddSubstitution({ *view, SubgraphView(preCompiledLayer) });
+    CHECK(optimizationViews.Validate(*view));
+}
+
+TEST_CASE("SubgraphViewWorkingCopyReplaceSlots")
+{
+    Graph graph;
+    const TensorInfo inputInfo({ 1, 8, 8, 16 }, DataType::QAsymmU8, 1.0f, 0);
+    const TensorInfo constInfo({ 1, 1, 1, 16 }, DataType::QAsymmU8, 0.9f, 0, true);
+    const TensorInfo outputInfo({ 1, 8, 8, 16 }, DataType::QAsymmU8, 1.0f, 0);
+
+    std::vector<uint8_t> constData(constInfo.GetNumElements(), 0);
+    std::iota(constData.begin(), constData.end(), 0);
+    ConstTensor constTensor(constInfo, constData);
+
+    // Add the original pattern
+    IConnectableLayer* input = graph.AddLayer<InputLayer>(0, "input");
+    auto constant = graph.AddLayer<ConstantLayer>("const");
+
+    constant->m_LayerOutput = std::make_shared<ScopedTensorHandle>(constTensor);
+    IConnectableLayer* mul      = graph.AddLayer<MultiplicationLayer>("mul");
+    IConnectableLayer* output   = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Create connections between layers
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    constant->GetOutputSlot(0).SetTensorInfo(constInfo);
+    mul->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    input->GetOutputSlot(0).Connect(mul->GetInputSlot(0));
+    constant->GetOutputSlot(0).Connect(mul->GetInputSlot(1));
+    mul->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    auto view = CreateSubgraphViewFrom({output, input, mul, constant},
+                                       CreateIInputsFrom({mul}),
+                                        CreateIOutputsFrom({mul}));
+
+    SubgraphView workingCopy = view->GetWorkingCopy();
+
+    // Check the WorkingCopy is as expected before replacement
+    CHECK(workingCopy.GetIConnectableLayers().size() == 4);
+    int idx=0;
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Constant, LayerType::Multiplication, LayerType::Output};
+    workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
+                                         {
+                                             CHECK((expectedSorted[idx] == l->GetType()));
+                                             idx++;
+                                         }
+    );
+
+    // Replace Multiplication and Constant with Depthwise
+    ReplaceUnsupportedLayers(workingCopy);
+
+    // Check the layers are as expected
+    idx=0;
+    LayerType expectedSortedReplaced[] = {LayerType::Input, LayerType::DepthwiseConvolution2d, LayerType::Output};
+    CHECK(workingCopy.GetIConnectableLayers().size() == 3);
+    workingCopy.ForEachIConnectableLayer([&idx, &expectedSortedReplaced](const IConnectableLayer* l)
+                                         {
+                                             CHECK((expectedSortedReplaced[idx] == l->GetType()));
+                                             idx++;
+                                         }
     );
 }
 

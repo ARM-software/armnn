@@ -55,6 +55,8 @@ public:
     const OutputSlot* GetConnectedOutputSlot() const { return m_Connection; }
     OutputSlot* GetConnectedOutputSlot() { return m_Connection; }
 
+    const IConnectableLayer& GetOwningIConnectableLayer() const override;
+
     /// Links the slot to an output slot or breaks an existing link if passing nullptr.
     void SetConnection(OutputSlot* source)
     {

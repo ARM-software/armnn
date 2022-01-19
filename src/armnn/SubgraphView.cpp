@@ -65,9 +65,9 @@ SubgraphView::SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& 
 }
 
 /// IConnectable Duplication to maintain backwards compatibility
-SubgraphView::SubgraphView(SubgraphView::IConnectableLayers &&layers,
-                           SubgraphView::IInputSlots &&inputs,
-                           SubgraphView::IOutputSlots &&outputs)
+SubgraphView::SubgraphView(SubgraphView::IConnectableLayers&& layers,
+                           SubgraphView::IInputSlots&& inputs,
+                           SubgraphView::IOutputSlots&& outputs)
         : m_IInputSlots{inputs}
         , m_IOutputSlots{outputs}
         , m_IConnectableLayers(IConnectableLayers{layers.begin(), layers.end()})
@@ -79,6 +79,42 @@ SubgraphView::SubgraphView(SubgraphView::IConnectableLayers &&layers,
     };
     std::transform(layers.begin(), layers.end(), std::back_inserter(m_Layers), f);
 
+    m_InputSlots.resize(inputs.size());
+    m_IInputSlots.resize(inputs.size());
+    for (unsigned int i = 0; i < inputs.size(); i++)
+    {
+        m_InputSlots.at(i) = PolymorphicDowncast<InputSlot*>(inputs[i]);
+        m_IInputSlots.at(i) = inputs[i];
+    }
+
+    m_OutputSlots.resize(outputs.size());
+    m_IOutputSlots.resize(outputs.size());
+    for (unsigned int i = 0; i < outputs.size(); i++)
+    {
+        m_OutputSlots.at(i) = PolymorphicDowncast<OutputSlot*>(outputs[i]);
+        m_IOutputSlots.at(i) = outputs[i];
+    }
+
+    ArrangeBySortOrder();
+    CheckSubgraph();
+}
+
+/// IConnectable Duplication to maintain backwards compatibility
+SubgraphView::SubgraphView(SubgraphView::IConnectableLayers&& layers,
+                           SubgraphView::IInputSlots&& inputs,
+                           SubgraphView::IOutputSlots&& outputs,
+                           std::shared_ptr<SubgraphViewWorkingCopy> ptr)
+        : m_IInputSlots{inputs}
+        , m_IOutputSlots{outputs}
+        , m_IConnectableLayers(IConnectableLayers{layers.begin(), layers.end()})
+        , p_WorkingCopyImpl(std::move(ptr))
+{
+    // Cast from IConnectableLayer to Layer for backward compatibility
+    auto f = [](IConnectableLayer* value)
+    {
+        return PolymorphicDowncast<Layer*>(value);
+    };
+    std::transform(layers.begin(), layers.end(), std::back_inserter(m_Layers), f);
 
     m_InputSlots.resize(inputs.size());
     m_IInputSlots.resize(inputs.size());
@@ -366,5 +402,196 @@ void SubgraphView::ArrangeBySortOrder()
 
     m_IConnectableLayers.sort(compareIConnectableLayerPriority);
 }
+
+struct SubgraphView::SubgraphViewWorkingCopy
+{
+public:
+
+    SubgraphViewWorkingCopy() = default;
+    SubgraphViewWorkingCopy(Graph graph)
+                            : m_Graph(graph)
+    {};
+
+    Graph m_Graph;
+
+};
+
+SubgraphView SubgraphView::GetWorkingCopy()
+{
+    if (p_WorkingCopyImpl)
+    {
+        throw Exception("The SubgraphView calling GetWorkingCopy() is already a working copy. This function "
+                        "should be called on original SubgraphView obtained from OptimizeSubgraphView()");
+    }
+
+    // Create a cut down SubgraphView with underlying graph containing only the relevant layers.
+    // It needs its own underlying layers so that they can be replaced safely.
+    Graph newGraph = Graph();
+    std::unordered_map<const IConnectableLayer*, IConnectableLayer*> originalToClonedLayerMap;
+    std::list<armnn::IConnectableLayer*> originalSubgraphLayers = GetIConnectableLayers();
+
+    auto ptr = std::make_shared<SubgraphViewWorkingCopy>(std::move(newGraph));
+    SubgraphView::IInputSlots workingCopyInputs;
+
+    for (auto&& originalLayer : originalSubgraphLayers)
+    {
+        Layer* const layer = PolymorphicDowncast<const Layer*>(originalLayer)->Clone(ptr->m_Graph);
+        originalToClonedLayerMap.emplace(originalLayer, layer);
+    }
+
+    // Add IInputSlots to workingCopy
+    std::vector<const IConnectableLayer*> processed;
+    for (auto originalSubgraphInputSlot : GetIInputSlots())
+    {
+        const IConnectableLayer& originalSubgraphLayer =
+                PolymorphicDowncast<InputSlot*>(originalSubgraphInputSlot)->GetOwningLayer();
+
+        // Only need process Slots of layer once
+        if (std::find(processed.begin(), processed.end(), &originalSubgraphLayer) == processed.end())
+        {
+            IConnectableLayer* clonedLayer = originalToClonedLayerMap[&originalSubgraphLayer];
+
+            // Add the InputSlot to WorkingCopy InputSlots
+            for (unsigned int i = 0; i < clonedLayer->GetNumInputSlots(); i++)
+            {
+                workingCopyInputs.push_back(&clonedLayer->GetInputSlot(i));
+            }
+            processed.push_back(&originalSubgraphLayer);
+        }
+    }
+    // Empty processed
+    processed.clear();
+
+    for (auto originalSubgraphLayer : originalSubgraphLayers)
+    {
+        IConnectableLayer* const clonedLayer = originalToClonedLayerMap[originalSubgraphLayer];
+
+        // connect all cloned layers as per original subgraph
+        for (unsigned int i = 0; i < clonedLayer->GetNumOutputSlots(); i++)
+        {
+            // OutputLayers have no OutputSlots to be connected
+            if (clonedLayer->GetType() != LayerType::Output)
+            {
+                auto& outputSlot = clonedLayer->GetOutputSlot(i);
+                for (unsigned int k = 0; k < originalSubgraphLayer->GetNumOutputSlots(); k++)
+                {
+                    auto& originalOutputSlot = originalSubgraphLayer->GetOutputSlot(k);
+                    for (unsigned int j = 0; j < originalOutputSlot.GetNumConnections(); j++)
+                    {
+                        // nextLayer is the layer with IInputSlot connected to IOutputSlot we are working on
+                        const IConnectableLayer& nextLayer =
+                                originalOutputSlot.GetConnection(j)->GetOwningIConnectableLayer();
+
+                        // Check the layer is in our map and so has a clonedLayer
+                        if (originalToClonedLayerMap.find(&nextLayer) != originalToClonedLayerMap.end())
+                        {
+                            IConnectableLayer* newGraphTargetLayer = originalToClonedLayerMap[&nextLayer];
+
+                            IInputSlot& inputSlot =
+                                    newGraphTargetLayer->GetInputSlot(
+                                            PolymorphicDowncast<OutputSlot*>(
+                                                    &originalOutputSlot)->GetConnection(j)->GetSlotIndex());
+
+                            // Then make the connection
+                            outputSlot.Connect(inputSlot);
+                        }
+                    }
+                    // Copy the tensorInfo to the clonedOutputSlot
+                    outputSlot.SetTensorInfo(originalOutputSlot.GetTensorInfo());
+                }
+            }
+        }
+    }
+
+    SubgraphView::IOutputSlots workingCopyOutputs;
+
+    // Add IOutputSlots to workingCopy
+    for (auto outputSlot : GetIOutputSlots())
+    {
+
+        const IConnectableLayer& originalSubgraphLayer = outputSlot->GetOwningIConnectableLayer();
+
+        // OutputLayers have no OutputSlots to be connected
+        // Only need process Slots of layer once
+        if (originalSubgraphLayer.GetType() != LayerType::Output &&
+            std::find(processed.begin(), processed.end(), &originalSubgraphLayer) == processed.end())
+        {
+            IConnectableLayer* clonedLayer = originalToClonedLayerMap[&originalSubgraphLayer];
+
+            // Add the OutputSlot to WorkingCopy InputSlots
+            for (unsigned int i = 0; i < clonedLayer->GetNumOutputSlots(); i++)
+            {
+                workingCopyOutputs.push_back(&clonedLayer->GetOutputSlot(i));
+            }
+            processed.push_back(&originalSubgraphLayer);
+        }
+    }
+    processed.clear();
+
+    SubgraphView::IConnectableLayers workingCopyLayers;
+    for (auto& pair : originalToClonedLayerMap)
+    {
+        workingCopyLayers.push_back(pair.second);
+    }
+
+    return {std::move(workingCopyLayers),
+            std::move(workingCopyInputs),
+            std::move(workingCopyOutputs),
+            ptr};
+}
+
+void SubgraphView::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer)
+{
+    ARMNN_ASSERT(substituteLayer != nullptr);
+    SubgraphView substituteSubgraph(substituteLayer);
+
+    SubstituteSubgraph(subgraph, substituteSubgraph);
+}
+
+void SubgraphView::SubstituteSubgraph(SubgraphView& patternSubgraph, const SubgraphView& substituteSubgraph)
+{
+    if (!p_WorkingCopyImpl)
+    {
+        throw NullPointerException("The SubgraphView calling SubstituteSubgraphView is not a working copy. "
+                                   "Call this function on SubgraphView returned from SubgraphView::GetWorkingCopy()");
+    }
+
+    // Add substitute layer to the Main graph i.e. graph in p_WorkingCopyImpl
+    auto workingCopyGraph = &p_WorkingCopyImpl->m_Graph;
+    substituteSubgraph.ForEachIConnectableLayer([workingCopyGraph](IConnectableLayer* iConnectableLayer)
+                                                {
+                                                    // Search WorkingCopy Graph for substituteLayer and add if missing
+                                                    if (std::find(std::begin(workingCopyGraph->m_Layers),
+                                                                  std::end(workingCopyGraph->m_Layers),
+                                                                  iConnectableLayer) ==
+                                                        std::end(workingCopyGraph->m_Layers))
+                                                    {
+                                                        auto layer = PolymorphicDowncast<Layer*>(iConnectableLayer);
+
+                                                        layer->Reparent(*workingCopyGraph,
+                                                                        (workingCopyGraph->m_Layers).end());
+
+                                                        workingCopyGraph->m_LayersInOrder = false;
+                                                    }
+                                                });
+
+    // Replace the old connections with connections to new layer
+    workingCopyGraph->ReplaceSubgraphConnections(patternSubgraph, substituteSubgraph);
+
+    // Update input/outputSlot pointers
+    m_IInputSlots = std::move(substituteSubgraph.m_IInputSlots);
+    m_IOutputSlots = std::move(substituteSubgraph.m_IOutputSlots);
+
+    // Delete the old layers.
+    workingCopyGraph->EraseSubgraphLayers(patternSubgraph);
+
+    // Sort
+    workingCopyGraph->TopologicalSort();
+
+    // Update SubgraphView layer pointers to match those of the internal WorkingCopy layer pointers
+    m_IConnectableLayers = IConnectableLayers{ workingCopyGraph->m_Layers.begin(),
+                                               workingCopyGraph->m_Layers.end() };
+}
+
 
 } // namespace armnn

@@ -151,7 +151,27 @@ public:
 
     void Clear();
 
+    /// This method returns a copy of the original SubgraphView provided by OptimizeSubgraphView with a separate
+    /// underlying graph from the main ArmNN graph.
+    /// Backend users should edit this working copy and then add it as a SubstitutionPair, along with original
+    /// SubgraphView, to the OptimizationViews returned by OptimizeSubgraphView.
+    /// ArmNN will then decide on whether or not to carry out Substitution of the two SubgraphViews.
+    SubgraphView GetWorkingCopy();
+
+    /// These methods should be called on a working copy subgraph created from GetWorkingCopy.
+    /// They take a SubgraphView pattern to replace and the substitute layer or subgraphView to substitute in.
+    void SubstituteSubgraph(SubgraphView&, IConnectableLayer*);
+    void SubstituteSubgraph(SubgraphView&, const SubgraphView&);
+
 private:
+    struct SubgraphViewWorkingCopy;
+
+    /// Constructs a sub-graph with the given arguments.
+    SubgraphView(IConnectableLayers&& layers,
+                 IInputSlots&& inputs,
+                 IOutputSlots&& outputs,
+                 std::shared_ptr<SubgraphViewWorkingCopy> ptr);
+
     void CheckSubgraph();
 
     /// Arrange the order of layers topologically so that nodes can be visited in valid order
@@ -168,5 +188,11 @@ private:
     /// The list of pointers to the layers of the parent graph.
     Layers m_Layers;
     IConnectableLayers m_IConnectableLayers;
+
+    /// Pointer to internal graph implementation. This stores a working copy of a graph, separate from the main
+    /// ArmNN graph, for use by Backends so that they can edit it and add as a SubstitutionPair to OptimizationViews
+    /// along with the original SubgraphView.
+    /// ArmNN will then decide on whether or not to substitute in the provided SubgraphView working copy.
+    std::shared_ptr<SubgraphViewWorkingCopy> p_WorkingCopyImpl;
 };
 } // namespace armnn

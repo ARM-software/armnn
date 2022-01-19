@@ -280,6 +280,8 @@ private:
     /// Also verifies weights and bias are set for FullyConnected layers.
     void ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
                                                    unsigned int slotIndex);
+
+    friend class SubgraphView;
 };
 
 /// Common base class for layers in the graph.

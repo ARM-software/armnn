@@ -2857,7 +2857,7 @@ IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor&
     {
         layer->SetBackendId(backend.value());
     }
-    else
+    else if (layer->GetBackendHint().has_value())
     {
         layer->SetBackendId(layer->GetBackendHint().value());
     }

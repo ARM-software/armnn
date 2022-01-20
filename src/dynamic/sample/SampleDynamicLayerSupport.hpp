@@ -23,6 +23,13 @@ public:
 
     bool IsOutputSupported(const armnn::TensorInfo& output,
                            armnn::Optional<std::string&> reasonIfUnsupported) const override;
+
+    bool IsLayerSupported(const armnn::LayerType& type,
+                          const std::vector<armnn::TensorInfo>& infos,
+                          const armnn::BaseDescriptor& descriptor,
+                          const armnn::Optional<armnn::LstmInputParamsInfo>& lstmParamsInfo,
+                          const armnn::Optional<armnn::QuantizedLstmInputParamsInfo>& quantizedLstmParamsInfo,
+                          armnn::Optional<std::string&> reasonIfUnsupported = armnn::EmptyOptional()) const override;
 };
 
 } // namespace sdb

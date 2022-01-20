@@ -12,6 +12,31 @@
 namespace sdb // sample dynamic backend
 {
 
+bool SampleDynamicLayerSupport::IsLayerSupported(const armnn::LayerType& type,
+                                                 const std::vector<armnn::TensorInfo>& infos,
+                                                 const armnn::BaseDescriptor& /*descriptor*/,
+                                                 const armnn::Optional<armnn::LstmInputParamsInfo>&
+                                                     /*lstmParamsInfo*/,
+                                                 const armnn::Optional<armnn::QuantizedLstmInputParamsInfo>&
+                                                     /*quantizedLstmParamsInfo*/,
+                                                 armnn::Optional<std::string&> reasonIfUnsupported) const
+{
+    switch (type)
+    {
+        case armnn::LayerType::Input:
+            return IsInputSupported(infos[0], reasonIfUnsupported);
+        case armnn::LayerType::Output:
+            return IsOutputSupported(infos[0], reasonIfUnsupported);
+        case armnn::LayerType::Addition:
+            return IsAdditionSupported(infos[0],
+                                       infos[1],
+                                       infos[2],
+                                       reasonIfUnsupported);
+        default:
+            return false;
+    }
+}
+
 bool SampleDynamicLayerSupport::IsInputSupported(const armnn::TensorInfo& input,
                                                  armnn::Optional<std::string&> reasonIfUnsupported) const
 {

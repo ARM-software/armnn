@@ -1535,10 +1535,10 @@ void CreateSampleDynamicBackendTestImpl()
     TensorInfo weightInfo(weightShape, DataType::Float32);
     Convolution2dDescriptor convolution2dDescriptor;
     std::vector<TensorInfo> infos = {inputInfo, outputInfo, weightInfo, TensorInfo()};
-    bool referenceConvolution2dSupported =
-             referenceLayerSupport->IsLayerSupported(LayerType::Convolution2d,
-                                                     infos,
-                                                     convolution2dDescriptor);
+    bool sampleConvolution2dSupported =
+             sampleLayerSupport->IsLayerSupported(LayerType::Convolution2d,
+                                                  infos,
+                                                  convolution2dDescriptor);
     CHECK(!sampleConvolution2dSupported);
 
     // Test the backend instance by creating a workload

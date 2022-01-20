@@ -7,6 +7,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/backends/ILayerSupport.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -581,6 +582,726 @@ bool ILayerSupport::IsLayerSupported(const LayerType& type,
         default:
             return false;
     }
+}
+
+bool ILayerSupport::IsActivationSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const ActivationDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsAdditionSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const ArgMinMaxDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,
+                                                  const TensorInfo& output,
+                                                  const TensorInfo& mean,
+                                                  const TensorInfo& var,
+                                                  const TensorInfo& beta,
+                                                  const TensorInfo& gamma,
+                                                  const BatchNormalizationDescriptor& descriptor,
+                                                  Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, mean, var, beta, gamma, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsBatchToSpaceNdSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const BatchToSpaceNdDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsCastSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsChannelShuffleSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const ChannelShuffleDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsComparisonSupported(const TensorInfo& input0,
+                                          const TensorInfo& input1,
+                                          const TensorInfo& output,
+                                          const ComparisonDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
+                                      const TensorInfo& output,
+                                      const OriginsDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(inputs, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConstantSupported(const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConvertBf16ToFp32Supported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConvertFp32ToBf16Supported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConvertFp32ToFp16Supported(const TensorInfo& input,
+                                                 const TensorInfo& output,
+                                                 Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConvolution2dSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const Convolution2dDescriptor& descriptor,
+                                             const TensorInfo& weights,
+                                             const Optional<TensorInfo>& biases,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, weights, biases, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsConvolution3dSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const Convolution3dDescriptor& descriptor,
+                                             const TensorInfo& weights,
+                                             const Optional<TensorInfo>& biases,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, weights, biases, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsDebugSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsDepthToSpaceSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const DepthToSpaceDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsDepthwiseConvolutionSupported(
+        const TensorInfo& input,
+        const TensorInfo& output,
+        const DepthwiseConvolution2dDescriptor& descriptor,
+        const TensorInfo& weights,
+        const Optional<TensorInfo>& biases,
+        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input,
+                 output,
+                 descriptor,
+                 weights,
+                 biases,
+                 reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsDequantizeSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
+                                                    const TensorInfo& scores,
+                                                    const TensorInfo& anchors,
+                                                    const TensorInfo& detectionBoxes,
+                                                    const TensorInfo& detectionClasses,
+                                                    const TensorInfo& detectionScores,
+                                                    const TensorInfo& numDetections,
+                                                    const DetectionPostProcessDescriptor& descriptor,
+                                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(boxEncodings,
+                 scores,
+                 anchors,
+                 detectionBoxes,
+                 detectionClasses,
+                 detectionScores,
+                 numDetections,
+                 descriptor,
+                 reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsDilatedDepthwiseConvolutionSupported(
+        const TensorInfo& input,
+        const TensorInfo& output,
+        const DepthwiseConvolution2dDescriptor& descriptor,
+        const TensorInfo& weights,
+        const Optional<TensorInfo>& biases,
+        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, weights, biases, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsDivisionSupported(const TensorInfo& input0,
+                                        const TensorInfo& input1,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const ElementwiseUnaryDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsFakeQuantizationSupported(const TensorInfo& input,
+                                                const FakeQuantizationDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsFillSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    const FillDescriptor& descriptor,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsFloorSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const TensorInfo& weights,
+                                              const TensorInfo& biases,
+                                              const FullyConnectedDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, weights, biases, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsGatherSupported(const TensorInfo& input0,
+                                      const TensorInfo& input1,
+                                      const TensorInfo& output,
+                                      const GatherDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsInputSupported(const TensorInfo& input,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsInstanceNormalizationSupported(
+        const TensorInfo& input,
+        const TensorInfo& output,
+        const InstanceNormalizationDescriptor& descriptor,
+        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsL2NormalizationSupported(const TensorInfo& input,
+                                               const TensorInfo& output,
+                                               const L2NormalizationDescriptor& descriptor,
+                                               Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsLogicalBinarySupported(const TensorInfo& input0,
+                                             const TensorInfo& input1,
+                                             const TensorInfo& output,
+                                             const LogicalBinaryDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsLogicalUnarySupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const ElementwiseUnaryDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const LogSoftmaxDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsLstmSupported(const TensorInfo& input,
+                                    const TensorInfo& outputStateIn,
+                                    const TensorInfo& cellStateIn,
+                                    const TensorInfo& scratchBuffer,
+                                    const TensorInfo& outputStateOut,
+                                    const TensorInfo& cellStateOut,
+                                    const TensorInfo& output,
+                                    const LstmDescriptor& descriptor,
+                                    const LstmInputParamsInfo& paramsInfo,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input,
+                 outputStateIn,
+                 cellStateIn,
+                 scratchBuffer,
+                 outputStateOut,
+                 cellStateOut,
+                 output,
+                 descriptor,
+                 paramsInfo,
+                 reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsMaximumSupported(const TensorInfo& input0,
+                                       const TensorInfo& input1,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsMeanSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    const MeanDescriptor& descriptor,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsMemCopySupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsMemImportSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsMergeSupported(const TensorInfo& input0,
+                                     const TensorInfo& input1,
+                                     const TensorInfo& output,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsMinimumSupported(const TensorInfo& input0,
+                                       const TensorInfo& input1,
+                                       const TensorInfo& output,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsMultiplicationSupported(const TensorInfo& input0,
+                                              const TensorInfo& input1,
+                                              const TensorInfo& output,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsNormalizationSupported(const TensorInfo& input,
+                                             const TensorInfo& output,
+                                             const NormalizationDescriptor& descriptor,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsOutputSupported(const TensorInfo& output,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsPadSupported(const TensorInfo& input,
+                                   const TensorInfo& output,
+                                   const PadDescriptor& descriptor,
+                                   Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsPermuteSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const PermuteDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsPooling2dSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const Pooling2dDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsPooling3dSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const Pooling3dDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsPreCompiledSupported(const TensorInfo& input,
+                                           const PreCompiledDescriptor& descriptor,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsPreluSupported(const TensorInfo& input,
+                                     const TensorInfo& alpha,
+                                     const TensorInfo& output,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, alpha, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsQuantizeSupported(const TensorInfo& input,
+                                        const TensorInfo& output,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsQLstmSupported(const TensorInfo& input,
+                                     const TensorInfo& previousOutputIn,
+                                     const TensorInfo& previousCellStateIn,
+                                     const TensorInfo& outputStateOut,
+                                     const TensorInfo& cellStateOut,
+                                     const TensorInfo& output,
+                                     const QLstmDescriptor& descriptor,
+                                     const LstmInputParamsInfo& paramsInfo,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input,
+                 previousOutputIn,
+                 previousCellStateIn,
+                 outputStateOut,
+                 cellStateOut,
+                 output,
+                 descriptor,
+                 paramsInfo,
+                 reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsQuantizedLstmSupported(const TensorInfo& input,
+                                             const TensorInfo& previousCellStateIn,
+                                             const TensorInfo& previousOutputIn,
+                                             const TensorInfo& cellStateOut,
+                                             const TensorInfo& output,
+                                             const QuantizedLstmInputParamsInfo& paramsInfo,
+                                             Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input,
+                 previousCellStateIn,
+                 previousOutputIn,
+                 cellStateOut,
+                 output,
+                 paramsInfo,
+                 reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsRankSupported(const TensorInfo& input,
+                                    const TensorInfo& output,
+                                    Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsReduceSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const ReduceDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsReshapeSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const ReshapeDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsResizeSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const ResizeDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsShapeSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsSliceSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     const SliceDescriptor& descriptor,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsSoftmaxSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const SoftmaxDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsSpaceToBatchNdSupported(const TensorInfo& input,
+                                              const TensorInfo& output,
+                                              const SpaceToBatchNdDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsSpaceToDepthSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const SpaceToDepthDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsSplitterSupported(const TensorInfo& input,
+                                        const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                                        const ViewsDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, outputs, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsStackSupported(const std::vector<const TensorInfo*>& inputs,
+                                     const TensorInfo& output,
+                                     const StackDescriptor& descriptor,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(inputs, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsStandInSupported(const std::vector<const TensorInfo*>& inputs,
+                                       const std::vector<const TensorInfo*>& outputs,
+                                       const StandInDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(inputs, outputs, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsStridedSliceSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const StridedSliceDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsSubtractionSupported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
+                                           const TensorInfo& output,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsSwitchSupported(const TensorInfo& input0,
+                                      const TensorInfo& input1,
+                                      const TensorInfo& output0,
+                                      const TensorInfo& output1,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input0, input1, output0, output1, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsTransposeConvolution2dSupported(
+        const TensorInfo& input,
+        const TensorInfo& output,
+        const TransposeConvolution2dDescriptor& descriptor,
+        const TensorInfo& weights,
+        const Optional<TensorInfo>& biases,
+        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, weights, biases, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsTransposeSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const TransposeDescriptor& descriptor,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input, output, descriptor, reasonIfUnsupported);
+    return false;
+}
+
+bool ILayerSupport::IsUnidirectionalSequenceLstmSupported(
+        const TensorInfo& input,
+        const TensorInfo& outputStateIn,
+        const TensorInfo& cellStateIn,
+        const TensorInfo& output,
+        const Optional<TensorInfo>& hiddenStateOutput,
+        const Optional<TensorInfo>& cellStateOutput,
+        const LstmDescriptor& descriptor,
+        const LstmInputParamsInfo& paramsInfo,
+        Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(input,
+                 outputStateIn,
+                 cellStateIn,
+                 output,
+                 hiddenStateOutput,
+                 cellStateOutput,
+                 descriptor,
+                 paramsInfo,
+                 reasonIfUnsupported);
+    return false;
 }
 ARMNN_NO_DEPRECATE_WARN_END
 }

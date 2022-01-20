@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c48a3e5431ac48fbbd53522e34c99ea4f4ce3e41" #Decouple CpuSoftmaxKernel
+DEFAULT_CLFRAMEWORKREVISION="d5c496d87e3b446532dd3dd163e9768de0daff4e" #Decouple CpuElementwiseKernel
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

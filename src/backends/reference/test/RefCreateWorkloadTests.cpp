@@ -1282,8 +1282,8 @@ static void RefCreateActivationWorkloadReplaceFunctionsTest()
     // new input and output tensor handlers are created and then replace in the workload
     shared_ptr<RefMemoryManager> memoryManager = make_shared<RefMemoryManager>();
     const RefTensorHandleFactory tensorHandleFactory(memoryManager);
-    TensorInfo inputInfo({2 , 2}, DataType::Float16);
-    TensorInfo outputInfo({2 , 2}, DataType::Float16);
+    TensorInfo inputInfo({2 , 2}, armnn::DataType::Float16);
+    TensorInfo outputInfo({2 , 2}, armnn::DataType::Float16);
     unique_ptr<ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
     unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
     unsigned int slot = 0;

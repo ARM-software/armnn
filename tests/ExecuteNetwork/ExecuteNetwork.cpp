@@ -154,7 +154,8 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
 
             std::copy(tensorData.begin(), tensorData.end(), inputData);
         }
-        else if (params.m_InputTypes[inputIndex].compare("qsymms8") == 0)
+        else if (params.m_InputTypes[inputIndex].compare("qsymms8") == 0 ||
+                 params.m_InputTypes[inputIndex].compare("qasymms8") == 0)
         {
             auto inputData = tfLiteInterpreter->typed_tensor<int8_t>(input);
 
@@ -212,26 +213,6 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
                                                    dataFile,
                                                    [](const std::string& s)
                                                    { return armnn::numeric_cast<uint8_t>(std::stoi(s)); });
-
-            std::copy(tensorData.begin(), tensorData.end(), inputData);
-        }
-        else if (params.m_InputTypes[inputIndex].compare("qasymms8") == 0)
-        {
-            auto inputData = tfLiteInterpreter->typed_tensor<int8_t>(input);
-
-            if(inputData == NULL)
-            {
-                ARMNN_LOG(fatal) << "Input tensor is null, input type: "
-                                    "\"" << params.m_InputTypes[inputIndex] << "\" may be incorrect.";
-                return EXIT_FAILURE;
-            }
-
-            std::vector<int8_t> tensorData;
-            PopulateTensorWithDataGeneric<int8_t>(tensorData,
-                                                  inputSize,
-                                                  dataFile,
-                                                  [](const std::string& s)
-                                                  { return armnn::numeric_cast<int8_t>(std::stoi(s)); });
 
             std::copy(tensorData.begin(), tensorData.end(), inputData);
         }
@@ -339,7 +320,8 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
                     }
                 }
             }
-            else if (params.m_OutputTypes[outputIndex].compare("qsymms8") == 0)
+            else if (params.m_OutputTypes[outputIndex].compare("qsymms8") == 0 ||
+                     params.m_OutputTypes[outputIndex].compare("qasymms8") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<int8_t>(tfLiteDelegateOutputId);
                 if(tfLiteDelageOutputData == NULL)

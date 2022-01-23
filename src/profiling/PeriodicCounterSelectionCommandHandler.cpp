@@ -6,7 +6,7 @@
 #include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <armnn/Types.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 #include <fmt/format.h>
@@ -86,9 +86,9 @@ void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet&
         // Get the capture data
         uint32_t capturePeriod = captureData.GetCapturePeriod();
         // Validate that the capture period is within the acceptable range.
-        if (capturePeriod > 0  && capturePeriod < LOWEST_CAPTURE_PERIOD)
+        if (capturePeriod > 0  && capturePeriod < arm::pipe::LOWEST_CAPTURE_PERIOD)
         {
-            capturePeriod = LOWEST_CAPTURE_PERIOD;
+            capturePeriod = arm::pipe::LOWEST_CAPTURE_PERIOD;
         }
         const std::vector<uint16_t>& counterIds = captureData.GetCounterIds();
 

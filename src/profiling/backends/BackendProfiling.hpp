@@ -17,7 +17,7 @@ namespace profiling
 class BackendProfiling : public IBackendProfiling
 {
 public:
-    BackendProfiling(const IRuntime::CreationOptions& options,
+    BackendProfiling(const ProfilingOptions& options,
                      ProfilingService& profilingService,
                      const BackendId& backendId)
             : m_Options(options),
@@ -43,7 +43,7 @@ public:
     bool IsProfilingEnabled() const override;
 
 private:
-    IRuntime::CreationOptions m_Options;
+    ProfilingOptions m_Options;
     ProfilingService& m_ProfilingService;
     BackendId m_BackendId;
 };

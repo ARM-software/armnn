@@ -157,6 +157,7 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/VerificationHelpers.cpp \
         src/armnnUtils/Filesystem.cpp \
         src/armnnUtils/Processes.cpp \
+        src/armnnUtils/ProfilingOptionsConverter.cpp \
         src/armnnUtils/Threads.cpp \
         src/armnnUtils/Transpose.cpp \
         src/armnn/layers/ActivationLayer.cpp \
@@ -266,7 +267,7 @@ LOCAL_SRC_FILES := \
 
 LOCAL_STATIC_LIBRARIES := \
         libflatbuffers-framework \
-        arm_compute_library 
+        arm_compute_library
 
 LOCAL_SHARED_LIBRARIES := \
         liblog

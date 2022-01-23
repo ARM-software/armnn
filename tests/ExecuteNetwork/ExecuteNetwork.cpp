@@ -11,6 +11,7 @@
 #include <armnn/Logging.hpp>
 #include <armnnUtils/Filesystem.hpp>
 #include <armnnUtils/TContainer.hpp>
+#include <ProfilingOptionsConverter.hpp>
 #include <InferenceTest.hpp>
 
 #if defined(ARMNN_SERIALIZER)
@@ -90,7 +91,8 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
         // Create the Armnn Delegate
         // Populate a DelegateOptions from the ExecuteNetworkParams.
         armnnDelegate::DelegateOptions delegateOptions = params.ToDelegateOptions();
-        delegateOptions.SetExternalProfilingParams(runtimeOptions.m_ProfilingOptions);
+        delegateOptions.SetExternalProfilingParams(
+            ConvertExternalProfilingOptions(runtimeOptions.m_ProfilingOptions));
 
         std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
                 theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),

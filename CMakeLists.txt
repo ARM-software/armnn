@@ -106,6 +106,8 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/ParserPrototxtFixture.hpp
     src/armnnUtils/Processes.hpp
     src/armnnUtils/Processes.cpp
+    src/armnnUtils/ProfilingOptionsConverter.hpp
+    src/armnnUtils/ProfilingOptionsConverter.cpp
     src/armnnUtils/PrototxtConversions.hpp
     src/armnnUtils/PrototxtConversions.cpp
     src/armnnUtils/TensorIOUtils.hpp
@@ -178,6 +180,7 @@ list(APPEND armnn_sources
     include/armnn/Utils.hpp
     include/armnn/Version.hpp
     include/armnn/profiling/ISendTimelinePacket.hpp
+    include/armnn/profiling/ProfilingOptions.hpp
     include/armnn/utility/Assert.hpp
     include/armnn/utility/IgnoreUnused.hpp
     include/armnn/utility/NumericCast.hpp

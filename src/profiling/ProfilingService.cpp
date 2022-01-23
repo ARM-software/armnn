@@ -38,7 +38,7 @@ void ProfilingService::ResetGuidGenerator()
     m_GuidGenerator.Reset();
 }
 
-void ProfilingService::ResetExternalProfilingOptions(const ExternalProfilingOptions& options,
+void ProfilingService::ResetExternalProfilingOptions(const armnn::profiling::ProfilingOptions& options,
                                                      bool resetProfilingService)
 {
     // Update the profiling options
@@ -60,7 +60,7 @@ bool ProfilingService::IsProfilingEnabled() const
 }
 
 ProfilingState ProfilingService::ConfigureProfilingService(
-        const ExternalProfilingOptions& options,
+        const armnn::profiling::ProfilingOptions& options,
         bool resetProfilingService)
 {
     ResetExternalProfilingOptions(options, resetProfilingService);

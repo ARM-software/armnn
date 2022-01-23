@@ -10,6 +10,7 @@
 #include "MockBackendId.hpp"
 #include "PeriodicCounterCapture.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
+#include "ProfilingOptionsConverter.hpp"
 #include "ProfilingStateMachine.hpp"
 #include "ProfilingUtils.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
@@ -20,6 +21,7 @@
 #include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/profiling/ISendTimelinePacket.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
 
 #include <doctest/doctest.h>
 #include <vector>
@@ -140,7 +142,8 @@ TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
     CHECK(counterMap.GetGlobalId(4, mockId) == 9 + shiftedId);
     CHECK(counterMap.GetGlobalId(5, mockId) == 10 + shiftedId);
     options.m_ProfilingOptions.m_EnableProfiling = false;
-    GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+    GetProfilingService(&runtime).ResetExternalProfilingOptions(
+        ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 }
 
 TEST_CASE("TestBackendCounters")
@@ -155,8 +158,8 @@ TEST_CASE("TestBackendCounters")
     const armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
     const armnn::BackendId gpuAccId(armnn::Compute::GpuAcc);
 
-    armnn::IRuntime::CreationOptions options;
-    options.m_ProfilingOptions.m_EnableProfiling = true;
+    ProfilingOptions options;
+    options.m_EnableProfiling = true;
 
     armnn::profiling::ProfilingService profilingService;
 
@@ -403,8 +406,8 @@ TEST_CASE("TestBackendCounterLogging")
     const armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
     const armnn::BackendId gpuAccId(armnn::Compute::GpuAcc);
 
-    armnn::IRuntime::CreationOptions options;
-    options.m_ProfilingOptions.m_EnableProfiling = true;
+    ProfilingOptions options;
+    options.m_EnableProfiling = true;
 
     armnn::profiling::ProfilingService profilingService;
 
@@ -459,7 +462,8 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     armnn::profiling::ProfilingService profilingService;
-    profilingService.ConfigureProfilingService(options.m_ProfilingOptions, true);
+    profilingService.ConfigureProfilingService(
+        ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 
     armnn::MockBackendInitialiser initialiser;
     // Create a runtime. During this the mock backend will be registered and context returned.
@@ -483,7 +487,8 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
 
     // Reset the profiling servie after the test.
     options.m_ProfilingOptions.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+    profilingService.ResetExternalProfilingOptions(
+        ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 }
 
 TEST_CASE("GetProfilingGuidGenerator")

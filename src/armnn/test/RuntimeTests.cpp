@@ -6,9 +6,11 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
+#include <ProfilingOptionsConverter.hpp>
 #include <Processes.hpp>
 #include <Runtime.hpp>
 #include <armnn/TypesUtils.hpp>
+
 
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <test/ProfilingTestUtils.hpp>
@@ -644,7 +646,8 @@ TEST_CASE("ProfilingEnableCpuRef")
     options.m_ProfilingOptions.m_TimelineEnabled = true;
 
     armnn::RuntimeImpl runtime(options);
-    GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, false);
+    GetProfilingService(&runtime).ResetExternalProfilingOptions(
+        ConvertExternalProfilingOptions(options.m_ProfilingOptions), false);
 
     profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);

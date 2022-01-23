@@ -15,6 +15,7 @@
 #include "ICounterRegistry.hpp"
 #include "ICounterValues.hpp"
 #include <armnn/profiling/ILocalPacketHandler.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
 #include "IProfilingService.hpp"
 #include "IReportStructure.hpp"
 #include "PeriodicCounterCapture.hpp"
@@ -50,7 +51,6 @@ static const uint16_t MAX_ARMNN_COUNTER     = INFERENCES_RUN;
 class ProfilingService : public IReadWriteCounterValues, public IProfilingService, public INotifyBackends
 {
 public:
-    using ExternalProfilingOptions = IRuntime::CreationOptions::ExternalProfilingOptions;
     using IProfilingConnectionFactoryPtr = std::unique_ptr<IProfilingConnectionFactory>;
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
     using CounterIndices = std::vector<std::atomic<uint32_t>*>;
@@ -149,8 +149,9 @@ public:
     ~ProfilingService();
 
     // Resets the profiling options, optionally clears the profiling service entirely
-    void ResetExternalProfilingOptions(const ExternalProfilingOptions& options, bool resetProfilingService = false);
-    ProfilingState ConfigureProfilingService(const ExternalProfilingOptions& options,
+    void ResetExternalProfilingOptions(const armnn::profiling::ProfilingOptions& options,
+                                       bool resetProfilingService = false);
+    ProfilingState ConfigureProfilingService(const armnn::profiling::ProfilingOptions& options,
                                              bool resetProfilingService = false);
 
 
@@ -239,7 +240,7 @@ private:
     void CheckCounterUid(uint16_t counterUid) const;
 
     // Profiling service components
-    ExternalProfilingOptions           m_Options;
+    ProfilingOptions                   m_Options;
     std::atomic<bool>                  m_TimelineReporting;
     CounterDirectory                   m_CounterDirectory;
     CounterIdMap                       m_CounterIdMap;

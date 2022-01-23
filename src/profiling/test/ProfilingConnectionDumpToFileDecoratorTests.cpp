@@ -78,7 +78,7 @@ TEST_SUITE("ProfilingConnectionDumpToFileDecoratorTests")
 {
 TEST_CASE("DumpIncomingInvalidFile")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_IncomingCaptureFile = "/";
     options.m_OutgoingCaptureFile =  "";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
@@ -87,7 +87,7 @@ TEST_CASE("DumpIncomingInvalidFile")
 
 TEST_CASE("DumpIncomingInvalidFileIgnoreErrors")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_IncomingCaptureFile = "/";
     options.m_OutgoingCaptureFile =  "";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, true);
@@ -98,7 +98,7 @@ TEST_CASE("DumpIncomingValidFile")
 {
     fs::path fileName = armnnUtils::Filesystem::NamedTempFile("Armnn-DumpIncomingValidFileTest-TempFile");
 
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_IncomingCaptureFile = fileName.string();
     options.m_OutgoingCaptureFile =  "";
 
@@ -122,7 +122,7 @@ TEST_CASE("DumpIncomingValidFile")
 
 TEST_CASE("DumpOutgoingInvalidFile")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_IncomingCaptureFile = "";
     options.m_OutgoingCaptureFile = "/";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
@@ -131,7 +131,7 @@ TEST_CASE("DumpOutgoingInvalidFile")
 
 TEST_CASE("DumpOutgoingInvalidFileIgnoreErrors")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_IncomingCaptureFile = "";
     options.m_OutgoingCaptureFile = "/";
 
@@ -146,7 +146,7 @@ TEST_CASE("DumpOutgoingValidFile")
 {
     fs::path fileName = armnnUtils::Filesystem::NamedTempFile("Armnn-DumpOutgoingValidFileTest-TempFile");
 
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_IncomingCaptureFile = "";
     options.m_OutgoingCaptureFile = fileName.string();
 

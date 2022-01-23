@@ -7,6 +7,7 @@
 
 #include <BufferManager.hpp>
 #include <ProfilingService.hpp>
+#include "ProfilingOptionsConverter.hpp"
 #include <ProfilingUtils.hpp>
 #include <SendTimelinePacket.hpp>
 #include <armnnUtils/Threads.hpp>
@@ -430,7 +431,8 @@ TEST_CASE("GetGuidsFromProfilingService")
     armnn::RuntimeImpl runtime(options);
     armnn::profiling::ProfilingService profilingService(runtime);
 
-    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+    profilingService.ResetExternalProfilingOptions(
+        ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
     ProfilingStaticGuid staticGuid = profilingService.GetStaticId("dummy");
     std::hash<std::string> hasher;
     uint64_t hash = static_cast<uint64_t>(hasher("dummy"));
@@ -446,7 +448,7 @@ TEST_CASE("GetGuidsFromProfilingService")
 
 TEST_CASE("GetTimelinePackerWriterFromProfilingService")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);

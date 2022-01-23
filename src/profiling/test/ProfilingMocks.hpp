@@ -163,7 +163,7 @@ private:
 class MockProfilingConnectionFactory : public IProfilingConnectionFactory
 {
 public:
-    IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override
+    IProfilingConnectionPtr GetProfilingConnection(const ProfilingOptions& options) const override
     {
         IgnoreUnused(options);
         return std::make_unique<MockProfilingConnection>();

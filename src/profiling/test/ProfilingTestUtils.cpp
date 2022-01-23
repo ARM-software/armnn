@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "ProfilingOptionsConverter.hpp"
 #include "ProfilingTestUtils.hpp"
 #include "ProfilingUtils.hpp"
 
@@ -369,7 +370,8 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     options.m_ProfilingOptions.m_EnableProfiling = true;
     options.m_ProfilingOptions.m_TimelineEnabled = true;
     armnn::RuntimeImpl runtime(options);
-    GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, false);
+    GetProfilingService(&runtime).ResetExternalProfilingOptions(
+        ConvertExternalProfilingOptions(options.m_ProfilingOptions), false);
 
     profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);

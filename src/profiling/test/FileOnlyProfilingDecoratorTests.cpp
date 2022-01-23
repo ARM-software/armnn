@@ -6,6 +6,7 @@
 #include <armnnUtils/Filesystem.hpp>
 #include <ProfilingService.hpp>
 #include "ProfilingTestUtils.hpp"
+#include "ProfilingOptionsConverter.hpp"
 #include "PrintPacketHeaderHandler.hpp"
 #include <Runtime.hpp>
 #include "TestTimelinePacketHandler.hpp"
@@ -233,7 +234,8 @@ TEST_CASE("DumpOutgoingValidFileEndToEnd")
 
         // In order to flush the files we need to gracefully close the profiling service.
         options.m_ProfilingOptions.m_EnableProfiling = false;
-        GetProfilingService(&runtime).ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+        GetProfilingService(&runtime).ResetExternalProfilingOptions(
+            ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 
         // The output file size should be greater than 0.
         CHECK(fs::file_size(tempPath) > 0);

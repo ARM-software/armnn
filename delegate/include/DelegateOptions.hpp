@@ -8,6 +8,7 @@
 #include <armnn/ArmNN.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/Optional.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
 
 #include <set>
 #include <string>
@@ -229,10 +230,10 @@ public:
     const armnn::ProfilingDetailsMethod& GetInternalProfilingDetail() const { return m_InternalProfilingDetail; }
 
     void SetExternalProfilingParams(
-        const armnn::IRuntime::CreationOptions::ExternalProfilingOptions& externalProfilingParams)
+        const armnn::profiling::ProfilingOptions& externalProfilingParams)
         { m_ProfilingOptions = externalProfilingParams; }
 
-    const armnn::IRuntime::CreationOptions::ExternalProfilingOptions& GetExternalProfilingParams() const
+    const armnn::profiling::ProfilingOptions& GetExternalProfilingParams() const
         { return m_ProfilingOptions; }
 
     void SetSerializeToDot(const std::string& serializeToDotFile) { m_SerializeToDot = serializeToDotFile; }
@@ -264,7 +265,7 @@ private:
     armnn::OptimizerOptions m_OptimizerOptions;
 
     /// External profiling options.
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions m_ProfilingOptions;
+    armnn::profiling::ProfilingOptions m_ProfilingOptions;
 
     /// Internal profiling options.
     /// Indicates whether internal profiling is enabled or not.

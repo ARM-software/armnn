@@ -27,7 +27,7 @@ class ProfilingConnectionDumpToFileDecorator : public IProfilingConnection
 public:
 
     ProfilingConnectionDumpToFileDecorator(std::unique_ptr<IProfilingConnection> connection,
-                                           const IRuntime::CreationOptions::ExternalProfilingOptions& options,
+                                           const ProfilingOptions& options,
                                            bool ignoreFailures = false);
 
     ~ProfilingConnectionDumpToFileDecorator();
@@ -51,11 +51,11 @@ private:
 
     void Fail(const std::string& errorMessage);
 
-    std::unique_ptr<IProfilingConnection>               m_Connection;
-    IRuntime::CreationOptions::ExternalProfilingOptions m_Options;
-    std::ofstream                                       m_IncomingDumpFileStream;
-    std::ofstream                                       m_OutgoingDumpFileStream;
-    bool                                                m_IgnoreFileErrors;
+    std::unique_ptr<IProfilingConnection> m_Connection;
+    ProfilingOptions                      m_Options;
+    std::ofstream                         m_IncomingDumpFileStream;
+    std::ofstream                         m_OutgoingDumpFileStream;
+    bool                                  m_IgnoreFileErrors;
 };
 
 } // namespace profiling

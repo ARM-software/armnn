@@ -19,7 +19,7 @@ public:
     ProfilingConnectionFactory()  = default;
     ~ProfilingConnectionFactory() = default;
 
-    IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const override;
+    IProfilingConnectionPtr GetProfilingConnection(const ProfilingOptions& options) const override;
 };
 
 }    // namespace profiling

@@ -18,6 +18,7 @@
 #include <ICounterValues.hpp>
 #include <PeriodicCounterCapture.hpp>
 #include <PeriodicCounterSelectionCommandHandler.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
 #include <ProfilingStateMachine.hpp>
 #include <ProfilingUtils.hpp>
 #include <RegisterBackendCounters.hpp>
@@ -29,7 +30,6 @@
 #include <SendTimelinePacket.hpp>
 
 #include <armnn/Conversion.hpp>
-#include <armnn/Types.hpp>
 
 #include <armnn/Utils.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
@@ -656,7 +656,7 @@ TEST_CASE("CaptureDataMethods")
 
 TEST_CASE("CheckProfilingServiceDisabled")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -666,7 +666,7 @@ TEST_CASE("CheckProfilingServiceDisabled")
 
 TEST_CASE("CheckProfilingServiceCounterDirectory")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
@@ -689,7 +689,7 @@ TEST_CASE("CheckProfilingServiceCounterDirectory")
 
 TEST_CASE("CheckProfilingServiceCounterValues")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -1800,7 +1800,7 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
-    uint32_t period1     = armnn::LOWEST_CAPTURE_PERIOD;
+    uint32_t period1     = arm::pipe::LOWEST_CAPTURE_PERIOD;
     uint32_t dataLength1 = 8;
     uint32_t offset      = 0;
 
@@ -1848,7 +1848,7 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     CHECK(((headerWord0 >> 26) & 0x3F) == 0);             // packet family
     CHECK(((headerWord0 >> 16) & 0x3FF) == 4);            // packet id
     CHECK(headerWord1 == 8);                              // data length
-    CHECK(period ==  armnn::LOWEST_CAPTURE_PERIOD);       // capture period
+    CHECK(period ==  arm::pipe::LOWEST_CAPTURE_PERIOD);   // capture period
 
     uint16_t counterId = 0;
     offset += sizeOfUint32;
@@ -1875,7 +1875,7 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     const std::vector<uint16_t> counterIdsB = holder.GetCaptureData().GetCounterIds();
 
     // Value should have been pulled up from 9000 to LOWEST_CAPTURE_PERIOD.
-    CHECK(holder.GetCaptureData().GetCapturePeriod() ==  armnn::LOWEST_CAPTURE_PERIOD);
+    CHECK(holder.GetCaptureData().GetCapturePeriod() ==  arm::pipe::LOWEST_CAPTURE_PERIOD);
     CHECK(counterIdsB.size() == 0);
 
     readBuffer = mockBuffer.GetReadableBuffer();
@@ -1888,10 +1888,10 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     offset += sizeOfUint32;
     period = ReadUint32(readBuffer, offset);
 
-    CHECK(((headerWord0 >> 26) & 0x3F) == 0);         // packet family
-    CHECK(((headerWord0 >> 16) & 0x3FF) == 4);        // packet id
-    CHECK(headerWord1 == 4);                          // data length
-    CHECK(period == armnn::LOWEST_CAPTURE_PERIOD);    // capture period
+    CHECK(((headerWord0 >> 26) & 0x3F) == 0);          // packet family
+    CHECK(((headerWord0 >> 16) & 0x3FF) == 4);         // packet id
+    CHECK(headerWord1 == 4);                           // data length
+    CHECK(period == arm::pipe::LOWEST_CAPTURE_PERIOD); // capture period
 }
 
 TEST_CASE("CheckTimelineActivationAndDeactivation")
@@ -2549,7 +2549,7 @@ TEST_CASE("CheckProfilingServiceGoodConnectionAcknowledgedPacket")
     unsigned int streamMetadataPacketsize = GetStreamMetaDataPacketSize();
 
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2609,7 +2609,7 @@ TEST_CASE("CheckProfilingServiceGoodConnectionAcknowledgedPacket")
 TEST_CASE("CheckProfilingServiceGoodRequestCounterDirectoryPacket")
 {
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2667,7 +2667,7 @@ TEST_CASE("CheckProfilingServiceGoodRequestCounterDirectoryPacket")
 TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacketInvalidCounterUid")
 {
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2746,7 +2746,7 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacketInvalidCounterU
 TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCounters")
 {
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2811,7 +2811,7 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCounters")
 TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketSingleCounter")
 {
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2888,7 +2888,7 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketSingleCounter"
 TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketMultipleCounters")
 {
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -2967,7 +2967,7 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketMultipleCounte
 TEST_CASE("CheckProfilingServiceDisconnect")
 {
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3025,7 +3025,7 @@ TEST_CASE("CheckProfilingServiceDisconnect")
 TEST_CASE("CheckProfilingServiceGoodPerJobCounterSelectionPacket")
 {
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3092,7 +3092,7 @@ TEST_CASE("CheckProfilingServiceGoodPerJobCounterSelectionPacket")
 
 TEST_CASE("CheckConfigureProfilingServiceOn")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3106,7 +3106,7 @@ TEST_CASE("CheckConfigureProfilingServiceOn")
 
 TEST_CASE("CheckConfigureProfilingServiceOff")
 {
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
@@ -3121,7 +3121,7 @@ TEST_CASE("CheckProfilingServiceEnabled")
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3152,7 +3152,7 @@ TEST_CASE("CheckProfilingServiceEnabledRuntime")
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3194,7 +3194,7 @@ TEST_CASE("CheckProfilingServiceBadConnectionAcknowledgedPacket")
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3256,7 +3256,7 @@ TEST_CASE("CheckProfilingServiceBadRequestCounterDirectoryPacket")
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3320,7 +3320,7 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacket")
     StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::profiling::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3421,7 +3421,7 @@ TEST_CASE("CheckRegisterBackendCounters")
     armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
 
     // Reset the profiling service to the uninitialized state
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling          = true;
     ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
@@ -3468,12 +3468,12 @@ TEST_CASE("CheckRegisterBackendCounters")
 
 TEST_CASE("CheckCounterStatusQuery")
 {
-    armnn::IRuntime::CreationOptions options;
-    options.m_ProfilingOptions.m_EnableProfiling = true;
+    ProfilingOptions options;
+    options.m_EnableProfiling = true;
 
     // Reset the profiling service to the uninitialized state
     ProfilingService profilingService;
-    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+    profilingService.ResetExternalProfilingOptions(options, true);
 
     const armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
     const armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
@@ -3599,18 +3599,18 @@ TEST_CASE("CheckCounterStatusQuery")
     CHECK_EQ(inactiveCpuRefCounter.m_Enabled, false);
 
     // Reset the profiling service to stop any running thread
-    options.m_ProfilingOptions.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(options.m_ProfilingOptions, true);
+    options.m_EnableProfiling = false;
+    profilingService.ResetExternalProfilingOptions(options, true);
 }
 
 TEST_CASE("CheckRegisterCounters")
 {
-    armnn::IRuntime::CreationOptions options;
-    options.m_ProfilingOptions.m_EnableProfiling = true;
+    ProfilingOptions options;
+    options.m_EnableProfiling = true;
     MockBufferManager mockBuffer(1024);
 
     CaptureData captureData;
-    MockProfilingService mockProfilingService(mockBuffer, options.m_ProfilingOptions.m_EnableProfiling, captureData);
+    MockProfilingService mockProfilingService(mockBuffer, options.m_EnableProfiling, captureData);
     armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
 
     mockProfilingService.RegisterMapping(6, 0, cpuRefId);
@@ -3667,7 +3667,7 @@ TEST_CASE("CheckFileFormat") {
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
 
     // Create profiling options.
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    ProfilingOptions options;
     options.m_EnableProfiling = true;
     // Check the default value set to binary
     CHECK(options.m_FileFormat == "binary");

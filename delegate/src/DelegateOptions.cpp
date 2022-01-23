@@ -59,7 +59,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
     armnn::OptimizerOptions optimizerOptions;
     bool internalProfilingState = false;
     armnn::ProfilingDetailsMethod internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions extProfilingParams;
+    armnn::profiling::ProfilingOptions extProfilingParams;
     for (size_t i = 0; i < num_options; ++i)
     {
         // Process backends

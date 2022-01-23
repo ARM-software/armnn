@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <armnn/Types.hpp>
 #include <armnn/profiling/ILocalPacketHandler.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
 #include "ProfilingUtils.hpp"
 
 #include <common/include/Packet.hpp>
@@ -20,7 +20,7 @@ namespace profiling
 class RequestCountersPacketHandler : public ILocalPacketHandler
 {
 public:
-    explicit RequestCountersPacketHandler(uint32_t capturePeriod = LOWEST_CAPTURE_PERIOD) :
+    explicit RequestCountersPacketHandler(uint32_t capturePeriod = arm::pipe::LOWEST_CAPTURE_PERIOD) :
         m_CapturePeriod(capturePeriod),
         m_Connection(nullptr),
         m_CounterDirectoryMessageHeader(ConstructHeader(0, 2)) {}

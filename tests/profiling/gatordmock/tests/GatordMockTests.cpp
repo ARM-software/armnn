@@ -250,7 +250,7 @@ TEST_CASE("GatorDMockEndToEnd")
     arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false);
 
     // Enable the profiling service.
-    armnn::IRuntime::CreationOptions::ExternalProfilingOptions options;
+    armnn::profiling::ProfilingOptions options;
     options.m_EnableProfiling = true;
     options.m_TimelineEnabled = true;
 

@@ -7,7 +7,7 @@
 
 #include "IProfilingConnection.hpp"
 
-#include <armnn/IRuntime.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
 
 #include <memory>
 
@@ -20,12 +20,12 @@ namespace profiling
 class IProfilingConnectionFactory
 {
 public:
-    using ExternalProfilingOptions = IRuntime::CreationOptions::ExternalProfilingOptions;
+    using ExternalProfilingOptions = ProfilingOptions;
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
 
     virtual ~IProfilingConnectionFactory() {}
 
-    virtual IProfilingConnectionPtr GetProfilingConnection(const ExternalProfilingOptions& options) const = 0;
+    virtual IProfilingConnectionPtr GetProfilingConnection(const ProfilingOptions& options) const = 0;
 };
 
 } // namespace profiling

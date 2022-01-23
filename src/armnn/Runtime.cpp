@@ -14,6 +14,7 @@
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include <backendsCommon/memoryOptimizerStrategyLibrary/MemoryOptimizerStrategyLibrary.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+#include <ProfilingOptionsConverter.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 
@@ -474,7 +475,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
 
             unique_ptr<armnn::profiling::IBackendProfiling> profilingIface =
                 std::make_unique<armnn::profiling::BackendProfiling>(armnn::profiling::BackendProfiling(
-                    options, m_ProfilingService, id));
+                    ConvertExternalProfilingOptions(options.m_ProfilingOptions), m_ProfilingService, id));
 
             // Backends may also provide a profiling context. Ask for it now.
             auto profilingContext = backend->CreateBackendProfilingContext(options, profilingIface);
@@ -493,7 +494,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
 
     BackendRegistryInstance().SetProfilingService(m_ProfilingService);
     // pass configuration info to the profiling service
-    m_ProfilingService.ConfigureProfilingService(options.m_ProfilingOptions);
+    m_ProfilingService.ConfigureProfilingService(ConvertExternalProfilingOptions(options.m_ProfilingOptions));
     if (options.m_ProfilingOptions.m_EnableProfiling)
     {
         // try to wait for the profiling service to initialise

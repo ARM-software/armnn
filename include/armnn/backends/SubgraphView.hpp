@@ -62,7 +62,7 @@ public:
 
     /// Constructs a sub-graph with the given arguments.
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use constructor with arguments: "
-                                      "IConnectableLayers, IInputSlots and IOutputSlots", "22.08")
+                                      "IConnectableLayers, IInputSlots and IOutputSlots", "22.11")
     SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers);
 
     /// Constructs a sub-graph with the given arguments.
@@ -81,35 +81,35 @@ public:
     SubgraphView& operator=(SubgraphView&& other);
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIInputSlots() returning"
-                                      " public IInputSlots", "22.08")
+                                      " public IInputSlots", "22.11")
     const InputSlots& GetInputSlots() const;
     const IInputSlots& GetIInputSlots() const;
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIOutputSlots() returning"
-                                      " public IOutputSlots", "22.08")
+                                      " public IOutputSlots", "22.11")
     const OutputSlots& GetOutputSlots() const;
     const IOutputSlots& GetIOutputSlots() const;
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIConnectableLayers() "
-                                      "returning public IConnectableLayers", "22.08")
+                                      "returning public IConnectableLayers", "22.11")
     const Layers& GetLayers() const;
     const IConnectableLayers& GetIConnectableLayers() const;
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIInputSlot() returning public "
-                                      "IInputSlot", "22.08")
+                                      "IInputSlot", "22.11")
     const InputSlot* GetInputSlot(unsigned int index) const;
     const IInputSlot* GetIInputSlot(unsigned int index) const;
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIInputSlot() returning public "
-                                      "IInputSlot", "22.08")
+                                      "IInputSlot", "22.11")
     InputSlot* GetInputSlot(unsigned int index);
     IInputSlot* GetIInputSlot(unsigned int index);
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIOutputSlot() returning"
-                                      " public IOutputSlot", "22.08")
+                                      " public IOutputSlot", "22.11")
     const OutputSlot* GetOutputSlot(unsigned int index) const;
     const IOutputSlot* GetIOutputSlot(unsigned int index) const;
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIOutputSlot() returning"
-                                      " public IOutputSlot", "22.08")
+                                      " public IOutputSlot", "22.11")
     OutputSlot* GetOutputSlot(unsigned int index);
     IOutputSlot* GetIOutputSlot(unsigned int index);
 

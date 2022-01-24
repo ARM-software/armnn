@@ -21,25 +21,25 @@ public:
                           const Optional<QuantizedLstmInputParamsInfo>& quantizedLstmParamsInfo = EmptyOptional(),
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsActivationSupported(const TensorInfo& input,
                                const TensorInfo& output,
                                const ActivationDescriptor& descriptor,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsAdditionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsArgMinMaxSupported(const TensorInfo& input,
                               const TensorInfo& output,
                               const ArgMinMaxDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsBatchNormalizationSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const TensorInfo& mean,
@@ -49,37 +49,37 @@ public:
                                        const BatchNormalizationDescriptor& descriptor,
                                        Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsBatchToSpaceNdSupported(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const BatchToSpaceNdDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsCastSupported(const TensorInfo& input,
                          const TensorInfo& output,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsChannelShuffleSupported(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const ChannelShuffleDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsComparisonSupported(const TensorInfo& input0,
                                const TensorInfo& input1,
                                const TensorInfo& output,
                                const ComparisonDescriptor& descriptor,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsConcatSupported(const std::vector<const TensorInfo*> inputs,
                            const TensorInfo& output,
                            const OriginsDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsConstantSupported(const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
@@ -87,7 +87,7 @@ public:
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
@@ -96,13 +96,13 @@ public:
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsConvertFp32ToFp16Supported(
             const TensorInfo& input,
             const TensorInfo& output,
             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsConvolution2dSupported(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const Convolution2dDescriptor& descriptor,
@@ -110,7 +110,7 @@ public:
                                   const Optional<TensorInfo>& biases,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsConvolution3dSupported(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const Convolution3dDescriptor& descriptor,
@@ -118,18 +118,18 @@ public:
                                   const Optional<TensorInfo>& biases,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsDebugSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsDepthToSpaceSupported(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const DepthToSpaceDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsDepthwiseConvolutionSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          const DepthwiseConvolution2dDescriptor& descriptor,
@@ -137,7 +137,7 @@ public:
                                          const Optional<TensorInfo>& biases,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsDequantizeSupported(const TensorInfo& input,
                                const TensorInfo& output,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
@@ -152,7 +152,7 @@ public:
                                          const DetectionPostProcessDescriptor& descriptor,
                                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsDilatedDepthwiseConvolutionSupported(const TensorInfo& input,
                                                 const TensorInfo& output,
                                                 const DepthwiseConvolution2dDescriptor& descriptor,
@@ -161,35 +161,35 @@ public:
                                                 Optional<std::string&> reasonIfUnsupported =
                                                     EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsDivisionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsElementwiseUnarySupported(const TensorInfo& input,
                                      const TensorInfo& output,
                                      const ElementwiseUnaryDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsFakeQuantizationSupported(const TensorInfo& input,
                                      const FakeQuantizationDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     virtual bool IsFillSupported(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const FillDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsFloorSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsFullyConnectedSupported(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const TensorInfo& weights,
@@ -197,50 +197,50 @@ public:
                                    const FullyConnectedDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsGatherSupported(const TensorInfo& input0,
                            const TensorInfo& input1,
                            const TensorInfo& output,
                            const GatherDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsInputSupported(const TensorInfo& input,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsInstanceNormalizationSupported(
         const TensorInfo& input,
         const TensorInfo& output,
         const InstanceNormalizationDescriptor& descriptor,
         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsL2NormalizationSupported(const TensorInfo& input,
                                     const TensorInfo& output,
                                     const L2NormalizationDescriptor& descriptor,
                                     Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsLogicalBinarySupported(const TensorInfo& input0,
                                   const TensorInfo& input1,
                                   const TensorInfo& output,
                                   const LogicalBinaryDescriptor& descriptor,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsLogicalUnarySupported(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const ElementwiseUnaryDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsLogSoftmaxSupported(const TensorInfo& input,
                                const TensorInfo& output,
                                const LogSoftmaxDescriptor& descriptor,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsLstmSupported(const TensorInfo& input,
                          const TensorInfo& outputStateIn,
                          const TensorInfo& cellStateIn,
@@ -252,13 +252,13 @@ public:
                          const LstmInputParamsInfo& paramsInfo,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsMaximumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsMeanSupported(const TensorInfo& input,
                          const TensorInfo& output,
                          const MeanDescriptor& descriptor,
@@ -277,69 +277,69 @@ public:
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsMinimumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsMultiplicationSupported(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    const TensorInfo& output,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsNormalizationSupported(const TensorInfo& input,
                                   const TensorInfo& output,
                                   const NormalizationDescriptor& descriptor,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsOutputSupported(const TensorInfo& output,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsPadSupported(const TensorInfo& input,
                         const TensorInfo& output,
                         const PadDescriptor& descriptor,
                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsPermuteSupported(const TensorInfo& input,
                             const TensorInfo& output,
                             const PermuteDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsPooling2dSupported(const TensorInfo& input,
                               const TensorInfo& output,
                               const Pooling2dDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsPooling3dSupported(const TensorInfo& input,
                               const TensorInfo& output,
                               const Pooling3dDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsPreCompiledSupported(const TensorInfo& input,
                                 const PreCompiledDescriptor& descriptor,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsPreluSupported(const TensorInfo& input,
                           const TensorInfo& alpha,
                           const TensorInfo& output,
                           Optional<std::string &> reasonIfUnsupported) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsQuantizeSupported(const TensorInfo& input,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsQLstmSupported(const TensorInfo& input,
                           const TensorInfo& previousOutputIn,
                           const TensorInfo& previousCellStateIn,
@@ -358,24 +358,24 @@ public:
                                   const QuantizedLstmInputParamsInfo& paramsInfo,
                                   Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsRankSupported(const TensorInfo& input,
                          const TensorInfo& output,
                          Optional<std::string&> reasonIfUnsupported) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsReduceSupported(const TensorInfo& input,
                            const TensorInfo& output,
                            const ReduceDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsReshapeSupported(const TensorInfo& input,
                             const TensorInfo& output,
                             const ReshapeDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsResizeSupported(const TensorInfo& input,
                            const TensorInfo& output,
                            const ResizeDescriptor& descriptor,
@@ -385,37 +385,37 @@ public:
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsSliceSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           const SliceDescriptor& descriptor,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsSoftmaxSupported(const TensorInfo& input,
                             const TensorInfo& output,
                             const SoftmaxDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsSpaceToBatchNdSupported(const TensorInfo& input,
                                    const TensorInfo& output,
                                    const SpaceToBatchNdDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsSpaceToDepthSupported(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const SpaceToDepthDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsSplitterSupported(const TensorInfo& input,
                              const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
                              const ViewsDescriptor& descriptor,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsStackSupported(const std::vector<const TensorInfo*>& inputs,
                           const TensorInfo& output,
                           const StackDescriptor& descriptor,
@@ -426,26 +426,26 @@ public:
                             const StandInDescriptor& descriptor,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsStridedSliceSupported(const TensorInfo& input,
                                  const TensorInfo& output,
                                  const StridedSliceDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsSubtractionSupported(const TensorInfo& input0,
                                 const TensorInfo& input1,
                                 const TensorInfo& output,
                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsSwitchSupported(const TensorInfo& input0,
                            const TensorInfo& input1,
                            const TensorInfo& output0,
                            const TensorInfo& output1,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsTransposeConvolution2dSupported(
         const TensorInfo& input,
         const TensorInfo& output,
@@ -454,13 +454,13 @@ public:
         const Optional<TensorInfo>& biases,
         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsTransposeSupported(const TensorInfo& input,
                               const TensorInfo& output,
                               const TransposeDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.08")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "22.11")
     bool IsUnidirectionalSequenceLstmSupported(
         const TensorInfo& input,
         const TensorInfo& outputStateIn,

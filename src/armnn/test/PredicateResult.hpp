@@ -5,5 +5,5 @@
 
 #include <armnnTestUtils/PredicateResult.hpp>
 
-#pragma message("src/armnn/test/PredicateResult.hpp has been deprecated, it is due for removal in 22.08 release." \
+#pragma message("src/armnn/test/PredicateResult.hpp has been deprecated, it is due for removal in 22.11 release." \
                 " Please use public interface include/armnnTestUtils/PredicateResult.hpp")

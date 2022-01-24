@@ -9,7 +9,7 @@
 #include <armnnTestUtils/LayerTestResult.hpp>
 
 #pragma message("backendsCommon/test/layerTests/LayerTestResult.hpp has been deprecated, it is due for " \
-                "removal in 22.08 release. Please use public interface include/armnnTestUtils/LayerTestResult.hpp")
+                "removal in 22.11 release. Please use public interface include/armnnTestUtils/LayerTestResult.hpp")
 
 
 

@@ -5,5 +5,5 @@
 
 #include "../../armnnTestUtils/UnitTests.hpp"
 
-#pragma message("src/armnn/test/UnitTests.hpp has been deprecated, it is due for removal in 22.08 release." \
+#pragma message("src/armnn/test/UnitTests.hpp has been deprecated, it is due for removal in 22.11 release." \
                 " Please use from armnnTestUtils library, /src/armnnTestUtils/UnitTests.hpp")

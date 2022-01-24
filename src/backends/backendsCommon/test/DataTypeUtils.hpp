@@ -5,5 +5,5 @@
 
 #include "../../armnnTestUtils/DataTypeUtils.hpp"
 
-#pragma message("backendsCommon/test/DataTypeUtils.hpp has been deprecated, it is due for removal in 22.08 release." \
+#pragma message("backendsCommon/test/DataTypeUtils.hpp has been deprecated, it is due for removal in 22.11 release." \
                 " Please use from armnnTestUtils library, /src/armnnTestUtils/DataTypeUtils.hpp)

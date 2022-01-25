@@ -20,6 +20,7 @@ list(APPEND armnnClBackendUnitTests_sources
     ClWorkloadFactoryHelper.hpp
     DefaultAllocatorTests.cpp
     Fp16SupportTest.cpp
+    ICLTensorProxyTests.cpp
     OpenClTimerTest.cpp
 )
 

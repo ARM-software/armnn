@@ -19,22 +19,15 @@
 #include <arm_compute/core/TensorShape.h>
 #include <arm_compute/core/Coordinates.h>
 
+#include <cl/IClTensorHandle.hpp>
+
 #include <CL/cl_ext.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 
 namespace armnn
 {
 
-class IClImportTensorHandle : public IAclTensorHandle
-{
-public:
-    virtual arm_compute::ICLTensor& GetTensor() = 0;
-    virtual arm_compute::ICLTensor const& GetTensor() const = 0;
-    virtual arm_compute::DataType GetDataType() const = 0;
-    virtual void SetMemoryGroup(const std::shared_ptr<arm_compute::IMemoryGroup>& memoryGroup) = 0;
-};
-
-class ClImportTensorHandle : public IClImportTensorHandle
+class ClImportTensorHandle : public IClTensorHandle
 {
 public:
     ClImportTensorHandle(const TensorInfo& tensorInfo, MemorySourceFlags importFlags)
@@ -380,12 +373,12 @@ private:
     bool m_Imported;
 };
 
-class ClImportSubTensorHandle : public IClImportTensorHandle
+class ClImportSubTensorHandle : public IClTensorHandle
 {
 public:
-    ClImportSubTensorHandle(IClImportTensorHandle* parent,
-                      const arm_compute::TensorShape& shape,
-                      const arm_compute::Coordinates& coords)
+    ClImportSubTensorHandle(IClTensorHandle* parent,
+                            const arm_compute::TensorShape& shape,
+                            const arm_compute::Coordinates& coords)
     : m_Tensor(&parent->GetTensor(), shape, coords)
     {
         parentHandle = parent;

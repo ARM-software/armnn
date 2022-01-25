@@ -50,7 +50,7 @@ std::unique_ptr<ITensorHandle> ClImportTensorHandleFactory::CreateSubTensorHandl
     }
 
     return std::make_unique<ClImportSubTensorHandle>(
-        PolymorphicDowncast<IClImportTensorHandle*>(&parent), shape, coords);
+        PolymorphicDowncast<IClTensorHandle*>(&parent), shape, coords);
 }
 
 std::unique_ptr<ITensorHandle> ClImportTensorHandleFactory::CreateTensorHandle(const TensorInfo& tensorInfo) const

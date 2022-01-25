@@ -44,6 +44,8 @@ if(ARMCOMPUTECL)
         ClTensorHandleFactory.hpp
         ClWorkloadFactory.cpp
         ClWorkloadFactory.hpp
+        IClTensorHandle.hpp
+        ICLTensorProxy.hpp
         OpenClTimer.cpp
         OpenClTimer.hpp
     )

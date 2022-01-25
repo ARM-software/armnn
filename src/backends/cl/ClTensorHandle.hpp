@@ -18,18 +18,10 @@
 #include <arm_compute/core/TensorShape.h>
 #include <arm_compute/core/Coordinates.h>
 
+#include <cl/IClTensorHandle.hpp>
+
 namespace armnn
 {
-
-
-class IClTensorHandle : public IAclTensorHandle
-{
-public:
-    virtual arm_compute::ICLTensor& GetTensor() = 0;
-    virtual arm_compute::ICLTensor const& GetTensor() const = 0;
-    virtual arm_compute::DataType GetDataType() const = 0;
-    virtual void SetMemoryGroup(const std::shared_ptr<arm_compute::IMemoryGroup>& memoryGroup) = 0;
-};
 
 class ClTensorHandle : public IClTensorHandle
 {

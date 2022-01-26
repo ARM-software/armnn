@@ -156,11 +156,7 @@ public:
     {
     }
 
-    static SimpleLogger& Get()
-    {
-        static SimpleLogger<Level> logger;
-        return logger;
-    }
+    static SimpleLogger& Get();
 
     void Enable(bool enable = true)
     {

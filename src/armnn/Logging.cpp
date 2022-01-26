@@ -21,6 +21,55 @@
 namespace armnn
 {
 
+template<LogSeverity Level>
+SimpleLogger<Level>& SimpleLogger<Level>::Get()
+{
+    static SimpleLogger<Level> logger;
+    return logger;
+}
+
+template<>
+SimpleLogger<LogSeverity::Debug>& SimpleLogger<LogSeverity::Debug>::Get()
+{
+    static SimpleLogger<LogSeverity::Debug> logger;
+    return logger;
+}
+
+template<>
+SimpleLogger<LogSeverity::Trace>& SimpleLogger<LogSeverity::Trace>::Get()
+{
+    static SimpleLogger<LogSeverity::Trace> logger;
+    return logger;
+}
+
+template<>
+SimpleLogger<LogSeverity::Info>& SimpleLogger<LogSeverity::Info>::Get()
+{
+    static SimpleLogger<LogSeverity::Info> logger;
+    return logger;
+}
+
+template<>
+SimpleLogger<LogSeverity::Warning>& SimpleLogger<LogSeverity::Warning>::Get()
+{
+    static SimpleLogger<LogSeverity::Warning> logger;
+    return logger;
+}
+
+template<>
+SimpleLogger<LogSeverity::Error>& SimpleLogger<LogSeverity::Error>::Get()
+{
+    static SimpleLogger<LogSeverity::Error> logger;
+    return logger;
+}
+
+template<>
+SimpleLogger<LogSeverity::Fatal>& SimpleLogger<LogSeverity::Fatal>::Get()
+{
+    static SimpleLogger<LogSeverity::Fatal> logger;
+    return logger;
+}
+
 void SetLogFilter(LogSeverity level)
 {
     SimpleLogger<LogSeverity::Trace>::Get().Enable(false);
@@ -148,6 +197,5 @@ void SetAllLoggingSinks(bool standardOut, bool debugOut, bool coloured)
     SetLoggingSinks<LogSeverity::Error>(standardOut, debugOut, coloured);
     SetLoggingSinks<LogSeverity::Fatal>(standardOut, debugOut, coloured);
 }
-
 
 } //namespace armnn

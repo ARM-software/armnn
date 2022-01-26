@@ -293,7 +293,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
       m_ProfilingService(*this)
 {
     const auto start_time = armnn::GetTimeNow();
-    ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION << "\n";
+    ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION;
     if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )
     {
         throw RuntimeException(
@@ -337,7 +337,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                     // backend should not be registered
                     ARMNN_LOG(warning) << "Backend "
                                        << id
-                                       << " is not registered as does not support protected content allocation \n";
+                                       << " is not registered as does not support protected content allocation.";
                     continue;
                 }
                 // The user is responsible to provide a custom memory allocator which allows to allocate
@@ -431,7 +431,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                     if (!strategy)
                     {
                         ARMNN_LOG(warning) << "MemoryOptimizerStrategy: " << memoryOptimizerStrategyName
-                                           << " was not found \n";
+                                           << " was not found.";
                     }
                     else
                     {
@@ -450,7 +450,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                             ARMNN_LOG(warning) << "Backend "
                                                << id
                                                << " does not have multi-axis packing capability and cannot support"
-                                               << "MemoryOptimizerStrategy: " << memoryOptimizerStrategyName << "\n";
+                                               << "MemoryOptimizerStrategy: " << memoryOptimizerStrategyName << ".";
                         }
                     }
                 }
@@ -497,7 +497,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
     m_DeviceSpec.AddSupportedBackends(supportedBackends);
 
     ARMNN_LOG(info) << "Initialization time: " << std::setprecision(2)
-                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms\n";
+                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms.";
 }
 
 RuntimeImpl::~RuntimeImpl()
@@ -547,7 +547,7 @@ RuntimeImpl::~RuntimeImpl()
 
     BackendRegistryInstance().SetProfilingService(armnn::EmptyOptional());
     ARMNN_LOG(info) << "Shutdown time: " << std::setprecision(2)
-                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
 }
 
 LoadedNetwork* RuntimeImpl::GetLoadedNetworkPtr(NetworkId networkId) const
@@ -595,12 +595,12 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
 
     if (!loadedNetwork)
     {
-        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.\n";
+        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.";
         return Status::Failure;
     }
     if (loadedNetwork->IsAsyncEnabled())
     {
-        ARMNN_LOG(error) << "Network " << networkId << " is async enabled.\n";
+        ARMNN_LOG(error) << "Network " << networkId << " is async enabled.";
         return Status::Failure;
     }
     ProfilerManager::GetInstance().RegisterProfiler(loadedNetwork->GetProfiler().get());
@@ -620,7 +620,7 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
     auto status = loadedNetwork->EnqueueWorkload(inputTensors, outputTensors);
 
     ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
-                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
 
     return status;
 }
@@ -638,12 +638,12 @@ Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
 
     if (!loadedNetwork)
     {
-        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.\n";
+        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.";
         return Status::Failure;
     }
     if (!loadedNetwork->IsAsyncEnabled())
     {
-        ARMNN_LOG(error) << "Attempting execute " << networkId << " when it is not async enabled.\n";
+        ARMNN_LOG(error) << "Attempting execute " << networkId << " when it is not async enabled.";
         return Status::Failure;
     }
     ProfilerManager::GetInstance().RegisterProfiler(loadedNetwork->GetProfiler().get());
@@ -657,7 +657,7 @@ Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
                                          preImportedOutputs);
 
     ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
-                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
 
     return status;
 }
@@ -670,12 +670,12 @@ std::unique_ptr<IWorkingMemHandle> RuntimeImpl::CreateWorkingMemHandle(NetworkId
 
     if (!loadedNetwork)
     {
-        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.\n";
+        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.";
         return nullptr;
     }
     if (!loadedNetwork->IsAsyncEnabled())
     {
-        ARMNN_LOG(error) << "Network " << networkId << " is not async enabled.\n";
+        ARMNN_LOG(error) << "Network " << networkId << " is not async enabled.";
         return nullptr;
     }
     ProfilerManager::GetInstance().RegisterProfiler(loadedNetwork->GetProfiler().get());

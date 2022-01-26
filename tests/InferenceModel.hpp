@@ -471,7 +471,7 @@ public:
             armnn::INetworkPtr network = CreateNetworkImpl<IParser>::Create(params, m_InputBindings, m_OutputBindings);
 
             ARMNN_LOG(info) << "Network parsing time: " << std::setprecision(2)
-                            << std::fixed << armnn::GetTimeDuration(parsing_start_time).count() << " ms\n";
+                            << std::fixed << armnn::GetTimeDuration(parsing_start_time).count() << " ms.";
 
             ARMNN_SCOPED_HEAP_PROFILING("Optimizing");
 
@@ -503,7 +503,7 @@ public:
             optNet = armnn::Optimize(*network, params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);
 
             ARMNN_LOG(info) << "Optimization time: " << std::setprecision(2)
-                            << std::fixed << armnn::GetTimeDuration(optimization_start_time).count() << " ms\n";
+                            << std::fixed << armnn::GetTimeDuration(optimization_start_time).count() << " ms.";
 
             if (!optNet)
             {
@@ -535,7 +535,7 @@ public:
             ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optNet), errorMessage, networkProperties);
 
             ARMNN_LOG(info) << "Network loading time: " << std::setprecision(2)
-                            << std::fixed << armnn::GetTimeDuration(loading_start_time).count() << " ms\n";
+                            << std::fixed << armnn::GetTimeDuration(loading_start_time).count() << " ms.";
 
             if (params.m_AsyncEnabled && params.m_ThreadPoolSize > 0)
             {

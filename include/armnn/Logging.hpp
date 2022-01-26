@@ -120,7 +120,15 @@ struct ScopedRecord
     ScopedRecord& operator=(const ScopedRecord&) = delete;
     ScopedRecord& operator=(ScopedRecord&&) = delete;
 
-    ScopedRecord(ScopedRecord&& other) = default;
+    ScopedRecord(ScopedRecord&& other)
+        : m_LogSinks(other.m_LogSinks)
+        , m_Os(std::move(other.m_Os))
+        , m_Enabled(other.m_Enabled)
+    {
+        // Disable the moved-from ScopedRecord, to prevent it from sending its (now empty) message to
+        // its sinks.
+        other.m_Enabled = false;
+    }
 
     template<typename Streamable>
     ScopedRecord& operator<<(const Streamable& s)
@@ -161,8 +169,7 @@ public:
 
     ScopedRecord StartNewRecord()
     {
-        ScopedRecord record(m_Sinks, Level, m_Enable);
-        return record;
+        return ScopedRecord(m_Sinks, Level, m_Enable);
     }
 
     void RemoveAllSinks()

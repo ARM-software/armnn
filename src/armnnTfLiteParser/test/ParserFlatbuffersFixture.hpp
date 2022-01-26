@@ -11,7 +11,6 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/BackendRegistry.hpp>
-#include <armnn/utility/Assert.hpp>
 
 #include "../TfLiteParser.hpp"
 
@@ -120,8 +119,8 @@ struct ParserFlatbuffersFixture
 
     void loadNetwork(armnn::NetworkId networkId, bool loadDynamic)
     {
-        bool ok = ReadStringToBinary();
-        if (!ok) {
+        if (!ReadStringToBinary())
+        {
             throw armnn::Exception("LoadNetwork failed while reading binary input");
         }
 
@@ -166,15 +165,10 @@ struct ParserFlatbuffersFixture
         flatbuffers::Parser parser;
 
         bool ok = parser.Parse(schemafile.c_str());
-        ARMNN_ASSERT_MSG(ok, "Failed to parse schema file");
+        CHECK_MESSAGE(ok, "Failed to parse schema file");
 
-        ok &= parser.Parse(m_JsonString.c_str());
-        ARMNN_ASSERT_MSG(ok, "Failed to parse json input");
-
-        if (!ok)
-        {
-            return false;
-        }
+        ok = parser.Parse(m_JsonString.c_str());
+        CHECK_MESSAGE(ok, "Failed to parse json input");
 
         {
             const uint8_t * bufferPtr = parser.builder_.GetBufferPointer();

@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="639f0f665b4346d287014adc99e14a8497aadf18" #Fix CPU detection code on Macos
+DEFAULT_CLFRAMEWORKREVISION="7195f71b2e44e2119b1763fde02b2cf3f9371a6b" #Add OpenBSD/arm64 support
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

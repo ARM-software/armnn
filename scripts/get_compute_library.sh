@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_21_11" # Release 21.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="7195f71b2e44e2119b1763fde02b2cf3f9371a6b" #Add OpenBSD/arm64 support
+DEFAULT_CLFRAMEWORKREVISION="21391c3f8b234c1a141e1c2d192072c91c254b33" #Fix s10plus NEON/PoolingLayer Nightly failure
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

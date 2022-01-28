@@ -112,6 +112,30 @@ ConvertAdditionalInfoToAclActivationLayerInfo(const QueueDescriptor& queueDescri
     return arm_compute::ActivationLayerInfo();
 }
 
+inline arm_compute::ActivationLayerInfo
+ConvertLstmActivationFuncToAclLayerInfo(uint32_t activationFunction)
+{
+    // For preparing the object for the class ActivationLayerInfo, we need to consider 5 situations.
+    switch (activationFunction)
+    {
+        case 0:
+            return arm_compute::ActivationLayerInfo(); // no activation, do nothing
+        case 1:
+            return arm_compute::ActivationLayerInfo(arm_compute::ActivationLayerInfo::ActivationFunction::RELU);
+        case 3:
+            return arm_compute::ActivationLayerInfo(
+                arm_compute::ActivationLayerInfo::ActivationFunction::BOUNDED_RELU, 6.0);
+        case 4:
+            return arm_compute::ActivationLayerInfo(
+                arm_compute::ActivationLayerInfo::ActivationFunction::TANH, 1.0, 1.0);
+        case 6:
+            return arm_compute::ActivationLayerInfo(
+                arm_compute::ActivationLayerInfo::ActivationFunction::LOGISTIC);
+        default:
+            throw armnn::Exception("Wrong Type of Activation Function!");
+    }
+}
+
 inline arm_compute::ComparisonOperation ConvertComparisonOperationToAcl(const ComparisonDescriptor& descriptor)
 {
     switch (descriptor.m_Operation)

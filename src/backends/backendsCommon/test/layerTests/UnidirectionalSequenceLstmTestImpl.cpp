@@ -17,6 +17,190 @@
 namespace {
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3>
+UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const std::vector<T>& input,
+    const std::vector<T>& outputExpected,
+    const armnn::TensorShape& inputShape,
+    const armnn::TensorShape& outputExpectedShape,
+    float qScale = 0.0f,
+    int32_t qOffset = 0,
+    armnn::DataType constantDataType = armnn::DataType::Float32)
+{
+    IgnoreUnused(memoryManager);
+    unsigned int batchSize = armnn::numeric_cast<unsigned int>(inputShape[1]);
+    unsigned int inputSize = armnn::numeric_cast<unsigned int>(inputShape[2]);
+    unsigned int outputSize = armnn::numeric_cast<unsigned int>(outputExpectedShape[2]);
+    unsigned numUnits = outputSize;
+
+    armnn::TensorInfo inputTensorInfo({1, batchSize , inputSize}, ArmnnType,  qScale, qOffset );
+    armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, ArmnnType, qScale, qOffset);
+
+    armnn::TensorInfo outputTensorInfo({1, batchSize, outputSize}, ArmnnType, qScale, qOffset);
+
+    std::vector<T> inputVector;
+    inputVector.assign(input.data(), input.data() + (batchSize * inputSize));
+
+    std::vector<T> cellStateInVector(batchSize * numUnits, T());
+    std::vector<T> outputStateInVector(batchSize * outputSize, T());
+
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+
+    std::vector<T> outputVector;
+    outputVector.assign(outputExpected.data(), outputExpected.data() + (batchSize * outputSize));
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateInHandle =
+                                              tensorHandleFactory.CreateTensorHandle(cellStateInTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
+                                              tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
+
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::UnidirectionalSequenceLstmQueueDescriptor data;
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
+    AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
+
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    armnn::TensorInfo tensorInfo4({numUnits}, constantDataType , qScale, qOffset);
+    armnn::TensorInfo tensorInfo8({numUnits, 2}, constantDataType, qScale, qOffset);
+    armnn::TensorInfo tensorInfo16({numUnits, 4}, constantDataType, qScale, qOffset);
+
+    std::vector<float> inputToInputWeights = {-0.45018822f, -0.02338299f, -0.0870589f,
+                                              -0.34550029f, 0.04266912f, -0.15680569f,
+                                              -0.34856534f, 0.43890524f};
+
+    std::vector<float> inputToForgetWeights = { 0.09701663f, 0.20334584f, -0.50592935f,
+                                                -0.31343272f, -0.40032279f, 0.44781327f,
+                                                0.01387155f, -0.35593212f};
+
+    std::vector<float> inputToCellWeights = { -0.50013041f, 0.1370284f, 0.11810488f, 0.2013163f,
+                                              -0.20583314f, 0.44344562f, 0.22077113f,
+                                              -0.29909778f};
+
+    std::vector<float> inputToOutputWeights = { -0.25065863f, -0.28290087f, 0.04613829f,
+                                                0.40525138f, 0.44272184f, 0.03897077f,
+                                                -0.1556896f, 0.19487578f};
+
+    std::vector<float> recurrentToInputWeights = {-0.0063535f, -0.2042388f, 0.31454784f,
+                                                  -0.35746509f, 0.28902304f, 0.08183324f,
+                                                  -0.16555229f, 0.02286911f, -0.13566875f,
+                                                  0.03034258f, 0.48091322f, -0.12528998f,
+                                                  0.24077177f, -0.51332325f, -0.33502164f,
+                                                  0.10629296f};
+
+    std::vector<float> recurrentToForgetWeights = { -0.48684245f, -0.06655136f, 0.42224967f,
+                                                    0.2112639f, 0.27654213f, 0.20864892f,
+                                                    -0.07646349f, 0.45877004f, 0.00141793f,
+                                                    -0.14609534f, 0.36447752f, 0.09196436f,
+                                                    0.28053468f, 0.01560611f, -0.20127171f,
+                                                    -0.01140004f};
+
+    std::vector<float> recurrentToCellWeights = { -0.3407414f, 0.24443203f, -0.2078532f,
+                                                  0.26320225f, 0.05695659f, -0.00123841f,
+                                                  -0.4744786f, -0.35869038f, -0.06418842f,
+                                                  -0.13502428f, -0.501764f, 0.22830659f,
+                                                  -0.46367589f, 0.26016325f, -0.03894562f,
+                                                  -0.16368064f};
+
+    std::vector<float> recurrentToOutputWeights = { 0.43385774f, -0.17194885f, 0.2718237f,
+                                                    0.09215671f, 0.24107647f, -0.39835793f,
+                                                    0.18212086f, 0.01301402f, 0.48572797f,
+                                                    -0.50656658f, 0.20047462f, -0.20607421f,
+                                                    -0.51818722f, -0.15390486f, 0.0468148f,
+                                                    0.39922136f};
+
+    std::vector<float> cellToInputWeights = {0., 0., 0., 0.};
+
+    std::vector<float> inputGateBias = {0., 0., 0., 0.};
+
+    std::vector<float> forgetGateBias = {1., 1., 1., 1.};
+
+    std::vector<float> cellBias = {0., 0., 0., 0.};
+
+    std::vector<float> outputGateBias = {0., 0., 0., 0.};
+
+    armnn::ScopedTensorHandle inputToInputWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle inputToForgetWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle inputToCellWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle inputToOutputWeightsTensor(tensorInfo8);
+    armnn::ScopedTensorHandle recurrentToInputWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle recurrentToForgetWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle recurrentToCellWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle recurrentToOutputWeightsTensor(tensorInfo16);
+    armnn::ScopedTensorHandle cellToInputWeightsTensor(tensorInfo4);
+    armnn::ScopedTensorHandle inputGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle forgetGateBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle cellBiasTensor(tensorInfo4);
+    armnn::ScopedTensorHandle outputGateBiasTensor(tensorInfo4);
+
+    AllocateAndCopyDataToITensorHandle(&inputToInputWeightsTensor, inputToInputWeights.data());
+    AllocateAndCopyDataToITensorHandle(&inputToForgetWeightsTensor, inputToForgetWeights.data());
+    AllocateAndCopyDataToITensorHandle(&inputToCellWeightsTensor, inputToCellWeights.data());
+    AllocateAndCopyDataToITensorHandle(&inputToOutputWeightsTensor, inputToOutputWeights.data());
+    AllocateAndCopyDataToITensorHandle(&recurrentToInputWeightsTensor, recurrentToInputWeights.data());
+    AllocateAndCopyDataToITensorHandle(&recurrentToForgetWeightsTensor, recurrentToForgetWeights.data());
+    AllocateAndCopyDataToITensorHandle(&recurrentToCellWeightsTensor, recurrentToCellWeights.data());
+    AllocateAndCopyDataToITensorHandle(&recurrentToOutputWeightsTensor, recurrentToOutputWeights.data());
+    AllocateAndCopyDataToITensorHandle(&cellToInputWeightsTensor, cellToInputWeights.data());
+    AllocateAndCopyDataToITensorHandle(&inputGateBiasTensor, inputGateBias.data());
+    AllocateAndCopyDataToITensorHandle(&forgetGateBiasTensor, forgetGateBias.data());
+    AllocateAndCopyDataToITensorHandle(&cellBiasTensor, cellBias.data());
+    AllocateAndCopyDataToITensorHandle(&outputGateBiasTensor, outputGateBias.data());
+
+    data.m_InputToInputWeights = &inputToInputWeightsTensor;
+    data.m_InputToForgetWeights = &inputToForgetWeightsTensor;
+    data.m_InputToCellWeights = &inputToCellWeightsTensor;
+    data.m_InputToOutputWeights = &inputToOutputWeightsTensor;
+    data.m_RecurrentToInputWeights = &recurrentToInputWeightsTensor;
+    data.m_RecurrentToForgetWeights = &recurrentToForgetWeightsTensor;
+    data.m_RecurrentToCellWeights = &recurrentToCellWeightsTensor;
+    data.m_RecurrentToOutputWeights = &recurrentToOutputWeightsTensor;
+    data.m_InputGateBias = &inputGateBiasTensor;
+    data.m_ForgetGateBias = &forgetGateBiasTensor;
+    data.m_CellBias = &cellBiasTensor;
+    data.m_OutputGateBias = &outputGateBiasTensor;
+
+    // Flags to set test configuration
+    data.m_Parameters.m_ActivationFunc = 4;
+    data.m_Parameters.m_CifgEnabled = false;
+    data.m_Parameters.m_PeepholeEnabled = false;
+    data.m_Parameters.m_ProjectionEnabled = false;
+    data.m_Parameters.m_ClippingThresCell = 10;
+    data.m_Parameters.m_ClippingThresProj = 0;
+    data.m_Parameters.m_TimeMajor = true;
+
+    std::unique_ptr<armnn::IWorkload> workload
+        = workloadFactory.CreateWorkload(armnn::LayerType::UnidirectionalSequenceLstm, data, info);
+    inputHandle->Allocate();
+    outputStateInHandle->Allocate();
+    cellStateInHandle->Allocate();
+
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
+    CopyDataToITensorHandle(outputStateInHandle.get(), outputStateInVector.data());
+    CopyDataToITensorHandle(cellStateInHandle.get(), cellStateInVector.data());
+
+    workload->Execute();
+
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
+
+    return LayerTestResult<T, 3>(actualOutput,
+                                 outputVector,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -368,6 +552,40 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
 }
 
 } // anonymous namespace
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatchTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputDesc({1, 2, 2}, armnn::DataType::Float32);
+    std::vector<float> input = {2., 3., 3., 4.};
+
+    armnn::TensorInfo outputDesc({1, 2, 4}, armnn::DataType::Float32);
+    std::vector<float> expectedOutput =
+                          {-0.02973187f, 0.1229473f,   0.20885126f, -0.15358765f,
+                           -0.0185422f,   0.11281417f,  0.24466537f, -0.1826292f};
+
+    return UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl<armnn::DataType::Float32>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        input, expectedOutput, inputDesc.GetShape(), outputDesc.GetShape());
+}
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory) {
+    armnn::TensorInfo inputInfo({3, 1, 3}, armnn::DataType::Float32);
+    std::vector<float> input = { 1., 2., 3., 4., 5., 4., 3., 2., 1. };
+
+    armnn::TensorInfo outputInfo({3, 1, 4}, armnn::DataType::Float32);
+    std::vector<float> expectedOutput = { -0.0714901f, -0.162117f, -0.175168f, -0.0232934f,
+                                          -0.0424661f, -0.231802f, -0.513374f, -0.00680323f,
+                                          -0.0668735f, 0.204078f, -0.42765f, -0.0312321f };
+    return UnidirectionalSequenceLstmLayerFloat32TestImpl<armnn::DataType::Float32>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        input, expectedOutput, inputInfo.GetShape(), outputInfo.GetShape());
+}
 
 LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,

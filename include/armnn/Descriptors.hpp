@@ -1086,17 +1086,29 @@ struct LstmDescriptor : BaseDescriptor
         , m_ProjectionEnabled(false)
         , m_LayerNormEnabled(false)
         , m_TimeMajor(false)
+        , m_InputIntermediateScale(0.0)
+        , m_ForgetIntermediateScale(0.0)
+        , m_CellIntermediateScale(0.0)
+        , m_OutputIntermediateScale(0.0)
+        , m_HiddenStateZeroPoint(0)
+        , m_HiddenStateScale(0.0)
     {}
 
     bool operator ==(const LstmDescriptor& rhs) const
     {
-        return m_ActivationFunc    == rhs.m_ActivationFunc &&
-               m_ClippingThresCell == rhs.m_ClippingThresCell &&
-               m_ClippingThresProj == rhs.m_ClippingThresProj &&
-               m_CifgEnabled       == rhs.m_CifgEnabled &&
-               m_PeepholeEnabled   == rhs.m_PeepholeEnabled &&
-               m_LayerNormEnabled  == rhs.m_LayerNormEnabled &&
-               m_TimeMajor         == rhs.m_TimeMajor;
+        return m_ActivationFunc          == rhs.m_ActivationFunc &&
+               m_ClippingThresCell       == rhs.m_ClippingThresCell &&
+               m_ClippingThresProj       == rhs.m_ClippingThresProj &&
+               m_CifgEnabled             == rhs.m_CifgEnabled &&
+               m_PeepholeEnabled         == rhs.m_PeepholeEnabled &&
+               m_LayerNormEnabled        == rhs.m_LayerNormEnabled &&
+               m_TimeMajor               == rhs.m_TimeMajor &&
+               m_InputIntermediateScale  == rhs.m_InputIntermediateScale &&
+               m_ForgetIntermediateScale == rhs.m_ForgetIntermediateScale &&
+               m_CellIntermediateScale   == rhs.m_CellIntermediateScale &&
+               m_OutputIntermediateScale == rhs.m_OutputIntermediateScale &&
+               m_HiddenStateZeroPoint    == rhs.m_HiddenStateZeroPoint &&
+               m_HiddenStateScale        == rhs.m_HiddenStateScale;
     }
 
     /// @brief The activation function to use.
@@ -1116,6 +1128,18 @@ struct LstmDescriptor : BaseDescriptor
     bool m_LayerNormEnabled;
     /// Enable/disable time major
     bool m_TimeMajor;
+    /// Input intermediate quantization scale
+    float m_InputIntermediateScale;
+    /// Forget intermediate quantization scale
+    float m_ForgetIntermediateScale;
+    /// Cell intermediate quantization scale
+    float m_CellIntermediateScale;
+    /// Output intermediate quantization scale
+    float m_OutputIntermediateScale;
+    /// Hidden State zero point
+    int32_t m_HiddenStateZeroPoint;
+    /// Hidden State quantization scale
+    float m_HiddenStateScale;
 };
 
 using UnidirectionalSequenceLstmDescriptor = LstmDescriptor;

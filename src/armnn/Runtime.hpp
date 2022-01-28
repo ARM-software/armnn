@@ -55,8 +55,10 @@ public:
     armnn::TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
     armnn::TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
-    std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors);
-    std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors);
+    std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors,
+                                              MemorySource forceImportMemorySource = MemorySource::Undefined);
+    std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors,
+                                                MemorySource forceImportMemorySource = MemorySource::Undefined);
 
     void ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds);
     void ClearImportedOutputs(NetworkId networkId, const std::vector<ImportedOutputId> outputIds);
@@ -64,7 +66,9 @@ public:
     // Evaluates network using input in inputTensors, outputs filled into outputTensors.
     Status EnqueueWorkload(NetworkId networkId,
                            const InputTensors& inputTensors,
-                           const OutputTensors& outputTensors);
+                           const OutputTensors& outputTensors,
+                           std::vector<ImportedInputId> preImportedInputIds = {},
+                           std::vector<ImportedOutputId> preImportedOutputIds = {});
 
     /// This is an experimental function.
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors.

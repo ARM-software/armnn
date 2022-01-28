@@ -1378,6 +1378,93 @@ TEST_CASE("RefRankEndToEndTestQSymmS8")
     RankEndToEnd<armnn::DataType::QSymmS8>(defaultBackends);
 }
 
+TEST_CASE("RefForceImportTest")
+{
+    using namespace armnn;
+
+    std::vector<BackendId> backends = defaultBackends;
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Square;
+    IConnectableLayer* activationLayer = net->AddActivationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
+    activationLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
+    activationLayer->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+
+    // Load it into the runtime. It should pass.
+    NetworkId netId;
+    std::string ignoredErrorMessage;
+
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
+               == Status::Success);
+
+    // Creates structures for input & output
+    std::vector<float> inputData
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    };
+
+    std::vector<float> outputData(4);
+
+    std::vector<float> expectedOutput
+    {
+         1.0f, 4.0f, 9.0f, 16.0f
+    };
+
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+
+    std::vector<ImportedInputId> importedInputIds =
+        runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    std::vector<ImportedOutputId> importedOutputIds =
+        runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+
+    // Do the inference and force the import as the memory is alligned.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+
+    // Retrieve the Profiler.Print() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->Print(ss);;
+    std::string dump = ss.str();
+
+    // Check there is a SyncMemGeneric workload as we exported
+    int count = SubStringCounter(dump, "SyncMemGeneric");
+    CHECK(count == 1);
+
+    // Shouldn't be any CopyMemGeneric workloads
+    count = SubStringCounter(dump, "CopyMemGeneric");
+    CHECK(count == 0);
+
+    // Check the output is correct
+    CHECK(std::equal(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end()));
+}
+
 #if !defined(__ANDROID__)
 // Only run these tests on non Android platforms
 TEST_CASE("RefImportNonAlignedPointerTest")

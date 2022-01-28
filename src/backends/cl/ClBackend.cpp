@@ -133,6 +133,15 @@ IBackendInternal::IWorkloadFactoryPtr ClBackend::CreateWorkloadFactory(
     MemorySourceFlags inputFlags,
     MemorySourceFlags outputFlags) const
 {
+    // To allow force import if inputFlags/outputFlags are Undefined, set it as Malloc
+    if (inputFlags == static_cast<MemorySourceFlags>(MemorySource::Undefined))
+    {
+        inputFlags = static_cast<MemorySourceFlags>(MemorySource::Malloc);
+    }
+    if (outputFlags == static_cast<MemorySourceFlags>(MemorySource::Undefined))
+    {
+        outputFlags = static_cast<MemorySourceFlags>(MemorySource::Malloc);
+    }
     std::shared_ptr<ClMemoryManager> memoryManager;
     if (m_UsingCustomAllocator)
     {
@@ -193,6 +202,15 @@ void ClBackend::RegisterTensorHandleFactories(TensorHandleFactoryRegistry& regis
                                               MemorySourceFlags inputFlags,
                                               MemorySourceFlags outputFlags)
 {
+    // To allow force import if inputFlags/outputFlags are Undefined, set it as Malloc
+    if (inputFlags == static_cast<MemorySourceFlags>(MemorySource::Undefined))
+    {
+        inputFlags = static_cast<MemorySourceFlags>(MemorySource::Malloc);
+    }
+    if (outputFlags == static_cast<MemorySourceFlags>(MemorySource::Undefined))
+    {
+        outputFlags = static_cast<MemorySourceFlags>(MemorySource::Malloc);
+    }
     std::shared_ptr<ClMemoryManager> memoryManager;
     if (m_UsingCustomAllocator)
     {

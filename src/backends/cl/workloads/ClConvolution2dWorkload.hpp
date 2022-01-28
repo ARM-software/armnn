@@ -13,6 +13,8 @@
 #include <arm_compute/runtime/CL/functions/CLConvolutionLayer.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
 
+#include <cl/ICLTensorProxy.hpp>
+
 #include <memory>
 
 namespace armnn
@@ -38,6 +40,9 @@ public:
 
     arm_compute::ConvolutionMethod GetConvolutionMethod() const;
 
+protected:
+    void Reconfigure() override;
+
 private:
     mutable arm_compute::CLConvolutionLayer m_ConvolutionLayer;
 
@@ -47,6 +52,9 @@ private:
     arm_compute::ConvolutionMethod m_ConvolutionMethod;
 
     void FreeUnusedTensors();
+
+    std::unique_ptr<ICLTensorProxy> m_InputProxy;
+    std::unique_ptr<ICLTensorProxy> m_OutputProxy;
 };
 
 } //namespace armnn

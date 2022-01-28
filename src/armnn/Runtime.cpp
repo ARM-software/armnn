@@ -77,14 +77,16 @@ armnn::TensorInfo IRuntime::GetOutputTensorInfo(NetworkId networkId, LayerBindin
     return pRuntimeImpl->GetOutputTensorInfo(networkId, layerId);
 }
 
-std::vector<ImportedInputId> IRuntime::ImportInputs(NetworkId networkId, const InputTensors& inputTensors)
+std::vector<ImportedInputId> IRuntime::ImportInputs(NetworkId networkId, const InputTensors& inputTensors,
+                                                    MemorySource forceImportMemorySource)
 {
-    return pRuntimeImpl->ImportInputs(networkId, inputTensors);
+    return pRuntimeImpl->ImportInputs(networkId, inputTensors, forceImportMemorySource);
 }
 
-std::vector<ImportedOutputId> IRuntime::ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors)
+std::vector<ImportedOutputId> IRuntime::ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors,
+                                                      MemorySource forceImportMemorySource)
 {
-    return pRuntimeImpl->ImportOutputs(networkId, outputTensors);
+    return pRuntimeImpl->ImportOutputs(networkId, outputTensors, forceImportMemorySource);
 }
 
 void IRuntime::ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds)
@@ -98,9 +100,12 @@ void IRuntime::ClearImportedOutputs(NetworkId networkId, const std::vector<Impor
 
 Status IRuntime::EnqueueWorkload(NetworkId networkId,
                                  const InputTensors& inputTensors,
-                                 const OutputTensors& outputTensors)
+                                 const OutputTensors& outputTensors,
+                                 std::vector<ImportedInputId> preImportedInputIds,
+                                 std::vector<ImportedOutputId> preImportedOutputIds)
 {
-    return pRuntimeImpl->EnqueueWorkload(networkId, inputTensors, outputTensors);
+    return pRuntimeImpl->EnqueueWorkload(networkId, inputTensors, outputTensors,
+                                         preImportedInputIds, preImportedOutputIds);
 }
 
 Status IRuntime::Execute(IWorkingMemHandle& workingMemHandle,
@@ -566,14 +571,16 @@ TensorInfo RuntimeImpl::GetOutputTensorInfo(NetworkId networkId, LayerBindingId 
     return GetLoadedNetworkPtr(networkId)->GetOutputTensorInfo(layerId);
 }
 
-std::vector<ImportedInputId> RuntimeImpl::ImportInputs(NetworkId networkId, const InputTensors& inputTensors)
+std::vector<ImportedInputId> RuntimeImpl::ImportInputs(NetworkId networkId, const InputTensors& inputTensors,
+                                                       MemorySource forceImportMemorySource)
 {
-    return GetLoadedNetworkPtr(networkId)->ImportInputs(inputTensors);
+    return GetLoadedNetworkPtr(networkId)->ImportInputs(inputTensors, forceImportMemorySource);
 }
 
-std::vector<ImportedOutputId> RuntimeImpl::ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors)
+std::vector<ImportedOutputId> RuntimeImpl::ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors,
+                                                         MemorySource forceImportMemorySource)
 {
-    return GetLoadedNetworkPtr(networkId)->ImportOutputs(outputTensors);
+    return GetLoadedNetworkPtr(networkId)->ImportOutputs(outputTensors, forceImportMemorySource);
 }
 
 void RuntimeImpl::ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds)
@@ -587,7 +594,9 @@ void RuntimeImpl::ClearImportedOutputs(NetworkId networkId, const std::vector<Im
 
 Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
                                 const InputTensors& inputTensors,
-                                const OutputTensors& outputTensors)
+                                const OutputTensors& outputTensors,
+                                std::vector<ImportedInputId> preImportedInputIds,
+                                std::vector<ImportedOutputId> preImportedOutputIds)
 {
     const auto startTime = armnn::GetTimeNow();
 
@@ -617,7 +626,8 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
     }
     lastId=networkId;
 
-    auto status = loadedNetwork->EnqueueWorkload(inputTensors, outputTensors);
+    auto status = loadedNetwork->EnqueueWorkload(inputTensors, outputTensors,
+                                                 preImportedInputIds, preImportedOutputIds);
 
     ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
                     << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";

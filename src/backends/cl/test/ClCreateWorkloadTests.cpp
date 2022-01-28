@@ -11,11 +11,14 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/backends/MemCopyWorkload.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
+#include <TensorHelpers.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <aclCommon/test/CreateWorkloadClNeon.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
+#include <cl/ClImportTensorHandle.hpp>
+#include <cl/ClImportTensorHandleFactory.hpp>
 #include <cl/ClTensorHandle.hpp>
 #include <cl/ClWorkloadFactory.hpp>
 #include <cl/workloads/ClWorkloads.hpp>
@@ -353,6 +356,64 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dFastMathEnabledWo
     IgnoreUnused(conv2dWorkload);
     ARMNN_ASSERT(conv2dWorkload != nullptr);
     ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::WINOGRAD);
+}
+
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClReplaceInputOutputConvolution2dWorkload")
+{
+    // Create Convolution2dWorkload with ClTensorHandle input and output
+    // Then replace the input and output with ClImportTensorHandle
+    Graph graph;
+    ClWorkloadFactory factory =
+        ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
+
+    auto workload =
+        CreateConvolution2dWorkloadTest<ClConvolution2dWorkload, DataType::Float32>(factory,
+                                                                                    graph,
+                                                                                    DataLayout::NHWC);
+
+    TensorShape inputShape  = std::initializer_list<unsigned int>({2, 8, 16, 3});
+    TensorShape outputShape = std::initializer_list<unsigned int>({2, 2, 10, 2});
+
+    // Checks that outputs and inputs are as we expect them (see definition of CreateConvolution2dWorkloadTest).
+    Convolution2dQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle  = PolymorphicDowncast<ITensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto outputHandle = PolymorphicDowncast<ITensorHandle*>(queueDescriptor.m_Outputs[0]);
+    CHECK((inputHandle->GetShape() == inputShape));
+    CHECK((outputHandle->GetShape() == outputShape));
+    // The input and output handles are created correctly as ClTensorHandle
+    CHECK((dynamic_cast<ClTensorHandle*>(inputHandle) != nullptr));
+    CHECK((dynamic_cast<ClTensorHandle*>(outputHandle) != nullptr));
+
+    // Replace with ImportTensorHandle
+    ClImportTensorHandleFactory importFactory(static_cast<MemorySourceFlags>(MemorySource::Malloc),
+                                              static_cast<MemorySourceFlags>(MemorySource::Malloc));
+
+    TensorInfo inputInfo({ 2, 8, 16, 3 }, DataType::Float32);
+    TensorInfo outputInfo({ 2, 2, 10, 2 }, DataType::Float32);
+
+    // create TensorHandle for memory import
+    auto inputImportHandle = importFactory.CreateTensorHandle(inputInfo);
+    auto outputImportHandle = importFactory.CreateTensorHandle(outputInfo);
+
+    // Calling ReplaceInputTensorHandle and ReplaceOutputTensorHandle does not throw exception
+    // as Reconfigure function is implemented
+    workload->ReplaceInputTensorHandle(inputImportHandle.get(), 0);
+    workload->ReplaceOutputTensorHandle(outputImportHandle.get(), 0);
+
+    // Correctly replaced with the import handles with correct information
+    queueDescriptor = workload->GetData();
+    auto replacedInputHandle  = PolymorphicDowncast<ITensorHandle*>(queueDescriptor.m_Inputs[0]);
+    auto replacedOutputHandle = PolymorphicDowncast<ITensorHandle*>(queueDescriptor.m_Outputs[0]);
+    CHECK((replacedInputHandle->GetShape() == inputShape));
+    CHECK((replacedOutputHandle->GetShape() == outputShape));
+
+    CHECK((inputImportHandle.get() == replacedInputHandle));
+    CHECK((inputImportHandle.get() == replacedInputHandle));
+
+    CHECK((dynamic_cast<ClTensorHandle*>(replacedInputHandle) == nullptr));
+    CHECK((dynamic_cast<ClImportTensorHandle*>(replacedInputHandle) != nullptr));
+    CHECK((dynamic_cast<ClTensorHandle*>(replacedOutputHandle) == nullptr));
+    CHECK((dynamic_cast<ClImportTensorHandle*>(replacedOutputHandle) != nullptr));
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dClCompiledContextWorkload")

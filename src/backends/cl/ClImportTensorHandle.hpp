@@ -205,7 +205,11 @@ public:
                 // We do this to match the behaviour of the Import function later on.
                 auto cachelineAlignment =
                         arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
-                auto roundedSize = cachelineAlignment + totalBytes - (totalBytes % cachelineAlignment);
+                auto roundedSize = totalBytes;
+                if (totalBytes % cachelineAlignment != 0)
+                {
+                    roundedSize = cachelineAlignment + totalBytes - (totalBytes % cachelineAlignment);
+                }
 
                 cl_int error = CL_SUCCESS;
                 cl_mem buffer;
@@ -252,7 +256,11 @@ private:
         // This does not change the size of the buffer, only the size of the mapping the buffer is mapped to
         auto cachelineAlignment =
                 arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
-        auto roundedSize = cachelineAlignment + totalBytes - (totalBytes % cachelineAlignment);
+        auto roundedSize = totalBytes;
+        if (totalBytes % cachelineAlignment != 0)
+        {
+            roundedSize = cachelineAlignment + totalBytes - (totalBytes % cachelineAlignment);
+        }
 
         cl_int error = CL_SUCCESS;
         cl_mem buffer;

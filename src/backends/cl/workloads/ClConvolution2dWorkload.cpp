@@ -90,6 +90,10 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
+    // Create Proxy tensor and set the initial tensor handle to it
+    m_InputProxy = std::make_unique<ICLTensorProxy>(&input);
+    m_OutputProxy = std::make_unique<ICLTensorProxy>(&output);
+
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
@@ -101,10 +105,10 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_configure");
         m_ConvolutionLayer.configure(clCompileContext,
-                                     &input,
+                                     m_InputProxy.get(),
                                      m_KernelTensor.get(),
                                      m_BiasTensor.get(),
-                                     &output,
+                                     m_OutputProxy.get(),
                                      padStrideInfo,
                                      arm_compute::WeightsInfo(),
                                      aclDilationInfo,
@@ -172,6 +176,15 @@ void ClConvolution2dWorkload::FreeUnusedTensors()
 {
     FreeTensorIfUnused(m_KernelTensor);
     FreeTensorIfUnused(m_BiasTensor);
+}
+
+void ClConvolution2dWorkload::Reconfigure()
+{
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_Reconfigure");
+    arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    m_InputProxy->set(&input);
+    m_OutputProxy->set(&output);
 }
 
 } //namespace armnn

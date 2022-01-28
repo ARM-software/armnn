@@ -55,14 +55,18 @@ public:
     TensorInfo GetInputTensorInfo(LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const;
 
-    std::vector<ImportedInputId> ImportInputs(const InputTensors& inputTensors);
-    std::vector<ImportedOutputId> ImportOutputs(const OutputTensors& outputTensors);
+    std::vector<ImportedInputId> ImportInputs(const InputTensors& inputTensors,
+                                              MemorySource forceImportMemorySource = MemorySource::Undefined);
+    std::vector<ImportedOutputId> ImportOutputs(const OutputTensors& outputTensors,
+                                                MemorySource forceImportMemorySource = MemorySource::Undefined);
 
     void ClearImportedInputs(const std::vector<ImportedInputId> inputIds);
     void ClearImportedOutputs(const std::vector<ImportedOutputId> outputIds);
 
     /// Single thread execution of the loaded network
-    Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors);
+    Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors,
+                           std::vector<ImportedInputId> preImportedInputIds = {},
+                           std::vector<ImportedOutputId> preImportedOutputIds = {});
 
     /// Thread safe execution of the loaded network
     Status Execute(const InputTensors& inputTensors,
@@ -200,8 +204,9 @@ private:
 
     // A set of vectors to record the workload queue indexes and their corresponding Input/Output Slot indexes
     // which are connected to Inputs and Outputs for the network.
-    std::vector<std::pair<unsigned int, unsigned int>> m_InputWorkloadSlotPairs;
-    std::vector<std::pair<unsigned int, unsigned int>> m_OutputWorkloadSlotPairs;
+    std::unordered_map<LayerBindingId, std::pair<unsigned int, unsigned int>> m_InputWorkloadSlotPairs;
+    std::unordered_map<LayerBindingId, std::pair<unsigned int, unsigned int>> m_OutputWorkloadSlotPairs;
+
 };
 
 }

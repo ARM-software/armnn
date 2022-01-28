@@ -216,18 +216,19 @@ public:
     TensorInfo GetInputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
-
     /// ImportInputs separates the importing and mapping of InputTensors from network execution.
     /// Allowing for a set of InputTensors to be imported and mapped once, but used in execution many times.
     /// This function is not thread safe and must not be used while other threads are calling Execute().
-    /// Only compatible with AsyncEnabled networks
-    std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors);
+    /// Only compatible with AsyncEnabled networks and aligned memory import
+    std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors,
+                                              MemorySource forceImportMemorySource = MemorySource::Undefined);
 
     /// ImportOutputs separates the importing and mapping of OutputTensors from network execution.
     /// Allowing for a set of OutputTensors to be imported and mapped once, but used in execution many times.
     /// This function is not thread safe and must not be used while other threads are calling Execute().
-    /// Only compatible with AsyncEnabled networks
-    std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors);
+    /// Only compatible with AsyncEnabled networks and aligned memory import
+    std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors,
+                                                MemorySource forceImportMemorySource = MemorySource::Undefined);
 
     /// Un-import and delete the imported InputTensor/s
     /// This function is not thread safe and must not be used while other threads are calling Execute().
@@ -242,7 +243,9 @@ public:
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors
     Status EnqueueWorkload(NetworkId networkId,
                            const InputTensors& inputTensors,
-                           const OutputTensors& outputTensors);
+                           const OutputTensors& outputTensors,
+                           std::vector<ImportedInputId> preImportedInputIds = {},
+                           std::vector<ImportedOutputId> preImportedOutputIds = {});
 
     /// This is an experimental function.
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors.

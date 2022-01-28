@@ -197,6 +197,11 @@ private:
     std::unique_ptr<MemoryManager> m_ExternalMemoryManager;
 
     std::unordered_map<BackendId, bool> m_SupportsExternallyManagedMemory;
+
+    // A set of vectors to record the workload queue indexes and their corresponding Input/Output Slot indexes
+    // which are connected to Inputs and Outputs for the network.
+    std::vector<std::pair<unsigned int, unsigned int>> m_InputWorkloadSlotPairs;
+    std::vector<std::pair<unsigned int, unsigned int>> m_OutputWorkloadSlotPairs;
 };
 
 }

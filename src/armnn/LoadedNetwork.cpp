@@ -312,6 +312,39 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     }
                     else
                     {
+                        if (layer->GetNumInputSlots() >= 1)
+                        {
+                            unsigned int slotIndex = 0;
+                            for (auto& inputSlot : layer->GetInputSlots())
+                            {
+                                if (inputSlot.GetOwningLayer().GetType() == LayerType::Input)
+                                {
+                                    m_InputWorkloadSlotPairs.push_back(
+                                        std::make_pair(m_WorkloadQueue.size(), slotIndex));
+                                }
+                                ++slotIndex;
+                            }
+                        }
+
+                        if (layer->GetNumOutputSlots() >= 1)
+                        {
+                            unsigned int slotIndex = 0;
+                            for (auto& outputSlot : layer->GetOutputSlots())
+                            {
+                                for (unsigned int i = 0; i < outputSlot.GetNumConnections(); i++)
+                                {
+                                    // If any of the connections on this outputSlot are connected to an Output then
+                                    // Add its index within layer->GetOutputSlots() to m_OutputWorkloadSlotPairs
+                                    if (outputSlot.GetConnection(i)->GetOwningLayer().GetType() == LayerType::Output)
+                                    {
+                                        m_OutputWorkloadSlotPairs.push_back(
+                                            std::make_pair(m_WorkloadQueue.size(), slotIndex));
+                                        continue;
+                                    }
+                                }
+                                ++slotIndex;
+                            }
+                        }
                         m_WorkloadQueue.push_back(std::move(workload));
                     }
 

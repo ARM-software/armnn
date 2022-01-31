@@ -351,6 +351,8 @@ public:
         m_AdditionalInfoObject = additionalInfo;
     }
 
+    virtual const BaseDescriptor& GetParameters() const override { return m_NullDescriptor; }
+
 protected:
     // Graph needs access to the virtual destructor.
     friend class Graph;
@@ -427,6 +429,10 @@ private:
 
     std::list<std::string> m_RelatedLayerNames;
 
+    /// returned by layers which have no parameters associated with them.
+    /// has to be a member as it is returned as a const reference
+    /// declared static so that there is only ever one of them in memory
+    static NullDescriptor m_NullDescriptor;
 };
 
 // A layer user-provided data can be bound to (e.g. inputs, outputs).

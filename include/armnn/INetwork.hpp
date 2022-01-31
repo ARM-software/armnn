@@ -112,6 +112,13 @@ public:
     /// Returns the armnn::LayerType of this layer
     virtual LayerType GetType() const = 0;
 
+    /// If the layer has a descriptor return it.
+    /// The base descriptor can then be cast to the correct descriptor class.
+    /// If the layer has no associated descriptor a struct of type NullDescriptor will be returned.
+    /// Note: NullDescriptors can be detected because they return true when
+    /// the BaseDescriptor IsNull function is invoked.
+    virtual const BaseDescriptor& GetParameters() const = 0;
+
 protected:
       /// Objects are not deletable via the handle
     ~IConnectableLayer() {}

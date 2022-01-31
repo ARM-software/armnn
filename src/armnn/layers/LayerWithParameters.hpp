@@ -15,7 +15,7 @@ class LayerWithParameters : public Layer
 public:
     using DescriptorType = Parameters;
 
-    const Parameters& GetParameters() const { return m_Param; }
+    const Parameters& GetParameters() const override { return m_Param; }
 
     /// Helper to serialize the layer parameters to string
     /// (currently used in DotSerializer and company).

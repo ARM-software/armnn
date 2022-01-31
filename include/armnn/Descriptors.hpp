@@ -21,7 +21,15 @@ namespace armnn
 /// Base class for all descriptors.
 struct BaseDescriptor
 {
+    virtual bool IsNull() const { return false; }
     virtual ~BaseDescriptor() = default;
+};
+
+/// Null Descriptor used as a return value from the IConnectableLayer GetParameters method
+/// by layers which do not have a descriptor
+struct NullDescriptor : BaseDescriptor
+{
+    bool IsNull() const override { return true; }
 };
 
 /// An ActivationDescriptor for the ActivationLayer.

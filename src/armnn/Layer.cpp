@@ -17,6 +17,9 @@
 namespace armnn
 {
 
+// Instantiate the static member variable
+NullDescriptor Layer::m_NullDescriptor;
+
 void InputSlot::Insert(Layer& layer)
 {
     ARMNN_ASSERT(layer.GetNumOutputSlots() == 1);

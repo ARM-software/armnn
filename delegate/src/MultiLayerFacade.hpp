@@ -129,9 +129,14 @@ public:
         return m_FirstLayer->GetType();
     }
 
+    virtual const armnn::BaseDescriptor& GetParameters() const override { return m_NullDescriptor; }
+
 private:
     armnn::IConnectableLayer* m_FirstLayer;
     armnn::IConnectableLayer* m_LastLayer;
+
+    // to satisfy the GetParameters method need to hand back a NullDescriptor
+    armnn::NullDescriptor m_NullDescriptor;
 };
 
 } // namespace armnnDelegate

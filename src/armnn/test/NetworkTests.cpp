@@ -600,4 +600,57 @@ TEST_CASE("StandInLayerSingleInputMultipleOutputsNetworkTest")
     CHECK(standIn->GetOutputSlot(1).GetConnection(0) == &output1->GetInputSlot(0));
 }
 
+TEST_CASE("ObtainConv2DDescriptorFromIConnectableLayer")
+{
+    armnn::NetworkImpl net;
+
+    unsigned int dims[] = { 10,1,1,1 };
+    std::vector<float> convWeightsData(10);
+    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), convWeightsData);
+
+    armnn::Convolution2dDescriptor convDesc2d;
+    convDesc2d.m_PadLeft = 2;
+    convDesc2d.m_PadRight = 3;
+    convDesc2d.m_PadTop = 4;
+    convDesc2d.m_PadBottom = 5;
+    convDesc2d.m_StrideX = 2;
+    convDesc2d.m_StrideY = 1;
+    convDesc2d.m_DilationX = 3;
+    convDesc2d.m_DilationY = 3;
+    convDesc2d.m_BiasEnabled = false;
+    convDesc2d.m_DataLayout = armnn::DataLayout::NCHW;
+    armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d,
+                                                                          weights,
+                                                                          armnn::EmptyOptional(),
+                                                                          "conv layer");
+    CHECK(convLayer);
+
+    const armnn::BaseDescriptor& descriptor = convLayer->GetParameters();
+    CHECK(descriptor.IsNull() == false);
+    const armnn::Convolution2dDescriptor& originalDescriptor =
+        static_cast<const armnn::Convolution2dDescriptor&>(descriptor);
+    CHECK(originalDescriptor.m_PadLeft == 2);
+    CHECK(originalDescriptor.m_PadRight == 3);
+    CHECK(originalDescriptor.m_PadTop == 4);
+    CHECK(originalDescriptor.m_PadBottom == 5);
+    CHECK(originalDescriptor.m_StrideX == 2);
+    CHECK(originalDescriptor.m_StrideY == 1);
+    CHECK(originalDescriptor.m_DilationX == 3);
+    CHECK(originalDescriptor.m_DilationY == 3);
+    CHECK(originalDescriptor.m_BiasEnabled == false);
+    CHECK(originalDescriptor.m_DataLayout == armnn::DataLayout::NCHW);
+}
+
+TEST_CASE("CheckNullDescriptor")
+{
+    armnn::NetworkImpl net;
+    armnn::IConnectableLayer* const addLayer = net.AddAdditionLayer();
+
+    CHECK(addLayer);
+
+    const armnn::BaseDescriptor& descriptor = addLayer->GetParameters();
+    // additional layer has no descriptor so a NullDescriptor will be returned
+    CHECK(descriptor.IsNull() == true);
+}
+
 }

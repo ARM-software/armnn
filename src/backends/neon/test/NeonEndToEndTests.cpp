@@ -568,6 +568,26 @@ TEST_CASE("NeonStridedSliceInvalidSliceEndToEndTest")
     StridedSliceInvalidSliceEndToEndTest(neonDefaultBackends);
 }
 
+TEST_CASE("NeonForceImportWithAlignedBuffersEndToEndTest")
+{
+    ForceImportWithAlignedBuffersEndToEndTest(neonDefaultBackends);
+}
+
+TEST_CASE("NeonForceImportWithMisalignedInputBuffersEndToEndTest")
+{
+    ForceImportWithMisalignedInputBuffersEndToEndTest(neonDefaultBackends);
+}
+
+TEST_CASE("NeonForceImportWithMisalignedOutputBuffersEndToEndTest")
+{
+    ForceImportWithMisalignedOutputBuffersEndToEndTest(neonDefaultBackends);
+}
+
+TEST_CASE("NeonForceImportWithMisalignedInputAndOutputBuffersEndToEndTest")
+{
+    ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(neonDefaultBackends);
+}
+
 // DISABLED
 //TEST_CASE("NeonDetectionPostProcessRegularNmsTest")
 //{

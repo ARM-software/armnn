@@ -514,4 +514,19 @@ TEST_CASE("ClQLstmEndToEndTest")
     QLstmEndToEnd(clDefaultBackends);
 }
 
+TEST_CASE("ClForceImportWithMisalignedInputBuffersEndToEndTest")
+{
+    ForceImportWithMisalignedInputBuffersEndToEndTest(clDefaultBackends);
+}
+
+TEST_CASE("ClForceImportWithMisalignedOutputBuffersEndToEndTest")
+{
+    ForceImportWithMisalignedOutputBuffersEndToEndTest(clDefaultBackends);
+}
+
+TEST_CASE("ClForceImportWithMisalignedInputAndOutputBuffersEndToEndTest")
+{
+    ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(clDefaultBackends);
+}
+
 }

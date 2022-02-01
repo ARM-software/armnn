@@ -8,6 +8,9 @@ set(armnnTestUtils_sources)
 list(APPEND armnnTestUtils_sources
         ../../include/armnnTestUtils/DataLayoutUtils.hpp
         ../../include/armnnTestUtils/LayerTestResult.hpp
+        ../../include/armnnTestUtils/MockBackend.hpp
+        ../../include/armnnTestUtils/MockMemoryManager.hpp
+        ../../include/armnnTestUtils/MockTensorHandle.hpp
         ../../include/armnnTestUtils/PredicateResult.hpp
         ../../include/armnnTestUtils/TensorCopyUtils.hpp
         ../../include/armnnTestUtils/WorkloadTestUtils.hpp
@@ -18,6 +21,12 @@ list(APPEND armnnTestUtils_sources
         DataTypeUtils.hpp
         GraphUtils.cpp
         GraphUtils.hpp
+        MockBackend.cpp
+        MockMemoryManager.cpp
+        MockTensorHandle.cpp
+        MockTensorHandleFactory.hpp
+        MockTensorHandleFactory.cpp
+        MockWorkloadFactoryHelper.hpp
         TensorCopyUtils.cpp
         TestUtils.cpp
         TestUtils.hpp

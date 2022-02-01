@@ -13,6 +13,7 @@
 #include <armnn/Optional.hpp>
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Logging.hpp>
+#include <armnn/backends/TensorHandle.hpp>
 
 #include <memory>
 #include <vector>
@@ -118,6 +119,11 @@ public:
     /// Note: NullDescriptors can be detected because they return true when
     /// the BaseDescriptor IsNull function is invoked.
     virtual const BaseDescriptor& GetParameters() const = 0;
+
+    using ConstantTensors = std::vector<std::reference_wrapper<std::shared_ptr<ConstTensorHandle>>>;
+
+    // Returns ConstantTensors of this Layer if it has any, otherwise returns empty vector.
+    virtual ConstantTensors GetConstantTensorsByRef() = 0;
 
 protected:
       /// Objects are not deletable via the handle

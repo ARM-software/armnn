@@ -145,6 +145,7 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
 
 Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()
 {
+    // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_Weight, m_Bias};
 }
 

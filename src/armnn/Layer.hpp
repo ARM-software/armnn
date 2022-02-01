@@ -394,8 +394,8 @@ protected:
     LayerType* CloneBase(Graph& graph, Params&& ... params) const;
 
     // Retrieve the Handles to the constants
-    using ConstantTensors = std::vector<std::reference_wrapper<std::shared_ptr<ConstTensorHandle>>>;
-    virtual ConstantTensors GetConstantTensorsByRef() {return ConstantTensors(); };
+    // Marking this as override and having this here keeps IConnectable abstract with only pure virtual function
+    virtual ConstantTensors GetConstantTensorsByRef() override {return ConstantTensors(); };
 
     // "Blob"
     AdditionalInfoObjectPtr m_AdditionalInfoObject;

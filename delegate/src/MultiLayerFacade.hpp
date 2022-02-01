@@ -131,6 +131,11 @@ public:
 
     virtual const armnn::BaseDescriptor& GetParameters() const override { return m_NullDescriptor; }
 
+protected:
+    /// Retrieve the handles to the constant values stored by the layer.
+    /// @return A vector of the constant tensors stored by this layer.
+    ConstantTensors GetConstantTensorsByRef() override { return {}; }
+
 private:
     armnn::IConnectableLayer* m_FirstLayer;
     armnn::IConnectableLayer* m_LastLayer;

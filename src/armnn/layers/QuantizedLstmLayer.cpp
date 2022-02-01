@@ -150,6 +150,7 @@ void QuantizedLstmLayer::ValidateTensorShapesFromInputs()
 
 Layer::ConstantTensors QuantizedLstmLayer::GetConstantTensorsByRef()
 {
+    // For API stability DO NOT ALTER order and add new members to the end of vector
     return
     {
         m_QuantizedLstmParameters.m_InputToInputWeights,

@@ -269,6 +269,7 @@ void LstmLayer::ValidateTensorShapesFromInputs()
 
 Layer::ConstantTensors LstmLayer::GetConstantTensorsByRef()
 {
+    // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_BasicParameters.m_InputToForgetWeights,
             m_BasicParameters.m_InputToCellWeights,
             m_BasicParameters.m_InputToOutputWeights,

@@ -77,6 +77,7 @@ void FullyConnectedLayer::ValidateTensorShapesFromInputs()
 
 Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()
 {
+    // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_Weight, m_Bias};
 }
 

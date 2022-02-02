@@ -10,7 +10,7 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnnUtils/FloatingPointComparison.hpp>
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 #include <doctest/doctest.h>
 

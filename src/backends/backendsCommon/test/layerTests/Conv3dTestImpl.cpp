@@ -5,7 +5,7 @@
 
 #include "Conv3dTestImpl.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 
@@ -15,7 +15,7 @@
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 using namespace armnnUtils;
 

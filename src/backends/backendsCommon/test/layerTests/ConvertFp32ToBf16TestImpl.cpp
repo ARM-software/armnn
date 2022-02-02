@@ -8,7 +8,7 @@
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 LayerTestResult<armnn::BFloat16, 4> ConvertFp32ToBf16Test(
     armnn::IWorkloadFactory& workloadFactory,

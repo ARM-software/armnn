@@ -453,6 +453,10 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/test/TensorUtilsTest.cpp \
         src/armnnTestUtils/CommonTestUtils.cpp \
         src/armnnTestUtils/GraphUtils.cpp \
+        src/armnnTestUtils/MockBackend.cpp \
+        src/armnnTestUtils/MockMemoryManager.cpp \
+        src/armnnTestUtils/MockTensorHandle.cpp \
+        src/armnnTestUtils/MockTensorHandleFactory.cpp \
         src/armnnTestUtils/TensorCopyUtils.cpp \
         src/armnnTestUtils/TestUtils.cpp \
         src/armnnTestUtils/UnitTests.cpp \

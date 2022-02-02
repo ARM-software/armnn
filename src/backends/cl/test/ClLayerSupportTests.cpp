@@ -8,7 +8,7 @@
 #include <layers/ConvertFp16ToFp32Layer.hpp>
 #include <layers/ConvertFp32ToFp16Layer.hpp>
 #include <layers/MeanLayer.hpp>
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 #include <armnn/backends/TensorHandle.hpp>
 #include <cl/ClWorkloadFactory.hpp>

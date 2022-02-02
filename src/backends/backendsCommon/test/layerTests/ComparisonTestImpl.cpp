@@ -7,7 +7,7 @@
 
 #include <armnn/utility/Assert.hpp>
 #include <Half.hpp>
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/backends/Workload.hpp>
@@ -16,7 +16,7 @@
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 namespace
 {

@@ -5,7 +5,7 @@
 
 #include "LstmTestImpl.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 #include <armnn/utility/NumericCast.hpp>
 
@@ -18,7 +18,7 @@
 #include <reference/workloads/Encoders.hpp>
 #include <reference/workloads/LstmUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 #include <doctest/doctest.h>
 namespace

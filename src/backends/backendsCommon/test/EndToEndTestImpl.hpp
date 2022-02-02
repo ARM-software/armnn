@@ -11,7 +11,7 @@
 #include <armnn/IRuntime.hpp>
 
 #include <Profiling.hpp>
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <doctest/doctest.h>

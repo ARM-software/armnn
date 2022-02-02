@@ -7,7 +7,7 @@
 
 #include <armnnTestUtils/LayerTestResult.hpp>
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 
@@ -18,7 +18,7 @@
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> PreluTest(

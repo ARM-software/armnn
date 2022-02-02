@@ -5,7 +5,7 @@
 #pragma once
 
 #include "EndToEndTestImpl.hpp"
-#include "QuantizeHelper.hpp"
+#include <armnnUtils/QuantizeHelper.hpp>
 
 #include <ResolveType.hpp>
 

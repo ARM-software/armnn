@@ -12,6 +12,7 @@ list(APPEND armnnRefBackendUnitTests_sources
     RefJsonPrinterTests.cpp
     RefLayerSupportTests.cpp
     RefLayerTests.cpp
+    RefMemCopyTests.cpp
     RefMemoryManagerTests.cpp
     RefOptimizedNetworkTests.cpp
     RefPerAxisIteratorTests.cpp

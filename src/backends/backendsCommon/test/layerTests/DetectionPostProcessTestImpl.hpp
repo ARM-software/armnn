@@ -16,7 +16,7 @@
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 #include <doctest/doctest.h>
 

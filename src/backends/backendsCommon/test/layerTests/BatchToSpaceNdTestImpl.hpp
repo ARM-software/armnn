@@ -10,10 +10,10 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
 
+#include <DataTypeUtils.hpp>
 #include <armnnTestUtils/LayerTestResult.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <DataTypeUtils.hpp>
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 namespace

@@ -4,13 +4,13 @@
 //
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-#include <aclCommon/test/MemCopyTestImpl.hpp>
 
 #if defined(ARMCOMPUTECL_ENABLED) && defined(ARMCOMPUTENEON_ENABLED)
+#include <armnnTestUtils/LayerTestResult.hpp>
+#include <armnnTestUtils/MemCopyTestImpl.hpp>
 #include <cl/ClWorkloadFactory.hpp>
 #include <cl/test/ClContextControlFixture.hpp>
 #include <cl/test/ClWorkloadFactoryHelper.hpp>
-
 #include <neon/NeonWorkloadFactory.hpp>
 #include <neon/test/NeonWorkloadFactoryHelper.hpp>
 #endif
@@ -41,6 +41,50 @@ TEST_CASE("AclTypeConversions")
 }
 
 #if defined(ARMCOMPUTECL_ENABLED) && defined(ARMCOMPUTENEON_ENABLED)
+
+namespace
+{
+
+template <>
+struct MemCopyTestHelper<armnn::NeonWorkloadFactory>
+{
+    static armnn::IBackendInternal::IMemoryManagerSharedPtr GetMemoryManager()
+    {
+        armnn::NeonBackend backend;
+        return backend.CreateMemoryManager();
+    }
+
+    static armnn::NeonWorkloadFactory GetFactory(
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ModelOptions& modelOptions = {})
+    {
+        armnn::NeonBackend backend;
+        return armnn::NeonWorkloadFactory(armnn::PolymorphicPointerDowncast<armnn::NeonMemoryManager>(memoryManager),
+                                          backend.CreateBackendSpecificModelContext(modelOptions));
+    }
+};
+
+template <>
+struct MemCopyTestHelper<armnn::ClWorkloadFactory>
+{
+    static armnn::IBackendInternal::IMemoryManagerSharedPtr GetMemoryManager()
+    {
+        armnn::ClBackend backend;
+        return backend.CreateMemoryManager();
+    }
+
+    static armnn::ClWorkloadFactory GetFactory(
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ModelOptions& modelOptions = {})
+    {
+        armnn::ClBackend backend;
+        return armnn::ClWorkloadFactory(armnn::PolymorphicPointerDowncast<armnn::ClMemoryManager>(memoryManager),
+                                        backend.CreateBackendSpecificModelContext(modelOptions));
+    }
+};
+}    // namespace
+
+
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CopyBetweenNeonAndGpu")
 {

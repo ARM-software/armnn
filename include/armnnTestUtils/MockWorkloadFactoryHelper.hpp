@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <MockTensorHandleFactory.hpp>
-#include <armnnTestUtils/MockBackend.hpp>
+#include "MockBackend.hpp"
+#include "MockTensorHandleFactory.hpp"
 #include <backendsCommon/test/WorkloadFactoryHelper.hpp>
 
 namespace

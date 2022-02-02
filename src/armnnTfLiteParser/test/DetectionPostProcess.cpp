@@ -9,7 +9,7 @@
 #include <GraphUtils.hpp>
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 TEST_SUITE("TensorflowLiteParser_DetectionPostProcess")
 {

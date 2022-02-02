@@ -8,7 +8,7 @@
 #include <ResolveType.hpp>
 
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 #include <armnnTestUtils/DataLayoutUtils.hpp>
 

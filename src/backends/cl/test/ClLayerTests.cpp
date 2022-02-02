@@ -6,7 +6,7 @@
 #include "ClContextControlFixture.hpp"
 #include "ClWorkloadFactoryHelper.hpp"
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 #include <UnitTests.hpp>
 
 #include <cl/ClLayerSupport.hpp>

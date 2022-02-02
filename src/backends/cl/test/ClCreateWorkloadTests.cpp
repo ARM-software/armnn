@@ -11,7 +11,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/backends/MemCopyWorkload.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
 #include <aclCommon/test/CreateWorkloadClNeon.hpp>

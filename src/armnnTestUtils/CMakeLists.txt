@@ -11,10 +11,11 @@ list(APPEND armnnTestUtils_sources
         ../../include/armnnTestUtils/MockBackend.hpp
         ../../include/armnnTestUtils/MockMemoryManager.hpp
         ../../include/armnnTestUtils/MockTensorHandle.hpp
+        ../../include/armnnTestUtils/MockWorkloadFactoryHelper.hpp
         ../../include/armnnTestUtils/PredicateResult.hpp
         ../../include/armnnTestUtils/TensorCopyUtils.hpp
         ../../include/armnnTestUtils/WorkloadTestUtils.hpp
-        TensorHelpers.hpp
+        ../../include/armnnTestUtils/TensorHelpers.hpp
         CreateWorkload.hpp
         CommonTestUtils.cpp
         CommonTestUtils.hpp
@@ -24,9 +25,7 @@ list(APPEND armnnTestUtils_sources
         MockBackend.cpp
         MockMemoryManager.cpp
         MockTensorHandle.cpp
-        MockTensorHandleFactory.hpp
         MockTensorHandleFactory.cpp
-        MockWorkloadFactoryHelper.hpp
         TensorCopyUtils.cpp
         TestUtils.cpp
         TestUtils.hpp

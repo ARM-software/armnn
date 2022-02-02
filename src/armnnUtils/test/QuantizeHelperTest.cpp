@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <doctest/doctest.h>

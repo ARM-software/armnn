@@ -13,7 +13,7 @@
 
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 template<typename T>
 LayerTestResult<T, 4> SimplePermuteTestImpl(

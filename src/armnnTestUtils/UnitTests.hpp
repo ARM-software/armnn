@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include "TensorHelpers.hpp"
+#include "armnnTestUtils/TensorHelpers.hpp"
 
 #include <armnn/Logging.hpp>
 #include <armnn/Utils.hpp>

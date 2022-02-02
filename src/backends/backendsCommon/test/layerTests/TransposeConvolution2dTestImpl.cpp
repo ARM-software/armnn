@@ -5,7 +5,7 @@
 
 #include "TransposeConvolution2dTestImpl.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 
 #include <armnnUtils/Permute.hpp>
@@ -18,7 +18,7 @@
 
 #include <reference/RefWorkloadFactory.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 #include <doctest/doctest.h>
 

@@ -13,7 +13,7 @@
 
 #include <doctest/doctest.h>
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <string>
 
 using namespace armnn;

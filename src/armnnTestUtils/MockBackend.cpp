@@ -15,6 +15,12 @@ constexpr const char* MockBackendId()
     return "CpuMock";
 }
 
+const BackendId& MockBackend::GetIdStatic()
+{
+    static const BackendId s_Id{MockBackendId()};
+    return s_Id;
+}
+
 namespace
 {
 static const BackendId s_Id{ MockBackendId() };

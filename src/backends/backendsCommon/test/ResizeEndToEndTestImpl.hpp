@@ -4,12 +4,9 @@
 //
 #pragma once
 
-#include "QuantizeHelper.hpp"
-
-
 #include <armnnUtils/Permute.hpp>
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <CommonTestUtils.hpp>

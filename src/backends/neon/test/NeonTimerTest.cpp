@@ -6,7 +6,7 @@
 #include "NeonWorkloadFactoryHelper.hpp"
 
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 #include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>

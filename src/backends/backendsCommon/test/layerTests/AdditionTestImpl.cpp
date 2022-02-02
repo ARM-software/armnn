@@ -7,7 +7,7 @@
 
 #include "ElementwiseTestImpl.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <reference/test/RefWorkloadFactoryHelper.hpp>
 
 template<>

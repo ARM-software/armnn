@@ -7,7 +7,7 @@
 
 #include <CommonTestUtils.hpp>
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 

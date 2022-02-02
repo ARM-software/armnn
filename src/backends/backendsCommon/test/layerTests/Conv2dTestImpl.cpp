@@ -5,7 +5,7 @@
 
 #include "Conv2dTestImpl.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
@@ -19,7 +19,7 @@
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 #include <string>
 

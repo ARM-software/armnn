@@ -5,7 +5,7 @@
 
 #include "ActivationTestImpl.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <backendsCommon/test/ActivationFixture.hpp>
@@ -15,7 +15,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 #include <algorithm>
 

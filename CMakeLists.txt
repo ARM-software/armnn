@@ -78,6 +78,7 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/Filesystem.hpp
     include/armnnUtils/FloatingPointComparison.hpp
     include/armnnUtils/FloatingPointConverter.hpp
+    include/armnnUtils/QuantizeHelper.hpp
     include/armnnUtils/TContainer.hpp
     include/armnnUtils/TensorUtils.hpp
     include/armnnUtils/Threads.hpp
@@ -107,7 +108,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/Processes.cpp
     src/armnnUtils/PrototxtConversions.hpp
     src/armnnUtils/PrototxtConversions.cpp
-    src/armnnUtils/QuantizeHelper.hpp
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
     src/armnnUtils/Threads.cpp

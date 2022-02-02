@@ -9,7 +9,7 @@
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 template<armnn::DataType ArmnnType, typename T>
 LayerTestResult<T, 4> SimpleFloorTest(

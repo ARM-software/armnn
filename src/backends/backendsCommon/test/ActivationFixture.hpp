@@ -9,7 +9,7 @@
 
 #include <armnn/utility/NumericCast.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 struct ActivationFixture
 {

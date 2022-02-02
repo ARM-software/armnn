@@ -8,7 +8,7 @@
 #include "InferenceTestImage.hpp"
 #include "ObjectDetectionCommon.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 #include <armnn/TypesUtils.hpp>
 #include <armnn/utility/NumericCast.hpp>

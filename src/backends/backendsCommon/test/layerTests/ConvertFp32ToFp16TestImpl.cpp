@@ -9,7 +9,7 @@
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 
 LayerTestResult<armnn::Half, 4> SimpleConvertFp32ToFp16Test(
     armnn::IWorkloadFactory& workloadFactory,

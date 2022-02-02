@@ -5,7 +5,7 @@
 
 #include "NeonWorkloadFactoryHelper.hpp"
 
-#include <TensorHelpers.hpp>
+#include <armnnTestUtils/TensorHelpers.hpp>
 #include <UnitTests.hpp>
 
 #include <neon/NeonLayerSupport.hpp>

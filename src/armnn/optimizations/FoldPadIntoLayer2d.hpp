@@ -7,7 +7,7 @@
 
 #include "Optimization.hpp"
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>

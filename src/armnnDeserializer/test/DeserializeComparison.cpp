@@ -6,7 +6,7 @@
 #include "ParserFlatbuffersSerializeFixture.hpp"
 #include <armnnDeserializer/IDeserializer.hpp>
 
-#include <QuantizeHelper.hpp>
+#include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
 #include <string>

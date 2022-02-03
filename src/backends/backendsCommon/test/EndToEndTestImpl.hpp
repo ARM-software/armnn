@@ -380,7 +380,7 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     // Contains ActivationWorkload
@@ -472,7 +472,7 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     // Check there are no SyncMemGeneric workloads as we didn't export
@@ -560,7 +560,7 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     // Check there is a SyncMemGeneric workload as we exported
@@ -649,7 +649,7 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     // Check there is a SyncMemGeneric workload as we exported
@@ -877,7 +877,7 @@ inline void ForceImportWithAlignedBuffersEndToEndTest(std::vector<BackendId> bac
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     if (backends[0] == Compute::CpuAcc)
@@ -987,7 +987,7 @@ inline void ForceImportWithMisalignedInputBuffersEndToEndTest(std::vector<Backen
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     // GpuAcc is a different case to CpuRef and CpuAcc, it doesn't use the buffer directly but instead maps it to a
@@ -1103,7 +1103,7 @@ inline void ForceImportWithMisalignedOutputBuffersEndToEndTest(std::vector<Backe
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     // GpuAcc is a different case to CpuRef and CpuAcc, it doesn't use the buffer directly but instead maps it to a
@@ -1221,7 +1221,7 @@ inline void ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(std::vect
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
     std::stringstream ss;
-    profilerManager.GetProfiler()->Print(ss);;
+    profilerManager.GetProfiler()->Print(ss);
     std::string dump = ss.str();
 
     // GpuAcc is a different case to CpuRef and CpuAcc, it doesn't use the buffer directly but instead maps it to a
@@ -1245,6 +1245,358 @@ inline void ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(std::vect
     }
     std::free(inputMemPtr);
     std::free(outputMemPtr);
+}
+
+inline void ForceImportRepeatedInferencesEndToEndTest(std::vector<BackendId> backends)
+{
+    /**
+     * This test is similar to the Import tests above, we create a network with a square function and pass in a vector
+     * with 4 floats, square them. and validate the output. We then check the profiling logs to see if input/output
+     * tensors are copied (CopyMemGeneric) or imported (SyncMemGeneric)
+     * In this we create some aligned buffers, import them into a network and validate the output and number of
+     * SynMemGeneric/CopyMemgeneric. Then we try the same network again with misaligned buffers to make sure it falls
+     * back to copying correctly.
+     */
+    using namespace armnn;
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Square;
+    IConnectableLayer* activationLayer = net->AddActivationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
+    activationLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
+    activationLayer->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    INFO("Load Network");
+    // Load it into the runtime. It should pass.
+    NetworkId netId;
+    std::string ignoredErrorMessage;
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
+               == Status::Success);
+    INFO("Generate Data");
+
+    // Creates structures for input & output
+    std::vector<float> inputData
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    };
+    std::vector<float> outputData(4);
+    std::vector<float> expectedOutput
+    {
+         1.0f, 4.0f, 9.0f, 16.0f
+    };
+
+    // Check our input and output pointers are actually aligned
+    uintptr_t alignment = GetDataTypeSize(DataType::Float32);
+    CHECK(!(reinterpret_cast<uintptr_t>(inputData.data()) % alignment));
+    CHECK(!(reinterpret_cast<uintptr_t>(outputData.data()) % alignment));
+
+    INFO("Create Inference");
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+    std::vector<ImportedInputId> importedInputIds =
+        runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    std::vector<ImportedOutputId> importedOutputIds =
+        runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    // Do the inference and force the import as the memory is aligned.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+
+    // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    std::string dump = ss.str();
+
+    if (backends[0] == Compute::CpuAcc)
+    {
+        // Reconfigure has not been implemented for CpuAcc so it will always copy, this will break whenever
+        // reconfigure is implemented
+        int count = SubStringCounter(dump, "SyncMemGeneric");
+        CHECK(count == 0);
+        // Should be 2 CopyMemGeneric workloads
+        count = SubStringCounter(dump, "CopyMemGeneric");
+        CHECK(count >= 1);
+    }
+    else
+    {
+        // Check there is at least 1 SyncMemGeneric workload as we exported
+        int count = SubStringCounter(dump, "SyncMemGeneric");
+        CHECK(count >= 1);
+        // Shouldn't be any CopyMemGeneric workloads
+        count = SubStringCounter(dump, "CopyMemGeneric");
+        CHECK(count == 0);
+    }
+    // Check the output is correct
+    CHECK(std::equal(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end()));
+
+    // This code looks a little funky but the idea is to create a buffer of floats but offset by the size of a char
+    // this will guarantee that the resultant buffer is misaligned and thus should always be copied.
+    auto inputMemPtr = std::malloc(4 * sizeof(float) + sizeof(char));
+    float* misalignedInputPtr = reinterpret_cast<float*>(reinterpret_cast<char*>(inputMemPtr) + 1);
+
+    // Check if our pointer is truly misaligned
+    CHECK (reinterpret_cast<uintptr_t>(misalignedInputPtr) % alignment);
+    auto inputBuffer = reinterpret_cast<float*>(misalignedInputPtr);
+    for (int i = 0; i < 4; i++)
+    {
+        inputBuffer[i] = 2.0f + static_cast<float>(i);
+    }
+
+    auto outputMemPtr = std::malloc(4 * sizeof(float) + sizeof(char));
+    float* misalignedOutputPtr = reinterpret_cast<float*>(reinterpret_cast<char*>(outputMemPtr) + 1);
+
+    // Check if our pointer is truly misaligned
+    CHECK (reinterpret_cast<uintptr_t>(misalignedOutputPtr) % alignment);
+
+    std::vector<float> expectedMisalignedOutput
+    {
+         4.0f, 9.0f, 16.0f, 25.0f
+    };
+
+    INFO("Create Second Inference");
+    InputTensors inputTensorsMisaligned
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), misalignedInputPtr)},
+    };
+    OutputTensors outputTensorsMisaligned
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), misalignedOutputPtr)}
+    };
+    importedInputIds = runtime->ImportInputs(netId, inputTensorsMisaligned, MemorySource::Malloc);
+    importedOutputIds = runtime->ImportOutputs(netId, outputTensorsMisaligned, MemorySource::Malloc);
+
+    // Do the inference and force the import as the memory is misaligned.
+    runtime->EnqueueWorkload(netId,
+                             inputTensorsMisaligned,
+                             outputTensorsMisaligned,
+                             importedInputIds,
+                             importedOutputIds);
+
+    // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
+    // We need to use AnalyzeEventsAndWriteResults here to make sure the second inference has been profiled
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    dump = ss.str();
+
+    // GpuAcc is a different case to CpuRef and CpuAcc, it doesn't use the buffer directly but instead maps it to a
+    // new set of addresses within Gpu Memory. This will almost always be auto-aligned, so we don't need to check
+    // for imports/copies. Only that the output is correct.
+    if (backends[0] != Compute::GpuAcc)
+    {
+        // The SyncMemGeneric will still be in the profiling log from the first inference
+        int count = SubStringCounter(dump, "SyncMemGeneric");
+        CHECK(count >= 1);
+        // We should now see CopyMemGeneric workloads as we copied all buffers
+        count = SubStringCounter(dump, "CopyMemGeneric");
+        CHECK(count >= 1);
+    }
+    // Check the output is correct
+    unsigned int index = 0;
+    for (auto outputValue : expectedMisalignedOutput)
+    {
+        CHECK(outputValue == reinterpret_cast<float*>(misalignedOutputPtr)[index]);
+        ++index;
+    }
+    // Clean up to avoid interfering with other tests
+    runtime->UnloadNetwork(netId);
+    std::free(inputMemPtr);
+    std::free(outputMemPtr);
+}
+
+
+inline void ForceImportRepeatedInferencesInvertedEndToEndTest(std::vector<BackendId> backends)
+{
+    /**
+     * This test is similar to the Import tests above, we create a network with a square function and pass in a vector
+     * with 4 floats, square them. and validate the output. We then check the profiling logs to see if input/output
+     * tensors are copied (CopyMemGeneric) or imported (SyncMemGeneric)
+     * In this we create some misaligned buffers, copy them into a network and validate the output and number of
+     * SynMemGeneric/CopyMemgeneric. Then we try the same network again with aligned buffers to make sure it switches
+     * to importing correctly.
+     */
+    using namespace armnn;
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+    IConnectableLayer* input = net->AddInputLayer(0);
+
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::Square;
+    IConnectableLayer* activationLayer = net->AddActivationLayer(descriptor);
+
+    IConnectableLayer* output = net->AddOutputLayer(0);
+
+    input->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
+    activationLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
+    activationLayer->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
+
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    INFO("Load Network");
+    // Load it into the runtime. It should pass.
+    NetworkId netId;
+    std::string ignoredErrorMessage;
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
+               == Status::Success);
+    INFO("Generate Data");
+
+    // This code looks a little funky but the idea is to create a buffer of floats but offset by the size of a char
+    // this will guarantee that the resultant buffer is misaligned and thus should always be copied.
+    auto inputMemPtr = std::malloc(4 * sizeof(float) + sizeof(char));
+    float* misalignedInputPtr = reinterpret_cast<float*>(reinterpret_cast<char*>(inputMemPtr) + 1);
+
+    // Check if our pointer is truly misaligned
+    uintptr_t alignment = GetDataTypeSize(DataType::Float32);
+    CHECK (reinterpret_cast<uintptr_t>(misalignedInputPtr) % alignment);
+    auto inputBuffer = reinterpret_cast<float*>(misalignedInputPtr);
+    for (int i = 0; i < 4; i++)
+    {
+        inputBuffer[i] = 2.0f + static_cast<float>(i);
+    }
+
+    auto outputMemPtr = std::malloc(4 * sizeof(float) + sizeof(char));
+    float* misalignedOutputPtr = reinterpret_cast<float*>(reinterpret_cast<char*>(outputMemPtr) + 1);
+
+    // Check if our pointer is truly misaligned
+    CHECK (reinterpret_cast<uintptr_t>(misalignedOutputPtr) % alignment);
+
+    std::vector<float> expectedMisalignedOutput
+    {
+         4.0f, 9.0f, 16.0f, 25.0f
+    };
+
+    INFO("Create Second Inference");
+    InputTensors inputTensorsMisaligned
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), misalignedInputPtr)},
+    };
+    OutputTensors outputTensorsMisaligned
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), misalignedOutputPtr)}
+    };
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+    std::vector<ImportedInputId>  importedInputIds =
+        runtime->ImportInputs(netId, inputTensorsMisaligned, MemorySource::Malloc);
+    std::vector<ImportedOutputId> importedOutputIds =
+        runtime->ImportOutputs(netId, outputTensorsMisaligned, MemorySource::Malloc);
+
+    // Do the inference and force the import as the memory is misaligned.
+    runtime->EnqueueWorkload(netId,
+                             inputTensorsMisaligned,
+                             outputTensorsMisaligned,
+                             importedInputIds,
+                             importedOutputIds);
+
+    // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    std::string dump = ss.str();
+
+    // GpuAcc is a different case to CpuRef and CpuAcc, it doesn't use the buffer directly but instead maps it to a
+    // new set of addresses within Gpu Memory. This will almost always be auto-aligned, so we don't need to check
+    // for imports/copies. Only that the output is correct.
+    if (backends[0] != Compute::GpuAcc)
+    {
+        // We can only copy so there should be no SyncMemGeneric
+        int count = SubStringCounter(dump, "SyncMemGeneric");
+        CHECK(count == 0);
+        // Should only be CopyMemGeneric workloads as we copied all buffers
+        count = SubStringCounter(dump, "CopyMemGeneric");
+        CHECK(count >= 1);
+    }
+    // Check the output is correct
+    unsigned int index = 0;
+    for (auto outputValue : expectedMisalignedOutput)
+    {
+        CHECK(outputValue == reinterpret_cast<float*>(misalignedOutputPtr)[index]);
+        ++index;
+    }
+    std::free(inputMemPtr);
+    std::free(outputMemPtr);
+
+    // Creates structures for input & output
+    std::vector<float> inputData
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    };
+    std::vector<float> outputData(4);
+    std::vector<float> expectedOutput
+    {
+         1.0f, 4.0f, 9.0f, 16.0f
+    };
+
+    // Check our input and output pointers are actually aligned
+    CHECK(!(reinterpret_cast<uintptr_t>(inputData.data()) % alignment));
+    CHECK(!(reinterpret_cast<uintptr_t>(outputData.data()) % alignment));
+
+    INFO("Create Inference");
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(runtime->GetInputTensorInfo(netId, 0), inputData.data())},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), outputData.data())}
+    };
+
+    importedInputIds = runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    importedOutputIds = runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    // Do the inference and force the import as the memory is aligned.
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+
+    // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
+    // We need to use AnalyzeEventsAndWriteResults here to make sure the second inference has been profiled
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    dump = ss.str();
+
+    if (backends[0] == Compute::CpuAcc)
+    {
+        // Reconfigure has not been implemented for CpuAcc so it will always copy, this will break whenever
+        // reconfigure is implemented
+        int count = SubStringCounter(dump, "SyncMemGeneric");
+        CHECK(count == 0);
+        // Should be 2 CopyMemGeneric workloads
+        count = SubStringCounter(dump, "CopyMemGeneric");
+        CHECK(count >= 1);
+    }
+    else
+    {
+        // Repeated inferences make it difficult to check for an accurate count. So we just validate that we have a
+        // SyncMemGeneric Workload when we previously didn't
+        int count = SubStringCounter(dump, "SyncMemGeneric");
+        CHECK(count >= 1);
+        // Should still be some CopyMemGeneric Workloads from the last inference
+        count = SubStringCounter(dump, "CopyMemGeneric");
+        CHECK(count >= 1);
+    }
+    // Check the output is correct
+    CHECK(std::equal(outputData.begin(), outputData.end(), expectedOutput.begin(), expectedOutput.end()));
+    // Clean up to avoid interfering with other tests
+    runtime->UnloadNetwork(netId);
 }
 
 } // anonymous namespace

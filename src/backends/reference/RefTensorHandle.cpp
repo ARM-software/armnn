@@ -170,11 +170,8 @@ bool RefTensorHandle::CanBeImported(void *memory, MemorySource source)
             {
                 return false;
             }
-
             return true;
-
         }
-
     }
     return false;
 }

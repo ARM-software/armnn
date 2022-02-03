@@ -1398,6 +1398,16 @@ TEST_CASE("RefForceImportWithMisalignedInputAndOutputBuffersEndToEndTest")
     ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(defaultBackends);
 }
 
+TEST_CASE("RefForceImportRepeatedInferencesEndToEndTest")
+{
+    ForceImportRepeatedInferencesEndToEndTest(defaultBackends);
+}
+
+TEST_CASE("RefForceImportRepeatedInferencesInvertedEndToEndTest")
+{
+    ForceImportRepeatedInferencesInvertedEndToEndTest(defaultBackends);
+}
+
 #if !defined(__ANDROID__)
 // Only run these tests on non Android platforms
 TEST_CASE("RefImportNonAlignedPointerTest")

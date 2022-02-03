@@ -97,7 +97,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
                                  armnnDelegate::TfLiteArmnnDelegateDelete);
         // Register armnn_delegate to TfLiteInterpreter
         status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
-        if (status == kTfLiteError)
+        if (status != kTfLiteOk)
         {
             ARMNN_LOG(fatal) << "Could not register ArmNN TfLite Delegate to TfLiteInterpreter!";
             return EXIT_FAILURE;
@@ -284,13 +284,13 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
             }
 
             std::cout << tfLiteInterpreter->GetOutputName(outputIndex) << ": ";
-            if (params.m_OutputTypes[outputIndex].compare("float") == 0)
+            if (params.m_OutputTypes[paramOutputIndex].compare("float") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
                 if(tfLiteDelageOutputData == NULL)
                 {
                     ARMNN_LOG(fatal) << "Output tensor is null, output type: "
-                                        "\"" << params.m_OutputTypes[outputIndex] << "\" may be incorrect.";
+                                        "\"" << params.m_OutputTypes[paramOutputIndex] << "\" may be incorrect.";
                     return EXIT_FAILURE;
                 }
 
@@ -302,13 +302,13 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
                     }
                 }
             }
-            else if (params.m_OutputTypes[outputIndex].compare("int") == 0)
+            else if (params.m_OutputTypes[paramOutputIndex].compare("int") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<int32_t>(tfLiteDelegateOutputId);
                 if(tfLiteDelageOutputData == NULL)
                 {
                     ARMNN_LOG(fatal) << "Output tensor is null, output type: "
-                                        "\"" << params.m_OutputTypes[outputIndex] << "\" may be incorrect.";
+                                        "\"" << params.m_OutputTypes[paramOutputIndex] << "\" may be incorrect.";
                     return EXIT_FAILURE;
                 }
 
@@ -320,14 +320,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
                     }
                 }
             }
-            else if (params.m_OutputTypes[outputIndex].compare("qsymms8") == 0 ||
-                     params.m_OutputTypes[outputIndex].compare("qasymms8") == 0)
+            else if (params.m_OutputTypes[paramOutputIndex].compare("qsymms8") == 0 ||
+                     params.m_OutputTypes[paramOutputIndex].compare("qasymms8") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<int8_t>(tfLiteDelegateOutputId);
                 if(tfLiteDelageOutputData == NULL)
                 {
                     ARMNN_LOG(fatal) << "Output tensor is null, output type: "
-                                        "\"" << params.m_OutputTypes[outputIndex] << "\" may be incorrect.";
+                                        "\"" << params.m_OutputTypes[paramOutputIndex] << "\" may be incorrect.";
                     return EXIT_FAILURE;
                 }
 
@@ -339,14 +339,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
                     }
                 }
             }
-            else if (params.m_OutputTypes[outputIndex].compare("qasymm8") == 0 ||
-                     params.m_OutputTypes[outputIndex].compare("qasymmu8") == 0)
+            else if (params.m_OutputTypes[paramOutputIndex].compare("qasymm8") == 0 ||
+                     params.m_OutputTypes[paramOutputIndex].compare("qasymmu8") == 0)
             {
                 auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<uint8_t>(tfLiteDelegateOutputId);
                 if(tfLiteDelageOutputData == NULL)
                 {
                     ARMNN_LOG(fatal) << "Output tensor is null, output type: "
-                                        "\"" << params.m_OutputTypes[outputIndex] << "\" may be incorrect.";
+                                        "\"" << params.m_OutputTypes[paramOutputIndex] << "\" may be incorrect.";
                     return EXIT_FAILURE;
                 }
 
@@ -361,7 +361,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
             else
             {
                 ARMNN_LOG(fatal) << "Output tensor is null, output type: "
-                                    "\"" << params.m_OutputTypes[outputIndex] <<
+                                    "\"" << params.m_OutputTypes[paramOutputIndex] <<
                                  "\" may be incorrect. Output type can be specified with -z argument";
                 return EXIT_FAILURE;
             }

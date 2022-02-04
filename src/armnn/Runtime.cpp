@@ -242,6 +242,7 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
                                            profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
             }
         }
+
         if (m_LoadedNetworks.erase(networkId) == 0)
         {
             ARMNN_LOG(warning) << "WARNING: RuntimeImpl::UnloadNetwork(): " << networkId << " not found!";
@@ -631,6 +632,12 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
 
     ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
                     << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
+
+    // Call After EnqueueWorkload events
+    for (auto&& context : m_BackendContexts)
+    {
+        context.second->AfterEnqueueWorkload(networkId);
+    }
 
     return status;
 }

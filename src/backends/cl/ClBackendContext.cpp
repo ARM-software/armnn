@@ -285,6 +285,11 @@ bool ClBackendContext::AfterUnloadNetwork(NetworkId networkId)
     return true;
 }
 
+bool ClBackendContext::AfterEnqueueWorkload(NetworkId)
+{
+    return m_ClContextControlWrapper->Sync();
+}
+
 ClBackendContext::~ClBackendContext()
 {
     if (m_Tuner && !m_TuningFile.empty())

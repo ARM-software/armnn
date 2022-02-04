@@ -25,6 +25,8 @@ public:
     bool BeforeUnloadNetwork(NetworkId networkId) override;
     bool AfterUnloadNetwork(NetworkId networkId) override;
 
+    bool AfterEnqueueWorkload(NetworkId networkId) override;
+
     ~ClBackendContext() override;
 
 private:

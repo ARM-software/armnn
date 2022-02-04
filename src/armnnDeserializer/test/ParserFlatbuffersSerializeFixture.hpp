@@ -96,10 +96,10 @@ struct ParserFlatbuffersSerializeFixture
         flatbuffers::Parser parser;
 
         bool ok = parser.Parse(schemafile.c_str());
-        ARMNN_ASSERT_MSG(ok, "Failed to parse schema file");
+        CHECK_MESSAGE(ok, std::string("Failed to parse schema file. Error was: " + parser.error_).c_str());
 
         ok &= parser.Parse(m_JsonString.c_str());
-        ARMNN_ASSERT_MSG(ok, "Failed to parse json input");
+        CHECK_MESSAGE(ok, std::string("Failed to parse json input. Error was: " + parser.error_).c_str());
 
         if (!ok)
         {

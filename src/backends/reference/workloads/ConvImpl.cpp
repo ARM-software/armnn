@@ -107,6 +107,8 @@ void Convolve(const TensorShape& rInputShape,
     const unsigned int outputWidth  = rOutputShape[widthIndex];
     const unsigned int inputHeight  = rInputShape[heightIndex];
     const unsigned int inputWidth   = rInputShape[widthIndex];
+    const unsigned int inputHW      = inputHeight * inputWidth;
+    const unsigned int inputWC      = inputWidth * inputChannels;
 
     const unsigned int filterHeight = depthwise ? rFilterShape[1] : rFilterShape[heightIndex];
     const unsigned int filterWidth  = depthwise ? rFilterShape[2] : rFilterShape[widthIndex];
@@ -119,6 +121,7 @@ void Convolve(const TensorShape& rInputShape,
 
     for (unsigned int batchIdx = 0; batchIdx < batchSize; batchIdx++)
     {
+        unsigned int mul_bwhc = batchIdx * inputHeight * inputWidth * inputChannels;
         for (unsigned int cOutput = 0; cOutput < outputChannels; cOutput++)
         {
             for (unsigned int yOutput = 0; yOutput < outputHeight; yOutput++)
@@ -186,15 +189,15 @@ void Convolve(const TensorShape& rInputShape,
                                     // performance regression.
                                     if (dataLayoutIndexed.GetDataLayout() == DataLayout::NHWC)
                                     {
-                                        inputIndex = batchIdx * inputHeight * inputWidth * inputChannels +
-                                                     (yInput - paddingTop) * inputWidth * inputChannels +
+                                        inputIndex = mul_bwhc +
+                                                     (yInput - paddingTop) * inputWC +
                                                      (xInput - paddingLeft) * inputChannels +
                                                      cInput;
                                     }
                                     else
                                     {
-                                        inputIndex = batchIdx * inputWidth * inputHeight * inputChannels +
-                                                     inputWidth * inputHeight * cInput +
+                                        inputIndex = mul_bwhc +
+                                                     inputHW * cInput +
                                                      inputWidth * (yInput - paddingTop) +
                                                      xInput - paddingLeft;
                                     }

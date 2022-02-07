@@ -297,7 +297,7 @@ public:
     const TensorShape& GetShape() const { return m_Info.GetShape(); }
     TensorShape& GetShape() { return m_Info.GetShape(); }
 
-    DataType GetDataType() const                    { return m_Info.GetDataType(); }
+    DataType GetDataType() const { return m_Info.GetDataType(); }
     unsigned int GetNumDimensions() const { return m_Info.GetNumDimensions(); }
     unsigned int GetNumBytes() const { return m_Info.GetNumBytes(); }
     unsigned int GetNumElements() const { return m_Info.GetNumElements(); }

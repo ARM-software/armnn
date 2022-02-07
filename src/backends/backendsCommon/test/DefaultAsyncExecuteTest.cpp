@@ -210,7 +210,7 @@ TEST_CASE("TestDefaultAsyncExeuteWithThreads")
     ConstTensor constInputTensor2(info, inVals2);
     ConstTensor constOutputTensor2(info, outVals2);
 
-    ConstTensor defaultTensor(info, &defaultVals);
+    ConstTensor defaultTensor(info, defaultVals.data());
 
     ScopedTensorHandle defaultInput = ScopedTensorHandle(defaultTensor);
     ScopedTensorHandle defaultOutput = ScopedTensorHandle(defaultTensor);

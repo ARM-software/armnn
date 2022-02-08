@@ -129,7 +129,6 @@ bool RefTensorHandle::Import(void* memory, MemorySource source)
                     m_Imported = false;
                     m_UnmanagedMemory = nullptr;
                 }
-
                 return false;
             }
 

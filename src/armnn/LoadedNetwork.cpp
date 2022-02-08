@@ -317,9 +317,11 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                             unsigned int inputSlotIndex = 0;
                             for (auto& inputSlot : layer->GetInputSlots())
                             {
-                                if (inputSlot.GetOwningLayer().GetType() == LayerType::Input)
+                                if (inputSlot.GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Input)
                                 {
-                                    auto inputLayer = PolymorphicDowncast<InputLayer*>(&inputSlot.GetOwningLayer());
+                                    auto inputLayer =
+                                        PolymorphicDowncast<InputLayer*>(
+                                            &inputSlot.GetConnectedOutputSlot()->GetOwningLayer());
                                     m_InputWorkloadSlotPairs[inputLayer->GetBindingId()] =
                                         std::make_pair(m_WorkloadQueue.size(), inputSlotIndex);
                                 }

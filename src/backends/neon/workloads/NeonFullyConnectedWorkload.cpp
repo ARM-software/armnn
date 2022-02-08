@@ -24,7 +24,7 @@ using ACLMemManagerOnDemand = std::shared_ptr<arm_compute::MemoryManagerOnDemand
 arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& output,
                                                        const TensorInfo& weights,
-                                                       const TensorInfo& biases,
+                                                       const Optional<TensorInfo>& biases,
                                                        const FullyConnectedDescriptor& descriptor,
                                                        const ActivationDescriptor* activationDescriptor)
 {
@@ -36,7 +36,8 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
     arm_compute::TensorInfo* optionalAclBiases = nullptr;
     if (descriptor.m_BiasEnabled)
     {
-        aclBiases = BuildArmComputeTensorInfo(biases);
+        ARMNN_ASSERT(biases.has_value());
+        aclBiases = BuildArmComputeTensorInfo(biases.value());
         optionalAclBiases = &aclBiases;
     }
 

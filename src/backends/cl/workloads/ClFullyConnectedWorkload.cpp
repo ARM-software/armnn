@@ -19,7 +19,7 @@ using namespace armcomputetensorutils;
 arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const TensorInfo& weights,
-                                                     const TensorInfo& biases,
+                                                     const Optional<TensorInfo>& biases,
                                                      const FullyConnectedDescriptor& descriptor,
                                                      const ActivationDescriptor* activationDescriptor)
 {
@@ -31,7 +31,8 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
     arm_compute::TensorInfo* optionalAclBiases = nullptr;
     if (descriptor.m_BiasEnabled)
     {
-        aclBiases = BuildArmComputeTensorInfo(biases);
+        ARMNN_ASSERT(biases.has_value());
+        aclBiases = BuildArmComputeTensorInfo(biases.value());
         optionalAclBiases = &aclBiases;
     }
 

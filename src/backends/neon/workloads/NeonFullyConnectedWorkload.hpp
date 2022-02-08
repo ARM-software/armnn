@@ -20,7 +20,7 @@ namespace armnn
 arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const TensorInfo& output,
                                                        const TensorInfo& weights,
-                                                       const TensorInfo& biases,
+                                                       const Optional<TensorInfo>& biases,
                                                        const FullyConnectedDescriptor& descriptor,
                                                        const ActivationDescriptor* activationDescriptor = nullptr);
 

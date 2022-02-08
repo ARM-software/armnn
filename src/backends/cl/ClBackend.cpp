@@ -399,11 +399,18 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                             {
                                 FullyConnectedLayer* baseLayer = PolymorphicDowncast<FullyConnectedLayer*>(&base);
 
+                                Optional<TensorInfo> biases;
+
+                                if (baseLayer->GetParameters().m_BiasEnabled)
+                                {
+                                    biases = baseLayer->m_Bias->GetTensorInfo();
+                                }
+
                                 arm_compute::Status status = ClFullyConnectedWorkloadValidate(
                                         baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
                                         activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
                                         baseLayer->m_Weight->GetTensorInfo(),
-                                        baseLayer->m_Bias->GetTensorInfo(),
+                                        biases,
                                         baseLayer->GetParameters(),
                                         &activationDesc);
 

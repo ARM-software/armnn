@@ -65,3 +65,4 @@
 #include "ClConvertFp32ToFp16Workload.hpp"
 #include "ClTransposeConvolution2dWorkload.hpp"
 #include "ClTransposeWorkload.hpp"
+#include "ClUnidirectionalSequenceLstmFloatWorkload.hpp"

@@ -249,35 +249,6 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
 def test_network_method_exists(method):
     assert getattr(ann.INetwork, method, None)
 
-
-def test_fullyconnected_layer_optional_none():
-    net = ann.INetwork()
-    layer = net.AddFullyConnectedLayer(ann.FullyConnectedDescriptor(),
-                                       ann.ConstTensor())
-
-    assert layer
-
-
-def test_fullyconnected_layer_optional_provided():
-    net = ann.INetwork()
-    layer = net.AddFullyConnectedLayer(ann.FullyConnectedDescriptor(),
-                                       ann.ConstTensor(),
-                                       ann.ConstTensor())
-
-    assert layer
-
-
-def test_fullyconnected_layer_all_args():
-    net = ann.INetwork()
-    layer = net.AddFullyConnectedLayer(ann.FullyConnectedDescriptor(),
-                                       ann.ConstTensor(),
-                                       ann.ConstTensor(),
-                                       'NAME1')
-
-    assert layer
-    assert 'NAME1' == layer.GetName()
-
-
 def test_DepthwiseConvolution2d_layer_optional_none():
     net = ann.INetwork()
     layer = net.AddDepthwiseConvolution2dLayer(convolution2dDescriptor=ann.DepthwiseConvolution2dDescriptor(),

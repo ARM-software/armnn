@@ -1105,35 +1105,6 @@ public:
 
     %feature("docstring",
         "
-        Adds a Fully Connected layer to the network with input weights and optional bias.
-        Also known as a Linear or Dense layer.
-
-        Args:
-            fullyConnectedDescriptor (FullyConnectedDescriptor): Description of the fully connected layer.
-            weights (ConstTensor): Tensor for the weights data.
-            biases (ConstTensor): Optional tensor for the bias data.
-            name (str): Optional name for the layer.
-
-        Returns:
-            IConnectableLayer: Interface for configuring the layer.
-    ") AddFullyConnectedLayer;
-    armnn::IConnectableLayer* AddFullyConnectedLayer(const armnn::FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                     const armnn::ConstTensor& weights,
-                                                     armnn::ConstTensor* biases = nullptr,
-                                                     const char* name = nullptr) {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        if (biases) {
-            return $self->AddFullyConnectedLayer(fullyConnectedDescriptor, weights,
-                                                 armnn::Optional<armnn::ConstTensor>(*biases), name);
-        } else {
-            return $self->AddFullyConnectedLayer(fullyConnectedDescriptor, weights,
-                                                 armnn::Optional<armnn::ConstTensor>(), name);
-        }
-        ARMNN_NO_DEPRECATE_WARN_END
-    }
-
-    %feature("docstring",
-        "
         Adds a 2D Transpose Convolution layer to the network.
 
         Args:

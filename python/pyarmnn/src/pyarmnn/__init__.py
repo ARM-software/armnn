@@ -38,7 +38,7 @@ try:
     from ._generated.pyarmnn_deserializer import IDeserializer
 except ImportError as err:
     logger = logging.getLogger(__name__)
-    message = "Your ArmNN library instance does not have an armnn models parser funcionality. "
+    message = "Your ArmNN library instance does not have ArmNN model (.armnn) parser functionality. "
     logger.warning("%s Skipped IDeserializer import.", message)
     logger.debug(str(err))
 

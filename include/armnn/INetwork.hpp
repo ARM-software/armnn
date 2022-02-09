@@ -392,18 +392,6 @@ public:
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddFullyConnectedLayer overload is deprecated", "22.05")
-    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                              const Optional<ConstTensor>& weights,
-                                              const Optional<ConstTensor>& biases,
-                                              const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddFullyConnectedLayer overload is deprecated", "22.05")
-    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                              const ConstTensor& weights,
-                                              const Optional<ConstTensor>& biases,
-                                              const char* name = nullptr);
-
     /// Adds a permute layer to the network.
     /// @param permuteDescriptor - PermuteDescriptor to configure the permute.
     /// @param name - Optional name for the layer.

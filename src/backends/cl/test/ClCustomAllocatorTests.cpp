@@ -40,7 +40,6 @@ public:
         }
         size_t space = size + alignment + alignment;
         auto allocatedMemPtr = std::malloc(space * sizeof(size_t));
-
         if (std::align(alignment, size, allocatedMemPtr, space) == nullptr)
         {
             throw armnn::Exception("SampleClBackendCustomAllocator::Alignment failed");
@@ -63,7 +62,6 @@ public:
 armnn::INetworkPtr CreateTestNetwork(armnn::TensorInfo& inputTensorInfo)
 {
     using namespace armnn;
-    INetworkPtr myNetwork = INetwork::Create();
 
     armnn::FullyConnectedDescriptor fullyConnectedDesc;
     float weightsData[] = {1.0f}; // Identity
@@ -71,25 +69,27 @@ armnn::INetworkPtr CreateTestNetwork(armnn::TensorInfo& inputTensorInfo)
     weightsInfo.SetConstant(true);
     armnn::ConstTensor weights(weightsInfo, weightsData);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer* fullyConnected = myNetwork->AddFullyConnectedLayer(fullyConnectedDesc,
-                                                                          weights,
-                                                                          EmptyOptional(),
-                                                                          "fully connected");
-    ARMNN_NO_DEPRECATE_WARN_END
-    IConnectableLayer* InputLayer = myNetwork->AddInputLayer(0);
-    IConnectableLayer* OutputLayer = myNetwork->AddOutputLayer(0);
-    InputLayer->GetOutputSlot(0).Connect(fullyConnected->GetInputSlot(0));
-    fullyConnected->GetOutputSlot(0).Connect(OutputLayer->GetInputSlot(0));
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights, "Weights");
+    armnn::IConnectableLayer* const fullyConnectedLayer =
+        network->AddFullyConnectedLayer(fullyConnectedDesc, "fully connected");
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(1));
+    fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
 
     //Set the tensors in the network.
 
-    InputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
 
     TensorInfo outputTensorInfo(TensorShape({1, 1}), DataType::Float32);
-    fullyConnected->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+    fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
-    return myNetwork;
+    return network;
 }
 
 TEST_SUITE("ClCustomAllocatorTests")

@@ -171,25 +171,6 @@ IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescript
     return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor, name);
 }
 
-IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                    const ConstTensor& weights,
-                                                    const Optional<ConstTensor>& biases,
-                                                    const char* name)
-{
-    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor,
-                                                armnn::Optional<ConstTensor>(weights),
-                                                biases,
-                                                name);
-}
-
-IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                    const Optional<ConstTensor>& weights,
-                                                    const Optional<ConstTensor>& biases,
-                                                    const char* name)
-{
-    return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor, weights, biases, name);
-}
-
 IConnectableLayer* INetwork::AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
                                              const char* name)
 {

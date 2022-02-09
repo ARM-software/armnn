@@ -927,22 +927,21 @@ TEST_CASE("SerializeFullyConnected")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-
-    // Old way of handling constant tensors.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
+    armnn::IConnectableLayer* const weightsInputLayer = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const biasInputLayer = network->AddInputLayer(2);
     armnn::IConnectableLayer* const fullyConnectedLayer =
-        network->AddFullyConnectedLayer(descriptor,
-                                        weights,
-                                        armnn::Optional<armnn::ConstTensor>(biases),
-                                        layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
-
+            network->AddFullyConnectedLayer(descriptor,
+                                            layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    weightsInputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(1));
+    biasInputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(2));
     fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    weightsInputLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    biasInputLayer->GetOutputSlot(0).SetTensorInfo(biasesInfo);
     fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));

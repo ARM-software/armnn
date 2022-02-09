@@ -71,26 +71,27 @@ int main()
 
     // Turn on logging to standard output
     // This is useful in this sample so that users can learn more about what is going on
-    armnn::ConfigureLogging(true, false, LogSeverity::Info);
+    ConfigureLogging(true, false, LogSeverity::Info);
 
     // Construct ArmNN network
-    armnn::NetworkId networkIdentifier;
-    INetworkPtr myNetwork = INetwork::Create();
-    armnn::FullyConnectedDescriptor fullyConnectedDesc;
+    NetworkId networkIdentifier;
+    INetworkPtr network = INetwork::Create();
+    FullyConnectedDescriptor fullyConnectedDesc;
     float weightsData[] = {1.0f}; // Identity
     TensorInfo weightsInfo(TensorShape({1, 1}), DataType::Float32, 0.0f, 0, true);
     weightsInfo.SetConstant(true);
-    armnn::ConstTensor weights(weightsInfo, weightsData);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer *fullyConnected = myNetwork->AddFullyConnectedLayer(fullyConnectedDesc,
-                                                                          weights,
-                                                                          EmptyOptional(),
-                                                                          "fully connected");
-    ARMNN_NO_DEPRECATE_WARN_END
-    IConnectableLayer *InputLayer = myNetwork->AddInputLayer(0);
-    IConnectableLayer *OutputLayer = myNetwork->AddOutputLayer(0);
-    InputLayer->GetOutputSlot(0).Connect(fullyConnected->GetInputSlot(0));
-    fullyConnected->GetOutputSlot(0).Connect(OutputLayer->GetInputSlot(0));
+    ConstTensor weights(weightsInfo, weightsData);
+
+    IConnectableLayer* inputLayer   = network->AddInputLayer(0);
+    IConnectableLayer* weightsLayer = network->AddConstantLayer(weights, "Weights");
+    IConnectableLayer* fullyConnectedLayer =
+            network->AddFullyConnectedLayer(fullyConnectedDesc, "fully connected");
+    IConnectableLayer* outputLayer  = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(1));
+    fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
 
     // Create ArmNN runtime:
     //
@@ -111,19 +112,19 @@ int main()
 
     //Set the tensors in the network.
     TensorInfo inputTensorInfo(TensorShape({1, 1}), DataType::Float32);
-    InputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
 
     unsigned int numElements = inputTensorInfo.GetNumElements();
     size_t totalBytes = numElements * sizeof(float);
 
     TensorInfo outputTensorInfo(TensorShape({1, 1}), DataType::Float32);
-    fullyConnected->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+    fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Optimise ArmNN network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = true;
-    armnn::IOptimizedNetworkPtr optNet =
-                Optimize(*myNetwork, {"GpuAcc"}, runtime->GetDeviceSpec(), optOptions);
+    IOptimizedNetworkPtr optNet =
+                Optimize(*network, {"GpuAcc"}, runtime->GetDeviceSpec(), optOptions);
     if (!optNet)
     {
         // This shouldn't happen for this simple sample, with GpuAcc backend.
@@ -154,13 +155,13 @@ int main()
 
     inputTensorInfo = runtime->GetInputTensorInfo(networkIdentifier, 0);
     inputTensorInfo.SetConstant(true);
-    armnn::InputTensors inputTensors
+    InputTensors inputTensors
     {
-        {0, armnn::ConstTensor(inputTensorInfo, alignedInputPtr)},
+        {0, ConstTensor(inputTensorInfo, alignedInputPtr)},
     };
-    armnn::OutputTensors outputTensors
+    OutputTensors outputTensors
     {
-        {0, armnn::Tensor(runtime->GetOutputTensorInfo(networkIdentifier, 0), alignedOutputPtr)}
+        {0, Tensor(runtime->GetOutputTensorInfo(networkIdentifier, 0), alignedOutputPtr)}
     };
 
     // Execute network

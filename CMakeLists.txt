@@ -162,7 +162,6 @@ list(APPEND armnn_sources
     include/armnn/IRuntime.hpp
     include/armnn/IStrategy.hpp
     include/armnn/IWorkingMemHandle.hpp
-    include/armnn/LayerSupport.hpp
     include/armnn/LayerVisitorBase.hpp
     include/armnn/Logging.hpp
     include/armnn/LstmParams.hpp
@@ -360,7 +359,6 @@ list(APPEND armnn_sources
     src/armnn/Layer.hpp
     src/armnn/LayersFwd.hpp
     src/armnn/LayerSupportCommon.hpp
-    src/armnn/LayerSupport.cpp
     src/armnn/LoadedNetwork.cpp
     src/armnn/LoadedNetwork.hpp
     src/armnn/Logging.cpp

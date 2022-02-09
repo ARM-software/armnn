@@ -162,7 +162,7 @@ bool LayerSupportHandle::IsActivationSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsAdditionSupported(const TensorInfo& input0,
@@ -177,7 +177,7 @@ bool LayerSupportHandle::IsAdditionSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsArgMinMaxSupported(const TensorInfo& input,
@@ -192,7 +192,7 @@ bool LayerSupportHandle::IsArgMinMaxSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsBatchNormalizationSupported(const TensorInfo& input,
@@ -211,7 +211,7 @@ bool LayerSupportHandle::IsBatchNormalizationSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsBatchToSpaceNdSupported(const TensorInfo& input,
@@ -226,7 +226,7 @@ bool LayerSupportHandle::IsBatchToSpaceNdSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsCastSupported(const TensorInfo& input,
@@ -240,7 +240,7 @@ bool LayerSupportHandle::IsCastSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsChannelShuffleSupported(const TensorInfo &input,
@@ -255,7 +255,7 @@ bool LayerSupportHandle::IsChannelShuffleSupported(const TensorInfo &input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsComparisonSupported(const TensorInfo& input0,
@@ -271,7 +271,7 @@ bool LayerSupportHandle::IsComparisonSupported(const TensorInfo& input0,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConcatSupported(const std::vector<const TensorInfo*> inputs,
@@ -291,7 +291,7 @@ bool LayerSupportHandle::IsConcatSupported(const std::vector<const TensorInfo*> 
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConstantSupported(const TensorInfo& output,
@@ -304,7 +304,7 @@ bool LayerSupportHandle::IsConstantSupported(const TensorInfo& output,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConvertBf16ToFp32Supported(const TensorInfo& input,
@@ -318,7 +318,7 @@ bool LayerSupportHandle::IsConvertBf16ToFp32Supported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConvertFp32ToBf16Supported(const TensorInfo& input,
@@ -332,7 +332,7 @@ bool LayerSupportHandle::IsConvertFp32ToBf16Supported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConvertFp16ToFp32Supported(const TensorInfo& input,
@@ -346,7 +346,7 @@ bool LayerSupportHandle::IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConvertFp32ToFp16Supported(const TensorInfo& input,
@@ -360,7 +360,7 @@ bool LayerSupportHandle::IsConvertFp32ToFp16Supported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConvolution2dSupported(const TensorInfo& input,
@@ -378,7 +378,7 @@ bool LayerSupportHandle::IsConvolution2dSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsConvolution3dSupported(const TensorInfo& input,
@@ -396,7 +396,7 @@ bool LayerSupportHandle::IsConvolution3dSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsDebugSupported(const TensorInfo& input,
@@ -410,7 +410,7 @@ bool LayerSupportHandle::IsDebugSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsDepthToSpaceSupported(const TensorInfo& input,
@@ -425,7 +425,7 @@ bool LayerSupportHandle::IsDepthToSpaceSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsDepthwiseConvolutionSupported(
@@ -444,7 +444,7 @@ bool LayerSupportHandle::IsDepthwiseConvolutionSupported(
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsDequantizeSupported(const TensorInfo& input,
@@ -458,7 +458,7 @@ bool LayerSupportHandle::IsDequantizeSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsDetectionPostProcessSupported(const TensorInfo& boxEncodings,
@@ -478,7 +478,7 @@ bool LayerSupportHandle::IsDetectionPostProcessSupported(const TensorInfo& boxEn
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsDilatedDepthwiseConvolutionSupported(
@@ -497,7 +497,7 @@ bool LayerSupportHandle::IsDilatedDepthwiseConvolutionSupported(
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsDivisionSupported(const TensorInfo& input0,
@@ -512,7 +512,7 @@ bool LayerSupportHandle::IsDivisionSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsElementwiseUnarySupported(const TensorInfo& input,
@@ -527,7 +527,7 @@ bool LayerSupportHandle::IsElementwiseUnarySupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsFakeQuantizationSupported(const TensorInfo& input,
@@ -541,7 +541,7 @@ bool LayerSupportHandle::IsFakeQuantizationSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsFillSupported(const TensorInfo& input,
@@ -556,7 +556,7 @@ bool LayerSupportHandle::IsFillSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsFloorSupported(const TensorInfo& input,
@@ -570,7 +570,7 @@ bool LayerSupportHandle::IsFloorSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
@@ -587,18 +587,25 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
         {
             if(!weights.IsConstant())
             {
-                reasonIfUnsupported.value() =
-                        "This backend might not support non constant weights. "
-                        "If weights are constant make sure to set IsConstant when creating TensorInfo";
+                if (reasonIfUnsupported.has_value())
+                {
+                    reasonIfUnsupported.value() =
+                            "This backend might not support non constant weights. "
+                            "If weights are constant make sure to set IsConstant when creating TensorInfo";
+                }
+
                 return false;
             }
             if(descriptor.m_BiasEnabled)
             {
                 if(!biases.IsConstant())
                 {
-                    reasonIfUnsupported.value() =
-                            "This backend might not support non constant bias. "
-                            "If bias are constant make sure to set IsConstant when creating TensorInfo";
+                    if (reasonIfUnsupported.has_value())
+                    {
+                        reasonIfUnsupported.value() =
+                                "This backend might not support non constant weights. "
+                                "If weights are constant make sure to set IsConstant when creating TensorInfo";
+                    }
                     return false;
                 }
             }
@@ -613,7 +620,7 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
 
         if(!descriptor.m_ConstantWeights)
         {
-            auto capability = GetCapability("NonConstWeights", m_BackendId);
+            capability = GetCapability("NonConstWeights", m_BackendId);
             if (capability.has_value() && capability.value().GetValue().AsBool() == true)
             {
                 return true;
@@ -629,7 +636,7 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
@@ -645,7 +652,7 @@ bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsInputSupported(const TensorInfo& input,
@@ -658,7 +665,7 @@ bool LayerSupportHandle::IsInputSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsInstanceNormalizationSupported(
@@ -674,7 +681,7 @@ bool LayerSupportHandle::IsInstanceNormalizationSupported(
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsL2NormalizationSupported(const TensorInfo& input,
@@ -689,7 +696,7 @@ bool LayerSupportHandle::IsL2NormalizationSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsLogicalBinarySupported(const TensorInfo& input0,
@@ -705,7 +712,7 @@ bool LayerSupportHandle::IsLogicalBinarySupported(const TensorInfo& input0,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsLogicalUnarySupported(const TensorInfo& input,
@@ -720,7 +727,7 @@ bool LayerSupportHandle::IsLogicalUnarySupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsLogSoftmaxSupported(const TensorInfo& input,
@@ -735,7 +742,7 @@ bool LayerSupportHandle::IsLogSoftmaxSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsLstmSupported(const TensorInfo& input,
@@ -756,7 +763,7 @@ bool LayerSupportHandle::IsLstmSupported(const TensorInfo& input,
                                             descriptor,
                                             paramsInfo,
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsMaximumSupported(const TensorInfo& input0,
@@ -771,7 +778,7 @@ bool LayerSupportHandle::IsMaximumSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsMeanSupported(const TensorInfo& input,
@@ -786,7 +793,7 @@ bool LayerSupportHandle::IsMeanSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsMemCopySupported(const TensorInfo& input,
@@ -800,7 +807,7 @@ bool LayerSupportHandle::IsMemCopySupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsMemImportSupported(const TensorInfo& input,
@@ -814,7 +821,7 @@ bool LayerSupportHandle::IsMemImportSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsMergeSupported(const TensorInfo& input0,
@@ -829,7 +836,7 @@ bool LayerSupportHandle::IsMergeSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsMinimumSupported(const TensorInfo& input0,
@@ -844,7 +851,7 @@ bool LayerSupportHandle::IsMinimumSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsMultiplicationSupported(const TensorInfo& input0,
@@ -859,7 +866,7 @@ bool LayerSupportHandle::IsMultiplicationSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsNormalizationSupported(const TensorInfo& input,
@@ -874,7 +881,7 @@ bool LayerSupportHandle::IsNormalizationSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsOutputSupported(const TensorInfo& output,
@@ -887,7 +894,7 @@ bool LayerSupportHandle::IsOutputSupported(const TensorInfo& output,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsPadSupported(const TensorInfo& input,
@@ -902,7 +909,7 @@ bool LayerSupportHandle::IsPadSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsPermuteSupported(const TensorInfo& input,
@@ -917,7 +924,7 @@ bool LayerSupportHandle::IsPermuteSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsPooling2dSupported(const TensorInfo& input,
@@ -932,7 +939,7 @@ bool LayerSupportHandle::IsPooling2dSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsPooling3dSupported(const TensorInfo& input,
@@ -947,7 +954,7 @@ bool LayerSupportHandle::IsPooling3dSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsPreCompiledSupported(const TensorInfo& input,
@@ -961,7 +968,7 @@ bool LayerSupportHandle::IsPreCompiledSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsPreluSupported(const TensorInfo& input,
@@ -976,7 +983,7 @@ bool LayerSupportHandle::IsPreluSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsQuantizeSupported(const TensorInfo& input,
@@ -990,7 +997,7 @@ bool LayerSupportHandle::IsQuantizeSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsQLstmSupported(const TensorInfo& input,
@@ -1010,7 +1017,7 @@ bool LayerSupportHandle::IsQLstmSupported(const TensorInfo& input,
                                             descriptor,
                                             paramsInfo,
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsQuantizedLstmSupported(const TensorInfo& input,
@@ -1028,7 +1035,7 @@ bool LayerSupportHandle::IsQuantizedLstmSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             paramsInfo,
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsRankSupported(const TensorInfo& input,
@@ -1042,7 +1049,7 @@ bool LayerSupportHandle::IsRankSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsReduceSupported(const TensorInfo& input,
@@ -1057,7 +1064,7 @@ bool LayerSupportHandle::IsReduceSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsReshapeSupported(const TensorInfo& input,
@@ -1072,7 +1079,7 @@ bool LayerSupportHandle::IsReshapeSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsResizeSupported(const TensorInfo& input,
@@ -1087,7 +1094,7 @@ bool LayerSupportHandle::IsResizeSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsShapeSupported(const TensorInfo& input,
@@ -1101,7 +1108,7 @@ bool LayerSupportHandle::IsShapeSupported(const TensorInfo& input,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsSliceSupported(const TensorInfo& input,
@@ -1116,7 +1123,7 @@ bool LayerSupportHandle::IsSliceSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsSoftmaxSupported(const TensorInfo& input,
@@ -1131,7 +1138,7 @@ bool LayerSupportHandle::IsSoftmaxSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsSpaceToBatchNdSupported(const TensorInfo& input,
@@ -1146,7 +1153,7 @@ bool LayerSupportHandle::IsSpaceToBatchNdSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsSpaceToDepthSupported(const TensorInfo& input,
@@ -1161,7 +1168,7 @@ bool LayerSupportHandle::IsSpaceToDepthSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsSplitterSupported(const TensorInfo& input,
@@ -1180,7 +1187,7 @@ bool LayerSupportHandle::IsSplitterSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsStackSupported(const std::vector<const TensorInfo*>& inputs,
@@ -1200,7 +1207,7 @@ bool LayerSupportHandle::IsStackSupported(const std::vector<const TensorInfo*>& 
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsStandInSupported(const std::vector<const TensorInfo*>& inputs,
@@ -1223,7 +1230,7 @@ bool LayerSupportHandle::IsStandInSupported(const std::vector<const TensorInfo*>
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 
@@ -1239,7 +1246,7 @@ bool LayerSupportHandle::IsStridedSliceSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsSubtractionSupported(const TensorInfo& input0,
@@ -1254,7 +1261,7 @@ bool LayerSupportHandle::IsSubtractionSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsSwitchSupported(const TensorInfo& input0,
@@ -1270,7 +1277,7 @@ bool LayerSupportHandle::IsSwitchSupported(const TensorInfo& input0,
                                             BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsTransposeConvolution2dSupported(
@@ -1289,7 +1296,7 @@ bool LayerSupportHandle::IsTransposeConvolution2dSupported(
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsTransposeSupported(const TensorInfo& input,
@@ -1304,7 +1311,7 @@ bool LayerSupportHandle::IsTransposeSupported(const TensorInfo& input,
                                             descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 bool LayerSupportHandle::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
@@ -1326,7 +1333,7 @@ bool LayerSupportHandle::IsUnidirectionalSequenceLstmSupported(const TensorInfo&
                                             descriptor,
                                             paramsInfo,
                                             EmptyOptional(),
-                                            reasonIfUnsupported.value());
+                                            reasonIfUnsupported);
 }
 
 }

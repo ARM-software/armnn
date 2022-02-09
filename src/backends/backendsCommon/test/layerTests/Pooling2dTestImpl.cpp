@@ -8,8 +8,6 @@
 #include <armnnUtils/QuantizeHelper.hpp>
 #include <ResolveType.hpp>
 
-#include <armnn/LayerSupport.hpp>
-
 #include <armnnUtils/TensorUtils.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Permute.hpp>
@@ -17,6 +15,7 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
+#include <armnn/BackendHelper.hpp>
 #include <backendsCommon/WorkloadInfo.hpp>
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
@@ -90,11 +89,11 @@ LayerTestResult<T, 4> SimplePooling2dTestImpl(
 
     // Don't execute if Pooling is not supported, as an exception will be raised.
     armnn::BackendId backend = workloadFactory.GetBackendId();
-    const size_t reasonIfUnsupportedMaxLen = 255;
-    char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    result.m_Supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
-                                                     queueDescriptor.m_Parameters,
-                                                     reasonIfUnsupported, reasonIfUnsupportedMaxLen);
+
+    auto handle = armnn::GetILayerSupportByBackendId(backend);
+    result.m_Supported = handle.IsPooling2dSupported(inputTensorInfo,
+                                                     outputTensorInfo,
+                                                     queueDescriptor.m_Parameters);
     if (!result.m_Supported)
     {
         return result;
@@ -817,11 +816,11 @@ LayerTestResult<T, 4> ComparePooling2dTestCommon(
 
     // Don't execute if Pooling is not supported, as an exception will be raised.
     armnn::BackendId backend = workloadFactory.GetBackendId();
-    const size_t reasonIfUnsupportedMaxLen = 255;
-    char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    comparisonResult.m_Supported = armnn::IsPooling2dSupported(backend, inputTensorInfo, outputTensorInfo,
-                                                               data.m_Parameters,
-                                                               reasonIfUnsupported, reasonIfUnsupportedMaxLen);
+
+    auto handle = armnn::GetILayerSupportByBackendId(backend);
+    comparisonResult.m_Supported = handle.IsPooling2dSupported(inputTensorInfo,
+                                                              outputTensorInfo,
+                                                              data.m_Parameters);
     if (!comparisonResult.m_Supported)
     {
         return comparisonResult;

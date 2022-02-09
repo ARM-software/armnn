@@ -126,7 +126,6 @@ LOCAL_SRC_FILES := \
         src/armnn/InternalTypes.cpp \
         src/armnn/JsonPrinter.cpp \
         src/armnn/Layer.cpp \
-        src/armnn/LayerSupport.cpp \
         src/armnn/LoadedNetwork.cpp \
         src/armnn/Logging.cpp \
         src/armnn/Network.cpp \

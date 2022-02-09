@@ -6,11 +6,12 @@
 #include "NormalizationTestImpl.hpp"
 
 #include <armnn/Exceptions.hpp>
-#include <armnn/LayerSupport.hpp>
 
 #include <armnn/utility/NumericCast.hpp>
 
 #include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/ILayerSupport.hpp>
+#include <armnn/BackendHelper.hpp>
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>
@@ -350,10 +351,9 @@ LayerTestResult<float,4> CompareNormalizationTestImpl(
 
     // Don't execute if Normalization is not supported for the method and channel types, as an exception will be raised.
     armnn::BackendId backend = workloadFactory.GetBackendId();
-    const size_t reasonIfUnsupportedMaxLen = 255;
-    char reasonIfUnsupported[reasonIfUnsupportedMaxLen+1];
-    ret.m_Supported = armnn::IsNormalizationSupported(backend, inputTensorInfo, outputTensorInfo, data.m_Parameters,
-                                                      reasonIfUnsupported, reasonIfUnsupportedMaxLen);
+    auto handle = armnn::GetILayerSupportByBackendId(backend);
+    ret.m_Supported = handle.IsNormalizationSupported(inputTensorInfo, outputTensorInfo, data.m_Parameters);
+
     if (!ret.m_Supported)
     {
         return ret;

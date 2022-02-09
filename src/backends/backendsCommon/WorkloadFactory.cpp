@@ -7,7 +7,6 @@
 #include <LayersFwd.hpp>
 
 #include <armnn/Types.hpp>
-#include <armnn/LayerSupport.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/BackendHelper.hpp>

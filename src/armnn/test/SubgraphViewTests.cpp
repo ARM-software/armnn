@@ -18,6 +18,7 @@
 #include <queue>
 #include <random>
 #include <chrono>
+#include <numeric>
 
 using namespace armnn;
 

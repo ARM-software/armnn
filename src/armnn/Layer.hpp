@@ -13,6 +13,7 @@
 #include <backendsCommon/WorkloadInfo.hpp>
 #include "InternalTypes.hpp"
 #include "SerializeLayerParameters.hpp"
+#include "DllExport.hpp"
 
 #include <armnn/Types.hpp>
 #include <armnn/Tensor.hpp>
@@ -434,7 +435,7 @@ private:
     /// returned by layers which have no parameters associated with them.
     /// has to be a member as it is returned as a const reference
     /// declared static so that there is only ever one of them in memory
-    static NullDescriptor m_NullDescriptor;
+    ARMNN_DLLEXPORT static NullDescriptor m_NullDescriptor;
 };
 
 // A layer user-provided data can be bound to (e.g. inputs, outputs).

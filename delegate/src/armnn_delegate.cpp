@@ -183,6 +183,9 @@ TfLiteIntArray* Delegate::IdentifyOperatorsToDelegate(TfLiteContext* tfLiteConte
 
     TfLiteIntArray* nodesToDelegate = TfLiteIntArrayCreate(executionPlan->size);
     nodesToDelegate->size = 0;
+
+    std::set<int32_t> unsupportedOperators;
+
     for (int i = 0; i < executionPlan->size; ++i)
     {
         const int nodeIndex = executionPlan->data[i];
@@ -203,10 +206,19 @@ TfLiteIntArray* Delegate::IdentifyOperatorsToDelegate(TfLiteContext* tfLiteConte
                    delegateData, tfLiteContext, tfLiteRegistration, tfLiteNode, nodeIndex) != kTfLiteOk)
         {
             // node is not supported by ArmNN
+            unsupportedOperators.insert(tfLiteRegistration->builtin_code);
             continue;
         }
 
         nodesToDelegate->data[nodesToDelegate->size++] = nodeIndex;
+    }
+
+    for (std::set<int32_t>::iterator it=unsupportedOperators.begin(); it!=unsupportedOperators.end(); ++it)
+    {
+        TF_LITE_KERNEL_LOG(tfLiteContext,
+                           "Operator %s [%d] is not supported by armnn_delegate.",
+                           tflite::EnumNameBuiltinOperator(tflite::BuiltinOperator(*it)),
+                           *it);
     }
 
     std::sort(&nodesToDelegate->data[0], &nodesToDelegate->data[nodesToDelegate->size]);

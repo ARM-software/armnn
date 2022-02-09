@@ -121,7 +121,7 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("CONCATENATION",
                                    tfLiteContext,
                                    IsConcatSupported,
                                    delegateData.m_Backends,
@@ -260,7 +260,7 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("MEAN",
                                    tfLiteContext,
                                    IsMeanSupported,
                                    delegateData.m_Backends,

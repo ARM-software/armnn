@@ -85,7 +85,7 @@ TfLiteStatus VisitPoolingOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("POOLING_2D",
                                    tfLiteContext,
                                    IsPooling2dSupported,
                                    delegateData.m_Backends,

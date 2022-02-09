@@ -91,7 +91,7 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
 
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("COMPARISON",
                                    tfLiteContext,
                                    IsComparisonSupported,
                                    delegateData.m_Backends,

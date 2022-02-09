@@ -137,7 +137,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     {
         // Check if splitter is supported
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("UNPACK",
                                    tfLiteContext,
                                    IsSplitterSupported,
                                    delegateData.m_Backends,
@@ -156,7 +156,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("RESHAPE",
                                    tfLiteContext,
                                    IsReshapeSupported,
                                    delegateData.m_Backends,

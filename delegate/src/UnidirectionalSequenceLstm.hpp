@@ -224,7 +224,7 @@ TfLiteStatus VisitUnidirectionalSequenceLstmOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("UNIDIRECTIONAL_SEQUENCE_LSTM",
                                    tfLiteContext,
                                    IsUnidirectionalSequenceLstmSupported,
                                    delegateData.m_Backends,

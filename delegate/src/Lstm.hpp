@@ -218,7 +218,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("LSTM",
                                    tfLiteContext,
                                    IsLstmSupported,
                                    delegateData.m_Backends,

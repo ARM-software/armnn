@@ -73,7 +73,7 @@ TfLiteStatus VisitGatherOperator(DelegateData& delegateData,
     {
         // Check if supported
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("GATHER",
                                    tfLiteContext,
                                    IsGatherSupported,
                                    delegateData.m_Backends,

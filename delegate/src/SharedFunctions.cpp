@@ -24,7 +24,7 @@ TfLiteStatus ValidateFloorOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("FLOOR",
                                    tfLiteContext,
                                    IsFloorSupported,
                                    delegateData.m_Backends,

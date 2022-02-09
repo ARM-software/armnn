@@ -117,7 +117,7 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     {
         // Check if supported
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("SPLIT",
                                    tfLiteContext,
                                    IsSplitterSupported,
                                    delegateData.m_Backends,
@@ -309,7 +309,7 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     {
         // Check if supported
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("SPLIT",
                                    tfLiteContext,
                                    IsSplitterSupported,
                                    delegateData.m_Backends,

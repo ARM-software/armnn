@@ -107,7 +107,7 @@ TfLiteStatus VisitReduceOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("REDUCE",
                                    tfLiteContext,
                                    IsReduceSupported,
                                    delegateData.m_Backends,

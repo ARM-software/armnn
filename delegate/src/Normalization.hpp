@@ -44,7 +44,7 @@ TfLiteStatus VisitL2NormalizationOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("L2_NORMALIZATION",
                                    tfLiteContext,
                                    IsL2NormalizationSupported,
                                    delegateData.m_Backends,
@@ -114,7 +114,7 @@ TfLiteStatus VisitLocalResponseNormalizationOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("NORMALIZATION",
                                    tfLiteContext,
                                    IsNormalizationSupported,
                                    delegateData.m_Backends,

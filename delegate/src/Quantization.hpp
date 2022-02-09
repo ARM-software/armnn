@@ -52,7 +52,7 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("DEQUANTIZE",
                                    tfLiteContext,
                                    IsDequantizeSupported,
                                    delegateData.m_Backends,
@@ -131,7 +131,7 @@ TfLiteStatus VisitQuantizeOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("QUANTIZE",
                                    tfLiteContext,
                                    IsQuantizeSupported,
                                    delegateData.m_Backends,

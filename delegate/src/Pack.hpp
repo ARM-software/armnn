@@ -76,7 +76,7 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("STACK",
                                    tfLiteContext,
                                    IsStackSupported,
                                    delegateData.m_Backends,

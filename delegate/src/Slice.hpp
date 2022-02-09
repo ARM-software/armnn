@@ -116,7 +116,7 @@ TfLiteStatus VisitSliceOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("SLICE",
                                    tfLiteContext,
                                    IsStridedSliceSupported,
                                    delegateData.m_Backends,

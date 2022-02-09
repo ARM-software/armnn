@@ -147,7 +147,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("CONV2D",
                                    tfLiteContext,
                                    IsConvolution2dSupported,
                                    delegateData.m_Backends,
@@ -300,7 +300,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("CONV3D",
                                    tfLiteContext,
                                    IsConvolution3dSupported,
                                    delegateData.m_Backends,
@@ -500,7 +500,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("DEPTHWISE_CONV2D",
                                    tfLiteContext,
                                    IsDepthwiseConvolutionSupported,
                                    delegateData.m_Backends,
@@ -695,7 +695,7 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("TRANSPOSE_CONV2D",
                                    tfLiteContext,
                                    IsTransposeConvolution2dSupported,
                                    delegateData.m_Backends,

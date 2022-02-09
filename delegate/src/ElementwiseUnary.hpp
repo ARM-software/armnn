@@ -54,7 +54,7 @@ TfLiteStatus VisitElementwiseUnaryOperator(DelegateData& delegateData,
 
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("ELEMENTWISE_UNARY",
                                    tfLiteContext,
                                    IsElementwiseUnarySupported,
                                    delegateData.m_Backends,

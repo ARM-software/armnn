@@ -54,7 +54,7 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("LOGICAL_BINARY",
                                    tfLiteContext,
                                    IsLogicalBinarySupported,
                                    delegateData.m_Backends,

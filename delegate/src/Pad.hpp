@@ -152,7 +152,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("PAD",
                                    tfLiteContext,
                                    IsPadSupported,
                                    delegateData.m_Backends,

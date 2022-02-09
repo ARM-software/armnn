@@ -27,7 +27,7 @@ TfLiteStatus ValidateAddOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("ADD",
                                    tfLiteContext,
                                    IsAdditionSupported,
                                    delegateData.m_Backends,
@@ -51,7 +51,7 @@ TfLiteStatus ValidateDivOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("DIV",
                                    tfLiteContext,
                                    IsDivisionSupported,
                                    delegateData.m_Backends,
@@ -103,7 +103,7 @@ TfLiteStatus ValidateMaximumOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("MAXIMUM",
                                    tfLiteContext,
                                    IsMaximumSupported,
                                    delegateData.m_Backends,
@@ -126,7 +126,7 @@ TfLiteStatus ValidateMinimumOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("MINIMUM",
                                    tfLiteContext,
                                    IsMinimumSupported,
                                    delegateData.m_Backends,
@@ -149,7 +149,7 @@ TfLiteStatus ValidateMulOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("MUL",
                                    tfLiteContext,
                                    IsMultiplicationSupported,
                                    delegateData.m_Backends,
@@ -172,7 +172,7 @@ TfLiteStatus ValidateSubOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("SUB",
                                    tfLiteContext,
                                    IsSubtractionSupported,
                                    delegateData.m_Backends,

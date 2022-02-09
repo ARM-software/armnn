@@ -74,7 +74,7 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("BATCH_TO_SPACE_ND",
                                    tfLiteContext,
                                    IsBatchToSpaceNdSupported,
                                    delegateData.m_Backends,
@@ -165,7 +165,7 @@ TfLiteStatus VisitSpaceToBatchNdOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("SPACE_TO_BATCH_ND",
                                    tfLiteContext,
                                    IsSpaceToBatchNdSupported,
                                    delegateData.m_Backends,

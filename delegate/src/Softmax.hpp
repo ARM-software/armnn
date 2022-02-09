@@ -22,7 +22,7 @@ TfLiteStatus ValidateSoftmaxOperator(DelegateData& delegateData,
                                      const armnn::SoftmaxDescriptor& descriptor)
 {
     bool isSupported = false;
-    FORWARD_LAYER_SUPPORT_FUNC(__func__,
+    FORWARD_LAYER_SUPPORT_FUNC("SOFTMAX",
                                tfLiteContext,
                                IsSoftmaxSupported,
                                delegateData.m_Backends,
@@ -41,7 +41,7 @@ TfLiteStatus ValidateLogSoftmaxOperator(DelegateData& delegateData,
                                         const armnn::LogSoftmaxDescriptor& descriptor)
 {
     bool isSupported = false;
-    FORWARD_LAYER_SUPPORT_FUNC(__func__,
+    FORWARD_LAYER_SUPPORT_FUNC("LOG_SOFTMAX",
                                tfLiteContext,
                                IsLogSoftmaxSupported,
                                delegateData.m_Backends,

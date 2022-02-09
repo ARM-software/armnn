@@ -74,7 +74,7 @@ TfLiteStatus VisitFillOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("FILL",
                                    tfLiteContext,
                                    IsFillSupported,
                                    delegateData.m_Backends,

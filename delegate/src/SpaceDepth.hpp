@@ -45,7 +45,7 @@ TfLiteStatus VisitSpaceToDepthOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("SPACE_TO_DEPTH",
                                    tfLiteContext,
                                    IsSpaceToDepthSupported,
                                    delegateData.m_Backends,
@@ -104,7 +104,7 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("DEPTH_TO_SPACE",
                                    tfLiteContext,
                                    IsDepthToSpaceSupported,
                                    delegateData.m_Backends,

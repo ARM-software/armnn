@@ -46,7 +46,7 @@ TfLiteStatus VisitCastOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("CAST",
                                    tfLiteContext,
                                    IsCastSupported,
                                    delegateData.m_Backends,
@@ -212,7 +212,7 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("RESHAPE",
                                    tfLiteContext,
                                    IsReshapeSupported,
                                    delegateData.m_Backends,

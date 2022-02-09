@@ -28,7 +28,7 @@ TfLiteStatus ValidateResizeOperator(DelegateData& delegateData,
                                     const armnn::ResizeDescriptor& descriptor)
 {
     bool isSupported = false;
-    FORWARD_LAYER_SUPPORT_FUNC(__func__,
+    FORWARD_LAYER_SUPPORT_FUNC("RESIZE",
                                tfLiteContext,
                                IsResizeSupported,
                                delegateData.m_Backends,

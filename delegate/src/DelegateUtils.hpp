@@ -25,7 +25,7 @@ namespace
 {
 
 // Macro to call an Is<layer_name>Supported function and log caller name together with reason for lack of support
-#define FORWARD_LAYER_SUPPORT_FUNC(funcName, tfLiteContext, func, backends, supported, ...) \
+#define FORWARD_LAYER_SUPPORT_FUNC(opName, tfLiteContext, func, backends, supported, ...) \
 try \
 { \
     for (auto&& backendId : backends) \
@@ -45,23 +45,23 @@ try \
                 if (reasonIfUnsupported.size() > 0) \
                 { \
                     TFLITE_LOG_PROD(tflite::TFLITE_LOG_WARNING, \
-                                    "%s: not supported by armnn: %s", funcName, reasonIfUnsupported.c_str()); \
+                                    "%s: not supported by armnn: %s", opName, reasonIfUnsupported.c_str()); \
                 } \
                 else \
                 { \
                     TFLITE_LOG_PROD(tflite::TFLITE_LOG_WARNING, \
-                                    "%s: not supported by armnn", funcName); \
+                                    "%s: not supported by armnn", opName); \
                 } \
             } \
         } \
         else \
         { \
-            TF_LITE_KERNEL_LOG(tfLiteContext, "%s: backend not registered: %s", funcName, backendId.Get().c_str()); \
+            TF_LITE_KERNEL_LOG(tfLiteContext, "%s: backend not registered: %s", opName, backendId.Get().c_str()); \
         } \
     } \
     if (!supported) \
     { \
-        TF_LITE_KERNEL_LOG(tfLiteContext, "%s: not supported by any specified backend", funcName); \
+        TF_LITE_KERNEL_LOG(tfLiteContext, "%s: not supported by any specified backend", opName); \
     } \
 } \
 catch (const armnn::InvalidArgumentException &e) \
@@ -224,7 +224,7 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
     armnn::ReshapeDescriptor reshapeDescriptor;
     reshapeDescriptor.m_TargetShape = reshapedInfo.GetShape();
     bool isSupported = false;
-    FORWARD_LAYER_SUPPORT_FUNC(__func__,
+    FORWARD_LAYER_SUPPORT_FUNC("RESHAPE",
                                tfLiteContext,
                                IsReshapeSupported,
                                delegateData.m_Backends,
@@ -331,7 +331,7 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
     }
 
     bool isSupported = false;
-    FORWARD_LAYER_SUPPORT_FUNC(__func__,
+    FORWARD_LAYER_SUPPORT_FUNC("ACTIVATION",
                                tfLiteContext,
                                IsActivationSupported,
                                data.m_Backends,
@@ -561,7 +561,7 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
 {
     IgnoreUnused(layer);
     bool isSupported = false;
-    FORWARD_LAYER_SUPPORT_FUNC(__func__,
+    FORWARD_LAYER_SUPPORT_FUNC("CONSTANT",
                                tfLiteContext,
                                IsConstantSupported,
                                data.m_Backends,
@@ -608,7 +608,7 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
         {
             armnn::TensorInfo inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
             bool isSupported = false;
-            FORWARD_LAYER_SUPPORT_FUNC(__func__,
+            FORWARD_LAYER_SUPPORT_FUNC("CONSTANT",
                                        tfLiteContext,
                                        IsConstantSupported,
                                        delegateData.m_Backends,

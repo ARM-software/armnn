@@ -112,7 +112,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     bool isSupported = false;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("FULLY_CONNECTED",
                                    tfLiteContext,
                                    IsFullyConnectedSupported,
                                    delegateData.m_Backends,

@@ -74,7 +74,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
 
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+        FORWARD_LAYER_SUPPORT_FUNC("TRANSPOSE",
                                    tfLiteContext,
                                    IsTransposeSupported,
                                    delegateData.m_Backends,

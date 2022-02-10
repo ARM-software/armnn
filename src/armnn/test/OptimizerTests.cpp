@@ -187,16 +187,16 @@ public:
 };
 
 template <typename NamePolicy>
-class MockBackend : public IBackendInternal
+class CustomAllocatorBackend : public IBackendInternal
 {
 public:
-    MockBackend() :
+    CustomAllocatorBackend() :
             m_BackendCapabilities(NamePolicy::GetIdStatic(), {{"NullCapability", false}}),
             m_CustomAllocator(false) {};
-    MockBackend(const BackendCapabilities& capabilities) :
+    CustomAllocatorBackend(const BackendCapabilities& capabilities) :
             m_BackendCapabilities(capabilities),
             m_CustomAllocator(false) {};
-    ~MockBackend() = default;
+    ~CustomAllocatorBackend() = default;
 
     static const BackendId& GetIdStatic()
     {
@@ -785,9 +785,10 @@ TEST_CASE("BackendHintTest")
 
     auto& backendRegistry = BackendRegistryInstance();
 
-    backendRegistry.Register("MockBackend", []() { return std::make_unique<MockBackend<MockPolicy>>(); });
+    backendRegistry.Register("MockBackend", []() { return std::make_unique<CustomAllocatorBackend<MockPolicy>>(); });
 
-    backendRegistry.Register("CustomBackend", []() { return std::make_unique<MockBackend<CustomPolicy>>(); });
+    backendRegistry.Register("CustomBackend",
+                             []() { return std::make_unique<CustomAllocatorBackend<CustomPolicy>>(); });
 
     // Define the network
     auto network = INetwork::Create();

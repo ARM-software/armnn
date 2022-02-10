@@ -1130,11 +1130,11 @@ inline void ForceImportWithMisalignedOutputBuffersEndToEndTest(std::vector<Backe
         // Check the output is correct
     }
     unsigned int index = 0;
-    char outputData[expectedOutput.size() * sizeof(float)];
-    std::memcpy(outputData, misalignedMemPtr, expectedOutput.size() * sizeof(float));
+    std::vector<float> outputData(expectedOutput.size(), 0);
+    std::memcpy(outputData.data(), misalignedMemPtr, expectedOutput.size() * sizeof(float));
     for (auto outputValue : expectedOutput)
     {
-        CHECK(outputValue == reinterpret_cast<float*>(outputData)[index]);
+        CHECK(outputValue == outputData[index]);
         ++index;
     }
     std::free(memPtr);
@@ -1241,7 +1241,7 @@ inline void ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(std::vect
     }
     // Check the output is correct
     unsigned int index = 0;
-    std::vector<float> outputData(expectedOutput.size());
+    std::vector<float> outputData(expectedOutput.size(), 0);
     std::memcpy(outputData.data(), misalignedOutputPtr, expectedOutput.size() * sizeof(float));
     for (auto expectedValue : expectedOutput)
     {
@@ -1418,7 +1418,7 @@ inline void ForceImportRepeatedInferencesEndToEndTest(std::vector<BackendId> bac
     }
     // Check the output is correct
     unsigned int index = 0;
-    std::vector<float> alignedOutputData(expectedMisalignedOutput.size());
+    std::vector<float> alignedOutputData(expectedMisalignedOutput.size(), 0);
     std::memcpy(alignedOutputData.data(), misalignedOutputPtr, expectedMisalignedOutput.size() * sizeof(float));
     for (auto outputValue : expectedMisalignedOutput)
     {

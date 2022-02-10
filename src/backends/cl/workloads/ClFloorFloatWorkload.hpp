@@ -23,9 +23,14 @@ public:
                          const arm_compute::CLCompileContext& clCompileContext);
 
     void Execute() const override;
+    // Replace input tensor handle with the given TensorHandle
+    void ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
 
+    // Replace output tensor handle with the given TensorHandle
+    void ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
 private:
     mutable arm_compute::CLFloor m_Layer;
+    virtual void Reconfigure();
 };
 
 } //namespace armnn

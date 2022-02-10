@@ -32,6 +32,12 @@ public:
     using FloatWorkload<BatchNormalizationQueueDescriptor>::FloatWorkload;
     void Execute() const override;
 
+    // Replace input tensor handle with the given TensorHandle
+    void ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
+
+    // Replace output tensor handle with the given TensorHandle
+    void ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
+
 private:
     mutable arm_compute::CLBatchNormalizationLayer m_Layer;
 
@@ -41,6 +47,7 @@ private:
     std::unique_ptr<arm_compute::CLTensor> m_Beta;
 
     void FreeUnusedTensors();
+    virtual void Reconfigure();
 };
 
 } //namespace armnn

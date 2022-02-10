@@ -62,4 +62,42 @@ void ClNormalizationFloatWorkload::Execute() const
     RunClFunction(m_NormalizationLayer, CHECK_LOCATION());
 }
 
+void ClNormalizationFloatWorkload::ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot)
+{
+    ITensorHandle* backupHandle = this->m_Data.m_Inputs[slot];
+    this->m_Data.m_Inputs[slot] = tensorHandle;
+    try
+    {
+        Reconfigure();
+    }
+    catch(armnn::UnimplementedException& e)
+    {
+        // Cannot reconfigure, revert the slot back and throw the exception.
+        this->m_Data.m_Inputs[slot] = backupHandle;
+        throw e;
+    }
+}
+
+// Replace output tensor handle with the given TensorHandle
+void ClNormalizationFloatWorkload::ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot)
+{
+    ITensorHandle* backupHandle = this->m_Data.m_Inputs[slot];
+    this->m_Data.m_Inputs[slot] = tensorHandle;
+    try
+    {
+        Reconfigure();
+    }
+    catch(armnn::UnimplementedException& e)
+    {
+        // Cannot reconfigure, revert the slot back and throw the exception.
+        this->m_Data.m_Inputs[slot] = backupHandle;
+        throw e;
+    }
+}
+
+void ClNormalizationFloatWorkload::Reconfigure()
+{
+    throw armnn::UnimplementedException("Reconfigure not implemented for this workload");
+}
+
 } //namespace armnn

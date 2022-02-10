@@ -180,9 +180,9 @@ void ClConvolution2dWorkload::FreeUnusedTensors()
 
 void ClConvolution2dWorkload::Reconfigure()
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_Reconfigure");
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+
     m_InputProxy->set(&input);
     m_OutputProxy->set(&output);
 }

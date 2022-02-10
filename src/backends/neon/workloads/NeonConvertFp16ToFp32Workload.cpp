@@ -40,4 +40,42 @@ void NeonConvertFp16ToFp32Workload::Execute() const
     }
 }
 
+void NeonConvertFp16ToFp32Workload::ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot)
+{
+    ITensorHandle* backupHandle = this->m_Data.m_Inputs[slot];
+    this->m_Data.m_Inputs[slot] = tensorHandle;
+    try
+    {
+        Reconfigure();
+    }
+    catch(armnn::UnimplementedException& e)
+    {
+        // Cannot reconfigure, revert the slot back and throw the exception.
+        this->m_Data.m_Inputs[slot] = backupHandle;
+        throw e;
+    }
+}
+
+// Replace output tensor handle with the given TensorHandle
+void NeonConvertFp16ToFp32Workload::ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot)
+{
+    ITensorHandle* backupHandle = this->m_Data.m_Inputs[slot];
+    this->m_Data.m_Inputs[slot] = tensorHandle;
+    try
+    {
+        Reconfigure();
+    }
+    catch(armnn::UnimplementedException& e)
+    {
+        // Cannot reconfigure, revert the slot back and throw the exception.
+        this->m_Data.m_Inputs[slot] = backupHandle;
+        throw e;
+    }
+}
+
+void NeonConvertFp16ToFp32Workload::Reconfigure()
+{
+    throw armnn::UnimplementedException("Reconfigure not implemented for this workload");
+}
+
 } //namespace armnn

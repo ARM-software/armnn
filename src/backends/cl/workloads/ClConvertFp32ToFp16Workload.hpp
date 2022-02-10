@@ -20,9 +20,14 @@ public:
                                 const WorkloadInfo& info,
                                 const arm_compute::CLCompileContext& clCompileContext);
     virtual void Execute() const override;
+    // Replace input tensor handle with the given TensorHandle
+    void ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
 
+    // Replace output tensor handle with the given TensorHandle
+    void ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
 private:
     mutable arm_compute::CLDepthConvertLayer m_Layer;
+    virtual void Reconfigure();
 };
 
 arm_compute::Status ClConvertFp32ToFp16WorkloadValidate(const TensorInfo& input, const TensorInfo& output);

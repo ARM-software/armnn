@@ -21,7 +21,11 @@ class NeonLstmFloatWorkload : public FloatWorkload<LstmQueueDescriptor>
 public:
     NeonLstmFloatWorkload(const LstmQueueDescriptor& descriptor, const WorkloadInfo& info);
     virtual void Execute() const override;
+    // Replace input tensor handle with the given TensorHandle
+    void ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
 
+    // Replace output tensor handle with the given TensorHandle
+    void ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override;
 private:
     mutable arm_compute::NELSTMLayer m_LstmLayer;
 
@@ -51,6 +55,7 @@ private:
     std::unique_ptr<arm_compute::Tensor> m_OutputLayerNormWeightsTensor;
 
     void FreeUnusedTensors();
+    virtual void Reconfigure();
 };
 
 arm_compute::Status NeonLstmFloatWorkloadValidate(const TensorInfo& input, const TensorInfo& outputStateIn,

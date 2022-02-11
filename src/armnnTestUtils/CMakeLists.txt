@@ -11,7 +11,6 @@ list(APPEND armnnTestUtils_sources
         ../../include/armnnTestUtils/MockBackend.hpp
         ../../include/armnnTestUtils/MockMemoryManager.hpp
         ../../include/armnnTestUtils/MockTensorHandle.hpp
-        ../../include/armnnTestUtils/MockWorkloadFactoryHelper.hpp
         ../../include/armnnTestUtils/PredicateResult.hpp
         ../../include/armnnTestUtils/TensorCopyUtils.hpp
         ../../include/armnnTestUtils/WorkloadTestUtils.hpp

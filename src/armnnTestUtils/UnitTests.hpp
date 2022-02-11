@@ -155,11 +155,11 @@ void CompareRefTestFunctionUsingTensorHandleFactory(const char* testName, TFuncP
 {
     auto memoryManager = WorkloadFactoryHelper<FactoryType>::GetMemoryManager();
     FactoryType workloadFactory = WorkloadFactoryHelper<FactoryType>::GetFactory(memoryManager);
+    auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
 
     armnn::RefWorkloadFactory refWorkloadFactory;
-    auto tensorHandleFactory = WorkloadFactoryHelper<FactoryType>::GetTensorHandleFactory(memoryManager);
-    auto refTensorHandleFactory =
-        RefWorkloadFactoryHelper::GetTensorHandleFactory(memoryManager);
+    auto refMemoryManager = WorkloadFactoryHelper<armnn::RefWorkloadFactory>::GetMemoryManager();
+    auto refTensorHandleFactory = RefWorkloadFactoryHelper::GetTensorHandleFactory(refMemoryManager);
 
     auto testResult = (*testFunction)(
         workloadFactory, memoryManager, refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory, args...);

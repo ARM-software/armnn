@@ -2,6 +2,7 @@
 
 - [Introduction](#introduction)
 - [Cross-compiling ToolChain](#cross-compiling-toolchain)
+- [Install Cmake](#build-cmake)
 - [Build and install Google's Protobuf library](#build-and-install-google-s-protobuf-library)
 - [Download Arm NN](#download-arm-nn)
 - [Build Arm Compute Library](#build-arm-compute-library)
@@ -9,13 +10,14 @@
 - [Build Onnx](#build-onnx)
 - [Build TfLite](#build-tflite)
 - [Build Arm NN](#build-armnn)
+- [Generate TF Lite Schema](#generate-tflite-schema)
 - [Build Standalone Sample Dynamic Backend](#build-standalone-sample-dynamic-backend)
 - [Run Unit Tests](#run-unit-tests)
 - [Troubleshooting and Errors:](#troubleshooting-and-errors-)
 
 
 ## Introduction
-These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 18.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Protobuf, Tflite, Flatbuffer and Compute Libraries.
+These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 18.04 and 20.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Protobuf, Tflite, Flatbuffer and Compute Libraries.
 Start by creating a directory to contain all components:
 
 '''
@@ -28,6 +30,20 @@ cd $HOME/armnn-devenv
 ```
 sudo apt install crossbuild-essential-arm64
 ```
+
+## Install Cmake
+Cmake 3.19rc3 is required to build TF Lite Delegate.
+
+'''
+sudo apt-get install libssl-dev
+wget https://github.com/Kitware/CMake/releases/download/v3.19.0-rc3/cmake-3.19.0-rc3.tar.gz
+tar -zxvf cmake-3.19.0-rc3.tar.gz
+cd cmake-3.19.0-rc3
+./bootstrap --prefix=$HOME/armnn-devenv/cmake/install
+make all install
+cd..
+'''
+
 
 ## Build and install Google's Protobuf library
 
@@ -101,15 +117,14 @@ Arm NN provides a script that downloads the version of Arm Compute Library that 
 ```bash
 git checkout $(../armnn/scripts/get_compute_library.sh -p) 
 ```
-* Build the Arm Compute Library:  
+* Build the Arm Compute Library:
   (Requires SCons if not previously installed: `sudo apt install scons`)
 ```bash
-scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j4 internal_only=0
+scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j4
 ```
 
 ## Build Flatbuffer
 * Building Flatbuffer version 1.12.0
-  (Requires CMake if not previously installed: `sudo apt install cmake`)
 ```bash
 cd $HOME/armnn-devenv
 wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz
@@ -157,8 +172,31 @@ cd $HOME/armnn-devenv
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/
 git checkout $(../armnn/scripts/get_tensorflow.sh -p) # Checks out the latest tested version of TF
-mkdir tflite
-cd tflite
+cd ..
+```
+
+* You will need to download gcc-arm-8.3-2019.03 toolchain and continue building TF Lite as following:
+```
+curl -LO https://storage.googleapis.com/mirror.tensorflow.org/developer.arm.com/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
+mkdir tflite-toolchains
+tar xvf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz -C tflite-toolchains
+mkdir tflite/build
+cd tflite/build
+ARMCC_PREFIX=$HOME/armnn-devenv/tflite-toolchains/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu- \
+ARMCC_FLAGS="-funsafe-math-optimizations" \
+cmake -DCMAKE_C_COMPILER=${ARMCC_PREFIX}gcc \
+      -DCMAKE_CXX_COMPILER=${ARMCC_PREFIX}g++ \
+      -DCMAKE_C_FLAGS="${ARMCC_FLAGS}" -DCMAKE_CXX_FLAGS="${ARMCC_FLAGS}" \
+      -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON  -DCMAKE_SYSTEM_NAME=Linux \
+      -DTFLITE_ENABLE_XNNPACK=OFF \
+      -DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+      $HOME/armnn-devenv/tensorflow/tensorflow/lite/ \
+cmake --build .
+```
+
+## Generate TF Lite Schema
+```
+cd $HOME/armnn-devenv
 cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
 ../flatbuffers-1.12.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
 ```
@@ -181,7 +219,7 @@ CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 -DONNX_GENERATED_SOURCES=$HOME/armnn-devenv/onnx \
 -DBUILD_ONNX_PARSER=1 \
 -DBUILD_TF_LITE_PARSER=1 \
--DTF_LITE_GENERATED_PATH=$HOME/armnn-devenv/tflite \
+-DTENSORFLOW_ROOT=$HOME/armnn-devenv/tensorflow \
 -DFLATBUFFERS_ROOT=$HOME/armnn-devenv/flatbuffers-arm64 \
 -DFLATC_DIR=$HOME/armnn-devenv/flatbuffers-1.12.0/build \
 -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install \
@@ -194,6 +232,12 @@ CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 ```bash
 -DSAMPLE_DYNAMIC_BACKEND=1 \
 -DDYNAMIC_BACKEND_PATHS=$SAMPLE_DYNAMIC_BACKEND_PATH
+```
+* If you want to build Arm NN TF Lite Delegate, add the arguments:
+```bash
+-DTFLITE_LIB_ROOT=$HOME/armnn-devenv/tflite/build \
+-DTF_LITE_SCHEMA_INCLUDE_PATH=$HOME/armnn-devenv/tflite \
+-DBUILD_ARMNN_TFLITE_DELEGATE=1
 ```
 * Run the build
 ```bash
@@ -241,9 +285,18 @@ ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
 
 ```bash
 LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH ./UnitTests
-Running 4493 test cases...
+[doctest] doctest version is "2.4.6"
+[doctest] run with "--help" for options
+===============================================================================
+[doctest] test cases:   4817 |   4817 passed | 0 failed | 0 skipped
+[doctest] assertions: 807634 | 807634 passed | 0 failed |
+[doctest] Status: SUCCESS!
+```
 
-*** No errors detected
+* Run the Delegate UnitTests:
+
+```bash
+LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH ./delegate/DelegateUnitTests
 ```
 
 ## Troubleshooting and Errors:
@@ -309,5 +362,5 @@ cc1plus: error: unrecognized command line option ‘-Wno-implicit-fallthrough’
  ```
 * Add Werror=0 to the scons command:
 ```
-scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j8 internal_only=0 Werror=0
+scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" -j8 Werror=0
 ```

@@ -12,7 +12,7 @@
 
 ## Introduction
 These are step by step instructions for using the Android NDK to build Arm NN.
-They have been tested on a clean install of Ubuntu 18.04, and should also work with other OS versions.
+They have been tested on a clean install of Ubuntu 18.04 and 20.04, and should also work with other OS versions.
 The instructions show how to build the Arm NN core library.
 Building protobuf is optional. We have given steps should the user wish to build it (i.e. as an Onnx dependency).
 All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` directory.
@@ -37,7 +37,7 @@ All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` 
 
 ## Build Google's Protobuf library (Optional)
 
-* Clone protobuf:  
+* Clone protobuf: 
   (Requires Git if not previously installed: `sudo apt install git`)
 ```bash
 mkdir $HOME/armnn-devenv/google
@@ -47,7 +47,7 @@ cd protobuf
 git checkout -b v3.12.0 v3.12.0
 ```
 
-* Build a native (x86) version of the protobuf libraries and compiler (protoc):  
+* Build a native (x86) version of the protobuf libraries and compiler (protoc): 
   (Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: `sudo apt install curl autoconf libtool build-essential g++`)
 ```bash
 ./autogen.sh
@@ -77,7 +77,7 @@ cd ..
 Note: The ANDROID_API variable should be set to the Android API version number you are using. E.g. "30" for Android R.
 
 ## Download Arm NN
-* Clone Arm NN:  
+* Clone Arm NN: 
   (Requires Git if not previously installed: `sudo apt install git`)
 
 ```bash
@@ -110,15 +110,18 @@ git clone https://github.com/ARM-software/ComputeLibrary.git
 cd ComputeLibrary
 git checkout <tag_name>
 ```
-Arm NN and Arm Compute Library are developed closely together. If you would like to use the Arm NN 21.11 release you will need the 21.11 release of ACL too. For example, if you want to checkout the 21.11 release tag:
+For example, if you want to checkout the 21.11 release tag:
 ```bash
 git checkout v21.11
 ```
+
+Arm NN and Arm Compute Library are developed closely together. If you would like to use a particular release of Arm NN you will need the same release tag of ACL too.
+
 Arm NN provides a script that downloads the version of Arm Compute Library that Arm NN was tested with:
 ```bash
 git checkout $(../armnn/scripts/get_compute_library.sh -p) 
 ```
-* the Arm Compute Library:  
+* the Arm Compute Library: 
   (Requires SCons if not previously installed: `sudo apt install scons`)
 ```bash
 scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
@@ -127,7 +130,7 @@ scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
 
 ## Build Arm NN
 
-* Build Arm NN:  
+* Build Arm NN:
   (Requires CMake if not previously installed: `sudo apt install cmake`)
 ```bash
 mkdir $HOME/armnn-devenv/armnn/build

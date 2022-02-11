@@ -1,10 +1,6 @@
 Frequently asked questions
 ==========================
 
-These are issues that have been commonly seen when using Arm NN.
-
-Note: The 21.08 release of Arm NN removes Boost library dependency. You are not required to install boost library with 21.08 and newer releases.
-
 Problems seen when trying to build armnn and ComputeLibrary obtained from GitHub
 -----------------------------------------------------------------------------
 
@@ -32,18 +28,6 @@ Many DynamicBackendTests fail with "Base path for shared objects does not exist"
 ---------------------------------------------------------
 This problem most commonly occurs when the compile and runtime environments for the unit tests differ. These dynamic backend tests rely on a set of test files and directories at runtime. These files are created by default during the cmake build. At runtime the tests will look for these files in src/backends/backendsCommon/test/ relative to where the Unittests executable was built. The usual solution to to copy these files and directories into the new unit test execution environment. You can also specify a new root path for these files by adding a command line parameter to the Unittests executable: Unittests -- --dynamic-backend-build-dir "new path"
 
-UnitTests fail on Max OS-X with errors in boost::program_options
----------------------------------------------------------
-When executing Arm NN UnitTests built in an OS-X environment, runtime errors occur around boost::program_options. When compiling boost the "b2" tool appears to have a bug where it defaults to using the native ranlib even when the correct tool is specified in the user_config.jam.
-
-To validate that this issue is occurring inspect the boost build log looking for warnings like:
-warning: ranlib: warning for library: libboost_atomic.a the table of contents is empty (no object file members in the library define global symbols)
-
-This problem has previously been reported to the boostorg GitHub project. The solution is to manually execute the correct ranlib on each static library. https://github.com/boostorg/build/issues/160
-
-Arm NN fails to build on Ubuntu 20.04
----------------------------------------------------------
-The compiler version update on Ubuntu 20.04 resulted in build errors in Flat buffers 1.10.0. Update to Flatbuffers 1.12.0 to resolve this problem. In addition when building flatbuffers specify -fPIC CXX flag to allow the libraries to be used in our shared objects. Without this the the Arm NN build can fail with libflatbuffers.a(util.cpp.o): relocation R_X86_64_PC32 against symbol `_ZN11flatbuffers9DirExistsEPKc' can not be used when making a shared object; recompile with -fPIC
 
 Tensorflow Lite benchmarking tool fails with segmentation fault when using the Arm NN delegate.
 ---------------------------------------------------------

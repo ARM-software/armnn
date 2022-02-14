@@ -25,9 +25,13 @@ ClConvertFp16ToFp32Workload::ClConvertFp16ToFp32Workload(
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(this->m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(this->m_Data.m_Outputs[0])->GetTensor();
 
+    // Create Proxy tensor and set the initial tensor handle to it
+    m_InputProxy = std::make_unique<ICLTensorProxy>(&input);
+    m_OutputProxy = std::make_unique<ICLTensorProxy>(&output);
+
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvertFp16ToFp32Workload_configure");
-        m_Layer.configure(clCompileContext, &input, &output, g_AclConvertPolicy, 0);
+        m_Layer.configure(clCompileContext, m_InputProxy.get(), m_OutputProxy.get(), g_AclConvertPolicy, 0);
     }
 }
 
@@ -92,7 +96,10 @@ void ClConvertFp16ToFp32Workload::ReplaceOutputTensorHandle(ITensorHandle* tenso
 
 void ClConvertFp16ToFp32Workload::Reconfigure()
 {
-    throw armnn::UnimplementedException("Reconfigure not implemented for this workload");
+    arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    m_InputProxy->set(&input);
+    m_OutputProxy->set(&output);
 }
 
 } //namespace armnn

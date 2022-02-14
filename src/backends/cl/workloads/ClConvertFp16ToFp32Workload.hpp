@@ -9,6 +9,8 @@
 
 #include <arm_compute/runtime/CL/functions/CLDepthConvertLayer.h>
 
+#include <cl/ICLTensorProxy.hpp>
+
 namespace armnn
 {
 
@@ -29,6 +31,9 @@ public:
 private:
     mutable arm_compute::CLDepthConvertLayer m_Layer;
     virtual void Reconfigure();
+
+    std::unique_ptr<ICLTensorProxy> m_InputProxy;
+    std::unique_ptr<ICLTensorProxy> m_OutputProxy;
 };
 
 arm_compute::Status ClConvertFp16ToFp32WorkloadValidate(const TensorInfo& input, const TensorInfo& output);

@@ -405,6 +405,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         inferenceModelParams.m_ThreadPoolSize                 = params.m_ThreadPoolSize;
         inferenceModelParams.m_OutputDetailsToStdOut          = params.m_OutputDetailsToStdOut;
         inferenceModelParams.m_OutputDetailsOnlyToStdOut      = params.m_OutputDetailsOnlyToStdOut;
+        inferenceModelParams.m_ImportInputsIfAligned          = params.m_ImportInputsIfAligned;
 
         for(const std::string& inputName: params.m_InputNames)
         {

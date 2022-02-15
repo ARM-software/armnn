@@ -65,6 +65,7 @@ struct ExecuteNetworkParams
     std::string                   m_MLGOTuningFilePath;
     TfLiteExecutor                m_TfLiteExecutor;
     size_t                        m_ThreadPoolSize;
+    bool                          m_ImportInputsIfAligned;
 
     // Ensures that the parameters for ExecuteNetwork fit together
     void ValidateParams();

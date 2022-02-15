@@ -423,8 +423,12 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                 ("output-network-details-only",
                  "Outputs layer tensor infos and descriptors to std out without profiling events. Defaults to off.",
                  cxxopts::value<bool>(m_ExNetParams.m_OutputDetailsOnlyToStdOut)->default_value("false")
-                                                                                ->implicit_value("true"));
+                                                                                ->implicit_value("true"))
 
+                ("import-inputs-if-aligned",
+                 "In & Out tensors will be imported per inference if the memory alignment allows. Defaults to false.",
+                 cxxopts::value<bool>(m_ExNetParams.m_ImportInputsIfAligned)->default_value("false")
+                         ->implicit_value("true"));
     }
     catch (const std::exception& e)
     {

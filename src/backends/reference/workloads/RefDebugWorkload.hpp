@@ -7,7 +7,7 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 
 namespace armnn
 {

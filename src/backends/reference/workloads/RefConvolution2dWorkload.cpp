@@ -14,7 +14,7 @@ namespace armnn
 {
 RefConvolution2dWorkload::RefConvolution2dWorkload(
     const Convolution2dQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
+    : RefBaseWorkload<Convolution2dQueueDescriptor>(descriptor, info)
 {
     WorkloadInfo detailsInfo;
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;

@@ -17,7 +17,7 @@ namespace armnn
 
 RefDepthwiseConvolution2dWorkload::RefDepthwiseConvolution2dWorkload(
         const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info)
-        : BaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
+        : RefBaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
     m_Weight = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Weight));
     const TensorInfo& rFilterInfo = m_Weight->GetTensorInfo();

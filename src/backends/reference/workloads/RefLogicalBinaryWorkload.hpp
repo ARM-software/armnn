@@ -7,16 +7,16 @@
 
 #include "BaseIterator.hpp"
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefLogicalBinaryWorkload : public BaseWorkload<LogicalBinaryQueueDescriptor>
+class RefLogicalBinaryWorkload : public RefBaseWorkload<LogicalBinaryQueueDescriptor>
 {
 public:
-    using BaseWorkload<LogicalBinaryQueueDescriptor>::m_Data;
+    using RefBaseWorkload<LogicalBinaryQueueDescriptor>::m_Data;
 
     RefLogicalBinaryWorkload(const LogicalBinaryQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;

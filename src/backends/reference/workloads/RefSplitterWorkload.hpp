@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 #include "Decoders.hpp"
 #include "Encoders.hpp"
@@ -13,10 +13,10 @@
 namespace armnn
 {
 
-class RefSplitterWorkload : public BaseWorkload<SplitterQueueDescriptor>
+class RefSplitterWorkload : public RefBaseWorkload<SplitterQueueDescriptor>
 {
 public:
-    using BaseWorkload<SplitterQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<SplitterQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 private:

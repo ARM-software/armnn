@@ -583,7 +583,6 @@ void MemImportQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 void MemSyncQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     ValidateNumInputs(workloadInfo, "MemSyncQueueDescriptor", 1);
-    ValidateNumOutputs(workloadInfo, "MemSyncQueueDescriptor" , 1);
 
     if (m_Inputs.size() != 1)
     {

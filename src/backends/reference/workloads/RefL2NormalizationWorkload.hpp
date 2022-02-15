@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefL2NormalizationWorkload : public BaseWorkload<L2NormalizationQueueDescriptor>
+class RefL2NormalizationWorkload : public RefBaseWorkload<L2NormalizationQueueDescriptor>
 {
 public:
     explicit RefL2NormalizationWorkload(const L2NormalizationQueueDescriptor& descriptor,

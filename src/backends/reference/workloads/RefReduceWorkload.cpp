@@ -16,7 +16,7 @@ namespace armnn
 RefReduceWorkload::RefReduceWorkload(
     const ReduceQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : BaseWorkload<ReduceQueueDescriptor>(descriptor, info) {}
+    : RefBaseWorkload<ReduceQueueDescriptor>(descriptor, info) {}
 
 void RefReduceWorkload::Execute() const
 {

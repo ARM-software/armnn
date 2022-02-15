@@ -54,16 +54,23 @@ public:
 
     profiling::ProfilingGuid GetGuid() const final { return m_Guid; }
 
+    virtual bool SupportsTensorHandleReplacement()  const override
+    {
+        return false;
+    }
+
     // Replace input tensor handle with the given TensorHandle
     void ReplaceInputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override
     {
-        m_Data.m_Inputs[slot] = tensorHandle;
+        armnn::IgnoreUnused(tensorHandle, slot);
+        throw armnn::UnimplementedException("ReplaceInputTensorHandle not implemented for this workload");
     }
 
     // Replace output tensor handle with the given TensorHandle
     void ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot) override
     {
-        m_Data.m_Outputs[slot] = tensorHandle;
+        armnn::IgnoreUnused(tensorHandle, slot);
+        throw armnn::UnimplementedException("ReplaceOutputTensorHandle not implemented for this workload");
     }
 
 protected:

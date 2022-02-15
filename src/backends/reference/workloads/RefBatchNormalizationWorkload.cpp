@@ -15,7 +15,7 @@ namespace armnn
 
 RefBatchNormalizationWorkload::RefBatchNormalizationWorkload(const BatchNormalizationQueueDescriptor& descriptor,
                                                              const WorkloadInfo& info)
-    : BaseWorkload(descriptor, info)
+    : RefBaseWorkload(descriptor, info)
     , m_Mean    (std::make_unique<ScopedTensorHandle>(*(descriptor.m_Mean)))
     , m_Variance(std::make_unique<ScopedTensorHandle>(*(descriptor.m_Variance)))
     , m_Beta    (std::make_unique<ScopedTensorHandle>(*(descriptor.m_Beta)))

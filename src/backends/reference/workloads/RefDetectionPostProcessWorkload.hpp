@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefDetectionPostProcessWorkload : public BaseWorkload<DetectionPostProcessQueueDescriptor>
+class RefDetectionPostProcessWorkload : public RefBaseWorkload<DetectionPostProcessQueueDescriptor>
 {
 public:
     explicit RefDetectionPostProcessWorkload(const DetectionPostProcessQueueDescriptor& descriptor,

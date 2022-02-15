@@ -16,7 +16,7 @@ namespace armnn
 {
 
 RefMeanWorkload::RefMeanWorkload(const MeanQueueDescriptor& descriptor, const WorkloadInfo& info)
-  :BaseWorkload<MeanQueueDescriptor>(descriptor, info) {}
+  :RefBaseWorkload<MeanQueueDescriptor>(descriptor, info) {}
 
 void RefMeanWorkload::Execute() const
 {

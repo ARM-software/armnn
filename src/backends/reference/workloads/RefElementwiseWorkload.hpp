@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/Types.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 #include "BaseIterator.hpp"
 #include "ElementwiseFunction.hpp"
@@ -18,12 +18,12 @@ namespace armnn
 {
 
 template <typename Functor, typename ParentDescriptor, typename armnn::StringMapping::Id DebugString>
-class RefElementwiseWorkload : public BaseWorkload<ParentDescriptor>
+class RefElementwiseWorkload : public RefBaseWorkload<ParentDescriptor>
 {
 public:
     using InType = typename ElementwiseBinaryFunction<Functor>::InType;
     using OutType = typename ElementwiseBinaryFunction<Functor>::OutType;
-    using BaseWorkload<ParentDescriptor>::m_Data;
+    using RefBaseWorkload<ParentDescriptor>::m_Data;
 
     RefElementwiseWorkload(const ParentDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;

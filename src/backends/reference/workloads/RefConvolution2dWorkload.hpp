@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 #include "Decoders.hpp"
 #include "Encoders.hpp"
@@ -13,7 +13,7 @@
 namespace armnn
 {
 
-class RefConvolution2dWorkload : public BaseWorkload<Convolution2dQueueDescriptor>
+class RefConvolution2dWorkload : public RefBaseWorkload<Convolution2dQueueDescriptor>
 {
 public:
     explicit RefConvolution2dWorkload(const Convolution2dQueueDescriptor& descriptor,

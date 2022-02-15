@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefReduceWorkload : public BaseWorkload<ReduceQueueDescriptor>
+class RefReduceWorkload : public RefBaseWorkload<ReduceQueueDescriptor>
 {
 public:
     explicit RefReduceWorkload(const ReduceQueueDescriptor& descriptor,

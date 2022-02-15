@@ -14,7 +14,7 @@ namespace armnn
 {
 
 RefQLstmWorkload::RefQLstmWorkload(const QLstmQueueDescriptor &descriptor, const WorkloadInfo &info)
-        : BaseWorkload<QLstmQueueDescriptor>(descriptor, info)
+        : RefBaseWorkload<QLstmQueueDescriptor>(descriptor, info)
         , m_InputToInputWeightsTensor     (AssignScopedTensorHandle(descriptor.m_InputToInputWeights))
         , m_InputToForgetWeightsTensor    (AssignScopedTensorHandle(descriptor.m_InputToForgetWeights))
         , m_InputToCellWeightsTensor      (AssignScopedTensorHandle(descriptor.m_InputToCellWeights))

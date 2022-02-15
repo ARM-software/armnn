@@ -7,16 +7,16 @@
 
 #include "BaseIterator.hpp"
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefComparisonWorkload : public BaseWorkload<ComparisonQueueDescriptor>
+class RefComparisonWorkload : public RefBaseWorkload<ComparisonQueueDescriptor>
 {
 public:
-    using BaseWorkload<ComparisonQueueDescriptor>::m_Data;
+    using RefBaseWorkload<ComparisonQueueDescriptor>::m_Data;
 
     RefComparisonWorkload(const ComparisonQueueDescriptor& descriptor, const WorkloadInfo& info);
     void PostAllocationConfigure() override;

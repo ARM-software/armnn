@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 #include "BaseIterator.hpp"
 #include "Decoders.hpp"
@@ -15,7 +15,7 @@
 namespace armnn
 {
 
-class RefFullyConnectedWorkload : public BaseWorkload<FullyConnectedQueueDescriptor>
+class RefFullyConnectedWorkload : public RefBaseWorkload<FullyConnectedQueueDescriptor>
 {
 public:
     explicit RefFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor,

@@ -139,6 +139,13 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
     bool useExternalMemoryManager = false;
     bool useInternalMemoryManager = false;
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
+
+    if (!networkProperties.m_AsyncEnabled)
+    {
+        m_IsInputImported = std::vector<bool>(order.GetNumInputs(), false);
+        m_IsOutputImported = std::vector<bool>(order.GetNumOutputs(), false);
+    }
+
     for (auto&& layer : order)
     {
         auto const& backendId = layer->GetBackendId();
@@ -312,44 +319,6 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     }
                     else
                     {
-                        if (layer->GetNumInputSlots() >= 1)
-                        {
-                            unsigned int inputSlotIndex = 0;
-                            for (auto& inputSlot : layer->GetInputSlots())
-                            {
-                                if (inputSlot.GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Input)
-                                {
-                                    auto inputLayer =
-                                        PolymorphicDowncast<InputLayer*>(
-                                            &inputSlot.GetConnectedOutputSlot()->GetOwningLayer());
-                                    m_InputWorkloadSlotPairs[inputLayer->GetBindingId()] =
-                                        std::make_pair(m_WorkloadQueue.size(), inputSlotIndex);
-                                }
-                                ++inputSlotIndex;
-                            }
-                        }
-
-                        if (layer->GetNumOutputSlots() >= 1)
-                        {
-                            unsigned int outputSlotIndex = 0;
-                            for (auto& outputSlot : layer->GetOutputSlots())
-                            {
-                                for (unsigned int i = 0; i < outputSlot.GetNumConnections(); i++)
-                                {
-                                    // If any of the connections on this outputSlot are connected to an Output then
-                                    // Add its index within layer->GetOutputSlots() to m_OutputWorkloadSlotPairs
-                                    if (outputSlot.GetConnection(i)->GetOwningLayer().GetType() == LayerType::Output)
-                                    {
-                                        auto outputLayer = PolymorphicDowncast<OutputLayer*>(
-                                            &outputSlot.GetConnection(i)->GetOwningLayer());
-                                        m_OutputWorkloadSlotPairs[outputLayer->GetBindingId()] =
-                                            std::make_pair(m_WorkloadQueue.size(), outputSlotIndex);
-                                        continue;
-                                    }
-                                }
-                                ++outputSlotIndex;
-                            }
-                        }
                         m_WorkloadQueue.push_back(std::move(workload));
                     }
 
@@ -357,6 +326,100 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     layer->ReleaseConstantData();
                     break;
                 }
+            }
+        }
+    }
+
+    // Gather information about workloads for inputs & outputs
+    if (!networkProperties.m_AsyncEnabled && m_WorkloadQueue.size() != 0)
+    {
+        const int noOfInputs = armnn::numeric_cast<int>(order.GetNumInputs());
+
+        // Get indices of all workloads connected to each input and
+        // check if they support tensor handle replacement
+        for (const BindableLayer* layer: order.GetInputLayers())
+        {
+            const auto bindingId = layer->GetBindingId();
+
+            bool supportsReplacement = true;
+
+            for (const auto inputSlot: layer->GetOutputSlot(0).GetConnections())
+            {
+                auto workloadIndex = std::distance(order.begin(), order.GetPosInGraph(inputSlot->GetOwningLayer()));
+                workloadIndex -= noOfInputs;
+
+                m_InputWorkloadSlotPairs[bindingId].emplace_back(WorkloadIndices{
+                        armnn::numeric_cast<unsigned int>(workloadIndex), inputSlot->GetSlotIndex()});
+
+                auto workload = m_WorkloadQueue[m_InputWorkloadSlotPairs[bindingId].back().m_WorkloadIndex].get();
+                supportsReplacement &= workload->SupportsTensorHandleReplacement();
+            }
+
+            ITensorHandleFactory::FactoryId factoryId = layer->GetOutputSlot(0).GetTensorHandleFactoryId();
+            // Get matching import factory Id
+            ITensorHandleFactory::FactoryId importFactoryId =
+                    m_TensorHandleFactoryRegistry.GetMatchingImportFactoryId(factoryId);
+
+            ITensorHandleFactory *importFactory = m_TensorHandleFactoryRegistry.GetFactory(importFactoryId);
+
+            if (supportsReplacement && importFactory)
+            {
+                m_PreImportedInputHandles.emplace_back(
+                        bindingId, importFactory->CreateTensorHandle(layer->GetOutputSlot(0).GetTensorInfo(), false));
+            }
+            else
+            {
+                m_PreImportedInputHandles.emplace_back(bindingId, nullptr);
+            }
+        }
+
+        // Get indices of all workloads connected to each output and
+        // check if they support tensor handle replacement
+        for (const BindableLayer* layer: order.GetOutputLayers())
+        {
+            const auto bindingId = layer->GetBindingId();
+
+            const auto outputSlot = layer->GetInputSlot(0).GetConnectedOutputSlot();
+            auto& indices = m_OutputWorkloadSlotPairs[bindingId];
+
+            auto workloadIndex = std::distance(order.begin(), order.GetPosInGraph(outputSlot->GetOwningLayer()));
+            workloadIndex -= noOfInputs;
+
+            indices.m_OutputSlotIndices = WorkloadIndices{numeric_cast<unsigned int>(workloadIndex),
+                                                          outputSlot->CalculateIndexOnOwner()};
+
+            bool supportsReplacement = true;
+            auto outputWorkload = m_WorkloadQueue[indices.m_OutputSlotIndices.m_WorkloadIndex].get();
+            supportsReplacement &= outputWorkload->SupportsTensorHandleReplacement();
+
+            for (auto &inputSlot: outputSlot->GetConnections())
+            {
+                if(inputSlot->GetOwningLayer().GetType() != LayerType::Output)
+                {
+                    auto inWorkloadIndex = std::distance(order.begin(),
+                                                         order.GetPosInGraph(inputSlot->GetOwningLayer()));
+                    inWorkloadIndex -= noOfInputs;
+                    indices.m_InputSlotIndices.emplace_back(WorkloadIndices{numeric_cast<unsigned int>(inWorkloadIndex),
+                                                            inputSlot->GetSlotIndex()});
+                    auto inputWorkload = m_WorkloadQueue[indices.m_InputSlotIndices.back().m_WorkloadIndex].get();
+                    supportsReplacement &= inputWorkload->SupportsTensorHandleReplacement();
+                }
+            }
+
+            ITensorHandleFactory::FactoryId factoryId = outputSlot->GetTensorHandleFactoryId();
+            // Get matching import factory Id
+            ITensorHandleFactory::FactoryId importFactoryId =
+                    m_TensorHandleFactoryRegistry.GetMatchingImportFactoryId(factoryId);
+            ITensorHandleFactory *importFactory = m_TensorHandleFactoryRegistry.GetFactory(importFactoryId);
+
+            if (supportsReplacement && importFactory)
+            {
+                m_PreImportedOutputHandles.emplace_back(
+                        bindingId, importFactory->CreateTensorHandle(outputSlot->GetTensorInfo(), false));
+            }
+            else
+            {
+                m_PreImportedOutputHandles.emplace_back(bindingId, nullptr);
             }
         }
     }
@@ -699,77 +762,133 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         m_InputQueue.clear();
         m_InputQueue.reserve(graph.GetNumInputs());
 
+        if (preImportedInputIds.size() > graph.GetNumInputs())
+        {
+            throw InvalidArgumentException("Invalid number of preImportedInputIds");
+        }
+
+        unsigned int inputIndex = 0;
+        unsigned int importedInputIdIndex = 0;
+        std::sort(preImportedInputIds.begin(), preImportedInputIds.end());
         for (const BindableLayer* inputLayer : graph.GetInputLayers())
         {
-            if (preImportedInputIds.size() > graph.GetNumInputs())
+            if (importedInputIdIndex < preImportedInputIds.size() &&
+                inputIndex == preImportedInputIds[importedInputIdIndex])
             {
-                throw InvalidArgumentException("Invalid number of preImportedInputIds");
-            }
-            auto layerBindingId = inputLayer->GetBindingId();
-            auto it = std::find_if(preImportedInputIds.begin(), preImportedInputIds.end(),
-                                   [=](auto preImportedInputId)
-            {
-                return m_PreImportedInputHandles[preImportedInputId].m_LayerBindingId == layerBindingId;
-            });
+                // Only replace tensorhandles if they have not already been replaced
+                if (!m_IsInputImported[inputIndex])
+                {
+                    auto outputTensorHandle = m_PreImportedInputHandles[inputIndex].m_TensorHandle.get();
 
-            if (it == preImportedInputIds.end())
+                    for (const auto& workloadInfo: m_InputWorkloadSlotPairs[inputLayer->GetBindingId()])
+                    {
+                        auto workload = m_WorkloadQueue[workloadInfo.m_WorkloadIndex].get();
+                        workload->ReplaceInputTensorHandle(outputTensorHandle, workloadInfo.m_SlotIndex);
+                    }
+                    m_IsInputImported[inputIndex] = true;
+                }
+                importedInputIdIndex++;
+            }
+            else
             {
+                if (m_IsInputImported[inputIndex])
+                {
+                    OutputHandler& handler = const_cast<OutputHandler&>(inputLayer->GetOutputHandler(0));
+
+                    for (const auto& workloadInfo: m_InputWorkloadSlotPairs[inputLayer->GetBindingId()])
+                    {
+                        auto workload = m_WorkloadQueue[workloadInfo.m_WorkloadIndex].get();
+                        workload->ReplaceInputTensorHandle(handler.GetData(), workloadInfo.m_SlotIndex);
+                    }
+
+                    m_IsInputImported[inputIndex] = false;
+                }
+
                 // InputTensorHandle is not imported yet, process to enqueue input
                 const TensorPin& pin = workloadData.GetInputTensorPin(inputLayer->GetBindingId());
                 EnqueueInput(*inputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
             }
+            inputIndex++;
         }
     }
-
     // For each output to the network, call EnqueueOutput with the data passed by the user.
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "PrepareOutputs");
         m_OutputQueue.clear();
         m_OutputQueue.reserve(graph.GetNumOutputs());
 
+        if (preImportedOutputIds.size() > graph.GetNumOutputs())
+        {
+            throw InvalidArgumentException("Invalid number of preImportedOutputIds");
+        }
+
+        unsigned int outputIndex = 0;
+        unsigned int importedOutputIdIndex = 0;
+        std::sort(preImportedOutputIds.begin(), preImportedOutputIds.end());
         for (const BindableLayer* outputLayer : graph.GetOutputLayers())
         {
-            if (preImportedOutputIds.size() > graph.GetNumOutputs())
+            if (importedOutputIdIndex < preImportedOutputIds.size() &&
+                outputIndex == preImportedOutputIds[importedOutputIdIndex])
             {
-                throw InvalidArgumentException("Invalid number of preImportedOutputIds");
-            }
-            auto layerBindingId = outputLayer->GetBindingId();
-            auto it = std::find_if(preImportedOutputIds.begin(), preImportedOutputIds.end(),
-                                   [=](auto preImportedOutputId)
-            {
-                return m_PreImportedOutputHandles[preImportedOutputId].m_LayerBindingId == layerBindingId;
-            });
+                // Only replace tensorhandles if they have not already been replaced
+                ITensorHandle* inputTensorHandle = m_PreImportedOutputHandles[outputIndex].m_TensorHandle.get();
 
-            const TensorPin& pin = workloadData.GetOutputTensorPin(outputLayer->GetBindingId());
+                if (!m_IsOutputImported[outputIndex])
+                {
+                    const auto bindingId = outputLayer->GetBindingId();
+                    const auto& indices = m_OutputWorkloadSlotPairs[bindingId];
 
-            if (it == preImportedOutputIds.end())
-            {
-                // OutputTensorHandle is not imported yet, process to enqueue Output
-                EnqueueOutput(*outputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
-            }
-            else
-            {
-                // Insert synchronization workload for the imported output
-                OutputQueueDescriptor outputQueueDescriptor;
-                WorkloadInfo info;
+                    auto outputWorkload = m_WorkloadQueue[indices.m_OutputSlotIndices.m_WorkloadIndex].get();
 
-                outputQueueDescriptor.m_Outputs.push_back(pin.GetTensorHandle());
-                info.m_OutputTensorInfos.push_back(pin.GetTensorInfo());
+                    outputWorkload->ReplaceOutputTensorHandle(inputTensorHandle,
+                                                              indices.m_OutputSlotIndices.m_SlotIndex);
 
-                // Gets the output handler from the previous node.
-                const OutputHandler& outputHandler =
-                    outputLayer->GetInputSlots()[0].GetConnectedOutputSlot()->GetOutputHandler();
+                    for (const auto& workloadInfo: indices.m_InputSlotIndices)
+                    {
+                        auto inputWorkload = m_WorkloadQueue[workloadInfo.m_WorkloadIndex].get();
+                        inputWorkload->ReplaceInputTensorHandle(inputTensorHandle, workloadInfo.m_SlotIndex);
+                    }
+                    m_IsOutputImported[outputIndex] = true;
+                }
 
-                const TensorInfo& inputTensorInfo = outputHandler.GetTensorInfo();
-                ITensorHandle* inputTensorHandle = outputHandler.GetData();
                 ARMNN_ASSERT_MSG(inputTensorHandle != nullptr, "Data should have been allocated.");
                 MemSyncQueueDescriptor syncDesc;
                 syncDesc.m_Inputs.push_back(inputTensorHandle);
-                info.m_InputTensorInfos.push_back(inputTensorInfo);
+                WorkloadInfo info;
+                info.m_InputTensorInfos.push_back(
+                        outputLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo());
                 auto syncWorkload = std::make_unique<SyncMemGenericWorkload>(syncDesc, info);
                 ARMNN_ASSERT_MSG(syncWorkload, "No sync workload created");
                 m_OutputQueue.push_back(move(syncWorkload));
+                importedOutputIdIndex++;
             }
+            else
+            {
+                if (m_IsOutputImported[outputIndex])
+                {
+                    const auto bindingId = outputLayer->GetBindingId();
+                    const auto& indices = m_OutputWorkloadSlotPairs[bindingId];
+
+                    auto outputWorkload = m_WorkloadQueue[indices.m_OutputSlotIndices.m_WorkloadIndex].get();
+                    const OutputHandler& outputHandler =
+                            outputLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOutputHandler();
+
+                    outputWorkload->ReplaceOutputTensorHandle(
+                            outputHandler.GetData(), indices.m_OutputSlotIndices.m_SlotIndex);
+
+                    for (const auto& workloadInfo: indices.m_InputSlotIndices)
+                    {
+                        auto inputWorkload = m_WorkloadQueue[workloadInfo.m_WorkloadIndex].get();
+                        inputWorkload->ReplaceInputTensorHandle(outputHandler.GetData(), workloadInfo.m_SlotIndex);
+                    }
+                    m_IsOutputImported[outputIndex] = false;
+                }
+
+                const TensorPin& pin = workloadData.GetOutputTensorPin(outputLayer->GetBindingId());
+                // OutputTensorHandle is not imported yet, process to enqueue Output
+                EnqueueOutput(*outputLayer, pin.GetTensorHandle(), pin.GetTensorInfo());
+            }
+            outputIndex++;
         }
     }
 
@@ -806,6 +925,7 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         timelineUtils->RecordEvent(inferenceGuid, LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
         timelineUtils->Commit();
     }
+
     return executionSucceeded ? Status::Success : Status::Failure;
 }
 
@@ -1186,14 +1306,13 @@ const armnn::Tensor GetOutputTensor(const LayerBindingId layerId, const OutputTe
 std::vector<ImportedInputId> LoadedNetwork::ImportInputs(const InputTensors& inputTensors,
                                                          MemorySource forceImportMemorySource)
 {
-    if (!m_NetworkProperties.m_ImportEnabled)
+    if (!m_NetworkProperties.m_AsyncEnabled)
     {
         // Cannot import if import is not enabled and forceImportMemorySource is undefined
         if (forceImportMemorySource == MemorySource::Undefined)
         {
             throw MemoryImportException("ImportInputs: Memory Import failed, NetworkProperties.m_ImportEnabled");
         }
-        // If forceImportMemorySource is defined, try import if memory is aligned
         if (inputTensors.size() != m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetNumInputs())
         {
             throw MemoryImportException("ImportInputs: Force Import failed, incorrect number of tensors");
@@ -1201,85 +1320,42 @@ std::vector<ImportedInputId> LoadedNetwork::ImportInputs(const InputTensors& inp
 
         std::vector<ImportedInputId> importedInputs;
         Graph& graph = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
-        for (auto inputTensor : inputTensors)
+        unsigned int inputIndex = 0;
+        for (const BindableLayer* inputLayer : graph.GetInputLayers())
         {
-            auto layerBindingId = inputTensor.first;
-            auto it = std::find_if(graph.GetInputLayers().begin(), graph.GetInputLayers().end(), [=](auto* layer)
+            auto outputTensorHandle = m_PreImportedInputHandles[inputIndex].m_TensorHandle.get();
+
+            if (!outputTensorHandle)
             {
-                return layer->GetBindingId() == layerBindingId;
+                inputIndex++;
+                continue;
+            }
+
+            auto layerBindingId = inputLayer->GetBindingId();
+            auto it = std::find_if(inputTensors.begin(), inputTensors.end(), [=](const auto& inputTensor)
+            {
+                return inputTensor.first == layerBindingId;
             });
 
-            if (it == graph.GetInputLayers().end())
+            if (it == inputTensors.end())
             {
-                throw MemoryImportException(fmt::format(
-                    "ImportInputs: Memory Import failed, unknown LayerBindingId: {}", layerBindingId));
+                inputIndex++;
+                continue;
             }
 
-            const Layer* layer = *it;
-            if (layer->GetType() != LayerType::Input)
-            {
-                throw InvalidArgumentException("ImportInputs: given layer not an InputLayer");
-            }
-            const OutputSlot& outputSlot = layer->GetOutputSlots()[0];
-            ITensorHandleFactory::FactoryId factoryId = outputSlot.GetTensorHandleFactoryId();
-            // Get matching import factory Id
-            ITensorHandleFactory::FactoryId importFactoryId =
-                m_TensorHandleFactoryRegistry.GetMatchingImportFactoryId(factoryId);
-            ITensorHandleFactory* importFactory =
-                m_TensorHandleFactoryRegistry.GetFactory(importFactoryId, forceImportMemorySource);
-            if (!importFactory)
-            {
-                throw MemoryImportException("ImportInputs: Force Import failed, cannot find matching Import Factory");
-            }
-
-            OutputHandler& handler = const_cast<OutputHandler&>(layer->GetOutputHandler(0));
-            handler.SetAllocatedData();
-            handler.CreateTensorHandles(*importFactory, false);
-            ITensorHandle* outputTensorHandle = handler.GetData();
+            const auto& inputTensor = *it;
             std::unique_ptr<ITensorHandle> passThroughTensorHandle =
                     std::make_unique<ConstPassthroughTensorHandle>(inputTensor.second.GetInfo(),
                                                                    inputTensor.second.GetMemoryArea());
-            // Check if the input memory can be imported
-            if (outputTensorHandle->CanBeImported(passThroughTensorHandle->Map(), forceImportMemorySource))
-            {
-                passThroughTensorHandle->Unmap();
-                if (outputTensorHandle->Import(passThroughTensorHandle->Map(), forceImportMemorySource))
-                {
-                    passThroughTensorHandle->Unmap();
-                    try
-                    {
-                        m_WorkloadQueue[m_InputWorkloadSlotPairs[layerBindingId].first].get()->ReplaceInputTensorHandle(
-                            outputTensorHandle, m_InputWorkloadSlotPairs[layerBindingId].second);
-                        importedInputs.push_back(m_CurImportedInputId++);
-                        // For force import, we want OutputHandler to own the TensorHandle,
-                        // so we do not move the TensorHandle to m_PreImportedInputHandles as in AsyncEnabled networks
-                        ImportedTensorHandlePin importedTensorHandlePin{layerBindingId, nullptr};
-                        m_PreImportedInputHandles.push_back(std::move(importedTensorHandlePin));
-                    }
-                    catch(armnn::UnimplementedException& e)
-                    {
-                        IgnoreUnused(e);
-                        // Method not implement, cannot use import tensor and have to use allocated data instead
-                        handler.UseAllocatedData();
-                    }
-                }
-            }
-            else
-            {
-                // Cannot import, use allocated data
-                handler.UseAllocatedData();
-                // Ensure that the workload get correct tensor
-                try
-                {
-                    m_WorkloadQueue[m_InputWorkloadSlotPairs[layerBindingId].first].get()->ReplaceInputTensorHandle(
-                        handler.GetData(), m_InputWorkloadSlotPairs[layerBindingId].second);
-                }
-                catch(armnn::UnimplementedException& e)
-                {
-                    IgnoreUnused(e);
-                }
-            }
 
+            if (outputTensorHandle->CanBeImported(passThroughTensorHandle->Map(), forceImportMemorySource)
+                && (outputTensorHandle->Import(passThroughTensorHandle->Map(), forceImportMemorySource)))
+            {
+                importedInputs.push_back(inputIndex);
+            }
+            passThroughTensorHandle->Unmap();
+
+            inputIndex++;
         }
 
         return importedInputs;
@@ -1363,7 +1439,7 @@ std::vector<ImportedInputId> LoadedNetwork::ImportInputs(const InputTensors& inp
 std::vector<ImportedOutputId> LoadedNetwork::ImportOutputs(const OutputTensors& outputTensors,
                                                            MemorySource forceImportMemorySource)
 {
-    if (!m_NetworkProperties.m_ExportEnabled)
+    if (!m_NetworkProperties.m_AsyncEnabled)
     {
         // Cannot import if import is not enabled and forceImportMemorySource is undefined
         if (forceImportMemorySource == MemorySource::Undefined)
@@ -1377,85 +1453,38 @@ std::vector<ImportedOutputId> LoadedNetwork::ImportOutputs(const OutputTensors& 
         }
         std::vector<ImportedInputId> importedOutputs;
         Graph& graph = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
-        for (auto outputTensor : outputTensors)
+
+        unsigned int outputIndex = 0;
+        for (const BindableLayer* const outputLayer : graph.GetOutputLayers())
         {
-            auto layerBindingId = outputTensor.first;
-            auto it = std::find_if(graph.GetOutputLayers().begin(), graph.GetOutputLayers().end(), [=](auto* layer)
+            auto inputTensorHandle = m_PreImportedOutputHandles[outputIndex].m_TensorHandle.get();
+
+            if (!inputTensorHandle)
             {
-                return layer->GetBindingId() == layerBindingId;
+                outputIndex++;
+                continue;
+            }
+
+            auto layerBindingId = outputLayer->GetBindingId();
+            auto it = std::find_if(outputTensors.begin(), outputTensors.end(), [=] (const auto& outputTensor)
+            {
+                return outputTensor.first == layerBindingId;
             });
 
-            if (it == graph.GetOutputLayers().end())
+            if (it == outputTensors.end())
             {
-                throw MemoryImportException(fmt::format("ImportOutputs: Memory Import failed, "
-                                                        "unknown LayerBindingId: {}",
-                                                        layerBindingId));
+                outputIndex++;
+                continue;
             }
 
-            const Layer* layer = *it;
-            if (layer->GetType() != LayerType::Output)
-            {
-                throw InvalidArgumentException("ImportOutputs: given layer not an OutputLayer");
-            }
-
-            const OutputSlot* outputSlot = layer->GetInputSlots()[0].GetConnectedOutputSlot();
-            ITensorHandleFactory::FactoryId factoryId = outputSlot->GetTensorHandleFactoryId();
-            ITensorHandleFactory::FactoryId importFactoryId =
-                m_TensorHandleFactoryRegistry.GetMatchingImportFactoryId(factoryId);
-            ITensorHandleFactory* importFactory =
-                m_TensorHandleFactoryRegistry.GetFactory(importFactoryId, forceImportMemorySource);
-            if (!importFactory)
-            {
-                throw MemoryImportException("ImportOutputs: Force Import failed, cannot find matching Import Factory");
-            }
-
-            OutputHandler& outputHandler =
-                const_cast<OutputHandler&>(layer->GetInputSlots()[0].GetConnectedOutputSlot()->GetOutputHandler());
-            outputHandler.SetAllocatedData();
-            ITensorHandle* inputTensorHandle = outputHandler.GetData();
-            outputHandler.CreateTensorHandles(*importFactory, false);
-            inputTensorHandle = outputHandler.GetData();
-
+            const auto outputTensor = *it;
             // Check if the output memory can be imported
-            if (inputTensorHandle->CanBeImported(outputTensor.second.GetMemoryArea(), forceImportMemorySource))
+            if (inputTensorHandle->CanBeImported(outputTensor.second.GetMemoryArea(), forceImportMemorySource)
+                && inputTensorHandle->Import(outputTensor.second.GetMemoryArea(), forceImportMemorySource))
             {
-                if (inputTensorHandle->Import(outputTensor.second.GetMemoryArea(), forceImportMemorySource))
-                {
-                    try
-                    {
-                        m_WorkloadQueue[m_OutputWorkloadSlotPairs[layerBindingId].first].get()->
-                            ReplaceOutputTensorHandle(inputTensorHandle,
-                                                      m_OutputWorkloadSlotPairs[layerBindingId].second);
-                        importedOutputs.push_back(m_CurImportedOutputId++);
-                        // For force import, we want OutputHandler to own the TensorHandle,
-                        // so we do not move the TensorHandle to m_PreImportedOutputHandles as in AsyncEnabled networks
-                        ImportedTensorHandlePin importedTensorHandlePin{layerBindingId, nullptr};
-                        m_PreImportedOutputHandles.push_back(std::move(importedTensorHandlePin));
-                    }
-                    catch(armnn::UnimplementedException& e)
-                    {
-                        IgnoreUnused(e);
-                        // Method not implement, cannot use import tensor and have to use allocated data instead
-                        outputHandler.UseAllocatedData();
-                    }
-                }
+                importedOutputs.push_back(outputIndex);
             }
-            else
-            {
-                // Cannot import, use allocated memory
-                outputHandler.UseAllocatedData();
-                // Ensure that the workload get correct tensor
-                try
-                {
-                    m_WorkloadQueue[m_OutputWorkloadSlotPairs[layerBindingId].first].get()->
-                            ReplaceOutputTensorHandle(outputHandler.GetData(),
-                                                      m_OutputWorkloadSlotPairs[layerBindingId].second);
-                }
-                catch(armnn::UnimplementedException& e)
-                {
-                    IgnoreUnused(e);
-                }
-            }
+            outputIndex++;
         }
         return importedOutputs;
     }

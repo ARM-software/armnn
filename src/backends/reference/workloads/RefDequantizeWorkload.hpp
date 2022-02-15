@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 
 namespace armnn
 {
 
-class RefDequantizeWorkload : public BaseWorkload<DequantizeQueueDescriptor>
+class RefDequantizeWorkload : public RefBaseWorkload<DequantizeQueueDescriptor>
 {
 public:
-    using BaseWorkload<DequantizeQueueDescriptor>::m_Data;
-    using BaseWorkload<DequantizeQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<DequantizeQueueDescriptor>::m_Data;
+    using RefBaseWorkload<DequantizeQueueDescriptor>::RefBaseWorkload;
 
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;

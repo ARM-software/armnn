@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 #include "Decoders.hpp"
 #include "Encoders.hpp"
 
 namespace armnn {
 
-class RefQuantizeWorkload : public BaseWorkload<QuantizeQueueDescriptor>
+class RefQuantizeWorkload : public RefBaseWorkload<QuantizeQueueDescriptor>
 {
 public:
     RefQuantizeWorkload(const QuantizeQueueDescriptor& descriptor, const WorkloadInfo &info);

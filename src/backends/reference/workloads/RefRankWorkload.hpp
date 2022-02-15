@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include "RefWorkloadUtils.hpp"
@@ -13,10 +13,10 @@
 namespace armnn
 {
 
-struct RefRankWorkload : public BaseWorkload<RankQueueDescriptor>
+struct RefRankWorkload : public RefBaseWorkload<RankQueueDescriptor>
 {
 public:
-    using BaseWorkload<RankQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<RankQueueDescriptor>::RefBaseWorkload;
     virtual void Execute() const override
     {
         Execute(m_Data.m_Inputs, m_Data.m_Outputs);

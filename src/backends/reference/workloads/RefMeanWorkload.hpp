@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include "Decoders.hpp"
@@ -14,7 +14,7 @@
 namespace armnn
 {
 
-class RefMeanWorkload : public BaseWorkload<MeanQueueDescriptor>
+class RefMeanWorkload : public RefBaseWorkload<MeanQueueDescriptor>
 {
 public:
     explicit RefMeanWorkload (const MeanQueueDescriptor& descriptor, const WorkloadInfo& info);

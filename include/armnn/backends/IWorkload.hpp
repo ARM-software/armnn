@@ -31,6 +31,10 @@ public:
 
     virtual profiling::ProfilingGuid GetGuid() const = 0;
 
+    // SupportsTensorHandleReplacement signals that a given workload is capable of
+    // replacing any of its I/O tensors via ReplaceInput/OutputTensorHandle
+    virtual bool SupportsTensorHandleReplacement() const = 0;
+
     // Replace input tensor handle with the given TensorHandle
     virtual void ReplaceInputTensorHandle(ITensorHandle* /*input*/, unsigned int /*slot*/) = 0;
 

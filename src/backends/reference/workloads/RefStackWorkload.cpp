@@ -15,7 +15,7 @@ namespace armnn
 
 RefStackWorkload::RefStackWorkload(const StackQueueDescriptor& descriptor,
                                    const WorkloadInfo& info)
-    : BaseWorkload(descriptor, info)
+    : RefBaseWorkload(descriptor, info)
 {}
 
 void RefStackWorkload::Execute() const

@@ -18,7 +18,7 @@ namespace armnn
 
 RefConstantWorkload::RefConstantWorkload(
     const ConstantQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : BaseWorkload<ConstantQueueDescriptor>(descriptor, info) {}
+    : RefBaseWorkload<ConstantQueueDescriptor>(descriptor, info) {}
 
 void RefConstantWorkload::Execute() const
 {

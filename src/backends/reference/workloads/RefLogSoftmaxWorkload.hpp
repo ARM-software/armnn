@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefLogSoftmaxWorkload : public BaseWorkload<LogSoftmaxQueueDescriptor>
+class RefLogSoftmaxWorkload : public RefBaseWorkload<LogSoftmaxQueueDescriptor>
 {
 public:
-    using BaseWorkload<LogSoftmaxQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<LogSoftmaxQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 private:

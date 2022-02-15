@@ -19,7 +19,7 @@ namespace armnn
 
 RefLogicalUnaryWorkload::RefLogicalUnaryWorkload(const ElementwiseUnaryQueueDescriptor& desc,
                                                  const WorkloadInfo& info)
-    : BaseWorkload<ElementwiseUnaryQueueDescriptor>(desc, info)
+    : RefBaseWorkload<ElementwiseUnaryQueueDescriptor>(desc, info)
 {}
 
 void RefLogicalUnaryWorkload::Execute() const

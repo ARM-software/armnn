@@ -5,12 +5,12 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 
 namespace armnn
 {
 
-class RefStridedSliceWorkload : public BaseWorkload<StridedSliceQueueDescriptor>
+class RefStridedSliceWorkload : public RefBaseWorkload<StridedSliceQueueDescriptor>
 {
 public:
     RefStridedSliceWorkload(const StridedSliceQueueDescriptor& descriptor, const WorkloadInfo& info);

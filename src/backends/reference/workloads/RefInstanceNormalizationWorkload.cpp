@@ -16,7 +16,7 @@ namespace armnn
 RefInstanceNormalizationWorkload::RefInstanceNormalizationWorkload(
     const InstanceNormalizationQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : BaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info) {}
+    : RefBaseWorkload<InstanceNormalizationQueueDescriptor>(descriptor, info) {}
 
 void RefInstanceNormalizationWorkload::Execute() const
 {

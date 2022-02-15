@@ -7,16 +7,16 @@
 
 #include "BaseIterator.hpp"
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefLogicalUnaryWorkload : public BaseWorkload<ElementwiseUnaryQueueDescriptor>
+class RefLogicalUnaryWorkload : public RefBaseWorkload<ElementwiseUnaryQueueDescriptor>
 {
 public:
-    using BaseWorkload<ElementwiseUnaryQueueDescriptor>::m_Data;
+    using RefBaseWorkload<ElementwiseUnaryQueueDescriptor>::m_Data;
 
     RefLogicalUnaryWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;

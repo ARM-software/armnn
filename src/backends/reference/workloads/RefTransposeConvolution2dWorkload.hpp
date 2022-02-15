@@ -9,12 +9,12 @@
 #include "Encoders.hpp"
 
 #include <armnn/backends/TensorHandle.hpp>
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 
 namespace armnn
 {
 
-class RefTransposeConvolution2dWorkload : public BaseWorkload<TransposeConvolution2dQueueDescriptor>
+class RefTransposeConvolution2dWorkload : public RefBaseWorkload<TransposeConvolution2dQueueDescriptor>
 {
 public:
     RefTransposeConvolution2dWorkload(const TransposeConvolution2dQueueDescriptor& descriptor,

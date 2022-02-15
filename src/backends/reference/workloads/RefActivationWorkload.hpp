@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefActivationWorkload : public BaseWorkload<ActivationQueueDescriptor>
+class RefActivationWorkload : public RefBaseWorkload<ActivationQueueDescriptor>
 {
 public:
-    using BaseWorkload<ActivationQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<ActivationQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor) override;
 

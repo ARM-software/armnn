@@ -15,7 +15,7 @@ namespace armnn
 
 RefPreluWorkload::RefPreluWorkload(const PreluQueueDescriptor& descriptor,
                                    const WorkloadInfo& info)
-    : BaseWorkload(descriptor, info)
+    : RefBaseWorkload(descriptor, info)
 {}
 
 void RefPreluWorkload::Execute() const

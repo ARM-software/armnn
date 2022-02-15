@@ -12,7 +12,7 @@ namespace armnn
 
 RefStridedSliceWorkload::RefStridedSliceWorkload(const StridedSliceQueueDescriptor& descriptor,
                                                  const WorkloadInfo& info)
-    : BaseWorkload(descriptor, info)
+    : RefBaseWorkload(descriptor, info)
 {}
 
 void RefStridedSliceWorkload::Execute() const

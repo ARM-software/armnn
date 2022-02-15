@@ -21,7 +21,7 @@ template <typename Functor, typename ParentDescriptor, typename armnn::StringMap
 RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::RefElementwiseWorkload(
     const ParentDescriptor& desc,
     const WorkloadInfo& info)
-    : BaseWorkload<ParentDescriptor>(desc, info)
+    : RefBaseWorkload<ParentDescriptor>(desc, info)
 {
 }
 

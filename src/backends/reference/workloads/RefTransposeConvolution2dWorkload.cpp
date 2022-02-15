@@ -15,7 +15,7 @@ namespace armnn
 
 RefTransposeConvolution2dWorkload::RefTransposeConvolution2dWorkload(
     const TransposeConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info) :
-    BaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info)
+    RefBaseWorkload<TransposeConvolution2dQueueDescriptor>(descriptor, info)
 {
     // set up weights decoder
     m_Weights = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Weight));

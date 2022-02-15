@@ -16,7 +16,7 @@ namespace armnn
 RefArgMinMaxWorkload::RefArgMinMaxWorkload(
         const ArgMinMaxQueueDescriptor& descriptor,
         const WorkloadInfo& info)
-        : BaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info) {}
+        : RefBaseWorkload<ArgMinMaxQueueDescriptor>(descriptor, info) {}
 
 
 void RefArgMinMaxWorkload::Execute() const

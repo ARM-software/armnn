@@ -21,7 +21,7 @@ namespace armnn
 
 RefComparisonWorkload::RefComparisonWorkload(const ComparisonQueueDescriptor& desc,
                                              const WorkloadInfo& info)
-    : BaseWorkload<ComparisonQueueDescriptor>(desc, info)
+    : RefBaseWorkload<ComparisonQueueDescriptor>(desc, info)
 {}
 
 void RefComparisonWorkload::PostAllocationConfigure()

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include "Decoders.hpp"
@@ -13,10 +13,10 @@
 
 namespace armnn
 {
-class RefPooling2dWorkload : public BaseWorkload<Pooling2dQueueDescriptor>
+class RefPooling2dWorkload : public RefBaseWorkload<Pooling2dQueueDescriptor>
 {
 public:
-    using BaseWorkload<Pooling2dQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<Pooling2dQueueDescriptor>::RefBaseWorkload;
 
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;

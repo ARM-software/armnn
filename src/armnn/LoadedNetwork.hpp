@@ -204,8 +204,21 @@ private:
 
     // A set of vectors to record the workload queue indexes and their corresponding Input/Output Slot indexes
     // which are connected to Inputs and Outputs for the network.
-    std::unordered_map<LayerBindingId, std::pair<unsigned int, unsigned int>> m_InputWorkloadSlotPairs;
-    std::unordered_map<LayerBindingId, std::pair<unsigned int, unsigned int>> m_OutputWorkloadSlotPairs;
+    struct WorkloadIndices
+    {
+        unsigned int m_WorkloadIndex;
+        unsigned int m_SlotIndex;
+    };
+
+    struct OutputWorkloadIndices
+    {
+        WorkloadIndices m_OutputSlotIndices;
+        std::vector<WorkloadIndices> m_InputSlotIndices;
+    };
+    std::unordered_map<LayerBindingId, std::vector<WorkloadIndices>> m_InputWorkloadSlotPairs;
+    std::unordered_map<LayerBindingId, OutputWorkloadIndices> m_OutputWorkloadSlotPairs;
+    std::vector<bool> m_IsInputImported;
+    std::vector<bool> m_IsOutputImported;
 
 };
 

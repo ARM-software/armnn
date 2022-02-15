@@ -7,7 +7,7 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include "Encoders.hpp"
@@ -16,7 +16,7 @@
 namespace armnn
 {
 
-class RefUnidirectionalSequenceLstmWorkload : public BaseWorkload<UnidirectionalSequenceLstmQueueDescriptor>
+class RefUnidirectionalSequenceLstmWorkload : public RefBaseWorkload<UnidirectionalSequenceLstmQueueDescriptor>
 {
 public:
     explicit RefUnidirectionalSequenceLstmWorkload(const UnidirectionalSequenceLstmQueueDescriptor& descriptor,

@@ -22,7 +22,7 @@ namespace armnn
 RefL2NormalizationWorkload::RefL2NormalizationWorkload(
         const L2NormalizationQueueDescriptor& descriptor,
         const WorkloadInfo& info)
-    : BaseWorkload<L2NormalizationQueueDescriptor>(descriptor, info) {}
+    : RefBaseWorkload<L2NormalizationQueueDescriptor>(descriptor, info) {}
 
 void RefL2NormalizationWorkload::Execute() const
 {

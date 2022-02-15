@@ -40,6 +40,8 @@ public:
 
     arm_compute::ConvolutionMethod GetConvolutionMethod() const;
 
+    bool SupportsTensorHandleReplacement() const override { return true;};
+
 protected:
     void Reconfigure() override;
 

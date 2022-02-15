@@ -15,7 +15,7 @@ namespace armnn
 {
 
 RefLstmWorkload::RefLstmWorkload(const LstmQueueDescriptor &descriptor, const WorkloadInfo &info)
-    : BaseWorkload<LstmQueueDescriptor>(descriptor, info)
+    : RefBaseWorkload<LstmQueueDescriptor>(descriptor, info)
     , m_InputToInputWeightsTensor     (AssignScopedTensorHandle(descriptor.m_InputToInputWeights))
     , m_InputToForgetWeightsTensor    (AssignScopedTensorHandle(descriptor.m_InputToForgetWeights))
     , m_InputToCellWeightsTensor      (AssignScopedTensorHandle(descriptor.m_InputToCellWeights))

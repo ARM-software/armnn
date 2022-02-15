@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include <armnn/Types.hpp>
@@ -14,7 +14,7 @@ namespace armnn
 {
 
 // Base class template providing an implementation of the Constant layer common to all data types.
-class RefConstantWorkload : public BaseWorkload<ConstantQueueDescriptor>
+class RefConstantWorkload : public RefBaseWorkload<ConstantQueueDescriptor>
 {
 public:
     RefConstantWorkload(const ConstantQueueDescriptor& descriptor, const WorkloadInfo& info);

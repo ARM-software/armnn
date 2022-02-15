@@ -4,17 +4,17 @@
 //
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 
 #include <armnn/TypesUtils.hpp>
 
 namespace armnn
 {
 
-class RefSpaceToDepthWorkload : public BaseWorkload<SpaceToDepthQueueDescriptor>
+class RefSpaceToDepthWorkload : public RefBaseWorkload<SpaceToDepthQueueDescriptor>
 {
 public:
-    using BaseWorkload<SpaceToDepthQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<SpaceToDepthQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 private:

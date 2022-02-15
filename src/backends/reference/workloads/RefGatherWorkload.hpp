@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 #include <armnn/TypesUtils.hpp>
@@ -16,10 +16,10 @@
 namespace armnn
 {
 
-class RefGatherWorkload : public BaseWorkload<GatherQueueDescriptor>
+class RefGatherWorkload : public RefBaseWorkload<GatherQueueDescriptor>
 {
 public:
-    using BaseWorkload<GatherQueueDescriptor>::BaseWorkload;
+    using RefBaseWorkload<GatherQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 private:

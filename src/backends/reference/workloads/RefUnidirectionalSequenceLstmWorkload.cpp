@@ -19,7 +19,7 @@ namespace armnn
 RefUnidirectionalSequenceLstmWorkload::RefUnidirectionalSequenceLstmWorkload(
     const UnidirectionalSequenceLstmQueueDescriptor& descriptor,
     const WorkloadInfo& info)
-    : BaseWorkload<UnidirectionalSequenceLstmQueueDescriptor>(descriptor, info)
+    : RefBaseWorkload<UnidirectionalSequenceLstmQueueDescriptor>(descriptor, info)
     , m_InputToInputWeightsTensor     (AssignScopedTensorHandle(descriptor.m_InputToInputWeights))
     , m_InputToForgetWeightsTensor    (AssignScopedTensorHandle(descriptor.m_InputToForgetWeights))
     , m_InputToCellWeightsTensor      (AssignScopedTensorHandle(descriptor.m_InputToCellWeights))

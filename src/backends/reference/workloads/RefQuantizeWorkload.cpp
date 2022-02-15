@@ -29,7 +29,7 @@ void QuantizeImpl(Decoder<float>& in, Encoder<float>& out, size_t numValues)
 } //namespace
 
 RefQuantizeWorkload::RefQuantizeWorkload(const QuantizeQueueDescriptor& descriptor, const WorkloadInfo &info)
-    : BaseWorkload(descriptor, info)
+    : RefBaseWorkload(descriptor, info)
     , m_NumElements(info.m_InputTensorInfos[0].GetNumElements())
 {
 }

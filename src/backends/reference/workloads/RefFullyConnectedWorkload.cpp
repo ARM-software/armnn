@@ -14,7 +14,7 @@ namespace armnn
 {
 RefFullyConnectedWorkload::RefFullyConnectedWorkload(
     const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info)
-        : BaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
+        : RefBaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
 {
 }
 

@@ -19,7 +19,7 @@ namespace armnn
 
 RefLogicalBinaryWorkload::RefLogicalBinaryWorkload(const LogicalBinaryQueueDescriptor& desc,
                                                    const WorkloadInfo& info)
-    : BaseWorkload<LogicalBinaryQueueDescriptor>(desc, info)
+    : RefBaseWorkload<LogicalBinaryQueueDescriptor>(desc, info)
 {}
 
 void RefLogicalBinaryWorkload::Execute() const

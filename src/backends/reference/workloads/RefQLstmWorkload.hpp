@@ -7,13 +7,13 @@
 
 #include <armnn/TypesUtils.hpp>
 
-#include <armnn/backends/Workload.hpp>
+#include "RefBaseWorkload.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 
 namespace armnn
 {
 
-class RefQLstmWorkload : public BaseWorkload<QLstmQueueDescriptor>
+class RefQLstmWorkload : public RefBaseWorkload<QLstmQueueDescriptor>
 {
 public:
     explicit RefQLstmWorkload(const QLstmQueueDescriptor& descriptor, const WorkloadInfo& info);

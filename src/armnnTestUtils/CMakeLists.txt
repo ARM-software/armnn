@@ -15,6 +15,7 @@ list(APPEND armnnTestUtils_sources
         ../../include/armnnTestUtils/TensorCopyUtils.hpp
         ../../include/armnnTestUtils/WorkloadTestUtils.hpp
         ../../include/armnnTestUtils/TensorHelpers.hpp
+        ../../include/armnnTestUtils/Version.hpp
         CreateWorkload.hpp
         CommonTestUtils.cpp
         CommonTestUtils.hpp
@@ -57,3 +58,5 @@ install(TARGETS armnnTestUtils
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
 add_library(Armnn::armnnTestUtils ALIAS armnnTestUtils)
+
+set_target_properties(armnnTestUtils PROPERTIES VERSION ${ARMNN_TEST_UTILS_LIB_VERSION} SOVERSION ${ARMNN_TEST_UTILS_LIB_SOVERSION})

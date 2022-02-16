@@ -7,6 +7,8 @@
 
 #include <armnn/utility/Assert.hpp>
 
+#include "armnnTestUtils/Version.hpp"
+
 using namespace armnn;
 
 void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const armnn::TensorInfo& tensorInfo,

@@ -13,7 +13,8 @@ list(APPEND additional_cmake_files
     cmake/ParserVersion.cmake
     cmake/Utils.cmake
     cmake/GlobalConfig.cmake
-    cmake/AddDllCopyCommands.cmake)
+    cmake/AddDllCopyCommands.cmake
+    cmake/ArmnnTestUtilsVersion.cmake)
 
 foreach(cmake_file ${additional_cmake_files})
     include(${cmake_file})

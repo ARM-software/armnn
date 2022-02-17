@@ -1,5 +1,5 @@
 # TfLite Delegate Quick Start Guide
-If you have downloaded the ArmNN Github binaries or built the TfLite delegate yourself, then this tutorial will show you how you can
+If you have downloaded the Arm NN Github binaries or built the TfLite delegate yourself, then this tutorial will show you how you can
 integrate it into TfLite to run models using python.
 
 Here is an example python script showing how to do this. In this script we are making use of the 
@@ -13,7 +13,7 @@ import tflite_runtime.interpreter as tflite
 # (if you are using the complete tensorflow package you can find load_delegate in tf.experimental.load_delegate)
 armnn_delegate = tflite.load_delegate( library="<path-to-armnn-binaries>/libarmnnDelegate.so",
                                        options={"backends": "CpuAcc,GpuAcc,CpuRef", "logging-severity":"info"})
-# Delegates/Executes all operations supported by ArmNN to/with ArmNN
+# Delegates/Executes all operations supported by Arm NN to/with Arm NN
 interpreter = tflite.Interpreter(model_path="<your-armnn-repo-dir>/delegate/python/test/test_data/mock_model.tflite", 
                                  experimental_delegates=[armnn_delegate])
 interpreter.allocate_tensors()
@@ -36,14 +36,14 @@ print(output_data)
 
 # Prepare the environment
 Pre-requisites:
- * Dynamically build Arm NN Delegate library or download the ArmNN binaries
+ * Dynamically build Arm NN Delegate library or download the Arm NN binaries
  * python3 (Depends on TfLite version)
  * virtualenv
  * numpy (Depends on TfLite version)
  * tflite_runtime (>=2.5, depends on Arm NN Delegate)
 
 If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md). Otherwise, 
-you can download the binaries [here](https://github.com/ARM-software/armnn/releases/tag/v21.11)
+you can download the binaries [here](https://github.com/ARM-software/armnn/releases/)
 
 We recommend creating a virtual environment for this tutorial. For the following code to work python3 is needed. Please
 also check the documentation of the TfLite version you want to use. There might be additional prerequisites for the python
@@ -88,16 +88,16 @@ python ExternalDelegatePythonTutorial.py
 ```
 The output should look similar to this:
 ```bash
-Info: ArmNN v27.0.0
+Info: Arm NN v28.0.0
 
 Info: Initialization time: 0.56 ms
 
-INFO: TfLiteArmnnDelegate: Created TfLite ArmNN delegate.
+INFO: TfLiteArmnnDelegate: Created TfLite Arm NN delegate.
 [[ 12 123  16  12  11  14  20  16  20  12]]
 Info: Shutdown time: 0.28 ms
 ```
 
-For more details of the kind of options you can pass to the Arm NN delegate please check the parameters of function [tflite_plugin_create_delegate](namespacetflite.xhtml).
+For more details of the kind of options you can pass to the Arm NN delegate please check the parameters of function tflite_plugin_create_delegate.
 
 You can also test the functionality of the external delegate adaptor by running some unit tests:
 ```bash

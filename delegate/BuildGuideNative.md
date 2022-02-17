@@ -65,7 +65,7 @@ found [here](https://docs.bazel.build/versions/master/install-compile-source.htm
 compile with CMake. Depending on your operating system and architecture there might be an easier way.
 ```bash
 wget -O cmake-3.16.0.tar.gz https://cmake.org/files/v3.16/cmake-3.16.0.tar.gz
-tar -xzf cmake-3.16.0.tar.gz -C $BASEDIR/cmake-3.16.0
+tar -xzf cmake-3.16.0.tar.gz -C $BASEDIR/
 
 # If you have an older CMake, remove installed in order to upgrade
 yes | sudo apt-get purge cmake
@@ -89,8 +89,10 @@ git checkout $(../armnn/scripts/get_tensorflow.sh -p) # Minimum version required
 Now the build process can be started. When calling "cmake", as below, you can specify a number of build
 flags. But if you have no need to configure your tensorflow build, you can follow the exact commands below:
 ```bash
-cmake $BASEDIR/tensorflow
-cmake --build $BASEDIR/tflite-output # This will be your DTFLITE_LIB_ROOT directory
+mkdir build # You are already inside $BASEDIR/tensorflow at this point
+cd build
+cmake $BASEDIR/tensorflow/tensorflow/lite -DTFLITE_ENABLE_XNNPACK=OFF
+cmake --build . # This will be your DTFLITE_LIB_ROOT directory
 ```
 
 ## Build Flatbuffers
@@ -123,7 +125,7 @@ To build the Arm Compute Library on your platform, download the Arm Compute Libr
 the version you want to use. Build it using `scons`.
 
 ```bash
-cd $HOME/armnn-devenv
+cd $BASEDIR
 git clone https://review.mlplatform.org/ml/ComputeLibrary 
 cd ComputeLibrary/
 git checkout $(../armnn/scripts/get_compute_library.sh -p) # e.g. v21.11
@@ -152,7 +154,7 @@ with the additional cmake arguments shown below
 cd $BASEDIR/armnn/delegate && mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=release                               # A release build rather than a debug build.
          -DTENSORFLOW_ROOT=$BASEDIR/tensorflow \                  # The root directory where tensorflow can be found.
-         -DTFLITE_LIB_ROOT=$BASEDIR/tflite-output \               # Directory where tensorflow libraries can be found.
+         -DTFLITE_LIB_ROOT=$BASEDIR/tensorflow/build \               # Directory where tensorflow libraries can be found.
          -DFLATBUFFERS_ROOT=$BASEDIR/flatbuffers-1.12.0/install \ # Flatbuffers install directory.
          -DArmnn_DIR=$BASEDIR/armnn/build \                       # Directory where the Arm NN library can be found
          -DARMNN_SOURCE_DIR=$BASEDIR/armnn                        # The top directory of the Arm NN repository. 
@@ -199,7 +201,7 @@ cmake .. -DARMCOMPUTE_ROOT=$BASEDIR/ComputeLibrary \
          -DBUILD_UNIT_TESTS=0 \
          -DBUILD_ARMNN_TFLITE_DELEGATE=1 \
          -DTENSORFLOW_ROOT=$BASEDIR/tensorflow \
-         -DTFLITE_LIB_ROOT=$BASEDIR/tflite-output \
+         -DTFLITE_LIB_ROOT=$BASEDIR/tensorflow/build \
          -DFLATBUFFERS_ROOT=$BASEDIR/flatbuffers-1.12.0/install
 make
 ```
@@ -227,11 +229,11 @@ wget https://github.com/ARM-software/ML-zoo/blob/master/models/image_classificat
 ```
 
 ## Execute the benchmarking tool with the Arm NN delegate
+You are already at $BASEDIR/benchmarking from the previous stage.
 ```bash
-cd $BASEDIR/benchmarking
 LD_LIBRARY_PATH=../armnn/build ./benchmark_model --graph=mobilenet_v2_1.0_224_quantized_1_default_1.tflite --external_delegate_path="../armnn/build/delegate/libarmnnDelegate.so" --external_delegate_options="backends:CpuAcc;logging-severity:info"
 ```
-The "external_delegate_options" here are specific to the Arm NN delegate. They are used to specify a target Arm NN backend or to enable/disable various options in Arm NN. A full description can be found in the parameters of function [tflite_plugin_create_delegate](namespacetflite.xhtml).
+The "external_delegate_options" here are specific to the Arm NN delegate. They are used to specify a target Arm NN backend or to enable/disable various options in Arm NN. A full description can be found in the parameters of function tflite_plugin_create_delegate.
 
 # Integrate the Arm NN TfLite Delegate into your project
 
@@ -256,4 +258,4 @@ armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get());
 
 For further information on using TfLite Delegates please visit the [tensorflow website](https://www.tensorflow.org/lite/guide)
 
-For more details of the kind of options you can pass to the Arm NN delegate please check the parameters of function [tflite_plugin_create_delegate](namespacetflite.xhtml).
+For more details of the kind of options you can pass to the Arm NN delegate please check the parameters of function tflite_plugin_create_delegate.

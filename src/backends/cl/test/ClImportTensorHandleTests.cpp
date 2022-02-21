@@ -225,7 +225,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClCanBeImported")
     TensorInfo info({ 1, 24, 16, 3 }, DataType::Float32);
 
     // create TensorHandle for memory import
-    auto handle = handleFactory.CreateTensorHandle(info);
+    auto handle = handleFactory.CreateTensorHandle(info, DataLayout::NHWC);
 
     // Get CLtensor
     arm_compute::CLTensor& tensor = PolymorphicDowncast<ClImportTensorHandle*>(handle.get())->GetTensor();
@@ -252,7 +252,7 @@ TEST_CASE("ClCanBeImportedAlignedMemory")
     TensorInfo info({ 1, 1, 1, 1 }, DataType::Float32);
 
     // create TensorHandle (Memory Managed status is irrelevant)
-    auto handle = handleFactory.CreateTensorHandle(info);
+    auto handle = handleFactory.CreateTensorHandle(info, DataLayout::NHWC);
     // Get CLtensor
     arm_compute::CLTensor& tensor = PolymorphicDowncast<ClImportTensorHandle*>(handle.get())->GetTensor();
 

@@ -116,8 +116,7 @@ public:
 
     bool CanBeImported(void* memory, MemorySource source) override
     {
-        armnn::IgnoreUnused(source);
-        if (reinterpret_cast<uintptr_t>(memory) % m_TypeAlignment)
+        if (source != MemorySource::Malloc || reinterpret_cast<uintptr_t>(memory) % m_TypeAlignment)
         {
             return false;
         }

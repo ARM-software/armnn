@@ -40,7 +40,19 @@ public:
 
     arm_compute::ConvolutionMethod GetConvolutionMethod() const;
 
-    bool SupportsTensorHandleReplacement() const override { return true;};
+    bool SupportsTensorHandleReplacement() const override
+    {
+        // NCHW DataLayout on ACL still uses paddding for alignment on the Conv2d workload so importing is unreliable.
+        if (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
 
 protected:
     void Reconfigure() override;

@@ -76,7 +76,6 @@
 #include "workloads/NeonSubtractionWorkload.hpp"
 #include "workloads/NeonTransposeConvolution2dWorkload.hpp"
 #include "workloads/NeonTransposeWorkload.hpp"
-#include "workloads/NeonUnidirectionalSequenceLstmFloatWorkload.hpp"
 #endif
 
 namespace armnn
@@ -345,17 +344,6 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
                                     *(PolymorphicDowncast<const QLstmDescriptor*>(&descriptor)),
                                     lstmParamsInfo.value(),
                                     reasonIfUnsupported);
-        case LayerType::UnidirectionalSequenceLstm:
-            return IsUnidirectionalSequenceLstmSupported(infos[0],
-                                                         infos[1],
-                                                         infos[2],
-                                                         infos[3],
-                                                         infos[4],
-                                                         infos[5],
-                                                         *(PolymorphicDowncast<const
-                                                            UnidirectionalSequenceLstmDescriptor*>(&descriptor)),
-                                                         lstmParamsInfo.value(),
-                                                         reasonIfUnsupported);
         case LayerType::Maximum:
             return IsMaximumSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::Mean:
@@ -1431,28 +1419,6 @@ bool NeonLayerSupport::IsTransposeSupported(const TensorInfo& input,
                                             Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonTransposeWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
-}
-
-bool NeonLayerSupport::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
-                                                             const TensorInfo& outputStateIn,
-                                                             const TensorInfo& cellStateIn,
-                                                             const TensorInfo& output,
-                                                             const Optional<TensorInfo>& hiddenStateOutput,
-                                                             const Optional<TensorInfo>& cellStateOutput,
-                                                             const UnidirectionalSequenceLstmDescriptor& descriptor,
-                                                             const LstmInputParamsInfo& paramsInfo,
-                                                             Optional<std::string&> reasonIfUnsupported) const
-{
-    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonUnidirectionalSequenceLstmFloatWorkloadValidate,
-                                   reasonIfUnsupported,
-                                   input,
-                                   outputStateIn,
-                                   cellStateIn,
-                                   output,
-                                   hiddenStateOutput,
-                                   cellStateOutput,
-                                   descriptor,
-                                   paramsInfo);
 }
 
 } // namespace armnn

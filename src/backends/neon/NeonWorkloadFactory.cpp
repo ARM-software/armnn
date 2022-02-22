@@ -555,11 +555,6 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
                                                                         info,
                                                                         m_MemoryManager->GetIntraLayerManager());
         }
-        case LayerType::UnidirectionalSequenceLstm :
-        {
-            auto desc = PolymorphicDowncast<const UnidirectionalSequenceLstmQueueDescriptor*>(&descriptor);
-            return MakeWorkloadHelper<NeonUnidirectionalSequenceLstmFloatWorkload, NullWorkload>(*desc, info);
-        }
         default:
             return nullptr;
     }

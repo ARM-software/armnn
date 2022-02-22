@@ -10,16 +10,6 @@
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
 
-LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatchTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
 LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

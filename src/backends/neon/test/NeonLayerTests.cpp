@@ -907,22 +907,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(QLstm2, QLstmTest2)
 // QuantizedLstm
 ARMNN_AUTO_TEST_CASE_WITH_THF(QuantizedLstm, QuantizedLstmTest)
 
-// Unidirectional Sequence Lstm
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatch,
-                              UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatchTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatch,
-                              UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32,
-                              UnidirectionalSequenceLstmLayerFloat32Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajor,
-                              UnidirectionalSequenceLstmLayerFloat32TimeMajorTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjection,
-                              UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNorm,
-                              UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjection,
-                              UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest)
-
 // Mean
 ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleFloat32, MeanSimpleTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(MeanSimpleAxisFloat32, MeanSimpleAxisTest<DataType::Float32>)

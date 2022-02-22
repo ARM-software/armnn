@@ -336,16 +336,6 @@ public:
                               const TransposeDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
-                                               const TensorInfo& outputStateIn,
-                                               const TensorInfo& cellStateIn,
-                                               const TensorInfo& output,
-                                               const Optional<TensorInfo>& hiddenStateOutput,
-                                               const Optional<TensorInfo>& cellStateOutput,
-                                               const UnidirectionalSequenceLstmDescriptor& descriptor,
-                                               const LstmInputParamsInfo& paramsInfo,
-                                               Optional<std::string&> reasonIfUnsupported) const override;
-
 private:
     const IBackendInternal::IBackendSpecificModelContextPtr m_ModelContextPtr;
 

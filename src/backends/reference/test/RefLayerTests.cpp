@@ -2554,10 +2554,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinFloat32, ReduceMinSimpleTest<DataType::Fl
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReduceMinNegativeAxisFloat32, ReduceMinNegativeAxisTest<DataType::Float32>)
 
 // Unidirectional Sequence Lstm
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatch,
-                              UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatchTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatch,
-                              UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32,
                               UnidirectionalSequenceLstmLayerFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajor,

@@ -420,6 +420,133 @@ template<typename T> void Concatenate(
 //
 // Implementation templates
 //
+template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
+LayerTestResult<T, 3> ConcatTestImpl(
+        IWorkloadFactory& workloadFactory,
+        const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+
+    IgnoreUnused(memoryManager);
+
+    unsigned int outputWidth = 3;
+    unsigned int outputHeight = 6;
+    unsigned int outputChannels = 3;
+
+    unsigned int inputWidth1 = 3;
+    unsigned int inputHeight1 = 6;
+    unsigned int inputChannels1 = 2;
+
+    unsigned int inputWidth2 = 3;
+    unsigned int inputHeight2 = 6;
+    unsigned int inputChannels2 = 1;
+
+    // Define the tensor descriptors.
+    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, ArmnnType);
+    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, ArmnnType);
+    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, ArmnnType);
+
+    std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
+
+    std::vector<T> expectedOutput =
+            {
+                    1, 2, 3,
+                    4, 5, 6,
+                    7, 8, 9,
+                    10, 11, 12,
+                    13, 14, 15,
+                    16, 17, 18,
+
+                    19, 20, 21,
+                    22, 23, 24,
+                    25, 26, 27,
+                    28, 29, 30,
+                    31, 32, 33,
+                    34, 35, 36,
+
+                    37, 38, 39,
+                    40, 41, 42,
+                    43, 44, 45,
+                    46, 47, 48,
+                    49, 50, 51,
+                    52, 53, 54
+            };
+
+    std::vector<T> input1 =
+            {
+                    1, 2, 3,
+                    4, 5, 6,
+                    7, 8, 9,
+                    10, 11, 12,
+                    13, 14, 15,
+                    16, 17, 18,
+
+                    19, 20, 21,
+                    22, 23, 24,
+                    25, 26, 27,
+                    28, 29, 30,
+                    31, 32, 33,
+                    34, 35, 36
+            };
+
+    std::vector<T> input2 =
+            {
+                    37, 38, 39,
+                    40, 41, 42,
+                    43, 44, 45,
+                    46, 47, 48,
+                    49, 50, 51,
+                    52, 53, 54,
+            };
+
+    std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //Extent of the window is defined by size of input[0].
+    ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
+
+    std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //Extent of the window is defined by size of input[1].
+    ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
+
+    std::unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+
+    bool subTensorsSupported = workloadFactory.SupportsSubTensors();
+
+    std::unique_ptr<ITensorHandle> inputHandle1 =
+            subTensorsSupported ?
+            tensorHandleFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
+            tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+
+    std::unique_ptr<ITensorHandle> inputHandle2  =
+            subTensorsSupported ?
+            tensorHandleFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
+            tensorHandleFactory.CreateTensorHandle(inputTensorInfo2);
+
+    ConcatQueueDescriptor data;
+    WorkloadInfo info;
+    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    data.m_ViewOrigins.push_back(window1);
+    data.m_ViewOrigins.push_back(window2);
+
+    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Concat, data, info);
+
+    inputHandle1->Allocate();
+    inputHandle2->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle1.get(), input1.data());
+    CopyDataToITensorHandle(inputHandle2.get(), input2.data());
+
+    workload->PostAllocationConfigure();
+    workload->Execute();
+
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
+
+    return LayerTestResult<T, 3>(actualOutput,
+                                 expectedOutput,
+                                 outputHandle->GetShape(),
+                                 outputTensorInfo.GetShape());
+}
 
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 LayerTestResult<T, 1> Concat1dTestImpl(
@@ -2119,125 +2246,15 @@ LayerTestResult<float,3> ConcatTest(
     const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    IgnoreUnused(memoryManager);
+    return ConcatTestImpl<DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory);
+}
 
-    unsigned int outputWidth = 3;
-    unsigned int outputHeight = 6;
-    unsigned int outputChannels = 3;
-
-    unsigned int inputWidth1 = 3;
-    unsigned int inputHeight1 = 6;
-    unsigned int inputChannels1 = 2;
-
-    unsigned int inputWidth2 = 3;
-    unsigned int inputHeight2 = 6;
-    unsigned int inputChannels2 = 1;
-
-    // Define the tensor descriptors.
-    TensorInfo outputTensorInfo({ outputChannels, outputHeight, outputWidth }, DataType::Float32);
-    TensorInfo inputTensorInfo1({ inputChannels1, inputHeight1, inputWidth1 }, DataType::Float32);
-    TensorInfo inputTensorInfo2({ inputChannels2, inputHeight2, inputWidth2 }, DataType::Float32);
-
-    std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
-
-    std::vector<float> expectedOutput =
-    {
-        1.0f, 2.0f, 3.0f,
-        4.0f, 5.0f, 6.0f,
-        7.0f, 8.0f, 9.0f,
-        10.0f, 11.0f, 12.0f,
-        13.0f, 14.0f, 15.0f,
-        16.0f, 17.0f, 18.0f,
-
-        19.0f, 20.0f, 21.0f,
-        22.0f, 23.0f, 24.0f,
-        25.0f, 26.0f, 27.0f,
-        28.0f, 29.0f, 30.0f,
-        31.0f, 32.0f, 33.0f,
-        34.0f, 35.0f, 36.0f,
-
-        37.0f, 38.0f, 39.0f,
-        40.0f, 41.0f, 42.0f,
-        43.0f, 44.0f, 45.0f,
-        46.0f, 47.0f, 48.0f,
-        49.0f, 50.0f, 51.0f,
-        52.0f, 53.0f, 54.0f
-    };
-
-    std::vector<float> input1 =
-    {
-        1.0f, 2.0f, 3.0f,
-        4.0f, 5.0f, 6.0f,
-        7.0f, 8.0f, 9.0f,
-        10.0f, 11.0f, 12.0f,
-        13.0f, 14.0f, 15.0f,
-        16.0f, 17.0f, 18.0f,
-
-        19.0f, 20.0f, 21.0f,
-        22.0f, 23.0f, 24.0f,
-        25.0f, 26.0f, 27.0f,
-        28.0f, 29.0f, 30.0f,
-        31.0f, 32.0f, 33.0f,
-        34.0f, 35.0f, 36.0f
-    };
-
-    std::vector<float> input2 =
-    {
-        37.0f, 38.0f, 39.0f,
-        40.0f, 41.0f, 42.0f,
-        43.0f, 44.0f, 45.0f,
-        46.0f, 47.0f, 48.0f,
-        49.0f, 50.0f, 51.0f,
-        52.0f, 53.0f, 54.0f,
-    };
-
-    std::vector<unsigned int> wOrigin1 = {0, 0, 0}; //Extent of the window is defined by size of input[0].
-    ConcatQueueDescriptor::ViewOrigin window1(wOrigin1);
-
-    std::vector<unsigned int> wOrigin2 = {2, 0, 0}; //Extent of the window is defined by size of input[1].
-    ConcatQueueDescriptor::ViewOrigin window2(wOrigin2);
-
-    std::unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
-
-    bool subTensorsSupported = workloadFactory.SupportsSubTensors();
-
-    std::unique_ptr<ITensorHandle> inputHandle1 =
-        subTensorsSupported ?
-            tensorHandleFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo1.GetShape(), wOrigin1.data()) :
-            tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
-
-    std::unique_ptr<ITensorHandle> inputHandle2  =
-        subTensorsSupported ?
-            tensorHandleFactory.CreateSubTensorHandle(*outputHandle, inputTensorInfo2.GetShape(), wOrigin2.data()) :
-            tensorHandleFactory.CreateTensorHandle(inputTensorInfo2);
-
-    ConcatQueueDescriptor data;
-    WorkloadInfo info;
-    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
-    AddInputToWorkload(data, info, inputTensorInfo2, inputHandle2.get());
-    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
-
-    data.m_ViewOrigins.push_back(window1);
-    data.m_ViewOrigins.push_back(window2);
-
-    std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(LayerType::Concat, data, info);
-
-    inputHandle1->Allocate();
-    inputHandle2->Allocate();
-    outputHandle->Allocate();
-
-    CopyDataToITensorHandle(inputHandle1.get(), input1.data());
-    CopyDataToITensorHandle(inputHandle2.get(), input2.data());
-
-    workload->PostAllocationConfigure();
-    workload->Execute();
-
-    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
-
-    return LayerTestResult<float, 3>(actualOutput,
-                                     expectedOutput,
-                                     outputHandle->GetShape(),
-                                     outputTensorInfo.GetShape());
+LayerTestResult<int32_t, 3> ConcatInt32Test(
+        IWorkloadFactory& workloadFactory,
+        const IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return ConcatTestImpl<DataType::Signed32>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
 LayerTestResult<float, 1> Concat1dTest(

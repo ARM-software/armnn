@@ -1,0 +1,25 @@
+var structarmnn_serializer_1_1_pooling3d_descriptor_builder =
+[
+    [ "Table", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a2549683883bf0a4251084435f0ebd6a2", null ],
+    [ "Pooling3dDescriptorBuilder", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a9711171e08d2f01ab040a030d3a324d6", null ],
+    [ "add_dataLayout", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#aa234e26d6c299a40e4a0d5606e7bf109", null ],
+    [ "add_outputShapeRounding", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a992d1297bd4cadde1aa3dd015d222082", null ],
+    [ "add_padBack", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a4bafab6029b3da09f07bbc5fd1f58338", null ],
+    [ "add_padBottom", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a13adbf2c0383488858a059ddd77f6058", null ],
+    [ "add_paddingMethod", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a1f62777cd68077c80196c6562010e7c9", null ],
+    [ "add_padFront", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#ab6e31b108b2bb0236786fcad76010a10", null ],
+    [ "add_padLeft", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a9817d369f7f78cce9b16ff7b4f64ac1e", null ],
+    [ "add_padRight", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a0bd089d13528b966c6838e7250549fad", null ],
+    [ "add_padTop", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a68f4ac424a33f03f6778cd5f59e96e4c", null ],
+    [ "add_poolDepth", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a483e5a388ce6e33e8d654d8de44eeaa9", null ],
+    [ "add_poolHeight", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#af55970c40aba68c1fb829b92b18f2455", null ],
+    [ "add_poolType", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a03b25a4b2e7465ced88b7af70ae08a9f", null ],
+    [ "add_poolWidth", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a4d78422cb7f7189fa84bc9c3335521c8", null ],
+    [ "add_strideX", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a961c24cfdc178d3d784656a62adf61f1", null ],
+    [ "add_strideY", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#aa4a202661ecd80a15d31e05dd8f6c336", null ],
+    [ "add_strideZ", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a6c07dae8a80b395e289d2ce80916f0b5", null ],
+    [ "Finish", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a12545b3d198b01f79269c5c888dcae6c", null ],
+    [ "operator=", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a31fac1b422e0b0bafcf7be8d0dcf99a8", null ],
+    [ "fbb_", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a97a08cdc2145003f012dd9dc6839627c", null ],
+    [ "start_", "structarmnn_serializer_1_1_pooling3d_descriptor_builder.xhtml#a8a66b87374e39832254f68fa17f30fe0", null ]
+];

@@ -684,13 +684,6 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
                                                                   m_MemoryManager->GetIntraLayerManager(),
                                                                   m_CLCompileContext);
         }
-        case LayerType::UnidirectionalSequenceLstm :
-        {
-            auto desc = PolymorphicDowncast<const UnidirectionalSequenceLstmQueueDescriptor*>(&descriptor);
-            return MakeWorkloadHelper<ClUnidirectionalSequenceLstmFloatWorkload, NullWorkload>(*desc,
-                                                                                               info,
-                                                                                               m_CLCompileContext);
-        }
         default:
             return nullptr;
     }

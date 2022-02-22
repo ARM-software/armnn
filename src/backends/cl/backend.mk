@@ -85,8 +85,7 @@ BACKEND_SOURCES := \
         workloads/ClStridedSliceWorkload.cpp \
         workloads/ClSubtractionWorkload.cpp \
         workloads/ClTransposeConvolution2dWorkload.cpp \
-        workloads/ClTransposeWorkload.cpp \
-        workloads/ClUnidirectionalSequenceLstmFloatWorkload.cpp
+        workloads/ClTransposeWorkload.cpp
 else
 
 # ARMNN_COMPUTE_CL_ENABLED == 0

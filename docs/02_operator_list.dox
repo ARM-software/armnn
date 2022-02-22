@@ -3337,20 +3337,6 @@ where N = batches, C = channels, H = height, W = width
          <tr><th>Weight Types
          <tr><td>FLOAT32
       </table>
-   <td>GpuAcc
-    <td>
-        <ul>
-         <li>All
-        </ul>
-    <td>
-     <table>
-        <tr><th>Input Types
-        <tr><td>FLOAT32
-     </table>
-     <table>
-        <tr><th>Weight Types
-        <tr><td>FLOAT32
-     </table>
 <tr>
   <td rowspan="3">UnmapLayer
   <td rowspan="3" style="width:200px;"> Layer to perform unmap operation on tensor.

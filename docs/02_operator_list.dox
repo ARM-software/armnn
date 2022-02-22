@@ -21,8 +21,8 @@ The main data-types that the Machine Learning functions support are the followin
     <li><b>QASYMMU8:</b> 8-bit unsigned asymmetric quantized
     <li><b>QASYMMS8:</b> 8-bit signed asymmetric quantized
     <li><b>QUANTIZEDSYMM8PERAXIS:</b> 8-bit signed symmetric quantized
-    <li><b>QSYMMS8:</b> 8-bit unsigned symmetric quantized
-    <li><b>QSYMMS16:</b> 16-bit unsigned symmetric quantized
+    <li><b>QSYMMS8:</b> 8-bit signed symmetric quantized
+    <li><b>QSYMMS16:</b> 16-bit signed symmetric quantized
     <li><b>FLOAT32:</b> 32-bit single precision floating point
     <li><b>FLOAT16:</b> 16-bit half precision floating point
     <li><b>SIGNED32:</b> 32-bit signed integer

@@ -631,15 +631,18 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
     auto status = loadedNetwork->EnqueueWorkload(inputTensors, outputTensors,
                                                  preImportedInputIds, preImportedOutputIds);
 
+
+    // Check if we imported, if not there's no need to call the After EnqueueWorkload events
+    if (!preImportedInputIds.empty() || !preImportedOutputIds.empty())
+    {
+        // Call After EnqueueWorkload events
+        for (auto&& context : m_BackendContexts)
+        {
+            context.second->AfterEnqueueWorkload(networkId);
+        }
+    }
     ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
                     << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
-
-    // Call After EnqueueWorkload events
-    for (auto&& context : m_BackendContexts)
-    {
-        context.second->AfterEnqueueWorkload(networkId);
-    }
-
     return status;
 }
 

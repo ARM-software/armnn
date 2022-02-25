@@ -16,10 +16,10 @@
 #include <common/include/Packet.hpp>
 
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ActivateTimelineReportingCommandHandler : public arm::pipe::CommandHandlerFunctor
@@ -30,7 +30,7 @@ public:
                                             uint32_t version,
                                             SendTimelinePacket& sendTimelinePacket,
                                             ProfilingStateMachine& profilingStateMachine,
-                                            Optional<IReportStructure&> reportStructure,
+                                            armnn::Optional<IReportStructure&> reportStructure,
                                             std::atomic<bool>& timelineReporting,
                                             INotifyBackends& notifyBackends)
         : CommandHandlerFunctor(familyId, packetId, version),
@@ -49,9 +49,9 @@ private:
     std::atomic<bool>&     m_TimelineReporting;
     INotifyBackends&       m_BackendNotifier;
 
-    Optional<IReportStructure&> m_ReportStructure;
+    armnn::Optional<IReportStructure&> m_ReportStructure;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

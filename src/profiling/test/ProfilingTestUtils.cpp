@@ -125,7 +125,7 @@ ProfilingGuid VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
     }
     else
     {
-        armnn::profiling::ProfilingService profilingService;
+        ProfilingService profilingService;
         CHECK(readProfilingGuid == profilingService.GetStaticId(label));
     }
 
@@ -373,7 +373,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     GetProfilingService(&runtime).ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), false);
 
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);
@@ -442,7 +442,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     armnn::NetworkId netId;
     CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
+    BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
     // Profiling is enabled, the post-optimisation structure should be created

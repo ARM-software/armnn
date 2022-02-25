@@ -16,10 +16,10 @@
 #include <string>
 #include <vector>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ProfilingConnectionDumpToFileDecorator : public IProfilingConnection
@@ -58,6 +58,6 @@ private:
     bool                                  m_IgnoreFileErrors;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

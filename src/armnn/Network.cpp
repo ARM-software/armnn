@@ -514,7 +514,7 @@ const std::shared_ptr<IProfiler>& IOptimizedNetwork::GetProfiler() const
     return pOptimizedNetworkImpl->GetGraph().GetProfiler();
 }
 
-profiling::ProfilingGuid IOptimizedNetwork::GetGuid() const
+arm::pipe::ProfilingGuid IOptimizedNetwork::GetGuid() const
 {
     return pOptimizedNetworkImpl->GetGuid();
 }
@@ -2866,18 +2866,18 @@ void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const
 
 OptimizedNetworkImpl::OptimizedNetworkImpl(const OptimizedNetworkImpl& other, const ModelOptions& modelOptions)
     : m_Graph(new Graph(*other.m_Graph.get()))
-    , m_Guid(profiling::ProfilingService::GetNextGuid())
+    , m_Guid(arm::pipe::ProfilingService::GetNextGuid())
     , m_ModelOptions(modelOptions)
 {
 }
 
 OptimizedNetworkImpl::OptimizedNetworkImpl(std::unique_ptr<Graph> graph)
-    : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid())
+    : m_Graph(std::move(graph)), m_Guid(arm::pipe::ProfilingService::GetNextGuid())
 {
 }
 
 OptimizedNetworkImpl::OptimizedNetworkImpl(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions)
-    : m_Graph(std::move(graph)), m_Guid(profiling::ProfilingService::GetNextGuid()), m_ModelOptions(modelOptions)
+    : m_Graph(std::move(graph)), m_Guid(arm::pipe::ProfilingService::GetNextGuid()), m_ModelOptions(modelOptions)
 {
 }
 

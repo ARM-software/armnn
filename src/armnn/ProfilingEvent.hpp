@@ -35,7 +35,7 @@ public:
           Event* parent,
           const BackendId backendId,
           std::vector<InstrumentPtr>&& instrument,
-          const Optional<profiling::ProfilingGuid> guid);
+          const Optional<arm::pipe::ProfilingGuid> guid);
 
     Event(const Event& other) = delete;
 
@@ -73,7 +73,7 @@ public:
 
     /// Get the associated profiling GUID if the event is a workload
     /// \return Optional GUID of the event
-    Optional<profiling::ProfilingGuid> GetProfilingGuid() const;
+    Optional<arm::pipe::ProfilingGuid> GetProfilingGuid() const;
 
     /// Assignment operator
     Event& operator=(const Event& other) = delete;
@@ -98,7 +98,7 @@ private:
     Instruments m_Instruments;
 
     /// Workload Profiling id
-    Optional<profiling::ProfilingGuid> m_ProfilingGuid;
+    Optional<arm::pipe::ProfilingGuid> m_ProfilingGuid;
 };
 
 } // namespace armnn

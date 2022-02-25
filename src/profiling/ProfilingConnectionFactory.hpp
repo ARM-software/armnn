@@ -7,10 +7,10 @@
 
 #include "IProfilingConnectionFactory.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ProfilingConnectionFactory final : public IProfilingConnectionFactory
@@ -22,6 +22,6 @@ public:
     IProfilingConnectionPtr GetProfilingConnection(const ProfilingOptions& options) const override;
 };
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

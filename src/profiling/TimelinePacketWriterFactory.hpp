@@ -10,10 +10,10 @@
 
 #include <memory>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class TimelinePacketWriterFactory
@@ -27,6 +27,6 @@ private:
     IBufferManager& m_BufferManager;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

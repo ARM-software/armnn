@@ -21,10 +21,10 @@
 
 #include <set>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 
@@ -35,8 +35,8 @@ public:
     PeriodicCounterSelectionCommandHandler(uint32_t familyId,
                                            uint32_t packetId,
                                            uint32_t version,
-                                           const std::unordered_map<BackendId,
-                                                   std::shared_ptr<armnn::profiling::IBackendProfilingContext>>&
+                                           const std::unordered_map<armnn::BackendId,
+                                                   std::shared_ptr<IBackendProfilingContext>>&
                                                    backendProfilingContexts,
                                            const ICounterMappings& counterIdMap,
                                            Holder& captureDataHolder,
@@ -65,8 +65,8 @@ public:
 private:
 
     std::unordered_map<armnn::BackendId, std::vector<uint16_t>> m_BackendCounterMap;
-    const std::unordered_map<BackendId,
-          std::shared_ptr<armnn::profiling::IBackendProfilingContext>>& m_BackendProfilingContexts;
+    const std::unordered_map<armnn::BackendId,
+          std::shared_ptr<IBackendProfilingContext>>& m_BackendProfilingContexts;
     const ICounterMappings& m_CounterIdMap;
     Holder& m_CaptureDataHolder;
     const uint16_t m_MaxArmCounterId;
@@ -81,7 +81,7 @@ private:
                                 const uint32_t capturePeriod,
                                 const std::vector<uint16_t> counterIds)
     {
-        Optional<std::string> errorMsg =
+        armnn::Optional<std::string> errorMsg =
                 m_BackendProfilingContexts.at(backendId)->ActivateCounters(capturePeriod, counterIds);
 
         if(errorMsg.has_value())
@@ -97,7 +97,7 @@ private:
 
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

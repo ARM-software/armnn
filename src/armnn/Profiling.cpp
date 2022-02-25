@@ -206,7 +206,7 @@ Event* ProfilerImpl::BeginEvent(armnn::IProfiler* profiler,
                                 const BackendId& backendId,
                                 const std::string& label,
                                 std::vector<InstrumentPtr>&& instruments,
-                                const Optional<profiling::ProfilingGuid>& guid)
+                                const Optional<arm::pipe::ProfilingGuid>& guid)
 {
     Event* parent = m_Parents.empty() ? nullptr : m_Parents.top();
     m_EventSequence.push_back(std::make_unique<Event>(label,
@@ -310,7 +310,7 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
     // If profiling GUID is entered, process it
     if (parentEvent->GetProfilingGuid().has_value())
     {
-        profiling::ProfilingGuid profilingGuid;
+        arm::pipe::ProfilingGuid profilingGuid;
         profilingGuid = parentEvent->GetProfilingGuid().value();
         parentObject.SetGuid(profilingGuid);
     }
@@ -610,7 +610,7 @@ void IProfiler::Print(std::ostream& outStream) const
 Event* IProfiler::BeginEvent(const BackendId& backendId,
                              const std::string& label,
                              std::vector<InstrumentPtr>&& instruments,
-                             const Optional<profiling::ProfilingGuid>& guid)
+                             const Optional<arm::pipe::ProfilingGuid>& guid)
 {
     return pProfilerImpl->BeginEvent(this, backendId, label, std::move(instruments), guid);
 }

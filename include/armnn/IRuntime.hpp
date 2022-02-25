@@ -146,7 +146,7 @@ public:
             uint32_t    m_CapturePeriod;
             /// The format of the file used for outputting profiling data.
             std::string m_FileFormat;
-            std::vector<armnn::profiling::ILocalPacketHandlerSharedPtr> m_LocalPacketHandlers;
+            std::vector<arm::pipe::ILocalPacketHandlerSharedPtr> m_LocalPacketHandlers;
         };
         ExternalProfilingOptions m_ProfilingOptions;
 

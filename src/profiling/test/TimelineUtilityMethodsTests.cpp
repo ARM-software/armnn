@@ -17,7 +17,7 @@
 #include <doctest/doctest.h>
 
 using namespace armnn;
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 TEST_SUITE("TimelineUtilityMethodsTests")
 {
@@ -214,20 +214,20 @@ TEST_CASE("CreateNamedTypedChildEntityTest")
     profilingService.NextGuid();
 
     CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, "", entityType),
-                      InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid, entityName, ""),
-                      InvalidArgumentException);
+                    arm::pipe::InvalidArgumentException);
     CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(
-        childEntityGuid, parentEntityGuid, "", entityType), InvalidArgumentException);
+        childEntityGuid, parentEntityGuid, "", entityType), arm::pipe::InvalidArgumentException);
     CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedChildEntity(
-        childEntityGuid, parentEntityGuid, entityName, ""), InvalidArgumentException);
+        childEntityGuid, parentEntityGuid, entityName, ""), arm::pipe::InvalidArgumentException);
 
     CHECK_NOTHROW(childEntityGuid = timelineUtilityMethods.CreateNamedTypedChildEntity(parentEntityGuid,
                                                                                               entityName,
                                                                                               entityType));
     CHECK(childEntityGuid != ProfilingGuid(0));
 
-    // Commit all packets at once
+    // Commit all packets at onceTimelineUtilityMethodsTests.cpp
     timelineUtilityMethods.Commit();
 
     // Get the readable buffer
@@ -296,7 +296,7 @@ TEST_CASE("DeclareLabelTest")
     profilingService.NextGuid();
 
     // Try declaring an invalid (empty) label
-    CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel(""), InvalidArgumentException);
+    CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel(""), arm::pipe::InvalidArgumentException);
 
     // Try declaring an invalid (wrong SWTrace format) label
     CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel("inv@lid lab€l"), RuntimeException);
@@ -322,20 +322,20 @@ TEST_CASE("CreateNameTypeEntityInvalidTest")
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
     // Invalid name
-    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity("", "Type"), InvalidArgumentException);
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity("", "Type"), arm::pipe::InvalidArgumentException);
 
     // Invalid type
-    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity("Name", ""), InvalidArgumentException);
+    CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity("Name", ""), arm::pipe::InvalidArgumentException);
 
     ProfilingDynamicGuid guid = profilingService.NextGuid();
 
     // CreatedNamedTypedEntity with Guid - Invalid name
     CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity(guid, "", "Type"),
-                      InvalidArgumentException);
+                    arm::pipe::InvalidArgumentException);
 
     // CreatedNamedTypedEntity with Guid - Invalid type
     CHECK_THROWS_AS(timelineUtilityMethods.CreateNamedTypedEntity(guid, "Name", ""),
-                      InvalidArgumentException);
+                    arm::pipe::InvalidArgumentException);
 
 }
 

@@ -64,25 +64,25 @@ TEST_CASE("CounterCaptureHandlingTest")
     // Offset index to point to mem address
     uint32_t offset = 0;
 
-    profiling::WriteUint64(data1, offset, time);
+    arm::pipe::WriteUint64(data1, offset, time);
     offset += sizeOfUint64;
     for (const auto& pair : indexValuePairs)
     {
-        profiling::WriteUint16(data1, offset, pair.first);
+        arm::pipe::WriteUint16(data1, offset, pair.first);
         offset += sizeOfUint16;
-        profiling::WriteUint32(data1, offset, pair.second);
+        arm::pipe::WriteUint32(data1, offset, pair.second);
         offset += sizeOfUint32;
     }
 
     offset = 0;
 
-    profiling::WriteUint64(data2, offset, time2);
+    arm::pipe::WriteUint64(data2, offset, time2);
     offset += sizeOfUint64;
     for (const auto& pair : indexValuePairs)
     {
-        profiling::WriteUint16(data2, offset, pair.first);
+        arm::pipe::WriteUint16(data2, offset, pair.first);
         offset += sizeOfUint16;
-        profiling::WriteUint32(data2, offset, pair.second);
+        arm::pipe::WriteUint32(data2, offset, pair.second);
         offset += sizeOfUint32;
     }
 
@@ -126,10 +126,10 @@ void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& c
     uint32_t uint64_t_size = sizeof(uint64_t);
     uint32_t threadId_size = sizeof(int);
 
-    profiling::BufferManager bufferManager(5);
-    profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+    arm::pipe::BufferManager bufferManager(5);
+    arm::pipe::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
-    std::unique_ptr<profiling::ISendTimelinePacket> sendTimelinePacket =
+    std::unique_ptr<arm::pipe::ISendTimelinePacket> sendTimelinePacket =
             timelinePacketWriterFactory.GetSendTimelinePacket();
 
     sendTimelinePacket->SendTimelineMessageDirectoryPackage();
@@ -139,7 +139,7 @@ void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& c
 
     unsigned int offset = uint32_t_size * 2;
 
-    std::unique_ptr<profiling::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
+    std::unique_ptr<arm::pipe::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
 
     uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
     CHECK(readStreamVersion == 4);
@@ -151,7 +151,7 @@ void CheckTimelineDirectory(arm::pipe::TimelineDirectoryCaptureCommandHandler& c
     CHECK(readThreadIdBytes == threadId_size);
     offset += uint8_t_size;
 
-    uint32_t declarationSize = profiling::ReadUint32(packetBuffer, offset);
+    uint32_t declarationSize = arm::pipe::ReadUint32(packetBuffer, offset);
     offset += uint32_t_size;
     for(uint32_t i = 0; i < declarationSize; ++i)
     {
@@ -187,53 +187,53 @@ void CheckTimelinePackets(arm::pipe::TimelineDecoder& timelineDecoder)
 {
     unsigned int i = 0; // Use a postfix increment to avoid changing indexes each time the packet gets updated.
     timelineDecoder.ApplyToModel([&](arm::pipe::TimelineDecoder::Model& m) {
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NAME_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NAME_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::NAME_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::NAME_LABEL);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::TYPE_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::TYPE_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::TYPE_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::TYPE_LABEL);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INDEX_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INDEX_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::INDEX_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::INDEX_LABEL);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::BACKENDID_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::BACKENDID_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::BACKENDID_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::BACKENDID_LABEL);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CHILD_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CHILD_LABEL);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::CHILD_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::CHILD_LABEL);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::EXECUTION_OF_GUID);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::EXECUTION_OF_GUID);
         CHECK(m.m_Labels[i++].m_Name ==
-                    profiling::LabelsAndEventClasses::EXECUTION_OF_LABEL);
+                    arm::pipe::LabelsAndEventClasses::EXECUTION_OF_LABEL);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::PROCESS_ID_GUID);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::PROCESS_ID_GUID);
         CHECK(m.m_Labels[i++].m_Name ==
-                    profiling::LabelsAndEventClasses::PROCESS_ID_LABEL);
+                    arm::pipe::LabelsAndEventClasses::PROCESS_ID_LABEL);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::LAYER_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::LAYER);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::LAYER_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::LAYER);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::WORKLOAD_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::WORKLOAD);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::WORKLOAD_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::WORKLOAD);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::NETWORK_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::NETWORK);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::NETWORK_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::NETWORK);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::CONNECTION_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::CONNECTION);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::CONNECTION_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::CONNECTION);
 
-        CHECK(m.m_Labels[i].m_Guid == profiling::LabelsAndEventClasses::INFERENCE_GUID);
-        CHECK(m.m_Labels[i++].m_Name == profiling::LabelsAndEventClasses::INFERENCE);
+        CHECK(m.m_Labels[i].m_Guid == arm::pipe::LabelsAndEventClasses::INFERENCE_GUID);
+        CHECK(m.m_Labels[i++].m_Name == arm::pipe::LabelsAndEventClasses::INFERENCE);
 
         CHECK(m.m_Labels[i].m_Guid ==
-                    profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
+                    arm::pipe::LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID);
         CHECK(m.m_Labels[i++].m_Name ==
-                    profiling::LabelsAndEventClasses::WORKLOAD_EXECUTION);
+                    arm::pipe::LabelsAndEventClasses::WORKLOAD_EXECUTION);
 
         CHECK(m.m_EventClasses[0].m_Guid ==
-                    profiling::LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
+                    arm::pipe::LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
         CHECK(m.m_EventClasses[1].m_Guid ==
-                    profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+                    arm::pipe::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
     });
 }
 
@@ -250,17 +250,17 @@ TEST_CASE("GatorDMockEndToEnd")
     arm::pipe::ConnectionHandler connectionHandler(udsNamespace, false);
 
     // Enable the profiling service.
-    armnn::profiling::ProfilingOptions options;
+    arm::pipe::ProfilingOptions options;
     options.m_EnableProfiling = true;
     options.m_TimelineEnabled = true;
 
-    armnn::profiling::ProfilingService profilingService;
+    arm::pipe::ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "WaitingForAck" state
-    CHECK(profilingService.GetCurrentState() == profiling::ProfilingState::Uninitialised);
+    CHECK(profilingService.GetCurrentState() == arm::pipe::ProfilingState::Uninitialised);
     profilingService.Update();
-    CHECK(profilingService.GetCurrentState() == profiling::ProfilingState::NotConnected);
+    CHECK(profilingService.GetCurrentState() == arm::pipe::ProfilingState::NotConnected);
     profilingService.Update();
 
     // Connect the profiling service
@@ -270,11 +270,11 @@ TEST_CASE("GatorDMockEndToEnd")
     gatordmock::GatordMockService mockService(std::move(basePipeServer), false);
 
     arm::pipe::TimelineDecoder& timelineDecoder = mockService.GetTimelineDecoder();
-    profiling::DirectoryCaptureCommandHandler& directoryCaptureCommandHandler =
+    arm::pipe::DirectoryCaptureCommandHandler& directoryCaptureCommandHandler =
          mockService.GetDirectoryCaptureCommandHandler();
 
     // Give the profiling service sending thread time start executing and send the stream metadata.
-    WaitFor([&](){return profilingService.GetCurrentState() == profiling::ProfilingState::WaitingForAck;},
+    WaitFor([&](){return profilingService.GetCurrentState() == arm::pipe::ProfilingState::WaitingForAck;},
             "Profiling service did not switch to WaitingForAck state");
 
     profilingService.Update();
@@ -288,7 +288,7 @@ TEST_CASE("GatorDMockEndToEnd")
     // And start to listen for packets
     mockService.LaunchReceivingThread();
 
-    WaitFor([&](){return profilingService.GetCurrentState() == profiling::ProfilingState::Active;},
+    WaitFor([&](){return profilingService.GetCurrentState() == arm::pipe::ProfilingState::Active;},
             "Profiling service did not switch to Active state");
 
     // As part of the default startup of the profiling service a counter directory packet will be sent.
@@ -304,8 +304,8 @@ TEST_CASE("GatorDMockEndToEnd")
     // Verify the commonly used timeline packets sent when the profiling service enters the active state
     CheckTimelinePackets(timelineDecoder);
 
-    const profiling::ICounterDirectory& serviceCounterDirectory  = profilingService.GetCounterDirectory();
-    const profiling::ICounterDirectory& receivedCounterDirectory = directoryCaptureCommandHandler.GetCounterDirectory();
+    const arm::pipe::ICounterDirectory& serviceCounterDirectory  = profilingService.GetCounterDirectory();
+    const arm::pipe::ICounterDirectory& receivedCounterDirectory = directoryCaptureCommandHandler.GetCounterDirectory();
 
     // Compare the basics of the counter directory from the service and the one we received over the wire.
     CHECK(serviceCounterDirectory.GetDeviceCount() == receivedCounterDirectory.GetDeviceCount());
@@ -316,7 +316,7 @@ TEST_CASE("GatorDMockEndToEnd")
     receivedCounterDirectory.GetDeviceCount();
     serviceCounterDirectory.GetDeviceCount();
 
-    const profiling::Devices& serviceDevices = serviceCounterDirectory.GetDevices();
+    const arm::pipe::Devices& serviceDevices = serviceCounterDirectory.GetDevices();
     for (auto& device : serviceDevices)
     {
         // Find the same device in the received counter directory.
@@ -326,7 +326,7 @@ TEST_CASE("GatorDMockEndToEnd")
         CHECK(device.second->m_Cores == (*foundDevice).second->m_Cores);
     }
 
-    const profiling::CounterSets& serviceCounterSets = serviceCounterDirectory.GetCounterSets();
+    const arm::pipe::CounterSets& serviceCounterSets = serviceCounterDirectory.GetCounterSets();
     for (auto& counterSet : serviceCounterSets)
     {
         // Find the same counter set in the received counter directory.
@@ -336,7 +336,7 @@ TEST_CASE("GatorDMockEndToEnd")
         CHECK(counterSet.second->m_Count == (*foundCounterSet).second->m_Count);
     }
 
-    const profiling::Categories& serviceCategories = serviceCounterDirectory.GetCategories();
+    const arm::pipe::Categories& serviceCategories = serviceCounterDirectory.GetCategories();
     for (auto& category : serviceCategories)
     {
         for (auto& receivedCategory : receivedCounterDirectory.GetCategories())
@@ -366,13 +366,13 @@ TEST_CASE("GatorDMockEndToEnd")
     }
 
     // Finally check the content of the counters.
-    const profiling::Counters& receivedCounters = receivedCounterDirectory.GetCounters();
+    const arm::pipe::Counters& receivedCounters = receivedCounterDirectory.GetCounters();
     for (auto& receivedCounter : receivedCounters)
     {
         // Translate the Uid and find the corresponding counter in the original counter directory.
         // Note we can't check m_MaxCounterUid here as it will likely differ between the two counter directories.
         uint16_t translated = directoryCaptureCommandHandler.TranslateUIDCopyToOriginal(receivedCounter.first);
-        const profiling::Counter* serviceCounter = serviceCounterDirectory.GetCounter(translated);
+        const arm::pipe::Counter* serviceCounter = serviceCounterDirectory.GetCounter(translated);
         CHECK(serviceCounter->m_DeviceUid == receivedCounter.second->m_DeviceUid);
         CHECK(serviceCounter->m_Name.compare(receivedCounter.second->m_Name) == 0);
         CHECK(serviceCounter->m_CounterSetUid == receivedCounter.second->m_CounterSetUid);

@@ -13,8 +13,8 @@ namespace armnnDelegate
 #define STRINGIFY_MACRO(s) #s
 
 // ArmNN Delegate version components
-#define DELEGATE_MAJOR_VERSION 25
-#define DELEGATE_MINOR_VERSION 1
+#define DELEGATE_MAJOR_VERSION 26
+#define DELEGATE_MINOR_VERSION 0
 #define DELEGATE_PATCH_VERSION 0
 
 /// DELEGATE_VERSION: "X.Y.Z"

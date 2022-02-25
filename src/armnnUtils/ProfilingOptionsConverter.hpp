@@ -8,10 +8,15 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/profiling/ProfilingOptions.hpp>
 
-namespace armnn
+namespace arm
 {
 
-profiling::ProfilingOptions ConvertExternalProfilingOptions(
-    const IRuntime::CreationOptions::ExternalProfilingOptions& options);
+namespace pipe
+{
 
-} // namespace armnn
+ProfilingOptions ConvertExternalProfilingOptions(
+    const armnn::IRuntime::CreationOptions::ExternalProfilingOptions& options);
+
+} // namespace pipe
+
+} // namespace arm

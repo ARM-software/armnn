@@ -9,10 +9,10 @@
 
 #include "DllExport.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class LabelsAndEventClasses
@@ -64,6 +64,6 @@ private:
     static ProfilingGuidGenerator m_GuidGenerator;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

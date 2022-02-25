@@ -27,7 +27,7 @@ namespace armnn
 {
 
 using namespace std;
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 namespace
 {
@@ -82,7 +82,7 @@ void AddWorkloadStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                                 std::string& errorMessage,
                                                                 const INetworkProperties& networkProperties,
-                                                                profiling::ProfilingService&  profilingService)
+                                                                ProfilingService&  profilingService)
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
 
@@ -116,7 +116,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 
 LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                              const INetworkProperties& networkProperties,
-                             profiling::ProfilingService&  profilingService) :
+                             ProfilingService&  profilingService) :
                              m_OptimizedNetwork(std::move(net)),
                              m_NetworkProperties(networkProperties),
                              m_TensorHandleFactoryRegistry(),
@@ -580,7 +580,7 @@ void LoadedNetwork::SendNetworkStructure()
     timelineUtils->Commit();
 }
 
-profiling::ProfilingGuid LoadedNetwork::GetNetworkGuid()
+ProfilingGuid LoadedNetwork::GetNetworkGuid()
 {
     return m_OptimizedNetwork->GetGuid();
 }
@@ -912,7 +912,7 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     {
         if (m_ProfilingService.IsProfilingEnabled())
         {
-            m_ProfilingService.IncrementCounterValue(armnn::profiling::INFERENCES_RUN);
+            m_ProfilingService.IncrementCounterValue(INFERENCES_RUN);
         }
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
         ARMNN_SCOPED_HEAP_PROFILING("Executing");
@@ -1142,7 +1142,7 @@ void LoadedNetwork::FreeWorkingMemory()
 }
 
 bool LoadedNetwork::Execute(std::unique_ptr<TimelineUtilityMethods>& timelineUtils,
-                            profiling::ProfilingGuid inferenceGuid)
+                           ProfilingGuid inferenceGuid)
 {
     bool success = true;
 
@@ -1682,19 +1682,19 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
         }
     };
 
-    std::unique_ptr<profiling::TimelineUtilityMethods> timelineUtils =
-            profiling::TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
-    profiling::ProfilingGuid inferenceGuid = m_ProfilingService.GetNextGuid();
+    std::unique_ptr<TimelineUtilityMethods> timelineUtils =
+           TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+   ProfilingGuid inferenceGuid = m_ProfilingService.GetNextGuid();
     if (timelineUtils)
     {
         // Add inference timeline trace if profiling is enabled.
-        profiling::ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
-        timelineUtils->CreateTypedEntity(inferenceGuid, profiling::LabelsAndEventClasses::INFERENCE_GUID);
-        timelineUtils->CreateRelationship(profiling::ProfilingRelationshipType::RetentionLink,
+       ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
+        timelineUtils->CreateTypedEntity(inferenceGuid,LabelsAndEventClasses::INFERENCE_GUID);
+        timelineUtils->CreateRelationship(ProfilingRelationshipType::RetentionLink,
                                           networkGuid,
                                           inferenceGuid,
-                                          profiling::LabelsAndEventClasses::EXECUTION_OF_GUID);
-        timelineUtils->RecordEvent(inferenceGuid, profiling::LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
+                                         LabelsAndEventClasses::EXECUTION_OF_GUID);
+        timelineUtils->RecordEvent(inferenceGuid,LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
     }
 
     bool executionSucceeded = true;
@@ -1702,7 +1702,7 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
     if (timelineUtils)
     {
         // Add end of life of the inference timeline if profiling is enabled.
-        timelineUtils->RecordEvent(inferenceGuid, profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+        timelineUtils->RecordEvent(inferenceGuid,LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
         timelineUtils->Commit();
     }
 
@@ -1762,7 +1762,7 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
         ARMNN_LOG(error) << "An error occurred attempting to execute a workload: " << error.what();
         executionSucceeded = false;
     };
-    profiling::ProfilingDynamicGuid workloadInferenceID(0);
+   ProfilingDynamicGuid workloadInferenceID(0);
 
     try
     {

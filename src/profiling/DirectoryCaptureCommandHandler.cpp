@@ -11,10 +11,10 @@
 #include <atomic>
 #include <iostream>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 // Utils
@@ -40,37 +40,37 @@ void DirectoryCaptureCommandHandler::ParseData(const arm::pipe::Packet& packet)
     // 0:15  [16] reserved: all zeros
     offset += uint16_t_size;
     // 16:31 [16] device_records_count: number of entries in the device_records_pointer_table
-    deviceRecordCount = profiling::ReadUint16(data, offset);
+    deviceRecordCount = ReadUint16(data, offset);
     offset += uint16_t_size;
 
     // Body header word 1:
     // 0:31 [32] device_records_pointer_table_offset: offset to the device_records_pointer_table
     // The offset is always zero here, as the device record pointer table field is always the first item in the pool
-    const uint32_t deviceRecordsPointerTableOffset = profiling::ReadUint32(data, offset);
+    const uint32_t deviceRecordsPointerTableOffset = ReadUint32(data, offset);
     offset += uint32_t_size;
 
     // Body header word 2:
     // 0:15  [16] reserved: all zeros
     offset += uint16_t_size;
     // 16:31 [16] counter_set_count: number of entries in the counter_set_pointer_table
-    counterSetRecordCount = profiling::ReadUint16(data, offset);
+    counterSetRecordCount = ReadUint16(data, offset);
     offset += uint16_t_size;
 
     // Body header word 3:
     // 0:31 [32] counter_set_pointer_table_offset: offset to the counter_set_pointer_table
-    const uint32_t counterPointerTableSetOffset = profiling::ReadUint32(data, offset);
+    const uint32_t counterPointerTableSetOffset = ReadUint32(data, offset);
     offset += uint32_t_size;
 
     // Body header word 4:
     // 0:15  [16] reserved: all zeros
     offset += uint16_t_size;
     // 16:31 [16] categories_count: number of entries in the categories_pointer_table
-    categoryRecordCount = profiling::ReadUint16(data, offset);
+    categoryRecordCount = ReadUint16(data, offset);
     offset += uint16_t_size;
 
     // Body header word 5:
     // 0:31 [32] categories_pointer_table_offset: offset to the categories_pointer_table
-    const uint32_t categoriesPointerTableOffset = profiling::ReadUint32(data, offset);
+    const uint32_t categoriesPointerTableOffset = ReadUint32(data, offset);
     offset += uint32_t_size;
 
     std::vector<uint32_t> deviceRecordOffsets(deviceRecordCount);
@@ -80,21 +80,21 @@ void DirectoryCaptureCommandHandler::ParseData(const arm::pipe::Packet& packet)
     offset = deviceRecordsPointerTableOffset;
     for (uint32_t i = 0; i < deviceRecordCount; ++i)
     {
-        deviceRecordOffsets[i] = profiling::ReadUint32(data, offset);
+        deviceRecordOffsets[i] = ReadUint32(data, offset);
         offset += uint32_t_size;
     }
 
     offset = counterPointerTableSetOffset;
     for (uint32_t i = 0; i < counterSetRecordCount; ++i)
     {
-        counterSetOffsets[i] = profiling::ReadUint32(data, offset);
+        counterSetOffsets[i] = ReadUint32(data, offset);
         offset += uint32_t_size;
     }
 
     offset = categoriesPointerTableOffset;
     for (uint32_t i = 0; i < categoryRecordCount; ++i)
     {
-        categoryOffsets[i] = profiling::ReadUint32(data, offset);
+        categoryOffsets[i] = ReadUint32(data, offset);
         offset += uint32_t_size;
     }
 
@@ -104,15 +104,15 @@ void DirectoryCaptureCommandHandler::ParseData(const arm::pipe::Packet& packet)
         uint32_t deviceRecordOffset = offset + deviceRecordOffsets[deviceIndex];
         // Device record word 0:
         // 0:15  [16] cores: the number of individual streams of counters for one or more cores of some device
-        uint16_t deviceCores = profiling::ReadUint16(data, deviceRecordOffset);
+        uint16_t deviceCores = ReadUint16(data, deviceRecordOffset);
         // 16:31 [16] deviceUid: the unique identifier for the device
         deviceRecordOffset += uint16_t_size;
-        uint16_t deviceUid = profiling::ReadUint16(data, deviceRecordOffset);
+        uint16_t deviceUid = ReadUint16(data, deviceRecordOffset);
         deviceRecordOffset += uint16_t_size;
 
         // Device record word 1:
         // Offset from the beginning of the device record pool to the name field.
-        uint32_t nameOffset = profiling::ReadUint32(data, deviceRecordOffset);
+        uint32_t nameOffset = ReadUint32(data, deviceRecordOffset);
 
         deviceRecordOffset = deviceRecordsPointerTableOffset + nameOffset;
 
@@ -128,11 +128,11 @@ void DirectoryCaptureCommandHandler::ParseData(const arm::pipe::Packet& packet)
 
         // Counter set record word 0:
         // 0:15  [16] count: the number of counters which can be active in this set at any one time
-        uint16_t counterSetCount = profiling::ReadUint16(data, counterSetOffset);
+        uint16_t counterSetCount = ReadUint16(data, counterSetOffset);
         counterSetOffset += uint16_t_size;
 
         // 16:31 [16] deviceUid: the unique identifier for the counter_set
-        uint16_t counterSetUid = profiling::ReadUint16(data, counterSetOffset);
+        uint16_t counterSetUid = ReadUint16(data, counterSetOffset);
         counterSetOffset += uint16_t_size;
 
         // Counter set record word 1:
@@ -162,17 +162,17 @@ void DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* co
         // 0:15 Reserved, value 0x0000.
         categoryRecordOffset += uint16_t_size;
         // 16:31 Number of events belonging to this category.
-        uint32_t eventCount = profiling::ReadUint16(data, categoryRecordOffset);
+        uint32_t eventCount = ReadUint16(data, categoryRecordOffset);
         categoryRecordOffset += uint16_t_size;
 
         // Category record word 2
         // 0:31  Offset from the beginning of the category data pool to the event_pointer_table
-        uint32_t eventPointerTableOffset = profiling::ReadUint32(data, categoryRecordOffset);
+        uint32_t eventPointerTableOffset = ReadUint32(data, categoryRecordOffset);
         categoryRecordOffset += uint32_t_size;
 
         // Category record word 3
         // 0:31 Offset from the beginning of the category data pool to the name field.
-        uint32_t nameOffset = profiling::ReadUint32(data, categoryRecordOffset);
+        uint32_t nameOffset = ReadUint32(data, categoryRecordOffset);
         categoryRecordOffset += uint32_t_size;
 
         std::vector<uint32_t> eventRecordsOffsets(eventCount);
@@ -182,7 +182,7 @@ void DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* co
         for (uint32_t eventIndex = 0; eventIndex < eventCount; ++eventIndex)
         {
             eventRecordsOffsets[eventIndex] =
-                profiling::ReadUint32(data, eventPointerTableOffset + uint32_t_size * eventIndex);
+                ReadUint32(data, eventPointerTableOffset + uint32_t_size * eventIndex);
         }
 
         const std::vector<CounterDirectoryEventRecord>& eventRecords =
@@ -218,34 +218,34 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
 
         // Event record word 0:
         // 0:15  [16] count_uid: unique ID for the counter. Must be unique across all counters in all categories
-        eventRecords[i].m_CounterUid = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterUid = ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
         // 16:31 [16] max_counter_uid: if the device this event is associated with has more than one core and there
         //                             is one of these counters per core this value will be set to
         //                             (counter_uid + cores (from device_record)) - 1.
         //                             If there is only a single core then this value will be the same as
         //                             the counter_uid value
-        eventRecords[i].m_MaxCounterUid = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_MaxCounterUid = ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // Event record word 1:
         // 0:15  [16] counter_set: UID of the counter_set this event is associated with. Set to zero if the event
         //                         is NOT associated with a counter_set
-        eventRecords[i].m_CounterSetUid  = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterSetUid  = ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // 16:31 [16] device: UID of the device this event is associated with. Set to zero if the event is NOT
         //                    associated with a device
-        eventRecords[i].m_DeviceUid = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_DeviceUid = ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // Event record word 2:
         // 0:15  [16] interpolation: type describing how to interpolate each data point in a stream of data points
-        eventRecords[i].m_CounterInterpolation = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterInterpolation = ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // 16:31 [16] class: type describing how to treat each data point in a stream of data points
-        eventRecords[i].m_CounterClass = profiling::ReadUint16(data, eventRecordOffset);
+        eventRecords[i].m_CounterClass = ReadUint16(data, eventRecordOffset);
         eventRecordOffset += uint16_t_size;
 
         // Event record word 3-4:
@@ -253,9 +253,9 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
         //                       those values as if they are fixed point numbers. Zero is not a valid value
         uint32_t multiplier[2] = { 0u, 0u };
 
-        multiplier[0] = profiling::ReadUint32(data, eventRecordOffset);
+        multiplier[0] = ReadUint32(data, eventRecordOffset);
         eventRecordOffset += uint32_t_size;
-        multiplier[1] = profiling::ReadUint32(data, eventRecordOffset);
+        multiplier[1] = ReadUint32(data, eventRecordOffset);
         eventRecordOffset += uint32_t_size;
 
         std::memcpy(&eventRecords[i].m_CounterMultiplier, &multiplier, sizeof(multiplier));
@@ -264,21 +264,21 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
         // 0:31 [32] name_eventRecordOffset: eventRecordOffset from the
         // beginning of the event record pool to the name field
         // The eventRecordOffset is always zero here, as the name field is always the first item in the pool
-        uint32_t nameOffset = profiling::ReadUint32(data, eventRecordOffset);
+        uint32_t nameOffset = ReadUint32(data, eventRecordOffset);
         eventRecordOffset += uint32_t_size;
 
         // Event record word 6:
         // 0:31 [32] description_eventRecordOffset: eventRecordOffset from the
         // beginning of the event record pool to the description field
         // The size of the name buffer in bytes
-        uint32_t descriptionOffset = profiling::ReadUint32(data, eventRecordOffset);
+        uint32_t descriptionOffset = ReadUint32(data, eventRecordOffset);
         eventRecordOffset += uint32_t_size;
 
         // Event record word 7:
         // 0:31 [32] units_eventRecordOffset: (optional) eventRecordOffset from the
         // beginning of the event record pool to the units field.
         // An eventRecordOffset value of zero indicates this field is not provided
-        uint32_t unitsOffset = profiling::ReadUint32(data, eventRecordOffset);
+        uint32_t unitsOffset = ReadUint32(data, eventRecordOffset);
 
         eventRecords[i].m_CounterName = GetStringNameFromBuffer(data, offset +
                                                                       eventRecordsOffsets[i] +
@@ -290,7 +290,7 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
                                                                              descriptionOffset +
                                                                              uint32_t_size);
 
-        eventRecords[i].m_CounterUnits = unitsOffset == 0 ? Optional<std::string>() :
+        eventRecords[i].m_CounterUnits = unitsOffset == 0 ? armnn::Optional<std::string>() :
                 GetStringNameFromBuffer(data, eventRecordsOffsets[i] + offset + unitsOffset + uint32_t_size);
     }
 
@@ -313,7 +313,7 @@ void DirectoryCaptureCommandHandler::operator()(const arm::pipe::Packet& packet)
 
     if (!m_QuietOperation)
     {
-        armnn::profiling::PrintCounterDirectory(m_CounterDirectory);
+        PrintCounterDirectory(m_CounterDirectory);
     }
 }
 
@@ -325,18 +325,18 @@ const ICounterDirectory& DirectoryCaptureCommandHandler::GetCounterDirectory() c
 std::string DirectoryCaptureCommandHandler::GetStringNameFromBuffer(const unsigned char* const data, uint32_t offset)
 {
     std::string deviceName;
-    uint8_t nextChar = profiling::ReadUint8(data, offset);
+    uint8_t nextChar = ReadUint8(data, offset);
 
     while (isprint(nextChar))
     {
         deviceName += static_cast<char>(nextChar);
         offset++;
-        nextChar = profiling::ReadUint8(data, offset);
+        nextChar = ReadUint8(data, offset);
     }
 
     return deviceName;
 }
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

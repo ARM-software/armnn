@@ -12,6 +12,19 @@
 #include "Exceptions.hpp"
 #include "Deprecated.hpp"
 
+namespace arm
+{
+namespace pipe
+{
+
+class ProfilingGuid;
+
+} // namespace armn
+} // namespace pipe
+
+/// Define LayerGuid type.
+using LayerGuid = arm::pipe::ProfilingGuid;
+
 namespace armnn
 {
 
@@ -356,11 +369,6 @@ private:
     /// Number of valid entries in @ref m_DimMappings
     SizeType m_NumDimMappings;
 };
-
-namespace profiling { class ProfilingGuid; }
-
-/// Define LayerGuid type.
-using LayerGuid = profiling::ProfilingGuid;
 
 class ITensorHandle;
 

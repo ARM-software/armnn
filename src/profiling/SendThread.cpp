@@ -14,15 +14,15 @@
 
 #include <cstring>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
-SendThread::SendThread(armnn::profiling::ProfilingStateMachine& profilingStateMachine,
-                       armnn::profiling::IBufferManager& buffer,
-                       armnn::profiling::ISendCounterPacket& sendCounterPacket,
+SendThread::SendThread(ProfilingStateMachine& profilingStateMachine,
+                       IBufferManager& buffer,
+                       ISendCounterPacket& sendCounterPacket,
                        int timeout)
     : m_StateMachine(profilingStateMachine)
     , m_BufferManager(buffer)
@@ -128,7 +128,7 @@ void SendThread::Send(IProfilingConnection& profilingConnection)
             // An exception should be thrown here, save it to be rethrown later from the main thread so that
             // it can be caught by the consumer
             m_SendThreadException =
-                    std::make_exception_ptr(RuntimeException("The send thread should not be running with the "
+                    std::make_exception_ptr(armnn::RuntimeException("The send thread should not be running with the "
                                                              "profiling service not yet initialized or connected"));
 
             return;
@@ -270,6 +270,6 @@ bool SendThread::WaitForPacketSent(uint32_t timeout = 1000)
     return timedOut;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

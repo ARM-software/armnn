@@ -30,7 +30,7 @@
 #include <limits>
 #include <backends/BackendProfiling.hpp>
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 class ReadCounterVals : public IReadCounterValues
 {
@@ -134,7 +134,7 @@ TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
 
     // Check if the MockBackends 3 dummy counters {0, 1, 2-5 (four cores)} are registered
     armnn::BackendId mockId = armnn::MockBackendId();
-    const armnn::profiling::ICounterMappings& counterMap = GetProfilingService(&runtime).GetCounterMappings();
+    const ICounterMappings& counterMap = GetProfilingService(&runtime).GetCounterMappings();
     CHECK(counterMap.GetGlobalId(0, mockId) == 5 + shiftedId);
     CHECK(counterMap.GetGlobalId(1, mockId) == 6 + shiftedId);
     CHECK(counterMap.GetGlobalId(2, mockId) == 7 + shiftedId);
@@ -161,20 +161,20 @@ TEST_CASE("TestBackendCounters")
     ProfilingOptions options;
     options.m_EnableProfiling = true;
 
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
 
-    std::unique_ptr<armnn::profiling::IBackendProfiling> cpuBackendProfilingPtr =
+    std::unique_ptr<IBackendProfiling> cpuBackendProfilingPtr =
             std::make_unique<BackendProfiling>(options, profilingService, cpuAccId);
-    std::unique_ptr<armnn::profiling::IBackendProfiling> gpuBackendProfilingPtr =
+    std::unique_ptr<IBackendProfiling> gpuBackendProfilingPtr =
             std::make_unique<BackendProfiling>(options, profilingService, gpuAccId);
 
-    std::shared_ptr<armnn::profiling::IBackendProfilingContext> cpuProfilingContextPtr =
+    std::shared_ptr<IBackendProfilingContext> cpuProfilingContextPtr =
             std::make_shared<armnn::MockBackendProfilingContext>(cpuBackendProfilingPtr);
-    std::shared_ptr<armnn::profiling::IBackendProfilingContext> gpuProfilingContextPtr =
+    std::shared_ptr<IBackendProfilingContext> gpuProfilingContextPtr =
             std::make_shared<armnn::MockBackendProfilingContext>(gpuBackendProfilingPtr);
 
     std::unordered_map<armnn::BackendId,
-            std::shared_ptr<armnn::profiling::IBackendProfilingContext>> backendProfilingContexts;
+            std::shared_ptr<IBackendProfilingContext>> backendProfilingContexts;
 
     backendProfilingContexts[cpuAccId] = cpuProfilingContextPtr;
     backendProfilingContexts[gpuAccId] = gpuProfilingContextPtr;
@@ -409,16 +409,16 @@ TEST_CASE("TestBackendCounterLogging")
     ProfilingOptions options;
     options.m_EnableProfiling = true;
 
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
 
-    std::unique_ptr<armnn::profiling::IBackendProfiling> cpuBackendProfilingPtr =
+    std::unique_ptr<IBackendProfiling> cpuBackendProfilingPtr =
             std::make_unique<BackendProfiling>(options, profilingService, cpuAccId);
 
-    std::shared_ptr<armnn::profiling::IBackendProfilingContext> cpuProfilingContextPtr =
+    std::shared_ptr<IBackendProfilingContext> cpuProfilingContextPtr =
             std::make_shared<armnn::MockBackendProfilingContext>(cpuBackendProfilingPtr);
 
     std::unordered_map<armnn::BackendId,
-            std::shared_ptr<armnn::profiling::IBackendProfilingContext>> backendProfilingContexts;
+            std::shared_ptr<IBackendProfilingContext>> backendProfilingContexts;
 
     uint16_t globalId = 5;
     counterIdMap.RegisterMapping(globalId, 0, cpuAccId);
@@ -461,7 +461,7 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ConfigureProfilingService(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 
@@ -478,7 +478,7 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
 
     // Now for the meat of the test. We're just going to send a random packet and make sure there
     // are no exceptions or errors. The sending of packets is already tested in SendTimelinePacketTests.
-    std::unique_ptr<armnn::profiling::ISendTimelinePacket> timelinePacket =
+    std::unique_ptr<ISendTimelinePacket> timelinePacket =
         backendProfilingIface->GetSendTimelinePacket();
     // Send TimelineEntityClassBinaryPacket
     const uint64_t entityBinaryPacketProfilingGuid = 123456u;
@@ -509,9 +509,9 @@ TEST_CASE("GetProfilingGuidGenerator")
     CHECK(backendProfilingIface);
 
     // Get the Guid generator and check the getting two Guid's results in the second being greater than the first.
-    armnn::profiling::IProfilingGuidGenerator& guidGenerator = backendProfilingIface->GetProfilingGuidGenerator();
-    const armnn::profiling::ProfilingDynamicGuid& firstGuid = guidGenerator.NextGuid();
-    const armnn::profiling::ProfilingDynamicGuid& secondGuid = guidGenerator.NextGuid();
+    IProfilingGuidGenerator& guidGenerator = backendProfilingIface->GetProfilingGuidGenerator();
+    const ProfilingDynamicGuid& firstGuid = guidGenerator.NextGuid();
+    const ProfilingDynamicGuid& secondGuid = guidGenerator.NextGuid();
     CHECK(secondGuid > firstGuid);
 
     // Reset the profiling servie after the test.

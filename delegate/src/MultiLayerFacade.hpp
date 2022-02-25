@@ -91,7 +91,7 @@ public:
         return m_FirstLayer->InferOutputShapes(inputShapes);
     }
 
-    virtual armnn::LayerGuid GetGuid() const override
+    virtual LayerGuid GetGuid() const override
     {
         return m_FirstLayer->GetGuid();
     }

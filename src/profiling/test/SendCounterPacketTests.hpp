@@ -22,10 +22,10 @@
 #include <mutex>
 #include <thread>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class SendCounterPacketTest : public SendCounterPacket
@@ -65,6 +65,6 @@ public:
     }
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

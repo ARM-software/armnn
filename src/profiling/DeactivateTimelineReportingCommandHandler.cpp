@@ -9,10 +9,10 @@
 #include <fmt/format.h>
 
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void DeactivateTimelineReportingCommandHandler::operator()(const arm::pipe::Packet& packet)
@@ -24,7 +24,7 @@ void DeactivateTimelineReportingCommandHandler::operator()(const arm::pipe::Pack
         case ProfilingState::Uninitialised:
         case ProfilingState::NotConnected:
         case ProfilingState::WaitingForAck:
-            throw RuntimeException(fmt::format(
+            throw armnn::RuntimeException(fmt::format(
                     "Deactivate Timeline Reporting Command Handler invoked while in a wrong state: {}",
                     GetProfilingStateName(currentState)));
         case ProfilingState::Active:
@@ -42,12 +42,12 @@ void DeactivateTimelineReportingCommandHandler::operator()(const arm::pipe::Pack
 
             break;
         default:
-            throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+            throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
                                    static_cast<int>(currentState)));
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

@@ -9,10 +9,10 @@
 
 #include <common/include/Packet.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class PrintPacketHeaderHandler : public ILocalPacketHandler
@@ -22,6 +22,6 @@ class PrintPacketHeaderHandler : public ILocalPacketHandler
     virtual void HandlePacket(const arm::pipe::Packet& packet);
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

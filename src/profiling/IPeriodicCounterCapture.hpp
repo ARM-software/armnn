@@ -5,9 +5,9 @@
 
 #pragma once
 
-namespace armnn
+namespace arm
 {
-namespace profiling
+namespace pipe
 {
 
 class IPeriodicCounterCapture
@@ -19,5 +19,5 @@ public:
     virtual void Stop() = 0;
 };
 
-} // namespace profiling
-} // namespace armnn
+} // namespace pipe
+} // namespace arm

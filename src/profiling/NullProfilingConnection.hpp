@@ -9,10 +9,10 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class NullProfilingConnection : public IProfilingConnection
@@ -36,6 +36,6 @@ class NullProfilingConnection : public IProfilingConnection
 
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

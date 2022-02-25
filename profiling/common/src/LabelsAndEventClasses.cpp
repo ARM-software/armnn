@@ -5,10 +5,10 @@
 
 #include "LabelsAndEventClasses.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 ProfilingGuidGenerator LabelsAndEventClasses::m_GuidGenerator;
@@ -74,6 +74,6 @@ ProfilingStaticGuid LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS_NAME_
 ProfilingStaticGuid LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS(
     m_GuidGenerator.GenerateStaticId("ARMNN_PROFILING_EOL"));
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

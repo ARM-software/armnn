@@ -11,10 +11,10 @@
 
 #include <common/include/Packet.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class RequestCountersPacketHandler : public ILocalPacketHandler
@@ -43,6 +43,6 @@ private:
     void SendCounterSelectionPacket();
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

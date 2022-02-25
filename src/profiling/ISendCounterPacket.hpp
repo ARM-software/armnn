@@ -8,10 +8,10 @@
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
 #include "ICounterDirectory.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ISendCounterPacket
@@ -35,7 +35,7 @@ public:
                                                     const std::vector<uint16_t>& selectedCounterIds) = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

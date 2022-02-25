@@ -7,6 +7,7 @@
 
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include "../../../profiling/common/include/TargetEndianess.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -17,21 +18,8 @@ namespace arm
 {
 namespace pipe
 {
-    class Packet;
-} // namespace pipe
-} // namespace arm
 
-namespace armnn
-{
-
-namespace profiling
-{
-
-enum class TargetEndianness
-{
-    BeWire,
-    LeWire
-};
+class Packet;
 
 // the handlers need to be able to do two
 // things to service the FileOnlyProfilingConnection
@@ -45,7 +33,7 @@ public:
 
     virtual void SetEndianess(const TargetEndianness& endianness) = 0;
 
-    virtual void ReturnPacket(arm::pipe::Packet& packet) = 0;
+    virtual void ReturnPacket(Packet& packet) = 0;
 
     virtual void Close() = 0;
 };
@@ -62,7 +50,7 @@ public:
     virtual std::vector<uint32_t> GetHeadersAccepted() = 0;
 
     /// process the packet
-    virtual void HandlePacket(const arm::pipe::Packet& packet) = 0;
+    virtual void HandlePacket(const Packet& packet) = 0;
 
     /// Set a profiling connection on the handler. Only need to implement this
     /// function if the handler will be writing data back to the profiled application.
@@ -73,6 +61,6 @@ public:
 using ILocalPacketHandlerPtr = std::unique_ptr<ILocalPacketHandler>;
 using ILocalPacketHandlerSharedPtr = std::shared_ptr<ILocalPacketHandler>;
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

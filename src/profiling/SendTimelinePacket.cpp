@@ -5,10 +5,10 @@
 
 #include "SendTimelinePacket.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void SendTimelinePacket::Commit()
@@ -142,9 +142,9 @@ void SendTimelinePacket::SendTimelineMessageDirectoryPackage()
         TimelinePacketStatus result = WriteTimelineMessageDirectoryPackage(&m_WriteBuffer->GetWritableData()[m_Offset],
                                                                            m_RemainingBufferSize,
                                                                            numberOfBytesWritten);
-        if (result != armnn::profiling::TimelinePacketStatus::Ok)
+        if (result != TimelinePacketStatus::Ok)
         {
-            throw RuntimeException("Error processing TimelineMessageDirectoryPackage", CHECK_LOCATION());
+            throw armnn::RuntimeException("Error processing TimelineMessageDirectoryPackage", CHECK_LOCATION());
         }
 
         // Commit the message
@@ -154,10 +154,10 @@ void SendTimelinePacket::SendTimelineMessageDirectoryPackage()
     }
     catch (...)
     {
-        throw RuntimeException("Error processing TimelineMessageDirectoryPackage", CHECK_LOCATION());
+        throw armnn::RuntimeException("Error processing TimelineMessageDirectoryPackage", CHECK_LOCATION());
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

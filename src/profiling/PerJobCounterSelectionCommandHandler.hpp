@@ -10,10 +10,10 @@
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Packet.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class PerJobCounterSelectionCommandHandler : public arm::pipe::CommandHandlerFunctor
@@ -28,13 +28,13 @@ public:
         , m_StateMachine(profilingStateMachine)
     {}
 
-    void operator()(const arm::pipe::Packet& packet) override;
+    void operator()(const Packet& packet) override;
 
 private:
     const ProfilingStateMachine& m_StateMachine;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

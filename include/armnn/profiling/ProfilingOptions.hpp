@@ -16,14 +16,6 @@ namespace pipe
 {
 /// The lowest performance data capture interval we support is 10 miliseconds.
 constexpr unsigned int LOWEST_CAPTURE_PERIOD = 10000u;
-} // namespace pipe
-} // namespace arm
-
-namespace armnn
-{
-
-namespace profiling
-{
 
 struct ProfilingOptions {
     ProfilingOptions()
@@ -45,9 +37,9 @@ struct ProfilingOptions {
     uint32_t m_CapturePeriod;
     /// The format of the file used for outputting profiling data.
     std::string m_FileFormat;
-    std::vector <armnn::profiling::ILocalPacketHandlerSharedPtr> m_LocalPacketHandlers;
+    std::vector <ILocalPacketHandlerSharedPtr> m_LocalPacketHandlers;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

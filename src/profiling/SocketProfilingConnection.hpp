@@ -10,9 +10,9 @@
 
 #pragma once
 
-namespace armnn
+namespace arm
 {
-namespace profiling
+namespace pipe
 {
 
 class SocketProfilingConnection : public IProfilingConnection
@@ -39,5 +39,5 @@ private:
     arm::pipe::PollFd m_Socket[1]{};
 };
 
-} // namespace profiling
-} // namespace armnn
+} // namespace pipe
+} // namespace arm

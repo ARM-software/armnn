@@ -9,10 +9,10 @@
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace  profiling
+namespace pipe
 {
 
 enum class ProfilingState
@@ -35,7 +35,7 @@ public:
 
     bool IsOneOfStates(ProfilingState state1)
     {
-        IgnoreUnused(state1);
+        armnn::IgnoreUnused(state1);
         return false;
     }
 
@@ -68,7 +68,7 @@ constexpr char const* GetProfilingStateName(ProfilingState state)
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

@@ -7,9 +7,9 @@
 #include <armnn/Exceptions.hpp>
 #include <map>
 
-namespace armnn
+namespace arm
 {
-namespace profiling
+namespace pipe
 {
 
 void CounterIdMap::RegisterMapping(uint16_t globalCounterId,
@@ -52,5 +52,5 @@ const std::pair<uint16_t, armnn::BackendId>& CounterIdMap::GetBackendId(uint16_t
     return it->second;
 }
 
-}    // namespace profiling
-}    // namespace armnn
+}    // namespace pipe
+}    // namespace arm

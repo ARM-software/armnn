@@ -8,6 +8,7 @@
 #include <common/include/NetworkSockets.hpp>
 #include <common/include/Packet.hpp>
 #include <common/include/SocketConnectionException.hpp>
+#include <common/include/TargetEndianess.hpp>
 
 #include <string>
 #include <atomic>
@@ -17,12 +18,6 @@ namespace arm
 
 namespace pipe
 {
-
-enum class TargetEndianness
-{
-    BeWire,
-    LeWire
-};
 
 enum class PacketDirection
 {

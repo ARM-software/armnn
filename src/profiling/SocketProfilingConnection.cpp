@@ -12,9 +12,9 @@
 #include <string>
 
 
-namespace armnn
+namespace arm
 {
-namespace profiling
+namespace pipe
 {
 
 SocketProfilingConnection::SocketProfilingConnection()
@@ -220,5 +220,5 @@ arm::pipe::Packet SocketProfilingConnection::ReceivePacket()
     return arm::pipe::Packet(metadataIdentifier, dataLength, packetData);
 }
 
-} // namespace profiling
-} // namespace armnn
+} // namespace pipe
+} // namespace arm

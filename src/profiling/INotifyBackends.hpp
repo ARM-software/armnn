@@ -5,10 +5,10 @@
 
 #pragma once
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class INotifyBackends
@@ -18,7 +18,7 @@ public:
     virtual void NotifyBackendsForTimelineReporting() = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

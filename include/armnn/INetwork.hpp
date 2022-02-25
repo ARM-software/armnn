@@ -783,7 +783,7 @@ public:
     Status PrintGraph();
     Status SerializeToDot(std::ostream& stream) const;
 
-    profiling::ProfilingGuid GetGuid() const;
+    arm::pipe::ProfilingGuid GetGuid() const;
 
     size_t GetNumInputs() const;
     size_t GetNumOutputs() const;

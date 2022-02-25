@@ -7,10 +7,10 @@
 
 #include "IProfilingConnection.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ISendThread
@@ -25,7 +25,7 @@ public:
     virtual void Stop(bool rethrowSendThreadExceptions = true) = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

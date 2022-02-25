@@ -8,10 +8,10 @@
 #include <memory>
 #include <stdint.h>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 static constexpr uint64_t MIN_STATIC_GUID = 1llu << 63;
@@ -70,11 +70,9 @@ struct ProfilingStaticGuid : public ProfilingGuid
     using ProfilingGuid::ProfilingGuid;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-
-
-} // namespace armnn
+} // namespace arm
 
 
 
@@ -82,9 +80,9 @@ namespace std
 {
 /// make ProfilingGuid hashable
 template <>
-struct hash<armnn::profiling::ProfilingGuid>
+struct hash<arm::pipe::ProfilingGuid>
 {
-    std::size_t operator()(armnn::profiling::ProfilingGuid const& guid) const noexcept
+    std::size_t operator()(arm::pipe::ProfilingGuid const& guid) const noexcept
     {
         return hash<uint64_t>()(uint64_t(guid));
     }
@@ -92,9 +90,9 @@ struct hash<armnn::profiling::ProfilingGuid>
 
 /// make ProfilingDynamicGuid hashable
 template <>
-struct hash<armnn::profiling::ProfilingDynamicGuid>
+struct hash<arm::pipe::ProfilingDynamicGuid>
 {
-    std::size_t operator()(armnn::profiling::ProfilingDynamicGuid const& guid) const noexcept
+    std::size_t operator()(arm::pipe::ProfilingDynamicGuid const& guid) const noexcept
     {
         return hash<uint64_t>()(uint64_t(guid));
     }
@@ -102,9 +100,9 @@ struct hash<armnn::profiling::ProfilingDynamicGuid>
 
 /// make ProfilingStaticGuid hashable
 template <>
-struct hash<armnn::profiling::ProfilingStaticGuid>
+struct hash<arm::pipe::ProfilingStaticGuid>
 {
-    std::size_t operator()(armnn::profiling::ProfilingStaticGuid const& guid) const noexcept
+    std::size_t operator()(arm::pipe::ProfilingStaticGuid const& guid) const noexcept
     {
         return hash<uint64_t>()(uint64_t(guid));
     }

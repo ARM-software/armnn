@@ -86,8 +86,8 @@ public:
     using IWorkloadFactoryPtr = std::unique_ptr<IWorkloadFactory>;
     using IBackendContextPtr = std::unique_ptr<IBackendContext>;
     /// This is the bridge between backend and backend profiling we'll keep it in the backend namespace.
-    using IBackendProfilingContextPtr = std::shared_ptr<armnn::profiling::IBackendProfilingContext>;
-    using IBackendProfilingPtr = std::unique_ptr<armnn::profiling::IBackendProfiling>;
+    using IBackendProfilingContextPtr = std::shared_ptr<arm::pipe::IBackendProfilingContext>;
+    using IBackendProfilingPtr = std::unique_ptr<arm::pipe::IBackendProfiling>;
     using ILayerSupportSharedPtr = std::shared_ptr<ILayerSupport>;
 
     using IBackendSpecificModelContextPtr = std::shared_ptr<IBackendModelContext>;

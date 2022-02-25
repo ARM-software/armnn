@@ -14,10 +14,10 @@
 
 #include <fmt/format.h>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 const Category* CounterDirectory::RegisterCategory(const std::string& categoryName)
@@ -52,7 +52,7 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
 
 const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
                                                uint16_t cores,
-                                               const Optional<std::string>& parentCategoryName)
+                                               const armnn::Optional<std::string>& parentCategoryName)
 {
     // Check that the given device name is valid
     if (deviceName.empty() ||
@@ -113,7 +113,7 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
 
 const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counterSetName,
                                                        uint16_t count,
-                                                       const Optional<std::string>& parentCategoryName)
+                                                       const armnn::Optional<std::string>& parentCategoryName)
 {
     // Check that the given counter set name is valid
     if (counterSetName.empty() ||
@@ -178,7 +178,7 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
     return counterSetPtr;
 }
 
-const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
+const Counter* CounterDirectory::RegisterCounter(const armnn::BackendId& backendId,
                                                  const uint16_t uid,
                                                  const std::string& parentCategoryName,
                                                  uint16_t counterClass,
@@ -186,10 +186,10 @@ const Counter* CounterDirectory::RegisterCounter(const BackendId& backendId,
                                                  double multiplier,
                                                  const std::string& name,
                                                  const std::string& description,
-                                                 const Optional<std::string>& units,
-                                                 const Optional<uint16_t>& numberOfCores,
-                                                 const Optional<uint16_t>& deviceUid,
-                                                 const Optional<uint16_t>& counterSetUid)
+                                                 const armnn::Optional<std::string>& units,
+                                                 const armnn::Optional<uint16_t>& numberOfCores,
+                                                 const armnn::Optional<uint16_t>& deviceUid,
+                                                 const armnn::Optional<uint16_t>& counterSetUid)
 {
     IgnoreUnused(backendId);
 
@@ -502,7 +502,7 @@ CountersIt CounterDirectory::FindCounter(const std::string& counterName) const
     });
 }
 
-uint16_t CounterDirectory::GetNumberOfCores(const Optional<uint16_t>& numberOfCores,
+uint16_t CounterDirectory::GetNumberOfCores(const armnn::Optional<uint16_t>& numberOfCores,
                                             uint16_t deviceUid)
 {
     // To get the number of cores, apply the following rules:
@@ -544,6 +544,6 @@ uint16_t CounterDirectory::GetNumberOfCores(const Optional<uint16_t>& numberOfCo
     return 0;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

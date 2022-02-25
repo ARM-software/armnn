@@ -20,10 +20,10 @@
 #include <mutex>
 #include <vector>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 // forward declaration of class
@@ -87,6 +87,6 @@ private:
     arm::pipe::TimelineDirectoryCaptureCommandHandler m_DirectoryDecoder;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

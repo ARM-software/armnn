@@ -7,10 +7,10 @@
 
 #include <armnn/Exceptions.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 PacketBuffer::PacketBuffer(unsigned int maxSize)
@@ -62,6 +62,6 @@ void PacketBuffer::Destroy()
     m_MaxSize = 0;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

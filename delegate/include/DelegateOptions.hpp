@@ -230,10 +230,10 @@ public:
     const armnn::ProfilingDetailsMethod& GetInternalProfilingDetail() const { return m_InternalProfilingDetail; }
 
     void SetExternalProfilingParams(
-        const armnn::profiling::ProfilingOptions& externalProfilingParams)
+        const arm::pipe::ProfilingOptions& externalProfilingParams)
         { m_ProfilingOptions = externalProfilingParams; }
 
-    const armnn::profiling::ProfilingOptions& GetExternalProfilingParams() const
+    const arm::pipe::ProfilingOptions& GetExternalProfilingParams() const
         { return m_ProfilingOptions; }
 
     void SetSerializeToDot(const std::string& serializeToDotFile) { m_SerializeToDot = serializeToDotFile; }
@@ -265,7 +265,7 @@ private:
     armnn::OptimizerOptions m_OptimizerOptions;
 
     /// External profiling options.
-    armnn::profiling::ProfilingOptions m_ProfilingOptions;
+    arm::pipe::ProfilingOptions m_ProfilingOptions;
 
     /// Internal profiling options.
     /// Indicates whether internal profiling is enabled or not.

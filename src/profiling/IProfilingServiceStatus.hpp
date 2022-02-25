@@ -11,10 +11,10 @@
 
 #include <cstdint>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IProfilingServiceStatus
@@ -25,6 +25,6 @@ public:
     virtual ~IProfilingServiceStatus() {};
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

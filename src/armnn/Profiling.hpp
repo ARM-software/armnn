@@ -39,13 +39,13 @@ public:
                       const BackendId& backendId,
                       const std::string& name,
                       std::vector<InstrumentPtr>&& instruments,
-                      const Optional<profiling::ProfilingGuid>& guid);
+                      const Optional<arm::pipe::ProfilingGuid>& guid);
 
     template<typename DescriptorType>
     void AddLayerDetails(const std::string& label,
                          const DescriptorType& desc,
                          const WorkloadInfo& infos,
-                         const profiling::ProfilingGuid guid)
+                         const arm::pipe::ProfilingGuid guid)
     {
         m_ProfilingDetails->AddDetailsToString(label, desc, infos, guid);
     }
@@ -134,7 +134,7 @@ public:
 
     template<typename... Args>
     ScopedProfilingEvent(const BackendId& backendId,
-                         const Optional<profiling::ProfilingGuid>& guid,
+                         const Optional<arm::pipe::ProfilingGuid>& guid,
                          const std::string& name,
                          Args&& ... args)
         : m_Event(nullptr)
@@ -180,7 +180,7 @@ template<typename DescriptorType>
 inline void ProfilingUpdateDescriptions(const std::string& name,
                                         const DescriptorType& desc,
                                         const WorkloadInfo& infos,
-                                        const profiling::ProfilingGuid guid)
+                                        const arm::pipe::ProfilingGuid guid)
 {
     IProfiler* profiler(ProfilerManager::GetInstance().GetProfiler()); ///< Profiler used
     if (profiler && profiler->IsProfilingEnabled())
@@ -193,7 +193,7 @@ template<typename DescriptorType>
 void IProfiler::AddLayerDetails(const std::string& name,
                                 const DescriptorType& desc,
                                 const WorkloadInfo& infos,
-                                const profiling::ProfilingGuid guid)
+                                const arm::pipe::ProfilingGuid guid)
 {
     return pProfilerImpl->AddLayerDetails(name, desc, infos, guid);
 }

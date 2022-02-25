@@ -54,12 +54,12 @@ private:
     void AddLayerDetails(const std::string& name,
                          const DescriptorType& desc,
                          const WorkloadInfo& infos,
-                         const profiling::ProfilingGuid guid);
+                         const arm::pipe::ProfilingGuid guid);
 
     Event* BeginEvent(const BackendId& backendId,
                       const std::string& label,
                       std::vector<InstrumentPtr>&& instruments,
-                      const Optional<profiling::ProfilingGuid>& guid);
+                      const Optional<arm::pipe::ProfilingGuid>& guid);
 
     std::unique_ptr<ProfilerImpl> pProfilerImpl;
 
@@ -69,7 +69,7 @@ private:
     friend inline void ProfilingUpdateDescriptions(const std::string& name,
                                                    const DescriptorType& desc,
                                                    const WorkloadInfo& infos,
-                                                   const profiling::ProfilingGuid guid);
+                                                   const arm::pipe::ProfilingGuid guid);
 
     // Friend functions for unit testing, see ProfilerTests.cpp.
     friend size_t GetProfilerEventSequenceSize(armnn::IProfiler* profiler);

@@ -11,10 +11,10 @@
 #include <chrono>
 #include <iostream>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 std::vector<uint32_t> TestTimelinePacketHandler::GetHeadersAccepted()
@@ -125,7 +125,7 @@ arm::pipe::ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateRelati
         m_TimelineModel.IsInferenceGuid(relationship.m_HeadGuid))
     {
         ProfilingStaticGuid attributeGuid(relationship.m_AttributeGuid);
-        if (attributeGuid == armnn::profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS)
+        if (attributeGuid == LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS)
         {
             if (m_PacketHandler != nullptr)
             {
@@ -136,6 +136,6 @@ arm::pipe::ITimelineDecoder::TimelineStatus TimelineMessageDecoder::CreateRelati
     return arm::pipe::ITimelineDecoder::TimelineStatus::TimelineStatus_Success;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

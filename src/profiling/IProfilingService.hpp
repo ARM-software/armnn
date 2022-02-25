@@ -12,10 +12,10 @@
 
 #include <common/include/ProfilingGuidGenerator.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IProfilingService : public IProfilingGuidGenerator, public IProfilingServiceStatus
@@ -29,7 +29,7 @@ public:
     virtual CaptureData GetCaptureData() = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

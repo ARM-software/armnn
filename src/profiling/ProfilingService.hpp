@@ -35,10 +35,10 @@
 
 #include <list>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 // Static constants describing ArmNN's counter UID's
 static const uint16_t NETWORK_LOADS         = 0;
@@ -55,10 +55,10 @@ public:
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
     using CounterIndices = std::vector<std::atomic<uint32_t>*>;
     using CounterValues = std::list<std::atomic<uint32_t>>;
-    using BackendProfilingContext = std::unordered_map<BackendId,
-                                                       std::shared_ptr<armnn::profiling::IBackendProfilingContext>>;
+    using BackendProfilingContext = std::unordered_map<armnn::BackendId,
+                                                       std::shared_ptr<IBackendProfilingContext>>;
 
-    ProfilingService(Optional<IReportStructure&> reportStructure = EmptyOptional())
+    ProfilingService(armnn::Optional<IReportStructure&> reportStructure = armnn::EmptyOptional())
         : m_Options()
         , m_TimelineReporting(false)
         , m_CounterDirectory()
@@ -126,7 +126,7 @@ public:
                                                       m_StateMachine,
                                                       *this)
         , m_TimelinePacketWriterFactory(m_BufferManager)
-        , m_MaxGlobalCounterId(armnn::profiling::INFERENCES_RUN)
+        , m_MaxGlobalCounterId(INFERENCES_RUN)
         , m_ServiceActive(false)
     {
         // Register the "Connection Acknowledged" command handler
@@ -149,9 +149,9 @@ public:
     ~ProfilingService();
 
     // Resets the profiling options, optionally clears the profiling service entirely
-    void ResetExternalProfilingOptions(const armnn::profiling::ProfilingOptions& options,
+    void ResetExternalProfilingOptions(const ProfilingOptions& options,
                                        bool resetProfilingService = false);
-    ProfilingState ConfigureProfilingService(const armnn::profiling::ProfilingOptions& options,
+    ProfilingState ConfigureProfilingService(const ProfilingOptions& options,
                                              bool resetProfilingService = false);
 
 
@@ -162,8 +162,8 @@ public:
     void Disconnect();
 
     // Store a profiling context returned from a backend that support profiling.
-    void AddBackendProfilingContext(const BackendId backendId,
-        std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext);
+    void AddBackendProfilingContext(const armnn::BackendId backendId,
+        std::shared_ptr<IBackendProfilingContext> profilingContext);
 
     // Enable the recording of timeline events and entities
     void NotifyBackendsForTimelineReporting() override;
@@ -185,7 +185,7 @@ public:
     CaptureData GetCaptureData() override;
     void SetCaptureData(uint32_t capturePeriod,
                         const std::vector<uint16_t>& counterIds,
-                        const std::set<BackendId>& activeBackends);
+                        const std::set<armnn::BackendId>& activeBackends);
 
     // Setters for the profiling service state
     void SetCounterValue(uint16_t counterUid, uint32_t value) override;
@@ -311,6 +311,6 @@ protected:
     }
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

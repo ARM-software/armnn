@@ -75,7 +75,7 @@ private:
     flatbuffers::Offset<flatbuffers::Vector<T>> CreateDataVector(const void* memory, unsigned int size);
 
     ///Function which maps Guid to an index
-    uint32_t GetSerializedId(armnn::LayerGuid guid);
+    uint32_t GetSerializedId(LayerGuid guid);
 
     /// Creates the serializer InputSlots for the layer.
     std::vector<flatbuffers::Offset<armnnSerializer::InputSlot>> CreateInputSlots(
@@ -98,7 +98,7 @@ private:
     std::vector<int> m_outputIds;
 
     /// Mapped Guids of all Layers to match our index.
-    std::unordered_map<armnn::LayerGuid, uint32_t > m_guidMap;
+    std::unordered_map<LayerGuid, uint32_t > m_guidMap;
 
     /// layer within our FlatBuffer index.
     uint32_t m_layerId;

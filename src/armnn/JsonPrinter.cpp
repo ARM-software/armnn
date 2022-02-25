@@ -138,7 +138,7 @@ void JsonPrinter::PrintType(armnn::JsonObjectType type)
     m_OutputStream << R"(")";
 }
 
-void JsonPrinter::PrintGuid(armnn::profiling::ProfilingGuid guid)
+void JsonPrinter::PrintGuid(arm::pipe::ProfilingGuid guid)
 {
     PrintTabs();
     m_OutputStream << std::quoted("GUID") << ": " << std::quoted(std::to_string(guid))  << "," << std::endl;

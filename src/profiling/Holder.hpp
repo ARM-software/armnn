@@ -10,10 +10,10 @@
 #include <set>
 #include "ProfilingUtils.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class CaptureData
@@ -63,6 +63,6 @@ private:
     CaptureData m_CaptureData;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

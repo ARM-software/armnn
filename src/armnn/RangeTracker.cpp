@@ -26,7 +26,7 @@ void RangeTracker::SetRange(const armnn::IConnectableLayer* layer, unsigned int 
     ranges[outputIdx] = std::make_pair(min, max);
 }
 
-RangeTracker::MinMaxRange RangeTracker::GetRange(armnn::LayerGuid guid, unsigned int idx) const
+RangeTracker::MinMaxRange RangeTracker::GetRange(LayerGuid guid, unsigned int idx) const
 {
     auto search = m_GuidToRangesMap.find(guid);
     if (search == m_GuidToRangesMap.end())

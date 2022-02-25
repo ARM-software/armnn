@@ -12,10 +12,10 @@
 
 #include <type_traits>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class SendCounterPacket : public ISendCounterPacket
@@ -51,7 +51,7 @@ private:
     template <typename ExceptionType>
     void CancelOperationAndThrow(IPacketBufferPtr& writerBuffer, const std::string& errorMessage)
     {
-        if (std::is_same<ExceptionType, armnn::profiling::BufferExhaustion>::value)
+        if (std::is_same<ExceptionType, BufferExhaustion>::value)
         {
             m_BufferManager.FlushReadList();
         }
@@ -85,6 +85,6 @@ protected:
                            std::string& errorMessage);
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

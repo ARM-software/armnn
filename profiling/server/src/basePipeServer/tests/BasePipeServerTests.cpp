@@ -25,21 +25,21 @@ TEST_CASE("BasePipeServerTest")
 
     // The socket should close once we leave the scope of CHECK_NOTHROW
     // and socketProfilingConnection should fail to connect
-    CHECK_THROWS_AS(profiling::SocketProfilingConnection socketProfilingConnection,
+    CHECK_THROWS_AS(arm::pipe::SocketProfilingConnection socketProfilingConnection,
                       arm::pipe::SocketConnectionException);
 
     // Try to initialize a listening socket through the ConnectionHandler again
     ConnectionHandler connectionHandler(udsNamespace, true);
     // socketProfilingConnection should connect now
-    profiling::SocketProfilingConnection socketProfilingConnection;
+    arm::pipe::SocketProfilingConnection socketProfilingConnection;
     CHECK(socketProfilingConnection.IsOpen());
 
     auto basePipeServer = connectionHandler.GetNewBasePipeServer(false);
     // GetNewBasePipeServer will return null if it fails to create a socket
     CHECK(basePipeServer.get());
 
-    profiling::BufferManager bufferManager;
-    profiling::SendCounterPacket sendCounterPacket(bufferManager);
+    arm::pipe::BufferManager bufferManager;
+    arm::pipe::SendCounterPacket sendCounterPacket(bufferManager);
 
     // Check that we can receive a StreamMetaDataPacket
     sendCounterPacket.SendStreamMetaDataPacket();

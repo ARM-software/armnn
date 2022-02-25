@@ -7,9 +7,9 @@
 #include "armnn/BackendId.hpp"
 #include <map>
 
-namespace armnn
+namespace arm
 {
-namespace profiling
+namespace pipe
 {
 
 class ICounterMappings
@@ -47,5 +47,5 @@ private:
     std::map<std::pair<uint16_t, armnn::BackendId>, uint16_t> m_BackendCounterIdMap;
 };
 
-}    // namespace profiling
-}    // namespace armnn
+}    // namespace pipe
+}    // namespace arm

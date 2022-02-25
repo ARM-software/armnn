@@ -13,7 +13,7 @@
 
 #include <doctest/doctest.h>
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 TEST_SUITE("BufferTests")
 {
@@ -383,8 +383,8 @@ TEST_CASE("ReadSwTraceMessageExceptionTest0")
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int offset = uint32_t_size;
-    CHECK_THROWS_AS(arm::pipe::ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
-                      arm::pipe::ProfilingException);
+    CHECK_THROWS_AS(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
+                      ProfilingException);
 
 }
 
@@ -405,8 +405,8 @@ TEST_CASE("ReadSwTraceMessageExceptionTest1")
 
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int offset = uint32_t_size;
-    CHECK_THROWS_AS(arm::pipe::ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
-                      arm::pipe::ProfilingException);
+    CHECK_THROWS_AS(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
+                      ProfilingException);
 
 }
 

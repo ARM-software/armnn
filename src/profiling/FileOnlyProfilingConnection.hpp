@@ -20,10 +20,10 @@
 #include <queue>
 #include <thread>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 // forward declaration
@@ -128,6 +128,6 @@ private:
     int m_Timeout;
 };
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

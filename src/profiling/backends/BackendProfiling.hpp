@@ -8,10 +8,10 @@
 #include "ProfilingService.hpp"
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class BackendProfiling : public IBackendProfiling
@@ -19,7 +19,7 @@ class BackendProfiling : public IBackendProfiling
 public:
     BackendProfiling(const ProfilingOptions& options,
                      ProfilingService& profilingService,
-                     const BackendId& backendId)
+                     const armnn::BackendId& backendId)
             : m_Options(options),
               m_ProfilingService(profilingService),
               m_BackendId(backendId) {}
@@ -45,7 +45,9 @@ public:
 private:
     ProfilingOptions m_Options;
     ProfilingService& m_ProfilingService;
-    BackendId m_BackendId;
+    armnn::BackendId m_BackendId;
 };
-}    // namespace profiling
-}    // namespace armnn
+
+}    // namespace pipe
+
+}    // namespace arm

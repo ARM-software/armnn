@@ -15,10 +15,10 @@
 
 #include <fmt/format.h>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 ProfilingGuidGenerator ProfilingService::m_GuidGenerator;
@@ -38,7 +38,7 @@ void ProfilingService::ResetGuidGenerator()
     m_GuidGenerator.Reset();
 }
 
-void ProfilingService::ResetExternalProfilingOptions(const armnn::profiling::ProfilingOptions& options,
+void ProfilingService::ResetExternalProfilingOptions(const arm::pipe::ProfilingOptions& options,
                                                      bool resetProfilingService)
 {
     // Update the profiling options
@@ -60,7 +60,7 @@ bool ProfilingService::IsProfilingEnabled() const
 }
 
 ProfilingState ProfilingService::ConfigureProfilingService(
-        const armnn::profiling::ProfilingOptions& options,
+        const ProfilingOptions& options,
         bool resetProfilingService)
 {
     ResetExternalProfilingOptions(options, resetProfilingService);
@@ -147,7 +147,7 @@ void ProfilingService::Update()
             ARMNN_ASSERT(m_ProfilingConnectionFactory);
             m_ProfilingConnection = m_ProfilingConnectionFactory->GetProfilingConnection(m_Options);
         }
-        catch (const Exception& e)
+        catch (const armnn::Exception& e)
         {
             ARMNN_LOG(warning) << "An error has occurred when creating the profiling connection: "
                                        << e.what();
@@ -185,7 +185,7 @@ void ProfilingService::Update()
 
         break;
     default:
-        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
                                            static_cast<int>(currentState)));
     }
 }
@@ -205,14 +205,14 @@ void ProfilingService::Disconnect()
 
         break;
     default:
-        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
-                                           static_cast<int>(currentState)));
+        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
+                                                  static_cast<int>(currentState)));
     }
 }
 
 // Store a profiling context returned from a backend that support profiling, and register its counters
-void ProfilingService::AddBackendProfilingContext(const BackendId backendId,
-    std::shared_ptr<armnn::profiling::IBackendProfilingContext> profilingContext)
+void ProfilingService::AddBackendProfilingContext(const armnn::BackendId backendId,
+    std::shared_ptr<IBackendProfilingContext> profilingContext)
 {
     ARMNN_ASSERT(profilingContext != nullptr);
     // Register the backend counters
@@ -279,7 +279,7 @@ CaptureData ProfilingService::GetCaptureData()
 
 void ProfilingService::SetCaptureData(uint32_t capturePeriod,
                                       const std::vector<uint16_t>& counterIds,
-                                      const std::set<BackendId>& activeBackends)
+                                      const std::set<armnn::BackendId>& activeBackends)
 {
     m_Holder.SetCaptureData(capturePeriod, counterIds, activeBackends);
 }
@@ -344,7 +344,7 @@ void ProfilingService::Initialize()
     {
         const Counter* loadedNetworksCounter =
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   armnn::profiling::NETWORK_LOADS,
+                                                   NETWORK_LOADS,
                                                    "ArmNN_Runtime",
                                                    0,
                                                    0,
@@ -360,7 +360,7 @@ void ProfilingService::Initialize()
     {
         const Counter* unloadedNetworksCounter =
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   armnn::profiling::NETWORK_UNLOADS,
+                                                   NETWORK_UNLOADS,
                                                    "ArmNN_Runtime",
                                                    0,
                                                    0,
@@ -376,7 +376,7 @@ void ProfilingService::Initialize()
     {
         const Counter* registeredBackendsCounter =
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   armnn::profiling::REGISTERED_BACKENDS,
+                                                   REGISTERED_BACKENDS,
                                                    "ArmNN_Runtime",
                                                    0,
                                                    0,
@@ -389,14 +389,14 @@ void ProfilingService::Initialize()
 
         // Due to backends being registered before the profiling service becomes active,
         // we need to set the counter to the correct value here
-        SetCounterValue(armnn::profiling::REGISTERED_BACKENDS, static_cast<uint32_t>(BackendRegistryInstance().Size()));
+        SetCounterValue(REGISTERED_BACKENDS, static_cast<uint32_t>(armnn::BackendRegistryInstance().Size()));
     }
     // Register a counter for the number of registered backends
     if (!m_CounterDirectory.IsCounterRegistered("Backends unregistered"))
     {
         const Counter* unregisteredBackendsCounter =
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   armnn::profiling::UNREGISTERED_BACKENDS,
+                                                   UNREGISTERED_BACKENDS,
                                                    "ArmNN_Runtime",
                                                    0,
                                                    0,
@@ -412,7 +412,7 @@ void ProfilingService::Initialize()
     {
         const Counter* inferencesRunCounter =
                 m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   armnn::profiling::INFERENCES_RUN,
+                                                   INFERENCES_RUN,
                                                    "ArmNN_Runtime",
                                                    0,
                                                    0,
@@ -456,7 +456,7 @@ void ProfilingService::Reset()
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
     m_BackendProfilingContexts.clear();
-    m_MaxGlobalCounterId = armnn::profiling::MAX_ARMNN_COUNTER;
+    m_MaxGlobalCounterId = MAX_ARMNN_COUNTER;
 }
 
 void ProfilingService::Stop()
@@ -541,6 +541,6 @@ ProfilingService::~ProfilingService()
 {
     Stop();
 }
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

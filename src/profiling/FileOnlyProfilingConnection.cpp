@@ -14,10 +14,10 @@
 #include <iostream>
 #include <thread>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 std::vector<uint32_t> StreamMetaDataProcessor::GetHeadersAccepted()
@@ -145,7 +145,7 @@ arm::pipe::Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
 void FileOnlyProfilingConnection::Fail(const std::string& errorMessage)
 {
     Close();
-    throw RuntimeException(errorMessage);
+    throw armnn::RuntimeException(errorMessage);
 }
 
 /// Adds a local packet handler to the FileOnlyProfilingConnection. Invoking this will start
@@ -303,6 +303,6 @@ void FileOnlyProfilingConnection::DispatchPacketToHandlers(const arm::pipe::Pack
     }
 }
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

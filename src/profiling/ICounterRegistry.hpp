@@ -8,10 +8,10 @@
 #include <armnn/Optional.hpp>
 #include <armnn/BackendId.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ICounterRegistry
@@ -24,13 +24,13 @@ public:
 
     virtual const Device*     RegisterDevice    (const std::string& deviceName,
                                                  uint16_t cores,
-                                                 const Optional<std::string>& parentCategoryName) = 0;
+                                                 const armnn::Optional<std::string>& parentCategoryName) = 0;
 
     virtual const CounterSet* RegisterCounterSet(const std::string& counterSetName,
                                                  uint16_t count,
-                                                 const Optional<std::string>& parentCategoryName) = 0;
+                                                 const armnn::Optional<std::string>& parentCategoryName) = 0;
 
-    virtual const Counter* RegisterCounter(const BackendId& backendId,
+    virtual const Counter* RegisterCounter(const armnn::BackendId& backendId,
                                            const uint16_t uid,
                                            const std::string& parentCategoryName,
                                            uint16_t counterClass,
@@ -38,13 +38,13 @@ public:
                                            double multiplier,
                                            const std::string& name,
                                            const std::string& description,
-                                           const Optional<std::string>& units,
-                                           const Optional<uint16_t>& numberOfCores,
-                                           const Optional<uint16_t>& deviceUid,
-                                           const Optional<uint16_t>& counterSetUid) = 0;
+                                           const armnn::Optional<std::string>& units,
+                                           const armnn::Optional<uint16_t>& numberOfCores,
+                                           const armnn::Optional<uint16_t>& deviceUid,
+                                           const armnn::Optional<uint16_t>& counterSetUid) = 0;
 
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

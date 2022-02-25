@@ -10,10 +10,10 @@
 
 #include <fstream>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 ProfilingConnectionDumpToFileDecorator::ProfilingConnectionDumpToFileDecorator(
@@ -154,9 +154,9 @@ bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const unsigned c
 void ProfilingConnectionDumpToFileDecorator::Fail(const std::string& errorMessage)
 {
     Close();
-    throw RuntimeException(errorMessage);
+    throw armnn::RuntimeException(errorMessage);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

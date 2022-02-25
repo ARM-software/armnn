@@ -19,10 +19,10 @@
 #include <iostream>
 #include <limits>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 namespace
@@ -39,7 +39,7 @@ void ThrowIfCantGenerateNextUid(uint16_t uid, uint16_t cores = 0)
         // running multiple parallel workloads and will not provide multiple streams of data for each event)
         if (uid == std::numeric_limits<uint16_t>::max())
         {
-            throw RuntimeException("Generating the next UID for profiling would result in an overflow");
+            throw armnn::RuntimeException("Generating the next UID for profiling would result in an overflow");
         }
         break;
     default: // cores > 1
@@ -47,7 +47,7 @@ void ThrowIfCantGenerateNextUid(uint16_t uid, uint16_t cores = 0)
         // allowed value for a counter UID is consequently: uint16_t_max - cores + 1
         if (uid >= std::numeric_limits<uint16_t>::max() - cores + 1)
         {
-            throw RuntimeException("Generating the next UID for profiling would result in an overflow");
+            throw armnn::RuntimeException("Generating the next UID for profiling would result in an overflow");
         }
         break;
     }
@@ -139,31 +139,6 @@ void WriteUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint8
     WriteUint8(packetBuffer->GetWritableData(), offset, value);
 }
 
-void WriteBytes(unsigned char* buffer, unsigned int offset, const void* value, unsigned int valueSize)
-{
-    arm::pipe::WriteBytes(buffer, offset, value, valueSize);
-}
-
-void WriteUint64(unsigned char* buffer, unsigned int offset, uint64_t value)
-{
-    arm::pipe::WriteUint64(buffer, offset, value);
-}
-
-void WriteUint32(unsigned char* buffer, unsigned int offset, uint32_t value)
-{
-    arm::pipe::WriteUint32(buffer, offset, value);
-}
-
-void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value)
-{
-    arm::pipe::WriteUint16(buffer, offset, value);
-}
-
-void WriteUint8(unsigned char* buffer, unsigned int offset, uint8_t value)
-{
-    arm::pipe::WriteUint8(buffer, offset, value);
-}
-
 void ReadBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
 {
     ARMNN_ASSERT(packetBuffer);
@@ -197,31 +172,6 @@ uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset)
     ARMNN_ASSERT(packetBuffer);
 
     return ReadUint8(packetBuffer->GetReadableData(), offset);
-}
-
-void ReadBytes(const unsigned char* buffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
-{
-    arm::pipe::ReadBytes(buffer, offset, valueSize, outValue);
-}
-
-uint64_t ReadUint64(const unsigned char* buffer, unsigned int offset)
-{
-    return arm::pipe::ReadUint64(buffer, offset);
-}
-
-uint32_t ReadUint32(const unsigned char* buffer, unsigned int offset)
-{
-    return arm::pipe::ReadUint32(buffer, offset);
-}
-
-uint16_t ReadUint16(const unsigned char* buffer, unsigned int offset)
-{
-    return arm::pipe::ReadUint16(buffer, offset);
-}
-
-uint8_t ReadUint8(const unsigned char* buffer, unsigned int offset)
-{
-    return arm::pipe::ReadUint8(buffer, offset);
 }
 
 std::string GetSoftwareInfo()
@@ -724,11 +674,6 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
     return TimelinePacketStatus::Ok;
 }
 
-std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth)
-{
-    return arm::pipe::CentreAlignFormatting(stringToPass, spacingWidth);
-}
-
 void PrintDeviceDetails(const std::pair<const unsigned short, std::unique_ptr<Device>>& devicePair)
 {
     std::string body;
@@ -904,7 +849,7 @@ void PrintCounterDirectory(ICounterDirectory& counterDirectory)
 uint64_t GetTimestamp()
 {
 #if USE_CLOCK_MONOTONIC_RAW
-    using clock = MonotonicClockRaw;
+    using clock = armnn::MonotonicClockRaw;
 #else
     using clock = std::chrono::steady_clock;
 #endif
@@ -942,9 +887,9 @@ arm::pipe::Packet ReceivePacket(const unsigned char* buffer, uint32_t length)
     return arm::pipe::Packet(metadataIdentifier, dataLength, packetData);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 
 namespace std
 {

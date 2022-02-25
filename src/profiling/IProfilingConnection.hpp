@@ -11,10 +11,10 @@
 
 #include <cstdint>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IProfilingConnection
@@ -31,6 +31,6 @@ public:
     virtual arm::pipe::Packet ReadPacket(uint32_t timeout) = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

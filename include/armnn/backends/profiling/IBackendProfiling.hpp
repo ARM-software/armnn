@@ -12,10 +12,10 @@
 #include <memory>
 #include <vector>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 struct CounterValue
@@ -55,11 +55,13 @@ public:
 
     virtual uint16_t RegisterDevice(const std::string& deviceName,
                                     uint16_t cores = 0,
-                                    const Optional<std::string>& parentCategoryName = EmptyOptional()) = 0;
+                                    const armnn::Optional<std::string>& parentCategoryName
+                                        = armnn::EmptyOptional()) = 0;
 
     virtual uint16_t RegisterCounterSet(const std::string& counterSetName,
                                         uint16_t count = 0,
-                                        const Optional<std::string>& parentCategoryName = EmptyOptional()) = 0;
+                                        const armnn::Optional<std::string>& parentCategoryName
+                                            = armnn::EmptyOptional()) = 0;
 
     virtual uint16_t RegisterCounter(const uint16_t uid,
                                      const std::string& parentCategoryName,
@@ -68,10 +70,10 @@ public:
                                      double multiplier,
                                      const std::string& name,
                                      const std::string& description,
-                                     const Optional<std::string>& units      = EmptyOptional(),
-                                     const Optional<uint16_t>& numberOfCores = EmptyOptional(),
-                                     const Optional<uint16_t>& deviceUid     = EmptyOptional(),
-                                     const Optional<uint16_t>& counterSetUid = EmptyOptional()) = 0;
+                                     const armnn::Optional<std::string>& units      = armnn::EmptyOptional(),
+                                     const armnn::Optional<uint16_t>& numberOfCores = armnn::EmptyOptional(),
+                                     const armnn::Optional<uint16_t>& deviceUid     = armnn::EmptyOptional(),
+                                     const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional()) = 0;
 
     virtual ~IRegisterBackendCounters() {}
 };
@@ -99,6 +101,6 @@ public:
 
 };
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

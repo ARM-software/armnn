@@ -5,10 +5,10 @@
 
 #include "RegisterBackendCounters.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void RegisterBackendCounters::RegisterCategory(const std::string& categoryName)
@@ -18,7 +18,7 @@ void RegisterBackendCounters::RegisterCategory(const std::string& categoryName)
 
 uint16_t RegisterBackendCounters::RegisterDevice(const std::string& deviceName,
                                                  uint16_t cores,
-                                                 const Optional<std::string>& parentCategoryName)
+                                                 const armnn::Optional<std::string>& parentCategoryName)
 {
     const Device* devicePtr = m_CounterDirectory.RegisterDevice(deviceName, cores, parentCategoryName);
     return devicePtr->m_Uid;
@@ -26,7 +26,7 @@ uint16_t RegisterBackendCounters::RegisterDevice(const std::string& deviceName,
 
 uint16_t RegisterBackendCounters::RegisterCounterSet(const std::string& counterSetName,
                                                      uint16_t count,
-                                                     const Optional<std::string>& parentCategoryName)
+                                                     const armnn::Optional<std::string>& parentCategoryName)
 {
     const CounterSet* counterSetPtr = m_CounterDirectory.RegisterCounterSet(counterSetName, count, parentCategoryName);
     return counterSetPtr->m_Uid;
@@ -39,10 +39,10 @@ uint16_t RegisterBackendCounters::RegisterCounter(const uint16_t uid,
                                                   double multiplier,
                                                   const std::string& name,
                                                   const std::string& description,
-                                                  const Optional<std::string>& units,
-                                                  const Optional<uint16_t>& numberOfCores,
-                                                  const Optional<uint16_t>& deviceUid,
-                                                  const Optional<uint16_t>& counterSetUid)
+                                                  const armnn::Optional<std::string>& units,
+                                                  const armnn::Optional<uint16_t>& numberOfCores,
+                                                  const armnn::Optional<uint16_t>& deviceUid,
+                                                  const armnn::Optional<uint16_t>& counterSetUid)
 {
     ++m_CurrentMaxGlobalCounterID;
     const Counter* counterPtr = m_CounterDirectory.RegisterCounter(m_BackendId,
@@ -80,6 +80,6 @@ uint16_t RegisterBackendCounters::RegisterCounter(const uint16_t uid,
     return m_CurrentMaxGlobalCounterID;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

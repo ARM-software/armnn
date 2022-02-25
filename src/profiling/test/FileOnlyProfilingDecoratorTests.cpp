@@ -19,7 +19,7 @@
 #include <sstream>
 #include <sys/stat.h>
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 using namespace armnn;
 
 using namespace std::chrono_literals;
@@ -32,7 +32,7 @@ class FileOnlyHelperService : public ProfilingService
     {
         return ProfilingService::WaitForPacketSent(m_ProfilingService, timeout);
     }
-    armnn::profiling::ProfilingService m_ProfilingService;
+    ProfilingService m_ProfilingService;
 };
 
 TEST_SUITE("FileOnlyProfilingDecoratorTests")

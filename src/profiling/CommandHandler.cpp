@@ -8,10 +8,10 @@
 
 #include <armnn/Logging.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void CommandHandler::Start(IProfilingConnection& profilingConnection)
@@ -85,7 +85,7 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
                 m_KeepRunning.store(false);
             }
         }
-        catch (const Exception& e)
+        catch (const armnn::Exception& e)
         {
             // Log the error and continue
             ARMNN_LOG(warning) << "An error has occurred when handling a command: " << e.what();
@@ -104,6 +104,6 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
     m_IsRunning.store(false);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -5,10 +5,10 @@
 
 #pragma once
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IConsumer
@@ -20,7 +20,7 @@ public:
     virtual void SetReadyToRead() = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

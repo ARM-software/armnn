@@ -8,10 +8,10 @@
 
 #include <fmt/format.h>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void PerJobCounterSelectionCommandHandler::operator()(const arm::pipe::Packet& packet)
@@ -44,6 +44,6 @@ void PerJobCounterSelectionCommandHandler::operator()(const arm::pipe::Packet& p
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

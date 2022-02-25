@@ -7,10 +7,10 @@
 
 #include <memory>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IReadOnlyPacketBuffer // interface used by the read thread
@@ -43,6 +43,6 @@ public:
 
 using IPacketBufferPtr = std::unique_ptr<IPacketBuffer>;
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

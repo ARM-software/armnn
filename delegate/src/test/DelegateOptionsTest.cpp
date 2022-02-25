@@ -87,7 +87,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebugFunction")
     // Enable debug with debug callback function
     armnn::OptimizerOptions optimizerOptions(false, true, false, false);
     bool callback = false;
-    auto mockCallback = [&](armnn::LayerGuid guid, unsigned int slotIndex, armnn::ITensorHandle* tensor)
+    auto mockCallback = [&](LayerGuid guid, unsigned int slotIndex, armnn::ITensorHandle* tensor)
     {
         armnn::IgnoreUnused(guid);
         armnn::IgnoreUnused(slotIndex);

@@ -12,10 +12,10 @@
 
 #define MAX_METADATA_PACKET_LENGTH 4096
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IBufferManager
@@ -38,6 +38,6 @@ public:
     virtual void FlushReadList() = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

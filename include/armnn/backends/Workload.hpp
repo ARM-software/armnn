@@ -32,7 +32,7 @@ public:
 
     BaseWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
         : m_Data(descriptor),
-          m_Guid(profiling::ProfilingService::GetNextGuid())
+          m_Guid(arm::pipe::ProfilingService::GetNextGuid())
     {
         m_Data.Validate(info);
     }
@@ -52,7 +52,7 @@ public:
 
     const QueueDescriptor& GetData() const { return m_Data; }
 
-    profiling::ProfilingGuid GetGuid() const final { return m_Guid; }
+    arm::pipe::ProfilingGuid GetGuid() const final { return m_Guid; }
 
     virtual bool SupportsTensorHandleReplacement()  const override
     {
@@ -75,7 +75,7 @@ public:
 
 protected:
     QueueDescriptor m_Data;
-    const profiling::ProfilingGuid m_Guid;
+    const arm::pipe::ProfilingGuid m_Guid;
 
 private:
     std::mutex m_AsyncWorkloadMutex;

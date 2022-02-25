@@ -19,7 +19,7 @@ public:
     virtual Status PrintGraph();
     virtual Status SerializeToDot(std::ostream& stream) const;
 
-    virtual profiling::ProfilingGuid GetGuid() const { return m_Guid; };
+    virtual arm::pipe::ProfilingGuid GetGuid() const { return m_Guid; };
 
     virtual size_t GetNumInputs() const;
     virtual size_t GetNumOutputs() const;
@@ -29,7 +29,7 @@ public:
 
 private:
     std::unique_ptr<Graph> m_Graph;
-    profiling::ProfilingGuid m_Guid;
+    arm::pipe::ProfilingGuid m_Guid;
     ModelOptions m_ModelOptions;
 };
 

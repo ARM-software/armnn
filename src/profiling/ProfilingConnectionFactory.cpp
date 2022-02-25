@@ -9,10 +9,10 @@
 #include "ProfilingConnectionDumpToFileDecorator.hpp"
 #include "SocketProfilingConnection.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 std::unique_ptr<IProfilingConnection> ProfilingConnectionFactory::GetProfilingConnection(
@@ -56,6 +56,6 @@ std::unique_ptr<IProfilingConnection> ProfilingConnectionFactory::GetProfilingCo
     }
 }
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

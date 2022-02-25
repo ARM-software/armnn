@@ -26,7 +26,7 @@ public:
     ~MockBackendInitialiser();
 };
 
-class MockBackendProfilingContext : public profiling::IBackendProfilingContext
+class MockBackendProfilingContext : public arm::pipe::IBackendProfilingContext
 {
 public:
     MockBackendProfilingContext(IBackendInternal::IBackendProfilingPtr& backendProfiling)
@@ -44,7 +44,7 @@ public:
 
     uint16_t RegisterCounters(uint16_t currentMaxGlobalCounterId)
     {
-        std::unique_ptr<profiling::IRegisterBackendCounters> counterRegistrar =
+        std::unique_ptr<arm::pipe::IRegisterBackendCounters> counterRegistrar =
             m_BackendProfiling->GetCounterRegistrationInterface(static_cast<uint16_t>(currentMaxGlobalCounterId));
 
         std::string categoryName("MockCounters");
@@ -77,17 +77,17 @@ public:
         return armnn::Optional<std::string>();
     }
 
-    std::vector<profiling::Timestamp> ReportCounterValues()
+    std::vector<arm::pipe::Timestamp> ReportCounterValues()
     {
-        std::vector<profiling::CounterValue> counterValues;
+        std::vector<arm::pipe::CounterValue> counterValues;
 
         for (auto counterId : m_ActiveCounters)
         {
-            counterValues.emplace_back(profiling::CounterValue{ counterId, counterId + 1u });
+            counterValues.emplace_back(arm::pipe::CounterValue{ counterId, counterId + 1u });
         }
 
         uint64_t timestamp = m_CapturePeriod;
-        return { profiling::Timestamp{ timestamp, counterValues } };
+        return { arm::pipe::Timestamp{ timestamp, counterValues } };
     }
 
     bool EnableProfiling(bool)

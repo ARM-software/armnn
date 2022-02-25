@@ -11,10 +11,10 @@
 
 #include <atomic>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 struct CounterDirectoryEventRecord
@@ -26,7 +26,7 @@ struct CounterDirectoryEventRecord
     std::string m_CounterName;
     uint16_t m_CounterSetUid;
     uint16_t m_CounterUid;
-    Optional<std::string> m_CounterUnits;
+    armnn::Optional<std::string> m_CounterUnits;
     uint16_t m_DeviceUid;
     uint16_t m_MaxCounterUid;
 };
@@ -80,6 +80,6 @@ private:
     std::atomic<bool> m_AlreadyParsed;
 };
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

@@ -30,7 +30,7 @@ void BackendRegistry::Register(const BackendId& id, BackendRegistry::FactoryFunc
     {
         if (m_ProfilingService.has_value() && m_ProfilingService.value().IsProfilingEnabled())
         {
-            m_ProfilingService.value().IncrementCounterValue(armnn::profiling::REGISTERED_BACKENDS);
+            m_ProfilingService.value().IncrementCounterValue(arm::pipe::REGISTERED_BACKENDS);
         }
     }
 
@@ -43,7 +43,7 @@ void BackendRegistry::Deregister(const BackendId& id)
 
     if (m_ProfilingService.has_value() && m_ProfilingService.value().IsProfilingEnabled())
     {
-        m_ProfilingService.value().IncrementCounterValue(armnn::profiling::UNREGISTERED_BACKENDS);
+        m_ProfilingService.value().IncrementCounterValue(arm::pipe::UNREGISTERED_BACKENDS);
     }
 }
 
@@ -102,7 +102,7 @@ void BackendRegistry::Swap(BackendRegistry& instance, BackendRegistry::FactorySt
     std::swap(instance.m_Factories, other);
 }
 
-void BackendRegistry::SetProfilingService(armnn::Optional<profiling::ProfilingService&> profilingService)
+void BackendRegistry::SetProfilingService(armnn::Optional<arm::pipe::ProfilingService&> profilingService)
 {
     m_ProfilingService = profilingService;
 }

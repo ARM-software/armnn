@@ -12,7 +12,7 @@
 
 #include <doctest/doctest.h>
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 TEST_SUITE("TimelinePacketTests")
 {
@@ -204,7 +204,7 @@ TEST_CASE("TimelineRelationshipPacketInvalidRelationTest")
                                                       buffer.data(),
                                                       armnn::numeric_cast<unsigned int>(buffer.size()),
                                                       numberOfBytesWritten),
-                      armnn::InvalidArgumentException);
+                    arm::pipe::InvalidArgumentException);
 
     CHECK(numberOfBytesWritten == 0);
 }
@@ -527,7 +527,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
 
     // Check the ui_name
     std::vector<uint32_t> swTraceString;
-    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
+    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
     offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceUINameLength = ReadUint32(buffer.data(), offset);
     CHECK(swTraceUINameLength == 14); // ui_name length including the null-terminator
@@ -539,7 +539,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
                             swTraceUINameLength - 1) == 0);   // The length of the label
 
     // Check arg_types
-    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
+    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
     offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgTypesLength = ReadUint32(buffer.data(), offset);
     CHECK(swTraceArgTypesLength == 3); // arg_types length including the null-terminator
@@ -551,7 +551,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
                             swTraceArgTypesLength - 1) == 0); // The length of the label
 
     // Check arg_names
-    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
+    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
     offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgNamesLength = ReadUint32(buffer.data(), offset);
     CHECK(swTraceArgNamesLength == 11); // arg_names length including the null-terminator
@@ -563,7 +563,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
                             swTraceArgNamesLength - 1) == 0); // The length of the label
 
     // Check second message decl_id
-    arm::pipe::StringToSwTraceString<arm::pipe::SwTraceCharPolicy>(label, swTraceString);
+    StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
     offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     readDeclId = ReadUint32(buffer.data(), offset);
     CHECK(readDeclId == 1);

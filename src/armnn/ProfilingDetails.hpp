@@ -34,7 +34,7 @@ public:
     void AddDetailsToString(const std::string& workloadName,
                             const DescriptorType& desc,
                             const WorkloadInfo& infos,
-                            const profiling::ProfilingGuid guid)
+                            const arm::pipe::ProfilingGuid guid)
     {
         // Once details exist, we can assume we're on the second iteration of details
         if (m_DetailsExist)

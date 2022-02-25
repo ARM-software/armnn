@@ -21,7 +21,7 @@
 #include <functional>
 #include <Runtime.hpp>
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 TEST_SUITE("SendTimelinePacketTests")
 {
@@ -421,7 +421,7 @@ TEST_CASE("SendTimelinePacketTests3")
     const uint64_t eventClassBinaryPacketNameGuid = 8845u;
     CHECK_THROWS_AS(sendTimelinePacket->SendTimelineEventClassBinaryPacket(
                       eventClassBinaryPacketProfilingGuid, eventClassBinaryPacketNameGuid),
-                      armnn::profiling::BufferExhaustion);
+                      BufferExhaustion);
 }
 
 TEST_CASE("GetGuidsFromProfilingService")
@@ -429,7 +429,7 @@ TEST_CASE("GetGuidsFromProfilingService")
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     armnn::RuntimeImpl runtime(options);
-    armnn::profiling::ProfilingService profilingService(runtime);
+    ProfilingService profilingService(runtime);
 
     profilingService.ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
@@ -450,7 +450,7 @@ TEST_CASE("GetTimelinePackerWriterFromProfilingService")
 {
     ProfilingOptions options;
     options.m_EnableProfiling = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     std::unique_ptr<ISendTimelinePacket> writer = profilingService.GetSendTimelinePacket();

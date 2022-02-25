@@ -78,7 +78,7 @@ public:
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                             std::string& errorMessage,
                                                             const INetworkProperties& networkProperties,
-                                                            profiling::ProfilingService& profilingService);
+                                                            arm::pipe::ProfilingService& profilingService);
 
     // NOTE we return by reference as the purpose of this method is only to provide
     // access to the private m_Profiler and in theory we should not need to increment
@@ -96,7 +96,7 @@ public:
         return m_NetworkProperties.m_AsyncEnabled;
     }
 
-    profiling::ProfilingGuid GetNetworkGuid();
+    arm::pipe::ProfilingGuid GetNetworkGuid();
 
 private:
 
@@ -112,7 +112,7 @@ private:
 
     LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                   const INetworkProperties& networkProperties,
-                  profiling::ProfilingService& profilingService);
+                  arm::pipe::ProfilingService& profilingService);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
@@ -122,8 +122,8 @@ private:
 
     void ImportOutputTensor(const Tensor& outputTensor, ITensorHandle* outputTensorHandle);
 
-    bool Execute(std::unique_ptr<profiling::TimelineUtilityMethods>& timelineUtils,
-                 profiling::ProfilingGuid inferenceGuid);
+    bool Execute(std::unique_ptr<arm::pipe::TimelineUtilityMethods>& timelineUtils,
+                 arm::pipe::ProfilingGuid inferenceGuid);
 
     const IWorkloadFactory& GetWorkloadFactory(const Layer& layer) const;
 
@@ -158,7 +158,7 @@ private:
 
     TensorHandleFactoryRegistry m_TensorHandleFactoryRegistry;
 
-    profiling::ProfilingService& m_ProfilingService;
+    arm::pipe::ProfilingService& m_ProfilingService;
 
     struct ImportedTensorHandlePin
     {

@@ -7,14 +7,15 @@
 
 #include "ProfilingStateMachine.hpp"
 #include "INotifyBackends.hpp"
+#include "ProfilingStateMachine.hpp"
 
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Packet.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class DeactivateTimelineReportingCommandHandler : public arm::pipe::CommandHandlerFunctor
@@ -41,6 +42,6 @@ private:
     INotifyBackends&       m_BackendNotifier;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

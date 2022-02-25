@@ -10,10 +10,10 @@
 
 #include <armnn/Types.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class TimelineUtilityMethods
@@ -95,6 +95,6 @@ private:
     std::unique_ptr<ISendTimelinePacket> m_SendTimelinePacket;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

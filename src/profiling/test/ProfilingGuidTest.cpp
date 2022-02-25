@@ -14,7 +14,7 @@
 #include <fmt/format.h>
 #include <thread>
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 TEST_SUITE("ProfilingGuidTests")
 {
@@ -93,10 +93,10 @@ TEST_CASE("StaticGuidGeneratorCollisionTest")
             // If we're running on a 32bit system it is more likely to get a GUID clash over 1 million executions.
             // We can generally detect this when the GUID turns out to be MIN_STATIC_GUID. Output a warning
             // message rather than error in this case.
-            if (guid == ProfilingGuid(armnn::profiling::MIN_STATIC_GUID))
+            if (guid == ProfilingGuid(MIN_STATIC_GUID))
             {
                 WARN("MIN_STATIC_GUID returned more than once from GenerateStaticId.");
-            } 
+            }
             else
             {
                 FAIL(fmt::format("GUID collision occurred: {} -> {}", str, guid));

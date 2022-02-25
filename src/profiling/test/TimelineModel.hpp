@@ -12,10 +12,10 @@
 #include <sstream>
 #include <vector>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 using LabelMap = std::map<uint64_t, arm::pipe::ITimelineDecoder::Label>;
 using Attribute = std::pair<std::string, std::string>;
@@ -184,6 +184,6 @@ std::string GetConnectionDescription(const Connection& connection);
 std::string GetExecutionDescription(Entity* execution);
 std::string GetEventDescription(EventObj* event);
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

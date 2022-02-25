@@ -12,10 +12,10 @@
 #include <common/include/PacketVersionResolver.hpp>
 #include <common/include/ProfilingException.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 std::vector<uint32_t> RequestCountersPacketHandler::GetHeadersAccepted()
@@ -75,6 +75,6 @@ void RequestCountersPacketHandler::SendCounterSelectionPacket()
     m_Connection->ReturnPacket(packet);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

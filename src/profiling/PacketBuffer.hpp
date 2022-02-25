@@ -9,10 +9,10 @@
 
 #include <memory>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class PacketBuffer : public IPacketBuffer
@@ -42,6 +42,6 @@ private:
     std::unique_ptr<unsigned char[]> m_Data;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

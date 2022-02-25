@@ -12,10 +12,10 @@
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Packet.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class RequestCounterDirectoryCommandHandler : public arm::pipe::CommandHandlerFunctor
@@ -45,6 +45,6 @@ private:
     const ProfilingStateMachine& m_StateMachine;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -9,10 +9,10 @@
 #include <string>
 #include <vector>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 enum class ProfilingRelationshipType
@@ -56,6 +56,6 @@ public:
                                                       uint64_t attributeGuid) = 0;
 };
 
-}    // namespace profiling
+}    // namespace pipe
 
-}    // namespace armnn
+}    // namespace arm

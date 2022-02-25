@@ -10,10 +10,10 @@
 
 #include <fmt/format.h>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& packet)
@@ -23,7 +23,7 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
     {
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
-        throw RuntimeException(fmt::format("Connection Acknowledged Command Handler invoked while in an "
+        throw armnn::RuntimeException(fmt::format("Connection Acknowledged Command Handler invoked while in an "
                                            "wrong state: {}",
                                            GetProfilingStateName(currentState)));
     case ProfilingState::WaitingForAck:
@@ -54,7 +54,7 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
                 // Enable profiling on the backend and assert that it returns true
                 if(!backendContext.second->EnableProfiling(true))
                 {
-                    throw BackendProfilingException(
+                    throw armnn::BackendProfilingException(
                             "Unable to enable profiling on Backend Id: " + backendContext.first.Get());
                 }
             }
@@ -67,12 +67,12 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
     case ProfilingState::Active:
         return; // NOP
     default:
-        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
                                            static_cast<int>(currentState)));
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

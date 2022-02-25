@@ -206,7 +206,7 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
 
     if (m_ProfilingService.IsProfilingEnabled())
     {
-        m_ProfilingService.IncrementCounterValue(armnn::profiling::NETWORK_LOADS);
+        m_ProfilingService.IncrementCounterValue(arm::pipe::NETWORK_LOADS);
     }
 
     return Status::Success;
@@ -227,8 +227,8 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
         return Status::Failure;
     }
 
-    std::unique_ptr<profiling::TimelineUtilityMethods> timelineUtils =
-            profiling::TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+    std::unique_ptr<arm::pipe::TimelineUtilityMethods> timelineUtils =
+        arm::pipe::TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
     {
         std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
@@ -238,9 +238,9 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
             auto search = m_LoadedNetworks.find(networkId);
             if (search != m_LoadedNetworks.end())
             {
-                profiling::ProfilingGuid networkGuid = search->second->GetNetworkGuid();
+                arm::pipe::ProfilingGuid networkGuid = search->second->GetNetworkGuid();
                 timelineUtils->RecordEvent(networkGuid,
-                                           profiling::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
+                                           arm::pipe::LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS);
             }
         }
 
@@ -252,7 +252,7 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
 
         if (m_ProfilingService.IsProfilingEnabled())
         {
-            m_ProfilingService.IncrementCounterValue(armnn::profiling::NETWORK_UNLOADS);
+            m_ProfilingService.IncrementCounterValue(arm::pipe::NETWORK_UNLOADS);
         }
     }
 
@@ -280,7 +280,7 @@ const std::shared_ptr<IProfiler> RuntimeImpl::GetProfiler(NetworkId networkId) c
     return nullptr;
 }
 
-void RuntimeImpl::ReportStructure() // armnn::profiling::IProfilingService& profilingService as param
+void RuntimeImpl::ReportStructure() // arm::pipe::IProfilingService& profilingService as param
 {
     // No-op for the time being, but this may be useful in future to have the profilingService available
     // if (profilingService.IsProfilingEnabled()){}
@@ -311,7 +311,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
     // goes through the backend registry
     LoadDynamicBackends(options.m_DynamicBackendsPath);
 
-    BackendIdSet supportedBackends;
+    armnn::BackendIdSet supportedBackends;
     for (const auto& id : BackendRegistryInstance().GetBackendIds())
     {
         // Store backend contexts for the supported ones
@@ -473,9 +473,9 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
             }
             supportedBackends.emplace(id);
 
-            unique_ptr<armnn::profiling::IBackendProfiling> profilingIface =
-                std::make_unique<armnn::profiling::BackendProfiling>(armnn::profiling::BackendProfiling(
-                    ConvertExternalProfilingOptions(options.m_ProfilingOptions), m_ProfilingService, id));
+            unique_ptr<arm::pipe::IBackendProfiling> profilingIface =
+                std::make_unique<arm::pipe::BackendProfiling>(arm::pipe::BackendProfiling(
+                    arm::pipe::ConvertExternalProfilingOptions(options.m_ProfilingOptions), m_ProfilingService, id));
 
             // Backends may also provide a profiling context. Ask for it now.
             auto profilingContext = backend->CreateBackendProfilingContext(options, profilingIface);
@@ -494,7 +494,8 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
 
     BackendRegistryInstance().SetProfilingService(m_ProfilingService);
     // pass configuration info to the profiling service
-    m_ProfilingService.ConfigureProfilingService(ConvertExternalProfilingOptions(options.m_ProfilingOptions));
+    m_ProfilingService.ConfigureProfilingService(
+        arm::pipe::ConvertExternalProfilingOptions(options.m_ProfilingOptions));
     if (options.m_ProfilingOptions.m_EnableProfiling)
     {
         // try to wait for the profiling service to initialise
@@ -734,7 +735,7 @@ void RuntimeImpl::LoadDynamicBackends(const std::string& overrideBackendPath)
     m_DynamicBackends = DynamicBackendUtils::CreateDynamicBackends(sharedObjects);
 
     // Register the dynamic backends in the backend registry
-    BackendIdSet registeredBackendIds = DynamicBackendUtils::RegisterDynamicBackends(m_DynamicBackends);
+    armnn::BackendIdSet registeredBackendIds = DynamicBackendUtils::RegisterDynamicBackends(m_DynamicBackends);
 
     // Add the registered dynamic backend ids to the list of supported backends
     m_DeviceSpec.AddSupportedBackends(registeredBackendIds, true);

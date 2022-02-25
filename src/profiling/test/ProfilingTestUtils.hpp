@@ -16,7 +16,7 @@
 #include <common/include/ProfilingGuid.hpp>
 
 using namespace armnn;
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 const static uint32_t bodyHeaderSize = 6;
 
@@ -63,10 +63,10 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId);
 
 bool CompareOutput(std::vector<std::string> output, std::vector<std::string> expectedOutput);
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ProfilingServiceRuntimeHelper : public ProfilingService
@@ -80,7 +80,7 @@ public:
     {
         return GetBufferManager(m_ProfilingService);
     }
-    armnn::profiling::ProfilingService& m_ProfilingService;
+    ProfilingService& m_ProfilingService;
 
     void ForceTransitionToState(ProfilingState newState)
     {
@@ -88,7 +88,7 @@ public:
     }
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

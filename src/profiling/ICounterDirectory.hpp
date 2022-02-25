@@ -13,10 +13,10 @@
 #include <unordered_set>
 #include <unordered_map>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 // Forward declarations
@@ -94,7 +94,7 @@ class Counter final
 {
 public:
     // Constructors
-    Counter(BackendId          backendId,
+    Counter(armnn::BackendId   backendId,
             uint16_t           counterUid,
             uint16_t           maxCounterUid,
             uint16_t           counterClass,
@@ -119,7 +119,7 @@ public:
     {}
 
     // Fields
-    BackendId   m_BackendId;
+    armnn::BackendId   m_BackendId;
     uint16_t    m_Uid;
     uint16_t    m_MaxCounterUid;
     uint16_t    m_Class;
@@ -158,6 +158,6 @@ public:
     virtual const Counter*    GetCounter(uint16_t uid)             const = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

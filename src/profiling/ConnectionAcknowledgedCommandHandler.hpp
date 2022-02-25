@@ -14,16 +14,16 @@
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Packet.hpp>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ConnectionAcknowledgedCommandHandler final : public arm::pipe::CommandHandlerFunctor
 {
 
-typedef const std::unordered_map<BackendId, std::shared_ptr<armnn::profiling::IBackendProfilingContext>>&
+typedef const std::unordered_map<armnn::BackendId, std::shared_ptr<IBackendProfilingContext>>&
     BackendProfilingContexts;
 
 public:
@@ -35,7 +35,8 @@ public:
                                          ISendTimelinePacket& sendTimelinePacket,
                                          ProfilingStateMachine& profilingStateMachine,
                                          IProfilingServiceStatus& profilingServiceStatus,
-                                         Optional<BackendProfilingContexts> backendProfilingContexts = EmptyOptional())
+                                         armnn::Optional<BackendProfilingContexts> backendProfilingContexts =
+                                             armnn::EmptyOptional())
         : CommandHandlerFunctor(familyId, packetId, version)
         , m_CounterDirectory(counterDirectory)
         , m_SendCounterPacket(sendCounterPacket)
@@ -59,11 +60,11 @@ private:
     ISendTimelinePacket&     m_SendTimelinePacket;
     ProfilingStateMachine&   m_StateMachine;
     IProfilingServiceStatus& m_ProfilingServiceStatus;
-    Optional<BackendProfilingContexts> m_BackendProfilingContext;
+    armnn::Optional<BackendProfilingContexts> m_BackendProfilingContext;
     std::atomic<bool> m_TimelineEnabled;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 

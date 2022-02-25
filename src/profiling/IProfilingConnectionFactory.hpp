@@ -11,10 +11,10 @@
 
 #include <memory>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IProfilingConnectionFactory
@@ -28,6 +28,6 @@ public:
     virtual IProfilingConnectionPtr GetProfilingConnection(const ProfilingOptions& options) const = 0;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

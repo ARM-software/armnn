@@ -13,10 +13,10 @@
 #include <atomic>
 #include <thread>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class CommandHandler
@@ -56,6 +56,6 @@ private:
     arm::pipe::PacketVersionResolver&  m_PacketVersionResolver;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

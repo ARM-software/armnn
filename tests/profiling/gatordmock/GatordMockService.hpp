@@ -120,7 +120,7 @@ public:
     /// Execute the WAIT command from the comamnd file.
     void WaitCommand(uint32_t timeout);
 
-    profiling::DirectoryCaptureCommandHandler& GetDirectoryCaptureCommandHandler()
+    arm::pipe::DirectoryCaptureCommandHandler& GetDirectoryCaptureCommandHandler()
     {
         return m_DirectoryCaptureCommandHandler;
     }
@@ -155,7 +155,7 @@ private:
     gatordmock::StreamMetadataCommandHandler m_StreamMetadataCommandHandler;
     gatordmock::StubCommandHandler m_StubCommandHandler;
 
-    profiling::DirectoryCaptureCommandHandler m_DirectoryCaptureCommandHandler;
+    arm::pipe::DirectoryCaptureCommandHandler m_DirectoryCaptureCommandHandler;
 
     arm::pipe::TimelineCaptureCommandHandler m_TimelineCaptureCommandHandler;
     arm::pipe::TimelineDirectoryCaptureCommandHandler m_TimelineDirectoryCaptureCommandHandler;

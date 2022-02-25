@@ -53,6 +53,6 @@ namespace armnn
 {
 Graph& GetGraphForTesting(IOptimizedNetwork* optNetPtr);
 ModelOptions& GetModelOptionsForTesting(IOptimizedNetwork* optNetPtr);
-profiling::ProfilingService& GetProfilingService(RuntimeImpl* runtime);
+arm::pipe::ProfilingService& GetProfilingService(RuntimeImpl* runtime);
 
 } // namespace armnn

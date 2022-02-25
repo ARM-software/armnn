@@ -6,10 +6,10 @@
 #include "BackendProfiling.hpp"
 #include "RegisterBackendCounters.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 std::unique_ptr<IRegisterBackendCounters>
@@ -92,5 +92,6 @@ bool BackendProfiling::IsProfilingEnabled() const
     return m_ProfilingService.IsProfilingEnabled();
 }
 
-}    // namespace profiling
-}    // namespace armnn
+}    // namespace pipe
+
+}    // namespace arm

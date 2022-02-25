@@ -13,10 +13,10 @@
 
 #include <memory>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class SendTimelinePacket : public ISendTimelinePacket
@@ -97,7 +97,8 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
                     continue;
 
                 case TimelinePacketStatus::Error:
-                    throw RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION());
+                    throw armnn::RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION
+                    ());
 
                 default:
                     m_Offset += numberOfBytesWritten;
@@ -106,7 +107,7 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
             }
         }
     }
-    catch (const RuntimeException& ex)
+    catch (const armnn::RuntimeException& ex)
     {
         // don't swallow in the catch all block
         throw ex;
@@ -116,16 +117,16 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
         // ditto
         throw ex;
     }
-    catch (const Exception& ex)
+    catch (const armnn::Exception& ex)
     {
         throw ex;
     }
     catch ( ... )
     {
-        throw RuntimeException("Unknown Exception thrown while sending TimelineBinaryPacket", CHECK_LOCATION());
+        throw armnn::RuntimeException("Unknown Exception thrown while sending TimelineBinaryPacket", CHECK_LOCATION());
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

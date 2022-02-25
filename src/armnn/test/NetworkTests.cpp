@@ -32,9 +32,9 @@ TEST_SUITE("Network")
 TEST_CASE("LayerGuids")
 {
     armnn::NetworkImpl net;
-    armnn::LayerGuid inputId = net.AddInputLayer(0)->GetGuid();
-    armnn::LayerGuid addId = net.AddAdditionLayer()->GetGuid();
-    armnn::LayerGuid outputId = net.AddOutputLayer(0)->GetGuid();
+    LayerGuid inputId = net.AddInputLayer(0)->GetGuid();
+    LayerGuid addId = net.AddAdditionLayer()->GetGuid();
+    LayerGuid outputId = net.AddOutputLayer(0)->GetGuid();
 
     CHECK(inputId != addId);
     CHECK(addId != outputId);

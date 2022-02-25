@@ -19,10 +19,10 @@
 #include <mutex>
 #include <thread>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class PeriodicCounterCapture final : public IPeriodicCounterCapture
@@ -33,8 +33,7 @@ public:
                            IReadCounterValues& readCounterValue,
                            const ICounterMappings& counterIdMap,
                            const std::unordered_map<armnn::BackendId,
-                                   std::shared_ptr<armnn::profiling::IBackendProfilingContext>>&
-                           backendProfilingContexts)
+                           std::shared_ptr<IBackendProfilingContext>>& backendProfilingContexts)
             : m_CaptureDataHolder(data)
             , m_IsRunning(false)
             , m_KeepRunning(false)
@@ -63,9 +62,9 @@ private:
     ISendCounterPacket&       m_SendCounterPacket;
     const ICounterMappings&   m_CounterIdMap;
     const std::unordered_map<armnn::BackendId,
-            std::shared_ptr<armnn::profiling::IBackendProfilingContext>>& m_BackendProfilingContexts;
+            std::shared_ptr<IBackendProfilingContext>>& m_BackendProfilingContexts;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -22,10 +22,10 @@
 #include <thread>
 #include <vector>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 constexpr unsigned int ThreadIdSize = sizeof(int); // Is platform dependent
@@ -150,9 +150,9 @@ uint64_t GetTimestamp();
 
 arm::pipe::Packet ReceivePacket(const unsigned char* buffer, uint32_t length);
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm
 
 namespace std
 {

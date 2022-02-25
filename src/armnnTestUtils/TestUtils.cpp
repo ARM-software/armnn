@@ -54,7 +54,7 @@ ModelOptions& GetModelOptionsForTesting(IOptimizedNetwork* optNet)
     return optNet->pOptimizedNetworkImpl->GetModelOptions();
 }
 
-profiling::ProfilingService& GetProfilingService(armnn::RuntimeImpl* runtime)
+arm::pipe::ProfilingService& GetProfilingService(armnn::RuntimeImpl* runtime)
 {
     return runtime->m_ProfilingService;
 }

@@ -6,10 +6,10 @@
 #include "BufferManager.hpp"
 #include "PacketBuffer.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 BufferManager::BufferManager(unsigned int numberOfBuffers, unsigned int maxPacketSize)
@@ -161,6 +161,6 @@ void BufferManager::FlushReadList()
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

@@ -25,7 +25,7 @@
 namespace armnn
 {
 using LoadedNetworks = std::unordered_map<NetworkId, std::unique_ptr<LoadedNetwork>>;
-using IReportStructure = profiling::IReportStructure;
+using IReportStructure = arm::pipe::IReportStructure;
 
 struct RuntimeImpl final :  public IReportStructure
 {
@@ -115,7 +115,7 @@ public:
 private:
     friend void RuntimeLoadedNetworksReserve(RuntimeImpl* runtime); // See RuntimeTests.cpp
 
-    friend profiling::ProfilingService& GetProfilingService(RuntimeImpl* runtime); // See RuntimeTests.cpp
+    friend arm::pipe::ProfilingService& GetProfilingService(RuntimeImpl* runtime); // See RuntimeTests.cpp
 
     int GenerateNetworkId();
 
@@ -150,7 +150,7 @@ private:
     std::vector<DynamicBackendPtr> m_DynamicBackends;
 
     /// Profiling Service Instance
-    profiling::ProfilingService m_ProfilingService;
+    arm::pipe::ProfilingService m_ProfilingService;
 };
 
 } // namespace armnn

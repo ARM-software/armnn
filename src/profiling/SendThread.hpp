@@ -20,10 +20,10 @@
 #include <thread>
 #include <type_traits>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class SendThread : public ISendThread, public IConsumer
@@ -70,6 +70,6 @@ private:
 
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

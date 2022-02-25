@@ -26,7 +26,7 @@
 
 #include <chrono>
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 
 namespace
 {
@@ -294,7 +294,7 @@ TEST_CASE("SendStreamMetaDataPacketTest")
     // Error no space left in buffer
     MockBufferManager mockBuffer1(10);
     SendCounterPacket sendPacket1(mockBuffer1);
-    CHECK_THROWS_AS(sendPacket1.SendStreamMetaDataPacket(), armnn::profiling::BufferExhaustion);
+    CHECK_THROWS_AS(sendPacket1.SendStreamMetaDataPacket(), BufferExhaustion);
 
     // Full metadata packet
 
@@ -1180,7 +1180,7 @@ TEST_CASE("SendCounterDirectoryPacketTest1")
     MockBufferManager mockBuffer(10);
     SendCounterPacket sendCounterPacket(mockBuffer);
     CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory),
-                      armnn::profiling::BufferExhaustion);
+                      BufferExhaustion);
 }
 
 TEST_CASE("SendCounterDirectoryPacketTest2")
@@ -1228,49 +1228,49 @@ TEST_CASE("SendCounterDirectoryPacketTest2")
     // Register a counter associated to "category1"
     const Counter* counter1 = nullptr;
     CHECK_NOTHROW(counter1 = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                     0,
-                                                                     category1Name,
-                                                                     0,
-                                                                     1,
-                                                                     123.45f,
-                                                                     "counter1",
-                                                                     "counter1description",
-                                                                     std::string("counter1units"),
-                                                                     numberOfCores));
+                                                              0,
+                                                              category1Name,
+                                                              0,
+                                                              1,
+                                                              123.45f,
+                                                              "counter1",
+                                                              "counter1description",
+                                                              std::string("counter1units"),
+                                                              numberOfCores));
     CHECK(counterDirectory.GetCounterCount() == 4);
     CHECK(counter1);
 
     // Register a counter associated to "category1"
     const Counter* counter2 = nullptr;
     CHECK_NOTHROW(counter2 = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                     4,
-                                                                     category1Name,
-                                                                     1,
-                                                                     0,
-                                                                     330.1245656765f,
-                                                                     "counter2",
-                                                                     "counter2description",
-                                                                     std::string("counter2units"),
-                                                                     armnn::EmptyOptional(),
-                                                                     device2->m_Uid,
-                                                                     0));
+                                                              4,
+                                                              category1Name,
+                                                              1,
+                                                              0,
+                                                              330.1245656765f,
+                                                              "counter2",
+                                                              "counter2description",
+                                                              std::string("counter2units"),
+                                                              armnn::EmptyOptional(),
+                                                              device2->m_Uid,
+                                                              0));
     CHECK(counterDirectory.GetCounterCount() == 5);
     CHECK(counter2);
 
     // Register a counter associated to "category2"
     const Counter* counter3 = nullptr;
     CHECK_NOTHROW(counter3 = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                     5,
-                                                                     category2Name,
-                                                                     1,
-                                                                     1,
-                                                                     0.0000045399f,
-                                                                     "counter3",
-                                                                     "counter3description",
-                                                                     armnn::EmptyOptional(),
-                                                                     numberOfCores,
-                                                                     device2->m_Uid,
-                                                                     counterSet1->m_Uid));
+                                                              5,
+                                                              category2Name,
+                                                              1,
+                                                              1,
+                                                              0.0000045399f,
+                                                              "counter3",
+                                                              "counter3description",
+                                                              armnn::EmptyOptional(),
+                                                              numberOfCores,
+                                                              device2->m_Uid,
+                                                              counterSet1->m_Uid));
     CHECK(counterDirectory.GetCounterCount() == 9);
     CHECK(counter3);
 
@@ -1773,17 +1773,17 @@ TEST_CASE("SendCounterDirectoryPacketTest7")
     // Register an invalid counter associated to a valid category
     const Counter* counter = nullptr;
     CHECK_NOTHROW(counter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                    0,
-                                                                    categoryName,
-                                                                    0,
-                                                                    1,
-                                                                    123.45f,
-                                                                    "counter",
-                                                                    "counter description",
-                                                                    std::string("invalid counter units"),
-                                                                    5,
-                                                                    device->m_Uid,
-                                                                    counterSet->m_Uid));
+                                                             0,
+                                                             categoryName,
+                                                             0,
+                                                             1,
+                                                             123.45f,
+                                                             "counter",
+                                                             "counter description",
+                                                             std::string("invalid counter units"),
+                                                             5,
+                                                             device->m_Uid,
+                                                             counterSet->m_Uid));
     CHECK(counterDirectory.GetCounterCount() == 5);
     CHECK(counter);
 

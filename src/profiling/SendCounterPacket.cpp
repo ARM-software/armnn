@@ -18,10 +18,10 @@
 
 #include <cstring>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void SendCounterPacket::SendStreamMetaDataPacket()
@@ -164,7 +164,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     }
     catch(...)
     {
-        CancelOperationAndThrow<RuntimeException>(writeBuffer, "Error processing packet.");
+        CancelOperationAndThrow<armnn::RuntimeException>(writeBuffer, "Error processing packet.");
     }
 
     m_BufferManager.Commit(writeBuffer, totalSize, false);
@@ -584,7 +584,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         std::string errorMessage;
         if (!CreateDeviceRecord(device, deviceRecord, errorMessage))
         {
-            CancelOperationAndThrow<RuntimeException>(errorMessage);
+            CancelOperationAndThrow<armnn::RuntimeException>(errorMessage);
         }
 
         // Update the total size in words of the device records
@@ -619,7 +619,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         std::string errorMessage;
         if (!CreateCounterSetRecord(counterSet, counterSetRecord, errorMessage))
         {
-            CancelOperationAndThrow<RuntimeException>(errorMessage);
+            CancelOperationAndThrow<armnn::RuntimeException>(errorMessage);
         }
 
         // Update the total size in words of the counter set records
@@ -654,7 +654,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         std::string errorMessage;
         if (!CreateCategoryRecord(category, counterDirectory.GetCounters(), categoryRecord, errorMessage))
         {
-            CancelOperationAndThrow<RuntimeException>(errorMessage);
+            CancelOperationAndThrow<armnn::RuntimeException>(errorMessage);
         }
 
         // Update the total size in words of the category records
@@ -918,6 +918,6 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
     m_BufferManager.Commit(writeBuffer, totalSize);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

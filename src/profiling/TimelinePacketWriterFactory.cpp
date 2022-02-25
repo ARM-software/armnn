@@ -7,10 +7,10 @@
 
 #include "SendTimelinePacket.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 std::unique_ptr<ISendTimelinePacket> TimelinePacketWriterFactory::GetSendTimelinePacket() const
@@ -18,6 +18,6 @@ std::unique_ptr<ISendTimelinePacket> TimelinePacketWriterFactory::GetSendTimelin
     return std::make_unique<SendTimelinePacket>(m_BufferManager);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

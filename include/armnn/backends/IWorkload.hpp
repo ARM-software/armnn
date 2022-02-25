@@ -29,7 +29,7 @@ public:
 
     virtual void ExecuteAsync(WorkingMemDescriptor& desc) = 0;
 
-    virtual profiling::ProfilingGuid GetGuid() const = 0;
+    virtual arm::pipe::ProfilingGuid GetGuid() const = 0;
 
     // SupportsTensorHandleReplacement signals that a given workload is capable of
     // replacing any of its I/O tensors via ReplaceInput/OutputTensorHandle

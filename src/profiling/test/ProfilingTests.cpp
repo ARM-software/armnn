@@ -51,7 +51,7 @@
 #include <random>
 
 
-using namespace armnn::profiling;
+using namespace arm::pipe;
 using PacketType = MockProfilingConnection::PacketType;
 
 TEST_SUITE("ExternalProfiling")
@@ -530,7 +530,7 @@ TEST_CASE("CheckProfilingStateMachine")
     ProfilingStateMachine profilingState15(ProfilingState::Active);
     CHECK_THROWS_AS(profilingState15.TransitionToState(ProfilingState::Uninitialised), armnn::Exception);
 
-    ProfilingStateMachine profilingState16(armnn::profiling::ProfilingState::Active);
+    ProfilingStateMachine profilingState16(ProfilingState::Active);
     CHECK_THROWS_AS(profilingState16.TransitionToState(ProfilingState::WaitingForAck), armnn::Exception);
 
     ProfilingStateMachine profilingState17(ProfilingState::Uninitialised);
@@ -657,7 +657,7 @@ TEST_CASE("CaptureDataMethods")
 TEST_CASE("CheckProfilingServiceDisabled")
 {
     ProfilingOptions options;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -667,7 +667,7 @@ TEST_CASE("CheckProfilingServiceDisabled")
 TEST_CASE("CheckProfilingServiceCounterDirectory")
 {
     ProfilingOptions options;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     const ICounterDirectory& counterDirectory0 = profilingService.GetCounterDirectory();
@@ -691,7 +691,7 @@ TEST_CASE("CheckProfilingServiceCounterValues")
 {
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     profilingService.Update();
@@ -702,7 +702,7 @@ TEST_CASE("CheckProfilingServiceCounterValues")
     std::vector<std::thread> writers;
 
     CHECK(!counters.empty());
-    uint16_t inferencesRun = armnn::profiling::INFERENCES_RUN;
+    uint16_t inferencesRun = INFERENCES_RUN;
 
     // Test GetAbsoluteCounterValue
     for (int i = 0; i < 4; ++i)
@@ -838,13 +838,13 @@ TEST_CASE("CheckCounterDirectoryRegisterCategory")
 
     // Register a category with an invalid name
     const Category* noCategory = nullptr;
-    CHECK_THROWS_AS(noCategory = counterDirectory.RegisterCategory(""), armnn::InvalidArgumentException);
+    CHECK_THROWS_AS(noCategory = counterDirectory.RegisterCategory(""), arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCategoryCount() == 0);
     CHECK(!noCategory);
 
     // Register a category with an invalid name
     CHECK_THROWS_AS(noCategory = counterDirectory.RegisterCategory("invalid category"),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCategoryCount() == 0);
     CHECK(!noCategory);
 
@@ -871,7 +871,7 @@ TEST_CASE("CheckCounterDirectoryRegisterCategory")
     // Register a category already registered
     const Category* anotherCategory = nullptr;
     CHECK_THROWS_AS(anotherCategory = counterDirectory.RegisterCategory(categoryName),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCategoryCount() == 1);
     CHECK(!anotherCategory);
 
@@ -898,7 +898,7 @@ TEST_CASE("CheckCounterDirectoryRegisterCategory")
     const Category* categoryInvalidDeviceName = nullptr;
     CHECK_THROWS_AS(categoryInvalidDeviceName =
                           counterDirectory.RegisterCategory(categoryWoDeviceName),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCategoryCount() == 2);
     CHECK(!categoryInvalidDeviceName);
 
@@ -961,12 +961,12 @@ TEST_CASE("CheckCounterDirectoryRegisterDevice")
 
     // Register a device with an invalid name
     const Device* noDevice = nullptr;
-    CHECK_THROWS_AS(noDevice = counterDirectory.RegisterDevice(""), armnn::InvalidArgumentException);
+    CHECK_THROWS_AS(noDevice = counterDirectory.RegisterDevice(""), arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetDeviceCount() == 0);
     CHECK(!noDevice);
 
     // Register a device with an invalid name
-    CHECK_THROWS_AS(noDevice = counterDirectory.RegisterDevice("inv@lid nam€"), armnn::InvalidArgumentException);
+    CHECK_THROWS_AS(noDevice = counterDirectory.RegisterDevice("inv@lid nam€"), arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetDeviceCount() == 0);
     CHECK(!noDevice);
 
@@ -992,7 +992,7 @@ TEST_CASE("CheckCounterDirectoryRegisterDevice")
 
     // Register a device with the name of a device already registered
     const Device* deviceSameName = nullptr;
-    CHECK_THROWS_AS(deviceSameName = counterDirectory.RegisterDevice(deviceName), armnn::InvalidArgumentException);
+    CHECK_THROWS_AS(deviceSameName = counterDirectory.RegisterDevice(deviceName), arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetDeviceCount() == 1);
     CHECK(!deviceSameName);
 
@@ -1019,7 +1019,7 @@ TEST_CASE("CheckCounterDirectoryRegisterDevice")
     const Device* deviceWCoresWInvalidParentCategory         = nullptr;
     CHECK_THROWS_AS(deviceWCoresWInvalidParentCategory =
                           counterDirectory.RegisterDevice(deviceWCoresWInvalidParentCategoryName, 3, std::string("")),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetDeviceCount() == 2);
     CHECK(!deviceWCoresWInvalidParentCategory);
 
@@ -1028,7 +1028,7 @@ TEST_CASE("CheckCounterDirectoryRegisterDevice")
     const Device* deviceWCoresWInvalidParentCategory2         = nullptr;
     CHECK_THROWS_AS(deviceWCoresWInvalidParentCategory2 = counterDirectory.RegisterDevice(
                           deviceWCoresWInvalidParentCategoryName2, 3, std::string("invalid_parent_category")),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetDeviceCount() == 2);
     CHECK(!deviceWCoresWInvalidParentCategory2);
 
@@ -1065,13 +1065,13 @@ TEST_CASE("CheckCounterDirectoryRegisterCounterSet")
 
     // Register a counter set with an invalid name
     const CounterSet* noCounterSet = nullptr;
-    CHECK_THROWS_AS(noCounterSet = counterDirectory.RegisterCounterSet(""), armnn::InvalidArgumentException);
+    CHECK_THROWS_AS(noCounterSet = counterDirectory.RegisterCounterSet(""), arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterSetCount() == 0);
     CHECK(!noCounterSet);
 
     // Register a counter set with an invalid name
     CHECK_THROWS_AS(noCounterSet = counterDirectory.RegisterCounterSet("invalid name"),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterSetCount() == 0);
     CHECK(!noCounterSet);
 
@@ -1098,7 +1098,7 @@ TEST_CASE("CheckCounterDirectoryRegisterCounterSet")
     // Register a counter set with the name of a counter set already registered
     const CounterSet* counterSetSameName = nullptr;
     CHECK_THROWS_AS(counterSetSameName = counterDirectory.RegisterCounterSet(counterSetName),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterSetCount() == 1);
     CHECK(!counterSetSameName);
 
@@ -1126,7 +1126,7 @@ TEST_CASE("CheckCounterDirectoryRegisterCounterSet")
     const CounterSet* counterSetWCountWInvalidParentCategory = nullptr;
     CHECK_THROWS_AS(counterSetWCountWInvalidParentCategory = counterDirectory.RegisterCounterSet(
                           counterSetWCountWInvalidParentCategoryName, 42, std::string("")),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterSetCount() == 2);
     CHECK(!counterSetWCountWInvalidParentCategory);
 
@@ -1136,7 +1136,7 @@ TEST_CASE("CheckCounterDirectoryRegisterCounterSet")
     const CounterSet* counterSetWCountWInvalidParentCategory2 = nullptr;
     CHECK_THROWS_AS(counterSetWCountWInvalidParentCategory2 = counterDirectory.RegisterCounterSet(
                           counterSetWCountWInvalidParentCategoryName2, 42, std::string("invalid_parent_category")),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterSetCount() == 2);
     CHECK(!counterSetWCountWInvalidParentCategory2);
 
@@ -1169,7 +1169,7 @@ TEST_CASE("CheckCounterDirectoryRegisterCounterSet")
     const CounterSet* counterSetSameCategory     = nullptr;
     CHECK_THROWS_AS(counterSetSameCategory =
                           counterDirectory.RegisterCounterSet(counterSetSameCategoryName, 0, invalidCategoryName),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterSetCount() == 3);
     CHECK(!counterSetSameCategory);
 }
@@ -1193,62 +1193,62 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                            123.45f,
                                                            "valid ",
                                                            "name"),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with an invalid parent category name
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   1,
-                                                                   "invalid parent category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   "valid description"),
-                      armnn::InvalidArgumentException);
+                                                                 1,
+                                                                 "invalid parent category",
+                                                                 0,
+                                                                 1,
+                                                                 123.45f,
+                                                                 "valid name",
+                                                                 "valid description"),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with an invalid class
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   2,
-                                                                   "valid_parent_category",
-                                                                   2,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid "
-                                                                   "name",
-                                                                   "valid description"),
-                      armnn::InvalidArgumentException);
+                                                                 2,
+                                                                 "valid_parent_category",
+                                                                 2,
+                                                                 1,
+                                                                 123.45f,
+                                                                 "valid "
+                                                                 "name",
+                                                                 "valid description"),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with an invalid interpolation
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   4,
-                                                                   "valid_parent_category",
-                                                                   0,
-                                                                   3,
-                                                                   123.45f,
-                                                                   "valid "
-                                                                   "name",
-                                                                   "valid description"),
-                      armnn::InvalidArgumentException);
+                                                                 4,
+                                                                 "valid_parent_category",
+                                                                 0,
+                                                                 3,
+                                                                 123.45f,
+                                                                 "valid "
+                                                                 "name",
+                                                                 "valid description"),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with an invalid multiplier
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   5,
-                                                                   "valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   .0f,
-                                                                   "valid "
-                                                                   "name",
-                                                                   "valid description"),
-                      armnn::InvalidArgumentException);
+                                                                 5,
+                                                                 "valid_parent_category",
+                                                                 0,
+                                                                 1,
+                                                                 .0f,
+                                                                 "valid "
+                                                                 "name",
+                                                                 "valid description"),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
@@ -1262,20 +1262,20 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                      123.45f,
                                                      "",
                                                      "valid description"),
-        armnn::InvalidArgumentException);
+        arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with an invalid name
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   7,
-                                                                   "valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "invalid nam€",
-                                                                   "valid description"),
-                      armnn::InvalidArgumentException);
+                                                                 7,
+                                                                 "valid_parent_category",
+                                                                 0,
+                                                                 1,
+                                                                 123.45f,
+                                                                 "invalid nam€",
+                                                                 "valid description"),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
@@ -1289,48 +1289,48 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                            123.45f,
                                                            "valid name",
                                                            ""),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with an invalid description
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   9,
-                                                                   "valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid "
-                                                                   "name",
-                                                                   "inv@lid description"),
-                      armnn::InvalidArgumentException);
+                                                                 9,
+                                                                 "valid_parent_category",
+                                                                 0,
+                                                                 1,
+                                                                 123.45f,
+                                                                 "valid "
+                                                                 "name",
+                                                                 "inv@lid description"),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with an invalid unit2
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   10,
-                                                                   "valid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   "valid description",
-                                                                   std::string("Mb/s2")),
-                      armnn::InvalidArgumentException);
+                                                                 10,
+                                                                 "valid_parent_category",
+                                                                 0,
+                                                                 1,
+                                                                 123.45f,
+                                                                 "valid name",
+                                                                 "valid description",
+                                                                 std::string("Mb/s2")),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
     // Register a counter with a non-existing parent category name
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   11,
-                                                                   "invalid_parent_category",
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name",
-                                                                   "valid description"),
-                      armnn::InvalidArgumentException);
+                                                                 11,
+                                                                 "invalid_parent_category",
+                                                                 0,
+                                                                 1,
+                                                                 123.45f,
+                                                                 "valid name",
+                                                                 "valid description"),
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 0);
     CHECK(!noCounter);
 
@@ -1384,21 +1384,21 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                            "valid name",
                                                            "valid description",
                                                            std::string("description")),
-                      armnn::InvalidArgumentException);
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 1);
     CHECK(!counterSameName);
 
     // Register a counter with a valid parent category name and units
     const Counter* counterWUnits = nullptr;
     CHECK_NOTHROW(counterWUnits = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                             14,
-                                                                             categoryName,
-                                                                             0,
-                                                                             1,
-                                                                             123.45f,
-                                                                             "valid name 2",
-                                                                             "valid description",
-                                                                             std::string("Mnnsq2")));    // Units
+                                                                   14,
+                                                                   categoryName,
+                                                                   0,
+                                                                   1,
+                                                                   123.45f,
+                                                                   "valid name 2",
+                                                                   "valid description",
+                                                                   std::string("Mnnsq2")));    // Units
     CHECK(counterDirectory.GetCounterCount() == 2);
     CHECK(counterWUnits);
     CHECK(counterWUnits->m_Uid > counter->m_Uid);
@@ -1417,16 +1417,16 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     // Register a counter with a valid parent category name and not associated with a device
     const Counter* counterWoDevice = nullptr;
     CHECK_NOTHROW(counterWoDevice = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                            26,
-                                                                            categoryName,
-                                                                            0,
-                                                                            1,
-                                                                            123.45f,
-                                                                            "valid name 3",
-                                                                            "valid description",
-                                                                            armnn::EmptyOptional(),// Units
-                                                                            armnn::EmptyOptional(),// Number of cores
-                                                                            0));                   // Device UID
+                                                                     26,
+                                                                     categoryName,
+                                                                     0,
+                                                                     1,
+                                                                     123.45f,
+                                                                     "valid name 3",
+                                                                     "valid description",
+                                                                     armnn::EmptyOptional(),// Units
+                                                                     armnn::EmptyOptional(),// Number of cores
+                                                                     0));                   // Device UID
     CHECK(counterDirectory.GetCounterCount() == 3);
     CHECK(counterWoDevice);
     CHECK(counterWoDevice->m_Uid > counter->m_Uid);
@@ -1444,17 +1444,17 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
 
     // Register a counter with a valid parent category name and associated to an invalid device
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   15,
-                                                                   categoryName,
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid name 4",
-                                                                   "valid description",
-                                                                   armnn::EmptyOptional(),    // Units
-                                                                   armnn::EmptyOptional(),    // Number of cores
-                                                                   100),                      // Device UID
-                      armnn::InvalidArgumentException);
+                                                                15,
+                                                                categoryName,
+                                                                0,
+                                                                1,
+                                                                123.45f,
+                                                                "valid name 4",
+                                                                "valid description",
+                                                                armnn::EmptyOptional(),    // Units
+                                                                armnn::EmptyOptional(),    // Number of cores
+                                                                100),                      // Device UID
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 3);
     CHECK(!noCounter);
 
@@ -1471,16 +1471,16 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     // Register a counter with a valid parent category name and associated to a device
     const Counter* counterWDevice = nullptr;
     CHECK_NOTHROW(counterWDevice = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                           16,
-                                                                           categoryName,
-                                                                           0,
-                                                                           1,
-                                                                           123.45f,
-                                                                           "valid name 5",
-                                                                           std::string("valid description"),
-                                                                           armnn::EmptyOptional(), // Units
-                                                                           armnn::EmptyOptional(), // Number of cores
-                                                                           device->m_Uid));        // Device UID
+                                                                    16,
+                                                                    categoryName,
+                                                                    0,
+                                                                    1,
+                                                                    123.45f,
+                                                                    "valid name 5",
+                                                                    std::string("valid description"),
+                                                                    armnn::EmptyOptional(), // Units
+                                                                    armnn::EmptyOptional(), // Number of cores
+                                                                    device->m_Uid));        // Device UID
     CHECK(counterDirectory.GetCounterCount() == 4);
     CHECK(counterWDevice);
     CHECK(counterWDevice->m_Uid > counter->m_Uid);
@@ -1499,17 +1499,17 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     // Register a counter with a valid parent category name and not associated with a counter set
     const Counter* counterWoCounterSet = nullptr;
     CHECK_NOTHROW(counterWoCounterSet = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                                17,
-                                                                                categoryName,
-                                                                                0,
-                                                                                1,
-                                                                                123.45f,
-                                                                                "valid name 6",
-                                                                                "valid description",
-                                                                                armnn::EmptyOptional(),// Units
-                                                                                armnn::EmptyOptional(),// No of cores
-                                                                                armnn::EmptyOptional(),// Device UID
-                                                                                0));               // CounterSet UID
+                                                                         17,
+                                                                         categoryName,
+                                                                         0,
+                                                                         1,
+                                                                         123.45f,
+                                                                         "valid name 6",
+                                                                         "valid description",
+                                                                         armnn::EmptyOptional(),// Units
+                                                                         armnn::EmptyOptional(),// No of cores
+                                                                         armnn::EmptyOptional(),// Device UID
+                                                                         0));               // CounterSet UID
     CHECK(counterDirectory.GetCounterCount() == 5);
     CHECK(counterWoCounterSet);
     CHECK(counterWoCounterSet->m_Uid > counter->m_Uid);
@@ -1527,18 +1527,18 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
 
     // Register a counter with a valid parent category name and associated to an invalid counter set
     CHECK_THROWS_AS(noCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                                   18,
-                                                                   categoryName,
-                                                                   0,
-                                                                   1,
-                                                                   123.45f,
-                                                                   "valid ",
-                                                                   "name 7",
-                                                                   std::string("valid description"),
-                                                                   armnn::EmptyOptional(),    // Units
-                                                                   armnn::EmptyOptional(),    // Number of cores
-                                                                   100),            // Counter set UID
-                      armnn::InvalidArgumentException);
+                                                                 18,
+                                                                 categoryName,
+                                                                 0,
+                                                                 1,
+                                                                 123.45f,
+                                                                 "valid ",
+                                                                 "name 7",
+                                                                 std::string("valid description"),
+                                                                 armnn::EmptyOptional(),    // Units
+                                                                 armnn::EmptyOptional(),    // Number of cores
+                                                                 100),            // Counter set UID
+                      arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 5);
     CHECK(!noCounter);
 
@@ -1727,12 +1727,12 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     // Register a counter to the other category
     const Counter* anotherCounter = nullptr;
     CHECK_NOTHROW(anotherCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID, 24,
-                                                                           anotherCategoryName, 1, 0, .00043f,
-                                                                           "valid name", "valid description",
-                                                                           armnn::EmptyOptional(), // Units
-                                                                           armnn::EmptyOptional(), // Number of cores
-                                                                           device->m_Uid,          // Device UID
-                                                                           counterSet->m_Uid));    // Counter set UID
+                                                                    anotherCategoryName, 1, 0, .00043f,
+                                                                    "valid name", "valid description",
+                                                                    armnn::EmptyOptional(), // Units
+                                                                    armnn::EmptyOptional(), // Number of cores
+                                                                    device->m_Uid,          // Device UID
+                                                                    counterSet->m_Uid));    // Counter set UID
     CHECK(counterDirectory.GetCounterCount() == 29);
     CHECK(anotherCounter);
     CHECK(anotherCounter->m_MaxCounterUid == anotherCounter->m_Uid);
@@ -1787,7 +1787,7 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
 
     uint32_t version = 1;
     const std::unordered_map<armnn::BackendId,
-            std::shared_ptr<armnn::profiling::IBackendProfilingContext>> backendProfilingContext;
+            std::shared_ptr<IBackendProfilingContext>> backendProfilingContext;
     CounterIdMap counterIdMap;
     Holder holder;
     TestCaptureThread captureThread;
@@ -1928,7 +1928,7 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
     TestReportStructure testReportStructure;
     TestNotifyBackends testNotifyBackends;
 
-    profiling::ActivateTimelineReportingCommandHandler activateTimelineReportingCommandHandler(0,
+    ActivateTimelineReportingCommandHandler activateTimelineReportingCommandHandler(0,
                                                            6,
                                                            packetVersionResolver.ResolvePacketVersion(0, 6)
                                                            .GetEncodedValue(),
@@ -2001,19 +2001,18 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
 TEST_CASE("CheckProfilingServiceNotActive")
 {
     using namespace armnn;
-    using namespace armnn::profiling;
 
     // Create runtime in which the test will run
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
 
     armnn::RuntimeImpl runtime(options);
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);
 
-    profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
+    BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
     // Profiling is enabled, the post-optimisation structure should be created
@@ -2344,7 +2343,7 @@ TEST_CASE("CheckPeriodicCounterCaptureThread")
     ProfilingStateMachine profilingStateMachine;
 
     const std::unordered_map<armnn::BackendId,
-            std::shared_ptr<armnn::profiling::IBackendProfilingContext>> backendProfilingContext;
+            std::shared_ptr<IBackendProfilingContext>> backendProfilingContext;
     CounterIdMap counterIdMap;
     Holder data;
     std::vector<uint16_t> captureIds1 = { 0, 1 };
@@ -2551,7 +2550,7 @@ TEST_CASE("CheckProfilingServiceGoodConnectionAcknowledgedPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2611,7 +2610,7 @@ TEST_CASE("CheckProfilingServiceGoodRequestCounterDirectoryPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2669,7 +2668,7 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacketInvalidCounterU
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2748,7 +2747,7 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCounters")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2813,7 +2812,7 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketSingleCounter"
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2890,7 +2889,7 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketMultipleCounte
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2969,7 +2968,7 @@ TEST_CASE("CheckProfilingServiceDisconnect")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3027,7 +3026,7 @@ TEST_CASE("CheckProfilingServiceGoodPerJobCounterSelectionPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3094,7 +3093,7 @@ TEST_CASE("CheckConfigureProfilingServiceOn")
 {
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
     // should get as far as NOT_CONNECTED
@@ -3107,7 +3106,7 @@ TEST_CASE("CheckConfigureProfilingServiceOn")
 TEST_CASE("CheckConfigureProfilingServiceOff")
 {
     ProfilingOptions options;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
     // should not move from Uninitialised
@@ -3123,7 +3122,7 @@ TEST_CASE("CheckProfilingServiceEnabled")
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -3153,7 +3152,7 @@ TEST_CASE("CheckProfilingServiceEnabledRuntime")
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
     ProfilingOptions options;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -3196,7 +3195,7 @@ TEST_CASE("CheckProfilingServiceBadConnectionAcknowledgedPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3258,7 +3257,7 @@ TEST_CASE("CheckProfilingServiceBadRequestCounterDirectoryPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3322,7 +3321,7 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3417,7 +3416,7 @@ TEST_CASE("CheckCounterIdMap")
 
 TEST_CASE("CheckRegisterBackendCounters")
 {
-    uint16_t globalCounterIds = armnn::profiling::INFERENCES_RUN;
+    uint16_t globalCounterIds = INFERENCES_RUN;
     armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
 
     // Reset the profiling service to the uninitialized state
@@ -3454,7 +3453,7 @@ TEST_CASE("CheckRegisterBackendCounters")
                                                                           1.f,
                                                                           "CounterOne",
                                                                           "first test counter");
-    CHECK((newGlobalCounterId = armnn::profiling::INFERENCES_RUN + 1));
+    CHECK((newGlobalCounterId = INFERENCES_RUN + 1));
     uint16_t mappedGlobalId = profilingService.GetCounterMappings().GetGlobalId(0, cpuRefId);
     CHECK(mappedGlobalId == newGlobalCounterId);
     auto backendMapping = profilingService.GetCounterMappings().GetBackendId(newGlobalCounterId);
@@ -3482,7 +3481,7 @@ TEST_CASE("CheckCounterStatusQuery")
     BackendProfiling backendProfilingCpuRef(options, profilingService, cpuRefId);
     BackendProfiling backendProfilingCpuAcc(options, profilingService, cpuAccId);
 
-    uint16_t initialNumGlobalCounterIds = armnn::profiling::INFERENCES_RUN;
+    uint16_t initialNumGlobalCounterIds = INFERENCES_RUN;
 
     // Create RegisterBackendCounters for CpuRef
     RegisterBackendCounters registerBackendCountersCpuRef(initialNumGlobalCounterIds, cpuRefId, profilingService);
@@ -3617,15 +3616,15 @@ TEST_CASE("CheckRegisterCounters")
     mockProfilingService.RegisterMapping(7, 1, cpuRefId);
     mockProfilingService.RegisterMapping(8, 2, cpuRefId);
 
-    armnn::profiling::BackendProfiling backendProfiling(options,
+    BackendProfiling backendProfiling(options,
                                                         mockProfilingService,
                                                         cpuRefId);
 
-    armnn::profiling::Timestamp timestamp;
+    Timestamp timestamp;
     timestamp.timestamp = 1000998;
     timestamp.counterValues.emplace_back(0, 700);
     timestamp.counterValues.emplace_back(2, 93);
-    std::vector<armnn::profiling::Timestamp> timestamps;
+    std::vector<Timestamp> timestamps;
     timestamps.push_back(timestamp);
     backendProfiling.ReportCounters(timestamps);
 
@@ -3675,7 +3674,7 @@ TEST_CASE("CheckFileFormat") {
     // Change file format to an unsupported value
     options.m_FileFormat = "json";
     // Enable the profiling service
-    armnn::profiling::ProfilingService profilingService;
+    ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
     // Start the command handler and the send thread
     profilingService.Update();

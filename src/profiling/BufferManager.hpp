@@ -13,10 +13,10 @@
 #include <vector>
 #include <queue>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class BufferManager : public IBufferManager
@@ -71,6 +71,6 @@ private:
     IConsumer* m_Consumer = nullptr;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

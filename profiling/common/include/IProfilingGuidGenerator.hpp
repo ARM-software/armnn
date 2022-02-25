@@ -9,10 +9,10 @@
 
 #include <string>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IProfilingGuidGenerator
@@ -27,6 +27,6 @@ public:
     virtual ~IProfilingGuidGenerator() {}
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

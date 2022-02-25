@@ -92,7 +92,7 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
         // Populate a DelegateOptions from the ExecuteNetworkParams.
         armnnDelegate::DelegateOptions delegateOptions = params.ToDelegateOptions();
         delegateOptions.SetExternalProfilingParams(
-            ConvertExternalProfilingOptions(runtimeOptions.m_ProfilingOptions));
+            arm::pipe::ConvertExternalProfilingOptions(runtimeOptions.m_ProfilingOptions));
 
         std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
                 theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),

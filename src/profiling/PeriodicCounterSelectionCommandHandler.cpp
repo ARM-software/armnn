@@ -13,10 +13,10 @@
 
 #include <vector>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void PeriodicCounterSelectionCommandHandler::ParseData(const arm::pipe::Packet& packet, CaptureData& captureData)
@@ -65,7 +65,7 @@ void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet&
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
     case ProfilingState::WaitingForAck:
-        throw RuntimeException(fmt::format("Periodic Counter Selection Command Handler invoked while in "
+        throw armnn::RuntimeException(fmt::format("Periodic Counter Selection Command Handler invoked while in "
                                            "an wrong state: {}",
                                            GetProfilingStateName(currentState)));
     case ProfilingState::Active:
@@ -161,7 +161,7 @@ void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet&
         break;
     }
     default:
-        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
                                            static_cast<int>(currentState)));
     }
 }
@@ -228,6 +228,6 @@ std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBacken
     return activeBackends;
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

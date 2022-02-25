@@ -9,10 +9,10 @@
 
 #include <iostream>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void PeriodicCounterCapture::Start()
@@ -105,7 +105,7 @@ void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
                 {
                     counterValue = readCounterValues.GetDeltaCounterValue(requestedId);
                 }
-                catch (const Exception& e)
+                catch (const armnn::Exception& e)
                 {
                     // Report the error and continue
                     ARMNN_LOG(warning) << "An error has occurred when getting a counter value: "
@@ -134,6 +134,6 @@ void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
     while (m_KeepRunning.load());
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

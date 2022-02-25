@@ -9,10 +9,10 @@
 
 #include <sstream>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 namespace
@@ -90,6 +90,6 @@ void ProfilingStateMachine::Reset()
     m_State.store(ProfilingState::Uninitialised);
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

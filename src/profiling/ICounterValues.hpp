@@ -7,10 +7,10 @@
 
 #include <cstdint>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class IReadCounterValues
@@ -41,6 +41,6 @@ public:
     virtual ~IReadWriteCounterValues() {}
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

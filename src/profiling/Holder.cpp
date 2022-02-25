@@ -6,10 +6,10 @@
 #include <armnn/BackendId.hpp>
 #include "Holder.hpp"
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 CaptureData& CaptureData::operator=(const CaptureData& other)
@@ -83,6 +83,6 @@ void Holder::SetCaptureData(uint32_t capturePeriod,
 
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

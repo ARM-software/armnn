@@ -95,7 +95,7 @@ serializer::ArgMinMaxFunction GetFlatBufferArgMinMaxFunction(armnn::ArgMinMaxFun
     }
 }
 
-uint32_t SerializerStrategy::GetSerializedId(armnn::LayerGuid guid)
+uint32_t SerializerStrategy::GetSerializedId(LayerGuid guid)
 {
     if (m_guidMap.empty())
     {

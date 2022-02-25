@@ -7,10 +7,10 @@
 
 #include <fmt/format.h>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 void RequestCounterDirectoryCommandHandler::operator()(const arm::pipe::Packet& packet)
@@ -21,7 +21,7 @@ void RequestCounterDirectoryCommandHandler::operator()(const arm::pipe::Packet& 
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
     case ProfilingState::WaitingForAck:
-        throw RuntimeException(fmt::format("Request Counter Directory Comand Handler invoked while in an "
+        throw armnn::RuntimeException(fmt::format("Request Counter Directory Comand Handler invoked while in an "
                                            "wrong state: {}",
                                            GetProfilingStateName(currentState)));
     case ProfilingState::Active:
@@ -40,11 +40,11 @@ void RequestCounterDirectoryCommandHandler::operator()(const arm::pipe::Packet& 
 
         break;
     default:
-        throw RuntimeException(fmt::format("Unknown profiling service state: {}",
+        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
                                            static_cast<int>(currentState)));
     }
 }
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

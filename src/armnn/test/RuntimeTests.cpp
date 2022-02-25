@@ -539,7 +539,7 @@ TEST_CASE("IVGCVSW_1929_QuantizedSoftmaxIssue")
                                                       errMessages);
         FAIL("An exception should have been thrown");
     }
-    catch (const InvalidArgumentException&)
+    catch (const armnn::InvalidArgumentException&)
     {
         // Different exceptions are thrown on different backends
     }
@@ -627,8 +627,8 @@ TEST_CASE("ProfilingDisable")
     armnn::NetworkId netId;
     CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
-    profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
+    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
     // Profiling is not enabled, the post-optimisation structure should not be created
@@ -638,7 +638,7 @@ TEST_CASE("ProfilingDisable")
 TEST_CASE("ProfilingEnableCpuRef")
 {
     using namespace armnn;
-    using namespace armnn::profiling;
+    using namespace arm::pipe;
 
     // Create runtime in which the test will run
     armnn::IRuntime::CreationOptions options;
@@ -649,7 +649,7 @@ TEST_CASE("ProfilingEnableCpuRef")
     GetProfilingService(&runtime).ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), false);
 
-    profiling::ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);
@@ -680,7 +680,7 @@ TEST_CASE("ProfilingEnableCpuRef")
     armnn::NetworkId netId;
     CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    profiling::BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
+    BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
     // Profiling is enabled, the post-optimisation structure should be created

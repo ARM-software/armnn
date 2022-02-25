@@ -74,10 +74,10 @@ TEST_CASE("TimelineDirectoryTest")
     uint32_t uint32_t_size = sizeof(uint32_t);
     uint32_t uint64_t_size = sizeof(uint64_t);
 
-    armnn::profiling::BufferManager bufferManager(5);
-    armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+    arm::pipe::BufferManager bufferManager(5);
+    arm::pipe::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
-    std::unique_ptr<armnn::profiling::ISendTimelinePacket> sendTimelinePacket =
+    std::unique_ptr<arm::pipe::ISendTimelinePacket> sendTimelinePacket =
             timelinePacketWriterFactory.GetSendTimelinePacket();
 
     arm::pipe::PacketVersionResolver packetVersionResolver;
@@ -97,7 +97,7 @@ TEST_CASE("TimelineDirectoryTest")
 
     unsigned int offset = uint32_t_size * 2;
 
-    std::unique_ptr<armnn::profiling::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
+    std::unique_ptr<arm::pipe::IPacketBuffer> packetBuffer = bufferManager.GetReadableBuffer();
 
     uint8_t readStreamVersion = ReadUint8(packetBuffer, offset);
     CHECK(readStreamVersion == 4);
@@ -106,7 +106,7 @@ TEST_CASE("TimelineDirectoryTest")
     CHECK(readPointerBytes == uint64_t_size);
     offset += uint8_t_size;
     uint8_t readThreadIdBytes = ReadUint8(packetBuffer, offset);
-    CHECK(readThreadIdBytes == armnn::profiling::ThreadIdSize);
+    CHECK(readThreadIdBytes == arm::pipe::ThreadIdSize);
     offset += uint8_t_size;
 
     uint32_t declarationSize = arm::pipe::ReadUint32(packetBuffer->GetReadableData(), offset);
@@ -145,10 +145,10 @@ TEST_CASE("TimelineDirectoryTest")
 
 TEST_CASE("TimelineCaptureTest")
 {
-    armnn::profiling::BufferManager bufferManager(50);
-    armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+    arm::pipe::BufferManager bufferManager(50);
+    arm::pipe::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
-    std::unique_ptr<armnn::profiling::ISendTimelinePacket> sendTimelinePacket =
+    std::unique_ptr<arm::pipe::ISendTimelinePacket> sendTimelinePacket =
         timelinePacketWriterFactory.GetSendTimelinePacket();
 
     arm::pipe::PacketVersionResolver packetVersionResolver;
@@ -157,7 +157,7 @@ TEST_CASE("TimelineCaptureTest")
 
     arm::pipe::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
-        armnn::profiling::ThreadIdSize);
+        arm::pipe::ThreadIdSize);
 
     using Status = arm::pipe::ITimelineDecoder::TimelineStatus;
     CHECK(timelineDecoder.SetEntityCallback(PushEntity)             == Status::TimelineStatus_Success);
@@ -175,16 +175,16 @@ TEST_CASE("TimelineCaptureTest")
     const int threadId = armnnUtils::Threads::GetCurrentThreadId();
 
     // need to do a bit of work here to extract the value from threadId
-    unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();;
+    unsigned char* uCharThreadId = new unsigned char[arm::pipe::ThreadIdSize]();;
     uint64_t uint64ThreadId;
 
-    arm::pipe::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
+    arm::pipe::WriteBytes(uCharThreadId, 0, &threadId, arm::pipe::ThreadIdSize);
 
-    if (armnn::profiling::ThreadIdSize == 4)
+    if (arm::pipe::ThreadIdSize == 4)
     {
         uint64ThreadId =  arm::pipe::ReadUint32(uCharThreadId, 0);
     }
-    else if (armnn::profiling::ThreadIdSize == 8)
+    else if (arm::pipe::ThreadIdSize == 8)
     {
         uint64ThreadId =  arm::pipe::ReadUint64(uCharThreadId, 0);
     }
@@ -224,8 +224,8 @@ TEST_CASE("TimelineCaptureTest")
                                            timelineCaptureCommandHandler);
 
         // Send relationship
-        armnn::profiling::ProfilingRelationshipType relationshipType =
-            armnn::profiling::ProfilingRelationshipType::DataLink;
+        arm::pipe::ProfilingRelationshipType relationshipType =
+            arm::pipe::ProfilingRelationshipType::DataLink;
         sendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                  relationshipGuid,
                                                                  headGuid,
@@ -261,10 +261,10 @@ TEST_CASE("TimelineCaptureTest")
 
 TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
 {
-    armnn::profiling::BufferManager               bufferManager(50);
-    armnn::profiling::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
+    arm::pipe::BufferManager               bufferManager(50);
+    arm::pipe::TimelinePacketWriterFactory timelinePacketWriterFactory(bufferManager);
 
-    std::unique_ptr<armnn::profiling::ISendTimelinePacket> sendTimelinePacket =
+    std::unique_ptr<arm::pipe::ISendTimelinePacket> sendTimelinePacket =
                                                         timelinePacketWriterFactory.GetSendTimelinePacket();
 
     arm::pipe::PacketVersionResolver packetVersionResolver;
@@ -273,7 +273,7 @@ TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
 
     arm::pipe::TimelineCaptureCommandHandler timelineCaptureCommandHandler(
         1, 1, packetVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), timelineDecoder,
-        armnn::profiling::ThreadIdSize);
+        arm::pipe::ThreadIdSize);
 
     using Status = arm::pipe::TimelineDecoder::TimelineStatus;
     CHECK(timelineDecoder.SetEntityCallback(PushEntity) == Status::TimelineStatus_Success);
@@ -291,16 +291,16 @@ TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
     const int threadId = armnnUtils::Threads::GetCurrentThreadId();
 
     // need to do a bit of work here to extract the value from threadId
-    unsigned char* uCharThreadId = new unsigned char[armnn::profiling::ThreadIdSize]();
+    unsigned char* uCharThreadId = new unsigned char[arm::pipe::ThreadIdSize]();
     uint64_t uint64ThreadId;
 
-    arm::pipe::WriteBytes(uCharThreadId, 0, &threadId, armnn::profiling::ThreadIdSize);
+    arm::pipe::WriteBytes(uCharThreadId, 0, &threadId, arm::pipe::ThreadIdSize);
 
-    if ( armnn::profiling::ThreadIdSize == 4 )
+    if ( arm::pipe::ThreadIdSize == 4 )
     {
         uint64ThreadId = arm::pipe::ReadUint32(uCharThreadId, 0);
-    } 
-    else if ( armnn::profiling::ThreadIdSize == 8 )
+    }
+    else if ( arm::pipe::ThreadIdSize == 8 )
     {
         uint64ThreadId = arm::pipe::ReadUint64(uCharThreadId, 0);
     }
@@ -329,8 +329,8 @@ TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
         sendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName2);
         sendTimelinePacket->SendTimelineLabelBinaryPacket(labelGuid, labelName3);
         // Send relationship
-        armnn::profiling::ProfilingRelationshipType relationshipType =
-            armnn::profiling::ProfilingRelationshipType::DataLink;
+        arm::pipe::ProfilingRelationshipType relationshipType =
+            arm::pipe::ProfilingRelationshipType::DataLink;
         sendTimelinePacket->SendTimelineRelationshipBinaryPacket(relationshipType,
                                                                  relationshipGuid,
                                                                  headGuid,

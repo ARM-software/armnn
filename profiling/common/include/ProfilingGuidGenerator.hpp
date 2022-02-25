@@ -11,10 +11,10 @@
 #include <functional>
 #include <mutex>
 
-namespace armnn
+namespace arm
 {
 
-namespace profiling
+namespace pipe
 {
 
 class ProfilingGuidGenerator : public IProfilingGuidGenerator
@@ -57,6 +57,6 @@ private:
     std::mutex m_SequenceMutex;
 };
 
-} // namespace profiling
+} // namespace pipe
 
-} // namespace armnn
+} // namespace arm

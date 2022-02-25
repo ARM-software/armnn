@@ -13,7 +13,7 @@ Event::Event(const std::string& eventName,
              Event* parent,
              const BackendId backendId,
              std::vector<InstrumentPtr>&& instruments,
-             const Optional<profiling::ProfilingGuid> guid)
+             const Optional<arm::pipe::ProfilingGuid> guid)
     : m_EventName(eventName)
     , m_Profiler(profiler)
     , m_Parent(parent)
@@ -86,7 +86,7 @@ BackendId Event::GetBackendId() const
     return m_BackendId;
 }
 
-Optional<profiling::ProfilingGuid> Event::GetProfilingGuid() const
+Optional<arm::pipe::ProfilingGuid> Event::GetProfilingGuid() const
 {
     return m_ProfilingGuid;
 }

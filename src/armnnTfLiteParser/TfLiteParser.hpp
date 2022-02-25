@@ -133,6 +133,7 @@ private:
     void ParseEqual(size_t subgraphIndex, size_t operatorIndex);
     void ParseExp(size_t subgraphIndex, size_t operatorIndex);
     void ParseExpandDims(size_t subgraphIndex, size_t operatorIndex);
+    void ParseFloorDiv(size_t subgraphIndex, size_t operatorIndex);
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
     void ParseGather(size_t subgraphIndex, size_t operatorIndex);
     void ParseGreater(size_t subgraphIndex, size_t operatorIndex);
@@ -210,6 +211,9 @@ private:
     armnn::IConnectableLayer* AddFusedActivationLayer(armnn::IConnectableLayer* layer,
                                                       unsigned int outputSlot,
                                                       tflite::ActivationFunctionType activationType);
+
+    /// Attach a floor layer to the one passed as a parameter
+    armnn::IConnectableLayer* AddFusedFloorLayer(armnn::IConnectableLayer* layer, unsigned int outputSlot);
 
     // SupportedDataStorage's purpose is to hold data till we pass over to the network.
     // We don't care about the content, and we want a single datatype to simplify the code.

@@ -689,6 +689,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_EQUAL]                   = &TfLiteParserImpl::ParseEqual;
     m_ParserFunctions[tflite::BuiltinOperator_EXP]                     = &TfLiteParserImpl::ParseExp;
     m_ParserFunctions[tflite::BuiltinOperator_EXPAND_DIMS]             = &TfLiteParserImpl::ParseExpandDims;
+    m_ParserFunctions[tflite::BuiltinOperator_FLOOR_DIV]               = &TfLiteParserImpl::ParseFloorDiv;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParserImpl::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_GATHER]                  = &TfLiteParserImpl::ParseGather;
     m_ParserFunctions[tflite::BuiltinOperator_GREATER]                 = &TfLiteParserImpl::ParseGreater;
@@ -2106,6 +2107,34 @@ void TfLiteParserImpl::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParserImpl::ParseFloorDiv(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo input1TensorInfo = ToTensorInfo(inputs[1]);
+
+    auto layerName = fmt::format("Div:{}:{}", subgraphIndex, operatorIndex);
+    IConnectableLayer* layer = m_Network->AddDivisionLayer(layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+    layer = AddFusedFloorLayer(layer, 0);
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -3941,6 +3970,18 @@ armnn::IConnectableLayer* TfLiteParserImpl::AddFusedActivationLayer(armnn::IConn
     prevOutputSlot.Connect(activationLayer->GetInputSlot(0));
     activationLayer->GetOutputSlot(0).SetTensorInfo(prevOutputSlot.GetTensorInfo());
     return activationLayer;
+}
+
+armnn::IConnectableLayer* TfLiteParserImpl::AddFusedFloorLayer(armnn::IConnectableLayer* prevLayer,
+                                                               unsigned int outputSlot)
+{
+    std::string layerName = prevLayer->GetName();
+    IConnectableLayer* floorLayer = m_Network->AddFloorLayer(layerName.c_str());
+
+    auto & prevOutputSlot = prevLayer->GetOutputSlot(outputSlot);
+    prevOutputSlot.Connect(floorLayer->GetInputSlot(0));
+    floorLayer->GetOutputSlot(0).SetTensorInfo(prevOutputSlot.GetTensorInfo());
+    return floorLayer;
 }
 
 TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromFile(const char* fileName)

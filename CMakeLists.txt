@@ -689,6 +689,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Div.cpp
              src/armnnTfLiteParser/test/ElementWiseUnary.cpp
              src/armnnTfLiteParser/test/ExpandDims.cpp
+             src/armnnTfLiteParser/test/FloorDiv.cpp
              src/armnnTfLiteParser/test/FullyConnected.cpp
              src/armnnTfLiteParser/test/Gather.cpp
              src/armnnTfLiteParser/test/L2Normalization.cpp

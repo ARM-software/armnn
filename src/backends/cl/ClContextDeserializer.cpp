@@ -8,6 +8,7 @@
 
 #include <armnn/Exceptions.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <armnn/Logging.hpp>
 
 #include <flatbuffers/flexbuffers.h>
 
@@ -18,6 +19,17 @@
 #include <iostream>
 #include <vector>
 
+
+#if defined(__linux__)
+#define SERIALIZER_USE_MMAP 1
+#if SERIALIZER_USE_MMAP
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#endif
+#endif
+
 namespace armnn
 {
 
@@ -26,8 +38,9 @@ void ClContextDeserializer::Deserialize(arm_compute::CLCompileContext& clCompile
                                         cl::Device& device,
                                         const std::string& filePath)
 {
-    std::ifstream inputFileStream(filePath, std::ios::binary);
     std::vector<std::uint8_t> binaryContent;
+#if !SERIALIZER_USE_MMAP
+    std::ifstream inputFileStream(filePath, std::ios::binary);
     while (inputFileStream)
     {
         char input;
@@ -38,6 +51,30 @@ void ClContextDeserializer::Deserialize(arm_compute::CLCompileContext& clCompile
         }
     }
     inputFileStream.close();
+#else
+    struct stat statbuf;
+    int fp = open(filePath.c_str(),O_RDONLY);
+    if (!fp)
+    {
+        ARMNN_LOG(error) << (std::string("Cannot open file ") + filePath);
+        return;
+    }
+    fstat(fp,&statbuf);
+    const unsigned long dataSize = static_cast<unsigned long>(statbuf.st_size);
+    binaryContent.resize(static_cast<long unsigned int>(dataSize));
+    void* ptrmem = mmap(NULL, dataSize,PROT_READ,MAP_PRIVATE,fp,0);
+    if(ptrmem!=MAP_FAILED)
+    {
+         memcpy (binaryContent.data(), ptrmem, dataSize);
+    }
+    close(fp);
+    if(ptrmem == MAP_FAILED)
+    {
+        ARMNN_LOG(error) << (std::string("Cannot map file ") + filePath);
+        return;
+    }
+#endif
+
     DeserializeFromBinary(clCompileContext, context, device, binaryContent);
 }
 

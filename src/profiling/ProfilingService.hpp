@@ -15,7 +15,6 @@
 #include "ICounterRegistry.hpp"
 #include "ICounterValues.hpp"
 #include <armnn/profiling/ILocalPacketHandler.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
 #include "IProfilingService.hpp"
 #include "IReportStructure.hpp"
 #include "PeriodicCounterCapture.hpp"
@@ -29,9 +28,9 @@
 #include "SendTimelinePacket.hpp"
 #include "TimelinePacketWriterFactory.hpp"
 #include "INotifyBackends.hpp"
+#include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
-#include <common/include/ProfilingGuidGenerator.hpp>
 
 #include <list>
 
@@ -40,15 +39,8 @@ namespace arm
 
 namespace pipe
 {
-// Static constants describing ArmNN's counter UID's
-static const uint16_t NETWORK_LOADS         = 0;
-static const uint16_t NETWORK_UNLOADS       = 1;
-static const uint16_t REGISTERED_BACKENDS   = 2;
-static const uint16_t UNREGISTERED_BACKENDS = 3;
-static const uint16_t INFERENCES_RUN        = 4;
-static const uint16_t MAX_ARMNN_COUNTER     = INFERENCES_RUN;
 
-class ProfilingService : public IReadWriteCounterValues, public IProfilingService, public INotifyBackends
+class ProfilingService : public IProfilingService, public INotifyBackends
 {
 public:
     using IProfilingConnectionFactoryPtr = std::unique_ptr<IProfilingConnectionFactory>;
@@ -150,9 +142,9 @@ public:
 
     // Resets the profiling options, optionally clears the profiling service entirely
     void ResetExternalProfilingOptions(const ProfilingOptions& options,
-                                       bool resetProfilingService = false);
+                                       bool resetProfilingService = false) override;
     ProfilingState ConfigureProfilingService(const ProfilingOptions& options,
-                                             bool resetProfilingService = false);
+                                             bool resetProfilingService = false) override;
 
 
     // Updates the profiling service, making it transition to a new state if necessary
@@ -163,21 +155,21 @@ public:
 
     // Store a profiling context returned from a backend that support profiling.
     void AddBackendProfilingContext(const armnn::BackendId backendId,
-        std::shared_ptr<IBackendProfilingContext> profilingContext);
+        std::shared_ptr<IBackendProfilingContext> profilingContext) override;
 
     // Enable the recording of timeline events and entities
     void NotifyBackendsForTimelineReporting() override;
 
     const ICounterDirectory& GetCounterDirectory() const;
-    ICounterRegistry& GetCounterRegistry();
-    ProfilingState GetCurrentState() const;
+    ICounterRegistry& GetCounterRegistry() override;
+    ProfilingState GetCurrentState() const override;
     bool IsCounterRegistered(uint16_t counterUid) const override;
     uint32_t GetAbsoluteCounterValue(uint16_t counterUid) const override;
     uint32_t GetDeltaCounterValue(uint16_t counterUid) override;
     uint16_t GetCounterCount() const override;
     // counter global/backend mapping functions
     const ICounterMappings& GetCounterMappings() const override;
-    IRegisterCounterMapping& GetCounterMappingRegistry();
+    IRegisterCounterMapping& GetCounterMappingRegistry() override;
 
     // Getters for the profiling service state
     bool IsProfilingEnabled() const override;
@@ -193,13 +185,6 @@ public:
     uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) override;
     uint32_t IncrementCounterValue(uint16_t counterUid) override;
 
-    // IProfilingGuidGenerator functions
-    /// Return the next random Guid in the sequence
-    ProfilingDynamicGuid NextGuid() override;
-    /// Create a ProfilingStaticGuid based on a hash of the string
-    ProfilingStaticGuid GenerateStaticId(const std::string& str) override;
-
-
     std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const override;
 
     ISendCounterPacket& GetSendCounterPacket() override
@@ -207,13 +192,7 @@ public:
         return m_SendCounterPacket;
     }
 
-    static ProfilingDynamicGuid GetNextGuid();
-
-    static ProfilingStaticGuid GetStaticId(const std::string& str);
-
-    void ResetGuidGenerator();
-
-    bool IsTimelineReportingEnabled()
+    bool IsTimelineReportingEnabled() const override
     {
         return m_TimelineReporting;
     }
@@ -271,8 +250,6 @@ private:
     TimelinePacketWriterFactory m_TimelinePacketWriterFactory;
     BackendProfilingContext     m_BackendProfilingContexts;
     uint16_t                    m_MaxGlobalCounterId;
-
-    static ProfilingGuidGenerator m_GuidGenerator;
 
     // Signalling to let external actors know when service is active or not
     std::mutex m_ServiceActiveMutex;

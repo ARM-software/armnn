@@ -21,23 +21,6 @@ namespace arm
 namespace pipe
 {
 
-ProfilingGuidGenerator ProfilingService::m_GuidGenerator;
-
-ProfilingDynamicGuid ProfilingService::GetNextGuid()
-{
-    return m_GuidGenerator.NextGuid();
-}
-
-ProfilingStaticGuid ProfilingService::GetStaticId(const std::string& str)
-{
-    return m_GuidGenerator.GenerateStaticId(str);
-}
-
-void ProfilingService::ResetGuidGenerator()
-{
-    m_GuidGenerator.Reset();
-}
-
 void ProfilingService::ResetExternalProfilingOptions(const arm::pipe::ProfilingOptions& options,
                                                      bool resetProfilingService)
 {
@@ -314,16 +297,6 @@ uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
     ARMNN_ASSERT(counterValuePtr);
     return counterValuePtr->operator++(std::memory_order::memory_order_relaxed);
-}
-
-ProfilingDynamicGuid ProfilingService::NextGuid()
-{
-    return ProfilingService::GetNextGuid();
-}
-
-ProfilingStaticGuid ProfilingService::GenerateStaticId(const std::string& str)
-{
-    return ProfilingService::GetStaticId(str);
 }
 
 std::unique_ptr<ISendTimelinePacket> ProfilingService::GetSendTimelinePacket() const

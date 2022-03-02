@@ -185,7 +185,7 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
         std::unique_ptr<IOptimizedNetwork>(rawNetwork),
         errorMessage,
         networkProperties,
-        m_ProfilingService);
+        m_ProfilingService.get());
 
     if (!loadedNetwork)
     {
@@ -204,9 +204,9 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
         context.second->AfterLoadNetwork(networkIdOut);
     }
 
-    if (m_ProfilingService.IsProfilingEnabled())
+    if (m_ProfilingService->IsProfilingEnabled())
     {
-        m_ProfilingService.IncrementCounterValue(arm::pipe::NETWORK_LOADS);
+        m_ProfilingService->IncrementCounterValue(arm::pipe::NETWORK_LOADS);
     }
 
     return Status::Success;
@@ -228,7 +228,7 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
     }
 
     std::unique_ptr<arm::pipe::TimelineUtilityMethods> timelineUtils =
-        arm::pipe::TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+        arm::pipe::TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService.get());
     {
         std::lock_guard<std::mutex> lockGuard(m_Mutex);
 
@@ -250,9 +250,9 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
             return Status::Failure;
         }
 
-        if (m_ProfilingService.IsProfilingEnabled())
+        if (m_ProfilingService->IsProfilingEnabled())
         {
-            m_ProfilingService.IncrementCounterValue(arm::pipe::NETWORK_UNLOADS);
+            m_ProfilingService->IncrementCounterValue(arm::pipe::NETWORK_UNLOADS);
         }
     }
 
@@ -296,9 +296,9 @@ void RuntimeImpl::ReportStructure() // arm::pipe::IProfilingService& profilingSe
 }
 
 RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
-    : m_NetworkIdCounter(0),
-      m_ProfilingService(*this)
+    : m_NetworkIdCounter(0)
 {
+    m_ProfilingService = arm::pipe::IProfilingService::CreateProfilingService(*this);
     const auto start_time = armnn::GetTimeNow();
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION;
     if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )
@@ -475,7 +475,9 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
 
             unique_ptr<arm::pipe::IBackendProfiling> profilingIface =
                 std::make_unique<arm::pipe::BackendProfiling>(arm::pipe::BackendProfiling(
-                    arm::pipe::ConvertExternalProfilingOptions(options.m_ProfilingOptions), m_ProfilingService, id));
+                    arm::pipe::ConvertExternalProfilingOptions(options.m_ProfilingOptions),
+                                                               *m_ProfilingService.get(),
+                                                               id));
 
             // Backends may also provide a profiling context. Ask for it now.
             auto profilingContext = backend->CreateBackendProfilingContext(options, profilingIface);
@@ -483,7 +485,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
             if (profilingContext)
             {
                 // Pass the context onto the profiling service.
-                m_ProfilingService.AddBackendProfilingContext(id, profilingContext);
+                m_ProfilingService->AddBackendProfilingContext(id, profilingContext);
             }
         }
         catch (const BackendUnavailableException&)
@@ -492,14 +494,14 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
         }
     }
 
-    BackendRegistryInstance().SetProfilingService(m_ProfilingService);
+    BackendRegistryInstance().SetProfilingService(*m_ProfilingService.get());
     // pass configuration info to the profiling service
-    m_ProfilingService.ConfigureProfilingService(
+    m_ProfilingService->ConfigureProfilingService(
         arm::pipe::ConvertExternalProfilingOptions(options.m_ProfilingOptions));
     if (options.m_ProfilingOptions.m_EnableProfiling)
     {
         // try to wait for the profiling service to initialise
-        m_ProfilingService.WaitForProfilingServiceActivation(3000);
+        m_ProfilingService->WaitForProfilingServiceActivation(3000);
     }
 
     m_DeviceSpec.AddSupportedBackends(supportedBackends);

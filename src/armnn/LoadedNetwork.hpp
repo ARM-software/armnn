@@ -19,7 +19,7 @@
 #include <backendsCommon/memoryOptimizerStrategyLibrary/strategies/SingleAxisPriorityList.hpp>
 
 
-#include <ProfilingService.hpp>
+#include <IProfilingService.hpp>
 #include <TimelineUtilityMethods.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
@@ -78,7 +78,7 @@ public:
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                             std::string& errorMessage,
                                                             const INetworkProperties& networkProperties,
-                                                            arm::pipe::ProfilingService& profilingService);
+                                                            arm::pipe::IProfilingService* profilingService);
 
     // NOTE we return by reference as the purpose of this method is only to provide
     // access to the private m_Profiler and in theory we should not need to increment
@@ -112,7 +112,7 @@ private:
 
     LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                   const INetworkProperties& networkProperties,
-                  arm::pipe::ProfilingService& profilingService);
+                  arm::pipe::IProfilingService* profilingService);
 
     void EnqueueInput(const BindableLayer& layer, ITensorHandle* tensorHandle, const TensorInfo& tensorInfo);
 
@@ -158,7 +158,8 @@ private:
 
     TensorHandleFactoryRegistry m_TensorHandleFactoryRegistry;
 
-    arm::pipe::ProfilingService& m_ProfilingService;
+    // NOTE: raw pointer because the profiling service is controlled by the Runtime
+    arm::pipe::IProfilingService* m_ProfilingService;
 
     struct ImportedTensorHandlePin
     {

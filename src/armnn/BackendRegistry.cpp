@@ -5,7 +5,8 @@
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Exceptions.hpp>
-#include <ProfilingService.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
+#include <IProfilingService.hpp>
 
 namespace armnn
 {
@@ -102,7 +103,7 @@ void BackendRegistry::Swap(BackendRegistry& instance, BackendRegistry::FactorySt
     std::swap(instance.m_Factories, other);
 }
 
-void BackendRegistry::SetProfilingService(armnn::Optional<arm::pipe::ProfilingService&> profilingService)
+void BackendRegistry::SetProfilingService(armnn::Optional<arm::pipe::IProfilingService&> profilingService)
 {
     m_ProfilingService = profilingService;
 }

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "ProfilingState.hpp"
+
 #include <atomic>
 
 #include <armnn/utility/IgnoreUnused.hpp>
@@ -14,14 +16,6 @@ namespace arm
 
 namespace pipe
 {
-
-enum class ProfilingState
-{
-    Uninitialised,
-    NotConnected,
-    WaitingForAck,
-    Active
-};
 
 class ProfilingStateMachine
 {
@@ -71,4 +65,3 @@ constexpr char const* GetProfilingStateName(ProfilingState state)
 } // namespace pipe
 
 } // namespace arm
-

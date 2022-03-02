@@ -448,6 +448,8 @@ list(APPEND armnn_sources
     src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
+    src/profiling/IProfilingService.cpp
+    src/profiling/IProfilingService.hpp
     src/profiling/IProfilingConnectionFactory.hpp
     src/profiling/NullProfilingConnection.hpp
     src/profiling/PacketBuffer.cpp
@@ -464,6 +466,7 @@ list(APPEND armnn_sources
     src/profiling/ProfilingConnectionFactory.hpp
     src/profiling/ProfilingService.cpp
     src/profiling/ProfilingService.hpp
+    src/profiling/ProfilingState.hpp
     src/profiling/ProfilingStateMachine.cpp
     src/profiling/ProfilingStateMachine.hpp
     src/profiling/ProfilingUtils.cpp

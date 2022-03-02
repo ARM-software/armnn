@@ -5,6 +5,8 @@
 
 #include <server/include/basePipeServer/ConnectionHandler.hpp>
 
+#include <BufferManager.hpp>
+#include <SendCounterPacket.hpp>
 #include <SocketProfilingConnection.hpp>
 #include <Processes.hpp>
 

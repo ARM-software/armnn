@@ -20,7 +20,7 @@ namespace arm
 namespace pipe
 {
 
-class ProfilingService;
+class IProfilingService;
 
 } // namespace arm
 } // namespace pipe
@@ -44,7 +44,7 @@ public:
     size_t Size() const;
     BackendIdSet GetBackendIds() const;
     std::string GetBackendIdsAsString() const;
-    void SetProfilingService(armnn::Optional<arm::pipe::ProfilingService&> profilingService);
+    void SetProfilingService(armnn::Optional<arm::pipe::IProfilingService&> profilingService);
     void RegisterAllocator(const BackendId& id, std::shared_ptr<ICustomAllocator> alloc);
     std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> GetAllocators();
     void RegisterMemoryOptimizerStrategy(const BackendId& id, std::shared_ptr<IMemoryOptimizerStrategy> strategy);
@@ -78,7 +78,7 @@ private:
     BackendRegistry& operator=(const BackendRegistry&) = delete;
 
     FactoryStorage m_Factories;
-    armnn::Optional<arm::pipe::ProfilingService&> m_ProfilingService;
+    armnn::Optional<arm::pipe::IProfilingService&> m_ProfilingService;
     std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> m_CustomMemoryAllocatorMap;
     std::unordered_map<BackendId, std::shared_ptr<IMemoryOptimizerStrategy>> m_MemoryOptimizerStrategyMap;
 };

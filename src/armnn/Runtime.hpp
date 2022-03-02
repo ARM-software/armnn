@@ -14,8 +14,6 @@
 
 #include <armnn/backends/DynamicBackend.hpp>
 
-#include <ProfilingService.hpp>
-
 #include <IProfilingService.hpp>
 #include <IReportStructure.hpp>
 
@@ -115,7 +113,7 @@ public:
 private:
     friend void RuntimeLoadedNetworksReserve(RuntimeImpl* runtime); // See RuntimeTests.cpp
 
-    friend arm::pipe::ProfilingService& GetProfilingService(RuntimeImpl* runtime); // See RuntimeTests.cpp
+    friend arm::pipe::IProfilingService& GetProfilingService(RuntimeImpl* runtime); // See RuntimeTests.cpp
 
     int GenerateNetworkId();
 
@@ -150,7 +148,7 @@ private:
     std::vector<DynamicBackendPtr> m_DynamicBackends;
 
     /// Profiling Service Instance
-    arm::pipe::ProfilingService m_ProfilingService;
+    std::unique_ptr<arm::pipe::IProfilingService> m_ProfilingService;
 };
 
 } // namespace armnn

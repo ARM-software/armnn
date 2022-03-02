@@ -10,7 +10,7 @@
 #include "WorkingMemDescriptor.hpp"
 
 #include <Profiling.hpp>
-#include <ProfilingService.hpp>
+#include <IProfilingService.hpp>
 
 #include <algorithm>
 
@@ -32,7 +32,7 @@ public:
 
     BaseWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
         : m_Data(descriptor),
-          m_Guid(arm::pipe::ProfilingService::GetNextGuid())
+          m_Guid(arm::pipe::IProfilingService::GetNextGuid())
     {
         m_Data.Validate(info);
     }

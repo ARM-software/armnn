@@ -5,7 +5,7 @@
 #include "Layer.hpp"
 
 #include "Graph.hpp"
-#include <ProfilingService.hpp>
+#include <IProfilingService.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/WorkloadData.hpp>
@@ -202,7 +202,7 @@ Layer::Layer(unsigned int numInputSlots,
 , m_Type(type)
 , m_BackendId()
 , m_BackendHint(EmptyOptional())
-, m_Guid(arm::pipe::ProfilingService::GetNextGuid())
+, m_Guid(arm::pipe::IProfilingService::GetNextGuid())
 {
     IgnoreUnused(layout);
     m_InputSlots.reserve(numInputSlots);

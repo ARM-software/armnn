@@ -18,7 +18,7 @@ class BackendProfiling : public IBackendProfiling
 {
 public:
     BackendProfiling(const ProfilingOptions& options,
-                     ProfilingService& profilingService,
+                     IProfilingService& profilingService,
                      const armnn::BackendId& backendId)
             : m_Options(options),
               m_ProfilingService(profilingService),
@@ -44,7 +44,7 @@ public:
 
 private:
     ProfilingOptions m_Options;
-    ProfilingService& m_ProfilingService;
+    IProfilingService& m_ProfilingService;
     armnn::BackendId m_BackendId;
 };
 

@@ -8,7 +8,7 @@
 #include "armnn/backends/profiling/IBackendProfiling.hpp"
 #include "CounterIdMap.hpp"
 #include "CounterDirectory.hpp"
-#include "ProfilingService.hpp"
+#include "IProfilingService.hpp"
 
 namespace arm
 {
@@ -21,7 +21,7 @@ class RegisterBackendCounters : public IRegisterBackendCounters
 public:
 
     RegisterBackendCounters(
-        uint16_t currentMaxGlobalCounterID, const armnn::BackendId& backendId, ProfilingService& profilingService)
+        uint16_t currentMaxGlobalCounterID, const armnn::BackendId& backendId, IProfilingService& profilingService)
         : m_CurrentMaxGlobalCounterID(currentMaxGlobalCounterID),
           m_BackendId(backendId),
           m_ProfilingService(profilingService),
@@ -55,7 +55,7 @@ public:
 private:
     uint16_t m_CurrentMaxGlobalCounterID;
     const armnn::BackendId& m_BackendId;
-    ProfilingService& m_ProfilingService;
+    IProfilingService& m_ProfilingService;
     ICounterRegistry& m_CounterDirectory;
 };
 

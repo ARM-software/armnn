@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ProfilingService.hpp"
+#include "IProfilingService.hpp"
 #include "armnn/profiling/ISendTimelinePacket.hpp"
 
 #include <armnn/Types.hpp>
@@ -22,7 +22,7 @@ public:
 
     // static factory method which will return a pointer to a timelie utility methods
     // object if profiling is enabled. Otherwise will return a null unique_ptr
-    static std::unique_ptr<TimelineUtilityMethods> GetTimelineUtils(ProfilingService& profilingService);
+    static std::unique_ptr<TimelineUtilityMethods> GetTimelineUtils(IProfilingService& profilingService);
 
     TimelineUtilityMethods(
         std::unique_ptr<ISendTimelinePacket>& sendTimelinePacket)

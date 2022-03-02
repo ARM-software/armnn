@@ -26,7 +26,7 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <ProfilingService.hpp>
+#include <IProfilingService.hpp>
 
 #include <common/include/ProfilingGuid.hpp>
 
@@ -2866,18 +2866,18 @@ void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const
 
 OptimizedNetworkImpl::OptimizedNetworkImpl(const OptimizedNetworkImpl& other, const ModelOptions& modelOptions)
     : m_Graph(new Graph(*other.m_Graph.get()))
-    , m_Guid(arm::pipe::ProfilingService::GetNextGuid())
+    , m_Guid(arm::pipe::IProfilingService::GetNextGuid())
     , m_ModelOptions(modelOptions)
 {
 }
 
 OptimizedNetworkImpl::OptimizedNetworkImpl(std::unique_ptr<Graph> graph)
-    : m_Graph(std::move(graph)), m_Guid(arm::pipe::ProfilingService::GetNextGuid())
+    : m_Graph(std::move(graph)), m_Guid(arm::pipe::IProfilingService::GetNextGuid())
 {
 }
 
 OptimizedNetworkImpl::OptimizedNetworkImpl(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions)
-    : m_Graph(std::move(graph)), m_Guid(arm::pipe::ProfilingService::GetNextGuid()), m_ModelOptions(modelOptions)
+    : m_Graph(std::move(graph)), m_Guid(arm::pipe::IProfilingService::GetNextGuid()), m_ModelOptions(modelOptions)
 {
 }
 

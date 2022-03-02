@@ -72,23 +72,22 @@ namespace pipe
 class ProfilingServiceRuntimeHelper : public ProfilingService
 {
 public:
-    ProfilingServiceRuntimeHelper(ProfilingService& profilingService)
+    ProfilingServiceRuntimeHelper(IProfilingService& profilingService)
     : m_ProfilingService(profilingService) {}
     ~ProfilingServiceRuntimeHelper() = default;
 
     BufferManager& GetProfilingBufferManager()
     {
-        return GetBufferManager(m_ProfilingService);
+        return GetBufferManager(static_cast<ProfilingService&>(m_ProfilingService));
     }
-    ProfilingService& m_ProfilingService;
+    IProfilingService& m_ProfilingService;
 
     void ForceTransitionToState(ProfilingState newState)
     {
-        TransitionToState(m_ProfilingService, newState);
+        TransitionToState(static_cast<ProfilingService&>(m_ProfilingService), newState);
     }
 };
 
 } // namespace pipe
 
 } // namespace arm
-

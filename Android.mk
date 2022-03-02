@@ -243,6 +243,7 @@ LOCAL_SRC_FILES := \
         src/profiling/DirectoryCaptureCommandHandler.cpp \
         src/profiling/FileOnlyProfilingConnection.cpp \
         src/profiling/Holder.cpp \
+        src/profiling/IProfilingService.cpp \
         src/profiling/PacketBuffer.cpp \
         src/profiling/PeriodicCounterCapture.cpp \
         src/profiling/PeriodicCounterSelectionCommandHandler.cpp \

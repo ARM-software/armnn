@@ -20,6 +20,7 @@
 #include <armnn/backends/MemCopyWorkload.hpp>
 #include <backendsCommon/MemSyncWorkload.hpp>
 #include <armnn/BackendHelper.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
 
 #include <fmt/format.h>
 
@@ -82,7 +83,7 @@ void AddWorkloadStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils
 std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                                 std::string& errorMessage,
                                                                 const INetworkProperties& networkProperties,
-                                                                ProfilingService&  profilingService)
+                                                                arm::pipe::IProfilingService* profilingService)
 {
     std::unique_ptr<LoadedNetwork> loadedNetwork;
 
@@ -116,7 +117,7 @@ std::unique_ptr<LoadedNetwork> LoadedNetwork::MakeLoadedNetwork(std::unique_ptr<
 
 LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                              const INetworkProperties& networkProperties,
-                             ProfilingService&  profilingService) :
+                             arm::pipe::IProfilingService* profilingService) :
                              m_OptimizedNetwork(std::move(net)),
                              m_NetworkProperties(networkProperties),
                              m_TensorHandleFactoryRegistry(),
@@ -254,7 +255,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
     ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
     std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-                        TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+        TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
     if (timelineUtils)
     {
         timelineUtils->CreateTypedEntity(networkGuid, LabelsAndEventClasses::NETWORK_GUID);
@@ -549,7 +550,7 @@ void LoadedNetwork::SendNetworkStructure()
     ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
 
     std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-                        TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+        TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
 
     timelineUtils->CreateTypedEntity(networkGuid, LabelsAndEventClasses::NETWORK_GUID);
 
@@ -893,8 +894,8 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     }
 
     std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-                        TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
-    ProfilingGuid inferenceGuid = m_ProfilingService.GetNextGuid();
+                        TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
+    ProfilingGuid inferenceGuid = m_ProfilingService->GetNextGuid();
     if (timelineUtils)
     {
         // Add inference timeline trace if profiling is enabled.
@@ -910,9 +911,9 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     bool executionSucceeded = true;
 
     {
-        if (m_ProfilingService.IsProfilingEnabled())
+        if (m_ProfilingService->IsProfilingEnabled())
         {
-            m_ProfilingService.IncrementCounterValue(INFERENCES_RUN);
+            m_ProfilingService->IncrementCounterValue(INFERENCES_RUN);
         }
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
         ARMNN_SCOPED_HEAP_PROFILING("Executing");
@@ -982,7 +983,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
         ARMNN_ASSERT_MSG(inputWorkload, "No input workload created");
 
         std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-                            TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+                            TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
         if (timelineUtils)
         {
             // Add Input Workload to the post-optimisation network structure
@@ -1070,7 +1071,7 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
         ARMNN_ASSERT_MSG(outputWorkload, "No output workload created");
 
         std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-            TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
+            TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
         if (timelineUtils)
         {
             // Add Output Workload to the post-optimisation network structure
@@ -1683,8 +1684,8 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
     };
 
     std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-           TimelineUtilityMethods::GetTimelineUtils(m_ProfilingService);
-   ProfilingGuid inferenceGuid = m_ProfilingService.GetNextGuid();
+           TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
+    ProfilingGuid inferenceGuid = m_ProfilingService->GetNextGuid();
     if (timelineUtils)
     {
         // Add inference timeline trace if profiling is enabled.

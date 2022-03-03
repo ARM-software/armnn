@@ -125,6 +125,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClTransposeConvolution2dWorkload.hpp
     ClTransposeWorkload.cpp
     ClTransposeWorkload.hpp
+    ClUnidirectionalSequenceLstmFloatWorkload.cpp
+    ClUnidirectionalSequenceLstmFloatWorkload.hpp
     ClWorkloads.hpp
     ClWorkloadUtils.hpp
 )

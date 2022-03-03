@@ -1025,6 +1025,22 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(QLstm2, ClContextControlFixture, QLstmTest2)
 // QuantizedLstm
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(QuantizedLstm, ClContextControlFixture, QuantizedLstmTest)
 
+// Unidirectional Sequence Lstm
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatch,
+                              UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatchTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatch,
+                              UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32,
+                              UnidirectionalSequenceLstmLayerFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajor,
+                              UnidirectionalSequenceLstmLayerFloat32TimeMajorTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjection,
+                              UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNorm,
+                              UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjection,
+                              UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest)
+
 // Convert from Float16 to Float32
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleConvertFp16ToFp32, ClContextControlFixture, SimpleConvertFp16ToFp32Test)
 // Convert from Float32 to Float16

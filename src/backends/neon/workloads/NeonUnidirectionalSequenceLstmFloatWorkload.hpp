@@ -31,10 +31,13 @@ private:
     //
     // ACL layers required to fully form a Unidirectional Sequence LSTM layer.
     //
+
+    // permutation for input (only used when input is batch major)
     mutable std::unique_ptr<arm_compute::NEPermute> m_Permute1;
     mutable std::unique_ptr<arm_compute::IFunction> m_Splitter;
     mutable std::vector<std::unique_ptr<arm_compute::NELSTMLayer>> m_Layers;
     mutable std::unique_ptr<arm_compute::NEConcatenateLayer> m_Concat;
+    // permutation for output (only used when input is batch major)
     mutable std::unique_ptr<arm_compute::NEPermute> m_Permute2;
 
     //

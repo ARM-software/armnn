@@ -427,4 +427,442 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     CHECK(std::equal(outputResult, outputResult + numElements, expectedOutput.begin(), expectedOutput.end()));
 }
 
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndToEndTest")
+{
+/*
+ * This is a test to check the functionality of the Forced Import functionality when using repeated inferences that
+ * require switching from importing to copy. For the first inference we create aligned Pointers and check they are
+ * imported correctly. For the second we use similar pointers but don't use PreImporting to force fall back to copy.
+ */
+    // Create runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr network(INetwork::Create());
+
+    armnn::TensorInfo inputInfo({ 1, 3, 4, 1 }, DataType::Float32);
+    armnn::TensorInfo kernelInfo({ 1, 3, 3, 1 }, DataType::Float32);
+    armnn::TensorInfo outputInfo({ 1, 3, 4, 1 }, DataType::Float32);
+
+    kernelInfo.SetConstant(true);
+
+    std::vector<float> kernel =
+    {
+        4, 5, 6,
+        0, 0, 0,
+        3, 2, 1
+    };
+
+    const std::vector<float> expectedOutput =
+    {
+        23, 41, 33, 21,
+        44, 65, 76, 52,
+        82, 85, 79, 42
+    };
+
+    unsigned int numElements = inputInfo.GetNumElements();
+    size_t totalBytes = numElements * sizeof(float);
+
+    IConnectableLayer* const inputLayer = network->AddInputLayer(0, "input");
+    ARMNN_ASSERT(inputLayer);
+
+    armnn::ConstTensor weights(kernelInfo, kernel);
+
+    armnn::Convolution2dDescriptor convDesc2d;
+    convDesc2d.m_StrideX = 1;
+    convDesc2d.m_StrideY = 1;
+    convDesc2d.m_PadLeft = 1;
+    convDesc2d.m_PadRight = 1;
+    convDesc2d.m_PadTop = 1;
+    convDesc2d.m_PadBottom = 1;
+    convDesc2d.m_DataLayout = DataLayout::NHWC;
+    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
+                                                                          weights,
+                                                                          armnn::EmptyOptional(),
+                                                                          "conv");
+    ARMNN_ASSERT(convLayer);
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    IConnectableLayer* output = network->AddOutputLayer(0, "output");
+    convLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    // Optimize the network
+    OptimizerOptions optOptions;
+    optOptions.m_ImportEnabled = false;
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
+    CHECK(optNet);
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    std::string ignoredErrorMessage;
+    // Enable Importing
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
+
+    // Creates structures for input & output
+    const size_t alignment =
+        arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
+    size_t space = totalBytes + alignment + alignment;
+    auto inputData = std::make_unique<uint8_t[]>(space);
+    void* alignedInputPtr = inputData.get();
+    CHECK(std::align(alignment, totalBytes, alignedInputPtr, space));
+
+    // Fill input with values
+    auto* inputPtr = reinterpret_cast<float*>(alignedInputPtr);
+    inputPtr[0] = 1;
+    inputPtr[1] = 5;
+    inputPtr[2] = 2;
+    inputPtr[3] = 3;
+    inputPtr[4] = 8;
+    inputPtr[5] = 7;
+    inputPtr[6] = 3;
+    inputPtr[7] = 6;
+    inputPtr[8] = 3;
+    inputPtr[9] = 3;
+    inputPtr[10] = 9;
+    inputPtr[11] = 1;
+
+
+    auto outputData = std::make_unique<uint8_t[]>(space);
+    void* alignedOutputPtr = outputData.get();
+    CHECK(std::align(alignment, totalBytes, alignedOutputPtr, space));
+    auto* outputPtr = reinterpret_cast<float*>(alignedOutputPtr);
+    std::fill_n(outputPtr, numElements, -10.0f);
+
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(inputTensorInfo, alignedInputPtr)},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), alignedOutputPtr)}
+    };
+
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+
+    INFO("Run ImportInputs");
+    std::vector<ImportedInputId> importedInputIds =
+        runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    std::vector<ImportedOutputId> importedOutputIds =
+        runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+
+    // Do the inference
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+
+    // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    std::string dump = ss.str();
+
+    // Contains Convolution2dWorkload
+    std::size_t found = dump.find("Convolution2dWorkload");
+    CHECK(found != std::string::npos);
+
+    // Contains SyncMemGeneric
+    found = dump.find("SyncMemGeneric");
+    CHECK(found != std::string::npos);
+
+    // Does not contain CopyMemGeneric
+    found = dump.find("CopyMemGeneric");
+    CHECK(found == std::string::npos);
+
+    // Sync the outputs so we can read the data
+    arm_compute::CLScheduler::get().sync();
+
+    // Check output is as expected
+    auto* outputResult = reinterpret_cast<float*>(alignedOutputPtr);
+    CHECK(outputResult);
+    CHECK(std::equal(outputResult, outputResult + numElements, expectedOutput.begin(), expectedOutput.end()));
+
+    // Repeat the inference, with new tensors and without using PreImporting to force it to fall back to copying
+
+    // Creates structures for input & output
+    auto inputDataCopy = std::make_unique<uint8_t[]>(space);
+    void* copyInputPtr = inputDataCopy.get();
+
+    // Fill input with values
+    auto* inputCopyPtr = reinterpret_cast<float*>(copyInputPtr);
+    inputCopyPtr[0] = 1;
+    inputCopyPtr[1] = 5;
+    inputCopyPtr[2] = 2;
+    inputCopyPtr[3] = 3;
+    inputCopyPtr[4] = 8;
+    inputCopyPtr[5] = 7;
+    inputCopyPtr[6] = 3;
+    inputCopyPtr[7] = 6;
+    inputCopyPtr[8] = 3;
+    inputCopyPtr[9] = 3;
+    inputCopyPtr[10] = 9;
+    inputCopyPtr[11] = 1;
+
+    // Output pre-filled with -10.0f
+    auto outputDataCopy = std::make_unique<uint8_t[]>(space);
+    void* copyOutputPtr = outputDataCopy.get();
+    auto* outputCopyPtr = reinterpret_cast<float*>(copyOutputPtr);
+    std::fill_n(outputCopyPtr, numElements, -10.0f);
+
+    InputTensors inputTensorsCopy
+    {
+        {0,armnn::ConstTensor(inputTensorInfo, copyInputPtr)},
+    };
+    OutputTensors outputTensorsCopy
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), copyOutputPtr)}
+    };
+
+    // Do the inference without any pre-imported input/output ids
+    runtime->EnqueueWorkload(netId, inputTensorsCopy, outputTensorsCopy);
+    // Sync the outputs so we can read the data
+    arm_compute::CLScheduler::get().sync();
+
+    // Check the output is correct
+    outputResult = reinterpret_cast<float*>(copyOutputPtr);
+    CHECK(outputResult);
+    CHECK(std::equal(outputResult, outputResult + numElements, expectedOutput.begin(), expectedOutput.end()));
+
+    // Query the profiler again, this will contain the results of both inferences
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    dump = ss.str();
+
+    // Contains Convolution2dWorkload
+    found = dump.find("Convolution2dWorkload");
+    CHECK(found != std::string::npos);
+
+    // Should still contain the SyncMemGeneric
+    found = dump.find("SyncMemGeneric");
+    CHECK(found != std::string::npos);
+
+    // Should now also contain a CopyMemGeneric
+    found = dump.find("CopyMemGeneric");
+    CHECK(found != std::string::npos);
+    runtime->UnloadNetwork(netId);
+}
+
+TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInvertedEndToEndTest")
+{
+/*
+ * This test is similar to the test above but instead of importing and then copying, we start by copying and then do
+ * the import.
+ */
+    // Create runtime in which test will run
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(armnn::IRuntime::Create(options));
+
+    // build up the structure of the network
+    INetworkPtr network(INetwork::Create());
+
+    armnn::TensorInfo inputInfo({ 1, 3, 4, 1 }, DataType::Float32);
+    armnn::TensorInfo kernelInfo({ 1, 3, 3, 1 }, DataType::Float32);
+    armnn::TensorInfo outputInfo({ 1, 3, 4, 1 }, DataType::Float32);
+
+    kernelInfo.SetConstant(true);
+
+    std::vector<float> kernel =
+    {
+        4, 5, 6,
+        0, 0, 0,
+        3, 2, 1
+    };
+
+    const std::vector<float> expectedOutput =
+    {
+        23, 41, 33, 21,
+        44, 65, 76, 52,
+        82, 85, 79, 42
+    };
+
+    unsigned int numElements = inputInfo.GetNumElements();
+    size_t totalBytes = numElements * sizeof(float);
+
+    IConnectableLayer* const inputLayer = network->AddInputLayer(0, "input");
+    ARMNN_ASSERT(inputLayer);
+
+    armnn::ConstTensor weights(kernelInfo, kernel);
+
+    armnn::Convolution2dDescriptor convDesc2d;
+    convDesc2d.m_StrideX = 1;
+    convDesc2d.m_StrideY = 1;
+    convDesc2d.m_PadLeft = 1;
+    convDesc2d.m_PadRight = 1;
+    convDesc2d.m_PadTop = 1;
+    convDesc2d.m_PadBottom = 1;
+    convDesc2d.m_DataLayout = DataLayout::NHWC;
+    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
+                                                                          weights,
+                                                                          armnn::EmptyOptional(),
+                                                                          "conv");
+    ARMNN_ASSERT(convLayer);
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+
+    IConnectableLayer* output = network->AddOutputLayer(0, "output");
+    convLayer->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    // Optimize the network
+    OptimizerOptions optOptions;
+    optOptions.m_ImportEnabled = false;
+    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
+    CHECK(optNet);
+
+    // Loads it into the runtime.
+    NetworkId netId;
+    std::string ignoredErrorMessage;
+    // Enable Importing
+    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
+
+    // Creates structures for input & output
+    const size_t alignment =
+        arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
+    size_t space = totalBytes + alignment + alignment;
+    auto inputData = std::make_unique<uint8_t[]>(space);
+    void* copyInputPtr = inputData.get();
+
+    // Fill input with values
+    auto* inputPtr = reinterpret_cast<float*>(copyInputPtr);
+    inputPtr[0] = 1;
+    inputPtr[1] = 5;
+    inputPtr[2] = 2;
+    inputPtr[3] = 3;
+    inputPtr[4] = 8;
+    inputPtr[5] = 7;
+    inputPtr[6] = 3;
+    inputPtr[7] = 6;
+    inputPtr[8] = 3;
+    inputPtr[9] = 3;
+    inputPtr[10] = 9;
+    inputPtr[11] = 1;
+
+    // Create output buffer and fill it with -10.0f
+    auto outputData = std::make_unique<uint8_t[]>(space);
+    void* copyOutputPtr = outputData.get();
+    auto* outputPtr = reinterpret_cast<float*>(copyOutputPtr);
+    std::fill_n(outputPtr, numElements, -10.0f);
+
+    TensorInfo inputTensorInfo = runtime->GetInputTensorInfo(netId, 0);
+    inputTensorInfo.SetConstant(true);
+    InputTensors inputTensors
+    {
+        {0,armnn::ConstTensor(inputTensorInfo, copyInputPtr)},
+    };
+    OutputTensors outputTensors
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), copyOutputPtr)}
+    };
+
+    runtime->GetProfiler(netId)->EnableProfiling(true);
+
+    // Do the inference without any pre-imported inputs/outputs
+    runtime->EnqueueWorkload(netId, inputTensors, outputTensors);
+
+    // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
+    ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
+    std::stringstream ss;
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    std::string dump = ss.str();
+
+    // Contains Convolution2dWorkload
+    std::size_t found = dump.find("Convolution2dWorkload");
+    CHECK(found != std::string::npos);
+
+    // Does not contain SyncMemGeneric
+    found = dump.find("SyncMemGeneric");
+    CHECK(found == std::string::npos);
+
+    // Does contain CopyMemGeneric
+    found = dump.find("CopyMemGeneric");
+    CHECK(found != std::string::npos);
+
+    // Sync the outputs so we can read the data
+    arm_compute::CLScheduler::get().sync();
+
+    // Check output is as expected
+    auto* outputResult = reinterpret_cast<float*>(copyOutputPtr);
+    CHECK(outputResult);
+    CHECK(std::equal(outputResult, outputResult + numElements, expectedOutput.begin(), expectedOutput.end()));
+
+    // Repeat the inference, with new tensors and while using pre-importing to force it to import
+
+    // Creates structures for input & output
+    auto inputDataImport = std::make_unique<uint8_t[]>(space);
+    void* alignedInputImportPtr = inputDataImport.get();
+    CHECK(std::align(alignment, totalBytes, alignedInputImportPtr, space));
+
+    // Fill input with values
+    auto* inputImportPtr = reinterpret_cast<float*>(alignedInputImportPtr);
+    inputImportPtr[0] = 1;
+    inputImportPtr[1] = 5;
+    inputImportPtr[2] = 2;
+    inputImportPtr[3] = 3;
+    inputImportPtr[4] = 8;
+    inputImportPtr[5] = 7;
+    inputImportPtr[6] = 3;
+    inputImportPtr[7] = 6;
+    inputImportPtr[8] = 3;
+    inputImportPtr[9] = 3;
+    inputImportPtr[10] = 9;
+    inputImportPtr[11] = 1;
+
+    // Output pre-filled with -10.0f
+    auto outputDataImport = std::make_unique<uint8_t[]>(space);
+    void* alignedOutputImportPtr = outputDataImport.get();
+    CHECK(std::align(alignment, totalBytes, alignedOutputImportPtr, space));
+    auto* outputImportPtr = reinterpret_cast<float*>(alignedOutputImportPtr);
+    std::fill_n(outputImportPtr, numElements, -10.0f);
+
+    InputTensors inputTensorsImport
+    {
+        {0,armnn::ConstTensor(inputTensorInfo, alignedInputImportPtr)},
+    };
+    OutputTensors outputTensorsImport
+    {
+        {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), alignedOutputImportPtr)}
+    };
+
+    INFO("Run ImportInputs");
+    std::vector<ImportedInputId> importedInputIds =
+        runtime->ImportInputs(netId, inputTensorsImport, MemorySource::Malloc);
+    std::vector<ImportedOutputId> importedOutputIds =
+        runtime->ImportOutputs(netId, outputTensorsImport, MemorySource::Malloc);
+
+    // Do the inference with pre-imported inputs/outputs
+    runtime->EnqueueWorkload(netId, inputTensorsImport, outputTensorsImport, importedInputIds, importedOutputIds);
+    // Sync the outputs so we can read the data
+    arm_compute::CLScheduler::get().sync();
+
+    // Check the output is correct
+    outputResult = reinterpret_cast<float*>(alignedOutputImportPtr);
+    CHECK(outputResult);
+    CHECK(std::equal(outputResult, outputResult + numElements, expectedOutput.begin(), expectedOutput.end()));
+
+
+    // Query the profiler again, this will contain the results of both inferences
+    profilerManager.GetProfiler()->AnalyzeEventsAndWriteResults(ss);
+    dump = ss.str();
+
+    // Contains Convolution2dWorkload
+    found = dump.find("Convolution2dWorkload");
+    CHECK(found != std::string::npos);
+
+    // Should now contain the SyncMemGeneric
+    found = dump.find("SyncMemGeneric");
+    CHECK(found != std::string::npos);
+
+    // Should still contain a CopyMemGeneric from the first inference
+    found = dump.find("CopyMemGeneric");
+    CHECK(found != std::string::npos);
+    runtime->UnloadNetwork(netId);
+}
+
 }

@@ -11,6 +11,7 @@
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 #include "armnnUtils/DataLayoutIndexed.hpp"
 #include <armnn/Logging.hpp>
+#include "Profiling.hpp"
 
 #include <string>
 #include <vector>
@@ -21,7 +22,7 @@ namespace common
 * @brief Used to load in a network through ArmNN and run inference on it against a given backend.
 *
 */
-template <class Tout>
+template <typename Tout>
 class ArmnnNetworkExecutor
 {
 private:
@@ -31,7 +32,7 @@ private:
     armnn::InputTensors     m_InputTensors;
     armnn::OutputTensors    m_OutputTensors;
     std::vector<armnnTfLiteParser::BindingPointInfo> m_outputBindingInfo;
-
+    Profiling m_profiling;
     std::vector<std::string> m_outputLayerNamesList;
 
     armnnTfLiteParser::BindingPointInfo m_inputBindingInfo;
@@ -59,7 +60,8 @@ public:
     *       * @param[in] backends - The list of preferred backends to run inference on
     */
     ArmnnNetworkExecutor(std::string& modelPath,
-                         std::vector<armnn::BackendId>& backends);
+                         std::vector<armnn::BackendId>& backends,
+                         bool isProfilingEnabled = false);
 
     /**
     * @brief Returns the aspect ratio of the associated model in the order of width, height.
@@ -87,12 +89,15 @@ public:
 
 };
 
-template <class Tout>
+template <typename Tout>
 ArmnnNetworkExecutor<Tout>::ArmnnNetworkExecutor(std::string& modelPath,
-                                           std::vector<armnn::BackendId>& preferredBackends)
-        : m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions()))
+                                           std::vector<armnn::BackendId>& preferredBackends,
+                                           bool isProfilingEnabled):
+        m_profiling(isProfilingEnabled),
+        m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions()))
 {
     // Import the TensorFlow lite model.
+    m_profiling.ProfilingStart();
     armnnTfLiteParser::ITfLiteParserPtr parser = armnnTfLiteParser::ITfLiteParser::Create();
     armnn::INetworkPtr network = parser->CreateNetworkFromBinaryFile(modelPath.c_str());
 
@@ -151,16 +156,16 @@ ArmnnNetworkExecutor<Tout>::ArmnnNetworkExecutor(std::string& modelPath,
             ));
         }
     }
-
+    m_profiling.ProfilingStopAndPrintUs("ArmnnNetworkExecutor time");
 }
 
-template <class Tout>
+template <typename Tout>
 armnn::DataType ArmnnNetworkExecutor<Tout>::GetInputDataType() const
 {
     return m_inputBindingInfo.second.GetDataType();
 }
 
-template <class Tout>
+template <typename Tout>
 void ArmnnNetworkExecutor<Tout>::PrepareTensors(const void* inputData, const size_t dataBytes)
 {
     assert(m_inputBindingInfo.second.GetNumBytes() >= dataBytes);
@@ -168,9 +173,10 @@ void ArmnnNetworkExecutor<Tout>::PrepareTensors(const void* inputData, const siz
     m_InputTensors = {{ m_inputBindingInfo.first, armnn::ConstTensor(m_inputBindingInfo.second, inputData)}};
 }
 
-template <class Tout>
+template <typename Tout>
 bool ArmnnNetworkExecutor<Tout>::Run(const void* inputData, const size_t dataBytes, InferenceResults<Tout>& outResults)
 {
+    m_profiling.ProfilingStart();
     /* Prepare tensors if they are not ready */
     ARMNN_LOG(debug) << "Preparing tensors...";
     this->PrepareTensors(inputData, dataBytes);
@@ -190,37 +196,37 @@ bool ArmnnNetworkExecutor<Tout>::Run(const void* inputData, const size_t dataByt
 
     outResults.reserve(m_outputLayerNamesList.size());
     outResults = m_OutputBuffer;
-
+    m_profiling.ProfilingStopAndPrintUs("Total inference time");
     return (armnn::Status::Success == ret);
 }
 
-template <class Tout>
+template <typename Tout>
 float ArmnnNetworkExecutor<Tout>::GetQuantizationScale()
 {
     return this->m_inputBindingInfo.second.GetQuantizationScale();
 }
 
-template <class Tout>
+template <typename Tout>
 int ArmnnNetworkExecutor<Tout>::GetQuantizationOffset()
 {
     return this->m_inputBindingInfo.second.GetQuantizationOffset();
 }
 
-template <class Tout>
+template <typename Tout>
 float ArmnnNetworkExecutor<Tout>::GetOutputQuantizationScale(int tensorIndex)
 {
     assert(this->m_outputLayerNamesList.size() > tensorIndex);
     return this->m_outputBindingInfo[tensorIndex].second.GetQuantizationScale();
 }
 
-template <class Tout>
+template <typename Tout>
 int ArmnnNetworkExecutor<Tout>::GetOutputQuantizationOffset(int tensorIndex)
 {
     assert(this->m_outputLayerNamesList.size() > tensorIndex);
     return this->m_outputBindingInfo[tensorIndex].second.GetQuantizationOffset();
 }
 
-template <class Tout>
+template <typename Tout>
 Size ArmnnNetworkExecutor<Tout>::GetImageAspectRatio()
 {
     const auto shape = m_inputBindingInfo.second.GetShape();

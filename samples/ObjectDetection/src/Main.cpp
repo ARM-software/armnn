@@ -20,6 +20,7 @@ const std::string MODEL_FILE_PATH = "--model-file-path";
 const std::string OUTPUT_VIDEO_FILE_PATH = "--output-video-file-path";
 const std::string LABEL_PATH = "--label-path";
 const std::string PREFERRED_BACKENDS = "--preferred-backends";
+const std::string PROFILING_ENABLED = "--profiling_enabled";
 const std::string HELP = "--help";
 
 /*
@@ -29,13 +30,16 @@ static std::map<std::string, std::string> CMD_OPTIONS = {
         {VIDEO_FILE_PATH, "[REQUIRED] Path to the video file to run object detection on"},
         {MODEL_FILE_PATH, "[REQUIRED] Path to the Object Detection model to use"},
         {LABEL_PATH, "[REQUIRED] Path to the label set for the provided model file. "
-                     "Label file is should just be an ordered list, seperated by new line."},
+                     "Label file  should be an ordered list, separated by a new line."},
         {MODEL_NAME, "[REQUIRED] The name of the model being used. Accepted options: YOLO_V3_TINY, SSD_MOBILE"},
         {OUTPUT_VIDEO_FILE_PATH, "[OPTIONAL] Path to the output video file with detections added in. "
                                  "If specified will save file to disk, else displays the output to screen"},
         {PREFERRED_BACKENDS, "[OPTIONAL] Takes the preferred backends in preference order, separated by comma."
                              " For example: CpuAcc,GpuAcc,CpuRef. Accepted options: [CpuAcc, CpuRef, GpuAcc]."
-                             " Defaults to CpuAcc,CpuRef"}
+                             " Defaults to CpuAcc,CpuRef"},
+        {PROFILING_ENABLED, "[OPTIONAL] Enabling this option will print important ML related milestones timing"
+                            "information in micro-seconds. By default, this option is disabled."
+                            "Accepted options are true/false."}
 };
 
 /*
@@ -137,6 +141,10 @@ int main(int argc, char *argv[])
     pipelineOptions.m_ModelFilePath = GetSpecifiedOption(options, MODEL_FILE_PATH);
     pipelineOptions.m_ModelName = GetSpecifiedOption(options, MODEL_NAME);
 
+    if (CheckOptionSpecified(options, PROFILING_ENABLED))
+    {
+        pipelineOptions.m_ProfilingEnabled = GetSpecifiedOption(options, PROFILING_ENABLED) == "true";
+    }
     if(CheckOptionSpecified(options, PREFERRED_BACKENDS))
     {
         pipelineOptions.m_backends = GetPreferredBackendList((GetSpecifiedOption(options, PREFERRED_BACKENDS)));
@@ -148,6 +156,8 @@ int main(int argc, char *argv[])
 
     auto labels = AssignColourToLabel(GetSpecifiedOption(options, LABEL_PATH));
 
+    common::Profiling profiling(pipelineOptions.m_ProfilingEnabled);
+    profiling.ProfilingStart();
     od::IPipelinePtr objectDetectionPipeline = od::CreatePipeline(pipelineOptions);
 
     auto inputAndOutput = GetFrameSourceAndSink(options);
@@ -180,5 +190,6 @@ int main(int argc, char *argv[])
         frame = reader->ReadFrame();
     }
     sink->Close();
+    profiling.ProfilingStopAndPrintUs("Overall compute time");
     return 0;
 }

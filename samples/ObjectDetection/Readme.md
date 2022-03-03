@@ -1,7 +1,11 @@
 # Object Detection Example
 
 ## Introduction
-This is a sample code showing object detection using Arm NN public C++ API. The compiled application can take
+This is a sample code showing object detection using Arm NN in two different modes:
+1. Utilizing public Arm NN C++ API.
+2. Utilizing Tensorflow lite delegate file mechanism together with Armnn delegate file.
+
+The compiled application can take
 
  * a video file
 
@@ -13,8 +17,22 @@ with detections shown in bounding boxes, class labels and confidence.
 
 ## Dependencies
 
-This example utilises OpenCV functions to capture and output video data. Top level inference API is provided by Arm NN
-library.
+This example utilizes OpenCV functions to capture and output video data.
+1. Public Arm NN C++ API is provided by Arm NN library.
+2. For Delegate file mode following dependencies exist:
+2.1 Tensorflow version 2.5.0
+2.2 Flatbuffers version 1.12.0
+2.3 Arm NN delegate library
+
+## System
+
+This example was created on Ubuntu 20.04 with gcc and g++ version 9.
+If encountered any compiler errors while running with a different compiler version, you can install version 9 with:
+```commandline
+sudo apt install gcc-9 g++-9
+```
+and add to every cmake command those compiler flags:
+-DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9
 
 ### Arm NN
 
@@ -22,7 +40,13 @@ Object detection example build system does not trigger Arm NN compilation. Thus,
 please ensure that Arm NN libraries and header files are available on your build platform.
 The application executable binary dynamically links with the following Arm NN libraries:
 * libarmnn.so
+For Arm NN public C++ API mode:
 * libarmnnTfLiteParser.so
+For Delegate file mode:
+* libarmnnDelegate.so
+
+Pre compiled Arm NN libraries can be downloaded from https://github.com/ARM-software/armnn/releases/download/v21.11/ArmNN-linux-aarch64.tar.gz
+the "lib" and "include" directories should be taken together.
 
 The build script searches for available Arm NN libraries in the following order:
 1. Inside custom user directory specified by ARMNN_LIB_DIR cmake option.
@@ -37,8 +61,11 @@ Please see [find_armnn.cmake](./cmake/find_armnn.cmake) for implementation detai
 ### OpenCV
 
 This application uses [OpenCV (Open Source Computer Vision Library)](https://opencv.org/) for video stream processing.
-Your host platform may have OpenCV available through linux package manager. If this is the case, please install it using
-standard way. If not, our build system has a script to download and cross-compile required OpenCV modules
+Your host platform may have OpenCV available through linux package manager. If this is the case, please install it using standard way.
+```commandline
+sudo apt install python3-opencv
+```
+If not, our build system has a script to download and cross-compile required OpenCV modules
 as well as [FFMPEG](https://ffmpeg.org/) and [x264 encoder](https://www.videolan.org/developers/x264.html) libraries.
 The latter will build limited OpenCV functionality and application will support only video file input and video file output
 way of working. Displaying video frames in a window requires building OpenCV with GTK and OpenGL support.
@@ -68,6 +95,49 @@ Note: Native build does not add third party libraries to compilation.
 
 Please see [find_opencv.cmake](./cmake/find_opencv.cmake) for implementation details.
 
+### Tensorflow Lite (Needed only in delegate file mode)
+
+This application uses [Tensorflow Lite)](https://www.tensorflow.org/) version 2.5.0 for demonstrating use of 'armnnDelegate'.
+armnnDelegate is a library for accelerating certain TensorFlow Lite operators on Arm hardware by providing
+the TensorFlow Lite interpreter with an alternative implementation of the operators via its delegation mechanism.
+You may clone and build Tensorflow lite and provide the path to its root and output library directories through the cmake
+flags TENSORFLOW_ROOT and TFLITE_LIB_ROOT respectively.
+For implementation details see the scripts FindTfLite.cmake and FindTfLiteSrc.cmake
+
+The application links with the Tensorflow lite library libtensorflow-lite.a
+
+#### Download and build Tensorflow Lite version 2.5.0
+Example for Tensorflow Lite native compilation
+```commandline
+sudo apt install build-essential
+git clone https://github.com/tensorflow/tensorflow.git
+cd tensorflow/tensorflow
+git checkout tags/v2.5.0
+mkdir build && cd build
+cmake ../lite -DTFLITE_ENABLE_XNNPACK=OFF
+make
+```
+
+### Flatbuffers (needed only in delegate file mode)
+
+This application uses [Flatbuffers)](https://google.github.io/flatbuffers/) version 1.12.0 for serialization
+You may clone and build Flatbuffers and provide the path to its root directory through the cmake
+flag FLATBUFFERS_ROOT.
+Please see [FindFlatbuffers.cmake] for implementation details.
+
+The application links with the Flatbuffers library libflatbuffers.a
+
+#### Download and build flatbuffers version 1.12.0
+Example for flatbuffer native compilation
+```commandline
+wget -O flatbuffers-1.12.0.zip https://github.com/google/flatbuffers/archive/v1.12.0.zip
+unzip -d . flatbuffers-1.12.0.zip
+cd flatbuffers-1.12.0
+mkdir install && cd install
+cmake .. -DCMAKE_INSTALL_PREFIX:PATH=`pwd`
+make install
+```
+
 ## Building
 There are two flows for building this application:
 * native build on a host platform,
@@ -83,6 +153,12 @@ There are two flows for building this application:
 * BUILD_UNIT_TESTS -  set to `1` to build tests. Additionally to the main application, `object_detection_example-tests`
 unit tests executable will be created.
 
+* For the Delegate file mode:
+* USE_ARMNN_DELEGATE - set to True to build the application with Tflite and delegate file mode. default is False.
+* TFLITE_LIB_ROOT - point to the custom location of Tflite lib
+* TENSORFLOW_ROOT - point to the custom location of Tensorflow root directory
+* FLATBUFFERS_ROOT - point to the custom location of Flatbuffers root directory
+
 ### Native Build
 To build this application on a host platform, firstly ensure that required dependencies are installed:
 For example, for raspberry PI:
@@ -90,7 +166,7 @@ For example, for raspberry PI:
 sudo apt-get update
 sudo apt-get -yq install pkg-config
 sudo apt-get -yq install libgtk2.0-dev zlib1g-dev libjpeg-dev libpng-dev libxvidcore-dev libx264-dev
-sudo apt-get -yq install libavcodec-dev libavformat-dev libswscale-dev
+sudo apt-get -yq install libavcodec-dev libavformat-dev libswscale-dev ocl-icd-opencl-dev
 ```
 
 To build demo application, create a build directory:
@@ -111,6 +187,15 @@ This will build the following in bin directory:
 If you have custom Arm NN and OpenCV location, use `OPENCV_LIB_DIR` and `ARMNN_LIB_DIR` options:
 ```commandline
 cmake  -DARMNN_LIB_DIR=/path/to/armnn -DOPENCV_LIB_DIR=/path/to/opencv ..
+make
+```
+
+If you have build with Delegate file mode and have custom Arm NN, Tflite, and Flatbuffers locations,
+use the USE_ARMNN_DELEGATE flag together with `TFLITE_LIB_ROOT`, `TENSORFLOW_ROOT`, `FLATBUFFERS_ROOT` and
+`ARMNN_LIB_DIR` options:
+```commandline
+cmake -DARMNN_LIB_DIR=/path/to/armnn/build/lib/ -DUSE_ARMNN_DELEGATE=True -DTFLITE_LIB_ROOT=/path/to/tensorflow/
+ -DTENSORFLOW_ROOT=/path/to/tensorflow/ -DFLATBUFFERS_ROOT=/path/to/flatbuffers/ ..
 make
 ```
 
@@ -170,8 +255,18 @@ The full list of libs after cross-compilation to copy on your board:
 libarmnn.so
 libarmnn.so.29
 libarmnn.so.29.0
+For Arm NN public C++ API mode:
 libarmnnTfLiteParser.so
 libarmnnTfLiteParser.so.24.4
+end
+For Delegate file mode:
+libarmnnDelegate.so
+libarmnnDelegate.so.25
+libarmnnDelegate.so.25.0
+libtensorflow-lite.a
+libflatbuffers.a
+end
+
 libavcodec.so
 libavcodec.so.58
 libavcodec.so.58.54.100
@@ -230,6 +325,9 @@ Once the application executable is built, it can be executed with the following 
 * --preferred-backends: Takes the preferred backends in preference order, separated by comma.
                         For example: CpuAcc,GpuAcc,CpuRef. Accepted options: [CpuAcc, CpuRef, GpuAcc].
                         Defaults to CpuRef **[OPTIONAL]**
+* --profiling_enabled: Enabling this option will print important ML related milestones timing
+                       information in micro-seconds. By default, this option is disabled.
+                       Accepted options are true/false **[OPTIONAL]**
 
 ### Object Detection on a supplied video file
 
@@ -258,10 +356,15 @@ This section provides a walkthrough of the application, explaining in detail the
 1. Initialisation
     1. Reading from Video Source
     2. Preparing Labels and Model Specific Functions
-2. Creating a Network
-    1. Creating Parser and Importing Graph
-    3. Optimizing Graph for Compute Device
-    4. Creating Input and Output Binding Information
+2. Creating a Network (two modes are available)
+    a. Armnn C++ API mode:
+        1. Creating Parser and Importing Graph
+        2. Optimizing Graph for Compute Device
+        3. Creating Input and Output Binding Information
+    b. using Tflite and delegate file mode:
+        1. Building a Model and creating Interpreter
+        2. Creating Arm NN delegate file
+        3. Registering the Arm NN delegate file to the Interpreter
 3. Object detection pipeline
     1. Pre-processing the Captured Frame
     2. Making Input and Output Tensors
@@ -298,10 +401,14 @@ the bounding boxes of various detected objects in a frame.
 Depending on the model being used, `CreatePipeline`  function returns specific implementation of the object detection
 pipeline.
 
-### Creating a Network
 
-All operations with Arm NN and networks are encapsulated in [`ArmnnNetworkExecutor`](./include/ArmnnNetworkExecutor.hpp)
-class.
+### There are two ways for Creating the Network. The first is using the Arm NN C++ API, and the second is using
+### Tflite with Arm NN delegate file
+
+#### Creating a Network using the Arm NN C++ API
+
+All operations with Arm NN and networks are encapsulated in
+[`ArmnnNetworkExecutor`](./common/include/ArmnnUtils/ArmnnNetworkExecutor.hpp) class.
 
 ##### Creating Parser and Importing Graph
 The first step with Arm NN SDK is to import a graph from file by using the appropriate parser.
@@ -374,9 +481,67 @@ number of dimensions, total number of elements).
 Similarly, we can get the output binding information for an output layer by using the parser to retrieve output
 tensor names and calling `GetNetworkOutputBindingInfo()`.
 
+#### Creating a Network using Tflite and Arm NN delegate file
+
+All operations with Tflite and networks are encapsulated in [`ArmnnNetworkExecutor`](./include/delegate/ArmnnNetworkExecutor.hpp)
+class.
+
+##### Building a Model and creating Interpreter
+The first step with Tflite is to build a model from file by using Flatbuffer model class.
+with that model we create the Tflite Interpreter.
+```c++
+#include <tensorflow/lite/interpreter.h>
+
+armnnTfLiteParser::ITfLiteParserPtr parser = armnnTfLiteParser::ITfLiteParser::Create();m_model = tflite::FlatBufferModel::BuildFromFile(modelPath.c_str());
+tflite::ops::builtin::BuiltinOpResolver resolver;
+tflite::InterpreterBuilder(*m_model, resolver)(&m_interpreter);
+```
+after the Interpreter is created we allocate tensors using the AllocateTensors function of the Interpreter
+```c++
+m_interpreter->AllocateTensors();
+```
+
+##### Creating Arm NN Delegate file
+Arm NN Delegate file is created using the ArmnnDelegate constructor
+The constructor accepts a DelegateOptions object that is created from the
+list of the preferred backends that we want to use, and the optimizerOptions object (optional).
+In this example we enable fast math and reduce all float32 operators to float16 optimizations.
+These optimizations can sometime improve the performance but can also cause degredation,
+depending on the model and the backends involved, therefore one should try it out and
+decide whether to use it or not.
+
+
+```c++
+#include <armnn_delegate.hpp>
+#include <DelegateOptions.hpp>
+#include <DelegateUtils.hpp>
+
+/* enable fast math optimization */
+armnn::BackendOptions modelOptionGpu("GpuAcc", {{"FastMathEnabled", true}});
+optimizerOptions.m_ModelOptions.push_back(modelOptionGpu);
+
+armnn::BackendOptions modelOptionCpu("CpuAcc", {{"FastMathEnabled", true}});
+optimizerOptions.m_ModelOptions.push_back(modelOptionCpu);
+/* enable reduce float32 to float16 optimization */
+optimizerOptions.m_ReduceFp32ToFp16 = true;
+
+armnnDelegate::DelegateOptions delegateOptions(preferredBackends, optimizerOptions);
+/* create delegate object */
+std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
+            theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                             armnnDelegate::TfLiteArmnnDelegateDelete);
+```
+##### Registering the Arm NN delegate file to the Interpreter
+Registering the Arm NN delegate file will provide the TensorFlow Lite interpreter with an alternative implementation
+of the operators that can be accelerated by the Arm hardware
+For example:
+```c++
+    /* Register the delegate file */
+    m_interpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+```
 ### Object detection pipeline
 
-Generic object detection pipeline has 3 steps to perform data pre-processing, run inference and decode inference results
+Generic object detection pipeline has 3 steps, to perform data pre-processing, run inference and decode inference results
 in the post-processing step.
 
 See [`ObjDetectionPipeline`](include/ObjectDetectionPipeline.hpp) and implementations for [`MobileNetSSDv1`](include/ObjectDetectionPipeline.hpp)
@@ -406,6 +571,13 @@ od::InferenceResults results;
 objectDetectionPipeline->Inference(processed, results);
 ```
 Inference step will call `ArmnnNetworkExecutor::Run` method that will prepare input tensors and execute inference.
+We have two separate implementations of the `ArmnnNetworkExecutor` class and its functions including `ArmnnNetworkExecutor::Run`
+The first Implementation [`ArmnnNetworkExecutor`](./common/include/ArmnnUtils/ArmnnNetworkExecutor.hpp)is utilizing
+Arm NN C++ API,
+while the second implementation [`ArmnnNetworkExecutor`](./include/delegate/ArmnnNetworkExecutor.hpp) is utilizing
+Tensorflow lite and its Delegate file mechanism.
+
+##### Executing Inference utilizing the Arm NN C++ API
 A compute device performs inference for the loaded network using the `EnqueueWorkload()` function of the runtime context.
 For example:
 ```c++
@@ -416,8 +588,22 @@ armnn::InputTensors inputTensors = {{ inputBindingInfo.first,armnn::ConstTensor(
 runtime->EnqueueWorkload(0, inputTensors, outputTensors);
 ```
 We allocate memory for output data once and map it to output tensor objects. After successful inference, we read data
-from the pre-allocated output data buffer. See [`ArmnnNetworkExecutor::ArmnnNetworkExecutor`](./src/ArmnnNetworkExecutor.cpp)
-and [`ArmnnNetworkExecutor::Run`](./src/ArmnnNetworkExecutor.cpp) for more details.
+from the pre-allocated output data buffer.
+See [`ArmnnNetworkExecutor::ArmnnNetworkExecutor`](./common/include/ArmnnUtils/ArmnnNetworkExecutor.hpp)
+and [`ArmnnNetworkExecutor::Run`](./common/include/ArmnnUtils/ArmnnNetworkExecutor.hpp) for more details.
+
+##### Executing Inference utilizing the Tensorflow lite and Arm NN delegate file 
+Inside the `PrepareTensors(..)` function, the input frame is copied to the Tflite Interpreter input tensor,
+than the Tflite Interpreter performs inference for the loaded network using the `Invoke()` function.
+For example:
+```c++
+PrepareTensors(inputData, dataBytes);
+
+if (m_interpreter->Invoke() == kTfLiteOk)
+```
+After successful inference, we read data from the Tflite Interpreter output tensor and copy
+it to the outResults vector.
+See [`ArmnnNetworkExecutor::Run`](./include/delegate/ArmnnNetworkExecutor.hpp) for more details.
 
 #### Postprocessing
 
@@ -430,7 +616,7 @@ confidence and number of detections in the input frame.
 See [`SSDResultDecoder`](./include/SSDResultDecoder.hpp) for more details.
 
 For YOLO V3 Tiny models, we decode the output and perform non-maximum suppression to filter out any weak detections
-below a confidence threshold and any redudant bounding boxes above an intersection-over-union threshold.
+below a confidence threshold and any redundant bounding boxes above an intersection-over-union threshold.
 See [`YoloResultDecoder`](./include/YoloResultDecoder.hpp) for more details.
 
 It is encouraged to experiment with threshold values for confidence and intersection-over-union (IoU)

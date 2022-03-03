@@ -44,6 +44,7 @@ struct PipelineOptions
     std::string m_ModelName;
     std::string m_ModelFilePath;
     std::vector<armnn::BackendId> m_backends;
+    bool m_ProfilingEnabled = false;
 };
 
 template<typename T>

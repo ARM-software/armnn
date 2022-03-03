@@ -35,7 +35,7 @@ TEST_CASE("Test Network Execution SSD_MOBILE")
     common::PipelineOptions options;
     options.m_ModelFilePath = GetResourceFilePath("ssd_mobilenet_v1.tflite");
     options.m_ModelName = "SSD_MOBILE";
-    options.m_backends = {"CpuRef"};
+    options.m_backends = {"CpuAcc", "CpuRef"};
 
     od::IPipelinePtr objectDetectionPipeline = od::CreatePipeline(options);
 

@@ -2,8 +2,13 @@
 # SPDX-License-Identifier: MIT
 # Search for ArmNN built libraries in user-provided path first, then current repository, then system
 
-set(ARMNN_LIB_NAMES "libarmnn.so"
-    "libarmnnTfLiteParser.so")
+if( USE_ARMNN_DELEGATE )
+    set(ARMNN_LIB_NAMES "libarmnn.so"
+        "libarmnnDelegate.so")
+else()
+    set(ARMNN_LIB_NAMES "libarmnn.so"
+        "libarmnnTfLiteParser.so")
+endif()
 
 set(ARMNN_LIBS "")
 
@@ -26,7 +31,13 @@ foreach(armnn_lib ${ARMNN_LIB_NAMES})
         list(APPEND ARMNN_LIBS ${ARMNN_${armnn_lib}})
         get_filename_component(LIB_DIR ${ARMNN_${armnn_lib}} DIRECTORY)
         get_filename_component(LIB_PARENT_DIR ${LIB_DIR} DIRECTORY)
-        set(ARMNN_INCLUDE_DIR ${LIB_PARENT_DIR}/include)
+        if( USE_ARMNN_DELEGATE )
+            set(ARMNN_INCLUDE_DIR ${LIB_PARENT_DIR}/include
+                ${PARENT_DIR}/../delegate/include
+                ${PARENT_DIR}/../delegate/src)
+        else()
+            set(ARMNN_INCLUDE_DIR ${LIB_PARENT_DIR}/include)
+        endif()
     endif()
 endforeach()
 

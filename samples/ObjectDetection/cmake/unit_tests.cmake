@@ -6,8 +6,6 @@ file(MAKE_DIRECTORY ${TEST_RESOURCES_DIR})
 add_definitions (-DTEST_RESOURCE_DIR="${TEST_RESOURCES_DIR}")
 set(TEST_TARGET_NAME "${CMAKE_PROJECT_NAME}-tests")
 
-file(GLOB TEST_SOURCES "test/*")
-
 include(../common/cmake/find_catch.cmake)
 
 ExternalProject_Add(basketball-image
@@ -42,6 +40,14 @@ ExternalProject_Add(ssd_mobile
         INSTALL_COMMAND ""
         )
 
+ExternalProject_Add(yolo_v3
+        URL https://github.com/ARM-software/ML-zoo/raw/master/models/object_detection/yolo_v3_tiny/tflite_fp32/yolo_v3_tiny_darknet_fp32.tflite
+        DOWNLOAD_NO_EXTRACT 1
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${CMAKE_COMMAND} -E copy <DOWNLOAD_DIR>/yolo_v3_tiny_darknet_fp32.tflite ${CMAKE_CURRENT_SOURCE_DIR}/test/resources
+        INSTALL_COMMAND ""
+        )
+
 add_executable("${TEST_TARGET_NAME}" ${SOURCES} ${TEST_SOURCES} ${CVUTILS_SOURCES} ${UTILS_SOURCES})
 
 add_dependencies(
@@ -62,3 +68,10 @@ target_include_directories("${TEST_TARGET_NAME}" PUBLIC ${TEST_TPIP_INCLUDE}
     ${OPENCV_INCLUDE_DIR} ${DEPENDENCIES_DIR} ${TEST_RESOURCES_DIR} ${COMMON_INCLUDE_DIR})
 
 target_link_libraries("${TEST_TARGET_NAME}" PUBLIC ${ARMNN_LIBS} ${OPENCV_LIBS} ${FFMPEG_LIBS})
+if( USE_ARMNN_DELEGATE )
+    set(CMAKE_CXX_FLAGS " -ldl -lrt -Wl,--copy-dt-needed-entries")
+    target_link_libraries("${TEST_TARGET_NAME}" PUBLIC ${TfLite_LIB})
+    target_link_libraries("${TEST_TARGET_NAME}" PUBLIC tflite_headers)
+    target_include_directories("${TEST_TARGET_NAME}" PUBLIC ${Flatbuffers_INCLUDE_DIR})
+    target_link_libraries("${TEST_TARGET_NAME}" PUBLIC ${Flatbuffers_LIB})
+endif()

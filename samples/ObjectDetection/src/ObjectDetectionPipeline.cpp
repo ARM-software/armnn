@@ -11,8 +11,8 @@ namespace od
 
 ObjDetectionPipeline::ObjDetectionPipeline(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                                            std::unique_ptr<IDetectionResultDecoder> decoder) :
-        m_executor(std::move(executor)),
-        m_decoder(std::move(decoder)){}
+    m_executor(std::move(executor)),
+    m_decoder(std::move(decoder)){}
 
 void od::ObjDetectionPipeline::Inference(const cv::Mat& processed, common::InferenceResults<float>& result)
 {
@@ -39,8 +39,8 @@ void ObjDetectionPipeline::PreProcessing(const cv::Mat& frame, cv::Mat& processe
 
 MobileNetSSDv1::MobileNetSSDv1(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                                float objectThreshold) :
-        ObjDetectionPipeline(std::move(executor),
-                             std::make_unique<SSDResultDecoder>(objectThreshold))
+    ObjDetectionPipeline(std::move(executor),
+                         std::make_unique<SSDResultDecoder>(objectThreshold))
 {}
 
 void MobileNetSSDv1::PreProcessing(const cv::Mat& frame, cv::Mat& processed)
@@ -52,13 +52,12 @@ void MobileNetSSDv1::PreProcessing(const cv::Mat& frame, cv::Mat& processed)
         processed.convertTo(processed, CV_32FC3, 1 / 127.5, -1);
     }
 }
-
 YoloV3Tiny::YoloV3Tiny(std::unique_ptr<common::ArmnnNetworkExecutor<float>> executor,
                        float NMSThreshold, float ClsThreshold, float ObjectThreshold) :
-        ObjDetectionPipeline(std::move(executor),
-                             std::move(std::make_unique<YoloResultDecoder>(NMSThreshold,
-                                                                           ClsThreshold,
-                                                                           ObjectThreshold)))
+    ObjDetectionPipeline(std::move(executor),
+                         std::move(std::make_unique<YoloResultDecoder>(NMSThreshold,
+                                                                       ClsThreshold,
+                                                                       ObjectThreshold)))
 {}
 
 void YoloV3Tiny::PreProcessing(const cv::Mat& frame, cv::Mat& processed)
@@ -72,11 +71,12 @@ void YoloV3Tiny::PreProcessing(const cv::Mat& frame, cv::Mat& processed)
 
 IPipelinePtr CreatePipeline(common::PipelineOptions& config)
 {
-    auto executor = std::make_unique<common::ArmnnNetworkExecutor<float>>(config.m_ModelFilePath, config.m_backends);
-
+    auto executor = std::make_unique<common::ArmnnNetworkExecutor<float>>(config.m_ModelFilePath,
+                                                                          config.m_backends,
+                                                                          config.m_ProfilingEnabled);
     if (config.m_ModelName == "SSD_MOBILE")
     {
-        float detectionThreshold = 0.6;
+        float detectionThreshold = 0.5;
 
         return std::make_unique<od::MobileNetSSDv1>(std::move(executor),
                                                     detectionThreshold

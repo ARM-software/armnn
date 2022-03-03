@@ -7,6 +7,7 @@
 #include <cl/ClTensorHandle.hpp>
 #include <armnn/backends/TensorHandle.hpp>
 #include <cl/ClLayerSupport.hpp>
+#include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
 #include <armnn/utility/NumericCast.hpp>
@@ -19,8 +20,8 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
-ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor,
-                                         const WorkloadInfo &info,
+ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor& descriptor,
+                                         const WorkloadInfo& info,
                                          const arm_compute::CLCompileContext& clCompileContext)
         : FloatWorkload<LstmQueueDescriptor>(descriptor, info)
 {
@@ -28,7 +29,7 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor,
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClLstmFloatWorkload_Construct",
                                          descriptor.m_Parameters,
                                          info,
-                                         this->GetGuid());
+                                         GetGuid());
 
     arm_compute::LSTMParams<arm_compute::ICLTensor> lstm_param;
 
@@ -163,35 +164,8 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor,
     float projection_threshold = m_Data.m_Parameters.m_ClippingThresProj;
 
     // for preparing the object for the class ActivationLayerInfo, we need to consider 5 situations
-    arm_compute::ActivationLayerInfo activationLayerInfo;
-    if (m_Data.m_Parameters.m_ActivationFunc == 0)
-    {
-        // no activation, do nothing
-    }
-    else if (m_Data.m_Parameters.m_ActivationFunc == 1)
-    {
-        activationLayerInfo = arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::RELU);
-    }
-    else if (m_Data.m_Parameters.m_ActivationFunc == 3)
-    {
-        activationLayerInfo = arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::BOUNDED_RELU, 6.0);
-    }
-    else if (m_Data.m_Parameters.m_ActivationFunc == 4)
-    {
-        activationLayerInfo =  arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::TANH, 1.0, 1.0);
-    }
-    else if (m_Data.m_Parameters.m_ActivationFunc == 6)
-    {
-        activationLayerInfo =  arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::LOGISTIC);
-    }
-    else
-    {
-        throw armnn::Exception("Wrong Type of Activation Function!");
-    }
+    arm_compute::ActivationLayerInfo activationLayerInfo =
+        ConvertLstmActivationFuncToAclLayerInfo(m_Data.m_Parameters.m_ActivationFunc);
 
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClLstmFloatWorkload_configure");
@@ -263,7 +237,7 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor &descriptor,
 
 void ClLstmFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLstmFloatWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLstmFloatWorkload_Execute", GetGuid());
     RunClFunction(m_LstmLayer, CHECK_LOCATION());
 }
 
@@ -354,35 +328,8 @@ arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const T
     float projection_threshold = descriptor.m_ClippingThresProj;
 
     // for preparing the object for the class ActivationLayerInfo, we need to consider 5 situations
-    arm_compute::ActivationLayerInfo activationLayerInfo;
-    if (descriptor.m_ActivationFunc == 0)
-    {
-        // no activation, do nothing
-    }
-    else if (descriptor.m_ActivationFunc == 1)
-    {
-        activationLayerInfo = arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::RELU);
-    }
-    else if (descriptor.m_ActivationFunc == 3)
-    {
-        activationLayerInfo = arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::BOUNDED_RELU, 6.0);
-    }
-    else if (descriptor.m_ActivationFunc == 4)
-    {
-        activationLayerInfo =  arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::TANH, 1.0, 1.0);
-    }
-    else if (descriptor.m_ActivationFunc == 6)
-    {
-        activationLayerInfo =  arm_compute::ActivationLayerInfo(
-                arm_compute::ActivationLayerInfo::ActivationFunction::LOGISTIC);
-    }
-    else
-    {
-        throw armnn::Exception("Wrong Type of Activation Function!");
-    }
+    arm_compute::ActivationLayerInfo activationLayerInfo =
+        ConvertLstmActivationFuncToAclLayerInfo(descriptor.m_ActivationFunc);
 
     if (descriptor.m_LayerNormEnabled)
     {

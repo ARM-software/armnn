@@ -19,7 +19,7 @@ class BackendProfiling : public IBackendProfiling
 public:
     BackendProfiling(const ProfilingOptions& options,
                      IProfilingService& profilingService,
-                     const armnn::BackendId& backendId)
+                     const std::string& backendId)
             : m_Options(options),
               m_ProfilingService(profilingService),
               m_BackendId(backendId) {}
@@ -45,7 +45,7 @@ public:
 private:
     ProfilingOptions m_Options;
     IProfilingService& m_ProfilingService;
-    armnn::BackendId m_BackendId;
+    std::string m_BackendId;
 };
 
 }    // namespace pipe

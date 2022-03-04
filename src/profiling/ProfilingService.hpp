@@ -47,7 +47,7 @@ public:
     using IProfilingConnectionPtr = std::unique_ptr<IProfilingConnection>;
     using CounterIndices = std::vector<std::atomic<uint32_t>*>;
     using CounterValues = std::list<std::atomic<uint32_t>>;
-    using BackendProfilingContext = std::unordered_map<armnn::BackendId,
+    using BackendProfilingContext = std::unordered_map<std::string,
                                                        std::shared_ptr<IBackendProfilingContext>>;
 
     ProfilingService(armnn::Optional<IReportStructure&> reportStructure = armnn::EmptyOptional())
@@ -154,7 +154,7 @@ public:
     void Disconnect();
 
     // Store a profiling context returned from a backend that support profiling.
-    void AddBackendProfilingContext(const armnn::BackendId backendId,
+    void AddBackendProfilingContext(const std::string& backendId,
         std::shared_ptr<IBackendProfilingContext> profilingContext) override;
 
     // Enable the recording of timeline events and entities
@@ -177,7 +177,7 @@ public:
     CaptureData GetCaptureData() override;
     void SetCaptureData(uint32_t capturePeriod,
                         const std::vector<uint16_t>& counterIds,
-                        const std::set<armnn::BackendId>& activeBackends);
+                        const std::set<std::string>& activeBackends);
 
     // Setters for the profiling service state
     void SetCounterValue(uint16_t counterUid, uint32_t value) override;

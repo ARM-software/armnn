@@ -6,7 +6,6 @@
 #pragma once
 
 #include <armnn/Optional.hpp>
-#include <armnn/BackendId.hpp>
 
 namespace arm
 {
@@ -30,7 +29,7 @@ public:
                                                  uint16_t count,
                                                  const armnn::Optional<std::string>& parentCategoryName) = 0;
 
-    virtual const Counter* RegisterCounter(const armnn::BackendId& backendId,
+    virtual const Counter* RegisterCounter(const std::string& backendId,
                                            const uint16_t uid,
                                            const std::string& parentCategoryName,
                                            uint16_t counterClass,

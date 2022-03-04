@@ -23,7 +23,7 @@ public:
         : m_CapturePeriod(0)
         , m_CounterIds()
         , m_ActiveBackends(){}
-    CaptureData(uint32_t capturePeriod, std::vector<uint16_t>& counterIds, std::set<armnn::BackendId> activeBackends)
+    CaptureData(uint32_t capturePeriod, std::vector<uint16_t>& counterIds, std::set<std::string> activeBackends)
         : m_CapturePeriod(capturePeriod)
         , m_CounterIds(counterIds)
         , m_ActiveBackends(activeBackends){}
@@ -34,18 +34,18 @@ public:
 
     CaptureData& operator=(const CaptureData& other);
 
-    void SetActiveBackends(const std::set<armnn::BackendId>& activeBackends);
+    void SetActiveBackends(const std::set<std::string>& activeBackends);
     void SetCapturePeriod(uint32_t capturePeriod);
     void SetCounterIds(const std::vector<uint16_t>& counterIds);
     uint32_t GetCapturePeriod() const;
     const std::vector<uint16_t>& GetCounterIds() const;
-    const std::set<armnn::BackendId>& GetActiveBackends() const;
+    const std::set<std::string>& GetActiveBackends() const;
     bool IsCounterIdInCaptureData(uint16_t counterId);
 
 private:
     uint32_t m_CapturePeriod;
     std::vector<uint16_t> m_CounterIds;
-    std::set<armnn::BackendId> m_ActiveBackends;
+    std::set<std::string> m_ActiveBackends;
 };
 
 class Holder
@@ -56,7 +56,7 @@ public:
     CaptureData GetCaptureData() const;
     void SetCaptureData(uint32_t capturePeriod,
                         const std::vector<uint16_t>& counterIds,
-                        const std::set<armnn::BackendId>& activeBackends);
+                        const std::set<std::string>& activeBackends);
 
 private:
     mutable std::mutex m_CaptureThreadMutex;

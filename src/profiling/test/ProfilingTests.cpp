@@ -1786,7 +1786,7 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     const uint32_t packetId = 0x40000;
 
     uint32_t version = 1;
-    const std::unordered_map<armnn::BackendId,
+    const std::unordered_map<std::string,
             std::shared_ptr<IBackendProfilingContext>> backendProfilingContext;
     CounterIdMap counterIdMap;
     Holder holder;
@@ -2342,7 +2342,7 @@ TEST_CASE("CheckPeriodicCounterCaptureThread")
 
     ProfilingStateMachine profilingStateMachine;
 
-    const std::unordered_map<armnn::BackendId,
+    const std::unordered_map<std::string,
             std::shared_ptr<IBackendProfilingContext>> backendProfilingContext;
     CounterIdMap counterIdMap;
     Holder data;
@@ -3382,8 +3382,8 @@ TEST_CASE("CheckCounterIdMap")
 
     uint16_t globalCounterIds = 0;
 
-    armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
-    armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
+    std::string cpuRefId(GetComputeDeviceAsCString(armnn::Compute::CpuRef));
+    std::string cpuAccId(GetComputeDeviceAsCString(armnn::Compute::CpuAcc));
 
     std::vector<uint16_t> cpuRefCounters = {0, 1, 2, 3};
     std::vector<uint16_t> cpuAccCounters = {0, 1};
@@ -3399,12 +3399,12 @@ TEST_CASE("CheckCounterIdMap")
         ++globalCounterIds;
     }
 
-    CHECK(counterIdMap.GetBackendId(0) == (std::pair<uint16_t, armnn::BackendId>(0, cpuRefId)));
-    CHECK(counterIdMap.GetBackendId(1) == (std::pair<uint16_t, armnn::BackendId>(1, cpuRefId)));
-    CHECK(counterIdMap.GetBackendId(2) == (std::pair<uint16_t, armnn::BackendId>(2, cpuRefId)));
-    CHECK(counterIdMap.GetBackendId(3) == (std::pair<uint16_t, armnn::BackendId>(3, cpuRefId)));
-    CHECK(counterIdMap.GetBackendId(4) == (std::pair<uint16_t, armnn::BackendId>(0, cpuAccId)));
-    CHECK(counterIdMap.GetBackendId(5) == (std::pair<uint16_t, armnn::BackendId>(1, cpuAccId)));
+    CHECK(counterIdMap.GetBackendId(0) == (std::pair<uint16_t, std::string>(0, cpuRefId)));
+    CHECK(counterIdMap.GetBackendId(1) == (std::pair<uint16_t, std::string>(1, cpuRefId)));
+    CHECK(counterIdMap.GetBackendId(2) == (std::pair<uint16_t, std::string>(2, cpuRefId)));
+    CHECK(counterIdMap.GetBackendId(3) == (std::pair<uint16_t, std::string>(3, cpuRefId)));
+    CHECK(counterIdMap.GetBackendId(4) == (std::pair<uint16_t, std::string>(0, cpuAccId)));
+    CHECK(counterIdMap.GetBackendId(5) == (std::pair<uint16_t, std::string>(1, cpuAccId)));
 
     CHECK(counterIdMap.GetGlobalId(0, cpuRefId) == 0);
     CHECK(counterIdMap.GetGlobalId(1, cpuRefId) == 1);
@@ -3417,7 +3417,7 @@ TEST_CASE("CheckCounterIdMap")
 TEST_CASE("CheckRegisterBackendCounters")
 {
     uint16_t globalCounterIds = INFERENCES_RUN;
-    armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
+    std::string cpuRefId(GetComputeDeviceAsCString(armnn::Compute::CpuRef));
 
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
@@ -3474,8 +3474,8 @@ TEST_CASE("CheckCounterStatusQuery")
     ProfilingService profilingService;
     profilingService.ResetExternalProfilingOptions(options, true);
 
-    const armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
-    const armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
+    const std::string cpuRefId(GetComputeDeviceAsCString(armnn::Compute::CpuRef));
+    const std::string cpuAccId(GetComputeDeviceAsCString(armnn::Compute::CpuAcc));
 
     // Create BackendProfiling for each backend
     BackendProfiling backendProfilingCpuRef(options, profilingService, cpuRefId);
@@ -3610,7 +3610,7 @@ TEST_CASE("CheckRegisterCounters")
 
     CaptureData captureData;
     MockProfilingService mockProfilingService(mockBuffer, options.m_EnableProfiling, captureData);
-    armnn::BackendId cpuRefId(armnn::Compute::CpuRef);
+    std::string cpuRefId(GetComputeDeviceAsCString(armnn::Compute::CpuRef));
 
     mockProfilingService.RegisterMapping(6, 0, cpuRefId);
     mockProfilingService.RegisterMapping(7, 1, cpuRefId);

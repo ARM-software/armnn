@@ -32,8 +32,8 @@ public:
                            ISendCounterPacket& packet,
                            IReadCounterValues& readCounterValue,
                            const ICounterMappings& counterIdMap,
-                           const std::unordered_map<armnn::BackendId,
-                           std::shared_ptr<IBackendProfilingContext>>& backendProfilingContexts)
+                           const std::unordered_map<std::string,
+                               std::shared_ptr<IBackendProfilingContext>>& backendProfilingContexts)
             : m_CaptureDataHolder(data)
             , m_IsRunning(false)
             , m_KeepRunning(false)
@@ -52,7 +52,7 @@ private:
     CaptureData ReadCaptureData();
     void Capture(IReadCounterValues& readCounterValues);
     void DispatchPeriodicCounterCapturePacket(
-            const armnn::BackendId& backendId, const std::vector<Timestamp>& timestampValues);
+            const std::string& backendId, const std::vector<Timestamp>& timestampValues);
 
     const Holder&             m_CaptureDataHolder;
     bool                      m_IsRunning;
@@ -61,7 +61,7 @@ private:
     IReadCounterValues&       m_ReadCounterValues;
     ISendCounterPacket&       m_SendCounterPacket;
     const ICounterMappings&   m_CounterIdMap;
-    const std::unordered_map<armnn::BackendId,
+    const std::unordered_map<std::string,
             std::shared_ptr<IBackendProfilingContext>>& m_BackendProfilingContexts;
 };
 

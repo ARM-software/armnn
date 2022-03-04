@@ -36,7 +36,7 @@ public:
                                          uint16_t count = 0,
                                          const armnn::Optional<std::string>& parentCategoryName
                                             = armnn::EmptyOptional()) override;
-    const Counter* RegisterCounter(const armnn::BackendId& backendId,
+    const Counter* RegisterCounter(const std::string& backendId,
                                    const uint16_t uid,
                                    const std::string& parentCategoryName,
                                    uint16_t counterClass,

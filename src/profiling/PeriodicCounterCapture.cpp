@@ -56,7 +56,7 @@ CaptureData PeriodicCounterCapture::ReadCaptureData()
 }
 
 void PeriodicCounterCapture::DispatchPeriodicCounterCapturePacket(
-    const armnn::BackendId& backendId, const std::vector<Timestamp>& timestampValues)
+    const std::string& backendId, const std::vector<Timestamp>& timestampValues)
 {
     // Report counter values
     for (const auto& timestampInfo : timestampValues)
@@ -122,7 +122,7 @@ void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
 
         // Report counter values for each active backend
         auto activeBackends = currentCaptureData.GetActiveBackends();
-        for_each(activeBackends.begin(), activeBackends.end(), [&](const armnn::BackendId& backendId)
+        for_each(activeBackends.begin(), activeBackends.end(), [&](const std::string& backendId)
         {
             DispatchPeriodicCounterCapturePacket(
                 backendId, m_BackendProfilingContexts.at(backendId)->ReportCounterValues());

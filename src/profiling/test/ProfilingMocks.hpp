@@ -505,7 +505,7 @@ public:
         return counterSetPtr;
     }
 
-    const Counter* RegisterCounter(const armnn::BackendId& backendId,
+    const Counter* RegisterCounter(const std::string& backendId,
                                    const uint16_t uid,
                                    const std::string& parentCategoryName,
                                    uint16_t counterClass,
@@ -676,7 +676,7 @@ public:
 
     void RegisterMapping(uint16_t globalCounterId,
                          uint16_t backendCounterId,
-                         const armnn::BackendId& backendId)
+                         const std::string& backendId)
     {
         m_CounterMapping.RegisterMapping(globalCounterId, backendCounterId, backendId);
     }

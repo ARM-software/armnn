@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnn/BackendId.hpp>
 #include "Holder.hpp"
 
 namespace arm
@@ -21,7 +20,7 @@ CaptureData& CaptureData::operator=(const CaptureData& other)
     return *this;
 }
 
-void CaptureData::SetActiveBackends(const std::set<armnn::BackendId>& activeBackends)
+void CaptureData::SetActiveBackends(const std::set<std::string>& activeBackends)
 {
     m_ActiveBackends = activeBackends;
 }
@@ -36,7 +35,7 @@ void CaptureData::SetCounterIds(const std::vector<uint16_t>& counterIds)
     m_CounterIds = counterIds;
 }
 
-const std::set<armnn::BackendId>& CaptureData::GetActiveBackends() const
+const std::set<std::string>& CaptureData::GetActiveBackends() const
 {
     return m_ActiveBackends;
 }
@@ -73,7 +72,7 @@ bool CaptureData::IsCounterIdInCaptureData(uint16_t counterId)
 
 void Holder::SetCaptureData(uint32_t capturePeriod,
                             const std::vector<uint16_t>& counterIds,
-                            const std::set<armnn::BackendId>& activeBackends)
+                            const std::set<std::string>& activeBackends)
 {
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);
 

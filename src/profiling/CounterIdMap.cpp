@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 //
 #include "CounterIdMap.hpp"
-#include "armnn/BackendId.hpp"
 #include <armnn/Exceptions.hpp>
 #include <map>
 
@@ -14,9 +13,9 @@ namespace pipe
 
 void CounterIdMap::RegisterMapping(uint16_t globalCounterId,
                                    uint16_t backendCounterId,
-                                   const armnn::BackendId& backendId)
+                                   const std::string& backendId)
 {
-    std::pair<uint16_t, armnn::BackendId> backendIdPair(backendCounterId, backendId);
+    std::pair<uint16_t, std::string> backendIdPair(backendCounterId, backendId);
     m_GlobalCounterIdMap[globalCounterId] = backendIdPair;
     m_BackendCounterIdMap[backendIdPair] = globalCounterId;
 }
@@ -27,9 +26,9 @@ void CounterIdMap::Reset()
     m_BackendCounterIdMap.clear();
 }
 
-uint16_t CounterIdMap::GetGlobalId(uint16_t backendCounterId, const armnn::BackendId& backendId) const
+uint16_t CounterIdMap::GetGlobalId(uint16_t backendCounterId, const std::string& backendId) const
 {
-    std::pair<uint16_t, armnn::BackendId> backendIdPair(backendCounterId, backendId);
+    std::pair<uint16_t, std::string> backendIdPair(backendCounterId, backendId);
     auto it = m_BackendCounterIdMap.find(backendIdPair);
     if (it == m_BackendCounterIdMap.end())
     {
@@ -40,7 +39,7 @@ uint16_t CounterIdMap::GetGlobalId(uint16_t backendCounterId, const armnn::Backe
     return it->second;
 }
 
-const std::pair<uint16_t, armnn::BackendId>& CounterIdMap::GetBackendId(uint16_t globalCounterId) const
+const std::pair<uint16_t, std::string>& CounterIdMap::GetBackendId(uint16_t globalCounterId) const
 {
     auto it = m_GlobalCounterIdMap.find(globalCounterId);
     if (it == m_GlobalCounterIdMap.end())

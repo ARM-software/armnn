@@ -155,8 +155,8 @@ TEST_CASE("TestBackendCounters")
     CounterIdMap counterIdMap;
     MockBackendSendCounterPacket sendCounterPacket;
 
-    const armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
-    const armnn::BackendId gpuAccId(armnn::Compute::GpuAcc);
+    const std::string cpuAccId(GetComputeDeviceAsCString(armnn::Compute::CpuAcc));
+    const std::string gpuAccId(GetComputeDeviceAsCString(armnn::Compute::GpuAcc));
 
     ProfilingOptions options;
     options.m_EnableProfiling = true;
@@ -173,7 +173,7 @@ TEST_CASE("TestBackendCounters")
     std::shared_ptr<IBackendProfilingContext> gpuProfilingContextPtr =
             std::make_shared<armnn::MockBackendProfilingContext>(gpuBackendProfilingPtr);
 
-    std::unordered_map<armnn::BackendId,
+    std::unordered_map<std::string,
             std::shared_ptr<IBackendProfilingContext>> backendProfilingContexts;
 
     backendProfilingContexts[cpuAccId] = cpuProfilingContextPtr;
@@ -222,7 +222,7 @@ TEST_CASE("TestBackendCounters")
     periodicCounterSelectionCommandHandler(PacketWriter(period, gpuCounters));
     periodicCounterCapture.Stop();
 
-    std::set<armnn::BackendId> activeIds = holder.GetCaptureData().GetActiveBackends();
+    std::set<std::string> activeIds = holder.GetCaptureData().GetActiveBackends();
     CHECK(activeIds.size() == 1);
     CHECK((activeIds.find(gpuAccId) != activeIds.end()));
 
@@ -403,8 +403,8 @@ TEST_CASE("TestBackendCounterLogging")
     CounterIdMap counterIdMap;
     MockBackendSendCounterPacket sendCounterPacket;
 
-    const armnn::BackendId cpuAccId(armnn::Compute::CpuAcc);
-    const armnn::BackendId gpuAccId(armnn::Compute::GpuAcc);
+    const std::string cpuAccId(GetComputeDeviceAsCString(armnn::Compute::CpuAcc));
+    const std::string gpuAccId(GetComputeDeviceAsCString(armnn::Compute::GpuAcc));
 
     ProfilingOptions options;
     options.m_EnableProfiling = true;
@@ -417,7 +417,7 @@ TEST_CASE("TestBackendCounterLogging")
     std::shared_ptr<IBackendProfilingContext> cpuProfilingContextPtr =
             std::make_shared<armnn::MockBackendProfilingContext>(cpuBackendProfilingPtr);
 
-    std::unordered_map<armnn::BackendId,
+    std::unordered_map<std::string,
             std::shared_ptr<IBackendProfilingContext>> backendProfilingContexts;
 
     uint16_t globalId = 5;

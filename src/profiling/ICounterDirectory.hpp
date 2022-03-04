@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <armnn/BackendId.hpp>
 
 #include <string>
 #include <vector>
@@ -94,7 +93,7 @@ class Counter final
 {
 public:
     // Constructors
-    Counter(armnn::BackendId   backendId,
+    Counter(const std::string& backendId,
             uint16_t           counterUid,
             uint16_t           maxCounterUid,
             uint16_t           counterClass,
@@ -119,7 +118,7 @@ public:
     {}
 
     // Fields
-    armnn::BackendId   m_BackendId;
+    std::string m_BackendId;
     uint16_t    m_Uid;
     uint16_t    m_MaxCounterUid;
     uint16_t    m_Class;

@@ -35,7 +35,7 @@ public:
     PeriodicCounterSelectionCommandHandler(uint32_t familyId,
                                            uint32_t packetId,
                                            uint32_t version,
-                                           const std::unordered_map<armnn::BackendId,
+                                           const std::unordered_map<std::string,
                                                    std::shared_ptr<IBackendProfilingContext>>&
                                                    backendProfilingContexts,
                                            const ICounterMappings& counterIdMap,
@@ -64,8 +64,8 @@ public:
 
 private:
 
-    std::unordered_map<armnn::BackendId, std::vector<uint16_t>> m_BackendCounterMap;
-    const std::unordered_map<armnn::BackendId,
+    std::unordered_map<std::string, std::vector<uint16_t>> m_BackendCounterMap;
+    const std::unordered_map<std::string,
           std::shared_ptr<IBackendProfilingContext>>& m_BackendProfilingContexts;
     const ICounterMappings& m_CounterIdMap;
     Holder& m_CaptureDataHolder;
@@ -77,9 +77,9 @@ private:
     ISendCounterPacket& m_SendCounterPacket;
     const ProfilingStateMachine& m_StateMachine;
 
-    void ActivateBackedCounters(const armnn::BackendId backendId,
-                                const uint32_t capturePeriod,
-                                const std::vector<uint16_t> counterIds)
+    void ActivateBackendCounters(const std::string backendId,
+                                 const uint32_t capturePeriod,
+                                 const std::vector<uint16_t> counterIds)
     {
         armnn::Optional<std::string> errorMsg =
                 m_BackendProfilingContexts.at(backendId)->ActivateCounters(capturePeriod, counterIds);
@@ -91,7 +91,7 @@ private:
         }
     }
     void ParseData(const arm::pipe::Packet& packet, CaptureData& captureData);
-    std::set<armnn::BackendId> ProcessBackendCounterIds(const uint32_t capturePeriod,
+    std::set<std::string> ProcessBackendCounterIds(const uint32_t capturePeriod,
                                                         const std::set<uint16_t> newCounterIds,
                                                         const std::set<uint16_t> unusedCounterIds);
 

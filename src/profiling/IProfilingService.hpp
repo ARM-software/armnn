@@ -46,7 +46,7 @@ public:
     virtual ProfilingState ConfigureProfilingService(const ProfilingOptions& options,
                                                      bool resetProfilingService = false) = 0;
     // Store a profiling context returned from a backend that support profiling.
-    virtual void AddBackendProfilingContext(const armnn::BackendId backendId,
+    virtual void AddBackendProfilingContext(const std::string& backendId,
         std::shared_ptr<IBackendProfilingContext> profilingContext) = 0;
     virtual ICounterRegistry& GetCounterRegistry() = 0;
     virtual IRegisterCounterMapping& GetCounterMappingRegistry() = 0;

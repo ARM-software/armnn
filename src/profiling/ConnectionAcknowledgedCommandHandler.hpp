@@ -23,7 +23,7 @@ namespace pipe
 class ConnectionAcknowledgedCommandHandler final : public arm::pipe::CommandHandlerFunctor
 {
 
-typedef const std::unordered_map<armnn::BackendId, std::shared_ptr<IBackendProfilingContext>>&
+typedef const std::unordered_map<std::string, std::shared_ptr<IBackendProfilingContext>>&
     BackendProfilingContexts;
 
 public:

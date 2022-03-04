@@ -5,7 +5,6 @@
 
 #include "ProfilingService.hpp"
 
-#include <armnn/BackendId.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
@@ -194,7 +193,7 @@ void ProfilingService::Disconnect()
 }
 
 // Store a profiling context returned from a backend that support profiling, and register its counters
-void ProfilingService::AddBackendProfilingContext(const armnn::BackendId backendId,
+void ProfilingService::AddBackendProfilingContext(const std::string& backendId,
     std::shared_ptr<IBackendProfilingContext> profilingContext)
 {
     ARMNN_ASSERT(profilingContext != nullptr);
@@ -262,7 +261,7 @@ CaptureData ProfilingService::GetCaptureData()
 
 void ProfilingService::SetCaptureData(uint32_t capturePeriod,
                                       const std::vector<uint16_t>& counterIds,
-                                      const std::set<armnn::BackendId>& activeBackends)
+                                      const std::set<std::string>& activeBackends)
 {
     m_Holder.SetCaptureData(capturePeriod, counterIds, activeBackends);
 }

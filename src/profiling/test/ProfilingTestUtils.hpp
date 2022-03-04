@@ -8,7 +8,6 @@
 #include "ProfilingUtils.hpp"
 #include "Runtime.hpp"
 
-#include <armnn/BackendId.hpp>
 #include <armnn/Optional.hpp>
 #include <BufferManager.hpp>
 #include <ProfilingService.hpp>

@@ -55,7 +55,7 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
                 if(!backendContext.second->EnableProfiling(true))
                 {
                     throw armnn::BackendProfilingException(
-                            "Unable to enable profiling on Backend Id: " + backendContext.first.Get());
+                            "Unable to enable profiling on Backend Id: " + backendContext.first);
                 }
             }
         }

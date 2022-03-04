@@ -6,9 +6,8 @@
 #include "CounterDirectory.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <armnn/Exceptions.hpp>
+#include <armnn/BackendId.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <common/include/SwTrace.hpp>
 
@@ -178,7 +177,7 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
     return counterSetPtr;
 }
 
-const Counter* CounterDirectory::RegisterCounter(const armnn::BackendId& backendId,
+const Counter* CounterDirectory::RegisterCounter(const std::string& /*backendId*/,
                                                  const uint16_t uid,
                                                  const std::string& parentCategoryName,
                                                  uint16_t counterClass,
@@ -191,8 +190,6 @@ const Counter* CounterDirectory::RegisterCounter(const armnn::BackendId& backend
                                                  const armnn::Optional<uint16_t>& deviceUid,
                                                  const armnn::Optional<uint16_t>& counterSetUid)
 {
-    IgnoreUnused(backendId);
-
     // Check that the given parent category name is valid
     if (parentCategoryName.empty() ||
             !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(parentCategoryName))

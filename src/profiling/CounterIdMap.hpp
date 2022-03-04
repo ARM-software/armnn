@@ -4,7 +4,6 @@
 //
 #pragma once
 
-#include "armnn/BackendId.hpp"
 #include <map>
 
 namespace arm
@@ -15,8 +14,8 @@ namespace pipe
 class ICounterMappings
 {
 public:
-    virtual uint16_t GetGlobalId(uint16_t backendCounterId, const armnn::BackendId& backendId) const = 0;
-    virtual const std::pair<uint16_t, armnn::BackendId>& GetBackendId(uint16_t globalCounterId) const = 0;
+    virtual uint16_t GetGlobalId(uint16_t backendCounterId, const std::string& backendId) const = 0;
+    virtual const std::pair<uint16_t, std::string>& GetBackendId(uint16_t globalCounterId) const = 0;
     virtual ~ICounterMappings() {}
 };
 
@@ -25,7 +24,7 @@ class IRegisterCounterMapping
 public:
     virtual void RegisterMapping(uint16_t globalCounterId,
                                  uint16_t backendCounterId,
-                                 const armnn::BackendId& backendId) = 0;
+                                 const std::string& backendId) = 0;
     virtual void Reset() = 0;
     virtual ~IRegisterCounterMapping() {}
 };
@@ -38,13 +37,13 @@ public:
     virtual ~CounterIdMap() {}
     void RegisterMapping(uint16_t globalCounterId,
                          uint16_t backendCounterId,
-                         const armnn::BackendId& backendId) override;
+                         const std::string& backendId) override;
     void Reset() override;
-    uint16_t GetGlobalId(uint16_t backendCounterId, const armnn::BackendId& backendId) const override;
-    const std::pair<uint16_t, armnn::BackendId>& GetBackendId(uint16_t globalCounterId) const override;
+    uint16_t GetGlobalId(uint16_t backendCounterId, const std::string& backendId) const override;
+    const std::pair<uint16_t, std::string>& GetBackendId(uint16_t globalCounterId) const override;
 private:
-    std::map<uint16_t, std::pair<uint16_t, armnn::BackendId>> m_GlobalCounterIdMap;
-    std::map<std::pair<uint16_t, armnn::BackendId>, uint16_t> m_BackendCounterIdMap;
+    std::map<uint16_t, std::pair<uint16_t, std::string>> m_GlobalCounterIdMap;
+    std::map<std::pair<uint16_t, std::string>, uint16_t> m_BackendCounterIdMap;
 };
 
 }    // namespace pipe

@@ -21,7 +21,7 @@ class RegisterBackendCounters : public IRegisterBackendCounters
 public:
 
     RegisterBackendCounters(
-        uint16_t currentMaxGlobalCounterID, const armnn::BackendId& backendId, IProfilingService& profilingService)
+        uint16_t currentMaxGlobalCounterID, const std::string& backendId, IProfilingService& profilingService)
         : m_CurrentMaxGlobalCounterID(currentMaxGlobalCounterID),
           m_BackendId(backendId),
           m_ProfilingService(profilingService),
@@ -54,7 +54,7 @@ public:
 
 private:
     uint16_t m_CurrentMaxGlobalCounterID;
-    const armnn::BackendId& m_BackendId;
+    const std::string& m_BackendId;
     IProfilingService& m_ProfilingService;
     ICounterRegistry& m_CounterDirectory;
 };

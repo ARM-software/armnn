@@ -73,7 +73,7 @@ std::vector<CounterStatus> BackendProfiling::GetActiveCounters()
 
     for (auto globalCounterId : globalCounterIds) {
         // Get pair of local counterId and backendId using globalCounterId
-        const std::pair<uint16_t, armnn::BackendId>& backendCounterIdPair =
+        const std::pair<uint16_t, std::string>& backendCounterIdPair =
                 m_ProfilingService.GetCounterMappings().GetBackendId(globalCounterId);
         if (backendCounterIdPair.second == m_BackendId)
         {

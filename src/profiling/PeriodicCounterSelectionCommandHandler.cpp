@@ -113,7 +113,7 @@ void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet&
             return counterId > m_MaxArmCounterId;
         });
 
-        std::set<armnn::BackendId> activeBackends;
+        std::set<std::string> activeBackends;
         std::set<uint16_t> backendCounterIds = std::set<uint16_t>(backendIdStart, validCounterIds.end());
 
         if (m_BackendCounterMap.size() != 0)
@@ -166,13 +166,13 @@ void PeriodicCounterSelectionCommandHandler::operator()(const arm::pipe::Packet&
     }
 }
 
-std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBackendCounterIds(
+std::set<std::string> PeriodicCounterSelectionCommandHandler::ProcessBackendCounterIds(
                                                                       const uint32_t capturePeriod,
                                                                       const std::set<uint16_t> newCounterIds,
                                                                       const std::set<uint16_t> unusedCounterIds)
 {
-    std::set<armnn::BackendId> changedBackends;
-    std::set<armnn::BackendId> activeBackends = m_CaptureDataHolder.GetCaptureData().GetActiveBackends();
+    std::set<std::string> changedBackends;
+    std::set<std::string> activeBackends = m_CaptureDataHolder.GetCaptureData().GetActiveBackends();
 
     for (uint16_t counterId : newCounterIds)
     {
@@ -195,7 +195,7 @@ std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBacken
             // If a backend has no counters associated with it we remove it from active backends and
             // send a capture period of zero with an empty vector, this will deactivate all the backends counters
             activeBackends.erase(backendId.second);
-            ActivateBackedCounters(backendId.second, 0, {});
+            ActivateBackendCounters(backendId.second, 0, {});
         }
         else
         {
@@ -208,7 +208,7 @@ std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBacken
     {
         for (auto backend : changedBackends)
         {
-            ActivateBackedCounters(backend, capturePeriod, m_BackendCounterMap[backend]);
+            ActivateBackendCounters(backend, capturePeriod, m_BackendCounterMap[backend]);
         }
     }
     // Otherwise update all the backends with the new capture period and any new/unused counters
@@ -216,7 +216,7 @@ std::set<armnn::BackendId> PeriodicCounterSelectionCommandHandler::ProcessBacken
     {
         for (auto backend : m_BackendCounterMap)
         {
-            ActivateBackedCounters(backend.first, capturePeriod, backend.second);
+            ActivateBackendCounters(backend.first, capturePeriod, backend.second);
         }
         if(capturePeriod == 0)
         {

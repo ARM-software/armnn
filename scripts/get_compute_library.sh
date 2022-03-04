@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="0597b7b55ba0c1aa2cc58e80f95dc918b92afe68" #Adding Comments to ComputeLibrary.dir on expected file structure
+DEFAULT_CLFRAMEWORKREVISION="4cbcb840caca1346de5f2271b67e4ede17b72734" #Removing SVE / SVE2 guards from decoupled kernels
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

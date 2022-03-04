@@ -89,7 +89,7 @@ public:
 
     void RegisterDebugCallback(const DebugCallbackFunction& func);
 
-    void SendNetworkStructure();
+    void SendNetworkStructure(arm::pipe::IProfilingService& profilingService);
 
     bool IsAsyncEnabled()
     {

@@ -543,14 +543,14 @@ void LoadedNetwork::AllocateAndExecuteConstantWorkloadsAsync()
     }
 }
 
-void LoadedNetwork::SendNetworkStructure()
+void LoadedNetwork::SendNetworkStructure(arm::pipe::IProfilingService& profilingService)
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_SendNetworkStructure");
     Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
     ProfilingGuid networkGuid = m_OptimizedNetwork->GetGuid();
 
     std::unique_ptr<TimelineUtilityMethods> timelineUtils =
-        TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
+        TimelineUtilityMethods::GetTimelineUtils(profilingService);
 
     timelineUtils->CreateTypedEntity(networkGuid, LabelsAndEventClasses::NETWORK_GUID);
 
@@ -560,19 +560,19 @@ void LoadedNetwork::SendNetworkStructure()
         AddLayerStructure(timelineUtils, *layer, networkGuid);
         switch (layer->GetType())
         {
-        case LayerType::Input:
-        case LayerType::Output:
-        {
-            // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput().
-            break;
-        }
-        default:
+            case LayerType::Input:
+            case LayerType::Output:
             {
-            for (auto& workload : m_WorkloadQueue)
-            {
-                // Add workload to the post-optimisation network structure
-                AddWorkloadStructure(timelineUtils, workload, *layer);
+                // Inputs and outputs are treated in a special way - see EnqueueInput() and EnqueueOutput().
+                break;
             }
+            default:
+            {
+                for (auto& workload : m_WorkloadQueue)
+                {
+                    // Add workload to the post-optimisation network structure
+                    AddWorkloadStructure(timelineUtils, workload, *layer);
+                }
             break;
             }
         }

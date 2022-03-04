@@ -110,7 +110,7 @@ public:
 
     //NOTE: we won't need the profiling service reference but it is good to pass the service
     // in this way to facilitate other implementations down the road
-    void ReportStructure() override;
+    void ReportStructure(arm::pipe::IProfilingService& profilingService) override;
 
     void InitialiseProfilingService(arm::pipe::IProfilingService& profilingService) override;
 

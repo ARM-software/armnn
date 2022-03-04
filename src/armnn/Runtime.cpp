@@ -286,18 +286,18 @@ const std::shared_ptr<IProfiler> RuntimeImpl::GetProfiler(NetworkId networkId) c
     return nullptr;
 }
 
-void RuntimeImpl::ReportStructure() // arm::pipe::IProfilingService& profilingService as param
+void RuntimeImpl::ReportStructure(arm::pipe::IProfilingService& profilingService)
 {
-    // No-op for the time being, but this may be useful in future to have the profilingService available
-    // if (profilingService.IsProfilingEnabled()){}
-
-    LoadedNetworks::iterator it = m_LoadedNetworks.begin();
-    while (it != m_LoadedNetworks.end())
+    if (profilingService.IsProfilingEnabled())
     {
-        auto& loadedNetwork = it->second;
-        loadedNetwork->SendNetworkStructure();
-        // Increment the Iterator to point to next entry
-        it++;
+        LoadedNetworks::iterator it = m_LoadedNetworks.begin();
+        while (it != m_LoadedNetworks.end())
+        {
+            auto& loadedNetwork = it->second;
+            loadedNetwork->SendNetworkStructure(profilingService);
+            // Increment the Iterator to point to next entry
+            it++;
+        }
     }
 }
 

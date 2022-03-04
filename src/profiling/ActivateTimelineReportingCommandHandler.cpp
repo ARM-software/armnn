@@ -5,6 +5,8 @@
 
 #include "ActivateTimelineReportingCommandHandler.hpp"
 #include "TimelineUtilityMethods.hpp"
+#include <ArmNNProfilingServiceInitialiser.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
 
 #include <armnn/Exceptions.hpp>
 #include <fmt/format.h>
@@ -49,7 +51,10 @@ void ActivateTimelineReportingCommandHandler::operator()(const arm::pipe::Packet
 
                 m_TimelineReporting = true;
 
-                m_ReportStructure.value().ReportStructure();
+                armnn::ArmNNProfilingServiceInitialiser initialiser;
+                std::unique_ptr<IProfilingService> profilingService = IProfilingService::CreateProfilingService(
+                    arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+                m_ReportStructure.value().ReportStructure(*profilingService);
 
                 m_BackendNotifier.NotifyBackendsForTimelineReporting();
             }

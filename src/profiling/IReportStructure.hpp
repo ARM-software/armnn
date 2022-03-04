@@ -11,11 +11,13 @@ namespace arm
 namespace pipe
 {
 
+class IProfilingService;
+
 class IReportStructure
 {
 public:
     virtual ~IReportStructure() {}
-    virtual void ReportStructure() = 0;
+    virtual void ReportStructure(arm::pipe::IProfilingService& profilingService) = 0;
 };
 
 } // namespace pipe

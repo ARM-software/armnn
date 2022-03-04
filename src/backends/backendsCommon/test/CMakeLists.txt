@@ -40,8 +40,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     LogSoftmaxEndToEndTestImpl.cpp
     LogSoftmaxEndToEndTestImpl.hpp
     MemoryManagerTests.cpp
-    MockBackend.cpp
-    MockBackend.hpp
     MockBackendId.hpp
     OptimizeSubgraphViewTests.cpp
     OptimizationViewsTests.cpp

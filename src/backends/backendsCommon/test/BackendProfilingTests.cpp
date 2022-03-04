@@ -7,7 +7,6 @@
 #include "CounterDirectory.hpp"
 #include "CounterIdMap.hpp"
 #include "Holder.hpp"
-#include "MockBackend.hpp"
 #include "MockBackendId.hpp"
 #include "PeriodicCounterCapture.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
@@ -23,6 +22,7 @@
 #include <armnn/Logging.hpp>
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 #include <armnn/profiling/ProfilingOptions.hpp>
+#include <armnnTestUtils/MockBackend.hpp>
 
 #include <doctest/doctest.h>
 #include <vector>

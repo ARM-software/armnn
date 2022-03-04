@@ -5,7 +5,6 @@
 
 
 #include <CommonTestUtils.hpp>
-#include "MockBackend.hpp"
 
 #include <Graph.hpp>
 #include <Network.hpp>
@@ -14,6 +13,7 @@
 #include <armnn/backends/OptimizationViews.hpp>
 #include <armnn/backends/SubgraphView.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
+#include <armnnTestUtils/MockBackend.hpp>
 
 #include <doctest/doctest.h>
 

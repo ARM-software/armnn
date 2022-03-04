@@ -32,7 +32,7 @@ struct MemCopyTestHelper<armnn::RefWorkloadFactory>
 TEST_SUITE("RefMemCopy")
 {
 
-    TEST_CASE("CopyBetweenCpuMockAndRef")
+    TEST_CASE("CopyBetweenMockAccAndRef")
     {
         LayerTestResult<float, 4> result =
             MemCopyTest<armnn::MockWorkloadFactory, armnn::RefWorkloadFactory, armnn::DataType::Float32>(false);
@@ -41,7 +41,7 @@ TEST_SUITE("RefMemCopy")
         CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
     }
 
-    TEST_CASE("CopyBetweenRefAndCpuMock")
+    TEST_CASE("CopyBetweenRefAndMockAcc")
     {
         LayerTestResult<float, 4> result =
             MemCopyTest<armnn::RefWorkloadFactory, armnn::MockWorkloadFactory, armnn::DataType::Float32>(false);
@@ -50,7 +50,7 @@ TEST_SUITE("RefMemCopy")
         CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
     }
 
-    TEST_CASE("CopyBetweenCpuMockAndRefWithSubtensors")
+    TEST_CASE("CopyBetweenMockAccAndRefWithSubtensors")
     {
         LayerTestResult<float, 4> result =
             MemCopyTest<armnn::MockWorkloadFactory, armnn::RefWorkloadFactory, armnn::DataType::Float32>(true);
@@ -59,7 +59,7 @@ TEST_SUITE("RefMemCopy")
         CHECK_MESSAGE(predResult.m_Result, predResult.m_Message.str());
     }
 
-    TEST_CASE("CopyBetweenRefAndCpuMockWithSubtensors")
+    TEST_CASE("CopyBetweenRefAndMockAccWithSubtensors")
     {
         LayerTestResult<float, 4> result =
             MemCopyTest<armnn::RefWorkloadFactory, armnn::MockWorkloadFactory, armnn::DataType::Float32>(true);

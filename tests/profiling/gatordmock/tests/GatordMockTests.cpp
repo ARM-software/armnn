@@ -9,7 +9,7 @@
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 #include <Runtime.hpp>
-#include <MockBackend.hpp>
+#include <armnnTestUtils/MockBackend.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <common/include/CommandHandlerRegistry.hpp>

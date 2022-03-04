@@ -4,6 +4,7 @@
 //
 
 #include <armnn/backends/ICustomAllocator.hpp>
+#include <armnn/BackendRegistry.hpp>
 #include <armnn/Descriptors.hpp>
 #include <armnn/Exceptions.hpp>
 #include <armnn/IRuntime.hpp>
@@ -12,7 +13,7 @@
 #include <cl/ClBackend.hpp>
 #include <doctest/doctest.h>
 #include <backendsCommon/DefaultAllocator.hpp>
-#include <backendsCommon/test/MockBackend.hpp>
+#include <armnnTestUtils/MockBackend.hpp>
 #include <cl/ClBackendDefaultAllocator.hpp>
 
 using namespace armnn;

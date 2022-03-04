@@ -4,13 +4,13 @@
 //
 
 #include <CommonTestUtils.hpp>
-#include "MockBackend.hpp"
 #include "MockBackendId.hpp"
 
 #include <Graph.hpp>
 #include <Network.hpp>
 
 #include <armnn/BackendRegistry.hpp>
+#include <armnnTestUtils/MockBackend.hpp>
 
 #include <doctest/doctest.h>
 #include <unordered_map>

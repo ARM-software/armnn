@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include "ArmNNProfilingServiceInitialiser.hpp"
 #include "CounterDirectory.hpp"
 #include "CounterIdMap.hpp"
 #include "Holder.hpp"
@@ -37,6 +38,11 @@ class ReadCounterVals : public IReadCounterValues
     virtual bool IsCounterRegistered(uint16_t counterUid) const override
     {
         return (counterUid > 4 && counterUid < 11);
+    }
+    virtual bool IsCounterRegistered(const std::string& counterName) const override
+    {
+        armnn::IgnoreUnused(counterName);
+        return false;
     }
     virtual uint16_t GetCounterCount() const override
     {
@@ -161,12 +167,14 @@ TEST_CASE("TestBackendCounters")
     ProfilingOptions options;
     options.m_EnableProfiling = true;
 
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    std::unique_ptr<IProfilingService> profilingService = arm::pipe::IProfilingService::CreateProfilingService(
+        arm::pipe::MAX_ARMNN_COUNTER, initialiser);
 
     std::unique_ptr<IBackendProfiling> cpuBackendProfilingPtr =
-            std::make_unique<BackendProfiling>(options, profilingService, cpuAccId);
+        std::make_unique<BackendProfiling>(options, *profilingService.get(), cpuAccId);
     std::unique_ptr<IBackendProfiling> gpuBackendProfilingPtr =
-            std::make_unique<BackendProfiling>(options, profilingService, gpuAccId);
+        std::make_unique<BackendProfiling>(options, *profilingService.get(), gpuAccId);
 
     std::shared_ptr<IBackendProfilingContext> cpuProfilingContextPtr =
             std::make_shared<armnn::MockBackendProfilingContext>(cpuBackendProfilingPtr);
@@ -409,10 +417,12 @@ TEST_CASE("TestBackendCounterLogging")
     ProfilingOptions options;
     options.m_EnableProfiling = true;
 
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    std::unique_ptr<IProfilingService> profilingService = arm::pipe::IProfilingService::CreateProfilingService(
+        arm::pipe::MAX_ARMNN_COUNTER, initialiser);
 
     std::unique_ptr<IBackendProfiling> cpuBackendProfilingPtr =
-            std::make_unique<BackendProfiling>(options, profilingService, cpuAccId);
+        std::make_unique<BackendProfiling>(options, *profilingService.get(), cpuAccId);
 
     std::shared_ptr<IBackendProfilingContext> cpuProfilingContextPtr =
             std::make_shared<armnn::MockBackendProfilingContext>(cpuBackendProfilingPtr);
@@ -461,15 +471,19 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
-    ProfilingService profilingService;
-    profilingService.ConfigureProfilingService(
+
+    armnn::ArmNNProfilingServiceInitialiser psInitialiser;
+    std::unique_ptr<IProfilingService> profilingService = arm::pipe::IProfilingService::CreateProfilingService(
+        arm::pipe::MAX_ARMNN_COUNTER, psInitialiser);
+
+    profilingService->ConfigureProfilingService(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 
     armnn::MockBackendInitialiser initialiser;
     // Create a runtime. During this the mock backend will be registered and context returned.
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
     armnn::MockBackendProfilingService mockProfilingService = armnn::MockBackendProfilingService::Instance();
-    armnn::MockBackendProfilingContext *mockBackEndProfilingContext = mockProfilingService.GetContext();
+    armnn::MockBackendProfilingContext* mockBackEndProfilingContext = mockProfilingService.GetContext();
     // Check that there is a valid context set.
     CHECK(mockBackEndProfilingContext);
     armnn::IBackendInternal::IBackendProfilingPtr& backendProfilingIface =
@@ -487,7 +501,7 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
 
     // Reset the profiling servie after the test.
     options.m_ProfilingOptions.m_EnableProfiling = false;
-    profilingService.ResetExternalProfilingOptions(
+    profilingService->ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 }
 

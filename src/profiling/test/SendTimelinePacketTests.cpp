@@ -5,11 +5,13 @@
 
 #include "ProfilingMocks.hpp"
 
+#include <ArmNNProfilingServiceInitialiser.hpp>
 #include <BufferManager.hpp>
 #include <ProfilingService.hpp>
 #include "ProfilingOptionsConverter.hpp"
 #include <ProfilingUtils.hpp>
 #include <SendTimelinePacket.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnnUtils/Threads.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
@@ -429,7 +431,8 @@ TEST_CASE("GetGuidsFromProfilingService")
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     armnn::RuntimeImpl runtime(options);
-    ProfilingService profilingService(runtime);
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser, runtime);
 
     profilingService.ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
@@ -450,7 +453,8 @@ TEST_CASE("GetTimelinePackerWriterFromProfilingService")
 {
     ProfilingOptions options;
     options.m_EnableProfiling = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     std::unique_ptr<ISendTimelinePacket> writer = profilingService.GetSendTimelinePacket();

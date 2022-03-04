@@ -6,9 +6,12 @@
 #include "ProfilingMocks.hpp"
 #include "ProfilingTestUtils.hpp"
 
+#include <ArmNNProfilingServiceInitialiser.hpp>
 #include <SendTimelinePacket.hpp>
 #include <TimelineUtilityMethods.hpp>
 #include <ProfilingService.hpp>
+
+#include <armnn/profiling/ArmNNProfiling.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 
@@ -24,7 +27,8 @@ TEST_SUITE("TimelineUtilityMethodsTests")
 TEST_CASE("CreateTypedLabelTest")
 {
     MockBufferManager mockBufferManager(1024);
-    ProfilingService  profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
 
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
@@ -74,7 +78,8 @@ TEST_CASE("CreateTypedLabelTest")
 TEST_CASE("SendWellKnownLabelsAndEventClassesTest")
 {
     MockBufferManager mockBufferManager(1024);
-    ProfilingService  profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
 
     CHECK_NOTHROW(TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(sendTimelinePacket));
@@ -201,7 +206,8 @@ TEST_CASE("SendWellKnownLabelsAndEventClassesTest")
 TEST_CASE("CreateNamedTypedChildEntityTest")
 {
     MockBufferManager mockBufferManager(1024);
-    ProfilingService  profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -288,7 +294,8 @@ TEST_CASE("CreateNamedTypedChildEntityTest")
 TEST_CASE("DeclareLabelTest")
 {
     MockBufferManager mockBufferManager(1024);
-    ProfilingService  profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -317,7 +324,8 @@ TEST_CASE("DeclareLabelTest")
 TEST_CASE("CreateNameTypeEntityInvalidTest")
 {
     MockBufferManager mockBufferManager(1024);
-    ProfilingService  profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -342,7 +350,8 @@ TEST_CASE("CreateNameTypeEntityInvalidTest")
 TEST_CASE("CreateNameTypeEntityTest")
 {
     MockBufferManager mockBufferManager(1024);
-    ProfilingService  profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -409,7 +418,8 @@ TEST_CASE("CreateNameTypeEntityTest")
 TEST_CASE("RecordEventTest")
 {
     MockBufferManager mockBufferManager(1024);
-    ProfilingService  profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.

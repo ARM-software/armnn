@@ -14,6 +14,7 @@
 
 #include <armnn/backends/DynamicBackend.hpp>
 
+#include <IInitialiseProfilingService.hpp>
 #include <IProfilingService.hpp>
 #include <IReportStructure.hpp>
 
@@ -24,8 +25,9 @@ namespace armnn
 {
 using LoadedNetworks = std::unordered_map<NetworkId, std::unique_ptr<LoadedNetwork>>;
 using IReportStructure = arm::pipe::IReportStructure;
+    using IInitialiseProfilingService = arm::pipe::IInitialiseProfilingService;
 
-struct RuntimeImpl final :  public IReportStructure
+struct RuntimeImpl final :  public IReportStructure, public IInitialiseProfilingService
 {
 public:
     /// Loads a complete network into the Runtime.
@@ -108,7 +110,9 @@ public:
 
     //NOTE: we won't need the profiling service reference but it is good to pass the service
     // in this way to facilitate other implementations down the road
-    void ReportStructure();
+    void ReportStructure() override;
+
+    void InitialiseProfilingService(arm::pipe::IProfilingService& profilingService) override;
 
 private:
     friend void RuntimeLoadedNetworksReserve(RuntimeImpl* runtime); // See RuntimeTests.cpp

@@ -3,11 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <ArmNNProfilingServiceInitialiser.hpp>
 #include "ProfilingOptionsConverter.hpp"
 #include "ProfilingTestUtils.hpp"
 #include "ProfilingUtils.hpp"
 
 #include <armnn/Descriptors.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
@@ -125,7 +127,8 @@ ProfilingGuid VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
     }
     else
     {
-        ProfilingService profilingService;
+        ArmNNProfilingServiceInitialiser initialiser;
+        ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
         CHECK(readProfilingGuid == profilingService.GetStaticId(label));
     }
 
@@ -373,7 +376,9 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     GetProfilingService(&runtime).ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), false);
 
-    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingServiceRuntimeHelper profilingServiceHelper(
+        arm::pipe::MAX_ARMNN_COUNTER, initialiser, GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);

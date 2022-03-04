@@ -206,8 +206,10 @@ class SwapProfilingConnectionFactoryHelper : public ProfilingService
 public:
     using MockProfilingConnectionFactoryPtr = std::unique_ptr<MockProfilingConnectionFactory>;
 
-    SwapProfilingConnectionFactoryHelper(ProfilingService& profilingService)
-        : ProfilingService()
+    SwapProfilingConnectionFactoryHelper(uint16_t maxGlobalCounterId,
+                                         IInitialiseProfilingService& initialiser,
+                                         ProfilingService& profilingService)
+        : ProfilingService(maxGlobalCounterId, initialiser)
         , m_ProfilingService(profilingService)
         , m_MockProfilingConnectionFactory(new MockProfilingConnectionFactory())
         , m_BackupProfilingConnectionFactory(nullptr)

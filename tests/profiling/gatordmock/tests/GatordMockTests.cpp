@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <ArmNNProfilingServiceInitialiser.hpp>
 #include <DirectoryCaptureCommandHandler.hpp>
 #include <GatordMockService.hpp>
 #include <ProfilingService.hpp>
@@ -254,7 +255,8 @@ TEST_CASE("GatorDMockEndToEnd")
     options.m_EnableProfiling = true;
     options.m_TimelineEnabled = true;
 
-    arm::pipe::ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    arm::pipe::ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "WaitingForAck" state
@@ -417,8 +419,8 @@ TEST_CASE("GatorDMockTimeLineActivation")
         FAIL("Failed to receive StreamMetaData");
     }
 
-    armnn::MockBackendProfilingService mockProfilingService = armnn::MockBackendProfilingService::Instance();
-    armnn::MockBackendProfilingContext *mockBackEndProfilingContext = mockProfilingService.GetContext();
+    armnn::MockBackendProfilingService  mockProfilingService = armnn::MockBackendProfilingService::Instance();
+    armnn::MockBackendProfilingContext* mockBackEndProfilingContext = mockProfilingService.GetContext();
 
     // Send Ack from GatorD
     mockService.SendConnectionAck();

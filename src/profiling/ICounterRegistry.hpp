@@ -37,10 +37,10 @@ public:
                                            double multiplier,
                                            const std::string& name,
                                            const std::string& description,
-                                           const armnn::Optional<std::string>& units,
-                                           const armnn::Optional<uint16_t>& numberOfCores,
-                                           const armnn::Optional<uint16_t>& deviceUid,
-                                           const armnn::Optional<uint16_t>& counterSetUid) = 0;
+                                           const armnn::Optional<std::string>& units = armnn::EmptyOptional(),
+                                           const armnn::Optional<uint16_t>& numberOfCores = armnn::EmptyOptional(),
+                                           const armnn::Optional<uint16_t>& deviceUid = armnn::EmptyOptional(),
+                                           const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional()) = 0;
 
 };
 

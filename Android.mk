@@ -117,6 +117,7 @@ LOCAL_SRC_FILES := \
         profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineDecoder.cpp \
         profiling/server/src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp \
+        src/armnn/ArmNNProfilingServiceInitialiser.cpp \
         src/armnn/BackendHelper.cpp \
         src/armnn/BackendRegistry.cpp \
         src/armnn/Descriptors.cpp \

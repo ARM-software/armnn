@@ -13,9 +13,11 @@ namespace pipe
 {
 
 std::unique_ptr<IProfilingService> IProfilingService::CreateProfilingService(
+    uint16_t maxGlobalCounterId,
+    IInitialiseProfilingService& initialiser,
     armnn::Optional<IReportStructure&> reportStructure)
 {
-    return std::make_unique<ProfilingService>(reportStructure);
+    return std::make_unique<ProfilingService>(maxGlobalCounterId, initialiser, reportStructure);
 }
 
 ProfilingGuidGenerator IProfilingService::m_GuidGenerator;

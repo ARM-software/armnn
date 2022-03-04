@@ -6,6 +6,8 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
+#include <ArmNNProfilingServiceInitialiser.hpp>
 #include <ProfilingOptionsConverter.hpp>
 #include <Processes.hpp>
 #include <Runtime.hpp>
@@ -627,7 +629,9 @@ TEST_CASE("ProfilingDisable")
     armnn::NetworkId netId;
     CHECK(runtime.LoadNetwork(netId, std::move(optNet)) == Status::Success);
 
-    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingServiceRuntimeHelper profilingServiceHelper(
+        arm::pipe::MAX_ARMNN_COUNTER, initialiser, GetProfilingService(&runtime));
     BufferManager& bufferManager = profilingServiceHelper.GetProfilingBufferManager();
     auto readableBuffer = bufferManager.GetReadableBuffer();
 
@@ -649,7 +653,9 @@ TEST_CASE("ProfilingEnableCpuRef")
     GetProfilingService(&runtime).ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), false);
 
-    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingServiceRuntimeHelper profilingServiceHelper(
+        arm::pipe::MAX_ARMNN_COUNTER, initialiser, GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);

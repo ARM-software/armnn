@@ -3,6 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <ArmNNProfilingServiceInitialiser.hpp>
+
 #include "ProfilingTests.hpp"
 #include "ProfilingTestUtils.hpp"
 
@@ -18,6 +20,7 @@
 #include <ICounterValues.hpp>
 #include <PeriodicCounterCapture.hpp>
 #include <PeriodicCounterSelectionCommandHandler.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnn/profiling/ProfilingOptions.hpp>
 #include <ProfilingStateMachine.hpp>
 #include <ProfilingUtils.hpp>
@@ -657,7 +660,8 @@ TEST_CASE("CaptureDataMethods")
 TEST_CASE("CheckProfilingServiceDisabled")
 {
     ProfilingOptions options;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -667,7 +671,8 @@ TEST_CASE("CheckProfilingServiceDisabled")
 TEST_CASE("CheckProfilingServiceCounterDirectory")
 {
     ProfilingOptions options;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     const ICounterDirectory& counterDirectory0 = profilingService.GetCounterDirectory();
@@ -691,7 +696,8 @@ TEST_CASE("CheckProfilingServiceCounterValues")
 {
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     profilingService.Update();
@@ -1767,6 +1773,11 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
             armnn::IgnoreUnused(counterUid);
             return true;
         }
+        bool IsCounterRegistered(const std::string& counterName) const override
+        {
+            armnn::IgnoreUnused(counterName);
+            return true;
+        }
         uint16_t GetCounterCount() const override
         {
             return 0;
@@ -2007,7 +2018,9 @@ TEST_CASE("CheckProfilingServiceNotActive")
     options.m_ProfilingOptions.m_EnableProfiling = true;
 
     armnn::RuntimeImpl runtime(options);
-    ProfilingServiceRuntimeHelper profilingServiceHelper(GetProfilingService(&runtime));
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingServiceRuntimeHelper profilingServiceHelper(
+        arm::pipe::MAX_ARMNN_COUNTER, initialiser, GetProfilingService(&runtime));
     profilingServiceHelper.ForceTransitionToState(ProfilingState::NotConnected);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::WaitingForAck);
     profilingServiceHelper.ForceTransitionToState(ProfilingState::Active);
@@ -2302,7 +2315,11 @@ TEST_CASE("CheckPeriodicCounterCaptureThread")
             armnn::IgnoreUnused(counterUid);
             return false;
         }
-
+        bool IsCounterRegistered(const std::string& counterName) const override
+        {
+            armnn::IgnoreUnused(counterName);
+            return false;
+        }
         uint16_t GetCounterCount() const override
         {
             return m_CounterSize;
@@ -2550,11 +2567,12 @@ TEST_CASE("CheckProfilingServiceGoodConnectionAcknowledgedPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "WaitingForAck" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -2610,11 +2628,12 @@ TEST_CASE("CheckProfilingServiceGoodRequestCounterDirectoryPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -2668,11 +2687,12 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacketInvalidCounterU
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -2747,11 +2767,12 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCounters")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -2812,11 +2833,12 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketSingleCounter"
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -2889,11 +2911,12 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketMultipleCounte
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -2968,11 +2991,12 @@ TEST_CASE("CheckProfilingServiceDisconnect")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Try to disconnect the profiling service while in the "Uninitialised" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3026,11 +3050,12 @@ TEST_CASE("CheckProfilingServiceGoodPerJobCounterSelectionPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3093,7 +3118,8 @@ TEST_CASE("CheckConfigureProfilingServiceOn")
 {
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
     // should get as far as NOT_CONNECTED
@@ -3106,7 +3132,8 @@ TEST_CASE("CheckConfigureProfilingServiceOn")
 TEST_CASE("CheckConfigureProfilingServiceOff")
 {
     ProfilingOptions options;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
     // should not move from Uninitialised
@@ -3122,7 +3149,8 @@ TEST_CASE("CheckProfilingServiceEnabled")
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -3152,7 +3180,8 @@ TEST_CASE("CheckProfilingServiceEnabledRuntime")
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
     LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
     ProfilingOptions options;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -3195,11 +3224,12 @@ TEST_CASE("CheckProfilingServiceBadConnectionAcknowledgedPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "WaitingForAck" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3257,11 +3287,12 @@ TEST_CASE("CheckProfilingServiceBadRequestCounterDirectoryPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3321,11 +3352,12 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacket")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
-    SwapProfilingConnectionFactoryHelper helper(profilingService);
+    SwapProfilingConnectionFactoryHelper helper(arm::pipe::MAX_ARMNN_COUNTER, initialiser, profilingService);
 
     // Bring the profiling service to the "Active" state
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
@@ -3422,7 +3454,8 @@ TEST_CASE("CheckRegisterBackendCounters")
     // Reset the profiling service to the uninitialized state
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     RegisterBackendCounters registerBackendCounters(globalCounterIds, cpuRefId, profilingService);
@@ -3471,7 +3504,8 @@ TEST_CASE("CheckCounterStatusQuery")
     options.m_EnableProfiling = true;
 
     // Reset the profiling service to the uninitialized state
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     const std::string cpuRefId(GetComputeDeviceAsCString(armnn::Compute::CpuRef));
@@ -3609,7 +3643,10 @@ TEST_CASE("CheckRegisterCounters")
     MockBufferManager mockBuffer(1024);
 
     CaptureData captureData;
-    MockProfilingService mockProfilingService(mockBuffer, options.m_EnableProfiling, captureData);
+
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    MockProfilingService mockProfilingService(
+        arm::pipe::MAX_ARMNN_COUNTER, initialiser, mockBuffer, options.m_EnableProfiling, captureData);
     std::string cpuRefId(GetComputeDeviceAsCString(armnn::Compute::CpuRef));
 
     mockProfilingService.RegisterMapping(6, 0, cpuRefId);
@@ -3674,7 +3711,8 @@ TEST_CASE("CheckFileFormat") {
     // Change file format to an unsupported value
     options.m_FileFormat = "json";
     // Enable the profiling service
-    ProfilingService profilingService;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
     profilingService.ResetExternalProfilingOptions(options, true);
     // Start the command handler and the send thread
     profilingService.Update();

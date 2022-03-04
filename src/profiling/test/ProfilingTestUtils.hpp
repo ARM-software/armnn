@@ -71,19 +71,21 @@ namespace pipe
 class ProfilingServiceRuntimeHelper : public ProfilingService
 {
 public:
-    ProfilingServiceRuntimeHelper(IProfilingService& profilingService)
-    : m_ProfilingService(profilingService) {}
+    ProfilingServiceRuntimeHelper(uint16_t maxGlobalCounterId,
+                                  IInitialiseProfilingService& initialiser,
+                                  arm::pipe::IProfilingService& profilingService)
+        : ProfilingService(maxGlobalCounterId, initialiser), m_ProfilingService(profilingService) {}
     ~ProfilingServiceRuntimeHelper() = default;
 
     BufferManager& GetProfilingBufferManager()
     {
-        return GetBufferManager(static_cast<ProfilingService&>(m_ProfilingService));
+        return GetBufferManager(static_cast<arm::pipe::ProfilingService&>(m_ProfilingService));
     }
-    IProfilingService& m_ProfilingService;
+    arm::pipe::IProfilingService& m_ProfilingService;
 
     void ForceTransitionToState(ProfilingState newState)
     {
-        TransitionToState(static_cast<ProfilingService&>(m_ProfilingService), newState);
+        TransitionToState(static_cast<arm::pipe::ProfilingService&>(m_ProfilingService), newState);
     }
 };
 

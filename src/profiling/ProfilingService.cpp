@@ -254,6 +254,16 @@ IRegisterCounterMapping& ProfilingService::GetCounterMappingRegistry()
     return m_CounterIdMap;
 }
 
+bool ProfilingService::IsCategoryRegistered(const std::string& categoryName) const
+{
+    return m_CounterDirectory.IsCategoryRegistered(categoryName);
+}
+
+bool ProfilingService::IsCounterRegistered(const std::string& counterName) const
+{
+    return m_CounterDirectory.IsCounterRegistered(counterName);
+}
+
 CaptureData ProfilingService::GetCaptureData()
 {
     return m_Holder.GetCaptureData();
@@ -305,96 +315,7 @@ std::unique_ptr<ISendTimelinePacket> ProfilingService::GetSendTimelinePacket() c
 
 void ProfilingService::Initialize()
 {
-    // Register a category for the basic runtime counters
-    if (!m_CounterDirectory.IsCategoryRegistered("ArmNN_Runtime"))
-    {
-        m_CounterDirectory.RegisterCategory("ArmNN_Runtime");
-    }
-
-    // Register a counter for the number of Network loads
-    if (!m_CounterDirectory.IsCounterRegistered("Network loads"))
-    {
-        const Counter* loadedNetworksCounter =
-                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   NETWORK_LOADS,
-                                                   "ArmNN_Runtime",
-                                                   0,
-                                                   0,
-                                                   1.f,
-                                                   "Network loads",
-                                                   "The number of networks loaded at runtime",
-                                                   std::string("networks"));
-        ARMNN_ASSERT(loadedNetworksCounter);
-        InitializeCounterValue(loadedNetworksCounter->m_Uid);
-    }
-    // Register a counter for the number of unloaded networks
-    if (!m_CounterDirectory.IsCounterRegistered("Network unloads"))
-    {
-        const Counter* unloadedNetworksCounter =
-                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   NETWORK_UNLOADS,
-                                                   "ArmNN_Runtime",
-                                                   0,
-                                                   0,
-                                                   1.f,
-                                                   "Network unloads",
-                                                   "The number of networks unloaded at runtime",
-                                                   std::string("networks"));
-        ARMNN_ASSERT(unloadedNetworksCounter);
-        InitializeCounterValue(unloadedNetworksCounter->m_Uid);
-    }
-    // Register a counter for the number of registered backends
-    if (!m_CounterDirectory.IsCounterRegistered("Backends registered"))
-    {
-        const Counter* registeredBackendsCounter =
-                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   REGISTERED_BACKENDS,
-                                                   "ArmNN_Runtime",
-                                                   0,
-                                                   0,
-                                                   1.f,
-                                                   "Backends registered",
-                                                   "The number of registered backends",
-                                                   std::string("backends"));
-        ARMNN_ASSERT(registeredBackendsCounter);
-        InitializeCounterValue(registeredBackendsCounter->m_Uid);
-
-        // Due to backends being registered before the profiling service becomes active,
-        // we need to set the counter to the correct value here
-        SetCounterValue(REGISTERED_BACKENDS, static_cast<uint32_t>(armnn::BackendRegistryInstance().Size()));
-    }
-    // Register a counter for the number of registered backends
-    if (!m_CounterDirectory.IsCounterRegistered("Backends unregistered"))
-    {
-        const Counter* unregisteredBackendsCounter =
-                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   UNREGISTERED_BACKENDS,
-                                                   "ArmNN_Runtime",
-                                                   0,
-                                                   0,
-                                                   1.f,
-                                                   "Backends unregistered",
-                                                   "The number of unregistered backends",
-                                                   std::string("backends"));
-        ARMNN_ASSERT(unregisteredBackendsCounter);
-        InitializeCounterValue(unregisteredBackendsCounter->m_Uid);
-    }
-    // Register a counter for the number of inferences run
-    if (!m_CounterDirectory.IsCounterRegistered("Inferences run"))
-    {
-        const Counter* inferencesRunCounter =
-                m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
-                                                   INFERENCES_RUN,
-                                                   "ArmNN_Runtime",
-                                                   0,
-                                                   0,
-                                                   1.f,
-                                                   "Inferences run",
-                                                   "The number of inferences run",
-                                                   std::string("inferences"));
-        ARMNN_ASSERT(inferencesRunCounter);
-        InitializeCounterValue(inferencesRunCounter->m_Uid);
-    }
+    m_Initialiser.InitialiseProfilingService(*this);
 }
 
 void ProfilingService::InitializeCounterValue(uint16_t counterUid)

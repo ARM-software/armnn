@@ -50,7 +50,9 @@ public:
     using BackendProfilingContext = std::unordered_map<std::string,
                                                        std::shared_ptr<IBackendProfilingContext>>;
 
-    ProfilingService(armnn::Optional<IReportStructure&> reportStructure = armnn::EmptyOptional())
+    ProfilingService(uint16_t maxGlobalCounterId,
+                     IInitialiseProfilingService& initialiser,
+                     armnn::Optional<IReportStructure&> reportStructure = armnn::EmptyOptional())
         : m_Options()
         , m_TimelineReporting(false)
         , m_CounterDirectory()
@@ -118,8 +120,9 @@ public:
                                                       m_StateMachine,
                                                       *this)
         , m_TimelinePacketWriterFactory(m_BufferManager)
-        , m_MaxGlobalCounterId(INFERENCES_RUN)
+        , m_MaxGlobalCounterId(maxGlobalCounterId)
         , m_ServiceActive(false)
+        , m_Initialiser(initialiser)
     {
         // Register the "Connection Acknowledged" command handler
         m_CommandHandlerRegistry.RegisterFunctor(&m_ConnectionAcknowledgedCommandHandler);
@@ -151,7 +154,7 @@ public:
     void Update();
 
     // Disconnects the profiling service from the external server
-    void Disconnect();
+    void Disconnect() override;
 
     // Store a profiling context returned from a backend that support profiling.
     void AddBackendProfilingContext(const std::string& backendId,
@@ -170,6 +173,8 @@ public:
     // counter global/backend mapping functions
     const ICounterMappings& GetCounterMappings() const override;
     IRegisterCounterMapping& GetCounterMappingRegistry() override;
+    bool IsCategoryRegistered(const std::string& categoryName) const override;
+    bool IsCounterRegistered(const std::string& counterName) const override;
 
     // Getters for the profiling service state
     bool IsProfilingEnabled() const override;
@@ -184,6 +189,8 @@ public:
     uint32_t AddCounterValue(uint16_t counterUid, uint32_t value) override;
     uint32_t SubtractCounterValue(uint16_t counterUid, uint32_t value) override;
     uint32_t IncrementCounterValue(uint16_t counterUid) override;
+
+    void InitializeCounterValue(uint16_t counterUid) override;
 
     std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const override;
 
@@ -211,7 +218,6 @@ private:
 
     // Initialization/reset functions
     void Initialize();
-    void InitializeCounterValue(uint16_t counterUid);
     void Reset();
     void Stop();
 
@@ -255,6 +261,8 @@ private:
     std::mutex m_ServiceActiveMutex;
     std::condition_variable m_ServiceActiveConditionVariable;
     bool m_ServiceActive;
+
+    IInitialiseProfilingService& m_Initialiser;
 
 protected:
 

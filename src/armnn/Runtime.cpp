@@ -2,6 +2,8 @@
 // Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
+#include "ArmNNProfilingServiceInitialiser.hpp"
 #include "Runtime.hpp"
 
 #include <armnn/Version.hpp>
@@ -115,7 +117,11 @@ Status IRuntime::Execute(IWorkingMemHandle& workingMemHandle,
                          std::vector<ImportedInputId> preImportedInputs,
                          std::vector<ImportedOutputId> preImportedOutputs)
 {
-    return pRuntimeImpl->Execute(workingMemHandle, inputTensors, outputTensors, preImportedInputs, preImportedOutputs);
+    return pRuntimeImpl->Execute(workingMemHandle,
+                                 inputTensors,
+                                 outputTensors,
+                                 preImportedInputs,
+                                 preImportedOutputs);
 }
 
 Status IRuntime::UnloadNetwork(NetworkId networkId)
@@ -295,10 +301,17 @@ void RuntimeImpl::ReportStructure() // arm::pipe::IProfilingService& profilingSe
     }
 }
 
+void RuntimeImpl::InitialiseProfilingService(arm::pipe::IProfilingService& profilingService)
+{
+    ArmNNProfilingServiceInitialiser initialiser;
+    initialiser.InitialiseProfilingService(profilingService);
+}
+
 RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
     : m_NetworkIdCounter(0)
 {
-    m_ProfilingService = arm::pipe::IProfilingService::CreateProfilingService(*this);
+    m_ProfilingService = arm::pipe::IProfilingService::CreateProfilingService(
+        arm::pipe::MAX_ARMNN_COUNTER, *this, *this);
     const auto start_time = armnn::GetTimeNow();
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION;
     if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )

@@ -628,9 +628,12 @@ private:
 class MockProfilingService : public ProfilingService
 {
 public:
-    MockProfilingService(MockBufferManager& mockBufferManager,
+    MockProfilingService(uint16_t maxGlobalCounterId,
+                         IInitialiseProfilingService& initialiser,
+                         MockBufferManager& mockBufferManager,
                          bool isProfilingEnabled,
                          const CaptureData& captureData) :
+        ProfilingService(maxGlobalCounterId, initialiser),
         m_SendCounterPacket(mockBufferManager),
         m_IsProfilingEnabled(isProfilingEnabled),
         m_CaptureData(captureData)

@@ -337,6 +337,8 @@ list(APPEND armnn_sources
     src/armnn/layers/UnidirectionalSequenceLstmLayer.hpp
     src/armnn/layers/UnmapLayer.cpp
     src/armnn/layers/UnmapLayer.hpp
+    src/armnn/ArmNNProfilingServiceInitialiser.cpp
+    src/armnn/ArmNNProfilingServiceInitialiser.hpp
     src/armnn/AsyncExecutionCallback.cpp
     src/armnn/AsyncExecutionCallback.hpp
     src/armnn/BackendRegistry.cpp
@@ -424,6 +426,7 @@ list(APPEND armnn_sources
     src/profiling/CommandHandler.hpp
     src/profiling/ConnectionAcknowledgedCommandHandler.cpp
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
+    src/profiling/Counter.hpp
     src/profiling/CounterDirectory.cpp
     src/profiling/CounterDirectory.hpp
     src/profiling/CounterIdMap.cpp
@@ -441,6 +444,7 @@ list(APPEND armnn_sources
     src/profiling/ICounterDirectory.hpp
     src/profiling/ICounterRegistry.hpp
     src/profiling/ICounterValues.hpp
+    src/profiling/IInitialiseProfilingService.hpp
     src/profiling/INotifyBackends.hpp
     src/profiling/IReportStructure.hpp
     src/profiling/ISendCounterPacket.hpp

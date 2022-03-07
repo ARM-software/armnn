@@ -9,6 +9,8 @@
 #include "WorkloadInfo.hpp"
 #include "WorkingMemDescriptor.hpp"
 
+#include <armnn/Logging.hpp>
+
 #include <Profiling.hpp>
 #include <IProfilingService.hpp>
 

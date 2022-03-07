@@ -4,7 +4,8 @@
 //
 #pragma once
 
-#include <armnn/IRuntime.hpp>
+#include <armnn/Optional.hpp>
+
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 
 #include <common/include/IProfilingGuidGenerator.hpp>

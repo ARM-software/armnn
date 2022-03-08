@@ -65,7 +65,7 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
             ARMNN_ASSERT(commandHandlerFunctor);
             commandHandlerFunctor->operator()(packet);
         }
-        catch (const armnn::TimeoutException&)
+        catch (const arm::pipe::TimeoutException&)
         {
             if (m_StopAfterTimeout.load())
             {
@@ -85,10 +85,10 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
                 m_KeepRunning.store(false);
             }
         }
-        catch (const armnn::Exception& e)
+        catch (...)
         {
             // Log the error and continue
-            ARMNN_LOG(warning) << "An error has occurred when handling a command: " << e.what();
+            ARMNN_LOG(warning) << "An unknown error has occurred when handling a command";
             // Did we get here because the socket failed?
             if ( !profilingConnection.IsOpen() )
             {

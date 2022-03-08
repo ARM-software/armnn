@@ -306,7 +306,7 @@ TEST_CASE("DeclareLabelTest")
     CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel(""), arm::pipe::InvalidArgumentException);
 
     // Try declaring an invalid (wrong SWTrace format) label
-    CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel("inv@lid lab€l"), RuntimeException);
+    CHECK_THROWS_AS(timelineUtilityMethods.DeclareLabel("inv@lid lab€l"), arm::pipe::ProfilingException);
 
     // Declare a valid label
     const std::string labelName = "valid label";

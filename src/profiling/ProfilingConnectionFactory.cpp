@@ -21,7 +21,7 @@ std::unique_ptr<IProfilingConnection> ProfilingConnectionFactory::GetProfilingCo
     // Before proceed to create the IProfilingConnection, check if the file format is supported
     if (!(options.m_FileFormat == "binary"))
     {
-        throw armnn::UnimplementedException("Unsupported profiling file format, only binary is supported");
+        throw arm::pipe::UnimplementedException("Unsupported profiling file format, only binary is supported");
     }
 
     // We can create 3 different types of IProfilingConnection.

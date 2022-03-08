@@ -5,7 +5,6 @@
 
 #include "FileOnlyProfilingConnection.hpp"
 
-#include <armnn/Exceptions.hpp>
 #include <common/include/Constants.hpp>
 #include <common/include/ProfilingException.hpp>
 #include <common/include/PacketVersionResolver.hpp>
@@ -145,7 +144,7 @@ arm::pipe::Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
 void FileOnlyProfilingConnection::Fail(const std::string& errorMessage)
 {
     Close();
-    throw armnn::RuntimeException(errorMessage);
+    throw arm::pipe::ProfilingException(errorMessage);
 }
 
 /// Adds a local packet handler to the FileOnlyProfilingConnection. Invoking this will start

@@ -6,7 +6,7 @@
 #include "ConnectionAcknowledgedCommandHandler.hpp"
 #include "TimelineUtilityMethods.hpp"
 
-#include <armnn/Exceptions.hpp>
+#include <common/include/ProfilingException.hpp>
 
 #include <fmt/format.h>
 
@@ -23,17 +23,17 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
     {
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
-        throw armnn::RuntimeException(fmt::format("Connection Acknowledged Command Handler invoked while in an "
-                                           "wrong state: {}",
-                                           GetProfilingStateName(currentState)));
+        throw arm::pipe::ProfilingException(fmt::format("Connection Acknowledged Command Handler invoked while in an "
+                                            "wrong state: {}",
+                                            GetProfilingStateName(currentState)));
     case ProfilingState::WaitingForAck:
         // Process the packet
         if (!(packet.GetPacketFamily() == 0u && packet.GetPacketId() == 1u))
         {
-            throw armnn::InvalidArgumentException(fmt::format("Expected Packet family = 0, id = 1 but "
-                                                              "received family = {}, id = {}",
-                                                              packet.GetPacketFamily(),
-                                                              packet.GetPacketId()));
+            throw arm::pipe::InvalidArgumentException(fmt::format("Expected Packet family = 0, id = 1 but "
+                                                                  "received family = {}, id = {}",
+                                                                  packet.GetPacketFamily(),
+                                                                  packet.GetPacketId()));
         }
 
         // Once a Connection Acknowledged packet has been received, move to the Active state immediately
@@ -54,7 +54,7 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
                 // Enable profiling on the backend and assert that it returns true
                 if(!backendContext.second->EnableProfiling(true))
                 {
-                    throw armnn::BackendProfilingException(
+                    throw arm::pipe::BackendProfilingException(
                             "Unable to enable profiling on Backend Id: " + backendContext.first);
                 }
             }
@@ -67,12 +67,11 @@ void ConnectionAcknowledgedCommandHandler::operator()(const arm::pipe::Packet& p
     case ProfilingState::Active:
         return; // NOP
     default:
-        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
-                                           static_cast<int>(currentState)));
+        throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
+                                            static_cast<int>(currentState)));
     }
 }
 
 } // namespace pipe
 
 } // namespace arm
-

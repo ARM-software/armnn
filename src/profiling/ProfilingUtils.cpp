@@ -39,7 +39,7 @@ void ThrowIfCantGenerateNextUid(uint16_t uid, uint16_t cores = 0)
         // running multiple parallel workloads and will not provide multiple streams of data for each event)
         if (uid == std::numeric_limits<uint16_t>::max())
         {
-            throw armnn::RuntimeException("Generating the next UID for profiling would result in an overflow");
+            throw arm::pipe::ProfilingException("Generating the next UID for profiling would result in an overflow");
         }
         break;
     default: // cores > 1
@@ -47,7 +47,7 @@ void ThrowIfCantGenerateNextUid(uint16_t uid, uint16_t cores = 0)
         // allowed value for a counter UID is consequently: uint16_t_max - cores + 1
         if (uid >= std::numeric_limits<uint16_t>::max() - cores + 1)
         {
-            throw armnn::RuntimeException("Generating the next UID for profiling would result in an overflow");
+            throw arm::pipe::ProfilingException("Generating the next UID for profiling would result in an overflow");
         }
         break;
     }
@@ -419,7 +419,7 @@ TimelinePacketStatus WriteTimelineRelationshipBinary(ProfilingRelationshipType r
             relationshipTypeUint = 3;
             break;
         default:
-            throw InvalidArgumentException("Unknown relationship type given.");
+            throw arm::pipe::InvalidArgumentException("Unknown relationship type given.");
     }
 
     // Write the timeline binary payload to the buffer

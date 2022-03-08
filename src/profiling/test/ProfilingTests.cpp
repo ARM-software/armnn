@@ -512,29 +512,29 @@ TEST_CASE("CheckProfilingStateMachine")
     CHECK(profilingState8.GetCurrentState() == ProfilingState::Active);
 
     ProfilingStateMachine profilingState9(ProfilingState::Uninitialised);
-    CHECK_THROWS_AS(profilingState9.TransitionToState(ProfilingState::WaitingForAck), armnn::Exception);
+    CHECK_THROWS_AS(profilingState9.TransitionToState(ProfilingState::WaitingForAck), arm::pipe::ProfilingException);
 
     ProfilingStateMachine profilingState10(ProfilingState::Uninitialised);
-    CHECK_THROWS_AS(profilingState10.TransitionToState(ProfilingState::Active), armnn::Exception);
+    CHECK_THROWS_AS(profilingState10.TransitionToState(ProfilingState::Active), arm::pipe::ProfilingException);
 
     ProfilingStateMachine profilingState11(ProfilingState::NotConnected);
-    CHECK_THROWS_AS(profilingState11.TransitionToState(ProfilingState::Uninitialised), armnn::Exception);
+    CHECK_THROWS_AS(profilingState11.TransitionToState(ProfilingState::Uninitialised), arm::pipe::ProfilingException);
 
     ProfilingStateMachine profilingState12(ProfilingState::NotConnected);
-    CHECK_THROWS_AS(profilingState12.TransitionToState(ProfilingState::Active), armnn::Exception);
+    CHECK_THROWS_AS(profilingState12.TransitionToState(ProfilingState::Active), arm::pipe::ProfilingException);
 
     ProfilingStateMachine profilingState13(ProfilingState::WaitingForAck);
-    CHECK_THROWS_AS(profilingState13.TransitionToState(ProfilingState::Uninitialised), armnn::Exception);
+    CHECK_THROWS_AS(profilingState13.TransitionToState(ProfilingState::Uninitialised), arm::pipe::ProfilingException);
 
     ProfilingStateMachine profilingState14(ProfilingState::WaitingForAck);
     profilingState14.TransitionToState(ProfilingState::NotConnected);
     CHECK(profilingState14.GetCurrentState() == ProfilingState::NotConnected);
 
     ProfilingStateMachine profilingState15(ProfilingState::Active);
-    CHECK_THROWS_AS(profilingState15.TransitionToState(ProfilingState::Uninitialised), armnn::Exception);
+    CHECK_THROWS_AS(profilingState15.TransitionToState(ProfilingState::Uninitialised), arm::pipe::ProfilingException);
 
     ProfilingStateMachine profilingState16(ProfilingState::Active);
-    CHECK_THROWS_AS(profilingState16.TransitionToState(ProfilingState::WaitingForAck), armnn::Exception);
+    CHECK_THROWS_AS(profilingState16.TransitionToState(ProfilingState::WaitingForAck), arm::pipe::ProfilingException);
 
     ProfilingStateMachine profilingState17(ProfilingState::Uninitialised);
 
@@ -998,7 +998,8 @@ TEST_CASE("CheckCounterDirectoryRegisterDevice")
 
     // Register a device with the name of a device already registered
     const Device* deviceSameName = nullptr;
-    CHECK_THROWS_AS(deviceSameName = counterDirectory.RegisterDevice(deviceName), arm::pipe::InvalidArgumentException);
+    CHECK_THROWS_AS(deviceSameName = counterDirectory.RegisterDevice(deviceName),
+                                     arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetDeviceCount() == 1);
     CHECK(!deviceSameName);
 
@@ -1831,11 +1832,11 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
                                                           readCounterValues, sendCounterPacket, profilingStateMachine);
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
-    CHECK_THROWS_AS(commandHandler(packetA), armnn::RuntimeException);
+    CHECK_THROWS_AS(commandHandler(packetA), arm::pipe::ProfilingException);
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-    CHECK_THROWS_AS(commandHandler(packetA), armnn::RuntimeException);
+    CHECK_THROWS_AS(commandHandler(packetA), arm::pipe::ProfilingException);
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
-    CHECK_THROWS_AS(commandHandler(packetA), armnn::RuntimeException);
+    CHECK_THROWS_AS(commandHandler(packetA), arm::pipe::ProfilingException);
     profilingStateMachine.TransitionToState(ProfilingState::Active);
     CHECK_NOTHROW(commandHandler(packetA));
 
@@ -1959,15 +1960,18 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
     arm::pipe::Packet ActivateTimelineReportingPacket(packetHeader1); // Length == 0
 
     CHECK_THROWS_AS(
-            activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket), armnn::Exception);
+        activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket),
+                                                           arm::pipe::ProfilingException);
 
     stateMachine.TransitionToState(ProfilingState::NotConnected);
     CHECK_THROWS_AS(
-            activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket), armnn::Exception);
+        activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket),
+                                                           arm::pipe::ProfilingException);
 
     stateMachine.TransitionToState(ProfilingState::WaitingForAck);
     CHECK_THROWS_AS(
-            activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket), armnn::Exception);
+        activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket),
+                                                           arm::pipe::ProfilingException);
 
     stateMachine.TransitionToState(ProfilingState::Active);
     activateTimelineReportingCommandHandler.operator()(ActivateTimelineReportingPacket);
@@ -1992,15 +1996,18 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
 
     stateMachine.Reset();
     CHECK_THROWS_AS(
-            deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket), armnn::Exception);
+        deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket),
+                                                             arm::pipe::ProfilingException);
 
     stateMachine.TransitionToState(ProfilingState::NotConnected);
     CHECK_THROWS_AS(
-            deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket), armnn::Exception);
+        deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket),
+                                                             arm::pipe::ProfilingException);
 
     stateMachine.TransitionToState(ProfilingState::WaitingForAck);
     CHECK_THROWS_AS(
-            deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket), armnn::Exception);
+        deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket),
+                                                             arm::pipe::ProfilingException);
 
     stateMachine.TransitionToState(ProfilingState::Active);
     deactivateTimelineReportingCommandHandler.operator()(deactivateTimelineReportingPacket);
@@ -2076,12 +2083,12 @@ TEST_CASE("CheckConnectionAcknowledged")
                                                         mockProfilingServiceStatus);
 
     // command handler received packet on ProfilingState::Uninitialised
-    CHECK_THROWS_AS(commandHandler(packetA), armnn::Exception);
+    CHECK_THROWS_AS(commandHandler(packetA), arm::pipe::ProfilingException);
 
     profilingState.TransitionToState(ProfilingState::NotConnected);
     CHECK(profilingState.GetCurrentState() == ProfilingState::NotConnected);
     // command handler received packet on ProfilingState::NotConnected
-    CHECK_THROWS_AS(commandHandler(packetA), armnn::Exception);
+    CHECK_THROWS_AS(commandHandler(packetA), arm::pipe::ProfilingException);
 
     profilingState.TransitionToState(ProfilingState::WaitingForAck);
     CHECK(profilingState.GetCurrentState() == ProfilingState::WaitingForAck);
@@ -2106,7 +2113,7 @@ TEST_CASE("CheckConnectionAcknowledged")
                                                                  sendTimelinePacket,
                                                                  profilingState,
                                                                  mockProfilingServiceStatus);
-    CHECK_THROWS_AS(differentCommandHandler(packetB), armnn::Exception);
+    CHECK_THROWS_AS(differentCommandHandler(packetB), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("CheckSocketConnectionException")
@@ -2438,13 +2445,13 @@ TEST_CASE("RequestCounterDirectoryCommandHandlerTest1")
     arm::pipe::Packet wrongPacket(wrongHeader);
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
-    CHECK_THROWS_AS(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    CHECK_THROWS_AS(commandHandler(wrongPacket), arm::pipe::ProfilingException); // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-    CHECK_THROWS_AS(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    CHECK_THROWS_AS(commandHandler(wrongPacket), arm::pipe::ProfilingException); // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
-    CHECK_THROWS_AS(commandHandler(wrongPacket), armnn::RuntimeException); // Wrong profiling state
+    CHECK_THROWS_AS(commandHandler(wrongPacket), arm::pipe::ProfilingException); // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::Active);
-    CHECK_THROWS_AS(commandHandler(wrongPacket), armnn::InvalidArgumentException); // Wrong packet
+    CHECK_THROWS_AS(commandHandler(wrongPacket), arm::pipe::InvalidArgumentException); // Wrong packet
 
     const uint32_t rightHeader = (packetId & 0x000003FF) << 16;
 
@@ -2505,11 +2512,11 @@ TEST_CASE("RequestCounterDirectoryCommandHandlerTest2")
                                      "categoryA", 1, 1, 3.0f, "counterB", "descB");
 
     profilingStateMachine.TransitionToState(ProfilingState::Uninitialised);
-    CHECK_THROWS_AS(commandHandler(packet), armnn::RuntimeException);    // Wrong profiling state
+    CHECK_THROWS_AS(commandHandler(packet), arm::pipe::ProfilingException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::NotConnected);
-    CHECK_THROWS_AS(commandHandler(packet), armnn::RuntimeException);    // Wrong profiling state
+    CHECK_THROWS_AS(commandHandler(packet), arm::pipe::ProfilingException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::WaitingForAck);
-    CHECK_THROWS_AS(commandHandler(packet), armnn::RuntimeException);    // Wrong profiling state
+    CHECK_THROWS_AS(commandHandler(packet), arm::pipe::ProfilingException);    // Wrong profiling state
     profilingStateMachine.TransitionToState(ProfilingState::Active);
     CHECK_NOTHROW(commandHandler(packet));
 
@@ -3409,8 +3416,8 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacket")
 TEST_CASE("CheckCounterIdMap")
 {
     CounterIdMap counterIdMap;
-    CHECK_THROWS_AS(counterIdMap.GetBackendId(0), armnn::Exception);
-    CHECK_THROWS_AS(counterIdMap.GetGlobalId(0, armnn::profiling::BACKEND_ID), armnn::Exception);
+    CHECK_THROWS_AS(counterIdMap.GetBackendId(0), arm::pipe::ProfilingException);
+    CHECK_THROWS_AS(counterIdMap.GetGlobalId(0, armnn::profiling::BACKEND_ID), arm::pipe::ProfilingException);
 
     uint16_t globalCounterIds = 0;
 

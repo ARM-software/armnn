@@ -39,7 +39,7 @@ void TestTimelinePacketHandler::HandlePacket(const arm::pipe::Packet& packet)
     {
         std::stringstream ss;
         ss << "Received a packet with unknown header [" << packet.GetHeader() << "]";
-        throw armnn::Exception(ss.str());
+        throw arm::pipe::ProfilingException(ss.str());
     }
 }
 
@@ -63,7 +63,7 @@ void TestTimelinePacketHandler::WaitOnInferenceCompletion(unsigned int timeout)
         std::chrono::duration<double, std::milli> elapsed = finish - start;
         std::stringstream ss;
         ss << "Timed out waiting on inference completion for " << elapsed.count() << " ms";
-        throw armnn::TimeoutException(ss.str());
+        throw arm::pipe::TimeoutException(ss.str());
     }
     return;
 }

@@ -66,11 +66,11 @@ void SendTimelinePacket::ReserveBuffer()
     // Check if there is enough space in the buffer
     if (m_WriteBuffer == nullptr)
     {
-        throw BufferExhaustion("No free buffers left", CHECK_LOCATION());
+        throw arm::pipe::BufferExhaustion("No free buffers left", LOCATION());
     }
     if (reserved < m_Offset)
     {
-        throw BufferExhaustion("Reserved space too small for use", CHECK_LOCATION());
+        throw arm::pipe::BufferExhaustion("Reserved space too small for use", LOCATION());
     }
 
     if (m_DirectoryPackage)
@@ -144,7 +144,7 @@ void SendTimelinePacket::SendTimelineMessageDirectoryPackage()
                                                                            numberOfBytesWritten);
         if (result != TimelinePacketStatus::Ok)
         {
-            throw armnn::RuntimeException("Error processing TimelineMessageDirectoryPackage", CHECK_LOCATION());
+            throw arm::pipe::ProfilingException("Error processing TimelineMessageDirectoryPackage", LOCATION());
         }
 
         // Commit the message
@@ -154,7 +154,7 @@ void SendTimelinePacket::SendTimelineMessageDirectoryPackage()
     }
     catch (...)
     {
-        throw armnn::RuntimeException("Error processing TimelineMessageDirectoryPackage", CHECK_LOCATION());
+        throw arm::pipe::ProfilingException("Error processing TimelineMessageDirectoryPackage", LOCATION());
     }
 }
 

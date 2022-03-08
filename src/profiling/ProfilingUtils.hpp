@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <armnn/Exceptions.hpp>
+#include <common/include/ProfilingException.hpp>
+
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 
 #include <armnn/utility/NumericCast.hpp>
@@ -140,11 +141,6 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
 std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth);
 
 void PrintCounterDirectory(ICounterDirectory& counterDirectory);
-
-class BufferExhaustion : public armnn::Exception
-{
-    using Exception::Exception;
-};
 
 uint64_t GetTimestamp();
 

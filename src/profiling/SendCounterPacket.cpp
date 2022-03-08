@@ -4,15 +4,17 @@
 //
 
 #include "SendCounterPacket.hpp"
-#include <common/include/EncodeVersion.hpp>
 
-#include <armnn/Exceptions.hpp>
+#include <common/include/Constants.hpp>
+#include <common/include/EncodeVersion.hpp>
+#include <common/include/ProfilingException.hpp>
+#include <common/include/SwTrace.hpp>
+
 #include <armnn/Conversion.hpp>
 #include <Processes.hpp>
+
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
-#include <common/include/Constants.hpp>
-#include <common/include/SwTrace.hpp>
 
 #include <fmt/format.h>
 
@@ -88,7 +90,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
-        CancelOperationAndThrow<BufferExhaustion>(
+        CancelOperationAndThrow<arm::pipe::BufferExhaustion>(
             writeBuffer,
             fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }
@@ -164,7 +166,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
     }
     catch(...)
     {
-        CancelOperationAndThrow<armnn::RuntimeException>(writeBuffer, "Error processing packet.");
+        CancelOperationAndThrow<arm::pipe::ProfilingException>(writeBuffer, "Error processing packet.");
     }
 
     m_BufferManager.Commit(writeBuffer, totalSize, false);
@@ -584,7 +586,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         std::string errorMessage;
         if (!CreateDeviceRecord(device, deviceRecord, errorMessage))
         {
-            CancelOperationAndThrow<armnn::RuntimeException>(errorMessage);
+            CancelOperationAndThrow<arm::pipe::ProfilingException>(errorMessage);
         }
 
         // Update the total size in words of the device records
@@ -619,7 +621,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         std::string errorMessage;
         if (!CreateCounterSetRecord(counterSet, counterSetRecord, errorMessage))
         {
-            CancelOperationAndThrow<armnn::RuntimeException>(errorMessage);
+            CancelOperationAndThrow<arm::pipe::ProfilingException>(errorMessage);
         }
 
         // Update the total size in words of the counter set records
@@ -654,7 +656,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         std::string errorMessage;
         if (!CreateCategoryRecord(category, counterDirectory.GetCounters(), categoryRecord, errorMessage))
         {
-            CancelOperationAndThrow<armnn::RuntimeException>(errorMessage);
+            CancelOperationAndThrow<arm::pipe::ProfilingException>(errorMessage);
         }
 
         // Update the total size in words of the category records
@@ -807,7 +809,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
-        CancelOperationAndThrow<BufferExhaustion>(
+        CancelOperationAndThrow<arm::pipe::BufferExhaustion>(
             writeBuffer,
             fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }
@@ -844,7 +846,7 @@ void SendCounterPacket::SendPeriodicCounterCapturePacket(uint64_t timestamp, con
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
-        CancelOperationAndThrow<BufferExhaustion>(
+        CancelOperationAndThrow<arm::pipe::BufferExhaustion>(
             writeBuffer,
             fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }
@@ -893,7 +895,7 @@ void SendCounterPacket::SendPeriodicCounterSelectionPacket(uint32_t capturePerio
 
     if (writeBuffer == nullptr || reserved < totalSize)
     {
-        CancelOperationAndThrow<BufferExhaustion>(
+        CancelOperationAndThrow<arm::pipe::BufferExhaustion>(
             writeBuffer,
             fmt::format("No space left in buffer. Unable to reserve ({}) bytes.", totalSize));
     }

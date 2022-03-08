@@ -10,12 +10,12 @@
 #include <ProfilingUtils.hpp>
 #include <IProfilingConnectionFactory.hpp>
 
-#include <armnn/Exceptions.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/Conversion.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
+
 
 #include <atomic>
 #include <condition_variable>

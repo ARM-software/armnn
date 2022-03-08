@@ -5,7 +5,7 @@
 
 #include "ProfilingStateMachine.hpp"
 
-#include <armnn/Exceptions.hpp>
+#include <common/include/ProfilingException.hpp>
 
 #include <sstream>
 
@@ -23,7 +23,7 @@ void ThrowStateTransitionException(ProfilingState expectedState, ProfilingState 
     std::stringstream ss;
     ss << "Cannot transition from state [" << GetProfilingStateName(expectedState) << "] "
        << "to state [" << GetProfilingStateName(newState) << "]";
-    throw armnn::RuntimeException(ss.str());
+    throw arm::pipe::ProfilingException(ss.str());
 }
 
 } // Anonymous namespace

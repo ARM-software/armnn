@@ -14,11 +14,11 @@
 #include <SendCounterPacket.hpp>
 #include <Processes.hpp>
 
-#include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
 #include <armnn/Utils.hpp>
 
 #include <common/include/Constants.hpp>
+#include <common/include/ProfilingException.hpp>
 
 #include <armnn/utility/Assert.hpp>
 
@@ -1673,7 +1673,7 @@ TEST_CASE("SendCounterDirectoryPacketTest3")
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(mockBuffer);
-    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
+    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendCounterDirectoryPacketTest4")
@@ -1691,7 +1691,7 @@ TEST_CASE("SendCounterDirectoryPacketTest4")
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(mockBuffer);
-    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
+    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendCounterDirectoryPacketTest5")
@@ -1709,7 +1709,7 @@ TEST_CASE("SendCounterDirectoryPacketTest5")
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(mockBuffer);
-    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
+    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendCounterDirectoryPacketTest6")
@@ -1741,7 +1741,7 @@ TEST_CASE("SendCounterDirectoryPacketTest6")
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(mockBuffer);
-    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
+    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendCounterDirectoryPacketTest7")
@@ -1790,7 +1790,7 @@ TEST_CASE("SendCounterDirectoryPacketTest7")
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
     SendCounterPacket sendCounterPacket(mockBuffer);
-    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), armnn::RuntimeException);
+    CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendThreadTest0")
@@ -2263,7 +2263,7 @@ TEST_CASE("SendThreadSendStreamMetadataPacket1")
     sendThread.Start(mockProfilingConnection);
 
     // The profiling state is set to "Uninitialized", so the send thread should throw an exception
-    CHECK_THROWS_AS(sendThread.Stop(), armnn::RuntimeException);
+    CHECK_THROWS_AS(sendThread.Stop(), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendThreadSendStreamMetadataPacket2")
@@ -2278,7 +2278,7 @@ TEST_CASE("SendThreadSendStreamMetadataPacket2")
     sendThread.Start(mockProfilingConnection);
 
     // The profiling state is set to "NotConnected", so the send thread should throw an exception
-    CHECK_THROWS_AS(sendThread.Stop(), armnn::RuntimeException);
+    CHECK_THROWS_AS(sendThread.Stop(), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendThreadSendStreamMetadataPacket3")

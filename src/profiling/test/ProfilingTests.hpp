@@ -96,7 +96,7 @@ public:
         else
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
-            throw armnn::TimeoutException("Simulate a timeout error\n");
+            throw arm::pipe::TimeoutException("Simulate a timeout error\n");
         }
     }
 
@@ -117,7 +117,7 @@ public:
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(timeout));
             ++m_ReadRequests;
-            throw armnn::TimeoutException("Simulate a timeout error\n");
+            throw arm::pipe::TimeoutException("Simulate a timeout error\n");
         }
 
         return arm::pipe::Packet(65536);
@@ -143,7 +143,7 @@ public:
     {
         armnn::IgnoreUnused(timeout);
         ++m_ReadRequests;
-        throw armnn::Exception("Simulate a non-timeout error");
+        throw arm::pipe::ProfilingException("Simulate a non-timeout error");
     }
 
     int ReadCalledCount()

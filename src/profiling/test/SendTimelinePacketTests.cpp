@@ -399,7 +399,7 @@ TEST_CASE("SendTimelinePacketTests2")
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = timelinePacketWriterFactory.GetSendTimelinePacket();
 
     CHECK_THROWS_AS(sendTimelinePacket->SendTimelineMessageDirectoryPackage(),
-                      armnn::RuntimeException);
+                    arm::pipe::ProfilingException);
 }
 
 TEST_CASE("SendTimelinePacketTests3")

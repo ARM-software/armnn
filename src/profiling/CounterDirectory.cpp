@@ -25,14 +25,15 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
     if (categoryName.empty() ||
             !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(categoryName))
     {
-        throw InvalidArgumentException("Trying to register a category with an invalid name");
+        throw arm::pipe::InvalidArgumentException("Trying to register a category with an invalid name");
     }
 
     // Check that the given category is not already registered
     if (IsCategoryRegistered(categoryName))
     {
-        throw InvalidArgumentException(fmt::format("Trying to register a category already registered (\"{}\")",
-                                       categoryName));
+        throw arm::pipe::InvalidArgumentException(fmt::format(
+            "Trying to register a category already registered (\"{}\")",
+            categoryName));
     }
 
     // Create the category
@@ -57,14 +58,15 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
     if (deviceName.empty() ||
             !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceCharPolicy>(deviceName))
     {
-        throw InvalidArgumentException("Trying to register a device with an invalid name");
+        throw arm::pipe::InvalidArgumentException("Trying to register a device with an invalid name");
     }
 
     // Check that a device with the given name is not already registered
     if (IsDeviceRegistered(deviceName))
     {
-        throw InvalidArgumentException(fmt::format("Trying to register a device already registered (\"{}\")",
-                                       deviceName));
+        throw arm::pipe::InvalidArgumentException(fmt::format(
+            "Trying to register a device already registered (\"{}\")",
+            deviceName));
     }
 
     // Check that a category with the given (optional) parent category name is already registered
@@ -74,22 +76,22 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
         const std::string& parentCategoryNameValue = parentCategoryName.value();
         if (parentCategoryNameValue.empty())
         {
-            throw InvalidArgumentException(
-                        fmt::format("Trying to connect a device (name: \"{}\") to an invalid "
-                                    "parent category (name: \"{}\")",
-                                    deviceName,
-                                    parentCategoryNameValue));
+            throw arm::pipe::InvalidArgumentException(
+                fmt::format("Trying to connect a device (name: \"{}\") to an invalid "
+                            "parent category (name: \"{}\")",
+                            deviceName,
+                            parentCategoryNameValue));
         }
 
         // Check that the given parent category is already registered
         auto categoryIt = FindCategory(parentCategoryNameValue);
         if (categoryIt == m_Categories.end())
         {
-            throw InvalidArgumentException(
-                        fmt::format("Trying to connect a device (name: \"{}\") to a parent category that "
-                                    "is not registered (name: \"{}\")",
-                                    deviceName,
-                                    parentCategoryNameValue));
+            throw arm::pipe::InvalidArgumentException(
+                fmt::format("Trying to connect a device (name: \"{}\") to a parent category that "
+                            "is not registered (name: \"{}\")",
+                            deviceName,
+                            parentCategoryNameValue));
         }
     }
 
@@ -118,15 +120,14 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
     if (counterSetName.empty() ||
             !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(counterSetName))
     {
-        throw InvalidArgumentException("Trying to register a counter set with an invalid name");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter set with an invalid name");
     }
 
     // Check that a counter set with the given name is not already registered
     if (IsCounterSetRegistered(counterSetName))
     {
-        throw InvalidArgumentException(
-                    fmt::format("Trying to register a counter set already registered (\"{}\")",
-                                counterSetName));
+        throw arm::pipe::InvalidArgumentException(
+            fmt::format("Trying to register a counter set already registered (\"{}\")", counterSetName));
     }
 
     // Peek the next UID, do not get an actual valid UID just now as we don't want to waste a good UID in case
@@ -140,8 +141,8 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
         const std::string& parentCategoryNameValue = parentCategoryName.value();
         if (parentCategoryNameValue.empty())
         {
-            throw InvalidArgumentException(
-                        fmt::format("Trying to connect a counter set (UID: {}) to an invalid "
+            throw arm::pipe::InvalidArgumentException(
+                fmt::format("Trying to connect a counter set (UID: {}) to an invalid "
                                     "parent category (name: \"{}\")",
                                     counterSetUidPeek,
                                     parentCategoryNameValue));
@@ -151,11 +152,11 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
         auto it = FindCategory(parentCategoryNameValue);
         if (it == m_Categories.end())
         {
-            throw InvalidArgumentException(
-                        fmt::format("Trying to connect a counter set (UID: {}) to a parent category "
-                                    "that is not registered (name: \"{}\")",
-                                    counterSetUidPeek,
-                                    parentCategoryNameValue));
+            throw arm::pipe::InvalidArgumentException(
+                fmt::format("Trying to connect a counter set (UID: {}) to a parent category "
+                            "that is not registered (name: \"{}\")",
+                            counterSetUidPeek,
+                            parentCategoryNameValue));
         }
     }
 
@@ -194,55 +195,55 @@ const Counter* CounterDirectory::RegisterCounter(const std::string& /*backendId*
     if (parentCategoryName.empty() ||
             !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(parentCategoryName))
     {
-        throw InvalidArgumentException("Trying to register a counter with an invalid parent category name");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter with an invalid parent category name");
     }
 
     // Check that the given class is valid
     if (counterClass != 0 && counterClass != 1)
     {
-        throw InvalidArgumentException("Trying to register a counter with an invalid class");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter with an invalid class");
     }
 
     // Check that the given interpolation is valid
     if (interpolation != 0 && interpolation != 1)
     {
-        throw InvalidArgumentException("Trying to register a counter with an invalid interpolation");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter with an invalid interpolation");
     }
 
     // Check that the given multiplier is valid
     if (multiplier == .0f)
     {
-        throw InvalidArgumentException("Trying to register a counter with an invalid multiplier");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter with an invalid multiplier");
     }
 
     // Check that the given name is valid
     if (name.empty() ||
             !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceCharPolicy>(name))
     {
-        throw InvalidArgumentException("Trying to register a counter with an invalid name");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter with an invalid name");
     }
 
     // Check that the given description is valid
     if (description.empty() ||
             !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceCharPolicy>(description))
     {
-        throw InvalidArgumentException("Trying to register a counter with an invalid description");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter with an invalid description");
     }
 
     // Check that the given units are valid
     if (units.has_value()
             && !arm::pipe::IsValidSwTraceString<arm::pipe::SwTraceNameCharPolicy>(units.value()))
     {
-        throw InvalidArgumentException("Trying to register a counter with a invalid units");
+        throw arm::pipe::InvalidArgumentException("Trying to register a counter with a invalid units");
     }
 
     // Check that the given parent category is registered
     auto categoryIt = FindCategory(parentCategoryName);
     if (categoryIt == m_Categories.end())
     {
-        throw InvalidArgumentException(
-                    fmt::format("Trying to connect a counter to a category that is not registered (name: \"{}\")",
-                                parentCategoryName));
+        throw arm::pipe::InvalidArgumentException(
+            fmt::format("Trying to connect a counter to a category that is not registered (name: \"{}\")",
+                        parentCategoryName));
     }
 
     // Get the parent category
@@ -258,11 +259,11 @@ const Counter* CounterDirectory::RegisterCounter(const std::string& /*backendId*
 
         if (parentCategoryCounter->m_Name == name)
         {
-            throw InvalidArgumentException(
-                        fmt::format("Trying to register a counter to category \"{}\" with a name that "
-                                    "is already used within that category (name: \"{}\")",
-                                    parentCategoryName,
-                                    name));
+            throw arm::pipe::InvalidArgumentException(
+                fmt::format("Trying to register a counter to category \"{}\" with a name that "
+                            "is already used within that category (name: \"{}\")",
+                            parentCategoryName,
+                            name));
         }
     }
 
@@ -524,9 +525,9 @@ uint16_t CounterDirectory::GetNumberOfCores(const armnn::Optional<uint16_t>& num
         auto deviceIt = FindDevice(deviceUid);
         if (deviceIt == m_Devices.end())
         {
-            throw InvalidArgumentException(
-                        fmt::format("Trying to connect a counter to a device that is not registered (device UID {})",
-                                    deviceUid));
+            throw arm::pipe::InvalidArgumentException(
+                fmt::format("Trying to connect a counter to a device that is not registered (device UID {})",
+                            deviceUid));
         }
 
         // Get the associated device

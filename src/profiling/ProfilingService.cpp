@@ -129,7 +129,7 @@ void ProfilingService::Update()
             ARMNN_ASSERT(m_ProfilingConnectionFactory);
             m_ProfilingConnection = m_ProfilingConnectionFactory->GetProfilingConnection(m_Options);
         }
-        catch (const armnn::Exception& e)
+        catch (const arm::pipe::ProfilingException& e)
         {
             ARMNN_LOG(warning) << "An error has occurred when creating the profiling connection: "
                                        << e.what();
@@ -167,8 +167,8 @@ void ProfilingService::Update()
 
         break;
     default:
-        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
-                                           static_cast<int>(currentState)));
+        throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
+                                            static_cast<int>(currentState)));
     }
 }
 
@@ -187,8 +187,8 @@ void ProfilingService::Disconnect()
 
         break;
     default:
-        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
-                                                  static_cast<int>(currentState)));
+        throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
+                                                        static_cast<int>(currentState)));
     }
 }
 
@@ -381,7 +381,7 @@ inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
 {
     if (!IsCounterRegistered(counterUid))
     {
-        throw InvalidArgumentException(fmt::format("Counter UID {} is not registered", counterUid));
+        throw arm::pipe::InvalidArgumentException(fmt::format("Counter UID {} is not registered", counterUid));
     }
 }
 

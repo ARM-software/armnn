@@ -6,9 +6,10 @@
 #include "SendThread.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <armnn/Exceptions.hpp>
 #include <armnn/Conversion.hpp>
 #include <armnn/utility/NumericCast.hpp>
+
+#include <common/include/ProfilingException.hpp>
 
 #include <Processes.hpp>
 
@@ -128,8 +129,8 @@ void SendThread::Send(IProfilingConnection& profilingConnection)
             // An exception should be thrown here, save it to be rethrown later from the main thread so that
             // it can be caught by the consumer
             m_SendThreadException =
-                    std::make_exception_ptr(armnn::RuntimeException("The send thread should not be running with the "
-                                                             "profiling service not yet initialized or connected"));
+                std::make_exception_ptr(arm::pipe::ProfilingException(
+                "The send thread should not be running with the profiling service not yet initialized or connected"));
 
             return;
         case ProfilingState::WaitingForAck:

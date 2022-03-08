@@ -51,7 +51,7 @@ private:
     template <typename ExceptionType>
     void CancelOperationAndThrow(IPacketBufferPtr& writerBuffer, const std::string& errorMessage)
     {
-        if (std::is_same<ExceptionType, BufferExhaustion>::value)
+        if (std::is_same<ExceptionType, arm::pipe::BufferExhaustion>::value)
         {
             m_BufferManager.FlushReadList();
         }

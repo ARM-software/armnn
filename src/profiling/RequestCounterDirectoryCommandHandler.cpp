@@ -21,17 +21,17 @@ void RequestCounterDirectoryCommandHandler::operator()(const arm::pipe::Packet& 
     case ProfilingState::Uninitialised:
     case ProfilingState::NotConnected:
     case ProfilingState::WaitingForAck:
-        throw armnn::RuntimeException(fmt::format("Request Counter Directory Comand Handler invoked while in an "
-                                           "wrong state: {}",
-                                           GetProfilingStateName(currentState)));
+        throw arm::pipe::ProfilingException(fmt::format("Request Counter Directory Comand Handler invoked while in an "
+                                            "wrong state: {}",
+                                            GetProfilingStateName(currentState)));
     case ProfilingState::Active:
         // Process the packet
         if (!(packet.GetPacketFamily() == 0u && packet.GetPacketId() == 3u))
         {
-            throw armnn::InvalidArgumentException(fmt::format("Expected Packet family = 0, id = 3 but "
-                                                              "received family = {}, id = {}",
-                                                              packet.GetPacketFamily(),
-                                                              packet.GetPacketId()));
+            throw arm::pipe::InvalidArgumentException(fmt::format("Expected Packet family = 0, id = 3 but "
+                                                                  "received family = {}, id = {}",
+                                                                  packet.GetPacketFamily(),
+                                                                  packet.GetPacketId()));
         }
 
         // Send all the packet required for the handshake with the external profiling service
@@ -40,8 +40,8 @@ void RequestCounterDirectoryCommandHandler::operator()(const arm::pipe::Packet& 
 
         break;
     default:
-        throw armnn::RuntimeException(fmt::format("Unknown profiling service state: {}",
-                                           static_cast<int>(currentState)));
+        throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
+                                            static_cast<int>(currentState)));
     }
 }
 

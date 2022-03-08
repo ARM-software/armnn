@@ -13,13 +13,13 @@
 #include <SendCounterPacket.hpp>
 #include <SendThread.hpp>
 
-#include <armnn/Exceptions.hpp>
 #include <armnn/Optional.hpp>
 #include <armnn/Conversion.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
+#include <common/include/ProfilingException.hpp>
 #include <common/include/ProfilingGuidGenerator.hpp>
 
 #include <atomic>
@@ -294,8 +294,8 @@ public:
         reservedSize = 0;
         if (requestedSize > m_MaxBufferSize)
         {
-            throw armnn::InvalidArgumentException("The maximum buffer size that can be requested is [" +
-                                                  std::to_string(m_MaxBufferSize) + "] bytes");
+            throw arm::pipe::InvalidArgumentException("The maximum buffer size that can be requested is [" +
+                                                      std::to_string(m_MaxBufferSize) + "] bytes");
         }
         reservedSize = requestedSize;
         return std::make_unique<MockPacketBuffer>(requestedSize);

@@ -97,8 +97,8 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
                     continue;
 
                 case TimelinePacketStatus::Error:
-                    throw armnn::RuntimeException("Error processing while sending TimelineBinaryPacket", CHECK_LOCATION
-                    ());
+                    throw arm::pipe::ProfilingException("Error processing while sending TimelineBinaryPacket",
+                                                        LOCATION());
 
                 default:
                     m_Offset += numberOfBytesWritten;
@@ -107,23 +107,19 @@ void SendTimelinePacket::ForwardWriteBinaryFunction(Func& func, Params&& ... par
             }
         }
     }
-    catch (const armnn::RuntimeException& ex)
-    {
-        // don't swallow in the catch all block
-        throw ex;
-    }
-    catch (const BufferExhaustion& ex)
+    catch (const arm::pipe::BufferExhaustion& ex)
     {
         // ditto
         throw ex;
     }
-    catch (const armnn::Exception& ex)
+    catch (const arm::pipe::ProfilingException& ex)
     {
+        // don't swallow in the catch all block
         throw ex;
     }
     catch ( ... )
     {
-        throw armnn::RuntimeException("Unknown Exception thrown while sending TimelineBinaryPacket", CHECK_LOCATION());
+        throw arm::pipe::ProfilingException("Unknown Exception thrown while sending TimelineBinaryPacket", LOCATION());
     }
 }
 

@@ -3,7 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 #include "CounterIdMap.hpp"
-#include <armnn/Exceptions.hpp>
+
+#include <common/include/ProfilingException.hpp>
+
 #include <map>
 
 namespace arm
@@ -34,7 +36,7 @@ uint16_t CounterIdMap::GetGlobalId(uint16_t backendCounterId, const std::string&
     {
         std::stringstream ss;
         ss << "No Backend Counter [" << backendIdPair.second << ":" << backendIdPair.first << "] registered";
-        throw armnn::Exception(ss.str());
+        throw arm::pipe::ProfilingException(ss.str());
     }
     return it->second;
 }
@@ -46,7 +48,7 @@ const std::pair<uint16_t, std::string>& CounterIdMap::GetBackendId(uint16_t glob
     {
         std::stringstream ss;
         ss << "No Global Counter ID [" << globalCounterId << "] registered";
-        throw armnn::Exception(ss.str());
+        throw arm::pipe::ProfilingException(ss.str());
     }
     return it->second;
 }

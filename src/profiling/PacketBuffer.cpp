@@ -5,7 +5,7 @@
 
 #include "PacketBuffer.hpp"
 
-#include <armnn/Exceptions.hpp>
+#include <common/include/ProfilingException.hpp>
 
 namespace arm
 {
@@ -39,8 +39,8 @@ void PacketBuffer::Commit(unsigned int size)
 {
     if (size > m_MaxSize)
     {
-        throw armnn::RuntimeException("Cannot commit [" + std::to_string(size) +
-                "] bytes which is more than the maximum size of the buffer [" + std::to_string(m_MaxSize) + "]");
+        throw arm::pipe::ProfilingException("Cannot commit [" + std::to_string(size) +
+            "] bytes which is more than the maximum size of the buffer [" + std::to_string(m_MaxSize) + "]");
     }
     m_Size = size;
 }

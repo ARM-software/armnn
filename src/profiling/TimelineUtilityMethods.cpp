@@ -104,13 +104,13 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedEntity(const std::s
     // Check that the entity name is valid
     if (name.empty())
     {
-        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
     }
 
     // Check that the entity type is valid
     if (type.empty())
     {
-        throw InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
     }
 
     // Generate dynamic GUID of the entity
@@ -128,13 +128,13 @@ void TimelineUtilityMethods::CreateNamedTypedEntity(ProfilingGuid entityGuid,
     // Check that the entity name is valid
     if (name.empty())
     {
-        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
     }
 
     // Check that the entity type is valid
     if (type.empty())
     {
-        throw InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
     }
 
     // Send Entity Binary Packet of the entity to the external profiling service
@@ -154,7 +154,7 @@ void TimelineUtilityMethods::CreateNamedTypedEntity(ProfilingGuid entityGuid,
     // Check that the entity name is valid
     if (name.empty())
     {
-        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
     }
 
     // Send Entity Binary Packet of the entity to the external profiling service
@@ -173,7 +173,7 @@ ProfilingStaticGuid TimelineUtilityMethods::DeclareLabel(const std::string& labe
     if (labelName.empty())
     {
         // The label name is invalid
-        throw InvalidArgumentException("Invalid label name, the label name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid label name, the label name cannot be empty");
     }
 
     // Generate a static GUID for the given label name
@@ -193,7 +193,7 @@ void TimelineUtilityMethods::MarkEntityWithLabel(ProfilingGuid entityGuid,
     if (labelName.empty())
     {
         // The label name is invalid
-        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
     }
 
     // Declare a label with the label's name, this call throws in case of error
@@ -242,14 +242,14 @@ ProfilingDynamicGuid TimelineUtilityMethods::CreateNamedTypedChildEntity(Profili
     if (entityName.empty())
     {
         // The entity name is invalid
-        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
     }
 
     // Check that the entity type is valid
     if (entityType.empty())
     {
         // The entity type is invalid
-        throw InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
     }
 
     // Create a named type entity from the given name and type, this call throws in case of error
@@ -277,14 +277,14 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
     if (entityName.empty())
     {
         // The entity name is invalid
-        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
     }
 
     // Check that the entity type is valid
     if (entityType.empty())
     {
         // The entity type is invalid
-        throw InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity type, the entity type cannot be empty");
     }
 
     // Create a named type entity from the given guid, name and type, this call throws in case of error
@@ -310,7 +310,7 @@ void TimelineUtilityMethods::CreateNamedTypedChildEntity(ProfilingGuid childEnti
     if (entityName.empty())
     {
         // The entity name is invalid
-        throw InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
+        throw arm::pipe::InvalidArgumentException("Invalid entity name, the entity name cannot be empty");
     }
 
     // Create a named type entity from the given guid, name and type, this call throws in case of error

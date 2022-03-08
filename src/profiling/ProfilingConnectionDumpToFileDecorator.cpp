@@ -5,8 +5,8 @@
 
 #include "ProfilingConnectionDumpToFileDecorator.hpp"
 
-#include <armnn/Exceptions.hpp>
 #include <armnn/utility/NumericCast.hpp>
+#include <common/include/ProfilingException.hpp>
 
 #include <fstream>
 
@@ -26,7 +26,7 @@ ProfilingConnectionDumpToFileDecorator::ProfilingConnectionDumpToFileDecorator(
 {
     if (!m_Connection)
     {
-        throw InvalidArgumentException("Connection cannot be nullptr");
+        throw arm::pipe::InvalidArgumentException("Connection cannot be nullptr");
     }
 }
 
@@ -154,7 +154,7 @@ bool ProfilingConnectionDumpToFileDecorator::DumpOutgoingToFile(const unsigned c
 void ProfilingConnectionDumpToFileDecorator::Fail(const std::string& errorMessage)
 {
     Close();
-    throw armnn::RuntimeException(errorMessage);
+    throw arm::pipe::ProfilingException(errorMessage);
 }
 
 } // namespace pipe

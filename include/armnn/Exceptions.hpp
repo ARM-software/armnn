@@ -137,12 +137,6 @@ class TimeoutException : public Exception
     using Exception::Exception;
 };
 
-class BackendProfilingException : public Exception
-{
-public:
-    using Exception::Exception;
-};
-
 class PolymorphicDowncastException : public Exception
 {
 public:

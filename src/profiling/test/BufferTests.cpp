@@ -9,8 +9,6 @@
 
 #include <common/include/SwTrace.hpp>
 
-#include <armnn/Exceptions.hpp>
-
 #include <doctest/doctest.h>
 
 using namespace arm::pipe;
@@ -113,7 +111,7 @@ TEST_CASE("PacketBufferCommitErrorTest")
     IPacketBufferPtr packetBuffer = std::make_unique<PacketBuffer>(8);
 
     // Cannot commit data bigger than the max size of the buffer
-    CHECK_THROWS_AS(packetBuffer->Commit(16);, armnn::RuntimeException);
+    CHECK_THROWS_AS(packetBuffer->Commit(16);, arm::pipe::ProfilingException);
 }
 
 TEST_CASE("BufferReserveTest")
@@ -384,7 +382,7 @@ TEST_CASE("ReadSwTraceMessageExceptionTest0")
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int offset = uint32_t_size;
     CHECK_THROWS_AS(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
-                      ProfilingException);
+                    arm::pipe::ProfilingException);
 
 }
 
@@ -406,7 +404,7 @@ TEST_CASE("ReadSwTraceMessageExceptionTest1")
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int offset = uint32_t_size;
     CHECK_THROWS_AS(ReadSwTraceMessage(packetBuffer->GetReadableData(), offset, packetBuffer->GetSize()),
-                      ProfilingException);
+                    arm::pipe::ProfilingException);
 
 }
 

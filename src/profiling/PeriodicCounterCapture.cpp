@@ -105,7 +105,7 @@ void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
                 {
                     counterValue = readCounterValues.GetDeltaCounterValue(requestedId);
                 }
-                catch (const armnn::Exception& e)
+                catch (const arm::pipe::ProfilingException& e)
                 {
                     // Report the error and continue
                     ARMNN_LOG(warning) << "An error has occurred when getting a counter value: "

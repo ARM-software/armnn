@@ -82,7 +82,7 @@ TEST_CASE("DumpIncomingInvalidFile")
     options.m_IncomingCaptureFile = "/";
     options.m_OutgoingCaptureFile =  "";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
-    CHECK_THROWS_AS(decorator.ReadPacket(0), armnn::RuntimeException);
+    CHECK_THROWS_AS(decorator.ReadPacket(0), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("DumpIncomingInvalidFileIgnoreErrors")
@@ -126,7 +126,7 @@ TEST_CASE("DumpOutgoingInvalidFile")
     options.m_IncomingCaptureFile = "";
     options.m_OutgoingCaptureFile = "/";
     ProfilingConnectionDumpToFileDecorator decorator(std::make_unique<DummyProfilingConnection>(), options, false);
-    CHECK_THROWS_AS(decorator.WritePacket(g_DataPtr, g_DataLength), armnn::RuntimeException);
+    CHECK_THROWS_AS(decorator.WritePacket(g_DataPtr, g_DataLength), arm::pipe::ProfilingException);
 }
 
 TEST_CASE("DumpOutgoingInvalidFileIgnoreErrors")

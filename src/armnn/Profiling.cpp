@@ -345,10 +345,14 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
                 parentObject.AddChild(childObject);
             }
 
-            // Recursively process children. In reality this won't be very deep recursion. ~4-6 levels deep.
-            ExtractJsonObjects(inferenceIndex, childEvent, parentObject.GetChild(childIdx), descendantsMap);
-
-            childIdx++;
+            // It's possible that childIdx can overrun the parents' child vector. Check before we try to process a
+            // non-existent child.
+            if (childIdx < parentObject.NumChildren())
+            {
+                // Recursively process children.
+                ExtractJsonObjects(inferenceIndex, childEvent, parentObject.GetChild(childIdx), descendantsMap);
+                childIdx++;
+            }
         }
     }
 }

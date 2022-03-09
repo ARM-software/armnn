@@ -225,6 +225,7 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddPadLayer',
     'AddPermuteLayer',
     'AddPooling2dLayer',
+    'AddPooling3dLayer',
     'AddPreluLayer',
     'AddQuantizeLayer',
     'AddQuantizedLstmLayer',

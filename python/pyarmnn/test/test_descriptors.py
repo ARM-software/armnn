@@ -282,6 +282,24 @@ def test_pooling_descriptor_default_values():
     assert desc.m_PaddingMethod == ann.PaddingMethod_Exclude
     assert desc.m_DataLayout == ann.DataLayout_NCHW
 
+def test_pooling_3d_descriptor_default_values():
+    desc = ann.Pooling3dDescriptor()
+    assert desc.m_PoolType == ann.PoolingAlgorithm_Max
+    assert desc.m_PadLeft == 0
+    assert desc.m_PadTop == 0
+    assert desc.m_PadRight == 0
+    assert desc.m_PadBottom == 0
+    assert desc.m_PadFront == 0
+    assert desc.m_PadBack == 0
+    assert desc.m_PoolHeight == 0
+    assert desc.m_PoolWidth == 0
+    assert desc.m_StrideX == 0
+    assert desc.m_StrideY == 0
+    assert desc.m_StrideZ == 0
+    assert desc.m_OutputShapeRounding == ann.OutputShapeRounding_Floor
+    assert desc.m_PaddingMethod == ann.PaddingMethod_Exclude
+    assert desc.m_DataLayout == ann.DataLayout_NCDHW
+
 
 def test_reshape_descriptor_default_values():
     desc = ann.ReshapeDescriptor()

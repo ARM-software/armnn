@@ -803,7 +803,21 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddPooling2dLayer;
     armnn::IConnectableLayer* AddPooling2dLayer(const armnn::Pooling2dDescriptor& pooling2dDescriptor,
-        const char* name = nullptr);
+                                                const char* name = nullptr);
+
+    %feature("docstring",
+        "
+        Adds a 3D Pooling layer to the network. Type of 3D pooling is decided by the configuration.
+
+        Args:
+            pooling3dDescriptor (Pooling3dDescriptor): Configuration for the 3D pooling layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddPooling3dLayer;
+    armnn::IConnectableLayer* AddPooling3dLayer(const armnn::Pooling3dDescriptor& pooling3dDescriptor,
+                                                const char* name = nullptr);
 
     %feature("docstring",
         "

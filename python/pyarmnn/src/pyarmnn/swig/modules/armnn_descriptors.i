@@ -745,6 +745,53 @@ struct Pooling2dDescriptor
 
 %feature("docstring",
     "
+    A descriptor for the Pooling3d layer. See `INetwork.AddPooling3dLayer()`.
+
+    Contains:
+        m_PoolType (int): The pooling algorithm to use (`PoolingAlgorithm_Max`, `PoolingAlgorithm_Average`, `PoolingAlgorithm_L2`). Default: `PoolingAlgorithm_Max`.
+        m_PadLeft (int): Underlying C++ data type is uint32_t. Padding left value in the width dimension. Default: 0.
+        m_PadRight (int): Underlying C++ data type is uint32_t. Padding right value in the width dimension. Default: 0.
+        m_PadTop (int): Underlying C++ data type is uint32_t. Padding top value in the height dimension. Default: 0.
+        m_PadBottom (int): Underlying C++ data type is uint32_t. Padding bottom value in the height dimension. Default: 0.
+        m_PadFront (int): Underlying C++ data type is uint32_t. Padding front value in the depth dimension. Default: 0.
+        m_PadBack (int): Underlying C++ data type is uint32_t. Padding back value in the depth dimension. Default: 0.
+        m_PoolWidth (int): Underlying C++ data type is uint32_t. Pooling width value. Default: 0.
+        m_PoolHeight (int): Underlying C++ data type is uint32_t. Pooling height value. Default: 0.
+        m_StrideX (int): Underlying C++ data type is uint32_t. Stride value when proceeding through input for the width dimension. Default: 0.
+        m_StrideY (int): Underlying C++ data type is uint32_t. Stride value when proceeding through input for the height dimension. Default: 0.
+        m_StrideZ (int): Underlying C++ data type is uint32_t. Stride value when proceeding through input for the depth dimension. Default: 0.
+        m_OutputShapeRounding (int):  The rounding method for the output shape. (`OutputShapeRounding_Floor`, `OutputShapeRounding_Ceiling`).
+                                                                                Default: `OutputShapeRounding_Floor`.
+        m_PaddingMethod (int): The padding method to be used. (`PaddingMethod_Exclude`, `PaddingMethod_IgnoreValue`).
+                                                                                Default: `PaddingMethod_Exclude`.
+        m_DataLayout (int): The data layout to be used (`DataLayout_NCDHW`, `DataLayout_NDHWC`). Default: `DataLayout_NCDHW`.
+
+    ") Pooling3dDescriptor;
+struct Pooling3dDescriptor
+{
+    Pooling3dDescriptor();
+
+    PoolingAlgorithm    m_PoolType;
+    uint32_t            m_PadLeft;
+    uint32_t            m_PadRight;
+    uint32_t            m_PadTop;
+    uint32_t            m_PadBottom;
+    uint32_t            m_PadFront;
+    uint32_t            m_PadBack;
+    uint32_t            m_PoolWidth;
+    uint32_t            m_PoolHeight;
+    uint32_t            m_StrideX;
+    uint32_t            m_StrideY;
+    uint32_t            m_StrideZ;
+    OutputShapeRounding m_OutputShapeRounding;
+    PaddingMethod       m_PaddingMethod;
+    DataLayout          m_DataLayout;
+
+    bool operator ==(const Pooling3dDescriptor& rhs) const;
+};
+
+%feature("docstring",
+    "
     A ReduceDescriptor for the REDUCE operators.
 
     Contains:

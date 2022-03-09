@@ -581,6 +581,11 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
             auto pooling2dQueueDescriptor = PolymorphicDowncast<const Pooling2dQueueDescriptor*>(&descriptor);
             return MakeWorkload<ClPooling2dWorkload>(*pooling2dQueueDescriptor, info, m_CLCompileContext);
         }
+        case LayerType::Pooling3d :
+        {
+            auto pooling3dQueueDescriptor = PolymorphicDowncast<const Pooling3dQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClPooling3dWorkload>(*pooling3dQueueDescriptor, info, m_CLCompileContext);
+        }
         case LayerType::PreCompiled :
         {
             auto preCompiledQueueDescriptor = PolymorphicDowncast<const PreCompiledQueueDescriptor*>(&descriptor);

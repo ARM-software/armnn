@@ -59,6 +59,7 @@
 #include "workloads/ClPadWorkload.hpp"
 #include "workloads/ClPermuteWorkload.hpp"
 #include "workloads/ClPooling2dWorkload.hpp"
+#include "workloads/ClPooling3dWorkload.hpp"
 #include "workloads/ClPreluWorkload.hpp"
 #include "workloads/ClQLstmWorkload.hpp"
 #include "workloads/ClQuantizedLstmWorkload.hpp"
@@ -448,6 +449,11 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
             return IsPooling2dSupported(infos[0],
                                         infos[1],
                                         *(PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor)),
+                                        reasonIfUnsupported);
+        case LayerType::Pooling3d:
+            return IsPooling3dSupported(infos[0],
+                                        infos[1],
+                                        *(PolymorphicDowncast<const Pooling3dDescriptor*>(&descriptor)),
                                         reasonIfUnsupported);
         case LayerType::Prelu:
             return IsPreluSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
@@ -1192,6 +1198,14 @@ bool ClLayerSupport::IsPooling2dSupported(const TensorInfo& input,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClPooling2dWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool ClLayerSupport::IsPooling3dSupported(const TensorInfo& input,
+                                          const TensorInfo& output,
+                                          const Pooling3dDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClPooling3dWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 bool ClLayerSupport::IsPreluSupported(const armnn::TensorInfo &input,

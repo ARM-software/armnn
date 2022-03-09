@@ -56,6 +56,12 @@ arm_compute::DataLayout ConvertDataLayout(armnn::DataLayout dataLayout);
 arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDescriptor& descriptor,
                                                               bool fpMixedPrecision = false);
 
+/// Utility function used to setup an arm_compute::Pooling3dLayerInfo object from given
+/// armnn::Pooling3dDescriptor
+/// bool fpMixedPrecision
+arm_compute::Pooling3dLayerInfo BuildArmComputePooling3dLayerInfo(const Pooling3dDescriptor& descriptor,
+                                                                  bool fpMixedPrecision = false);
+
 /// Utility function to setup an arm_compute::NormalizationLayerInfo object from an armnn::NormalizationDescriptor.
 arm_compute::NormalizationLayerInfo BuildArmComputeNormalizationLayerInfo(const NormalizationDescriptor& desc);
 

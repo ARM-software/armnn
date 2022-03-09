@@ -29,6 +29,15 @@ namespace
 
 using namespace armnnUtils;
 
+template<typename T>
+void PermuteNCDHWToNDHWC(std::vector<T> &src, armnn::TensorInfo &srcInfo)
+{
+    const armnn::PermutationVector NCDHWToNDHWC = { 0, 4, 1, 2, 3 };
+    std::vector<T> tmp(src.size());
+    armnnUtils::Permute(srcInfo.GetShape(), NCDHWToNDHWC, src.data(), tmp.data(), sizeof(T));
+    src = tmp;
+}
+
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 5> SimplePooling3dTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
@@ -137,6 +146,7 @@ LayerTestResult<T, 5> SimpleMaxPooling3dSize2x2x2Stride1x1x1TestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -153,6 +163,7 @@ LayerTestResult<T, 5> SimpleMaxPooling3dSize2x2x2Stride1x1x1TestCommon(
     descriptor.m_PadFront = descriptor.m_PadBack = 0;
     descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
 
     unsigned int inputWidth = 3;
     unsigned int inputHeight = 3;
@@ -169,8 +180,10 @@ LayerTestResult<T, 5> SimpleMaxPooling3dSize2x2x2Stride1x1x1TestCommon(
     unsigned int channels = 2;
     unsigned int batchSize = 2;
 
-    armnn::TensorInfo inputTensorInfo({ batchSize, channels, inputDepth, inputHeight, inputWidth }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ batchSize, channels, outputDepth, outputHeight, outputWidth }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( batchSize, channels, inputDepth, inputHeight,
+                                                                   inputWidth, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( batchSize, channels, outputDepth, outputHeight,
+                                                                    outputWidth, dataLayout, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -239,6 +252,12 @@ LayerTestResult<T, 5> SimpleMaxPooling3dSize2x2x2Stride1x1x1TestCommon(
             },
             qScale, qOffset);
 
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC(outputExpected, outputTensorInfo);
+    }
+
     return SimplePooling3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
         input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
@@ -249,7 +268,7 @@ LayerTestResult<T, 5> SimpleMaxPooling3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
-    const armnn::DataLayout dataLayout = armnn::DataLayout::NCDHW,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -306,16 +325,10 @@ LayerTestResult<T, 5> SimpleMaxPooling3dTestCommon(
         },
         qScale, qOffset));
 
-    const armnn::PermutationVector NCDHWToNDHWC = { 0, 4, 1, 2, 3 };
     if (dataLayout == armnn::DataLayout::NDHWC)
     {
-        std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCDHWToNDHWC, inputData.data(), tmp.data(), sizeof(T));
-        inputData = tmp;
-
-        std::vector<T> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCDHWToNDHWC, outputData.data(), tmp1.data(), sizeof(T));
-        outputData = tmp1;
+        PermuteNCDHWToNDHWC(inputData, inputTensorInfo);
+        PermuteNCDHWToNDHWC(outputData, outputTensorInfo);
     }
 
     return SimplePooling3dTestImpl<ArmnnType>(
@@ -328,6 +341,7 @@ LayerTestResult<T, 5> IgnorePaddingSimpleMaxPooling3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -342,9 +356,10 @@ LayerTestResult<T, 5> IgnorePaddingSimpleMaxPooling3dTestCommon(
     descriptor.m_PadFront = 1;
     descriptor.m_PadBack = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
+    descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4, 4 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3, 3 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 4, 4, 4 , dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 3, 3, 3 , dataLayout, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -394,6 +409,12 @@ LayerTestResult<T, 5> IgnorePaddingSimpleMaxPooling3dTestCommon(
              1.0f,  2.0f, -4.0f,
         },
         qScale, qOffset);
+
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC(outputExpected, outputTensorInfo);
+    }
 
     return SimplePooling3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
@@ -462,16 +483,10 @@ LayerTestResult<T, 5> SimpleAveragePooling3dTestCommon(
         },
         qScale, qOffset));
 
-    const armnn::PermutationVector NCDHWToNDHWC = { 0, 4, 1, 2, 3 };
     if (dataLayout == armnn::DataLayout::NDHWC)
     {
-        std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCDHWToNDHWC, inputData.data(), tmp.data(), sizeof(T));
-        inputData = tmp;
-
-        std::vector<T> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCDHWToNDHWC, outputData.data(), tmp1.data(), sizeof(T));
-        outputData = tmp1;
+        PermuteNCDHWToNDHWC(inputData, inputTensorInfo);
+        PermuteNCDHWToNDHWC(outputData, outputTensorInfo);
     }
 
     return SimplePooling3dTestImpl<ArmnnType>(
@@ -484,6 +499,7 @@ LayerTestResult<T, 5> LargeTensorsAveragePooling3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -498,11 +514,12 @@ LayerTestResult<T, 5> LargeTensorsAveragePooling3dTestCommon(
     descriptor.m_PadFront = 50;
     descriptor.m_PadBack = 50;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo({ 5, 3, 52, 60, 68 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ 5, 3, 11, 13, 15 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 5, 3, 52, 60, 68, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 5, 3, 11, 13, 14, dataLayout, ArmnnType);
 
-    // Set quantization parameters if the requested type is a quantized type.
+    // Set quantization parameters if the requested type is a quantized type.armnnUtils::GetTensorInfo(
     if(armnn::IsQuantizedType<T>())
     {
         inputTensorInfo.SetQuantizationScale(qScale);
@@ -535,6 +552,7 @@ LayerTestResult<T, 5> IgnorePaddingSimpleAveragePooling3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -549,9 +567,11 @@ LayerTestResult<T, 5> IgnorePaddingSimpleAveragePooling3dTestCommon(
     descriptor.m_PadFront = 1;
     descriptor.m_PadBack = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
+    descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4, 4 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3, 3 }, ArmnnType);
+
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo ( 1, 1, 4, 4, 4, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 3, 3, 3, dataLayout, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -602,6 +622,12 @@ LayerTestResult<T, 5> IgnorePaddingSimpleAveragePooling3dTestCommon(
         },
         qScale, qOffset);
 
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC(outputExpected, outputTensorInfo);
+    }
+
     return SimplePooling3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
         input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
@@ -612,7 +638,7 @@ LayerTestResult<T, 5> SimpleL2Pooling3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
-    armnn::DataLayout dataLayout = armnn::DataLayout::NCDHW,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -669,16 +695,10 @@ LayerTestResult<T, 5> SimpleL2Pooling3dTestCommon(
         },
         qScale, qOffset));
 
-    const armnn::PermutationVector NCDHWToNDHWC = { 0, 4, 1, 2, 3 };
     if (dataLayout == armnn::DataLayout::NDHWC)
     {
-        std::vector<T> tmp(inputData.size());
-        armnnUtils::Permute(inputTensorInfo.GetShape(), NCDHWToNDHWC, inputData.data(), tmp.data(), sizeof(T));
-        inputData = tmp;
-
-        std::vector<T> tmp1(outputData.size());
-        armnnUtils::Permute(outputTensorInfo.GetShape(), NCDHWToNDHWC, outputData.data(), tmp1.data(), sizeof(T));
-        outputData = tmp1;
+        PermuteNCDHWToNDHWC(inputData, inputTensorInfo);
+        PermuteNCDHWToNDHWC(outputData, outputTensorInfo);
     }
 
     return SimplePooling3dTestImpl<ArmnnType>(
@@ -691,6 +711,7 @@ LayerTestResult<T, 5> IgnorePaddingSimpleL2Pooling3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -705,9 +726,10 @@ LayerTestResult<T, 5> IgnorePaddingSimpleL2Pooling3dTestCommon(
     descriptor.m_PadFront = 1;
     descriptor.m_PadBack = 1;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
+    descriptor.m_DataLayout = dataLayout;
 
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 4, 4, 4 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 3, 3, 3 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 4, 4, 4, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 3, 3, 3, dataLayout,ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -794,9 +816,62 @@ LayerTestResult<T, 5> IgnorePaddingSimpleL2Pooling3dTestCommon(
         },
         qScale, qOffset);
 
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC(outputExpected, outputTensorInfo);
+    }
+
     return SimplePooling3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
         input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 5> AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout,
+        float qScale = 1.0f,
+        int32_t qOffset = 0)
+{
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 1, 3, 1, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 2, 2, 1, dataLayout, ArmnnType);
+
+    armnn::Pooling3dDescriptor descriptor;
+    descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
+    descriptor.m_PoolWidth = 1;
+    descriptor.m_PoolHeight = 2;
+    descriptor.m_PoolDepth = 3;
+    descriptor.m_StrideX = 1;
+    descriptor.m_StrideY = 2;
+    descriptor.m_StrideZ = 1;
+    descriptor.m_PadLeft = 0;
+    descriptor.m_PadRight = 0;
+    descriptor.m_PadTop = 2;
+    descriptor.m_PadBottom = 0;
+    descriptor.m_PadFront = 1;
+    descriptor.m_PadBack = 2;
+    descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+    descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
+
+    // Construct input data.
+    auto input = QuantizedVector<T>( { 1.0f, 3.0f, 4.0f, }, qScale, qOffset);
+
+    // These were calculated manually.
+    auto outputExpected = QuantizedVector<T>( { 0.0f, 3.0f, 0.0f, 3.0f, }, qScale, qOffset);
+
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC<T>(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC<T>(outputExpected, outputTensorInfo);
+    }
+
+    return SimplePooling3dTestImpl<ArmnnType>(
+            workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+            input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -804,18 +879,66 @@ LayerTestResult<T, 5> AsymmetricNonSquareMaxPooling3dTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 1, 3, 1 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2, 1 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 1, 3, 1, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 2, 2, 1, dataLayout, ArmnnType);
 
     armnn::Pooling3dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Max;
     descriptor.m_PoolWidth = 1;
     descriptor.m_PoolHeight = 2;
     descriptor.m_PoolDepth = 3;
-    descriptor.m_StrideX = 0;
+    descriptor.m_StrideX = 1;
+    descriptor.m_StrideY = 2;
+    descriptor.m_StrideZ = 1;
+    descriptor.m_PadLeft = 0;
+    descriptor.m_PadRight = 0;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 0;
+    descriptor.m_PadFront = 1;
+    descriptor.m_PadBack = 2;
+    descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+    descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
+
+    // Construct input data.
+    auto input = QuantizedVector<T>( { 1.0f, 3.0f, 4.0f, }, qScale, qOffset);
+
+    // These were calculated manually.
+    auto outputExpected = QuantizedVector<T>( { 1.0f, 4.0f, 1.0f, 4.0f, }, qScale, qOffset);
+
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC<T>(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC<T>(outputExpected, outputTensorInfo);
+    }
+
+    return SimplePooling3dTestImpl<ArmnnType>(
+        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 5> AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
+    float qScale = 1.0f,
+    int32_t qOffset = 0)
+{
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 1, 3, 1, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 2, 2, 1, dataLayout, ArmnnType);
+
+    armnn::Pooling3dDescriptor descriptor;
+    descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
+    descriptor.m_PoolWidth = 1;
+    descriptor.m_PoolHeight = 2;
+    descriptor.m_PoolDepth = 3;
+    descriptor.m_StrideX = 1;
     descriptor.m_StrideY = 2;
     descriptor.m_StrideZ = 1;
     descriptor.m_PadLeft = 0;
@@ -826,21 +949,19 @@ LayerTestResult<T, 5> AsymmetricNonSquareMaxPooling3dTestCommon(
     descriptor.m_PadBack = 2;
     descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
 
     // Construct input data.
-    auto input = QuantizedVector<T>(
-        {
-            1.0f, 3.0f, 4.0f,
-        },
-        qScale, qOffset);
+    auto input = QuantizedVector<T>({ 1.0f, 3.0f, 4.0f, }, qScale, qOffset);
 
     // These were calculated manually.
-    auto outputExpected = QuantizedVector<T>(
-        {
-            0.0f, 3.0f, 0.0f, 3.0f,
-        },
-        qScale, qOffset);
+    auto outputExpected = QuantizedVector<T>( { 0.0f, 2.0f, 0.0f, 2.0f, }, qScale, qOffset);
 
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC<T>(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC<T>(outputExpected, outputTensorInfo);
+    }
     return SimplePooling3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
         input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
@@ -848,61 +969,61 @@ LayerTestResult<T, 5> AsymmetricNonSquareMaxPooling3dTestCommon(
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 5> AsymmetricNonSquareAveragePooling3dTestCommon(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory,
-    float qScale = 1.0f,
-    int32_t qOffset = 0)
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout,
+        float qScale = 1.0f,
+        int32_t qOffset = 0)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 1, 3, 1 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2, 1 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 1, 3, 1, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 2, 2, 1, dataLayout, ArmnnType);
 
     armnn::Pooling3dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::Average;
     descriptor.m_PoolWidth = 1;
     descriptor.m_PoolHeight = 2;
     descriptor.m_PoolDepth = 3;
-    descriptor.m_StrideX = 0;
+    descriptor.m_StrideX = 1;
     descriptor.m_StrideY = 2;
     descriptor.m_StrideZ = 1;
     descriptor.m_PadLeft = 0;
     descriptor.m_PadRight = 0;
-    descriptor.m_PadTop = 2;
+    descriptor.m_PadTop = 1;
     descriptor.m_PadBottom = 0;
     descriptor.m_PadFront = 1;
     descriptor.m_PadBack = 2;
     descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
 
     // Construct input data.
-    auto input = QuantizedVector<T>(
-        {
-            1.0f, 3.0f, 4.0f,
-        },
-        qScale, qOffset);
+    auto input = QuantizedVector<T>( { 1.0f, 3.0f, 4.0f, }, qScale, qOffset);
 
     // These were calculated manually.
-    auto outputExpected = QuantizedVector<T>(
-        {
-            0.0f, 2.0f, 0.0f, 2.0f,
-        },
-        qScale, qOffset);
+    auto outputExpected = QuantizedVector<T>( { 1.0f, 3.5f, 1.0f, 3.5f, }, qScale, qOffset);
 
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC<T>(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC<T>(outputExpected, outputTensorInfo);
+    }
     return SimplePooling3dTestImpl<ArmnnType>(
-        workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
-        input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
+            workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+            input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-LayerTestResult<T, 5> AsymmetricNonSquareL2Pooling3dTestCommon(
+LayerTestResult<T, 5> AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
-    armnn::TensorInfo inputTensorInfo({ 1, 1, 1, 3, 1 }, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({ 1, 1, 2, 2, 1 }, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 1, 3, 1, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 2, 2, 1, dataLayout, ArmnnType);
 
     armnn::Pooling3dDescriptor descriptor;
     descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
@@ -920,24 +1041,70 @@ LayerTestResult<T, 5> AsymmetricNonSquareL2Pooling3dTestCommon(
     descriptor.m_PadBack = 2;
     descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
     descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
 
     // Construct input data.
-    auto input = QuantizedVector<T>(
-        {
-            1.0f, 3.0f, 4.0f,
-        },
-        qScale, qOffset);
+    auto input = QuantizedVector<T>( { 1.0f, 3.0f, 4.0f, }, qScale, qOffset);
 
     // These were calculated manually.
-    auto outputExpected = QuantizedVector<T>(
-        {
-            0.0f, 2.2360679775f, 0.0f, 2.2360679775f,
-        },
-        qScale, qOffset);
+    auto outputExpected = QuantizedVector<T>( { 0.0f, 2.2360679775f, 0.0f, 2.2360679775f, }, qScale, qOffset);
+
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC<T>(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC<T>(outputExpected, outputTensorInfo);
+    }
 
     return SimplePooling3dTestImpl<ArmnnType>(
         workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
         input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 5> AsymmetricNonSquareL2Pooling3dTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout,
+        float qScale = 1.0f,
+        int32_t qOffset = 0)
+{
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 1, 3, 1, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo( 1, 1, 2, 2, 1, dataLayout, ArmnnType);
+
+    armnn::Pooling3dDescriptor descriptor;
+    descriptor.m_PoolType = armnn::PoolingAlgorithm::L2;
+    descriptor.m_PoolWidth = 1;
+    descriptor.m_PoolHeight = 2;
+    descriptor.m_PoolDepth = 3;
+    descriptor.m_StrideX = 1;
+    descriptor.m_StrideY = 2;
+    descriptor.m_StrideZ = 1;
+    descriptor.m_PadLeft = 0;
+    descriptor.m_PadRight = 0;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 0;
+    descriptor.m_PadFront = 1;
+    descriptor.m_PadBack = 2;
+    descriptor.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+    descriptor.m_PaddingMethod = armnn::PaddingMethod::Exclude;
+    descriptor.m_DataLayout = dataLayout;
+
+    // Construct input data.
+    auto input = QuantizedVector<T>( { 1.0f, 3.0f, 4.0f, }, qScale, qOffset);
+
+    // These were calculated manually.
+    auto outputExpected = QuantizedVector<T>( { 1.0f, 3.53553390593f, 1.0f, 3.53553390593f, }, qScale, qOffset);
+
+    if (dataLayout == armnn::DataLayout::NDHWC)
+    {
+        PermuteNCDHWToNDHWC<T>(input, inputTensorInfo);
+        PermuteNCDHWToNDHWC<T>(outputExpected, outputTensorInfo);
+    }
+
+    return SimplePooling3dTestImpl<ArmnnType>(
+            workloadFactory, memoryManager, tensorHandleFactory, descriptor, qScale, qOffset,
+            input, outputExpected, inputTensorInfo.GetShape(), outputTensorInfo.GetShape());
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -948,6 +1115,7 @@ LayerTestResult<T, 5> ComparePooling3dTestCommon(
     const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::ITensorHandleFactory& refTensorHandleFactory,
     armnn::PoolingAlgorithm poolingType,
+    const armnn::DataLayout dataLayout,
     float qScale = 1.0f,
     int32_t qOffset = 0)
 {
@@ -970,14 +1138,10 @@ LayerTestResult<T, 5> ComparePooling3dTestCommon(
     const unsigned int outputHeight = (inputHeight + 2 * padY + strideY - poolSize) / strideY;
     const unsigned int outputDepth = (inputDepth + 2 * padZ + strideZ - poolSize) / strideZ;
 
-    armnn::TensorInfo inputTensorInfo;
-    armnn::TensorInfo outputTensorInfo;
-
-    unsigned int inputShape[] = { batchSize, channelCount, inputHeight, inputWidth, inputDepth };
-    unsigned int outputShape[] = { batchSize, channelCount, outputHeight, outputWidth, outputDepth };
-
-    inputTensorInfo = armnn::TensorInfo(5, inputShape, ArmnnType);
-    outputTensorInfo = armnn::TensorInfo(5, outputShape, ArmnnType);
+    armnn::TensorInfo inputTensorInfo = armnnUtils::GetTensorInfo(batchSize, channelCount, inputDepth, inputHeight,
+                                                                  inputWidth, dataLayout, ArmnnType);
+    armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(batchSize, channelCount, outputDepth, outputHeight,
+                                                                   outputWidth, dataLayout, ArmnnType);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -991,7 +1155,6 @@ LayerTestResult<T, 5> ComparePooling3dTestCommon(
     std::vector<T> input = MakeRandomTensor<T>(inputTensorInfo, 81715);
     std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
     std::vector<T> expectedOutput(outputTensorInfo.GetNumElements());
-
     LayerTestResult<T, 5> comparisonResult(outputTensorInfo);
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
@@ -1015,8 +1178,10 @@ LayerTestResult<T, 5> ComparePooling3dTestCommon(
     data.m_Parameters.m_PadFront = padZ;
     data.m_Parameters.m_PadBack = padZ;
     data.m_Parameters.m_OutputShapeRounding = armnn::OutputShapeRounding::Floor;
+    data.m_Parameters.m_DataLayout = dataLayout;
 
-    std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> outputHandleRef =
+                                          refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo);
 
     // Don't execute if Pooling is not supported, as an exception will be raised.
@@ -1062,34 +1227,36 @@ LayerTestResult<T, 5> ComparePooling3dTestCommon(
     return comparisonResult;
 }
 
-
 } // anonymous namespace
 
 LayerTestResult<float, 5> SimpleMaxPooling3dSize2x2x2Stride1x1x1Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return SimpleMaxPooling3dSize2x2x2Stride1x1x1TestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager, tensorHandleFactory);
+        workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> SimpleMaxPooling3dSize2x2x2Stride1x1x1Uint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return SimpleMaxPooling3dSize2x2x2Stride1x1x1TestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 128);
+        workloadFactory, memoryManager, tensorHandleFactory, dataLayout, 0.1f, 128);
 }
 
 LayerTestResult<int16_t, 5> SimpleMaxPooling3dSize2x2x2Stride1x1x1Int16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return SimpleMaxPooling3dSize2x2x2Stride1x1x1TestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> SimpleMaxPooling3dTest(
@@ -1125,28 +1292,31 @@ LayerTestResult<int16_t, 5> SimpleMaxPooling3dInt16Test(
 LayerTestResult<float, 5> IgnorePaddingSimpleMaxPooling3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleMaxPooling3dTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> IgnorePaddingSimpleMaxPooling3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleMaxPooling3dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, tensorHandleFactory, 1.0f, -5);
+            workloadFactory, memoryManager, tensorHandleFactory,dataLayout, 1.0f, -5);
 }
 
 LayerTestResult<int16_t, 5> IgnorePaddingSimpleMaxPooling3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleMaxPooling3dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> SimpleAveragePooling3dTest(
@@ -1212,163 +1382,271 @@ LayerTestResult<int16_t, 5> SimpleL2Pooling3dInt16Test(
 LayerTestResult<float, 5> LargeTensorsAveragePooling3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return LargeTensorsAveragePooling3dTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> LargeTensorsAveragePooling3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return LargeTensorsAveragePooling3dTestCommon<armnn::DataType::QAsymmU8>(
-        workloadFactory, memoryManager, tensorHandleFactory, 0.5, -1);
+        workloadFactory, memoryManager, tensorHandleFactory, dataLayout, 0.5, -1);
 }
 
 LayerTestResult<int16_t, 5> LargeTensorsAveragePooling3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return LargeTensorsAveragePooling3dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> IgnorePaddingSimpleAveragePooling3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleAveragePooling3dTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> IgnorePaddingSimpleAveragePooling3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleAveragePooling3dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, tensorHandleFactory, 1.0f, -5);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout, 1.0f, -5);
 }
 
 LayerTestResult<int16_t, 5> IgnorePaddingSimpleAveragePooling3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleAveragePooling3dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> IgnorePaddingSimpleL2Pooling3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleL2Pooling3dTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> IgnorePaddingSimpleL2Pooling3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleL2Pooling3dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, tensorHandleFactory, 1.0f, -5);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout, 1.0f, -5);
 }
 
 LayerTestResult<int16_t, 5> IgnorePaddingSimpleL2Pooling3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return IgnorePaddingSimpleL2Pooling3dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> AsymmetricNonSquareMaxPooling3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareMaxPooling3dTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> AsymmetricNonSquareMaxPooling3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareMaxPooling3dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<int16_t, 5> AsymmetricNonSquareMaxPooling3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareMaxPooling3dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<float, 5> AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<uint8_t, 5> AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<int16_t, 5> AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> AsymmetricNonSquareAveragePooling3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareAveragePooling3dTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> AsymmetricNonSquareAveragePooling3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareAveragePooling3dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<int16_t, 5> AsymmetricNonSquareAveragePooling3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareAveragePooling3dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<float, 5> AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<uint8_t, 5> AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<int16_t, 5> AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> AsymmetricNonSquareL2Pooling3dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareL2Pooling3dTestCommon<armnn::DataType::Float32>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> AsymmetricNonSquareL2Pooling3dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareL2Pooling3dTestCommon<armnn::DataType::QAsymmU8>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<int16_t, 5> AsymmetricNonSquareL2Pooling3dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory)
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    const armnn::DataLayout dataLayout)
 {
     return AsymmetricNonSquareL2Pooling3dTestCommon<armnn::DataType::QSymmS16>(
-            workloadFactory, memoryManager, tensorHandleFactory);
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<float, 5> AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::Float32>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<uint8_t, 5> AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::QAsymmU8>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
+}
+
+LayerTestResult<int16_t, 5> AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        const armnn::DataLayout dataLayout)
+{
+    return AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTestCommon<armnn::DataType::QSymmS16>(
+            workloadFactory, memoryManager, tensorHandleFactory, dataLayout);
 }
 
 LayerTestResult<float, 5> ComparePooling3dTest(
@@ -1377,10 +1655,12 @@ LayerTestResult<float, 5> ComparePooling3dTest(
     armnn::IWorkloadFactory& refWorkloadFactory,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::ITensorHandleFactory& refTensorHandleFactory,
-    armnn::PoolingAlgorithm  poolingType)
+    armnn::PoolingAlgorithm  poolingType,
+    const armnn::DataLayout dataLayout)
 {
     return ComparePooling3dTestCommon<armnn::DataType::Float32>(
-        workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory, poolingType);
+        workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory,
+        poolingType, dataLayout);
 }
 
 LayerTestResult<uint8_t, 5> ComparePooling3dUint8Test(
@@ -1389,11 +1669,12 @@ LayerTestResult<uint8_t, 5> ComparePooling3dUint8Test(
     armnn::IWorkloadFactory& refWorkloadFactory,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::ITensorHandleFactory& refTensorHandleFactory,
-    armnn::PoolingAlgorithm  poolingType)
+    armnn::PoolingAlgorithm  poolingType,
+    const armnn::DataLayout dataLayout)
 {
     return ComparePooling3dTestCommon<armnn::DataType::QAsymmU8>(
         workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory,
-        poolingType, 0.1f, 128);
+        poolingType, dataLayout, 0.1f, 128);
 }
 
 LayerTestResult<int16_t, 5> ComparePooling3dInt16Test(
@@ -1402,8 +1683,10 @@ LayerTestResult<int16_t, 5> ComparePooling3dInt16Test(
     armnn::IWorkloadFactory& refWorkloadFactory,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
     const armnn::ITensorHandleFactory& refTensorHandleFactory,
-    armnn::PoolingAlgorithm  poolingType)
+    armnn::PoolingAlgorithm  poolingType,
+    const armnn::DataLayout dataLayout)
 {
     return ComparePooling3dTestCommon<armnn::DataType::QSymmS16>(
-        workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory, poolingType);
+        workloadFactory, memoryManager,  refWorkloadFactory, tensorHandleFactory, refTensorHandleFactory,
+        poolingType, dataLayout);
 }

@@ -86,6 +86,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClPermuteWorkload.hpp
     ClPooling2dWorkload.cpp
     ClPooling2dWorkload.hpp
+    ClPooling3dWorkload.cpp
+    ClPooling3dWorkload.hpp
     ClPreluWorkload.cpp
     ClPreluWorkload.hpp
     ClQLstmWorkload.cpp

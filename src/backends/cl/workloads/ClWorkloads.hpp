@@ -43,6 +43,7 @@
 #include "ClPermuteWorkload.hpp"
 #include "ClPadWorkload.hpp"
 #include "ClPooling2dWorkload.hpp"
+#include "ClPooling3dWorkload.hpp"
 #include "ClPreluWorkload.hpp"
 #include "ClQLstmWorkload.hpp"
 #include "ClQuantizeWorkload.hpp"

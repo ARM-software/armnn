@@ -469,7 +469,7 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AcrossChannelNormalization,
                                  ClContextControlFixture,
                                  AcrossChannelNormalizationTest)
 
-// Pooling
+// Pooling2d
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleMaxPooling2dSize3x3Stride2x4,
                                  ClContextControlFixture,
                                  SimpleMaxPooling2dSize3x3Stride2x4Test,
@@ -610,6 +610,85 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_L2Pooling2dSize7Uint8,
                                  L2Pooling2dSize7Uint8Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(L2Pooling2dSize9, ClContextControlFixture, L2Pooling2dSize9Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_L2Pooling2dSize9Uint8, ClContextControlFixture, L2Pooling2dSize9Uint8Test)
+
+// Pooling3d
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleMaxPooling3dSize2x2x2Stride1x1x1,
+                                 ClContextControlFixture,
+                                 SimpleMaxPooling3dSize2x2x2Stride1x1x1Test,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleMaxPooling3d,
+                                 ClContextControlFixture,
+                                 SimpleMaxPooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleMaxPooling3d,
+                                 ClContextControlFixture,
+                                 IgnorePaddingSimpleMaxPooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAveragePooling3d,
+                                 ClContextControlFixture,
+                                 SimpleAveragePooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(LargeTensorsAveragePooling3d,
+                                 ClContextControlFixture,
+                                 LargeTensorsAveragePooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleAveragePooling3d,
+                                 ClContextControlFixture,
+                                 IgnorePaddingSimpleAveragePooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleL2Pooling3d,
+                                 ClContextControlFixture,
+                                 SimpleL2Pooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleL2Pooling3d,
+                                 ClContextControlFixture,
+                                 IgnorePaddingSimpleL2Pooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareMaxPooling3d,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareMaxPooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareAveragePooling3d,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareAveragePooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareL2Pooling3d,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareL2Pooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPool,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPool,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTEDAsymmetricNonSquareL2Pooling3dWithPaddingOnlyPool,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAveragePooling3d,
+                                 ClContextControlFixture,
+                                 SimpleAveragePooling3dTest,
+                                 DataLayout::NDHWC)
+
+
+
 
 // Add
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAdd, ClContextControlFixture, AdditionTest)
@@ -2010,7 +2089,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClContextControlFixture") {}
 // The ARMNN_COMPARE_REF_AUTO_TEST_CASE and the ARMNN_COMPARE_REF_FIXTURE_TEST_CASE test units are not available
 // if the reference backend is not built
 
-// ============================================================================
 // COMPARE tests
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareSoftmaxBeta1WithReference, CompareSoftmaxTest, 1.0f)
@@ -2048,6 +2126,15 @@ ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareAveragePooling2dWithRefUint8, C
                                           PoolingAlgorithm::Average)
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareL2Pooling2dWithRef, ComparePooling2dTest, PoolingAlgorithm::L2)
+
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareMaxPooling3dWithRef, ComparePooling3dTest, PoolingAlgorithm::Max,
+                                          DataLayout::NDHWC)
+
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareAveragePooling3dWithRef, ComparePooling3dTest,
+                                          PoolingAlgorithm::Average, DataLayout::NDHWC)
+
+ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareL2Pooling3dWithRef, ComparePooling3dTest, PoolingAlgorithm::L2,
+                                          DataLayout::NDHWC)
 
 ARMNN_COMPARE_REF_AUTO_TEST_CASE_WITH_THF(CompareAddition, CompareAdditionTest)
 

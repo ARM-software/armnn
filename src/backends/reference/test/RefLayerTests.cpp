@@ -568,11 +568,12 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquarePooling2dInt16, AsymmetricNonSquareP
 
 // [ Pooling 3D
 //MaxPooling
-ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dSize2x2x2Stride1x1x1, SimpleMaxPooling3dSize2x2x2Stride1x1x1Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dSize2x2x2Stride1x1x1, SimpleMaxPooling3dSize2x2x2Stride1x1x1Test,
+                              DataLayout::NCDHW)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dSize2x2x2Stride1x1x1Uint8,
-                              SimpleMaxPooling3dSize2x2x2Stride1x1x1Uint8Test)
+                              SimpleMaxPooling3dSize2x2x2Stride1x1x1Uint8Test, DataLayout::NCDHW)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dSize2x2x2Stride1x1x1Int16,
-                              SimpleMaxPooling3dSize2x2x2Stride1x1x1Int16Test)
+                              SimpleMaxPooling3dSize2x2x2Stride1x1x1Int16Test, DataLayout::NCDHW)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3d, SimpleMaxPooling3dTest, DataLayout::NDHWC)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dNCDHW, SimpleMaxPooling3dTest, DataLayout::NCDHW)
@@ -581,9 +582,12 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dInt16, SimpleMaxPooling3dInt16Te
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dUint8NCDHW, SimpleMaxPooling3dUint8Test, DataLayout::NCDHW)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleMaxPooling3dInt16NCDHW, SimpleMaxPooling3dInt16Test, DataLayout::NCDHW)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling3d, IgnorePaddingSimpleMaxPooling3dTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling3dUint8, IgnorePaddingSimpleMaxPooling3dUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling3dInt16, IgnorePaddingSimpleMaxPooling3dInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling3d, IgnorePaddingSimpleMaxPooling3dTest,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling3dUint8, IgnorePaddingSimpleMaxPooling3dUint8Test,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleMaxPooling3dInt16, IgnorePaddingSimpleMaxPooling3dInt16Test,
+                              DataLayout::NCDHW)
 
 //AveragePooling
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling3d, SimpleAveragePooling3dTest, DataLayout::NDHWC)
@@ -596,13 +600,18 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleAveragePooling3dInt16NCDHW, SimpleAveragePoo
 // Due to the size of the input each of these test cases takes about 3 minutes
 // to execute in an x86 environment.  We'll disable but not remove them for the
 // moment.
-//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3d, LargeTensorsAveragePooling3dTest)
-//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dUint8, LargeTensorsAveragePooling3dUint8Test)
-//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dInt16, LargeTensorsAveragePooling3dInt16Test)
+//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3d, LargeTensorsAveragePooling3dTest, DataLayout::NCDHW)
+//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dUint8, LargeTensorsAveragePooling3dUint8Test,
+//                              DataLayout::NCDHW)
+//ARMNN_AUTO_TEST_CASE_WITH_THF(LargeTensorsAveragePooling3dInt16, LargeTensorsAveragePooling3dInt16Test,
+//                              DataLayout::NCDHW)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3d, IgnorePaddingSimpleAveragePooling3dTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3dUint8, IgnorePaddingSimpleAveragePooling3dUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3dInt16, IgnorePaddingSimpleAveragePooling3dInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3d, IgnorePaddingSimpleAveragePooling3dTest,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3dUint8, IgnorePaddingSimpleAveragePooling3dUint8Test,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleAveragePooling3dInt16, IgnorePaddingSimpleAveragePooling3dInt16Test,
+                              DataLayout::NCDHW)
 
 //L2Pooling
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleL2Pooling3d, SimpleL2Pooling3dTest, DataLayout::NDHWC)
@@ -612,22 +621,61 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleL2Pooling3dInt16, SimpleL2Pooling3dInt16Test
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleL2Pooling3dUint8NCDHW, SimpleL2Pooling3dUint8Test, DataLayout::NCDHW)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleL2Pooling3dInt16NCDHW, SimpleL2Pooling3dInt16Test, DataLayout::NCDHW)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleL2Pooling3d, IgnorePaddingSimpleL2Pooling3dTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleL2Pooling3dUint8, IgnorePaddingSimpleL2Pooling3dUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleL2Pooling3dInt16, IgnorePaddingSimpleL2Pooling3dInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleL2Pooling3d, IgnorePaddingSimpleL2Pooling3dTest, DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleL2Pooling3dUint8, IgnorePaddingSimpleL2Pooling3dUint8Test,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(IgnorePaddingSimpleL2Pooling3dInt16, IgnorePaddingSimpleL2Pooling3dInt16Test,
+                              DataLayout::NCDHW)
 
 //NonSquarePooling
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareMaxPooling3d, AsymmetricNonSquareMaxPooling3dTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareMaxPooling3dUint8, AsymmetricNonSquareMaxPooling3dUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareMaxPooling3dInt16, AsymmetricNonSquareMaxPooling3dInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareMaxPooling3d, AsymmetricNonSquareMaxPooling3dTest, DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareMaxPooling3dUint8, AsymmetricNonSquareMaxPooling3dUint8Test,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareMaxPooling3dInt16, AsymmetricNonSquareMaxPooling3dInt16Test,
+                              DataLayout::NCDHW)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareAveragePooling3d, AsymmetricNonSquareAveragePooling3dTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareAveragePooling3dUint8, AsymmetricNonSquareAveragePooling3dUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareAveragePooling3dInt16, AsymmetricNonSquareAveragePooling3dInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareAveragePooling3d, AsymmetricNonSquareAveragePooling3dTest,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareAveragePooling3dUint8, AsymmetricNonSquareAveragePooling3dUint8Test,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareAveragePooling3dInt16, AsymmetricNonSquareAveragePooling3dInt16Test,
+                              DataLayout::NCDHW)
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareL2Pooling3d, AsymmetricNonSquareL2Pooling3dTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareL2Pooling3dUint8, AsymmetricNonSquareL2Pooling3dUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareL2Pooling3dInt16, AsymmetricNonSquareL2Pooling3dInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareL2Pooling3d, AsymmetricNonSquareL2Pooling3dTest, DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareL2Pooling3dUint8, AsymmetricNonSquareL2Pooling3dUint8Test,
+                              DataLayout::NCDHW)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmNonSquareL2Pooling3dInt16, AsymmetricNonSquareL2Pooling3dInt16Test,
+                              DataLayout::NCDHW)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPool,
+                              AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTest,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolUint8,
+                              AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolUint8Test,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolInt16,
+                              AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolInt16Test,
+                              DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPool,
+                              AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTest,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolUint8,
+                              AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolUint8Test,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolInt16,
+                              AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolInt16Test,
+                              DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPool,
+                              AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTest,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolUint8,
+                              AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolUint8Test,
+                              DataLayout::NDHWC)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolInt16,
+                              AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolInt16Test,
+                              DataLayout::NDHWC)
 // Pooling 3D ]
 
 

@@ -4,6 +4,7 @@
 //
 
 #include "ProfilingMocks.hpp"
+#include "ProfilingTestUtils.hpp"
 
 #include <ArmNNProfilingServiceInitialiser.hpp>
 #include <BufferManager.hpp>
@@ -428,6 +429,8 @@ TEST_CASE("SendTimelinePacketTests3")
 
 TEST_CASE("GetGuidsFromProfilingService")
 {
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
+
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
     armnn::RuntimeImpl runtime(options);
@@ -451,6 +454,8 @@ TEST_CASE("GetGuidsFromProfilingService")
 
 TEST_CASE("GetTimelinePackerWriterFromProfilingService")
 {
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
+
     ProfilingOptions options;
     options.m_EnableProfiling = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;

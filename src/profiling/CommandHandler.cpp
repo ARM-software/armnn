@@ -6,7 +6,7 @@
 #include "CommandHandler.hpp"
 #include "ProfilingService.hpp"
 
-#include <armnn/Logging.hpp>
+#include <common/include/Logging.hpp>
 
 namespace arm
 {
@@ -75,7 +75,7 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
         catch (const arm::pipe::ProfilingException& e)
         {
             // Log the error and continue
-            ARMNN_LOG(warning) << "An error has occurred when handling a command: " << e.what();
+            ARM_PIPE_LOG(warning) << "An error has occurred when handling a command: " << e.what();
             // Did we get here because the socket failed?
             if ( !profilingConnection.IsOpen() )
             {
@@ -88,7 +88,7 @@ void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)
         catch (...)
         {
             // Log the error and continue
-            ARMNN_LOG(warning) << "An unknown error has occurred when handling a command";
+            ARM_PIPE_LOG(warning) << "An unknown error has occurred when handling a command";
             // Did we get here because the socket failed?
             if ( !profilingConnection.IsOpen() )
             {

@@ -89,6 +89,46 @@ public:
     }
 };
 
+struct LogLevelSwapper
+{
+public:
+    LogLevelSwapper(arm::pipe::LogSeverity severity)
+    {
+        // Set the new log level
+        arm::pipe::ConfigureLogging(true, true, severity);
+    }
+    ~LogLevelSwapper()
+    {
+        // The default log level for unit tests is "Fatal"
+        arm::pipe::ConfigureLogging(true, true, arm::pipe::LogSeverity::Fatal);
+    }
+};
+
+struct StreamRedirector
+{
+public:
+    StreamRedirector(std::ostream& stream, std::streambuf* newStreamBuffer)
+        : m_Stream(stream)
+        , m_BackupBuffer(m_Stream.rdbuf(newStreamBuffer))
+    {}
+
+    ~StreamRedirector() { CancelRedirect(); }
+
+    void CancelRedirect()
+    {
+        // Only cancel the redirect once.
+        if (m_BackupBuffer != nullptr )
+        {
+            m_Stream.rdbuf(m_BackupBuffer);
+            m_BackupBuffer = nullptr;
+        }
+    }
+
+private:
+    std::ostream& m_Stream;
+    std::streambuf* m_BackupBuffer;
+};
+
 } // namespace pipe
 
 } // namespace arm

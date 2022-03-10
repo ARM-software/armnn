@@ -31,6 +31,32 @@
 #include <limits>
 #include <backends/BackendProfiling.hpp>
 
+
+namespace arm
+{
+
+namespace pipe
+{
+
+struct LogLevelSwapper
+{
+public:
+    LogLevelSwapper(arm::pipe::LogSeverity severity)
+    {
+        // Set the new log level
+        arm::pipe::ConfigureLogging(true, true, severity);
+    }
+    ~LogLevelSwapper()
+    {
+        // The default log level for unit tests is "Fatal"
+        arm::pipe::ConfigureLogging(true, true, arm::pipe::LogSeverity::Fatal);
+    }
+};
+
+} // namespace pipe
+
+} // namespace arm
+
 using namespace arm::pipe;
 
 class ReadCounterVals : public IReadCounterValues
@@ -123,6 +149,8 @@ TEST_SUITE("BackendProfilingTestSuite")
 {
 TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
 {
+    arm::pipe::LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
+
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
@@ -154,6 +182,8 @@ TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
 
 TEST_CASE("TestBackendCounters")
 {
+    arm::pipe::LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
+
     Holder holder;
     arm::pipe::PacketVersionResolver packetVersionResolver;
     ProfilingStateMachine stateMachine;
@@ -457,17 +487,19 @@ TEST_CASE("TestBackendCounterLogging")
 
     uint32_t period = 15939u;
 
-    armnn::SetAllLoggingSinks(true, false, false);
-    SetLogFilter(armnn::LogSeverity::Warning);
+    arm::pipe::SetAllLoggingSinks(true, false, false);
+    arm::pipe::SetLogFilter(arm::pipe::LogSeverity::Warning);
     periodicCounterSelectionCommandHandler(PacketWriter(period, {5}));
     periodicCounterCapture.Stop();
-    SetLogFilter(armnn::LogSeverity::Fatal);
+    arm::pipe::SetLogFilter(arm::pipe::LogSeverity::Fatal);
 
     CHECK(ss.str().find("ActivateCounters example test error") != std::string::npos);
 }
 
 TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
 {
+    arm::pipe::LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
+
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;
@@ -507,6 +539,8 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
 
 TEST_CASE("GetProfilingGuidGenerator")
 {
+    arm::pipe::LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
+
     // Reset the profiling service to the uninitialized state
     armnn::IRuntime::CreationOptions options;
     options.m_ProfilingOptions.m_EnableProfiling = true;

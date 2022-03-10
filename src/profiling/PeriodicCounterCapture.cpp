@@ -5,7 +5,7 @@
 
 #include "PeriodicCounterCapture.hpp"
 
-#include <armnn/Logging.hpp>
+#include <common/include/Logging.hpp>
 
 #include <iostream>
 
@@ -108,7 +108,7 @@ void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
                 catch (const arm::pipe::ProfilingException& e)
                 {
                     // Report the error and continue
-                    ARMNN_LOG(warning) << "An error has occurred when getting a counter value: "
+                    ARM_PIPE_LOG(warning) << "An error has occurred when getting a counter value: "
                                        << e.what();
                     continue;
                 }

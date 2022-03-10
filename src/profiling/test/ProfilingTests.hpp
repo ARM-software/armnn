@@ -7,14 +7,13 @@
 
 #include "ProfilingMocks.hpp"
 
-#include <armnn/Logging.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <IProfilingConnection.hpp>
 #include <ProfilingService.hpp>
 
 #include <common/include/CommandHandlerFunctor.hpp>
-
+#include <common/include/Logging.hpp>
 
 #include <doctest/doctest.h>
 
@@ -26,46 +25,6 @@ namespace arm
 
 namespace pipe
 {
-
-struct LogLevelSwapper
-{
-public:
-    LogLevelSwapper(armnn::LogSeverity severity)
-    {
-        // Set the new log level
-        armnn::ConfigureLogging(true, true, severity);
-    }
-    ~LogLevelSwapper()
-    {
-        // The default log level for unit tests is "Fatal"
-        armnn::ConfigureLogging(true, true, armnn::LogSeverity::Fatal);
-    }
-};
-
-struct StreamRedirector
-{
-public:
-    StreamRedirector(std::ostream& stream, std::streambuf* newStreamBuffer)
-        : m_Stream(stream)
-        , m_BackupBuffer(m_Stream.rdbuf(newStreamBuffer))
-    {}
-
-    ~StreamRedirector() { CancelRedirect(); }
-
-    void CancelRedirect()
-    {
-        // Only cancel the redirect once.
-        if (m_BackupBuffer != nullptr )
-        {
-            m_Stream.rdbuf(m_BackupBuffer);
-            m_BackupBuffer = nullptr;
-        }
-    }
-
-private:
-    std::ostream& m_Stream;
-    std::streambuf* m_BackupBuffer;
-};
 
 class TestProfilingConnectionBase : public IProfilingConnection
 {

@@ -10,6 +10,7 @@ if(BUILD_TIMELINE_DECODER)
         CommandHandlerKey.cpp
         CommandHandlerRegistry.cpp
         CommonProfilingUtils.cpp
+        Logging.cpp
         NetworkSockets.cpp
         PacketVersionResolver.cpp
         SwTrace.cpp

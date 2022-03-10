@@ -110,6 +110,7 @@ LOCAL_SRC_FILES := \
         profiling/common/src/CommandHandlerKey.cpp \
         profiling/common/src/CommandHandlerRegistry.cpp \
         profiling/common/src/CommonProfilingUtils.cpp \
+        profiling/common/src/Logging.cpp \
         profiling/common/src/NetworkSockets.cpp \
         profiling/common/src/PacketVersionResolver.cpp \
         profiling/common/src/SwTrace.cpp \

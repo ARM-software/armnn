@@ -139,6 +139,8 @@ TEST_CASE("CheckPacketKeyComparisons")
 
 TEST_CASE("CheckCommandHandler")
 {
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
+
     arm::pipe::PacketVersionResolver packetVersionResolver;
     ProfilingStateMachine profilingStateMachine;
 
@@ -3153,7 +3155,12 @@ TEST_CASE("CheckConfigureProfilingServiceOff")
 TEST_CASE("CheckProfilingServiceEnabled")
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
-    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Warning);
+
+    // Redirect the output to a local stream so that we can parse the warning message
+    std::stringstream ss;
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
+
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
@@ -3163,9 +3170,6 @@ TEST_CASE("CheckProfilingServiceEnabled")
     profilingService.Update();
     CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
 
-    // Redirect the output to a local stream so that we can parse the warning message
-    std::stringstream ss;
-    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
     profilingService.Update();
 
     // Reset the profiling service to stop any running thread
@@ -3185,7 +3189,12 @@ TEST_CASE("CheckProfilingServiceEnabled")
 TEST_CASE("CheckProfilingServiceEnabledRuntime")
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
-    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Warning);
+
+    // Redirect the output to a local stream so that we can parse the warning message
+    std::stringstream ss;
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
+
     ProfilingOptions options;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
     ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
@@ -3199,9 +3208,6 @@ TEST_CASE("CheckProfilingServiceEnabledRuntime")
     profilingService.Update();
     CHECK(profilingService.GetCurrentState() == ProfilingState::NotConnected);
 
-    // Redirect the output to a local stream so that we can parse the warning message
-    std::stringstream ss;
-    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
     profilingService.Update();
 
     // Reset the profiling service to stop any running thread
@@ -3221,8 +3227,7 @@ TEST_CASE("CheckProfilingServiceEnabledRuntime")
 TEST_CASE("CheckProfilingServiceBadConnectionAcknowledgedPacket")
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
-    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
-
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Warning);
 
     // Redirect the standard output to a local stream so that we can parse the warning message
     std::stringstream ss;
@@ -3285,7 +3290,7 @@ TEST_CASE("CheckProfilingServiceBadConnectionAcknowledgedPacket")
 TEST_CASE("CheckProfilingServiceBadRequestCounterDirectoryPacket")
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
-    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Warning);
 
     // Redirect the standard output to a local stream so that we can parse the warning message
     std::stringstream ss;
@@ -3350,7 +3355,7 @@ TEST_CASE("CheckProfilingServiceBadRequestCounterDirectoryPacket")
 TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacket")
 {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
-    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Warning);
 
     // Redirect the standard output to a local stream so that we can parse the warning message
     std::stringstream ss;
@@ -3707,7 +3712,11 @@ TEST_CASE("CheckRegisterCounters")
 
 TEST_CASE("CheckFileFormat") {
     // Locally reduce log level to "Warning", as this test needs to parse a warning message from the standard output
-    LogLevelSwapper logLevelSwapper(armnn::LogSeverity::Warning);
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Warning);
+
+    // Redirect the output to a local stream so that we can parse the warning message
+    std::stringstream ss;
+    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // Create profiling options.
     ProfilingOptions options;
@@ -3724,10 +3733,6 @@ TEST_CASE("CheckFileFormat") {
     // Start the command handler and the send thread
     profilingService.Update();
     CHECK(profilingService.GetCurrentState()==ProfilingState::NotConnected);
-
-    // Redirect the output to a local stream so that we can parse the warning message
-    std::stringstream ss;
-    StreamRedirector streamRedirector(std::cout, ss.rdbuf());
 
     // When Update is called and the current state is ProfilingState::NotConnected
     // an exception will be raised from GetProfilingConnection and displayed as warning in the output local stream

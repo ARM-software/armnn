@@ -13,7 +13,6 @@
 #include <Runtime.hpp>
 #include <armnn/TypesUtils.hpp>
 
-
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <test/ProfilingTestUtils.hpp>
 
@@ -36,7 +35,7 @@ void RuntimeLoadedNetworksReserve(armnn::RuntimeImpl* runtime)
     runtime->m_LoadedNetworks.reserve(1);
 }
 
-}
+} // namespace armnn
 
 TEST_SUITE("Runtime")
 {
@@ -599,6 +598,8 @@ TEST_CASE("RuntimeBackendOptions")
 TEST_CASE("ProfilingDisable")
 {
     using namespace armnn;
+
+    LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
 
     // Create runtime in which the test will run
     armnn::IRuntime::CreationOptions options;

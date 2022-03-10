@@ -5,11 +5,9 @@
 
 #include "ProfilingService.hpp"
 
-#include <armnn/Logging.hpp>
-
+#include <common/include/Logging.hpp>
 #include <common/include/NumericCast.hpp>
 #include <common/include/ProfilingGuid.hpp>
-
 #include <common/include/SocketConnectionException.hpp>
 
 #include <fmt/format.h>
@@ -131,12 +129,12 @@ void ProfilingService::Update()
         }
         catch (const arm::pipe::ProfilingException& e)
         {
-            ARMNN_LOG(warning) << "An error has occurred when creating the profiling connection: "
+            ARM_PIPE_LOG(warning) << "An error has occurred when creating the profiling connection: "
                                        << e.what();
         }
         catch (const arm::pipe::SocketConnectionException& e)
         {
-            ARMNN_LOG(warning) << "An error has occurred when creating the profiling connection ["
+            ARM_PIPE_LOG(warning) << "An error has occurred when creating the profiling connection ["
                                        << e.what() << "] on socket [" << e.GetSocketFd() << "].";
         }
 
@@ -425,7 +423,7 @@ void ProfilingService::WaitForProfilingServiceActivation(unsigned int timeout)
         std::chrono::duration<double, std::milli> elapsed = finish - start;
         std::stringstream ss;
         ss << "Timed out waiting on profiling service activation for " << elapsed.count() << " ms";
-        ARMNN_LOG(warning) << ss.str();
+        ARM_PIPE_LOG(warning) << ss.str();
     }
     return;
 }

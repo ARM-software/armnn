@@ -13,10 +13,10 @@
 #include "ICounterValues.hpp"
 
 #include "armnn/backends/profiling/IBackendProfilingContext.hpp"
-#include "armnn/Logging.hpp"
 #include "armnn/BackendRegistry.hpp"
 
 #include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Logging.hpp>
 #include <common/include/Packet.hpp>
 
 #include <set>
@@ -86,7 +86,7 @@ private:
 
         if(errorMsg.has_value())
         {
-            ARMNN_LOG(warning) << "An error has occurred when activating counters of " << backendId << ": "
+            ARM_PIPE_LOG(warning) << "An error has occurred when activating counters of " << backendId << ": "
                                << errorMsg.value();
         }
     }
@@ -100,4 +100,3 @@ private:
 } // namespace pipe
 
 } // namespace arm
-

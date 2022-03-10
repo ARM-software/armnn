@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="41a729edf9facc6e901055e0cc84219f75670475" #Decouple fuseBatchNormalizationKernel
+DEFAULT_CLFRAMEWORKREVISION="17c48f9e518abfcb45477f0eeebf487498c6a270" #Revert mws heuristics for CpuPool2d
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

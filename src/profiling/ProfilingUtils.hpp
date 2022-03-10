@@ -9,8 +9,6 @@
 
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 
-#include <armnn/utility/NumericCast.hpp>
-
 #include "ICounterDirectory.hpp"
 #include "IPacketBuffer.hpp"
 

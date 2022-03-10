@@ -7,7 +7,7 @@
 #include "ProfilingUtils.hpp"
 
 #include <armnn/profiling/ProfilingOptions.hpp>
-#include <armnn/utility/NumericCast.hpp>
+#include <common/include/NumericCast.hpp>
 
 #include <fmt/format.h>
 
@@ -22,8 +22,8 @@ namespace pipe
 void PeriodicCounterSelectionCommandHandler::ParseData(const arm::pipe::Packet& packet, CaptureData& captureData)
 {
     std::vector<uint16_t> counterIds;
-    uint32_t sizeOfUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
-    uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
+    uint32_t sizeOfUint32 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint16_t));
     uint32_t offset = 0;
 
     if (packet.GetLength() < 4)

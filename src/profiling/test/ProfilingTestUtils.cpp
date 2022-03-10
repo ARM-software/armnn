@@ -11,13 +11,13 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <armnn/utility/NumericCast.hpp>
 
 #include <Processes.hpp>
 #include <ProfilingService.hpp>
 #include <armnnUtils/Threads.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
+#include <common/include/NumericCast.hpp>
 
 #include <TestUtils.hpp>
 
@@ -27,10 +27,10 @@ uint32_t GetStreamMetaDataPacketSize()
 {
     uint32_t sizeUint32 = sizeof(uint32_t);
     uint32_t payloadSize = 0;
-    payloadSize += armnn::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
-    payloadSize += armnn::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
-    payloadSize += armnn::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
-    payloadSize += armnn::numeric_cast<uint32_t>(GetProcessName().size()) + 1;
+    payloadSize += arm::pipe::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
+    payloadSize += arm::pipe::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
+    payloadSize += arm::pipe::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
+    payloadSize += arm::pipe::numeric_cast<uint32_t>(GetProcessName().size()) + 1;
 
     // Add packetVersionEntries
     payloadSize += 13 * 2 * sizeUint32;
@@ -112,7 +112,7 @@ ProfilingGuid VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
     unsigned int uint64_t_size = sizeof(uint64_t);
-    unsigned int label_size    = armnn::numeric_cast<unsigned int>(label.size());
+    unsigned int label_size    = arm::pipe::numeric_cast<unsigned int>(label.size());
 
     // Check the decl id
     uint32_t eventClassDeclId = ReadUint32(readableData, offset);

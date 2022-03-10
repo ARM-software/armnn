@@ -4,10 +4,14 @@
 //
 
 #include "../ProfilingConnectionDumpToFileDecorator.hpp"
-#include <armnnUtils/Filesystem.hpp>
+
 #include <Runtime.hpp>
+
+#include <armnnUtils/Filesystem.hpp>
+
 #include <armnn/utility/IgnoreUnused.hpp>
-#include <armnn/utility/NumericCast.hpp>
+
+#include <common/include/NumericCast.hpp>
 
 #include <fstream>
 #include <sstream>
@@ -20,7 +24,7 @@ namespace
 {
 
 const std::vector<char> g_Data       = { 'd', 'u', 'm', 'm', 'y' };
-const uint32_t          g_DataLength = armnn::numeric_cast<uint32_t>(g_Data.size());
+const uint32_t          g_DataLength = arm::pipe::numeric_cast<uint32_t>(g_Data.size());
 const unsigned char*    g_DataPtr    = reinterpret_cast<const unsigned char*>(g_Data.data());
 
 class DummyProfilingConnection : public IProfilingConnection

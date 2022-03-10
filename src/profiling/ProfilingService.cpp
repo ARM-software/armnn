@@ -6,8 +6,8 @@
 #include "ProfilingService.hpp"
 
 #include <armnn/Logging.hpp>
-#include <armnn/utility/NumericCast.hpp>
 
+#include <common/include/NumericCast.hpp>
 #include <common/include/ProfilingGuid.hpp>
 
 #include <common/include/SocketConnectionException.hpp>
@@ -323,7 +323,7 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
     // Increase the size of the counter index if necessary
     if (counterUid >= m_CounterIndex.size())
     {
-        m_CounterIndex.resize(armnn::numeric_cast<size_t>(counterUid) + 1);
+        m_CounterIndex.resize(arm::pipe::numeric_cast<size_t>(counterUid) + 1);
     }
 
     // Create a new atomic counter and add it to the list

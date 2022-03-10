@@ -7,6 +7,8 @@
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
+#include <armnn/utility/Assert.hpp>
+
 #include <Counter.hpp>
 
 namespace armnn

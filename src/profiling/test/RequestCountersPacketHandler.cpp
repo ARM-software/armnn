@@ -7,8 +7,7 @@
 
 #include "DirectoryCaptureCommandHandler.hpp"
 
-#include <armnn/utility/NumericCast.hpp>
-
+#include <common/include/NumericCast.hpp>
 #include <common/include/PacketVersionResolver.hpp>
 #include <common/include/ProfilingException.hpp>
 
@@ -55,7 +54,7 @@ void RequestCountersPacketHandler::SendCounterSelectionPacket()
     uint32_t uint32_t_size = sizeof(uint32_t);
 
     uint32_t offset   = 0;
-    uint32_t bodySize = uint32_t_size + armnn::numeric_cast<uint32_t>(m_IdList.size()) * uint16_t_size;
+    uint32_t bodySize = uint32_t_size + arm::pipe::numeric_cast<uint32_t>(m_IdList.size()) * uint16_t_size;
 
     auto uniqueData     = std::make_unique<unsigned char[]>(bodySize);
     auto data = reinterpret_cast<unsigned char*>(uniqueData.get());

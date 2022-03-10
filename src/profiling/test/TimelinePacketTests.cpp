@@ -3,11 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnnUtils/Threads.hpp>
 #include <ProfilingUtils.hpp>
 
-#include <armnn/utility/NumericCast.hpp>
+#include <armnnUtils/Threads.hpp>
 
+#include <common/include/NumericCast.hpp>
 #include <common/include/SwTrace.hpp>
 
 #include <doctest/doctest.h>
@@ -56,7 +56,7 @@ TEST_CASE("TimelineLabelPacketTestBufferExhaustionFixedValue")
     TimelinePacketStatus result = WriteTimelineLabelBinaryPacket(profilingGuid,
                                                                  label,
                                                                  buffer.data(),
-                                                                 armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                                 arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::BufferExhaustion);
     CHECK(numberOfBytesWritten == 0);
@@ -72,7 +72,7 @@ TEST_CASE("TimelineLabelPacketTestInvalidLabel")
     TimelinePacketStatus result = WriteTimelineLabelBinaryPacket(profilingGuid,
                                                                  label,
                                                                  buffer.data(),
-                                                                 armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                                 arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Error);
     CHECK(numberOfBytesWritten == 0);
@@ -88,7 +88,7 @@ TEST_CASE("TimelineLabelPacketTestSingleConstructionOfData")
     TimelinePacketStatus result = WriteTimelineLabelBinaryPacket(profilingGuid,
                                                                  label,
                                                                  buffer.data(),
-                                                                 armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                                 arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                                  numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
     CHECK(numberOfBytesWritten == 28);
@@ -179,7 +179,7 @@ TEST_CASE("TimelineRelationshipPacketSmallBufferSizeTest")
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                             arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::BufferExhaustion);
     CHECK(numberOfBytesWritten == 0);
@@ -202,7 +202,7 @@ TEST_CASE("TimelineRelationshipPacketInvalidRelationTest")
                                                       tailGuid,
                                                       attributeGuid,
                                                       buffer.data(),
-                                                      armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                      arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                       numberOfBytesWritten),
                     arm::pipe::InvalidArgumentException);
 
@@ -226,7 +226,7 @@ TEST_CASE("TimelineRelationshipPacketTestDataConstruction")
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                             arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
     CHECK(numberOfBytesWritten == 40);
@@ -283,7 +283,7 @@ TEST_CASE("TimelineRelationshipPacketExecutionLinkTestDataConstruction")
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                             arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
     CHECK(numberOfBytesWritten == 40);
@@ -339,7 +339,7 @@ TEST_CASE("TimelineRelationshipPacketDataLinkTestDataConstruction")
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                             arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
     CHECK(numberOfBytesWritten == 40);
@@ -395,7 +395,7 @@ TEST_CASE("TimelineRelationshipPacketLabelLinkTestDataConstruction")
                                                              tailGuid,
                                                              attributeGuid,
                                                              buffer.data(),
-                                                             armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                             arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                              numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
     CHECK(numberOfBytesWritten == 40);
@@ -461,7 +461,8 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
     std::vector<unsigned char> buffer(512, 0);
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineMessageDirectoryPackage(buffer.data(),
-                                                                       armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                                       arm::pipe::numeric_cast<unsigned int>(
+                                                                           buffer.size()),
                                                                        numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
 
@@ -528,7 +529,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
     // Check the ui_name
     std::vector<uint32_t> swTraceString;
     StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
-    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (arm::pipe::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceUINameLength = ReadUint32(buffer.data(), offset);
     CHECK(swTraceUINameLength == 14); // ui_name length including the null-terminator
 
@@ -540,7 +541,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
 
     // Check arg_types
     StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
-    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (arm::pipe::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgTypesLength = ReadUint32(buffer.data(), offset);
     CHECK(swTraceArgTypesLength == 3); // arg_types length including the null-terminator
 
@@ -552,7 +553,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
 
     // Check arg_names
     StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
-    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (arm::pipe::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     uint32_t swTraceArgNamesLength = ReadUint32(buffer.data(), offset);
     CHECK(swTraceArgNamesLength == 11); // arg_names length including the null-terminator
 
@@ -564,7 +565,7 @@ TEST_CASE("TimelineMessageDirectoryPacketTestFullConstruction")
 
     // Check second message decl_id
     StringToSwTraceString<SwTraceCharPolicy>(label, swTraceString);
-    offset += (armnn::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
+    offset += (arm::pipe::numeric_cast<unsigned int>(swTraceString.size()) - 1) * uint32_t_size;
     readDeclId = ReadUint32(buffer.data(), offset);
     CHECK(readDeclId == 1);
 
@@ -614,7 +615,7 @@ TEST_CASE("TimelineEntityPacketTestBufferExhaustedWithFixedBufferSize")
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEntityBinary(profilingGuid,
                                                             buffer.data(),
-                                                            armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                            arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                             numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::BufferExhaustion);
     CHECK(numberOfBytesWritten == 0);
@@ -628,7 +629,7 @@ TEST_CASE("TimelineEntityPacketTestFullConstructionOfData")
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEntityBinary(profilingGuid,
                                                             buffer.data(),
-                                                            armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                            arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                             numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
     CHECK(numberOfBytesWritten == 12);
@@ -686,7 +687,7 @@ TEST_CASE("TimelineEventClassTestBufferExhaustionFixedValue")
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
                                                                 profilingNameGuid,
                                                                 buffer.data(),
-                                                                armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                                arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                                 numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::BufferExhaustion);
     CHECK(numberOfBytesWritten == 0);
@@ -702,7 +703,7 @@ TEST_CASE("TimelineEventClassTestFullConstructionOfData")
     TimelinePacketStatus result = WriteTimelineEventClassBinary(profilingGuid,
                                                                 profilingNameGuid,
                                                                 buffer.data(),
-                                                                armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                                arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                                 numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
     CHECK(numberOfBytesWritten == 20);
@@ -771,7 +772,7 @@ TEST_CASE("TimelineEventPacketTestBufferExhaustionFixedValue")
                                                            threadId,
                                                            profilingGuid,
                                                            buffer.data(),
-                                                           armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                           arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                            numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::BufferExhaustion);
     CHECK(numberOfBytesWritten == 0);
@@ -789,7 +790,7 @@ TEST_CASE("TimelineEventPacketTestFullConstructionOfData")
                                                            threadId,
                                                            profilingGuid,
                                                            buffer.data(),
-                                                           armnn::numeric_cast<unsigned int>(buffer.size()),
+                                                           arm::pipe::numeric_cast<unsigned int>(buffer.size()),
                                                            numberOfBytesWritten);
     CHECK(result == TimelinePacketStatus::Ok);
 

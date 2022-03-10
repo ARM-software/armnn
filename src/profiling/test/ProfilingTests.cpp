@@ -3,15 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <ArmNNProfilingServiceInitialiser.hpp>
-
 #include "ProfilingTests.hpp"
 #include "ProfilingTestUtils.hpp"
 
-#include <backends/BackendProfiling.hpp>
-#include <common/include/EncodeVersion.hpp>
-#include <common/include/PacketVersionResolver.hpp>
-#include <common/include/SwTrace.hpp>
+#include <ArmNNProfilingServiceInitialiser.hpp>
 #include <CommandHandler.hpp>
 #include <ConnectionAcknowledgedCommandHandler.hpp>
 #include <CounterDirectory.hpp>
@@ -20,8 +15,6 @@
 #include <ICounterValues.hpp>
 #include <PeriodicCounterCapture.hpp>
 #include <PeriodicCounterSelectionCommandHandler.hpp>
-#include <armnn/profiling/ArmNNProfiling.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
 #include <ProfilingStateMachine.hpp>
 #include <ProfilingUtils.hpp>
 #include <RegisterBackendCounters.hpp>
@@ -33,15 +26,23 @@
 #include <SendTimelinePacket.hpp>
 
 #include <armnn/Conversion.hpp>
-
 #include <armnn/Utils.hpp>
+
+#include <armnn/profiling/ArmNNProfiling.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
+
 #include <armnn/utility/IgnoreUnused.hpp>
-#include <armnn/utility/NumericCast.hpp>
+
+#include <backends/BackendProfiling.hpp>
 
 #include <common/include/CommandHandlerKey.hpp>
 #include <common/include/CommandHandlerRegistry.hpp>
-#include <common/include/SocketConnectionException.hpp>
+#include <common/include/EncodeVersion.hpp>
+#include <common/include/NumericCast.hpp>
 #include <common/include/Packet.hpp>
+#include <common/include/PacketVersionResolver.hpp>
+#include <common/include/SocketConnectionException.hpp>
+#include <common/include/SwTrace.hpp>
 
 #include <doctest/doctest.h>
 
@@ -1808,8 +1809,8 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     SendCounterPacket sendCounterPacket(mockBuffer);
     SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
 
-    uint32_t sizeOfUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
-    uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
+    uint32_t sizeOfUint32 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
     uint32_t period1     = arm::pipe::LOWEST_CAPTURE_PERIOD;
@@ -2045,8 +2046,8 @@ TEST_CASE("CheckConnectionAcknowledged")
     const uint32_t connectionPacketId = 0x10000;
     const uint32_t version            = 1;
 
-    uint32_t sizeOfUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
-    uint32_t sizeOfUint16 = armnn::numeric_cast<uint32_t>(sizeof(uint16_t));
+    uint32_t sizeOfUint32 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeOfUint16 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint16_t));
 
     // Data with period and counters
     uint32_t period1     = 10;
@@ -2470,7 +2471,7 @@ TEST_CASE("RequestCounterDirectoryCommandHandlerTest1")
     CHECK(header1Word1 == 24);                       // data length
 
     uint32_t bodyHeader1Word0   = ReadUint32(readBuffer1, 8);
-    uint16_t deviceRecordCount = armnn::numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
+    uint16_t deviceRecordCount = arm::pipe::numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
     CHECK(deviceRecordCount == 0); // device_records_count
 
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
@@ -2537,9 +2538,9 @@ TEST_CASE("RequestCounterDirectoryCommandHandlerTest2")
     const uint32_t bodyHeader1Word3      = ReadUint32(readBuffer1, 20);
     const uint32_t bodyHeader1Word4      = ReadUint32(readBuffer1, 24);
     const uint32_t bodyHeader1Word5      = ReadUint32(readBuffer1, 28);
-    const uint16_t deviceRecordCount     = armnn::numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
-    const uint16_t counterSetRecordCount = armnn::numeric_cast<uint16_t>(bodyHeader1Word2 >> 16);
-    const uint16_t categoryRecordCount   = armnn::numeric_cast<uint16_t>(bodyHeader1Word4 >> 16);
+    const uint16_t deviceRecordCount     = arm::pipe::numeric_cast<uint16_t>(bodyHeader1Word0 >> 16);
+    const uint16_t counterSetRecordCount = arm::pipe::numeric_cast<uint16_t>(bodyHeader1Word2 >> 16);
+    const uint16_t categoryRecordCount   = arm::pipe::numeric_cast<uint16_t>(bodyHeader1Word4 >> 16);
     CHECK(deviceRecordCount == 1);                      // device_records_count
     CHECK(bodyHeader1Word1 == 0 + bodyHeaderSizeBytes);      // device_records_pointer_table_offset
     CHECK(counterSetRecordCount == 1);                  // counter_set_count

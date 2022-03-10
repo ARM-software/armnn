@@ -18,6 +18,7 @@
 #include <armnn/Utils.hpp>
 
 #include <common/include/Constants.hpp>
+#include <common/include/NumericCast.hpp>
 #include <common/include/ProfilingException.hpp>
 
 #include <armnn/utility/Assert.hpp>
@@ -289,7 +290,7 @@ TEST_CASE("SendPeriodicCounterCapturePacketTest")
 
 TEST_CASE("SendStreamMetaDataPacketTest")
 {
-    uint32_t sizeUint32 = armnn::numeric_cast<uint32_t>(sizeof(uint32_t));
+    uint32_t sizeUint32 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint32_t));
 
     // Error no space left in buffer
     MockBufferManager mockBuffer1(10);
@@ -300,10 +301,10 @@ TEST_CASE("SendStreamMetaDataPacketTest")
 
     std::string processName = GetProcessName().substr(0, 60);
 
-    uint32_t infoSize =            armnn::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
-    uint32_t hardwareVersionSize = armnn::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
-    uint32_t softwareVersionSize = armnn::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
-    uint32_t processNameSize =     armnn::numeric_cast<uint32_t>(processName.size()) + 1;
+    uint32_t infoSize =            arm::pipe::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
+    uint32_t hardwareVersionSize = arm::pipe::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
+    uint32_t softwareVersionSize = arm::pipe::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
+    uint32_t processNameSize =     arm::pipe::numeric_cast<uint32_t>(processName.size()) + 1;
 
     // Supported Packets
     // Packet Encoding version 1.0.0
@@ -350,7 +351,7 @@ TEST_CASE("SendStreamMetaDataPacketTest")
     CHECK(((headerWord0 >> 26) & 0x3F) == 0); // packet family
     CHECK(((headerWord0 >> 16) & 0x3FF) == 0); // packet id
 
-    uint32_t totalLength = armnn::numeric_cast<uint32_t>(2 * sizeUint32 +
+    uint32_t totalLength = arm::pipe::numeric_cast<uint32_t>(2 * sizeUint32 +
                                                          10 * sizeUint32 + infoSize +
                                                          hardwareVersionSize + softwareVersionSize +
                                                          processNameSize + sizeUint32 +
@@ -366,7 +367,7 @@ TEST_CASE("SendStreamMetaDataPacketTest")
     CHECK(ReadUint32(readBuffer2, offset) == MAX_METADATA_PACKET_LENGTH); // max_data_len
     offset += sizeUint32;
     int pid = armnnUtils::Processes::GetCurrentId();
-    CHECK(ReadUint32(readBuffer2, offset) == armnn::numeric_cast<uint32_t>(pid));
+    CHECK(ReadUint32(readBuffer2, offset) == arm::pipe::numeric_cast<uint32_t>(pid));
     offset += sizeUint32;
     uint32_t poolOffset = 10 * sizeUint32;
     CHECK(ReadUint32(readBuffer2, offset) == poolOffset); // offset_info
@@ -942,7 +943,7 @@ TEST_CASE("CreateCategoryRecordTest")
     ARMNN_ASSERT(counter1);
     ARMNN_ASSERT(counter2);
     ARMNN_ASSERT(counter3);
-    uint16_t categoryEventCount = armnn::numeric_cast<uint16_t>(counters.size());
+    uint16_t categoryEventCount = arm::pipe::numeric_cast<uint16_t>(counters.size());
 
     // Create a category record
     SendCounterPacket::CategoryRecord categoryRecord;

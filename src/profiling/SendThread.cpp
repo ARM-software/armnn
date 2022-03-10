@@ -7,7 +7,7 @@
 #include "ProfilingUtils.hpp"
 
 #include <armnn/Conversion.hpp>
-#include <armnn/utility/NumericCast.hpp>
+#include <common/include/NumericCast.hpp>
 
 #include <common/include/ProfilingException.hpp>
 
@@ -233,7 +233,7 @@ void SendThread::FlushBuffer(IProfilingConnection& profilingConnection, bool not
         if (profilingConnection.IsOpen())
         {
             // Write a packet to the profiling connection. Silently ignore any write error and continue
-            profilingConnection.WritePacket(readBuffer, armnn::numeric_cast<uint32_t>(readBufferSize));
+            profilingConnection.WritePacket(readBuffer, arm::pipe::numeric_cast<uint32_t>(readBufferSize));
 
             // Set the flag that indicates whether at least a packet has been sent
             packetsSent = true;

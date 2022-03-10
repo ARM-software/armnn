@@ -16,8 +16,8 @@
 #include <armnn/Optional.hpp>
 #include <armnn/Conversion.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
+#include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
 #include <common/include/ProfilingException.hpp>
 #include <common/include/ProfilingGuidGenerator.hpp>
@@ -131,7 +131,7 @@ public:
 
     arm::pipe::Packet ReadPacket(uint32_t timeout) override
     {
-        armnn::IgnoreUnused(timeout);
+        arm::pipe::IgnoreUnused(timeout);
 
         // Simulate a delay in the reading process. The default timeout is way too long.
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -165,7 +165,7 @@ class MockProfilingConnectionFactory : public IProfilingConnectionFactory
 public:
     IProfilingConnectionPtr GetProfilingConnection(const ProfilingOptions& options) const override
     {
-        armnn::IgnoreUnused(options);
+        arm::pipe::IgnoreUnused(options);
         return std::make_unique<MockProfilingConnection>();
     }
 };
@@ -404,7 +404,7 @@ public:
 
     void SendCounterDirectoryPacket(const ICounterDirectory& counterDirectory) override
     {
-        armnn::IgnoreUnused(counterDirectory);
+        arm::pipe::IgnoreUnused(counterDirectory);
 
         std::string message("SendCounterDirectoryPacket");
         unsigned int reserved = 0;
@@ -416,7 +416,7 @@ public:
     void SendPeriodicCounterCapturePacket(uint64_t timestamp,
                                           const std::vector<CounterValue>& values) override
     {
-        armnn::IgnoreUnused(timestamp, values);
+        arm::pipe::IgnoreUnused(timestamp, values);
 
         std::string message("SendPeriodicCounterCapturePacket");
         unsigned int reserved = 0;
@@ -428,7 +428,7 @@ public:
     void SendPeriodicCounterSelectionPacket(uint32_t capturePeriod,
                                             const std::vector<uint16_t>& selectedCounterIds) override
     {
-        armnn::IgnoreUnused(capturePeriod, selectedCounterIds);
+        arm::pipe::IgnoreUnused(capturePeriod, selectedCounterIds);
 
         std::string message("SendPeriodicCounterSelectionPacket");
         unsigned int reserved = 0;
@@ -518,7 +518,7 @@ public:
                                    const armnn::Optional<uint16_t>& deviceUid = armnn::EmptyOptional(),
                                    const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional())
     {
-        armnn::IgnoreUnused(backendId);
+        arm::pipe::IgnoreUnused(backendId);
 
         // Get the number of cores from the argument only
         uint16_t deviceCores = numberOfCores.has_value() ? numberOfCores.value() : 0;
@@ -602,19 +602,19 @@ public:
 
     const Device* GetDevice(uint16_t uid) const override
     {
-        armnn::IgnoreUnused(uid);
+        arm::pipe::IgnoreUnused(uid);
         return nullptr; // Not used by the unit tests
     }
 
     const CounterSet* GetCounterSet(uint16_t uid) const override
     {
-        armnn::IgnoreUnused(uid);
+        arm::pipe::IgnoreUnused(uid);
         return nullptr; // Not used by the unit tests
     }
 
     const Counter* GetCounter(uint16_t uid) const override
     {
-        armnn::IgnoreUnused(uid);
+        arm::pipe::IgnoreUnused(uid);
         return nullptr; // Not used by the unit tests
     }
 
@@ -701,7 +701,7 @@ class MockProfilingServiceStatus : public IProfilingServiceStatus
 {
 public:
     void NotifyProfilingServiceActive() override {}
-    void WaitForProfilingServiceActivation(unsigned int timeout) override { armnn::IgnoreUnused(timeout); }
+    void WaitForProfilingServiceActivation(unsigned int timeout) override { arm::pipe::IgnoreUnused(timeout); }
 };
 
 } // namespace pipe

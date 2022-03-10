@@ -13,8 +13,9 @@
 #include <armnn/Optional.hpp>
 #include <armnn/Conversion.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
+#include <common/include/IgnoreUnused.hpp>
+#include <common/include/NumericCast.hpp>
 
 #include <atomic>
 #include <condition_variable>

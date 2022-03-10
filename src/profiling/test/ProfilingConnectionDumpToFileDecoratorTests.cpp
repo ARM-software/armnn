@@ -9,9 +9,9 @@
 
 #include <armnnUtils/Filesystem.hpp>
 
-#include <armnn/utility/IgnoreUnused.hpp>
-
+#include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
+
 
 #include <fstream>
 #include <sstream>
@@ -53,14 +53,14 @@ public:
 
     bool WritePacket(const unsigned char* buffer, uint32_t length) override
     {
-        armnn::IgnoreUnused(buffer);
-        armnn::IgnoreUnused(length);
+        arm::pipe::IgnoreUnused(buffer);
+        arm::pipe::IgnoreUnused(length);
         return true;
     }
 
     Packet ReadPacket(uint32_t timeout) override
     {
-        armnn::IgnoreUnused(timeout);
+        arm::pipe::IgnoreUnused(timeout);
         return std::move(*m_Packet);
     }
 

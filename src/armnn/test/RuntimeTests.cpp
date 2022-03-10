@@ -429,8 +429,8 @@ TEST_CASE("RuntimeMemoryLeak")
 
     // These are needed because VALGRIND_COUNT_LEAKS is a macro that assigns to the parameters
     // so they are assigned to, but still considered unused, causing a warning.
-    IgnoreUnused(dubious);
-    IgnoreUnused(suppressed);
+    armnn::IgnoreUnused(dubious);
+    armnn::IgnoreUnused(suppressed);
 }
 #endif // WITH_VALGRIND
 

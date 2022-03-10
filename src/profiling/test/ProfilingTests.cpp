@@ -31,13 +31,12 @@
 #include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnn/profiling/ProfilingOptions.hpp>
 
-#include <armnn/utility/IgnoreUnused.hpp>
-
 #include <backends/BackendProfiling.hpp>
 
 #include <common/include/CommandHandlerKey.hpp>
 #include <common/include/CommandHandlerRegistry.hpp>
 #include <common/include/EncodeVersion.hpp>
+#include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
 #include <common/include/Packet.hpp>
 #include <common/include/PacketVersionResolver.hpp>
@@ -1772,12 +1771,12 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     {
         bool IsCounterRegistered(uint16_t counterUid) const override
         {
-            armnn::IgnoreUnused(counterUid);
+            arm::pipe::IgnoreUnused(counterUid);
             return true;
         }
         bool IsCounterRegistered(const std::string& counterName) const override
         {
-            armnn::IgnoreUnused(counterName);
+            arm::pipe::IgnoreUnused(counterName);
             return true;
         }
         uint16_t GetCounterCount() const override
@@ -1786,12 +1785,12 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
         }
         uint32_t GetAbsoluteCounterValue(uint16_t counterUid) const override
         {
-            armnn::IgnoreUnused(counterUid);
+            arm::pipe::IgnoreUnused(counterUid);
             return 0;
         }
         uint32_t GetDeltaCounterValue(uint16_t counterUid) override
         {
-            armnn::IgnoreUnused(counterUid);
+            arm::pipe::IgnoreUnused(counterUid);
             return 0;
         }
     };
@@ -2320,12 +2319,12 @@ TEST_CASE("CheckPeriodicCounterCaptureThread")
         //not used
         bool IsCounterRegistered(uint16_t counterUid) const override
         {
-            armnn::IgnoreUnused(counterUid);
+            arm::pipe::IgnoreUnused(counterUid);
             return false;
         }
         bool IsCounterRegistered(const std::string& counterName) const override
         {
-            armnn::IgnoreUnused(counterName);
+            arm::pipe::IgnoreUnused(counterName);
             return false;
         }
         uint16_t GetCounterCount() const override

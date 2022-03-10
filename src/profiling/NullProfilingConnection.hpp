@@ -7,7 +7,7 @@
 
 #include "IProfilingConnection.hpp"
 
-#include <armnn/utility/IgnoreUnused.hpp>
+#include <common/include/IgnoreUnused.hpp>
 
 namespace arm
 {
@@ -23,14 +23,14 @@ class NullProfilingConnection : public IProfilingConnection
 
     virtual bool WritePacket(const unsigned char* buffer, uint32_t length) override
     {
-        armnn::IgnoreUnused(buffer);
-        armnn::IgnoreUnused(length);
+        arm::pipe::IgnoreUnused(buffer);
+        arm::pipe::IgnoreUnused(length);
         return true;
     };
 
     virtual Packet ReadPacket(uint32_t timeout) override
     {
-        armnn::IgnoreUnused(timeout);
+        arm::pipe::IgnoreUnused(timeout);
         return Packet(0);
     }
 

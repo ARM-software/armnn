@@ -9,7 +9,7 @@
 
 #include <atomic>
 
-#include <armnn/utility/IgnoreUnused.hpp>
+#include <common/include/IgnoreUnused.hpp>
 
 namespace arm
 {
@@ -29,7 +29,7 @@ public:
 
     bool IsOneOfStates(ProfilingState state1)
     {
-        armnn::IgnoreUnused(state1);
+        arm::pipe::IgnoreUnused(state1);
         return false;
     }
 

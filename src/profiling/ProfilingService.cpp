@@ -126,7 +126,7 @@ void ProfilingService::Update()
         try
         {
             // Setup the profiling connection
-            ARMNN_ASSERT(m_ProfilingConnectionFactory);
+            ARM_PIPE_ASSERT(m_ProfilingConnectionFactory);
             m_ProfilingConnection = m_ProfilingConnectionFactory->GetProfilingConnection(m_Options);
         }
         catch (const arm::pipe::ProfilingException& e)
@@ -147,7 +147,7 @@ void ProfilingService::Update()
                                                                           // "NotConnected" state
         break;
     case ProfilingState::WaitingForAck:
-        ARMNN_ASSERT(m_ProfilingConnection);
+        ARM_PIPE_ASSERT(m_ProfilingConnection);
 
         // Start the command thread
         m_CommandHandler.Start(*m_ProfilingConnection);
@@ -196,7 +196,7 @@ void ProfilingService::Disconnect()
 void ProfilingService::AddBackendProfilingContext(const std::string& backendId,
     std::shared_ptr<IBackendProfilingContext> profilingContext)
 {
-    ARMNN_ASSERT(profilingContext != nullptr);
+    ARM_PIPE_ASSERT(profilingContext != nullptr);
     // Register the backend counters
     m_MaxGlobalCounterId = profilingContext->RegisterCounters(m_MaxGlobalCounterId);
     m_BackendProfilingContexts.emplace(backendId, std::move(profilingContext));
@@ -230,7 +230,7 @@ uint32_t ProfilingService::GetAbsoluteCounterValue(uint16_t counterUid) const
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    ARMNN_ASSERT(counterValuePtr);
+    ARM_PIPE_ASSERT(counterValuePtr);
     return counterValuePtr->load(std::memory_order::memory_order_relaxed);
 }
 
@@ -238,7 +238,7 @@ uint32_t ProfilingService::GetDeltaCounterValue(uint16_t counterUid)
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    ARMNN_ASSERT(counterValuePtr);
+    ARM_PIPE_ASSERT(counterValuePtr);
     const uint32_t counterValue = counterValuePtr->load(std::memory_order::memory_order_relaxed);
     SubtractCounterValue(counterUid, counterValue);
     return counterValue;
@@ -280,7 +280,7 @@ void ProfilingService::SetCounterValue(uint16_t counterUid, uint32_t value)
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    ARMNN_ASSERT(counterValuePtr);
+    ARM_PIPE_ASSERT(counterValuePtr);
     counterValuePtr->store(value, std::memory_order::memory_order_relaxed);
 }
 
@@ -288,7 +288,7 @@ uint32_t ProfilingService::AddCounterValue(uint16_t counterUid, uint32_t value)
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    ARMNN_ASSERT(counterValuePtr);
+    ARM_PIPE_ASSERT(counterValuePtr);
     return counterValuePtr->fetch_add(value, std::memory_order::memory_order_relaxed);
 }
 
@@ -296,7 +296,7 @@ uint32_t ProfilingService::SubtractCounterValue(uint16_t counterUid, uint32_t va
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    ARMNN_ASSERT(counterValuePtr);
+    ARM_PIPE_ASSERT(counterValuePtr);
     return counterValuePtr->fetch_sub(value, std::memory_order::memory_order_relaxed);
 }
 
@@ -304,7 +304,7 @@ uint32_t ProfilingService::IncrementCounterValue(uint16_t counterUid)
 {
     CheckCounterUid(counterUid);
     std::atomic<uint32_t>* counterValuePtr = m_CounterIndex.at(counterUid);
-    ARMNN_ASSERT(counterValuePtr);
+    ARM_PIPE_ASSERT(counterValuePtr);
     return counterValuePtr->operator++(std::memory_order::memory_order_relaxed);
 }
 

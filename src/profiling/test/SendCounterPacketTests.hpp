@@ -12,7 +12,6 @@
 
 #include <armnn/Optional.hpp>
 #include <armnn/Conversion.hpp>
-#include <armnn/utility/Assert.hpp>
 
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>

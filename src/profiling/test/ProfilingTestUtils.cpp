@@ -10,12 +10,12 @@
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
-#include <armnn/utility/Assert.hpp>
 
 #include <Processes.hpp>
 #include <ProfilingService.hpp>
 #include <armnnUtils/Threads.hpp>
 
+#include <common/include/Assert.hpp>
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <common/include/NumericCast.hpp>
 
@@ -78,7 +78,7 @@ void VerifyTimelineHeaderBinary(const unsigned char* readableData,
                                 unsigned int& offset,
                                 uint32_t packetDataLength)
 {
-    ARMNN_ASSERT(readableData);
+    ARM_PIPE_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -107,7 +107,7 @@ ProfilingGuid VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
                                                   const unsigned char* readableData,
                                                   unsigned int& offset)
 {
-    ARMNN_ASSERT(readableData);
+    ARM_PIPE_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -153,7 +153,7 @@ void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
                                               const unsigned char* readableData,
                                               unsigned int& offset)
 {
-    ARMNN_ASSERT(readableData);
+    ARM_PIPE_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -184,7 +184,7 @@ void VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType relati
                                                 const unsigned char* readableData,
                                                 unsigned int& offset)
 {
-    ARMNN_ASSERT(readableData);
+    ARM_PIPE_ASSERT(readableData);
 
     uint32_t relationshipTypeUint = 0;
     switch (relationshipType)
@@ -274,7 +274,7 @@ ProfilingGuid VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
                                                    const unsigned char* readableData,
                                                    unsigned int& offset)
 {
-    ARMNN_ASSERT(readableData);
+    ARM_PIPE_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);
@@ -310,7 +310,7 @@ ProfilingGuid VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
                                               const unsigned char* readableData,
                                               unsigned int& offset)
 {
-    ARMNN_ASSERT(readableData);
+    ARM_PIPE_ASSERT(readableData);
 
     // Utils
     unsigned int uint32_t_size = sizeof(uint32_t);

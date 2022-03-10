@@ -5,6 +5,7 @@
 
 #include "SendCounterPacket.hpp"
 
+#include <common/include/Assert.hpp>
 #include <common/include/Constants.hpp>
 #include <common/include/EncodeVersion.hpp>
 #include <common/include/ProfilingException.hpp>
@@ -13,8 +14,7 @@
 #include <armnn/Conversion.hpp>
 #include <Processes.hpp>
 
-#include <armnn/utility/Assert.hpp>
-#include <common/include/NumericCast.hpp>
+#include <armnn/utility/NumericCast.hpp>
 
 #include <fmt/format.h>
 
@@ -177,10 +177,10 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
                                              CategoryRecord& categoryRecord,
                                              std::string& errorMessage)
 {
-    ARMNN_ASSERT(category);
+    ARM_PIPE_ASSERT(category);
 
     const std::string& categoryName = category->m_Name;
-    ARMNN_ASSERT(!categoryName.empty());
+    ARM_PIPE_ASSERT(!categoryName.empty());
 
     // Remove any duplicate counters
     std::vector<uint16_t> categoryCounters;
@@ -299,13 +299,13 @@ bool SendCounterPacket::CreateDeviceRecord(const DevicePtr& device,
                                            DeviceRecord& deviceRecord,
                                            std::string& errorMessage)
 {
-    ARMNN_ASSERT(device);
+    ARM_PIPE_ASSERT(device);
 
     uint16_t deviceUid = device->m_Uid;
     const std::string& deviceName = device->m_Name;
     uint16_t deviceCores = device->m_Cores;
 
-    ARMNN_ASSERT(!deviceName.empty());
+    ARM_PIPE_ASSERT(!deviceName.empty());
 
     // Device record word 0:
     // 16:31 [16] uid: the unique identifier for the device
@@ -349,13 +349,13 @@ bool SendCounterPacket::CreateCounterSetRecord(const CounterSetPtr& counterSet,
                                                CounterSetRecord& counterSetRecord,
                                                std::string& errorMessage)
 {
-    ARMNN_ASSERT(counterSet);
+    ARM_PIPE_ASSERT(counterSet);
 
     uint16_t counterSetUid = counterSet->m_Uid;
     const std::string& counterSetName = counterSet->m_Name;
     uint16_t counterSetCount = counterSet->m_Count;
 
-    ARMNN_ASSERT(!counterSetName.empty());
+    ARM_PIPE_ASSERT(!counterSetName.empty());
 
     // Counter set record word 0:
     // 16:31 [16] uid: the unique identifier for the counter_set
@@ -399,7 +399,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
                                           EventRecord& eventRecord,
                                           std::string& errorMessage)
 {
-    ARMNN_ASSERT(counter);
+    ARM_PIPE_ASSERT(counter);
 
     uint16_t           counterUid           = counter->m_Uid;
     uint16_t           maxCounterUid        = counter->m_MaxCounterUid;
@@ -412,9 +412,9 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     const std::string& counterDescription   = counter->m_Description;
     const std::string& counterUnits         = counter->m_Units;
 
-    ARMNN_ASSERT(counterClass == 0 || counterClass == 1);
-    ARMNN_ASSERT(counterInterpolation == 0 || counterInterpolation == 1);
-    ARMNN_ASSERT(counterMultiplier);
+    ARM_PIPE_ASSERT(counterClass == 0 || counterClass == 1);
+    ARM_PIPE_ASSERT(counterInterpolation == 0 || counterInterpolation == 1);
+    ARM_PIPE_ASSERT(counterMultiplier);
 
     // Utils
     const size_t uint32_t_size = sizeof(uint32_t);
@@ -453,7 +453,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     // 0:63 [64] multiplier: internal data stream is represented as integer values, this allows scaling of
     //                       those values as if they are fixed point numbers. Zero is not a valid value
     uint32_t multiplier[2] = { 0u, 0u };
-    ARMNN_ASSERT(sizeof(counterMultiplier) == sizeof(multiplier));
+    ARM_PIPE_ASSERT(sizeof(counterMultiplier) == sizeof(multiplier));
     std::memcpy(multiplier, &counterMultiplier, sizeof(multiplier));
     const uint32_t eventRecordWord3 = multiplier[0];
     const uint32_t eventRecordWord4 = multiplier[1];

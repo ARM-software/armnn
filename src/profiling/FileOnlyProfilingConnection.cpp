@@ -107,7 +107,7 @@ void FileOnlyProfilingConnection::Close()
 
 bool FileOnlyProfilingConnection::WritePacket(const unsigned char* buffer, uint32_t length)
 {
-    ARMNN_ASSERT(buffer);
+    ARM_PIPE_ASSERT(buffer);
     arm::pipe::Packet packet = ReceivePacket(buffer, length);
     ForwardPacketToHandlers(packet);
     return true;

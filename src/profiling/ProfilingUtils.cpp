@@ -5,6 +5,7 @@
 
 #include "ProfilingUtils.hpp"
 
+#include <common/include/Assert.hpp>
 #include <common/include/CommonProfilingUtils.hpp>
 #include <common/include/ProfilingException.hpp>
 #include <common/include/SwTrace.hpp>
@@ -13,7 +14,6 @@
 
 #include <WallClockTimer.hpp>
 
-#include <armnn/utility/Assert.hpp>
 
 #include <common/include/NumericCast.hpp>
 
@@ -94,7 +94,7 @@ std::vector<uint16_t> GetNextCounterUids(uint16_t firstUid, uint16_t cores)
 
 void WriteBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset,  const void* value, unsigned int valueSize)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     WriteBytes(packetBuffer->GetWritableData(), offset, value, valueSize);
 }
@@ -115,63 +115,63 @@ uint32_t ConstructHeader(uint32_t packetFamily, uint32_t packetClass, uint32_t p
 
 void WriteUint64(const std::unique_ptr<IPacketBuffer>& packetBuffer, unsigned int offset, uint64_t value)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     WriteUint64(packetBuffer->GetWritableData(), offset, value);
 }
 
 void WriteUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint32_t value)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     WriteUint32(packetBuffer->GetWritableData(), offset, value);
 }
 
 void WriteUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint16_t value)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     WriteUint16(packetBuffer->GetWritableData(), offset, value);
 }
 
 void WriteUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset, uint8_t value)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     WriteUint8(packetBuffer->GetWritableData(), offset, value);
 }
 
 void ReadBytes(const IPacketBufferPtr& packetBuffer, unsigned int offset, unsigned int valueSize, uint8_t outValue[])
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     ReadBytes(packetBuffer->GetReadableData(), offset, valueSize, outValue);
 }
 
 uint64_t ReadUint64(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     return ReadUint64(packetBuffer->GetReadableData(), offset);
 }
 
 uint32_t ReadUint32(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     return ReadUint32(packetBuffer->GetReadableData(), offset);
 }
 
 uint16_t ReadUint16(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     return ReadUint16(packetBuffer->GetReadableData(), offset);
 }
 
 uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset)
 {
-    ARMNN_ASSERT(packetBuffer);
+    ARM_PIPE_ASSERT(packetBuffer);
 
     return ReadUint8(packetBuffer->GetReadableData(), offset);
 }

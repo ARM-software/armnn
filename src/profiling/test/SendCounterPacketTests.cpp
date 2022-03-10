@@ -9,7 +9,6 @@
 
 #include <BufferManager.hpp>
 #include <CounterDirectory.hpp>
-#include <common/include/EncodeVersion.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
 #include <Processes.hpp>
@@ -17,11 +16,11 @@
 #include <armnn/Conversion.hpp>
 #include <armnn/Utils.hpp>
 
+#include <common/include/Assert.hpp>
 #include <common/include/Constants.hpp>
+#include <common/include/EncodeVersion.hpp>
 #include <common/include/NumericCast.hpp>
 #include <common/include/ProfilingException.hpp>
-
-#include <armnn/utility/Assert.hpp>
 
 #include <doctest/doctest.h>
 
@@ -565,7 +564,7 @@ TEST_CASE("CreateEventRecordTest")
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    ARMNN_ASSERT(counter);
+    ARM_PIPE_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -691,7 +690,7 @@ TEST_CASE("CreateEventRecordNoUnitsTest")
                                                          "",
                                                          deviceUid,
                                                          counterSetUid);
-    ARMNN_ASSERT(counter);
+    ARM_PIPE_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -798,7 +797,7 @@ TEST_CASE("CreateInvalidEventRecordTest1")
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    ARMNN_ASSERT(counter);
+    ARM_PIPE_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -837,7 +836,7 @@ TEST_CASE("CreateInvalidEventRecordTest2")
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    ARMNN_ASSERT(counter);
+    ARM_PIPE_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -876,7 +875,7 @@ TEST_CASE("CreateInvalidEventRecordTest3")
                                                          counterUnits,
                                                          deviceUid,
                                                          counterSetUid);
-    ARMNN_ASSERT(counter);
+    ARM_PIPE_ASSERT(counter);
 
     // Create an event record
     SendCounterPacket::EventRecord eventRecord;
@@ -896,7 +895,7 @@ TEST_CASE("CreateCategoryRecordTest")
     // Create a category for testing
     const std::string categoryName = "some_category";
     const CategoryPtr category = std::make_unique<Category>(categoryName);
-    ARMNN_ASSERT(category);
+    ARM_PIPE_ASSERT(category);
     category->m_Counters = { 11u, 23u, 5670u };
 
     // Create a collection of counters
@@ -940,10 +939,10 @@ TEST_CASE("CreateCategoryRecordTest")
     Counter* counter1 = counters.find(11)->second.get();
     Counter* counter2 = counters.find(23)->second.get();
     Counter* counter3 = counters.find(5670)->second.get();
-    ARMNN_ASSERT(counter1);
-    ARMNN_ASSERT(counter2);
-    ARMNN_ASSERT(counter3);
-    uint16_t categoryEventCount = arm::pipe::numeric_cast<uint16_t>(counters.size());
+    ARM_PIPE_ASSERT(counter1);
+    ARM_PIPE_ASSERT(counter2);
+    ARM_PIPE_ASSERT(counter3);
+    uint16_t categoryEventCount = armnn::numeric_cast<uint16_t>(counters.size());
 
     // Create a category record
     SendCounterPacket::CategoryRecord categoryRecord;

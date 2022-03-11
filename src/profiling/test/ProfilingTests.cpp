@@ -1912,7 +1912,7 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
     class TestReportStructure : public IReportStructure
     {
         public:
-        virtual void ReportStructure(arm::pipe::IProfilingService& profilingService) override
+        virtual void ReportStructure(arm::pipe::IProfilingService& /*profilingService*/) override
         {
             m_ReportStructureCalled = true;
         }

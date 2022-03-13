@@ -70,6 +70,11 @@ public:
     using ProfilingException::ProfilingException;
 };
 
+class BadOptionalAccessException : public ProfilingException
+{
+    using ProfilingException::ProfilingException;
+};
+
 class BufferExhaustion : public ProfilingException
 {
 public:

@@ -1432,8 +1432,8 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                                      123.45f,
                                                                      "valid name 3",
                                                                      "valid description",
-                                                                     armnn::EmptyOptional(),// Units
-                                                                     armnn::EmptyOptional(),// Number of cores
+                                                                     arm::pipe::EmptyOptional(),// Units
+                                                                     arm::pipe::EmptyOptional(),// Number of cores
                                                                      0));                   // Device UID
     CHECK(counterDirectory.GetCounterCount() == 3);
     CHECK(counterWoDevice);
@@ -1459,8 +1459,8 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                                 123.45f,
                                                                 "valid name 4",
                                                                 "valid description",
-                                                                armnn::EmptyOptional(),    // Units
-                                                                armnn::EmptyOptional(),    // Number of cores
+                                                                arm::pipe::EmptyOptional(),    // Units
+                                                                arm::pipe::EmptyOptional(),    // Number of cores
                                                                 100),                      // Device UID
                       arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 3);
@@ -1486,8 +1486,8 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                                     123.45f,
                                                                     "valid name 5",
                                                                     std::string("valid description"),
-                                                                    armnn::EmptyOptional(), // Units
-                                                                    armnn::EmptyOptional(), // Number of cores
+                                                                    arm::pipe::EmptyOptional(), // Units
+                                                                    arm::pipe::EmptyOptional(), // Number of cores
                                                                     device->m_Uid));        // Device UID
     CHECK(counterDirectory.GetCounterCount() == 4);
     CHECK(counterWDevice);
@@ -1514,9 +1514,9 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                                          123.45f,
                                                                          "valid name 6",
                                                                          "valid description",
-                                                                         armnn::EmptyOptional(),// Units
-                                                                         armnn::EmptyOptional(),// No of cores
-                                                                         armnn::EmptyOptional(),// Device UID
+                                                                         arm::pipe::EmptyOptional(),// Units
+                                                                         arm::pipe::EmptyOptional(),// No of cores
+                                                                         arm::pipe::EmptyOptional(),// Device UID
                                                                          0));               // CounterSet UID
     CHECK(counterDirectory.GetCounterCount() == 5);
     CHECK(counterWoCounterSet);
@@ -1543,8 +1543,8 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                                  "valid ",
                                                                  "name 7",
                                                                  std::string("valid description"),
-                                                                 armnn::EmptyOptional(),    // Units
-                                                                 armnn::EmptyOptional(),    // Number of cores
+                                                                 arm::pipe::EmptyOptional(),    // Units
+                                                                 arm::pipe::EmptyOptional(),    // Number of cores
                                                                  100),            // Counter set UID
                       arm::pipe::InvalidArgumentException);
     CHECK(counterDirectory.GetCounterCount() == 5);
@@ -1556,10 +1556,10 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     CHECK_NOTHROW(counterWNumberOfCores = counterDirectory.RegisterCounter(
                              armnn::profiling::BACKEND_ID, 50,
                              categoryName, 0, 1, 123.45f, "valid name 8", "valid description",
-                             armnn::EmptyOptional(),      // Units
+                             arm::pipe::EmptyOptional(),      // Units
                              numberOfCores,               // Number of cores
-                             armnn::EmptyOptional(),      // Device UID
-                             armnn::EmptyOptional()));    // Counter set UID
+                             arm::pipe::EmptyOptional(),      // Device UID
+                             arm::pipe::EmptyOptional()));    // Counter set UID
     CHECK(counterDirectory.GetCounterCount() == 20);
     CHECK(counterWNumberOfCores);
     CHECK(counterWNumberOfCores->m_Uid > counter->m_Uid);
@@ -1594,10 +1594,10 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     CHECK_NOTHROW(counterWMultiCoreDevice = counterDirectory.RegisterCounter(
                              armnn::profiling::BACKEND_ID, 19, categoryName, 0, 1,
                              123.45f, "valid name 9", "valid description",
-                             armnn::EmptyOptional(),      // Units
-                             armnn::EmptyOptional(),      // Number of cores
+                             arm::pipe::EmptyOptional(),      // Units
+                             arm::pipe::EmptyOptional(),      // Number of cores
                              multiCoreDevice->m_Uid,      // Device UID
-                             armnn::EmptyOptional()));    // Counter set UID
+                             arm::pipe::EmptyOptional()));    // Counter set UID
     CHECK(counterDirectory.GetCounterCount() == 24);
     CHECK(counterWMultiCoreDevice);
     CHECK(counterWMultiCoreDevice->m_Uid > counter->m_Uid);
@@ -1642,10 +1642,10 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
                                                     123.45f,
                                                     "valid name 10",
                                                     "valid description",
-                                                    armnn::EmptyOptional(),  // Units
+                                                    arm::pipe::EmptyOptional(),  // Units
                                                     numberOfCourse,          // Number of cores
-                                                    armnn::EmptyOptional(),  // Device UID
-                                                    armnn::EmptyOptional()));// Counter set UID
+                                                    arm::pipe::EmptyOptional(),  // Device UID
+                                                    arm::pipe::EmptyOptional()));// Counter set UID
     CHECK(counterDirectory.GetCounterCount() == 26);
     CHECK(counterWMultiCoreDeviceWParentCategory);
     CHECK(counterWMultiCoreDeviceWParentCategory->m_Uid > counter->m_Uid);
@@ -1679,9 +1679,9 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     CHECK_NOTHROW(counterWCounterSet = counterDirectory.RegisterCounter(
                              armnn::profiling::BACKEND_ID, 300,
                              categoryName, 0, 1, 123.45f, "valid name 11", "valid description",
-                             armnn::EmptyOptional(),    // Units
+                             arm::pipe::EmptyOptional(),    // Units
                              0,                         // Number of cores
-                             armnn::EmptyOptional(),    // Device UID
+                             arm::pipe::EmptyOptional(),    // Device UID
                              counterSet->m_Uid));       // Counter set UID
     CHECK(counterDirectory.GetCounterCount() == 27);
     CHECK(counterWCounterSet);
@@ -1703,7 +1703,7 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     CHECK_NOTHROW(counterWDeviceWCounterSet = counterDirectory.RegisterCounter(
                              armnn::profiling::BACKEND_ID, 23,
                              categoryName, 0, 1, 123.45f, "valid name 12", "valid description",
-                             armnn::EmptyOptional(),    // Units
+                             arm::pipe::EmptyOptional(),    // Units
                              1,                         // Number of cores
                              device->m_Uid,             // Device UID
                              counterSet->m_Uid));       // Counter set UID
@@ -1737,8 +1737,8 @@ TEST_CASE("CheckCounterDirectoryRegisterCounter")
     CHECK_NOTHROW(anotherCounter = counterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID, 24,
                                                                     anotherCategoryName, 1, 0, .00043f,
                                                                     "valid name", "valid description",
-                                                                    armnn::EmptyOptional(), // Units
-                                                                    armnn::EmptyOptional(), // Number of cores
+                                                                    arm::pipe::EmptyOptional(), // Units
+                                                                    arm::pipe::EmptyOptional(), // Number of cores
                                                                     device->m_Uid,          // Device UID
                                                                     counterSet->m_Uid));    // Counter set UID
     CHECK(counterDirectory.GetCounterCount() == 29);

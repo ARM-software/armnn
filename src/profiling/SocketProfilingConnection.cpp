@@ -5,9 +5,10 @@
 
 #include "SocketProfilingConnection.hpp"
 
-#include "common/include/SocketConnectionException.hpp"
+#include <common/include/SocketConnectionException.hpp>
 
 #include <cerrno>
+#include <cstring>
 #include <fcntl.h>
 #include <string>
 
@@ -149,7 +150,7 @@ arm::pipe::Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
         {
             // This is a corner case. The socket as been woken up but not with any data.
             // We'll throw a timeout exception to loop around again.
-            throw armnn::TimeoutException(
+            throw arm::pipe::TimeoutException(
                 "SocketProfilingConnection: File descriptor was polled but no data was available to receive.");
         }
 

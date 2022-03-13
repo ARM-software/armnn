@@ -1251,7 +1251,7 @@ TEST_CASE("SendCounterDirectoryPacketTest2")
                                                               "counter2",
                                                               "counter2description",
                                                               std::string("counter2units"),
-                                                              armnn::EmptyOptional(),
+                                                              arm::pipe::EmptyOptional(),
                                                               device2->m_Uid,
                                                               0));
     CHECK(counterDirectory.GetCounterCount() == 5);
@@ -1267,7 +1267,7 @@ TEST_CASE("SendCounterDirectoryPacketTest2")
                                                               0.0000045399f,
                                                               "counter3",
                                                               "counter3description",
-                                                              armnn::EmptyOptional(),
+                                                              arm::pipe::EmptyOptional(),
                                                               numberOfCores,
                                                               device2->m_Uid,
                                                               counterSet1->m_Uid));

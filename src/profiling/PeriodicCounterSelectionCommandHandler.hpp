@@ -81,7 +81,7 @@ private:
                                  const uint32_t capturePeriod,
                                  const std::vector<uint16_t> counterIds)
     {
-        armnn::Optional<std::string> errorMsg =
+        arm::pipe::Optional<std::string> errorMsg =
                 m_BackendProfilingContexts.at(backendId)->ActivateCounters(capturePeriod, counterIds);
 
         if(errorMsg.has_value())

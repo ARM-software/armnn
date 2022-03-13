@@ -60,13 +60,13 @@ TEST_CASE("CreateTypedLabelTest")
     VerifyTimelineHeaderBinary(readableData, offset, 68);
 
     // First dataset sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityName, readableData, offset);
+    VerifyTimelineLabelBinaryPacketData(arm::pipe::EmptyOptional(), entityName, readableData, offset);
 
     // Second dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                entityGuid,
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                labelTypeGuid,
                                                readableData,
                                                offset);
@@ -251,28 +251,28 @@ TEST_CASE("CreateNamedTypedChildEntityTest")
     VerifyTimelineHeaderBinary(readableData, offset, 188);
 
     // First dataset sent: TimelineEntityBinaryPacket
-    VerifyTimelineEntityBinaryPacketData(EmptyOptional(), readableData, offset);
+    VerifyTimelineEntityBinaryPacketData(arm::pipe::EmptyOptional(), readableData, offset);
 
     // Second dataset sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityName, readableData, offset);
+    VerifyTimelineLabelBinaryPacketData(arm::pipe::EmptyOptional(), entityName, readableData, offset);
 
     // Third dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
 
     // Fifth dataset sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityType, readableData, offset);
+    VerifyTimelineLabelBinaryPacketData(arm::pipe::EmptyOptional(), entityType, readableData, offset);
 
     // Sixth dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -280,10 +280,10 @@ TEST_CASE("CreateNamedTypedChildEntityTest")
 
     // Eighth dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                parentEntityGuid,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                readableData,
                                                offset);
 
@@ -386,26 +386,26 @@ TEST_CASE("CreateNameTypeEntityTest")
 
     // Packets for Name Entity
     // First dataset sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityName, readableData, offset);
+    VerifyTimelineLabelBinaryPacketData(arm::pipe::EmptyOptional(), entityName, readableData, offset);
 
     // Second dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                LabelsAndEventClasses::NAME_GUID,
                                                readableData,
                                                offset);
 
     // Packets for Type Entity
     // First dataset sent: TimelineLabelBinaryPacket
-    VerifyTimelineLabelBinaryPacketData(EmptyOptional(), entityType, readableData, offset);
+    VerifyTimelineLabelBinaryPacketData(arm::pipe::EmptyOptional(), entityType, readableData, offset);
 
     // Second dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
-                                               EmptyOptional(),
-                                               EmptyOptional(),
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                LabelsAndEventClasses::TYPE_GUID,
                                                readableData,
                                                offset);
@@ -451,11 +451,12 @@ TEST_CASE("RecordEventTest")
     VerifyTimelineHeaderBinary(readableData, offset, 60 + ThreadIdSize);
 
     // First dataset sent: TimelineEntityBinaryPacket
-    VerifyTimelineEventBinaryPacket(EmptyOptional(), EmptyOptional(), EmptyOptional(), readableData, offset);
+    VerifyTimelineEventBinaryPacket(
+        arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), readableData, offset);
 
     // Second dataset sent: TimelineRelationshipBinaryPacket
     VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
-                                               EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
                                                entityGuid,
                                                eventGuid,
                                                eventClassGuid,

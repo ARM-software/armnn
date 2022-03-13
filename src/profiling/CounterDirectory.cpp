@@ -50,7 +50,7 @@ const Category* CounterDirectory::RegisterCategory(const std::string& categoryNa
 
 const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
                                                uint16_t cores,
-                                               const armnn::Optional<std::string>& parentCategoryName)
+                                               const arm::pipe::Optional<std::string>& parentCategoryName)
 {
     // Check that the given device name is valid
     if (deviceName.empty() ||
@@ -112,7 +112,7 @@ const Device* CounterDirectory::RegisterDevice(const std::string& deviceName,
 
 const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counterSetName,
                                                        uint16_t count,
-                                                       const armnn::Optional<std::string>& parentCategoryName)
+                                                       const arm::pipe::Optional<std::string>& parentCategoryName)
 {
     // Check that the given counter set name is valid
     if (counterSetName.empty() ||
@@ -184,10 +184,10 @@ const Counter* CounterDirectory::RegisterCounter(const std::string& applicationN
                                                  double multiplier,
                                                  const std::string& name,
                                                  const std::string& description,
-                                                 const armnn::Optional<std::string>& units,
-                                                 const armnn::Optional<uint16_t>& numberOfCores,
-                                                 const armnn::Optional<uint16_t>& deviceUid,
-                                                 const armnn::Optional<uint16_t>& counterSetUid)
+                                                 const arm::pipe::Optional<std::string>& units,
+                                                 const arm::pipe::Optional<uint16_t>& numberOfCores,
+                                                 const arm::pipe::Optional<uint16_t>& deviceUid,
+                                                 const arm::pipe::Optional<uint16_t>& counterSetUid)
 {
     // Check that the given parent category name is valid
     if (parentCategoryName.empty() ||
@@ -498,7 +498,7 @@ CountersIt CounterDirectory::FindCounter(const std::string& counterName) const
     });
 }
 
-uint16_t CounterDirectory::GetNumberOfCores(const armnn::Optional<uint16_t>& numberOfCores,
+uint16_t CounterDirectory::GetNumberOfCores(const arm::pipe::Optional<uint16_t>& numberOfCores,
                                             uint16_t deviceUid)
 {
     // To get the number of cores, apply the following rules:

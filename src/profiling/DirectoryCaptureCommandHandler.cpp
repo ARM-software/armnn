@@ -289,7 +289,7 @@ std::vector<CounterDirectoryEventRecord> DirectoryCaptureCommandHandler::ReadEve
                                                                              descriptionOffset +
                                                                              uint32_t_size);
 
-        eventRecords[i].m_CounterUnits = unitsOffset == 0 ? armnn::Optional<std::string>() :
+        eventRecords[i].m_CounterUnits = unitsOffset == 0 ? arm::pipe::Optional<std::string>() :
                 GetStringNameFromBuffer(data, eventRecordsOffsets[i] + offset + unitsOffset + uint32_t_size);
     }
 

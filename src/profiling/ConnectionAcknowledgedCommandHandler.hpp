@@ -35,8 +35,8 @@ public:
                                          ISendTimelinePacket& sendTimelinePacket,
                                          ProfilingStateMachine& profilingStateMachine,
                                          IProfilingServiceStatus& profilingServiceStatus,
-                                         armnn::Optional<BackendProfilingContexts> backendProfilingContexts =
-                                             armnn::EmptyOptional())
+                                         arm::pipe::Optional<BackendProfilingContexts> backendProfilingContexts =
+                                         arm::pipe::EmptyOptional())
         : CommandHandlerFunctor(familyId, packetId, version)
         , m_CounterDirectory(counterDirectory)
         , m_SendCounterPacket(sendCounterPacket)
@@ -60,11 +60,10 @@ private:
     ISendTimelinePacket&     m_SendTimelinePacket;
     ProfilingStateMachine&   m_StateMachine;
     IProfilingServiceStatus& m_ProfilingServiceStatus;
-    armnn::Optional<BackendProfilingContexts> m_BackendProfilingContext;
+    arm::pipe::Optional<BackendProfilingContexts> m_BackendProfilingContext;
     std::atomic<bool> m_TimelineEnabled;
 };
 
 } // namespace pipe
 
 } // namespace arm
-

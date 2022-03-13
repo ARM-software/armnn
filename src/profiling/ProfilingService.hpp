@@ -52,7 +52,7 @@ public:
 
     ProfilingService(uint16_t maxGlobalCounterId,
                      IInitialiseProfilingService& initialiser,
-                     armnn::Optional<IReportStructure&> reportStructure = armnn::EmptyOptional())
+                     arm::pipe::Optional<IReportStructure&> reportStructure = arm::pipe::EmptyOptional())
         : m_Options()
         , m_TimelineReporting(false)
         , m_ProfilingConnectionFactory(new ProfilingConnectionFactory())

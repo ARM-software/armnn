@@ -6,9 +6,11 @@
 #pragma once
 
 #include <armnn/profiling/ILocalPacketHandler.hpp>
+#include <armnn/profiling/ProfilingOptions.hpp>
+
+#include "DirectoryCaptureCommandHandler.hpp"
 #include "IProfilingConnection.hpp"
 #include "ProfilingUtils.hpp"
-#include "Runtime.hpp"
 
 #include <common/include/Assert.hpp>
 #include <common/include/Packet.hpp>
@@ -16,6 +18,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <fstream>
+#include <map>
 #include <mutex>
 #include <queue>
 #include <thread>

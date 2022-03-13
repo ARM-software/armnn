@@ -30,24 +30,24 @@ public:
     const Category*   RegisterCategory  (const std::string& categoryName) override;
     const Device*     RegisterDevice    (const std::string& deviceName,
                                          uint16_t cores = 0,
-                                         const armnn::Optional<std::string>& parentCategoryName
-                                            = armnn::EmptyOptional()) override;
+                                         const arm::pipe::Optional<std::string>& parentCategoryName
+                                         = arm::pipe::EmptyOptional()) override;
     const CounterSet* RegisterCounterSet(const std::string& counterSetName,
                                          uint16_t count = 0,
-                                         const armnn::Optional<std::string>& parentCategoryName
-                                            = armnn::EmptyOptional()) override;
+                                         const arm::pipe::Optional<std::string>& parentCategoryName
+                                            = arm::pipe::EmptyOptional()) override;
     const Counter* RegisterCounter(const std::string& backendId,
-                                   const uint16_t uid,
-                                   const std::string& parentCategoryName,
-                                   uint16_t counterClass,
-                                   uint16_t interpolation,
-                                   double multiplier,
-                                   const std::string& name,
-                                   const std::string& description,
-                                   const armnn::Optional<std::string>& units = armnn::EmptyOptional(),
-                                   const armnn::Optional<uint16_t>& numberOfCores = armnn::EmptyOptional(),
-                                   const armnn::Optional<uint16_t>& deviceUid = armnn::EmptyOptional(),
-                                   const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional()) override;
+        const uint16_t uid,
+        const std::string& parentCategoryName,
+        uint16_t counterClass,
+        uint16_t interpolation,
+        double multiplier,
+        const std::string& name,
+        const std::string& description,
+        const arm::pipe::Optional<std::string>& units = arm::pipe::EmptyOptional(),
+        const arm::pipe::Optional<uint16_t>& numberOfCores = arm::pipe::EmptyOptional(),
+        const arm::pipe::Optional<uint16_t>& deviceUid = arm::pipe::EmptyOptional(),
+        const arm::pipe::Optional<uint16_t>& counterSetUid = arm::pipe::EmptyOptional()) override;
 
     // Getters for counts
     uint16_t GetCategoryCount()   const override { return arm::pipe::numeric_cast<uint16_t>(m_Categories.size());  }
@@ -94,7 +94,7 @@ private:
     CounterSetsIt FindCounterSet(const std::string& counterSetName) const;
     CountersIt    FindCounter(uint16_t counterUid) const;
     CountersIt    FindCounter(const std::string& counterName) const;
-    uint16_t      GetNumberOfCores(const armnn::Optional<uint16_t>& numberOfCores,
+    uint16_t      GetNumberOfCores(const arm::pipe::Optional<uint16_t>& numberOfCores,
                                    uint16_t deviceUid);
 };
 

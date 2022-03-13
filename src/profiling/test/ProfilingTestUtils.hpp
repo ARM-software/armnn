@@ -8,10 +8,10 @@
 #include "ProfilingUtils.hpp"
 #include "Runtime.hpp"
 
-#include <armnn/Optional.hpp>
 #include <BufferManager.hpp>
 #include <ProfilingService.hpp>
 
+#include <common/include/Optional.hpp>
 #include <common/include/ProfilingGuid.hpp>
 
 using namespace armnn;
@@ -30,7 +30,7 @@ void VerifyTimelineHeaderBinary(const unsigned char* readableData,
                                 unsigned int& offset,
                                 uint32_t packetDataLength);
 
-ProfilingGuid VerifyTimelineLabelBinaryPacketData(Optional<ProfilingGuid> guid,
+ProfilingGuid VerifyTimelineLabelBinaryPacketData(arm::pipe::Optional<ProfilingGuid> guid,
                                                   const std::string& label,
                                                   const unsigned char* readableData,
                                                   unsigned int& offset);
@@ -41,20 +41,20 @@ void VerifyTimelineEventClassBinaryPacketData(ProfilingGuid guid,
                                               unsigned int& offset);
 
 void VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType relationshipType,
-                                                Optional<ProfilingGuid> relationshipGuid,
-                                                Optional<ProfilingGuid> headGuid,
-                                                Optional<ProfilingGuid> tailGuid,
-                                                Optional<ProfilingGuid> attributeGuid,
+                                                arm::pipe::Optional<ProfilingGuid> relationshipGuid,
+                                                arm::pipe::Optional<ProfilingGuid> headGuid,
+                                                arm::pipe::Optional<ProfilingGuid> tailGuid,
+                                                arm::pipe::Optional<ProfilingGuid> attributeGuid,
                                                 const unsigned char* readableData,
                                                 unsigned int& offset);
 
-ProfilingGuid VerifyTimelineEntityBinaryPacketData(Optional<ProfilingGuid> guid,
+ProfilingGuid VerifyTimelineEntityBinaryPacketData(arm::pipe::Optional<ProfilingGuid> guid,
                                                    const unsigned char* readableData,
                                                    unsigned int& offset);
 
-ProfilingGuid VerifyTimelineEventBinaryPacket(Optional<uint64_t> timestamp,
-                                              Optional<int> threadId,
-                                              Optional<ProfilingGuid> eventGuid,
+ProfilingGuid VerifyTimelineEventBinaryPacket(arm::pipe::Optional<uint64_t> timestamp,
+                                              arm::pipe::Optional<int> threadId,
+                                              arm::pipe::Optional<ProfilingGuid> eventGuid,
                                               const unsigned char* readableData,
                                               unsigned int& offset);
 

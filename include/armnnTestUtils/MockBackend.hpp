@@ -162,7 +162,7 @@ public:
         return nextMaxGlobalCounterId;
     }
 
-    Optional<std::string> ActivateCounters(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
+    arm::pipe::Optional<std::string> ActivateCounters(uint32_t capturePeriod, const std::vector<uint16_t>& counterIds)
     {
         if (capturePeriod == 0 || counterIds.size() == 0)
         {
@@ -170,11 +170,11 @@ public:
         }
         else if (capturePeriod == 15939u)
         {
-            return armnn::Optional<std::string>("ActivateCounters example test error");
+            return arm::pipe::Optional<std::string>("ActivateCounters example test error");
         }
         m_CapturePeriod  = capturePeriod;
         m_ActiveCounters = counterIds;
-        return armnn::Optional<std::string>();
+        return arm::pipe::Optional<std::string>();
     }
 
     std::vector<arm::pipe::Timestamp> ReportCounterValues()

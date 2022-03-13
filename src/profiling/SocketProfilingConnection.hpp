@@ -5,7 +5,6 @@
 
 #include "IProfilingConnection.hpp"
 
-#include <Runtime.hpp>
 #include <common/include/NetworkSockets.hpp>
 
 #pragma once

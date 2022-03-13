@@ -13,11 +13,10 @@
 #include <SendCounterPacket.hpp>
 #include <SendThread.hpp>
 
-#include <armnn/Optional.hpp>
-
 #include <common/include/Assert.hpp>
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
+#include <common/include/Optional.hpp>
 #include <common/include/ProfilingException.hpp>
 #include <common/include/ProfilingGuidGenerator.hpp>
 
@@ -512,10 +511,10 @@ public:
                                    double multiplier,
                                    const std::string& name,
                                    const std::string& description,
-                                   const armnn::Optional<std::string>& units = armnn::EmptyOptional(),
-                                   const armnn::Optional<uint16_t>& numberOfCores = armnn::EmptyOptional(),
-                                   const armnn::Optional<uint16_t>& deviceUid = armnn::EmptyOptional(),
-                                   const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional())
+                                   const arm::pipe::Optional<std::string>& units = arm::pipe::EmptyOptional(),
+                                   const arm::pipe::Optional<uint16_t>& numberOfCores = arm::pipe::EmptyOptional(),
+                                   const arm::pipe::Optional<uint16_t>& deviceUid = arm::pipe::EmptyOptional(),
+                                   const arm::pipe::Optional<uint16_t>& counterSetUid = arm::pipe::EmptyOptional())
     {
         arm::pipe::IgnoreUnused(backendId);
 

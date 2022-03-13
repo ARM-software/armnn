@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/Optional.hpp>
+#include <common/include/Optional.hpp>
 
 namespace arm
 {
@@ -23,24 +23,24 @@ public:
 
     virtual const Device*     RegisterDevice    (const std::string& deviceName,
                                                  uint16_t cores,
-                                                 const armnn::Optional<std::string>& parentCategoryName) = 0;
+                                                 const arm::pipe::Optional<std::string>& parentCategoryName) = 0;
 
     virtual const CounterSet* RegisterCounterSet(const std::string& counterSetName,
                                                  uint16_t count,
-                                                 const armnn::Optional<std::string>& parentCategoryName) = 0;
+                                                 const arm::pipe::Optional<std::string>& parentCategoryName) = 0;
 
     virtual const Counter* RegisterCounter(const std::string& backendId,
-                                           const uint16_t uid,
-                                           const std::string& parentCategoryName,
-                                           uint16_t counterClass,
-                                           uint16_t interpolation,
-                                           double multiplier,
-                                           const std::string& name,
-                                           const std::string& description,
-                                           const armnn::Optional<std::string>& units = armnn::EmptyOptional(),
-                                           const armnn::Optional<uint16_t>& numberOfCores = armnn::EmptyOptional(),
-                                           const armnn::Optional<uint16_t>& deviceUid = armnn::EmptyOptional(),
-                                           const armnn::Optional<uint16_t>& counterSetUid = armnn::EmptyOptional()) = 0;
+        const uint16_t uid,
+        const std::string& parentCategoryName,
+        uint16_t counterClass,
+        uint16_t interpolation,
+        double multiplier,
+        const std::string& name,
+        const std::string& description,
+        const arm::pipe::Optional<std::string>& units = arm::pipe::EmptyOptional(),
+        const arm::pipe::Optional<uint16_t>& numberOfCores = arm::pipe::EmptyOptional(),
+        const arm::pipe::Optional<uint16_t>& deviceUid = arm::pipe::EmptyOptional(),
+        const arm::pipe::Optional<uint16_t>& counterSetUid = arm::pipe::EmptyOptional()) = 0;
 
 };
 

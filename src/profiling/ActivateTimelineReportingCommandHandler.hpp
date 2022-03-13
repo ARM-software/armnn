@@ -10,11 +10,9 @@
 #include "IReportStructure.hpp"
 #include "INotifyBackends.hpp"
 
-#include "armnn/Optional.hpp"
-
 #include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/Optional.hpp>
 #include <common/include/Packet.hpp>
-
 
 namespace arm
 {
@@ -30,7 +28,7 @@ public:
                                             uint32_t version,
                                             SendTimelinePacket& sendTimelinePacket,
                                             ProfilingStateMachine& profilingStateMachine,
-                                            armnn::Optional<IReportStructure&> reportStructure,
+                                            arm::pipe::Optional<IReportStructure&> reportStructure,
                                             std::atomic<bool>& timelineReporting,
                                             INotifyBackends& notifyBackends)
         : CommandHandlerFunctor(familyId, packetId, version),
@@ -49,7 +47,7 @@ private:
     std::atomic<bool>&     m_TimelineReporting;
     INotifyBackends&       m_BackendNotifier;
 
-    armnn::Optional<IReportStructure&> m_ReportStructure;
+    arm::pipe::Optional<IReportStructure&> m_ReportStructure;
 };
 
 } // namespace pipe

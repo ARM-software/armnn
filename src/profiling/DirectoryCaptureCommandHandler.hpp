@@ -26,7 +26,7 @@ struct CounterDirectoryEventRecord
     std::string m_CounterName;
     uint16_t m_CounterSetUid;
     uint16_t m_CounterUid;
-    armnn::Optional<std::string> m_CounterUnits;
+    arm::pipe::Optional<std::string> m_CounterUnits;
     uint16_t m_DeviceUid;
     uint16_t m_MaxCounterUid;
 };

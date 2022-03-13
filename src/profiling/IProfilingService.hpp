@@ -17,7 +17,8 @@
 
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 #include <armnn/profiling/ProfilingOptions.hpp>
-#include <armnn/Optional.hpp>
+
+#include <common/include/Optional.hpp>
 #include <common/include/ProfilingGuidGenerator.hpp>
 
 namespace arm
@@ -34,7 +35,7 @@ public:
     static std::unique_ptr<IProfilingService> CreateProfilingService(
         uint16_t maxGlobalCounterId,
         IInitialiseProfilingService& initialiser,
-        armnn::Optional<IReportStructure&> reportStructure = armnn::EmptyOptional());
+        arm::pipe::Optional<IReportStructure&> reportStructure = arm::pipe::EmptyOptional());
     virtual ~IProfilingService() {};
     virtual std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const = 0;
     virtual const ICounterMappings& GetCounterMappings() const = 0;

@@ -10,8 +10,6 @@
 #include <ProfilingUtils.hpp>
 #include <IProfilingConnectionFactory.hpp>
 
-#include <armnn/Optional.hpp>
-
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
 

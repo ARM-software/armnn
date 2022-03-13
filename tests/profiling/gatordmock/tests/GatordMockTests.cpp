@@ -4,7 +4,6 @@
 //
 
 #include <ArmNNProfilingServiceInitialiser.hpp>
-#include <DirectoryCaptureCommandHandler.hpp>
 #include <GatordMockService.hpp>
 #include <ProfilingService.hpp>
 #include <TimelinePacketWriterFactory.hpp>

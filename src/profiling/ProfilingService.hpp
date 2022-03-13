@@ -55,7 +55,6 @@ public:
                      armnn::Optional<IReportStructure&> reportStructure = armnn::EmptyOptional())
         : m_Options()
         , m_TimelineReporting(false)
-        , m_CounterDirectory()
         , m_ProfilingConnectionFactory(new ProfilingConnectionFactory())
         , m_ProfilingConnection()
         , m_StateMachine()

@@ -46,7 +46,7 @@ void ActivateTimelineReportingCommandHandler::operator()(const arm::pipe::Packet
                                            + " id = " + std::to_string(packet.GetPacketId()));
             }
 
-            if(!m_TimelineReporting)
+            if (!m_TimelineReporting)
             {
                 m_SendTimelinePacket.SendTimelineMessageDirectoryPackage();
 

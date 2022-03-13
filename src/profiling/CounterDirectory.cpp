@@ -6,8 +6,6 @@
 #include "CounterDirectory.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <armnn/BackendId.hpp>
-
 #include <common/include/Assert.hpp>
 #include <common/include/SwTrace.hpp>
 
@@ -178,7 +176,7 @@ const CounterSet* CounterDirectory::RegisterCounterSet(const std::string& counte
     return counterSetPtr;
 }
 
-const Counter* CounterDirectory::RegisterCounter(const std::string& /*backendId*/,
+const Counter* CounterDirectory::RegisterCounter(const std::string& applicationName,
                                                  const uint16_t uid,
                                                  const std::string& parentCategoryName,
                                                  uint16_t counterClass,
@@ -294,7 +292,7 @@ const Counter* CounterDirectory::RegisterCounter(const std::string& /*backendId*
     const std::string unitsValue = units.has_value() ? units.value() : "";
 
     // Create the counter
-    CounterPtr counter = std::make_shared<Counter>(armnn::profiling::BACKEND_ID,
+    CounterPtr counter = std::make_shared<Counter>(applicationName,
                                                    counterUids.front(),
                                                    maxCounterUid,
                                                    counterClass,

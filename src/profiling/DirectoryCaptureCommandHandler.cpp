@@ -5,7 +5,6 @@
 
 #include "DirectoryCaptureCommandHandler.hpp"
 
-#include <armnn/BackendId.hpp>
 #include "ProfilingUtils.hpp"
 
 #include <atomic>
@@ -192,7 +191,7 @@ void DirectoryCaptureCommandHandler::ReadCategoryRecords(const unsigned char* co
             GetStringNameFromBuffer(data, offset + categoryOffsets[categoryIndex] + nameOffset + uint32_t_size));
         for (auto& counter : eventRecords)
         {
-            const Counter* registeredCounter = m_CounterDirectory.RegisterCounter(armnn::profiling::BACKEND_ID,
+            const Counter* registeredCounter = m_CounterDirectory.RegisterCounter(m_ApplicationName,
                                                                                   counter.m_CounterUid,
                                                                                   category->m_Name,
                                                                                   counter.m_CounterClass,

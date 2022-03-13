@@ -35,8 +35,13 @@ class DirectoryCaptureCommandHandler : public arm::pipe::CommandHandlerFunctor
 {
 
 public:
-    DirectoryCaptureCommandHandler(uint32_t familyId, uint32_t packetId, uint32_t version, bool quietOperation = true)
+    DirectoryCaptureCommandHandler(const std::string& applicationName,
+                                   uint32_t familyId,
+                                   uint32_t packetId,
+                                   uint32_t version,
+                                   bool quietOperation = true)
         : CommandHandlerFunctor(familyId, packetId, version)
+        , m_ApplicationName(applicationName)
         , m_QuietOperation(quietOperation)
         , m_AlreadyParsed(false)
     {}
@@ -72,6 +77,7 @@ private:
     std::string GetStringNameFromBuffer(const unsigned char* data, uint32_t offset);
     bool IsValidChar(unsigned char c);
 
+    std::string m_ApplicationName;
     CounterDirectory m_CounterDirectory;
     std::unordered_map<uint16_t, uint16_t> m_UidTranslation;
     bool m_QuietOperation;

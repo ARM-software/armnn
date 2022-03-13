@@ -32,7 +32,7 @@ void RequestCountersPacketHandler::HandlePacket(const arm::pipe::Packet& packet)
     }
     arm::pipe::PacketVersionResolver packetVersionResolver;
     DirectoryCaptureCommandHandler directoryCaptureCommandHandler(
-            0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue());
+        "ARMNN", 0, 2, packetVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue());
     directoryCaptureCommandHandler.operator()(packet);
     const ICounterDirectory& counterDirectory = directoryCaptureCommandHandler.GetCounterDirectory();
     for (auto& category : counterDirectory.GetCategories())

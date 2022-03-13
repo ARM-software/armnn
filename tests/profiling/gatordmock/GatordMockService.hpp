@@ -54,7 +54,7 @@ public:
             // This stub lets us ignore any counter capture packets we receive without throwing an error
             , m_StubCommandHandler(3, 0, m_PacketVersionResolver.ResolvePacketVersion(0, 3).GetEncodedValue())
             , m_DirectoryCaptureCommandHandler(
-                    0, 2, m_PacketVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), !echoPackets)
+                    "ARMNN", 0, 2, m_PacketVersionResolver.ResolvePacketVersion(0, 2).GetEncodedValue(), !echoPackets)
             , m_TimelineCaptureCommandHandler(
                     1, 1, m_PacketVersionResolver.ResolvePacketVersion(1, 1).GetEncodedValue(), m_TimelineDecoder)
             , m_TimelineDirectoryCaptureCommandHandler(

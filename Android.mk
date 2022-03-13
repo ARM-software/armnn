@@ -113,6 +113,7 @@ LOCAL_SRC_FILES := \
         profiling/common/src/Logging.cpp \
         profiling/common/src/NetworkSockets.cpp \
         profiling/common/src/PacketVersionResolver.cpp \
+        profiling/common/src/Processes.cpp \
         profiling/common/src/SwTrace.cpp \
         profiling/common/src/LabelsAndEventClasses.cpp \
         profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
@@ -158,7 +159,6 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/TensorUtils.cpp \
         src/armnnUtils/VerificationHelpers.cpp \
         src/armnnUtils/Filesystem.cpp \
-        src/armnnUtils/Processes.cpp \
         src/armnnUtils/ProfilingOptionsConverter.cpp \
         src/armnnUtils/Threads.cpp \
         src/armnnUtils/Transpose.cpp \

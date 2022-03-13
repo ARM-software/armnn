@@ -105,8 +105,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/ParserHelper.hpp
     src/armnnUtils/ParserHelper.cpp
     src/armnnUtils/ParserPrototxtFixture.hpp
-    src/armnnUtils/Processes.hpp
-    src/armnnUtils/Processes.cpp
     src/armnnUtils/ProfilingOptionsConverter.hpp
     src/armnnUtils/ProfilingOptionsConverter.cpp
     src/armnnUtils/PrototxtConversions.hpp

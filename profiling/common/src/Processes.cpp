@@ -11,9 +11,9 @@
 #include <common/include/WindowsWrapper.hpp>
 #endif
 
-namespace armnnUtils
+namespace arm
 {
-namespace Processes
+namespace pipe
 {
 
 int GetCurrentId()
@@ -25,5 +25,5 @@ int GetCurrentId()
 #endif
 }
 
-}
-}
+} // namespace pipe
+} // namespace arm

@@ -5,12 +5,12 @@
 
 #pragma once
 
-namespace armnnUtils
+namespace arm
 {
-namespace Processes
+namespace pipe
 {
 
 int GetCurrentId();
 
-}
-}
+} // namespace arm
+} // namespace pipe

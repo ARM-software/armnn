@@ -13,6 +13,7 @@ if(BUILD_TIMELINE_DECODER)
         Logging.cpp
         NetworkSockets.cpp
         PacketVersionResolver.cpp
+        Processes.cpp
         SwTrace.cpp
         LabelsAndEventClasses.cpp)
 

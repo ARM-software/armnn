@@ -11,7 +11,6 @@
 #include <CounterDirectory.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
-#include <Processes.hpp>
 
 #include <armnn/Utils.hpp>
 
@@ -20,6 +19,7 @@
 #include <common/include/Constants.hpp>
 #include <common/include/EncodeVersion.hpp>
 #include <common/include/NumericCast.hpp>
+#include <common/include/Processes.hpp>
 #include <common/include/ProfilingException.hpp>
 
 #include <doctest/doctest.h>
@@ -365,7 +365,7 @@ TEST_CASE("SendStreamMetaDataPacketTest")
     offset += sizeUint32;
     CHECK(ReadUint32(readBuffer2, offset) == MAX_METADATA_PACKET_LENGTH); // max_data_len
     offset += sizeUint32;
-    int pid = armnnUtils::Processes::GetCurrentId();
+    int pid = arm::pipe::GetCurrentId();
     CHECK(ReadUint32(readBuffer2, offset) == arm::pipe::numeric_cast<uint32_t>(pid));
     offset += sizeUint32;
     uint32_t poolOffset = 10 * sizeUint32;

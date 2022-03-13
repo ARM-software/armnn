@@ -11,13 +11,13 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
 
-#include <Processes.hpp>
 #include <ProfilingService.hpp>
 #include <armnnUtils/Threads.hpp>
 
 #include <common/include/Assert.hpp>
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <common/include/NumericCast.hpp>
+#include <common/include/Processes.hpp>
 
 #include <TestUtils.hpp>
 
@@ -492,7 +492,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                offset);
 
     // Process ID Label
-    int processID = armnnUtils::Processes::GetCurrentId();
+    int processID = arm::pipe::GetCurrentId();
     std::stringstream ss;
     ss << processID;
     std::string processIdLabel = ss.str();

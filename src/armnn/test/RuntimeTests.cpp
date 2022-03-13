@@ -3,17 +3,20 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <ArmNNProfilingServiceInitialiser.hpp>
+#include <ProfilingOptionsConverter.hpp>
+#include <Runtime.hpp>
+
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
-#include <armnn/profiling/ArmNNProfiling.hpp>
-#include <ArmNNProfilingServiceInitialiser.hpp>
-#include <ProfilingOptionsConverter.hpp>
-#include <Processes.hpp>
-#include <Runtime.hpp>
 #include <armnn/TypesUtils.hpp>
 
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
 #include <common/include/LabelsAndEventClasses.hpp>
+#include <common/include/Processes.hpp>
+
 #include <test/ProfilingTestUtils.hpp>
 
 #include <HeapProfiling.hpp>
@@ -733,7 +736,7 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                offset);
 
     // Process ID Label
-    int processID = armnnUtils::Processes::GetCurrentId();
+    int processID = arm::pipe::GetCurrentId();
     std::stringstream ss;
     ss << processID;
     std::string processIdLabel = ss.str();

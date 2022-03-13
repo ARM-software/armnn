@@ -9,10 +9,9 @@
 #include <common/include/Conversion.hpp>
 #include <common/include/Constants.hpp>
 #include <common/include/EncodeVersion.hpp>
+#include <common/include/Processes.hpp>
 #include <common/include/ProfilingException.hpp>
 #include <common/include/SwTrace.hpp>
-
-#include <Processes.hpp>
 
 #include <fmt/format.h>
 
@@ -110,7 +109,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         offset += sizeUint32;
         WriteUint32(writeBuffer, offset, MAX_METADATA_PACKET_LENGTH); // max_data_length
         offset += sizeUint32;
-        int pid = armnnUtils::Processes::GetCurrentId();
+        int pid = arm::pipe::GetCurrentId();
         WriteUint32(writeBuffer, offset, arm::pipe::numeric_cast<uint32_t>(pid)); // pid
         offset += sizeUint32;
         uint32_t poolOffset = bodySize;

@@ -6,21 +6,25 @@
 #include "LoadedNetwork.hpp"
 #include "Layer.hpp"
 #include "Graph.hpp"
-#include <Processes.hpp>
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
 #include "WorkingMemHandle.hpp"
 
+#include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
-#include <armnn/utility/Assert.hpp>
 
 #include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 #include <armnn/backends/MemCopyWorkload.hpp>
-#include <backendsCommon/MemSyncWorkload.hpp>
-#include <armnn/BackendHelper.hpp>
+
 #include <armnn/profiling/ArmNNProfiling.hpp>
+
+#include <armnn/utility/Assert.hpp>
+
+#include <backendsCommon/MemSyncWorkload.hpp>
+
+#include <common/include/Processes.hpp>
 
 #include <fmt/format.h>
 
@@ -262,7 +266,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
         // Mark the network with a start of life event
         timelineUtils->RecordEvent(networkGuid, LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
         // and with the process ID
-        int processID = armnnUtils::Processes::GetCurrentId();
+        int processID = arm::pipe::GetCurrentId();
         std::stringstream ss;
         ss << processID;
         timelineUtils->MarkEntityWithLabel(networkGuid, ss.str(), LabelsAndEventClasses::PROCESS_ID_GUID);

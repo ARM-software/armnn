@@ -8,7 +8,7 @@
 #include <BufferManager.hpp>
 #include <SendCounterPacket.hpp>
 #include <SocketProfilingConnection.hpp>
-#include <Processes.hpp>
+#include <common/include/Processes.hpp>
 
 #include <doctest/doctest.h>
 
@@ -57,7 +57,7 @@ TEST_CASE("BasePipeServerTest")
     bufferManager.MarkRead(packetBuffer);
 
     CHECK(basePipeServer.get()->WaitForStreamMetaData());
-    CHECK(basePipeServer.get()->GetStreamMetadataPid() == armnnUtils::Processes::GetCurrentId());
+    CHECK(basePipeServer.get()->GetStreamMetadataPid() == arm::pipe::GetCurrentId());
     CHECK(basePipeServer.get()->GetStreamMetadataMaxDataLen() == MAX_METADATA_PACKET_LENGTH);
 
     // Now try a simple PeriodicCounterSelectionPacket

@@ -7,10 +7,7 @@
 #include "ProfilingUtils.hpp"
 
 #include <common/include/NumericCast.hpp>
-
 #include <common/include/ProfilingException.hpp>
-
-#include <Processes.hpp>
 
 #include <cstring>
 

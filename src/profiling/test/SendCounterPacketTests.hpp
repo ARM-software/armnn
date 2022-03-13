@@ -11,7 +11,6 @@
 #include <IProfilingConnectionFactory.hpp>
 
 #include <armnn/Optional.hpp>
-#include <armnn/Conversion.hpp>
 
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>

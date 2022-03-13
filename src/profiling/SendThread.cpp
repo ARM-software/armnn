@@ -6,7 +6,6 @@
 #include "SendThread.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <armnn/Conversion.hpp>
 #include <common/include/NumericCast.hpp>
 
 #include <common/include/ProfilingException.hpp>

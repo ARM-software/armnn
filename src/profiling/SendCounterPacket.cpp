@@ -6,15 +6,13 @@
 #include "SendCounterPacket.hpp"
 
 #include <common/include/Assert.hpp>
+#include <common/include/Conversion.hpp>
 #include <common/include/Constants.hpp>
 #include <common/include/EncodeVersion.hpp>
 #include <common/include/ProfilingException.hpp>
 #include <common/include/SwTrace.hpp>
 
-#include <armnn/Conversion.hpp>
 #include <Processes.hpp>
-
-#include <armnn/utility/NumericCast.hpp>
 
 #include <fmt/format.h>
 
@@ -275,7 +273,7 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
     // Allocate the necessary space for the category record
     categoryRecord.resize(categoryRecordSize);
 
-    ARMNN_NO_CONVERSION_WARN_BEGIN
+    ARM_PIPE_NO_CONVERSION_WARN_BEGIN
     // Create the category record
     categoryRecord[0] = categoryRecordWord1; // event_count + reserved
     categoryRecord[1] = categoryRecordWord2; // event_pointer_table_offset
@@ -290,7 +288,7 @@ bool SendCounterPacket::CreateCategoryRecord(const CategoryPtr& category,
         std::copy(eventRecord.begin(), eventRecord.end(), offset); // event_record
         offset += eventRecord.size();
     }
-    ARMNN_NO_CONVERSION_WARN_END
+    ARM_PIPE_NO_CONVERSION_WARN_END
 
     return true;
 }
@@ -523,7 +521,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
     // Allocate the space for the event record
     eventRecord.resize(eventRecordSize);
 
-    ARMNN_NO_CONVERSION_WARN_BEGIN
+    ARM_PIPE_NO_CONVERSION_WARN_BEGIN
     // Create the event record
     eventRecord[0] = eventRecordWord0; // max_counter_uid + counter_uid
     eventRecord[1] = eventRecordWord1; // device + counter_set
@@ -542,7 +540,7 @@ bool SendCounterPacket::CreateEventRecord(const CounterPtr& counter,
         offset += counterDescriptionBuffer.size();
         std::copy(counterUnitsBuffer.begin(), counterUnitsBuffer.end(), offset); // units
     }
-    ARMNN_NO_CONVERSION_WARN_END
+    ARM_PIPE_NO_CONVERSION_WARN_END
 
     return true;
 }
@@ -762,7 +760,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         bodyHeaderWord5  // categories_pointer_table_offset
     };
 
-    ARMNN_NO_CONVERSION_WARN_BEGIN
+    ARM_PIPE_NO_CONVERSION_WARN_BEGIN
     // Create the counter directory packet
     auto counterDirectoryPacketOffset = counterDirectoryPacket.begin();
     // packet_header
@@ -798,7 +796,7 @@ void SendCounterPacket::SendCounterDirectoryPacket(const ICounterDirectory& coun
         std::copy(categoryRecord.begin(), categoryRecord.end(), counterDirectoryPacketOffset); // category_record
         counterDirectoryPacketOffset += categoryRecord.size();
     }
-    ARMNN_NO_CONVERSION_WARN_END
+    ARM_PIPE_NO_CONVERSION_WARN_END
 
     // Calculate the total size in bytes of the counter directory packet
     uint32_t totalSize = arm::pipe::numeric_cast<uint32_t>(counterDirectoryPacketSize * uint32_t_size);

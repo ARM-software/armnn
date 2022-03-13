@@ -25,7 +25,6 @@
 #include <SendThread.hpp>
 #include <SendTimelinePacket.hpp>
 
-#include <armnn/Conversion.hpp>
 #include <armnn/Utils.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>

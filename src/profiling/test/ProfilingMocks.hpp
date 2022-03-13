@@ -14,7 +14,6 @@
 #include <SendThread.hpp>
 
 #include <armnn/Optional.hpp>
-#include <armnn/Conversion.hpp>
 
 #include <common/include/Assert.hpp>
 #include <common/include/IgnoreUnused.hpp>

@@ -13,10 +13,10 @@
 #include <SendCounterPacket.hpp>
 #include <Processes.hpp>
 
-#include <armnn/Conversion.hpp>
 #include <armnn/Utils.hpp>
 
 #include <common/include/Assert.hpp>
+#include <common/include/Conversion.hpp>
 #include <common/include/Constants.hpp>
 #include <common/include/EncodeVersion.hpp>
 #include <common/include/NumericCast.hpp>
@@ -605,7 +605,7 @@ TEST_CASE("CreateEventRecordTest")
     CHECK(eventRecordWord2[1] == counterInterpolation); // interpolation
     CHECK(std::memcmp(eventRecordWord34, &counterMultiplier, sizeof(counterMultiplier)) == 0); // multiplier
 
-    ARMNN_NO_CONVERSION_WARN_BEGIN
+    ARM_PIPE_NO_CONVERSION_WARN_BEGIN
     uint32_t eventRecordBlockSize = 8u * sizeof(uint32_t);
     uint32_t counterNameOffset = eventRecordBlockSize; // The name is the first item in pool
     uint32_t counterDescriptionOffset = counterNameOffset + // Counter name offset
@@ -620,7 +620,7 @@ TEST_CASE("CreateEventRecordTest")
                                 1u + // Null-terminator
                                 2u;  // Rounding to the next word
 
-    ARMNN_NO_CONVERSION_WARN_END
+    ARM_PIPE_NO_CONVERSION_WARN_END
 
     CHECK(eventRecord[5] == counterNameOffset); // name_offset
     CHECK(eventRecord[6] == counterDescriptionOffset); // description_offset
@@ -729,7 +729,7 @@ TEST_CASE("CreateEventRecordNoUnitsTest")
     CHECK(eventRecordWord2[1] == counterInterpolation); // interpolation
     CHECK(std::memcmp(eventRecordWord34, &counterMultiplier, sizeof(counterMultiplier)) == 0); // multiplier
 
-    ARMNN_NO_CONVERSION_WARN_BEGIN
+    ARM_PIPE_NO_CONVERSION_WARN_BEGIN
     uint32_t eventRecordBlockSize = 8u * sizeof(uint32_t);
     uint32_t counterNameOffset = eventRecordBlockSize; // The name is the first item in pool
     uint32_t counterDescriptionOffset = counterNameOffset + // Counter name offset
@@ -737,7 +737,7 @@ TEST_CASE("CreateEventRecordNoUnitsTest")
                                         counterName.size() + // 18u
                                         1u + // Null-terminator
                                         1u; // Rounding to the next word
-    ARMNN_NO_CONVERSION_WARN_END
+    ARM_PIPE_NO_CONVERSION_WARN_END
 
     CHECK(eventRecord[5] == counterNameOffset); // name_offset
     CHECK(eventRecord[6] == counterDescriptionOffset); // description_offset
@@ -964,12 +964,12 @@ TEST_CASE("CreateCategoryRecordTest")
 
     size_t uint32_t_size = sizeof(uint32_t);
 
-    ARMNN_NO_CONVERSION_WARN_BEGIN
+    ARM_PIPE_NO_CONVERSION_WARN_BEGIN
     uint32_t categoryRecordBlockSize = 3u * uint32_t_size;
     uint32_t eventPointerTableOffset = categoryRecordBlockSize; // The event pointer table is the first item in pool
     uint32_t categoryNameOffset = eventPointerTableOffset + // Event pointer table offset
                                   categoryEventCount * uint32_t_size; // The size of the event pointer table
-    ARMNN_NO_CONVERSION_WARN_END
+    ARM_PIPE_NO_CONVERSION_WARN_END
 
     CHECK(categoryRecord[1] == eventPointerTableOffset); // event_pointer_table_offset
     CHECK(categoryRecord[2] == categoryNameOffset); // name_offset

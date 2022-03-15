@@ -210,7 +210,7 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
 
         ConfigureTuner(*(m_Tuner.get()), tuningLevel);
 
-        if (!m_TuningFile.empty() && tuningLevel == TuningLevel::None)
+        if (!m_TuningFile.empty())
         {
             try
             {
@@ -219,7 +219,11 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
             }
             catch (const std::exception& e)
             {
-                ARMNN_LOG(warning) << "Could not load GpuAcc tuner data file.";
+                // Warn if not tuning, otherwise tuning will generate new params
+                if (tuningLevel == TuningLevel::None)
+                {
+                    ARMNN_LOG(warning) << "Could not load GpuAcc tuner data file.";
+                }
             }
         }
 

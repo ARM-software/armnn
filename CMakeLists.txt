@@ -422,23 +422,16 @@ list(APPEND armnn_sources
     src/profiling/CommandHandler.hpp
     src/profiling/ConnectionAcknowledgedCommandHandler.cpp
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
-    src/profiling/Counter.hpp
-    src/profiling/CounterDirectory.cpp
-    src/profiling/CounterDirectory.hpp
     src/profiling/CounterIdMap.cpp
     src/profiling/CounterIdMap.hpp
     src/profiling/DeactivateTimelineReportingCommandHandler.cpp
     src/profiling/DeactivateTimelineReportingCommandHandler.hpp
-    src/profiling/DirectoryCaptureCommandHandler.cpp
-    src/profiling/DirectoryCaptureCommandHandler.hpp
     src/profiling/FileOnlyProfilingConnection.cpp
     src/profiling/FileOnlyProfilingConnection.hpp
     src/profiling/Holder.cpp
     src/profiling/Holder.hpp
     src/profiling/IBufferManager.hpp
     src/profiling/IConsumer.hpp
-    src/profiling/ICounterDirectory.hpp
-    src/profiling/ICounterRegistry.hpp
     src/profiling/ICounterValues.hpp
     src/profiling/IInitialiseProfilingService.hpp
     src/profiling/INotifyBackends.hpp

@@ -8,7 +8,6 @@
 #include "CounterIdMap.hpp"
 #include "Holder.hpp"
 #include "ICounterValues.hpp"
-#include "ICounterRegistry.hpp"
 #include "IInitialiseProfilingService.hpp"
 #include "IProfilingServiceStatus.hpp"
 #include "ISendCounterPacket.hpp"
@@ -18,8 +17,10 @@
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 #include <armnn/profiling/ProfilingOptions.hpp>
 
+#include <common/include/ICounterRegistry.hpp>
 #include <common/include/Optional.hpp>
 #include <common/include/ProfilingGuidGenerator.hpp>
+
 
 namespace arm
 {

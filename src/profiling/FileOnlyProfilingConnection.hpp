@@ -8,12 +8,13 @@
 #include <armnn/profiling/ILocalPacketHandler.hpp>
 #include <armnn/profiling/ProfilingOptions.hpp>
 
-#include "DirectoryCaptureCommandHandler.hpp"
 #include "IProfilingConnection.hpp"
 #include "ProfilingUtils.hpp"
 
 #include <common/include/Assert.hpp>
 #include <common/include/Packet.hpp>
+
+#include <server/include/timelineDecoder/DirectoryCaptureCommandHandler.hpp>
 
 #include <atomic>
 #include <condition_variable>

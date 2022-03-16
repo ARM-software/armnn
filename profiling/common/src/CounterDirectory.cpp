@@ -3,8 +3,8 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "CounterDirectory.hpp"
-#include "ProfilingUtils.hpp"
+#include <common/include/CounterDirectory.hpp>
+#include <common/include/CommonProfilingUtils.hpp>
 
 #include <common/include/Assert.hpp>
 #include <common/include/SwTrace.hpp>

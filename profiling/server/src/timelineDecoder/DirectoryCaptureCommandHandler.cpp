@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "DirectoryCaptureCommandHandler.hpp"
+#include <common/include/CommonProfilingUtils.hpp>
 
-#include "ProfilingUtils.hpp"
+#include <server/include/timelineDecoder/DirectoryCaptureCommandHandler.hpp>
 
 #include <atomic>
 #include <iostream>

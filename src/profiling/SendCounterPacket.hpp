@@ -6,7 +6,6 @@
 #pragma once
 
 #include "IBufferManager.hpp"
-#include "ICounterDirectory.hpp"
 #include "ISendCounterPacket.hpp"
 #include "ProfilingUtils.hpp"
 

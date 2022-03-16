@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include "CounterDirectory.hpp"
-
 #include <common/include/CommandHandlerFunctor.hpp>
+#include <common/include/CounterDirectory.hpp>
 
 #include <atomic>
 

@@ -6,6 +6,7 @@
 if(BUILD_TIMELINE_DECODER)
     set(timelineDecoder_sources)
     list(APPEND timelineDecoder_sources
+        DirectoryCaptureCommandHandler.cpp
         TimelineCaptureCommandHandler.cpp
         TimelineDecoder.cpp
         TimelineDirectoryCaptureCommandHandler.cpp)

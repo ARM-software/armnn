@@ -9,7 +9,7 @@
 #include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnn/utility/Assert.hpp>
 
-#include <Counter.hpp>
+#include <common/include/Counter.hpp>
 
 namespace armnn
 {

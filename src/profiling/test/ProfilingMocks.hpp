@@ -17,6 +17,7 @@
 #include <armnn/profiling/ArmNNProfiling.hpp>
 
 #include <common/include/Assert.hpp>
+#include <common/include/CommonProfilingUtils.hpp>
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
 #include <common/include/Optional.hpp>

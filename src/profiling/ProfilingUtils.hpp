@@ -5,11 +5,11 @@
 
 #pragma once
 
+#include <common/include/ICounterDirectory.hpp>
 #include <common/include/ProfilingException.hpp>
 
 #include <armnn/profiling/ISendTimelinePacket.hpp>
 
-#include "ICounterDirectory.hpp"
 #include "IPacketBuffer.hpp"
 
 #include <common/include/Packet.hpp>
@@ -28,10 +28,6 @@ namespace pipe
 {
 
 constexpr unsigned int ThreadIdSize = sizeof(int); // Is platform dependent
-
-uint16_t GetNextUid(bool peekOnly = false);
-
-std::vector<uint16_t> GetNextCounterUids(uint16_t firstUid, uint16_t cores);
 
 void WriteBytes(const IPacketBuffer& packetBuffer, unsigned int offset, const void* value, unsigned int valueSize);
 
@@ -131,8 +127,6 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
                                               unsigned int& numberOfBytesWritten);
 
 std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth);
-
-void PrintCounterDirectory(ICounterDirectory& counterDirectory);
 
 uint64_t GetTimestamp();
 

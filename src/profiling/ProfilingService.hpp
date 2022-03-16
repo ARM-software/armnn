@@ -9,12 +9,10 @@
 #include "BufferManager.hpp"
 #include "CommandHandler.hpp"
 #include "ConnectionAcknowledgedCommandHandler.hpp"
-#include "CounterDirectory.hpp"
 #include "CounterIdMap.hpp"
 #include "DeactivateTimelineReportingCommandHandler.hpp"
-#include "ICounterRegistry.hpp"
 #include "ICounterValues.hpp"
-#include <armnn/profiling/ILocalPacketHandler.hpp>
+#include "INotifyBackends.hpp"
 #include "IProfilingService.hpp"
 #include "IReportStructure.hpp"
 #include "PeriodicCounterCapture.hpp"
@@ -27,9 +25,12 @@
 #include "SendThread.hpp"
 #include "SendTimelinePacket.hpp"
 #include "TimelinePacketWriterFactory.hpp"
-#include "INotifyBackends.hpp"
+
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
+#include <armnn/profiling/ILocalPacketHandler.hpp>
+
+#include <common/include/CounterDirectory.hpp>
 
 #include <list>
 

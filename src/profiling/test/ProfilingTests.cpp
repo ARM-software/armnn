@@ -9,7 +9,6 @@
 #include <ArmNNProfilingServiceInitialiser.hpp>
 #include <CommandHandler.hpp>
 #include <ConnectionAcknowledgedCommandHandler.hpp>
-#include <CounterDirectory.hpp>
 #include <CounterIdMap.hpp>
 #include <Holder.hpp>
 #include <ICounterValues.hpp>
@@ -34,6 +33,7 @@
 
 #include <common/include/CommandHandlerKey.hpp>
 #include <common/include/CommandHandlerRegistry.hpp>
+#include <common/include/CounterDirectory.hpp>
 #include <common/include/EncodeVersion.hpp>
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>

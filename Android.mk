@@ -110,6 +110,7 @@ LOCAL_SRC_FILES := \
         profiling/common/src/CommandHandlerKey.cpp \
         profiling/common/src/CommandHandlerRegistry.cpp \
         profiling/common/src/CommonProfilingUtils.cpp \
+        profiling/common/src/CounterDirectory.cpp \
         profiling/common/src/LabelsAndEventClasses.cpp \
         profiling/common/src/Logging.cpp \
         profiling/common/src/NetworkSockets.cpp \
@@ -117,6 +118,7 @@ LOCAL_SRC_FILES := \
         profiling/common/src/Processes.cpp \
         profiling/common/src/SwTrace.cpp \
         profiling/common/src/Threads.cpp \
+        profiling/server/src/timelineDecoder/DirectoryCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineDecoder.cpp \
         profiling/server/src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp \
@@ -239,10 +241,8 @@ LOCAL_SRC_FILES := \
         src/profiling/BufferManager.cpp \
         src/profiling/CommandHandler.cpp \
         src/profiling/ConnectionAcknowledgedCommandHandler.cpp \
-        src/profiling/CounterDirectory.cpp \
         src/profiling/CounterIdMap.cpp \
         src/profiling/DeactivateTimelineReportingCommandHandler.cpp \
-        src/profiling/DirectoryCaptureCommandHandler.cpp \
         src/profiling/FileOnlyProfilingConnection.cpp \
         src/profiling/Holder.cpp \
         src/profiling/IProfilingService.cpp \

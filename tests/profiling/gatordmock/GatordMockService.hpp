@@ -16,12 +16,10 @@
 
 #include <server/include/basePipeServer/BasePipeServer.hpp>
 
+#include <server/include/timelineDecoder/DirectoryCaptureCommandHandler.hpp>
 #include <server/include/timelineDecoder/TimelineDecoder.hpp>
 #include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
 #include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
-
-// src/profiling
-#include <DirectoryCaptureCommandHandler.hpp>
 
 #include <atomic>
 #include <string>

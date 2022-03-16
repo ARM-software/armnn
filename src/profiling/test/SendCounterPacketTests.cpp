@@ -8,7 +8,6 @@
 #include "SendCounterPacketTests.hpp"
 
 #include <BufferManager.hpp>
-#include <CounterDirectory.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
 
@@ -17,6 +16,7 @@
 #include <common/include/Assert.hpp>
 #include <common/include/Conversion.hpp>
 #include <common/include/Constants.hpp>
+#include <common/include/CounterDirectory.hpp>
 #include <common/include/EncodeVersion.hpp>
 #include <common/include/NumericCast.hpp>
 #include <common/include/Processes.hpp>

@@ -5,11 +5,11 @@
 
 #include "RequestCountersPacketHandler.hpp"
 
-#include "DirectoryCaptureCommandHandler.hpp"
-
 #include <common/include/NumericCast.hpp>
 #include <common/include/PacketVersionResolver.hpp>
 #include <common/include/ProfilingException.hpp>
+
+#include <server/include/timelineDecoder/DirectoryCaptureCommandHandler.hpp>
 
 namespace arm
 {

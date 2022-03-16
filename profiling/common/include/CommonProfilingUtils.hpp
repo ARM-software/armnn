@@ -4,6 +4,8 @@
 //
 #pragma once
 
+#include "ICounterDirectory.hpp"
+
 #include <cstdint>
 #include <string>
 
@@ -33,6 +35,12 @@ void WriteUint16(unsigned char* buffer, unsigned int offset, uint16_t value);
 void WriteUint8(unsigned char* buffer, unsigned int offset, uint8_t value);
 
 std::string CentreAlignFormatting(const std::string& stringToPass, const int spacingWidth);
+
+void PrintCounterDirectory(ICounterDirectory& counterDirectory);
+
+uint16_t GetNextUid(bool peekOnly = false);
+
+    std::vector<uint16_t> GetNextCounterUids(uint16_t firstUid, uint16_t cores);
 
 } // namespace pipe
 } // namespace arm

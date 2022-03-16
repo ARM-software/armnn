@@ -6,7 +6,7 @@
 #pragma once
 
 #include <armnn/backends/profiling/IBackendProfiling.hpp>
-#include "ICounterDirectory.hpp"
+#include <common/include/ICounterDirectory.hpp>
 
 namespace arm
 {
@@ -38,4 +38,3 @@ public:
 } // namespace pipe
 
 } // namespace arm
-

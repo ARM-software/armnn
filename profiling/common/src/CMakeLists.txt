@@ -10,6 +10,7 @@ if(BUILD_TIMELINE_DECODER)
         CommandHandlerKey.cpp
         CommandHandlerRegistry.cpp
         CommonProfilingUtils.cpp
+        CounterDirectory.cpp
         LabelsAndEventClasses.cpp
         Logging.cpp
         NetworkSockets.cpp

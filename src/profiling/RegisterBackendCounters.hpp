@@ -5,10 +5,12 @@
 
 #pragma once
 
-#include "armnn/backends/profiling/IBackendProfiling.hpp"
 #include "CounterIdMap.hpp"
-#include "CounterDirectory.hpp"
 #include "IProfilingService.hpp"
+
+#include "armnn/backends/profiling/IBackendProfiling.hpp"
+
+#include <common/include/CounterDirectory.hpp>
 
 namespace arm
 {

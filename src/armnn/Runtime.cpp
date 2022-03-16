@@ -6,23 +6,29 @@
 #include "ArmNNProfilingServiceInitialiser.hpp"
 #include "Runtime.hpp"
 
+#include <ProfilingOptionsConverter.hpp>
+
 #include <armnn/Version.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/BackendHelper.hpp>
 #include <armnn/Logging.hpp>
-#include <armnn/utility/Timer.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
+
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
+#include <armnn/utility/PolymorphicDowncast.hpp>
+#include <armnn/utility/Timer.hpp>
+
+#include <backends/BackendProfiling.hpp>
+
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include <backendsCommon/memoryOptimizerStrategyLibrary/MemoryOptimizerStrategyLibrary.hpp>
-#include <armnn/utility/PolymorphicDowncast.hpp>
-#include <ProfilingOptionsConverter.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 
 #include <iostream>
 
-#include <backends/BackendProfiling.hpp>
 
 using namespace armnn;
 using namespace std;
@@ -311,7 +317,12 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
     : m_NetworkIdCounter(0)
 {
     m_ProfilingService = arm::pipe::IProfilingService::CreateProfilingService(
-        arm::pipe::MAX_ARMNN_COUNTER, *this, *this);
+        arm::pipe::MAX_ARMNN_COUNTER,
+        *this,
+        arm::pipe::ARMNN_SOFTWARE_INFO,
+        arm::pipe::ARMNN_SOFTWARE_VERSION,
+        arm::pipe::ARMNN_HARDWARE_VERSION,
+        *this);
     const auto start_time = armnn::GetTimeNow();
     ARMNN_LOG(info) << "ArmNN v" << ARMNN_VERSION;
     if ( options.m_ProfilingOptions.m_TimelineEnabled && !options.m_ProfilingOptions.m_EnableProfiling )

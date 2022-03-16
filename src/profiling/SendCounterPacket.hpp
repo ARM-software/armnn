@@ -27,8 +27,14 @@ public:
     using EventRecord           = std::vector<uint32_t>;
     using IndexValuePairsVector = std::vector<CounterValue>;
 
-    SendCounterPacket(IBufferManager& buffer)
-        : m_BufferManager(buffer)
+    SendCounterPacket(IBufferManager& buffer,
+                      const std::string& softwareInfo,
+                      const std::string& softwareVersion,
+                      const std::string& hardwareVersion)
+        : m_BufferManager(buffer),
+          m_SoftwareInfo(softwareInfo),
+          m_SoftwareVersion(softwareVersion),
+          m_HardwareVersion(hardwareVersion)
     {}
 
     void SendStreamMetaDataPacket() override;
@@ -83,6 +89,10 @@ protected:
     bool CreateEventRecord(const CounterPtr& counter,
                            EventRecord& eventRecord,
                            std::string& errorMessage);
+private:
+    std::string m_SoftwareInfo;
+    std::string m_SoftwareVersion;
+    std::string m_HardwareVersion;
 };
 
 } // namespace pipe

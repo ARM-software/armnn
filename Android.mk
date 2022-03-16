@@ -110,12 +110,13 @@ LOCAL_SRC_FILES := \
         profiling/common/src/CommandHandlerKey.cpp \
         profiling/common/src/CommandHandlerRegistry.cpp \
         profiling/common/src/CommonProfilingUtils.cpp \
+        profiling/common/src/LabelsAndEventClasses.cpp \
         profiling/common/src/Logging.cpp \
         profiling/common/src/NetworkSockets.cpp \
         profiling/common/src/PacketVersionResolver.cpp \
         profiling/common/src/Processes.cpp \
         profiling/common/src/SwTrace.cpp \
-        profiling/common/src/LabelsAndEventClasses.cpp \
+        profiling/common/src/Threads.cpp \
         profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineDecoder.cpp \
         profiling/server/src/timelineDecoder/TimelineDirectoryCaptureCommandHandler.cpp \
@@ -160,7 +161,6 @@ LOCAL_SRC_FILES := \
         src/armnnUtils/VerificationHelpers.cpp \
         src/armnnUtils/Filesystem.cpp \
         src/armnnUtils/ProfilingOptionsConverter.cpp \
-        src/armnnUtils/Threads.cpp \
         src/armnnUtils/Transpose.cpp \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \

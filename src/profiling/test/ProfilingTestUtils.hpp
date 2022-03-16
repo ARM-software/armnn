@@ -11,6 +11,8 @@
 #include <BufferManager.hpp>
 #include <ProfilingService.hpp>
 
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
 #include <common/include/Optional.hpp>
 #include <common/include/ProfilingGuid.hpp>
 
@@ -74,7 +76,12 @@ public:
     ProfilingServiceRuntimeHelper(uint16_t maxGlobalCounterId,
                                   IInitialiseProfilingService& initialiser,
                                   arm::pipe::IProfilingService& profilingService)
-        : ProfilingService(maxGlobalCounterId, initialiser), m_ProfilingService(profilingService) {}
+        : ProfilingService(maxGlobalCounterId,
+                           initialiser,
+                           arm::pipe::ARMNN_SOFTWARE_INFO,
+                           arm::pipe::ARMNN_SOFTWARE_VERSION,
+                           arm::pipe::ARMNN_HARDWARE_VERSION),
+          m_ProfilingService(profilingService) {}
     ~ProfilingServiceRuntimeHelper() = default;
 
     BufferManager& GetProfilingBufferManager()

@@ -13,6 +13,9 @@
 #include <SendCounterPacket.hpp>
 #include <SendThread.hpp>
 
+#include <armnn/BackendId.hpp>
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
 #include <common/include/Assert.hpp>
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
@@ -631,8 +634,15 @@ public:
                          MockBufferManager& mockBufferManager,
                          bool isProfilingEnabled,
                          const CaptureData& captureData) :
-        ProfilingService(maxGlobalCounterId, initialiser),
-        m_SendCounterPacket(mockBufferManager),
+        ProfilingService(maxGlobalCounterId,
+                         initialiser,
+                         arm::pipe::ARMNN_SOFTWARE_INFO,
+                         arm::pipe::ARMNN_SOFTWARE_VERSION,
+                         arm::pipe::ARMNN_HARDWARE_VERSION),
+        m_SendCounterPacket(mockBufferManager,
+                            arm::pipe::ARMNN_SOFTWARE_INFO,
+                            arm::pipe::ARMNN_SOFTWARE_VERSION,
+                            arm::pipe::ARMNN_HARDWARE_VERSION),
         m_IsProfilingEnabled(isProfilingEnabled),
         m_CaptureData(captureData)
     {}

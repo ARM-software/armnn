@@ -10,6 +10,8 @@
 #include <Runtime.hpp>
 #include <armnnTestUtils/MockBackend.hpp>
 
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <common/include/CommandHandlerRegistry.hpp>
 
@@ -255,7 +257,11 @@ TEST_CASE("GatorDMockEndToEnd")
     options.m_TimelineEnabled = true;
 
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    arm::pipe::ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    arm::pipe::ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                                 initialiser,
+                                                 arm::pipe::ARMNN_SOFTWARE_INFO,
+                                                 arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                                 arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Bring the profiling service to the "WaitingForAck" state

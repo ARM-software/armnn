@@ -153,16 +153,23 @@ TEST_CASE("SendPeriodicCounterSelectionPacketTest")
 {
     // Error no space left in buffer
     MockBufferManager mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockBuffer1);
+    SendCounterPacket sendPacket1(mockBuffer1,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
 
     uint32_t capturePeriod = 1000;
     std::vector<uint16_t> selectedCounterIds;
-    CHECK_THROWS_AS(sendPacket1.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds),
-                      BufferExhaustion);
+    CHECK_THROWS_AS(sendPacket1.SendPeriodicCounterSelectionPacket(
+                        capturePeriod, selectedCounterIds),
+                        BufferExhaustion);
 
     // Packet without any counters
     MockBufferManager mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockBuffer2);
+    SendCounterPacket sendPacket2(mockBuffer2,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
 
     sendPacket2.SendPeriodicCounterSelectionPacket(capturePeriod, selectedCounterIds);
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
@@ -178,7 +185,10 @@ TEST_CASE("SendPeriodicCounterSelectionPacketTest")
 
     // Full packet message
     MockBufferManager mockBuffer3(512);
-    SendCounterPacket sendPacket3(mockBuffer3);
+    SendCounterPacket sendPacket3(mockBuffer3,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
 
     selectedCounterIds.reserve(5);
     selectedCounterIds.emplace_back(100);
@@ -216,7 +226,10 @@ TEST_CASE("SendPeriodicCounterCapturePacketTest")
 
     // Error no space left in buffer
     MockBufferManager mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockBuffer1);
+    SendCounterPacket sendPacket1(mockBuffer1,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
 
     auto captureTimestamp = std::chrono::steady_clock::now();
     uint64_t time =  static_cast<uint64_t >(captureTimestamp.time_since_epoch().count());
@@ -227,7 +240,10 @@ TEST_CASE("SendPeriodicCounterCapturePacketTest")
 
     // Packet without any counters
     MockBufferManager mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockBuffer2);
+    SendCounterPacket sendPacket2(mockBuffer2,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
 
     sendPacket2.SendPeriodicCounterCapturePacket(time, indexValuePairs);
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
@@ -244,7 +260,10 @@ TEST_CASE("SendPeriodicCounterCapturePacketTest")
 
     // Full packet message
     MockBufferManager mockBuffer3(512);
-    SendCounterPacket sendPacket3(mockBuffer3);
+    SendCounterPacket sendPacket3(mockBuffer3,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
 
     indexValuePairs.reserve(5);
     indexValuePairs.emplace_back(CounterValue{0, 100});
@@ -293,16 +312,19 @@ TEST_CASE("SendStreamMetaDataPacketTest")
 
     // Error no space left in buffer
     MockBufferManager mockBuffer1(10);
-    SendCounterPacket sendPacket1(mockBuffer1);
+    SendCounterPacket sendPacket1(mockBuffer1,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_THROWS_AS(sendPacket1.SendStreamMetaDataPacket(), BufferExhaustion);
 
     // Full metadata packet
 
     std::string processName = GetProcessName().substr(0, 60);
 
-    uint32_t infoSize =            arm::pipe::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
-    uint32_t hardwareVersionSize = arm::pipe::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
-    uint32_t softwareVersionSize = arm::pipe::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
+    uint32_t infoSize =            arm::pipe::numeric_cast<uint32_t>(arm::pipe::ARMNN_SOFTWARE_INFO.size()) + 1;
+    uint32_t hardwareVersionSize = arm::pipe::numeric_cast<uint32_t>(arm::pipe::ARMNN_HARDWARE_VERSION.size()) + 1;
+    uint32_t softwareVersionSize = arm::pipe::numeric_cast<uint32_t>(arm::pipe::ARMNN_SOFTWARE_VERSION.size()) + 1;
     uint32_t processNameSize =     arm::pipe::numeric_cast<uint32_t>(processName.size()) + 1;
 
     // Supported Packets
@@ -340,7 +362,10 @@ TEST_CASE("SendStreamMetaDataPacketTest")
     uint32_t packetEntries = static_cast<uint32_t>(packetVersions.size());
 
     MockBufferManager mockBuffer2(512);
-    SendCounterPacket sendPacket2(mockBuffer2);
+    SendCounterPacket sendPacket2(mockBuffer2,
+                                  arm::pipe::ARMNN_SOFTWARE_INFO,
+                                  arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                  arm::pipe::ARMNN_HARDWARE_VERSION);
     sendPacket2.SendStreamMetaDataPacket();
     auto readBuffer2 = mockBuffer2.GetReadableBuffer();
 
@@ -365,7 +390,7 @@ TEST_CASE("SendStreamMetaDataPacketTest")
     offset += sizeUint32;
     CHECK(ReadUint32(readBuffer2, offset) == MAX_METADATA_PACKET_LENGTH); // max_data_len
     offset += sizeUint32;
-    int pid = arm::pipe::GetCurrentId();
+    int pid = arm::pipe::GetCurrentProcessId();
     CHECK(ReadUint32(readBuffer2, offset) == arm::pipe::numeric_cast<uint32_t>(pid));
     offset += sizeUint32;
     uint32_t poolOffset = 10 * sizeUint32;
@@ -390,19 +415,22 @@ TEST_CASE("SendStreamMetaDataPacketTest")
     offset += sizeUint32;
     if (infoSize)
     {
-        CHECK(strcmp(reinterpret_cast<const char *>(&readData2[offset]), GetSoftwareInfo().c_str()) == 0);
+        CHECK(strcmp(reinterpret_cast<const char *>(&readData2[offset]),
+                                                    arm::pipe::ARMNN_SOFTWARE_INFO.c_str()) == 0);
         offset += infoSize;
     }
 
     if (hardwareVersionSize)
     {
-        CHECK(strcmp(reinterpret_cast<const char *>(&readData2[offset]), GetHardwareVersion().c_str()) == 0);
+        CHECK(strcmp(reinterpret_cast<const char *>(&readData2[offset]),
+                                                    arm::pipe::ARMNN_HARDWARE_VERSION.c_str()) == 0);
         offset += hardwareVersionSize;
     }
 
     if (softwareVersionSize)
     {
-        CHECK(strcmp(reinterpret_cast<const char *>(&readData2[offset]), GetSoftwareVersion().c_str()) == 0);
+        CHECK(strcmp(reinterpret_cast<const char *>(&readData2[offset]),
+                                                    arm::pipe::ARMNN_SOFTWARE_VERSION.c_str()) == 0);
         offset += softwareVersionSize;
     }
 
@@ -1178,7 +1206,10 @@ TEST_CASE("SendCounterDirectoryPacketTest1")
 
     // Buffer with not enough space
     MockBufferManager mockBuffer(10);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory),
                       BufferExhaustion);
 }
@@ -1276,7 +1307,10 @@ TEST_CASE("SendCounterDirectoryPacketTest2")
 
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_NOTHROW(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory));
 
     // Get the readable buffer
@@ -1672,7 +1706,10 @@ TEST_CASE("SendCounterDirectoryPacketTest3")
 
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
@@ -1690,7 +1727,10 @@ TEST_CASE("SendCounterDirectoryPacketTest4")
 
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
@@ -1708,7 +1748,10 @@ TEST_CASE("SendCounterDirectoryPacketTest5")
 
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
@@ -1740,7 +1783,10 @@ TEST_CASE("SendCounterDirectoryPacketTest6")
 
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
@@ -1789,7 +1835,10 @@ TEST_CASE("SendCounterDirectoryPacketTest7")
 
     // Buffer with enough space
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK_THROWS_AS(sendCounterPacket.SendCounterDirectoryPacket(counterDirectory), arm::pipe::ProfilingException);
 }
 
@@ -1800,7 +1849,10 @@ TEST_CASE("SendThreadTest0")
 
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(0);
-    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockStreamCounterBuffer, sendCounterPacket);
 
     // Try to start the send thread many times, it must only start once
@@ -1826,7 +1878,10 @@ TEST_CASE("SendThreadTest1")
 
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockStreamCounterBuffer, sendCounterPacket);
     sendThread.Start(mockProfilingConnection);
 
@@ -1934,7 +1989,10 @@ TEST_CASE("SendThreadTest2")
 
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockStreamCounterBuffer, sendCounterPacket);
     sendThread.Start(mockProfilingConnection);
 
@@ -2052,7 +2110,10 @@ TEST_CASE("SendThreadTest3")
 
     MockProfilingConnection mockProfilingConnection;
     MockStreamCounterBuffer mockStreamCounterBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer);
+    SendCounterPacket sendCounterPacket(mockStreamCounterBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockStreamCounterBuffer, sendCounterPacket);
     sendThread.Start(mockProfilingConnection);
 
@@ -2153,7 +2214,10 @@ TEST_CASE("SendCounterPacketTestWithSendThread")
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(1, 1024);
-    SendCounterPacket sendCounterPacket(bufferManager);
+    SendCounterPacket sendCounterPacket(bufferManager,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, bufferManager, sendCounterPacket, -1);
     sendThread.Start(mockProfilingConnection);
 
@@ -2200,7 +2264,10 @@ TEST_CASE("SendThreadBufferTest")
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);
-    SendCounterPacket sendCounterPacket(bufferManager);
+    SendCounterPacket sendCounterPacket(bufferManager,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, bufferManager, sendCounterPacket, -1);
     sendThread.Start(mockProfilingConnection);
 
@@ -2258,7 +2325,10 @@ TEST_CASE("SendThreadSendStreamMetadataPacket1")
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);
-    SendCounterPacket sendCounterPacket(bufferManager);
+    SendCounterPacket sendCounterPacket(bufferManager,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, bufferManager, sendCounterPacket);
     sendThread.Start(mockProfilingConnection);
 
@@ -2273,7 +2343,10 @@ TEST_CASE("SendThreadSendStreamMetadataPacket2")
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);
-    SendCounterPacket sendCounterPacket(bufferManager);
+    SendCounterPacket sendCounterPacket(bufferManager,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, bufferManager, sendCounterPacket);
     sendThread.Start(mockProfilingConnection);
 
@@ -2290,7 +2363,10 @@ TEST_CASE("SendThreadSendStreamMetadataPacket3")
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);
-    SendCounterPacket sendCounterPacket(bufferManager);
+    SendCounterPacket sendCounterPacket(bufferManager,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, bufferManager, sendCounterPacket);
     sendThread.Start(mockProfilingConnection);
 
@@ -2315,7 +2391,10 @@ TEST_CASE("SendThreadSendStreamMetadataPacket4")
 
     MockProfilingConnection mockProfilingConnection;
     BufferManager bufferManager(3, 1024);
-    SendCounterPacket sendCounterPacket(bufferManager);
+    SendCounterPacket sendCounterPacket(bufferManager,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, bufferManager, sendCounterPacket);
     sendThread.Start(mockProfilingConnection);
 

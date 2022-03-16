@@ -5,9 +5,7 @@
 #include "TimelineUtilityMethods.hpp"
 
 #include <common/include/LabelsAndEventClasses.hpp>
-
-
-#include <armnnUtils/Threads.hpp>
+#include <common/include/Threads.hpp>
 
 namespace arm
 {
@@ -375,7 +373,7 @@ ProfilingDynamicGuid TimelineUtilityMethods::RecordEvent(ProfilingGuid entityGui
     uint64_t timestamp = GetTimestamp();
 
     // Get the thread id
-    int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    int threadId = arm::pipe::GetCurrentThreadId();
 
     // Generate a GUID for the event
     ProfilingDynamicGuid eventGuid = IProfilingService::GetNextGuid();

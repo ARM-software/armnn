@@ -15,6 +15,8 @@
 #include "ProfilingUtils.hpp"
 #include "RequestCounterDirectoryCommandHandler.hpp"
 
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
 #include <TestUtils.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
@@ -199,7 +201,11 @@ TEST_CASE("TestBackendCounters")
 
     armnn::ArmNNProfilingServiceInitialiser initialiser;
     std::unique_ptr<IProfilingService> profilingService = arm::pipe::IProfilingService::CreateProfilingService(
-        arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+        arm::pipe::MAX_ARMNN_COUNTER,
+        initialiser,
+        arm::pipe::ARMNN_SOFTWARE_INFO,
+        arm::pipe::ARMNN_SOFTWARE_VERSION,
+        arm::pipe::ARMNN_HARDWARE_VERSION);
 
     std::unique_ptr<IBackendProfiling> cpuBackendProfilingPtr =
         std::make_unique<BackendProfiling>(options, *profilingService.get(), cpuAccId);
@@ -449,7 +455,11 @@ TEST_CASE("TestBackendCounterLogging")
 
     armnn::ArmNNProfilingServiceInitialiser initialiser;
     std::unique_ptr<IProfilingService> profilingService = arm::pipe::IProfilingService::CreateProfilingService(
-        arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+        arm::pipe::MAX_ARMNN_COUNTER,
+        initialiser,
+        arm::pipe::ARMNN_SOFTWARE_INFO,
+        arm::pipe::ARMNN_SOFTWARE_VERSION,
+        arm::pipe::ARMNN_HARDWARE_VERSION);
 
     std::unique_ptr<IBackendProfiling> cpuBackendProfilingPtr =
         std::make_unique<BackendProfiling>(options, *profilingService.get(), cpuAccId);
@@ -506,7 +516,11 @@ TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
 
     armnn::ArmNNProfilingServiceInitialiser psInitialiser;
     std::unique_ptr<IProfilingService> profilingService = arm::pipe::IProfilingService::CreateProfilingService(
-        arm::pipe::MAX_ARMNN_COUNTER, psInitialiser);
+        arm::pipe::MAX_ARMNN_COUNTER,
+        psInitialiser,
+        arm::pipe::ARMNN_SOFTWARE_INFO,
+        arm::pipe::ARMNN_SOFTWARE_VERSION,
+        arm::pipe::ARMNN_HARDWARE_VERSION);
 
     profilingService->ConfigureProfilingService(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);

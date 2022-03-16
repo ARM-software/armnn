@@ -35,6 +35,9 @@ public:
     static std::unique_ptr<IProfilingService> CreateProfilingService(
         uint16_t maxGlobalCounterId,
         IInitialiseProfilingService& initialiser,
+        const std::string& softwareInfo,
+        const std::string& softwareVersion,
+        const std::string& hardwareVersion,
         arm::pipe::Optional<IReportStructure&> reportStructure = arm::pipe::EmptyOptional());
     virtual ~IProfilingService() {};
     virtual std::unique_ptr<ISendTimelinePacket> GetSendTimelinePacket() const = 0;

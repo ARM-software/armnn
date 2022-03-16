@@ -266,7 +266,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
         // Mark the network with a start of life event
         timelineUtils->RecordEvent(networkGuid, LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS);
         // and with the process ID
-        int processID = arm::pipe::GetCurrentId();
+        int processID = arm::pipe::GetCurrentProcessId();
         std::stringstream ss;
         ss << processID;
         timelineUtils->MarkEntityWithLabel(networkGuid, ss.str(), LabelsAndEventClasses::PROCESS_ID_GUID);

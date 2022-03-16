@@ -84,12 +84,6 @@ std::pair<uint32_t, uint32_t> CreateTimelinePacketHeader(uint32_t packetFamily,
                                                          uint32_t sequenceNumbered,
                                                          uint32_t dataLength);
 
-std::string GetSoftwareInfo();
-
-std::string GetSoftwareVersion();
-
-std::string GetHardwareVersion();
-
 std::string GetProcessName();
 
 enum class TimelinePacketStatus

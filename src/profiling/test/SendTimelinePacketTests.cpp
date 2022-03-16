@@ -13,11 +13,11 @@
 #include <ProfilingUtils.hpp>
 #include <SendTimelinePacket.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
-#include <armnnUtils/Threads.hpp>
 #include <TimelinePacketWriterFactory.hpp>
 
-#include <common/include/SwTrace.hpp>
 #include <common/include/LabelsAndEventClasses.hpp>
+#include <common/include/SwTrace.hpp>
+#include <common/include/Threads.hpp>
 
 #include <doctest/doctest.h>
 
@@ -339,7 +339,7 @@ TEST_CASE("SendEventClassAfterTimelineEntityPacketTest")
 
     // Send TimelineEventBinaryPacket
     const uint64_t timestamp = 456789u;
-    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    const int threadId = arm::pipe::GetCurrentThreadId();
     const uint64_t eventProfilingGuid = 123456u;
     sendTimelinePacket->SendTimelineEventBinaryPacket(timestamp, threadId, eventProfilingGuid);
 
@@ -435,7 +435,12 @@ TEST_CASE("GetGuidsFromProfilingService")
     options.m_ProfilingOptions.m_EnableProfiling = true;
     armnn::RuntimeImpl runtime(options);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser, runtime);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION,
+                                      runtime);
 
     profilingService.ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
@@ -459,7 +464,11 @@ TEST_CASE("GetTimelinePackerWriterFromProfilingService")
     ProfilingOptions options;
     options.m_EnableProfiling = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     std::unique_ptr<ISendTimelinePacket> writer = profilingService.GetSendTimelinePacket();

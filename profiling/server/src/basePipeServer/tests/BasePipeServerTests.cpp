@@ -41,7 +41,7 @@ TEST_CASE("BasePipeServerTest")
     CHECK(basePipeServer.get());
 
     arm::pipe::BufferManager bufferManager;
-    arm::pipe::SendCounterPacket sendCounterPacket(bufferManager);
+    arm::pipe::SendCounterPacket sendCounterPacket(bufferManager, "ArmNN", "Armnn 25.0", "");
 
     // Check that we can receive a StreamMetaDataPacket
     sendCounterPacket.SendStreamMetaDataPacket();
@@ -57,7 +57,7 @@ TEST_CASE("BasePipeServerTest")
     bufferManager.MarkRead(packetBuffer);
 
     CHECK(basePipeServer.get()->WaitForStreamMetaData());
-    CHECK(basePipeServer.get()->GetStreamMetadataPid() == arm::pipe::GetCurrentId());
+    CHECK(basePipeServer.get()->GetStreamMetadataPid() == arm::pipe::GetCurrentProcessId());
     CHECK(basePipeServer.get()->GetStreamMetadataMaxDataLen() == MAX_METADATA_PACKET_LENGTH);
 
     // Now try a simple PeriodicCounterSelectionPacket

@@ -15,9 +15,17 @@ namespace pipe
 std::unique_ptr<IProfilingService> IProfilingService::CreateProfilingService(
     uint16_t maxGlobalCounterId,
     IInitialiseProfilingService& initialiser,
+    const std::string& softwareInfo,
+    const std::string& softwareVersion,
+    const std::string& hardwareVersion,
     arm::pipe::Optional<IReportStructure&> reportStructure)
 {
-    return std::make_unique<ProfilingService>(maxGlobalCounterId, initialiser, reportStructure);
+    return std::make_unique<ProfilingService>(maxGlobalCounterId,
+                                              initialiser,
+                                              softwareInfo,
+                                              softwareVersion,
+                                              hardwareVersion,
+                                              reportStructure);
 }
 
 ProfilingGuidGenerator IProfilingService::m_GuidGenerator;

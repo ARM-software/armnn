@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnnUtils/Threads.hpp>
+#include "Threads.hpp"
 
 #if defined(__linux__)
 #include <unistd.h>
@@ -19,9 +19,9 @@
 #include <unistd.h>
 #endif
 
-namespace armnnUtils
+namespace arm
 {
-namespace Threads
+namespace pipe
 {
 
 int GetCurrentThreadId()
@@ -41,5 +41,5 @@ int GetCurrentThreadId()
 #endif
 }
 
-}
-}
+} // namespace pipe
+} // namespace arm

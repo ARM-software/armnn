@@ -13,7 +13,6 @@
 #include "ICounterValues.hpp"
 
 #include "armnn/backends/profiling/IBackendProfilingContext.hpp"
-#include "armnn/BackendRegistry.hpp"
 
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Logging.hpp>

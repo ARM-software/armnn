@@ -5,10 +5,9 @@
 
 #include <ProfilingUtils.hpp>
 
-#include <armnnUtils/Threads.hpp>
-
 #include <common/include/NumericCast.hpp>
 #include <common/include/SwTrace.hpp>
+#include <common/include/Threads.hpp>
 
 #include <doctest/doctest.h>
 
@@ -729,7 +728,7 @@ TEST_CASE("TimelineEventClassTestFullConstructionOfData")
 TEST_CASE("TimelineEventPacketTestNoBuffer")
 {
     const uint64_t timestamp = 456789u;
-    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    const int threadId = arm::pipe::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,
@@ -747,7 +746,7 @@ TEST_CASE("TimelineEventPacketTestBufferExhaustionZeroValue")
     std::vector<unsigned char> buffer(512, 0);
 
     const uint64_t timestamp = 456789u;
-    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    const int threadId = arm::pipe::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,
@@ -765,7 +764,7 @@ TEST_CASE("TimelineEventPacketTestBufferExhaustionFixedValue")
     std::vector<unsigned char> buffer(10, 0);
 
     const uint64_t timestamp = 456789u;
-    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    const int threadId = arm::pipe::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,
@@ -783,7 +782,7 @@ TEST_CASE("TimelineEventPacketTestFullConstructionOfData")
     std::vector<unsigned char> buffer(512, 0);
 
     const uint64_t timestamp = 456789u;
-    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    const int threadId = arm::pipe::GetCurrentThreadId();
     const uint64_t profilingGuid = 123456u;
     unsigned int numberOfBytesWritten = 789u;
     TimelinePacketStatus result = WriteTimelineEventBinary(timestamp,

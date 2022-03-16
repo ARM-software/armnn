@@ -7,15 +7,11 @@
 
 #include <common/include/Assert.hpp>
 #include <common/include/CommonProfilingUtils.hpp>
+#include <common/include/NumericCast.hpp>
 #include <common/include/ProfilingException.hpp>
 #include <common/include/SwTrace.hpp>
 
 #include <armnn/Version.hpp>
-
-#include <WallClockTimer.hpp>
-
-
-#include <common/include/NumericCast.hpp>
 
 #include <fstream>
 #include <iostream>
@@ -174,22 +170,6 @@ uint8_t ReadUint8(const IPacketBufferPtr& packetBuffer, unsigned int offset)
     ARM_PIPE_ASSERT(packetBuffer);
 
     return ReadUint8(packetBuffer->GetReadableData(), offset);
-}
-
-std::string GetSoftwareInfo()
-{
-    return std::string("ArmNN");
-}
-
-std::string GetHardwareVersion()
-{
-    return std::string();
-}
-
-std::string GetSoftwareVersion()
-{
-    std::string result = "Armnn " + std::to_string(ARMNN_MAJOR_VERSION) + "." + std::to_string(ARMNN_MINOR_VERSION);
-    return result;
 }
 
 std::string GetProcessName()

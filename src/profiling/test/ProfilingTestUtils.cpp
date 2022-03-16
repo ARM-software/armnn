@@ -12,12 +12,12 @@
 #include <armnn/profiling/ArmNNProfiling.hpp>
 
 #include <ProfilingService.hpp>
-#include <armnnUtils/Threads.hpp>
 
 #include <common/include/Assert.hpp>
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <common/include/NumericCast.hpp>
 #include <common/include/Processes.hpp>
+#include <common/include/Threads.hpp>
 
 #include <TestUtils.hpp>
 
@@ -27,9 +27,9 @@ uint32_t GetStreamMetaDataPacketSize()
 {
     uint32_t sizeUint32 = sizeof(uint32_t);
     uint32_t payloadSize = 0;
-    payloadSize += arm::pipe::numeric_cast<uint32_t>(GetSoftwareInfo().size()) + 1;
-    payloadSize += arm::pipe::numeric_cast<uint32_t>(GetHardwareVersion().size()) + 1;
-    payloadSize += arm::pipe::numeric_cast<uint32_t>(GetSoftwareVersion().size()) + 1;
+    payloadSize += arm::pipe::numeric_cast<uint32_t>(arm::pipe::ARMNN_SOFTWARE_INFO.size()) + 1;
+    payloadSize += arm::pipe::numeric_cast<uint32_t>(arm::pipe::ARMNN_HARDWARE_VERSION.size()) + 1;
+    payloadSize += arm::pipe::numeric_cast<uint32_t>(arm::pipe::ARMNN_SOFTWARE_VERSION.size()) + 1;
     payloadSize += arm::pipe::numeric_cast<uint32_t>(GetProcessName().size()) + 1;
 
     // Add packetVersionEntries
@@ -128,7 +128,11 @@ ProfilingGuid VerifyTimelineLabelBinaryPacketData(arm::pipe::Optional<ProfilingG
     else
     {
         ArmNNProfilingServiceInitialiser initialiser;
-        ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+        ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                          initialiser,
+                                          arm::pipe::ARMNN_SOFTWARE_INFO,
+                                          arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                          arm::pipe::ARMNN_HARDWARE_VERSION);
         CHECK(readProfilingGuid == profilingService.GetStaticId(label));
     }
 
@@ -343,7 +347,7 @@ ProfilingGuid VerifyTimelineEventBinaryPacket(arm::pipe::Optional<uint64_t> time
     }
     else
     {
-        CHECK(readThreadId == armnnUtils::Threads::GetCurrentThreadId());
+        CHECK(readThreadId == arm::pipe::GetCurrentThreadId());
     }
 
     // Check the event GUID
@@ -492,7 +496,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                offset);
 
     // Process ID Label
-    int processID = arm::pipe::GetCurrentId();
+    int processID = arm::pipe::GetCurrentProcessId();
     std::stringstream ss;
     ss << processID;
     std::string processIdLabel = ss.str();

@@ -10,6 +10,8 @@
 #include <ProfilingUtils.hpp>
 #include <IProfilingConnectionFactory.hpp>
 
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
 #include <common/include/IgnoreUnused.hpp>
 #include <common/include/NumericCast.hpp>
 
@@ -28,7 +30,10 @@ class SendCounterPacketTest : public SendCounterPacket
 {
 public:
     SendCounterPacketTest(IBufferManager& buffer)
-        : SendCounterPacket(buffer)
+        : SendCounterPacket(buffer,
+                            arm::pipe::ARMNN_SOFTWARE_INFO,
+                            arm::pipe::ARMNN_SOFTWARE_VERSION,
+                            arm::pipe::ARMNN_HARDWARE_VERSION)
     {}
 
     bool CreateDeviceRecordTest(const DevicePtr& device,

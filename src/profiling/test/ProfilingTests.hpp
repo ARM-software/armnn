@@ -12,6 +12,8 @@
 #include <IProfilingConnection.hpp>
 #include <ProfilingService.hpp>
 
+#include <armnn/profiling/ArmNNProfiling.hpp>
+
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Logging.hpp>
 
@@ -168,7 +170,11 @@ public:
     SwapProfilingConnectionFactoryHelper(uint16_t maxGlobalCounterId,
                                          IInitialiseProfilingService& initialiser,
                                          ProfilingService& profilingService)
-        : ProfilingService(maxGlobalCounterId, initialiser)
+        : ProfilingService(maxGlobalCounterId,
+                           initialiser,
+                           arm::pipe::ARMNN_SOFTWARE_INFO,
+                           arm::pipe::ARMNN_SOFTWARE_VERSION,
+                           arm::pipe::ARMNN_HARDWARE_VERSION)
         , m_ProfilingService(profilingService)
         , m_MockProfilingConnectionFactory(new MockProfilingConnectionFactory())
         , m_BackupProfilingConnectionFactory(nullptr)

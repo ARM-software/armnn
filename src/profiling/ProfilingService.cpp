@@ -347,7 +347,6 @@ void ProfilingService::Reset()
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
     m_BackendProfilingContexts.clear();
-    m_MaxGlobalCounterId = MAX_ARMNN_COUNTER;
 }
 
 void ProfilingService::Stop()

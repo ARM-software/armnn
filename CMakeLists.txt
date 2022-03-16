@@ -82,7 +82,6 @@ list(APPEND armnnUtils_sources
     include/armnnUtils/QuantizeHelper.hpp
     include/armnnUtils/TContainer.hpp
     include/armnnUtils/TensorUtils.hpp
-    include/armnnUtils/Threads.hpp
     include/armnnUtils/Transpose.hpp
     src/armnnUtils/BFloat16.hpp
     src/armnnUtils/CompatibleTypes.cpp
@@ -111,7 +110,6 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/PrototxtConversions.cpp
     src/armnnUtils/TensorIOUtils.hpp
     src/armnnUtils/TensorUtils.cpp
-    src/armnnUtils/Threads.cpp
     src/armnnUtils/Transpose.cpp
     )
 

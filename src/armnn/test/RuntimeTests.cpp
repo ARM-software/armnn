@@ -736,7 +736,7 @@ TEST_CASE("ProfilingEnableCpuRef")
                                                offset);
 
     // Process ID Label
-    int processID = arm::pipe::GetCurrentId();
+    int processID = arm::pipe::GetCurrentProcessId();
     std::stringstream ss;
     ss << processID;
     std::string processIdLabel = ss.str();

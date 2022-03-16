@@ -16,7 +16,7 @@ namespace arm
 namespace pipe
 {
 
-int GetCurrentId()
+int GetCurrentProcessId()
 {
 #if defined(__unix__) || defined(__APPLE__)
     return getpid();

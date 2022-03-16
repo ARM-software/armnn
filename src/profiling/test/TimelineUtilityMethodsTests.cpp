@@ -28,7 +28,11 @@ TEST_CASE("CreateTypedLabelTest")
 {
     MockBufferManager mockBufferManager(1024);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
 
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
@@ -79,7 +83,11 @@ TEST_CASE("SendWellKnownLabelsAndEventClassesTest")
 {
     MockBufferManager mockBufferManager(1024);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     SendTimelinePacket sendTimelinePacket(mockBufferManager);
 
     CHECK_NOTHROW(TimelineUtilityMethods::SendWellKnownLabelsAndEventClasses(sendTimelinePacket));
@@ -207,7 +215,11 @@ TEST_CASE("CreateNamedTypedChildEntityTest")
 {
     MockBufferManager mockBufferManager(1024);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -295,7 +307,11 @@ TEST_CASE("DeclareLabelTest")
 {
     MockBufferManager mockBufferManager(1024);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -325,7 +341,11 @@ TEST_CASE("CreateNameTypeEntityInvalidTest")
 {
     MockBufferManager mockBufferManager(1024);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -351,7 +371,11 @@ TEST_CASE("CreateNameTypeEntityTest")
 {
     MockBufferManager mockBufferManager(1024);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
 
@@ -419,7 +443,11 @@ TEST_CASE("RecordEventTest")
 {
     MockBufferManager mockBufferManager(1024);
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     std::unique_ptr<ISendTimelinePacket> sendTimelinePacket = std::make_unique<SendTimelinePacket>(mockBufferManager);
     TimelineUtilityMethods timelineUtilityMethods(sendTimelinePacket);
     // Generate first guid to ensure that the named typed entity guid is not 0 on local single test.

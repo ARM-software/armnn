@@ -28,7 +28,6 @@
 #include "SendTimelinePacket.hpp"
 #include "TimelinePacketWriterFactory.hpp"
 #include "INotifyBackends.hpp"
-#include <armnn/profiling/ArmNNProfiling.hpp>
 #include <armnn/backends/profiling/IBackendProfilingContext.hpp>
 
 
@@ -52,6 +51,9 @@ public:
 
     ProfilingService(uint16_t maxGlobalCounterId,
                      IInitialiseProfilingService& initialiser,
+                     const std::string& softwareInfo,
+                     const std::string& softwareVersion,
+                     const std::string& hardwareVersion,
                      arm::pipe::Optional<IReportStructure&> reportStructure = arm::pipe::EmptyOptional())
         : m_Options()
         , m_TimelineReporting(false)
@@ -67,7 +69,7 @@ public:
                            m_CommandHandlerRegistry,
                            m_PacketVersionResolver)
         , m_BufferManager()
-        , m_SendCounterPacket(m_BufferManager)
+        , m_SendCounterPacket(m_BufferManager, softwareInfo, softwareVersion, hardwareVersion)
         , m_SendThread(m_StateMachine, m_BufferManager, m_SendCounterPacket)
         , m_SendTimelinePacket(m_BufferManager)
         , m_PeriodicCounterCapture(m_Holder, m_SendCounterPacket, *this, m_CounterIdMap, m_BackendProfilingContexts)
@@ -93,7 +95,7 @@ public:
                                                    m_BackendProfilingContexts,
                                                    m_CounterIdMap,
                                                    m_Holder,
-                                                   MAX_ARMNN_COUNTER,
+                                                   maxGlobalCounterId,
                                                    m_PeriodicCounterCapture,
                                                    *this,
                                                    m_SendCounterPacket,
@@ -110,6 +112,7 @@ public:
                                                     m_StateMachine,
                                                     reportStructure,
                                                     m_TimelineReporting,
+                                                    *this,
                                                     *this)
         , m_DeactivateTimelineReportingCommandHandler(0,
                                                       7,

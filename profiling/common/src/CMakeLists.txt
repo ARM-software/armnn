@@ -10,12 +10,13 @@ if(BUILD_TIMELINE_DECODER)
         CommandHandlerKey.cpp
         CommandHandlerRegistry.cpp
         CommonProfilingUtils.cpp
+        LabelsAndEventClasses.cpp
         Logging.cpp
         NetworkSockets.cpp
         PacketVersionResolver.cpp
         Processes.cpp
         SwTrace.cpp
-        LabelsAndEventClasses.cpp)
+        Threads.cpp)
 
     include_directories(${PROJECT_SOURCE_DIR}/profiling/common/include)
     include_directories(${PROJECT_SOURCE_DIR}/common/include)

@@ -148,7 +148,10 @@ TEST_CASE("CheckCommandHandler")
     TestProfilingConnectionArmnnError testProfilingConnectionArmnnError;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
     SendTimelinePacket sendTimelinePacket(mockBuffer);
     MockProfilingServiceStatus mockProfilingServiceStatus;
@@ -662,7 +665,11 @@ TEST_CASE("CheckProfilingServiceDisabled")
 {
     ProfilingOptions options;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -673,7 +680,11 @@ TEST_CASE("CheckProfilingServiceCounterDirectory")
 {
     ProfilingOptions options;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     const ICounterDirectory& counterDirectory0 = profilingService.GetCounterDirectory();
@@ -698,7 +709,11 @@ TEST_CASE("CheckProfilingServiceCounterValues")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     profilingService.Update();
@@ -1806,7 +1821,10 @@ TEST_CASE("CounterSelectionCommandHandlerParseData")
     TestCaptureThread captureThread;
     TestReadCounterValues readCounterValues;
     MockBufferManager mockBuffer(512);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
 
     uint32_t sizeOfUint32 = arm::pipe::numeric_cast<uint32_t>(sizeof(uint32_t));
@@ -1912,8 +1930,9 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
     class TestReportStructure : public IReportStructure
     {
         public:
-        virtual void ReportStructure(arm::pipe::IProfilingService& /*profilingService*/) override
+        virtual void ReportStructure(arm::pipe::IProfilingService& profilingService) override
         {
+            arm::pipe::IgnoreUnused(profilingService);
             m_ReportStructureCalled = true;
         }
 
@@ -1940,6 +1959,13 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
     ProfilingStateMachine stateMachine;
     TestReportStructure testReportStructure;
     TestNotifyBackends testNotifyBackends;
+    armnn::ArmNNProfilingServiceInitialiser initialiser;
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
+
 
     ActivateTimelineReportingCommandHandler activateTimelineReportingCommandHandler(0,
                                                            6,
@@ -1949,7 +1975,8 @@ TEST_CASE("CheckTimelineActivationAndDeactivation")
                                                            stateMachine,
                                                            testReportStructure,
                                                            testNotifyBackends.m_timelineReporting,
-                                                           testNotifyBackends);
+                                                           testNotifyBackends,
+                                                           profilingService);
 
     // Write an "ActivateTimelineReporting" packet into the mock profiling connection, to simulate an input from an
     // external profiling service
@@ -2069,7 +2096,10 @@ TEST_CASE("CheckConnectionAcknowledged")
     CHECK(profilingState.GetCurrentState() == ProfilingState::Uninitialised);
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingState, mockBuffer, sendCounterPacket);
     SendTimelinePacket sendTimelinePacket(mockBuffer);
     MockProfilingServiceStatus mockProfilingServiceStatus;
@@ -2375,7 +2405,10 @@ TEST_CASE("CheckPeriodicCounterCaptureThread")
     std::vector<uint16_t> captureIds2;
 
     MockBufferManager mockBuffer(512);
-    SendCounterPacket sendCounterPacket(mockBuffer);
+    SendCounterPacket sendCounterPacket(mockBuffer,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockBuffer, sendCounterPacket);
 
     std::vector<uint16_t> counterIds;
@@ -2433,7 +2466,10 @@ TEST_CASE("RequestCounterDirectoryCommandHandlerTest1")
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer1(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer1);
+    SendCounterPacket sendCounterPacket(mockBuffer1,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockBuffer1, sendCounterPacket);
     MockBufferManager mockBuffer2(1024);
     SendTimelinePacket sendTimelinePacket(mockBuffer2);
@@ -2493,7 +2529,10 @@ TEST_CASE("RequestCounterDirectoryCommandHandlerTest2")
     ProfilingStateMachine profilingStateMachine;
     CounterDirectory counterDirectory;
     MockBufferManager mockBuffer1(1024);
-    SendCounterPacket sendCounterPacket(mockBuffer1);
+    SendCounterPacket sendCounterPacket(mockBuffer1,
+                                        arm::pipe::ARMNN_SOFTWARE_INFO,
+                                        arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                        arm::pipe::ARMNN_HARDWARE_VERSION);
     SendThread sendThread(profilingStateMachine, mockBuffer1, sendCounterPacket);
     MockBufferManager mockBuffer2(1024);
     SendTimelinePacket sendTimelinePacket(mockBuffer2);
@@ -2576,7 +2615,11 @@ TEST_CASE("CheckProfilingServiceGoodConnectionAcknowledgedPacket")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2637,7 +2680,11 @@ TEST_CASE("CheckProfilingServiceGoodRequestCounterDirectoryPacket")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2696,7 +2743,11 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacketInvalidCounterU
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2776,7 +2827,11 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketNoCounters")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2842,7 +2897,11 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketSingleCounter"
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -2920,7 +2979,11 @@ TEST_CASE("CheckProfilingServiceGoodPeriodicCounterSelectionPacketMultipleCounte
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3000,7 +3063,11 @@ TEST_CASE("CheckProfilingServiceDisconnect")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3059,7 +3126,11 @@ TEST_CASE("CheckProfilingServiceGoodPerJobCounterSelectionPacket")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3127,7 +3198,11 @@ TEST_CASE("CheckConfigureProfilingServiceOn")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
     // should get as far as NOT_CONNECTED
@@ -3141,7 +3216,11 @@ TEST_CASE("CheckConfigureProfilingServiceOff")
 {
     ProfilingOptions options;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.ConfigureProfilingService(options);
     // should not move from Uninitialised
@@ -3163,7 +3242,11 @@ TEST_CASE("CheckProfilingServiceEnabled")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -3196,7 +3279,11 @@ TEST_CASE("CheckProfilingServiceEnabledRuntime")
 
     ProfilingOptions options;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
     CHECK(profilingService.GetCurrentState() == ProfilingState::Uninitialised);
     profilingService.Update();
@@ -3236,7 +3323,11 @@ TEST_CASE("CheckProfilingServiceBadConnectionAcknowledgedPacket")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3299,7 +3390,11 @@ TEST_CASE("CheckProfilingServiceBadRequestCounterDirectoryPacket")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3364,7 +3459,11 @@ TEST_CASE("CheckProfilingServiceBadPeriodicCounterSelectionPacket")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     // Swap the profiling connection factory in the profiling service instance with our mock one
@@ -3466,7 +3565,11 @@ TEST_CASE("CheckRegisterBackendCounters")
     ProfilingOptions options;
     options.m_EnableProfiling          = true;
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     RegisterBackendCounters registerBackendCounters(globalCounterIds, cpuRefId, profilingService);
@@ -3516,7 +3619,11 @@ TEST_CASE("CheckCounterStatusQuery")
 
     // Reset the profiling service to the uninitialized state
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
 
     const std::string cpuRefId(GetComputeDeviceAsCString(armnn::Compute::CpuRef));
@@ -3727,7 +3834,11 @@ TEST_CASE("CheckFileFormat") {
     options.m_FileFormat = "json";
     // Enable the profiling service
     armnn::ArmNNProfilingServiceInitialiser initialiser;
-    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER, initialiser);
+    ProfilingService profilingService(arm::pipe::MAX_ARMNN_COUNTER,
+                                      initialiser,
+                                      arm::pipe::ARMNN_SOFTWARE_INFO,
+                                      arm::pipe::ARMNN_SOFTWARE_VERSION,
+                                      arm::pipe::ARMNN_HARDWARE_VERSION);
     profilingService.ResetExternalProfilingOptions(options, true);
     // Start the command handler and the send thread
     profilingService.Update();

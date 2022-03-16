@@ -8,8 +8,6 @@
 #include "IProfilingService.hpp"
 #include "armnn/profiling/ISendTimelinePacket.hpp"
 
-#include <armnn/Types.hpp>
-
 namespace arm
 {
 

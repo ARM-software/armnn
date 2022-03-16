@@ -10,7 +10,7 @@ namespace arm
 namespace pipe
 {
 
-int GetCurrentId();
+int GetCurrentProcessId();
 
 } // namespace arm
 } // namespace pipe

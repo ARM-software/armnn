@@ -25,9 +25,9 @@ namespace pipe
 
 void SendCounterPacket::SendStreamMetaDataPacket()
 {
-    const std::string info(GetSoftwareInfo());
-    const std::string hardwareVersion(GetHardwareVersion());
-    const std::string softwareVersion(GetSoftwareVersion());
+    const std::string info(m_SoftwareInfo);
+    const std::string hardwareVersion(m_HardwareVersion);
+    const std::string softwareVersion(m_SoftwareVersion);
     const std::string processName = GetProcessName().substr(0, 60);
 
     const uint32_t infoSize =            arm::pipe::numeric_cast<uint32_t>(info.size()) + 1;
@@ -109,7 +109,7 @@ void SendCounterPacket::SendStreamMetaDataPacket()
         offset += sizeUint32;
         WriteUint32(writeBuffer, offset, MAX_METADATA_PACKET_LENGTH); // max_data_length
         offset += sizeUint32;
-        int pid = arm::pipe::GetCurrentId();
+        int pid = arm::pipe::GetCurrentProcessId();
         WriteUint32(writeBuffer, offset, arm::pipe::numeric_cast<uint32_t>(pid)); // pid
         offset += sizeUint32;
         uint32_t poolOffset = bodySize;

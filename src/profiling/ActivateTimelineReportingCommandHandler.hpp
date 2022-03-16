@@ -30,12 +30,14 @@ public:
                                             ProfilingStateMachine& profilingStateMachine,
                                             arm::pipe::Optional<IReportStructure&> reportStructure,
                                             std::atomic<bool>& timelineReporting,
-                                            INotifyBackends& notifyBackends)
+                                            INotifyBackends& notifyBackends,
+                                            IProfilingService& profilingService)
         : CommandHandlerFunctor(familyId, packetId, version),
           m_SendTimelinePacket(sendTimelinePacket),
           m_StateMachine(profilingStateMachine),
           m_TimelineReporting(timelineReporting),
           m_BackendNotifier(notifyBackends),
+          m_ProfilingService(profilingService),
           m_ReportStructure(reportStructure)
     {}
 
@@ -46,6 +48,7 @@ private:
     ProfilingStateMachine& m_StateMachine;
     std::atomic<bool>&     m_TimelineReporting;
     INotifyBackends&       m_BackendNotifier;
+    IProfilingService&     m_ProfilingService;
 
     arm::pipe::Optional<IReportStructure&> m_ReportStructure;
 };

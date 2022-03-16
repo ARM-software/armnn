@@ -5,12 +5,12 @@
 
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/CommonProfilingUtils.hpp>
+#include <common/include/Threads.hpp>
 #include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
 #include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 #include <server/include/timelineDecoder/TimelineDecoder.hpp>
 
 #include <BufferManager.hpp>
-#include <armnnUtils/Threads.hpp>
 #include <ProfilingService.hpp>
 #include <PacketBuffer.hpp>
 #include <TimelinePacketWriterFactory.hpp>
@@ -172,7 +172,7 @@ TEST_CASE("TimelineCaptureTest")
     const uint64_t timestamp = 33333u;
     const uint64_t eventGuid = 44444u;
 
-    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    const int threadId = arm::pipe::GetCurrentThreadId();
 
     // need to do a bit of work here to extract the value from threadId
     unsigned char* uCharThreadId = new unsigned char[arm::pipe::ThreadIdSize]();;
@@ -288,7 +288,7 @@ TEST_CASE("TimelineCaptureTestMultipleStringsInBuffer")
     const uint64_t timestamp          = 33333u;
     const uint64_t eventGuid          = 44444u;
 
-    const int threadId = armnnUtils::Threads::GetCurrentThreadId();
+    const int threadId = arm::pipe::GetCurrentThreadId();
 
     // need to do a bit of work here to extract the value from threadId
     unsigned char* uCharThreadId = new unsigned char[arm::pipe::ThreadIdSize]();

@@ -8,7 +8,8 @@
 #include <armnn/ArmNN.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/Optional.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
+
+#include <client/include/ProfilingOptions.hpp>
 
 #include <set>
 #include <string>

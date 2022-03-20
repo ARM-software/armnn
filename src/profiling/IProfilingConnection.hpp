@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/profiling/ILocalPacketHandler.hpp>
+#include <client/include/ILocalPacketHandler.hpp>
 
 #include <common/include/Packet.hpp>
 

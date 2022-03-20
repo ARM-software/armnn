@@ -6,8 +6,8 @@
 #pragma once
 
 
-#include <armnn/utility/IgnoreUnused.hpp>
-#include "../../../profiling/common/include/TargetEndianess.hpp"
+#include <common/include/IgnoreUnused.hpp>
+#include <common/include/TargetEndianess.hpp>
 
 #include <cstdint>
 #include <memory>
@@ -55,7 +55,9 @@ public:
     /// Set a profiling connection on the handler. Only need to implement this
     /// function if the handler will be writing data back to the profiled application.
     virtual void SetConnection(IInternalProfilingConnection* profilingConnection)
-    {armnn::IgnoreUnused(profilingConnection);}
+    {
+        arm::pipe::IgnoreUnused(profilingConnection);
+    }
 };
 
 using ILocalPacketHandlerPtr = std::unique_ptr<ILocalPacketHandler>;

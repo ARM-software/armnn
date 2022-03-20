@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <IInitialiseProfilingService.hpp>
-#include <IProfilingService.hpp>
+#include <client/include/IInitialiseProfilingService.hpp>
+#include <client/include/IProfilingService.hpp>
 
 namespace armnn
 {

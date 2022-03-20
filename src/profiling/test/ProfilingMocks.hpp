@@ -5,9 +5,7 @@
 
 #pragma once
 
-#include <Holder.hpp>
 #include <IProfilingConnectionFactory.hpp>
-#include <IProfilingServiceStatus.hpp>
 #include <ProfilingService.hpp>
 #include <ProfilingUtils.hpp>
 #include <SendCounterPacket.hpp>
@@ -15,6 +13,9 @@
 
 #include <armnn/BackendId.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
+
+#include <client/include/Holder.hpp>
+#include <client/include/IProfilingServiceStatus.hpp>
 
 #include <common/include/Assert.hpp>
 #include <common/include/CommonProfilingUtils.hpp>

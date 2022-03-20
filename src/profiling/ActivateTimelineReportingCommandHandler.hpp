@@ -7,8 +7,9 @@
 
 #include "ProfilingStateMachine.hpp"
 #include "SendTimelinePacket.hpp"
-#include "IReportStructure.hpp"
 #include "INotifyBackends.hpp"
+
+#include <client/include/IReportStructure.hpp>
 
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Optional.hpp>

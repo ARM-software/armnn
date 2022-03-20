@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "IProfilingService.hpp"
-#include "armnn/profiling/ISendTimelinePacket.hpp"
+#include <client/include/IProfilingService.hpp>
+#include <client/include/ISendTimelinePacket.hpp>
 
 namespace arm
 {

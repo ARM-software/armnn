@@ -22,6 +22,7 @@ add_custom_target(AdditionalCMakeFiles SOURCES ${additional_cmake_files})
 include(GNUInstallDirs)
 
 include_directories(SYSTEM common/include)
+include_directories(SYSTEM client/include)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR})
 
 set(BUILD_UNIT_TESTS 0)

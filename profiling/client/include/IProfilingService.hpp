@@ -12,10 +12,10 @@
 #include "IProfilingServiceStatus.hpp"
 #include "ISendCounterPacket.hpp"
 #include "IReportStructure.hpp"
+#include "ProfilingOptions.hpp"
 #include "ProfilingState.hpp"
 
-#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
+#include <client/include/backends/IBackendProfilingContext.hpp>
 
 #include <common/include/ICounterRegistry.hpp>
 #include <common/include/Optional.hpp>

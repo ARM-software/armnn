@@ -12,10 +12,12 @@
 #include "Tensor.hpp"
 #include "Types.hpp"
 #include "TypesUtils.hpp"
-#include "profiling/ILocalPacketHandler.hpp"
 
 #include <armnn/backends/ICustomAllocator.hpp>
 #include <armnn/backends/IMemoryOptimizerStrategy.hpp>
+
+#include <client/include/ILocalPacketHandler.hpp>
+
 #include <memory>
 #include <map>
 
@@ -31,7 +33,7 @@ class IRuntime;
 using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
 struct INetworkProperties
-{   
+{
     INetworkProperties(bool asyncEnabled,
                        MemorySource inputSource,
                        MemorySource outputSource,

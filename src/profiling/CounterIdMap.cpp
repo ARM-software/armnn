@@ -2,7 +2,8 @@
 // Copyright © 2020 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "CounterIdMap.hpp"
+
+#include <client/include/CounterIdMap.hpp>
 
 #include <common/include/ProfilingException.hpp>
 

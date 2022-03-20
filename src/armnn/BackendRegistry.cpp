@@ -6,7 +6,8 @@
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Exceptions.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
-#include <IProfilingService.hpp>
+
+#include <client/include/IProfilingService.hpp>
 
 namespace armnn
 {

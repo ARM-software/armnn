@@ -8,7 +8,7 @@
 #include "IProfilingConnection.hpp"
 #include "ProfilingUtils.hpp"
 
-#include <armnn/profiling/ProfilingOptions.hpp>
+#include <client/include/ProfilingOptions.hpp>
 
 #include <fstream>
 #include <memory>

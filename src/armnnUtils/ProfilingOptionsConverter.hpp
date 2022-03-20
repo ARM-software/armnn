@@ -6,7 +6,8 @@
 #pragma once
 
 #include <armnn/IRuntime.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
+
+#include <client/include/ProfilingOptions.hpp>
 
 namespace arm
 {

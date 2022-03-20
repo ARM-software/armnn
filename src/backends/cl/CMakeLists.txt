@@ -72,3 +72,4 @@ target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armn
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/profiling)
 target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/common/include)
+target_include_directories(armnnClBackend PRIVATE ${PROJECT_SOURCE_DIR}/profiling/client/include)

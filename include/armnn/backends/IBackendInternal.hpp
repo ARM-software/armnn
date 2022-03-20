@@ -16,8 +16,9 @@
 #include <armnn/backends/ITensorHandleFactory.hpp>
 #include <armnn/backends/OptimizationViews.hpp>
 #include <armnn/backends/SubgraphView.hpp>
-#include <armnn/backends/profiling/IBackendProfiling.hpp>
-#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
+
+#include <client/include/backends/IBackendProfiling.hpp>
+#include <client/include/backends/IBackendProfilingContext.hpp>
 
 #include <vector>
 #include <memory>

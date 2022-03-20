@@ -4,7 +4,9 @@
 //
 
 #include "ActivateTimelineReportingCommandHandler.hpp"
-#include "TimelineUtilityMethods.hpp"
+
+#include <client/include/TimelineUtilityMethods.hpp>
+
 #include <common/include/ProfilingException.hpp>
 
 #include <fmt/format.h>

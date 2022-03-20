@@ -5,14 +5,13 @@
 
 #pragma once
 
-#include <common/include/ICounterDirectory.hpp>
-#include <common/include/ProfilingException.hpp>
-
-#include <armnn/profiling/ISendTimelinePacket.hpp>
-
 #include "IPacketBuffer.hpp"
 
+#include <client/include/ISendTimelinePacket.hpp>
+
+#include <common/include/ICounterDirectory.hpp>
 #include <common/include/Packet.hpp>
+#include <common/include/ProfilingException.hpp>
 
 #include <algorithm>
 #include <cstring>

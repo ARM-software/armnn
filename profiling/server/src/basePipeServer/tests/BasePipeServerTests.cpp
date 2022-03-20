@@ -14,7 +14,6 @@
 
 TEST_SUITE("BasePipeServerTests")
 {
-using namespace armnn;
 using namespace arm::pipe;
 
 TEST_CASE("BasePipeServerTest")

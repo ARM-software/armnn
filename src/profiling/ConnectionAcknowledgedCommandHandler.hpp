@@ -5,11 +5,13 @@
 
 #pragma once
 
-#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
-#include "IProfilingServiceStatus.hpp"
-#include "ISendCounterPacket.hpp"
-#include "armnn/profiling/ISendTimelinePacket.hpp"
 #include "ProfilingStateMachine.hpp"
+
+#include <client/include/IProfilingServiceStatus.hpp>
+#include <client/include/ISendCounterPacket.hpp>
+#include <client/include/ISendTimelinePacket.hpp>
+
+#include <client/include/backends/IBackendProfilingContext.hpp>
 
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Packet.hpp>

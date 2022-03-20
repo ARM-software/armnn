@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "IProfilingService.hpp"
 #include "ProfilingService.hpp"
+
+#include <client/include/IProfilingService.hpp>
 
 namespace arm
 {

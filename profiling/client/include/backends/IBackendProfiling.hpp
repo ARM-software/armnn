@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#include <armnn/profiling/ISendTimelinePacket.hpp>
+#include <client/include/ISendTimelinePacket.hpp>
 
 #include <common/include/IProfilingGuidGenerator.hpp>
 #include <common/include/Optional.hpp>

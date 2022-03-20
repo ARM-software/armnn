@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <armnn/profiling/ILocalPacketHandler.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
-
 #include "IProfilingConnection.hpp"
 #include "ProfilingUtils.hpp"
+
+#include <client/include/ILocalPacketHandler.hpp>
+#include <client/include/ProfilingOptions.hpp>
 
 #include <common/include/Assert.hpp>
 #include <common/include/Packet.hpp>

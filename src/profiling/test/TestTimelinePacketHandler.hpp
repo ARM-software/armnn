@@ -5,15 +5,16 @@
 
 #pragma once
 
-#include <armnn/profiling/ILocalPacketHandler.hpp>
-#include <server/include/timelineDecoder/ITimelineDecoder.hpp>
-
 #include "ProfilingUtils.hpp"
-#include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
-#include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 #include "TimelineModel.hpp"
 
+#include <client/include/ILocalPacketHandler.hpp>
+
 #include <common/include/Packet.hpp>
+
+#include <server/include/timelineDecoder/ITimelineDecoder.hpp>
+#include <server/include/timelineDecoder/TimelineCaptureCommandHandler.hpp>
+#include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 
 #include <condition_variable>
 #include <map>

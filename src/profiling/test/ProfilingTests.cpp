@@ -9,9 +9,6 @@
 #include <ArmNNProfilingServiceInitialiser.hpp>
 #include <CommandHandler.hpp>
 #include <ConnectionAcknowledgedCommandHandler.hpp>
-#include <CounterIdMap.hpp>
-#include <Holder.hpp>
-#include <ICounterValues.hpp>
 #include <PeriodicCounterCapture.hpp>
 #include <PeriodicCounterSelectionCommandHandler.hpp>
 #include <ProfilingStateMachine.hpp>
@@ -27,9 +24,13 @@
 #include <armnn/Utils.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
 
 #include <backends/BackendProfiling.hpp>
+
+#include <client/include/CounterIdMap.hpp>
+#include <client/include/Holder.hpp>
+#include <client/include/ICounterValues.hpp>
+#include <client/include/ProfilingOptions.hpp>
 
 #include <common/include/CommandHandlerKey.hpp>
 #include <common/include/CommandHandlerRegistry.hpp>

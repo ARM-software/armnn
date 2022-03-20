@@ -7,11 +7,12 @@
 
 #include "IBufferManager.hpp"
 #include "IConsumer.hpp"
-#include "ISendCounterPacket.hpp"
 #include "ISendThread.hpp"
 #include "IProfilingConnection.hpp"
 #include "ProfilingStateMachine.hpp"
 #include "ProfilingUtils.hpp"
+
+#include <client/include/ISendCounterPacket.hpp>
 
 #include <common/include/ICounterDirectory.hpp>
 

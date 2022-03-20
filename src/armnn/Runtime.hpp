@@ -14,9 +14,9 @@
 
 #include <armnn/backends/DynamicBackend.hpp>
 
-#include <IInitialiseProfilingService.hpp>
-#include <IProfilingService.hpp>
-#include <IReportStructure.hpp>
+#include <client/include/IInitialiseProfilingService.hpp>
+#include <client/include/IProfilingService.hpp>
+#include <client/include/IReportStructure.hpp>
 
 #include <mutex>
 #include <unordered_map>

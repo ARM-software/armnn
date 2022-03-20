@@ -60,7 +60,7 @@ TEST_CASE("RuntimeRegisterDebugCallback")
     std::vector<unsigned int> slotIndexes;
     auto mockCallback = [&](LayerGuid guid, unsigned int slotIndex, ITensorHandle* tensor)
     {
-        IgnoreUnused(guid);
+        armnn::IgnoreUnused(guid);
         slotIndexes.push_back(slotIndex);
         tensorShapes.push_back(tensor->GetShape());
         callCount++;

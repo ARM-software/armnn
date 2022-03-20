@@ -10,6 +10,8 @@
 
 #include <doctest/doctest.h>
 
+#include <thread>
+
 using namespace armnn;
 
 

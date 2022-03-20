@@ -12,7 +12,8 @@
 #include <armnn/Logging.hpp>
 
 #include <Profiling.hpp>
-#include <IProfilingService.hpp>
+
+#include <client/include/IProfilingService.hpp>
 
 #include <algorithm>
 

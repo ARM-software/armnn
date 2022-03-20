@@ -8,10 +8,11 @@
 
 #include <ArmNNProfilingServiceInitialiser.hpp>
 #include <SendTimelinePacket.hpp>
-#include <TimelineUtilityMethods.hpp>
 #include <ProfilingService.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
+
+#include <client/include/TimelineUtilityMethods.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 

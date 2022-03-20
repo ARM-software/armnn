@@ -8,7 +8,6 @@
 #include <mutex>
 #include <vector>
 #include <set>
-#include "ProfilingUtils.hpp"
 
 namespace arm
 {

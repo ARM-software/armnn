@@ -26,7 +26,7 @@
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <IProfilingService.hpp>
+#include <client/include/IProfilingService.hpp>
 
 #include <common/include/ProfilingGuid.hpp>
 

@@ -176,8 +176,8 @@ list(APPEND armnn_sources
     include/armnn/TypesUtils.hpp
     include/armnn/Utils.hpp
     include/armnn/Version.hpp
-    include/armnn/profiling/ISendTimelinePacket.hpp
-    include/armnn/profiling/ProfilingOptions.hpp
+    profiling/client/include/ISendTimelinePacket.hpp
+    profiling/client/include/ProfilingOptions.hpp
     include/armnn/utility/Assert.hpp
     include/armnn/utility/IgnoreUnused.hpp
     include/armnn/utility/NumericCast.hpp
@@ -423,26 +423,26 @@ list(APPEND armnn_sources
     src/profiling/ConnectionAcknowledgedCommandHandler.cpp
     src/profiling/ConnectionAcknowledgedCommandHandler.hpp
     src/profiling/CounterIdMap.cpp
-    src/profiling/CounterIdMap.hpp
+    profiling/client/include/CounterIdMap.hpp
     src/profiling/DeactivateTimelineReportingCommandHandler.cpp
     src/profiling/DeactivateTimelineReportingCommandHandler.hpp
     src/profiling/FileOnlyProfilingConnection.cpp
     src/profiling/FileOnlyProfilingConnection.hpp
     src/profiling/Holder.cpp
-    src/profiling/Holder.hpp
+    profiling/client/include/Holder.hpp
     src/profiling/IBufferManager.hpp
     src/profiling/IConsumer.hpp
-    src/profiling/ICounterValues.hpp
-    src/profiling/IInitialiseProfilingService.hpp
+    profiling/client/include/ICounterValues.hpp
+    profiling/client/include/IInitialiseProfilingService.hpp
     src/profiling/INotifyBackends.hpp
-    src/profiling/IReportStructure.hpp
-    src/profiling/ISendCounterPacket.hpp
+    profiling/client/include/IReportStructure.hpp
+    profiling/client/include/ISendCounterPacket.hpp
     src/profiling/ISendThread.hpp
     src/profiling/IPacketBuffer.hpp
     src/profiling/IPeriodicCounterCapture.hpp
     src/profiling/IProfilingConnection.hpp
     src/profiling/IProfilingService.cpp
-    src/profiling/IProfilingService.hpp
+    profiling/client/include/IProfilingService.hpp
     src/profiling/IProfilingConnectionFactory.hpp
     src/profiling/NullProfilingConnection.hpp
     src/profiling/PacketBuffer.cpp
@@ -459,7 +459,7 @@ list(APPEND armnn_sources
     src/profiling/ProfilingConnectionFactory.hpp
     src/profiling/ProfilingService.cpp
     src/profiling/ProfilingService.hpp
-    src/profiling/ProfilingState.hpp
+    profiling/client/include/ProfilingState.hpp
     src/profiling/ProfilingStateMachine.cpp
     src/profiling/ProfilingStateMachine.hpp
     src/profiling/ProfilingUtils.cpp
@@ -479,7 +479,7 @@ list(APPEND armnn_sources
     src/profiling/TimelinePacketWriterFactory.cpp
     src/profiling/TimelinePacketWriterFactory.hpp
     src/profiling/TimelineUtilityMethods.cpp
-    src/profiling/TimelineUtilityMethods.hpp
+    profiling/client/include/TimelineUtilityMethods.hpp
     src/profiling/backends/BackendProfiling.cpp
     src/profiling/backends/BackendProfiling.hpp
     third-party/cxxopts/cxxopts.hpp
@@ -521,6 +521,7 @@ target_include_directories(armnn
         src/armnnUtils
         src/backends
         src/profiling
+        profiling/client/include
         profiling/common/include
 )
 
@@ -962,6 +963,7 @@ if(BUILD_GATORD_MOCK)
     add_library_ex(gatordMockService STATIC ${gatord_mock_sources})
 
     target_include_directories(gatordMockService PRIVATE profiling/common/include
+                                                         profiling/client/include
                                                          profiling/server/src/basePipeServer
                                                          src/armnnUtils
                                                          src/profiling
@@ -975,6 +977,7 @@ if(BUILD_GATORD_MOCK)
     add_executable_ex(GatordMock tests/profiling/gatordmock/GatordMockMain.cpp)
 
     target_include_directories(GatordMock PRIVATE profiling/common/include
+                                                  profiling/client/include
                                                   profiling/server/src/basePipeServer
                                                   src/armnnUtils
                                                   src/profiling

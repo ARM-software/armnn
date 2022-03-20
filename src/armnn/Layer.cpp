@@ -5,10 +5,13 @@
 #include "Layer.hpp"
 
 #include "Graph.hpp"
-#include <IProfilingService.hpp>
-#include <armnn/utility/NumericCast.hpp>
+
 #include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/WorkloadData.hpp>
+
+#include <armnn/utility/NumericCast.hpp>
+
+#include <client/include/IProfilingService.hpp>
 
 #include <fmt/format.h>
 

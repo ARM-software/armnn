@@ -6,7 +6,8 @@
 #pragma once
 
 #include "ProfilingService.hpp"
-#include <armnn/backends/profiling/IBackendProfiling.hpp>
+
+#include <client/include/backends/IBackendProfiling.hpp>
 
 namespace arm
 {

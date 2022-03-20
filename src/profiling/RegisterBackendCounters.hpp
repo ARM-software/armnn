@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include "CounterIdMap.hpp"
-#include "IProfilingService.hpp"
+#include <client/include/CounterIdMap.hpp>
+#include <client/include/IProfilingService.hpp>
 
-#include "armnn/backends/profiling/IBackendProfiling.hpp"
+#include <client/include/backends/IBackendProfiling.hpp>
 
 #include <common/include/CounterDirectory.hpp>
 

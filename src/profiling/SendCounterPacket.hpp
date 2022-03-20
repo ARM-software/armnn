@@ -6,8 +6,9 @@
 #pragma once
 
 #include "IBufferManager.hpp"
-#include "ISendCounterPacket.hpp"
 #include "ProfilingUtils.hpp"
+
+#include <client/include/ISendCounterPacket.hpp>
 
 #include <type_traits>
 

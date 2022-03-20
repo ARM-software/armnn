@@ -5,14 +5,15 @@
 
 #pragma once
 
-#include "CounterIdMap.hpp"
-#include "Holder.hpp"
 #include "ProfilingStateMachine.hpp"
 #include "SendCounterPacket.hpp"
 #include "IPeriodicCounterCapture.hpp"
-#include "ICounterValues.hpp"
 
-#include "armnn/backends/profiling/IBackendProfilingContext.hpp"
+#include <client/include/CounterIdMap.hpp>
+#include <client/include/Holder.hpp>
+#include <client/include/ICounterValues.hpp>
+
+#include <client/include/backends/IBackendProfilingContext.hpp>
 
 #include <common/include/CommandHandlerFunctor.hpp>
 #include <common/include/Logging.hpp>

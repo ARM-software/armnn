@@ -2,7 +2,9 @@
 // Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include "TimelineUtilityMethods.hpp"
+#include "ProfilingUtils.hpp"
+
+#include <client/include/TimelineUtilityMethods.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <common/include/Threads.hpp>

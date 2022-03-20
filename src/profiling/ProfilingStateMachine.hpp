@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "ProfilingState.hpp"
-
-#include <atomic>
+#include <client/include/ProfilingState.hpp>
 
 #include <common/include/IgnoreUnused.hpp>
+
+#include <atomic>
 
 namespace arm
 {

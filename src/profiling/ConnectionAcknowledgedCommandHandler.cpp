@@ -4,7 +4,8 @@
 //
 
 #include "ConnectionAcknowledgedCommandHandler.hpp"
-#include "TimelineUtilityMethods.hpp"
+
+#include <client/include/TimelineUtilityMethods.hpp>
 
 #include <common/include/ProfilingException.hpp>
 

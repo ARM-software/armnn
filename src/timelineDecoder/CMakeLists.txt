@@ -11,6 +11,7 @@ if(BUILD_TIMELINE_DECODER)
 
     include_directories(${PROJECT_SOURCE_DIR}/src/profiling
                         ${PROJECT_SOURCE_DIR}/profiling/common/include
+                        ${PROJECT_SOURCE_DIR}/profiling/client/include
                         ${PROJECT_SOURCE_DIR}/profiling/server/include/timelineDecoder
                         ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 

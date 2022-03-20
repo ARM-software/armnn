@@ -6,7 +6,8 @@
 #pragma once
 
 #include "IBufferManager.hpp"
-#include "armnn/profiling/ISendTimelinePacket.hpp"
+
+#include <client/include/ISendTimelinePacket.hpp>
 
 #include <memory>
 

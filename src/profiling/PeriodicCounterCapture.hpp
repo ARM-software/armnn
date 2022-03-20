@@ -6,12 +6,13 @@
 #pragma once
 
 #include "IPeriodicCounterCapture.hpp"
-#include "Holder.hpp"
 #include "SendCounterPacket.hpp"
-#include "ICounterValues.hpp"
-#include "CounterIdMap.hpp"
 
-#include <armnn/backends/profiling/IBackendProfilingContext.hpp>
+#include <client/include/CounterIdMap.hpp>
+#include <client/include/Holder.hpp>
+#include <client/include/ICounterValues.hpp>
+
+#include <client/include/backends/IBackendProfilingContext.hpp>
 
 #include <common/include/Packet.hpp>
 

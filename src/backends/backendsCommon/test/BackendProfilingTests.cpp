@@ -4,8 +4,6 @@
 //
 
 #include "ArmNNProfilingServiceInitialiser.hpp"
-#include "CounterIdMap.hpp"
-#include "Holder.hpp"
 #include "MockBackendId.hpp"
 #include "PeriodicCounterCapture.hpp"
 #include "PeriodicCounterSelectionCommandHandler.hpp"
@@ -20,14 +18,17 @@
 #include <armnn/Logging.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
-#include <armnn/profiling/ISendTimelinePacket.hpp>
-#include <armnn/profiling/ProfilingOptions.hpp>
 
 #include <armnn/utility/IgnoreUnused.hpp>
 
 #include <armnnTestUtils/MockBackend.hpp>
 
 #include <backends/BackendProfiling.hpp>
+
+#include <client/include/CounterIdMap.hpp>
+#include <client/include/Holder.hpp>
+#include <client/include/ISendTimelinePacket.hpp>
+#include <client/include/ProfilingOptions.hpp>
 
 #include <common/include/CounterDirectory.hpp>
 

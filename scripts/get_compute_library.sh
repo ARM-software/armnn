@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4e66d707a292b90a344e32c59eb1dacb67a0e4c1" #Added windows native build support
+DEFAULT_CLFRAMEWORKREVISION="8a87983c90299dfc7d6fbda3dba312e7603d7074" #Setup automatic kernel window for dynamic fusion
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -810,6 +810,11 @@ protected:
                                          const IDeviceSpec& deviceSpec,
                                          const OptimizerOptions& options,
                                          Optional<std::vector<std::string>&> messages);
+    friend IOptimizedNetworkPtr Optimize(const Graph& inGraph,
+                                         const std::vector<BackendId>& backendPreferences,
+                                         const IDeviceSpec& deviceSpec,
+                                         const OptimizerOptions& options,
+                                         Optional<std::vector<std::string>&> messages);
 
     IOptimizedNetwork(std::unique_ptr<Graph> graph, const ModelOptions& modelOptions);
 
@@ -829,5 +834,20 @@ IOptimizedNetworkPtr Optimize(const INetwork& network,
                               const std::vector<BackendId>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
                               const OptimizerOptions& options = OptimizerOptions(),
+                              Optional<std::vector<std::string>&> messages = EmptyOptional());
+
+/// Create an optimized version of the network
+/// @param inGraph Graph to be optimized.
+/// @param backendPreferences The choice of the backend ordered by user preferences.
+/// @param deviceSpec DeviceSpec object as queried from the runtime. See IRuntime::GetDeviceSpec()
+/// @param messages If there are failures or warnings a string describing same will be added to the vector
+/// @param options OptimizerOptions object with optimizer configuration options
+/// @return An IOptimizedNetworkPtr interface to the optimized network, throws an exception derived from
+/// armnn::Exception if process fails.
+
+IOptimizedNetworkPtr Optimize(const Graph& inGraph,
+                              const std::vector<BackendId>& backendPreferences,
+                              const IDeviceSpec& deviceSpec,
+                              const OptimizerOptions& options,
                               Optional<std::vector<std::string>&> messages = EmptyOptional());
 } //namespace armnn

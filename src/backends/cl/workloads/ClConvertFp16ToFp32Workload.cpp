@@ -80,8 +80,8 @@ void ClConvertFp16ToFp32Workload::ReplaceInputTensorHandle(ITensorHandle* tensor
 // Replace output tensor handle with the given TensorHandle
 void ClConvertFp16ToFp32Workload::ReplaceOutputTensorHandle(ITensorHandle* tensorHandle, unsigned int slot)
 {
-    ITensorHandle* backupHandle = this->m_Data.m_Inputs[slot];
-    this->m_Data.m_Inputs[slot] = tensorHandle;
+    ITensorHandle* backupHandle = this->m_Data.m_Outputs[slot];
+    this->m_Data.m_Outputs[slot] = tensorHandle;
     try
     {
         Reconfigure();
@@ -89,7 +89,7 @@ void ClConvertFp16ToFp32Workload::ReplaceOutputTensorHandle(ITensorHandle* tenso
     catch(armnn::UnimplementedException& e)
     {
         // Cannot reconfigure, revert the slot back and throw the exception.
-        this->m_Data.m_Inputs[slot] = backupHandle;
+        this->m_Data.m_Outputs[slot] = backupHandle;
         throw e;
     }
 }

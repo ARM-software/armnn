@@ -1456,7 +1456,7 @@ std::vector<ImportedOutputId> LoadedNetwork::ImportOutputs(const OutputTensors& 
         {
             throw MemoryImportException("ImportOutputs: Force Import failed, incorrect number of tensors");
         }
-        std::vector<ImportedInputId> importedOutputs;
+        std::vector<ImportedOutputId> importedOutputs;
         Graph& graph = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
 
         unsigned int outputIndex = 0;

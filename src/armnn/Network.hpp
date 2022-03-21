@@ -238,6 +238,10 @@ public:
                                                           const LstmInputParams& params,
                                                           const char* name = nullptr);
 
+    IConnectableLayer* AddConvertFp16ToFp32Layer(const char* name = nullptr);
+
+    IConnectableLayer* AddConvertFp32ToFp16Layer(const char* name = nullptr);
+
     ARMNN_NO_DEPRECATE_WARN_BEGIN
     void Accept(ILayerVisitor& visitor) const;
     ARMNN_NO_DEPRECATE_WARN_END

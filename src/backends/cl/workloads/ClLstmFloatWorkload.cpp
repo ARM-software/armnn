@@ -310,7 +310,7 @@ arm_compute::Status ClLstmFloatWorkloadValidate(const TensorInfo& input, const T
 
         if (paramsInfo.m_ProjectionBias != nullptr)
         {
-            aclProjectionBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetInputGateBias());
+            aclProjectionBiasInfo = BuildArmComputeTensorInfo(paramsInfo.GetProjectionBias());
         }
         lstm_params_info.set_projection_params(&aclProjectionWeightsInfo,
                                                paramsInfo.m_ProjectionBias != nullptr ?

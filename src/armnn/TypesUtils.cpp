@@ -35,8 +35,8 @@ QuantizedType armnn::Quantize(float value, float scale, int32_t offset)
     ARMNN_ASSERT(scale != 0.f);
     ARMNN_ASSERT(!std::isnan(value));
 
-    float clampedValue = std::min(std::max(static_cast<float>(round(value/scale) + offset), static_cast<float>(min)),
-                                  static_cast<float>(max));
+    float clampedValue = std::min(std::max((static_cast<float>(offset) + static_cast<float>(round(value/scale))),
+                                            static_cast<float>(min)), static_cast<float>(max));
     auto quantizedBits = static_cast<QuantizedType>(clampedValue);
 
     return quantizedBits;

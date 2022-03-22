@@ -918,8 +918,10 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajor,
                               UnidirectionalSequenceLstmLayerFloat32TimeMajorTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjection,
                               UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNorm,
-                              UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTest)
+// Moved to  NeonLayerTests_NDK_Bug.cpp
+//ARMNN_AUTO_TEST_CASE_WITH_THF(
+//    UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNorm,
+//    UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjection,
                               UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest)
 

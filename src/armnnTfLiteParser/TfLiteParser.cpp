@@ -1130,7 +1130,7 @@ void TfLiteParserImpl::ParseConv3D(size_t subgraphIndex, size_t operatorIndex)
     unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
 
     CalcPadding(inputDepth, filterDepth, desc.m_StrideZ,
-                desc.m_DilationY, desc.m_PadFront, desc.m_PadBack, options->padding);
+                desc.m_DilationZ, desc.m_PadFront, desc.m_PadBack, options->padding);
     CalcPadding(inputHeight, filterHeight, desc.m_StrideY,
                 desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, options->padding);
     CalcPadding(inputWidth, filterWidth, desc.m_StrideX,

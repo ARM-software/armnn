@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-if(BUILD_TIMELINE_DECODER)
     set(pipeCommon_sources)
     list(APPEND pipeCommon_sources
         CommandHandlerFunctor.cpp
@@ -41,4 +40,3 @@ if(BUILD_TIMELINE_DECODER)
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     )
-endif()

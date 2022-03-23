@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "../ProfilingConnectionDumpToFileDecorator.hpp"
+#include <client/src/ProfilingConnectionDumpToFileDecorator.hpp>
 
 #include <Runtime.hpp>
 

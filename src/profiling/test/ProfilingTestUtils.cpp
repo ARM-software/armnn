@@ -6,12 +6,12 @@
 #include <ArmNNProfilingServiceInitialiser.hpp>
 #include "ProfilingOptionsConverter.hpp"
 #include "ProfilingTestUtils.hpp"
-#include "ProfilingUtils.hpp"
 
 #include <armnn/Descriptors.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>
 
-#include <ProfilingService.hpp>
+#include <client/src/ProfilingService.hpp>
+#include <client/src/ProfilingUtils.hpp>
 
 #include <common/include/Assert.hpp>
 #include <common/include/LabelsAndEventClasses.hpp>

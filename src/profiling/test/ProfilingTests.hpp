@@ -9,8 +9,8 @@
 
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
-#include <IProfilingConnection.hpp>
-#include <ProfilingService.hpp>
+#include <client/src/IProfilingConnection.hpp>
+#include <client/src/ProfilingService.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
 

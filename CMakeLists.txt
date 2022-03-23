@@ -176,8 +176,6 @@ list(APPEND armnn_sources
     include/armnn/TypesUtils.hpp
     include/armnn/Utils.hpp
     include/armnn/Version.hpp
-    profiling/client/include/ISendTimelinePacket.hpp
-    profiling/client/include/ProfilingOptions.hpp
     include/armnn/utility/Assert.hpp
     include/armnn/utility/IgnoreUnused.hpp
     include/armnn/utility/NumericCast.hpp
@@ -414,74 +412,6 @@ list(APPEND armnn_sources
     src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.hpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
-    src/profiling/ActivateTimelineReportingCommandHandler.cpp
-    src/profiling/ActivateTimelineReportingCommandHandler.hpp
-    src/profiling/BufferManager.cpp
-    src/profiling/BufferManager.hpp
-    src/profiling/CommandHandler.cpp
-    src/profiling/CommandHandler.hpp
-    src/profiling/ConnectionAcknowledgedCommandHandler.cpp
-    src/profiling/ConnectionAcknowledgedCommandHandler.hpp
-    src/profiling/CounterIdMap.cpp
-    profiling/client/include/CounterIdMap.hpp
-    src/profiling/DeactivateTimelineReportingCommandHandler.cpp
-    src/profiling/DeactivateTimelineReportingCommandHandler.hpp
-    src/profiling/FileOnlyProfilingConnection.cpp
-    src/profiling/FileOnlyProfilingConnection.hpp
-    src/profiling/Holder.cpp
-    profiling/client/include/Holder.hpp
-    src/profiling/IBufferManager.hpp
-    src/profiling/IConsumer.hpp
-    profiling/client/include/ICounterValues.hpp
-    profiling/client/include/IInitialiseProfilingService.hpp
-    src/profiling/INotifyBackends.hpp
-    profiling/client/include/IReportStructure.hpp
-    profiling/client/include/ISendCounterPacket.hpp
-    src/profiling/ISendThread.hpp
-    src/profiling/IPacketBuffer.hpp
-    src/profiling/IPeriodicCounterCapture.hpp
-    src/profiling/IProfilingConnection.hpp
-    src/profiling/IProfilingService.cpp
-    profiling/client/include/IProfilingService.hpp
-    src/profiling/IProfilingConnectionFactory.hpp
-    src/profiling/NullProfilingConnection.hpp
-    src/profiling/PacketBuffer.cpp
-    src/profiling/PacketBuffer.hpp
-    src/profiling/PeriodicCounterCapture.hpp
-    src/profiling/PeriodicCounterCapture.cpp
-    src/profiling/PeriodicCounterSelectionCommandHandler.cpp
-    src/profiling/PeriodicCounterSelectionCommandHandler.hpp
-    src/profiling/PerJobCounterSelectionCommandHandler.cpp
-    src/profiling/PerJobCounterSelectionCommandHandler.hpp
-    src/profiling/ProfilingConnectionDumpToFileDecorator.cpp
-    src/profiling/ProfilingConnectionDumpToFileDecorator.hpp
-    src/profiling/ProfilingConnectionFactory.cpp
-    src/profiling/ProfilingConnectionFactory.hpp
-    src/profiling/ProfilingService.cpp
-    src/profiling/ProfilingService.hpp
-    profiling/client/include/ProfilingState.hpp
-    src/profiling/ProfilingStateMachine.cpp
-    src/profiling/ProfilingStateMachine.hpp
-    src/profiling/ProfilingUtils.cpp
-    src/profiling/ProfilingUtils.hpp
-    src/profiling/RegisterBackendCounters.cpp
-    src/profiling/RegisterBackendCounters.hpp
-    src/profiling/RequestCounterDirectoryCommandHandler.cpp
-    src/profiling/RequestCounterDirectoryCommandHandler.hpp
-    src/profiling/SendCounterPacket.cpp
-    src/profiling/SendCounterPacket.hpp
-    src/profiling/SendThread.cpp
-    src/profiling/SendThread.hpp
-    src/profiling/SendTimelinePacket.cpp
-    src/profiling/SendTimelinePacket.hpp
-    src/profiling/SocketProfilingConnection.cpp
-    src/profiling/SocketProfilingConnection.hpp
-    src/profiling/TimelinePacketWriterFactory.cpp
-    src/profiling/TimelinePacketWriterFactory.hpp
-    src/profiling/TimelineUtilityMethods.cpp
-    profiling/client/include/TimelineUtilityMethods.hpp
-    src/profiling/backends/BackendProfiling.cpp
-    src/profiling/backends/BackendProfiling.hpp
     third-party/cxxopts/cxxopts.hpp
     third-party/ghc/filesystem.hpp
     third-party/half/half.hpp
@@ -521,24 +451,23 @@ target_include_directories(armnn
         src/armnnUtils
         src/backends
         src/profiling
-        profiling/client/include
         profiling/common/include
+        profiling/client/include
 )
-
-target_link_libraries(armnn armnnUtils)
-# only link pipeCommon if it has been built
-if(BUILD_TIMELINE_DECODER)
-    target_link_libraries(armnn pipeCommon)
-endif()
-
-target_link_libraries(armnn ${CMAKE_DL_LIBS})
-if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
-    target_link_libraries(armnn Ws2_32.lib)
-endif()
 
 # Link fmt third-party library
 add_subdirectory(third-party/fmt)
-target_link_libraries(armnn fmt)
+target_link_libraries(armnn PUBLIC fmt)
+
+target_link_libraries(armnn PUBLIC armnnUtils)
+target_link_libraries(armnn PUBLIC pipeCommon)
+target_link_libraries(armnn PUBLIC pipeClient)
+
+target_link_libraries(armnn PUBLIC ${CMAKE_DL_LIBS})
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
+    target_link_libraries(armnn PUBLIC Ws2_32.lib)
+endif()
+
 
 if(BUILD_ONNX_PARSER)
     install(TARGETS armnnOnnxParser
@@ -549,11 +478,11 @@ endif()
 install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL)
-    target_link_libraries(armnn ${ARMCOMPUTE_LIBRARIES})
+    target_link_libraries(armnn PUBLIC ${ARMCOMPUTE_LIBRARIES})
 endif()
 
 if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-    target_link_libraries(armnn ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(armnn PUBLIC ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
 set_target_properties(armnn PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION})
@@ -931,6 +860,7 @@ endif()
 if(BUILD_TIMELINE_DECODER)
     add_subdirectory(profiling/server/src/timelineDecoder)
     add_subdirectory(profiling/common/src)
+    add_subdirectory(profiling/client/src)
     add_subdirectory(src/timelineDecoder)
 endif()
 
@@ -983,14 +913,14 @@ if(BUILD_GATORD_MOCK)
                                                   src/profiling
                                                   src/timelineDecoder)
 
-    target_link_libraries(GatordMock
+    target_link_libraries(GatordMock PUBLIC
                           armnn
                           armnnBasePipeServer
                           timelineDecoder
                           gatordMockService)
 
     if(Threads_FOUND AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))
-        target_link_libraries(GatordMock ${CMAKE_THREAD_LIBS_INIT})
+        target_link_libraries(GatordMock PUBLIC ${CMAKE_THREAD_LIBS_INIT})
     endif()
 
 endif()

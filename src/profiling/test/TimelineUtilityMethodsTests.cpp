@@ -7,12 +7,13 @@
 #include "ProfilingTestUtils.hpp"
 
 #include <ArmNNProfilingServiceInitialiser.hpp>
-#include <SendTimelinePacket.hpp>
-#include <ProfilingService.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
 
 #include <client/include/TimelineUtilityMethods.hpp>
+
+#include <client/src/SendTimelinePacket.hpp>
+#include <client/src/ProfilingService.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 

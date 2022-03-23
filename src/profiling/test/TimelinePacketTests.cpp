@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <ProfilingUtils.hpp>
+#include <client/src/ProfilingUtils.hpp>
 
 #include <common/include/NumericCast.hpp>
 #include <common/include/SwTrace.hpp>

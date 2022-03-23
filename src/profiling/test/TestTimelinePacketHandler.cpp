@@ -4,7 +4,8 @@
 //
 
 #include "TestTimelinePacketHandler.hpp"
-#include "IProfilingConnection.hpp"
+
+#include <client/src/IProfilingConnection.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 

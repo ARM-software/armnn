@@ -11,11 +11,10 @@
 #include "IInitialiseProfilingService.hpp"
 #include "IProfilingServiceStatus.hpp"
 #include "ISendCounterPacket.hpp"
+#include "ISendTimelinePacket.hpp"
 #include "IReportStructure.hpp"
 #include "ProfilingOptions.hpp"
 #include "ProfilingState.hpp"
-
-#include <client/include/backends/IBackendProfilingContext.hpp>
 
 #include <common/include/ICounterRegistry.hpp>
 #include <common/include/Optional.hpp>
@@ -27,6 +26,9 @@ namespace arm
 
 namespace pipe
 {
+
+// forward declaration
+class IBackendProfilingContext;
 
 class IProfilingService : public IProfilingGuidGenerator,
                           public IProfilingServiceStatus,

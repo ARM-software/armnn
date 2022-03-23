@@ -5,9 +5,10 @@
 
 #include <server/include/basePipeServer/ConnectionHandler.hpp>
 
-#include <BufferManager.hpp>
-#include <SendCounterPacket.hpp>
-#include <SocketProfilingConnection.hpp>
+#include <client/src/BufferManager.hpp>
+#include <client/src/SendCounterPacket.hpp>
+#include <client/src/SocketProfilingConnection.hpp>
+
 #include <common/include/Processes.hpp>
 
 #include <doctest/doctest.h>

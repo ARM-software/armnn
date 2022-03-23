@@ -2,9 +2,16 @@
 // Copyright © 2020 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #pragma once
 
+#include <client/include/CounterStatus.hpp>
+#include <client/include/CounterValue.hpp>
+#include <client/include/IProfilingService.hpp>
+#include <client/include/ISendCounterPacket.hpp>
 #include <client/include/ISendTimelinePacket.hpp>
+#include <client/include/ProfilingOptions.hpp>
+#include <client/include/Timestamp.hpp>
 
 #include <common/include/IProfilingGuidGenerator.hpp>
 #include <common/include/Optional.hpp>
@@ -17,36 +24,6 @@ namespace arm
 
 namespace pipe
 {
-
-struct CounterValue
-{
-    CounterValue(uint16_t id, uint32_t value) :
-        counterId(id), counterValue(value) {}
-    uint16_t counterId;
-    uint32_t counterValue;
-};
-
-struct Timestamp
-{
-    uint64_t timestamp;
-    std::vector<CounterValue> counterValues;
-};
-
-struct CounterStatus
-{
-    CounterStatus(uint16_t backendCounterId,
-                  uint16_t globalCounterId,
-                  bool enabled,
-                  uint32_t samplingRateInMicroseconds)
-                  : m_BackendCounterId(backendCounterId),
-                    m_GlobalCounterId(globalCounterId),
-                    m_Enabled(enabled),
-                    m_SamplingRateInMicroseconds(samplingRateInMicroseconds) {}
-    uint16_t m_BackendCounterId;
-    uint16_t m_GlobalCounterId;
-    bool     m_Enabled;
-    uint32_t m_SamplingRateInMicroseconds;
-};
 
 class IRegisterBackendCounters
 {
@@ -81,6 +58,9 @@ public:
 class IBackendProfiling
 {
 public:
+    static std::unique_ptr<IBackendProfiling> CreateBackendProfiling(const ProfilingOptions& options,
+                                                                     IProfilingService& profilingService,
+                                                                     const std::string& backendId);
     virtual ~IBackendProfiling()
     {}
 

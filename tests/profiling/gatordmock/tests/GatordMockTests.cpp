@@ -5,10 +5,11 @@
 
 #include <ArmNNProfilingServiceInitialiser.hpp>
 #include <GatordMockService.hpp>
-#include <ProfilingService.hpp>
-#include <TimelinePacketWriterFactory.hpp>
 #include <Runtime.hpp>
 #include <armnnTestUtils/MockBackend.hpp>
+
+#include <client/src/ProfilingService.hpp>
+#include <client/src/TimelinePacketWriterFactory.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
 

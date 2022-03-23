@@ -20,10 +20,10 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/utility/Timer.hpp>
 
-#include <backends/BackendProfiling.hpp>
-
 #include <backendsCommon/DynamicBackendUtils.hpp>
 #include <backendsCommon/memoryOptimizerStrategyLibrary/MemoryOptimizerStrategyLibrary.hpp>
+
+#include <client/include/backends/IBackendProfiling.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 
@@ -498,10 +498,10 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
             supportedBackends.emplace(id);
 
             unique_ptr<arm::pipe::IBackendProfiling> profilingIface =
-                std::make_unique<arm::pipe::BackendProfiling>(arm::pipe::BackendProfiling(
+                arm::pipe::IBackendProfiling::CreateBackendProfiling(
                     arm::pipe::ConvertExternalProfilingOptions(options.m_ProfilingOptions),
-                                                               *m_ProfilingService.get(),
-                                                               id));
+                    *m_ProfilingService.get(),
+                    id.Get());
 
             // Backends may also provide a profiling context. Ask for it now.
             auto profilingContext = backend->CreateBackendProfilingContext(options, profilingIface);

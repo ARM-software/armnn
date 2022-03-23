@@ -121,6 +121,34 @@ LOCAL_SRC_FILES := \
         profiling/common/src/Processes.cpp \
         profiling/common/src/SwTrace.cpp \
         profiling/common/src/Threads.cpp \
+        profiling/client/src/ActivateTimelineReportingCommandHandler.cpp \
+        profiling/client/src/BufferManager.cpp \
+        profiling/client/src/CommandHandler.cpp \
+        profiling/client/src/ConnectionAcknowledgedCommandHandler.cpp \
+        profiling/client/src/CounterIdMap.cpp \
+        profiling/client/src/DeactivateTimelineReportingCommandHandler.cpp \
+        profiling/client/src/FileOnlyProfilingConnection.cpp \
+        profiling/client/src/Holder.cpp \
+        profiling/client/src/IProfilingService.cpp \
+        profiling/client/src/PacketBuffer.cpp \
+        profiling/client/src/PeriodicCounterCapture.cpp \
+        profiling/client/src/PeriodicCounterSelectionCommandHandler.cpp \
+        profiling/client/src/PerJobCounterSelectionCommandHandler.cpp \
+        profiling/client/src/ProfilingConnectionDumpToFileDecorator.cpp \
+        profiling/client/src/ProfilingConnectionFactory.cpp \
+        profiling/client/src/ProfilingService.cpp \
+        profiling/client/src/ProfilingStateMachine.cpp \
+        profiling/client/src/ProfilingUtils.cpp \
+        profiling/client/src/RegisterBackendCounters.cpp \
+        profiling/client/src/RequestCounterDirectoryCommandHandler.cpp \
+        profiling/client/src/SendCounterPacket.cpp \
+        profiling/client/src/SendThread.cpp \
+        profiling/client/src/SendTimelinePacket.cpp \
+        profiling/client/src/SocketProfilingConnection.cpp \
+        profiling/client/src/TimelinePacketWriterFactory.cpp \
+        profiling/client/src/TimelineUtilityMethods.cpp \
+        profiling/client/src/backends/BackendProfiling.cpp \
+        profiling/client/src/backends/IBackendProfiling.cpp \
         profiling/server/src/timelineDecoder/DirectoryCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineCaptureCommandHandler.cpp \
         profiling/server/src/timelineDecoder/TimelineDecoder.cpp \
@@ -240,33 +268,6 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/TransposeLayer.cpp \
         src/armnn/layers/UnidirectionalSequenceLstmLayer.cpp \
         src/armnn/layers/UnmapLayer.cpp \
-        src/profiling/ActivateTimelineReportingCommandHandler.cpp \
-        src/profiling/BufferManager.cpp \
-        src/profiling/CommandHandler.cpp \
-        src/profiling/ConnectionAcknowledgedCommandHandler.cpp \
-        src/profiling/CounterIdMap.cpp \
-        src/profiling/DeactivateTimelineReportingCommandHandler.cpp \
-        src/profiling/FileOnlyProfilingConnection.cpp \
-        src/profiling/Holder.cpp \
-        src/profiling/IProfilingService.cpp \
-        src/profiling/PacketBuffer.cpp \
-        src/profiling/PeriodicCounterCapture.cpp \
-        src/profiling/PeriodicCounterSelectionCommandHandler.cpp \
-        src/profiling/PerJobCounterSelectionCommandHandler.cpp \
-        src/profiling/ProfilingConnectionDumpToFileDecorator.cpp \
-        src/profiling/ProfilingConnectionFactory.cpp \
-        src/profiling/ProfilingService.cpp \
-        src/profiling/ProfilingStateMachine.cpp \
-        src/profiling/ProfilingUtils.cpp \
-        src/profiling/RegisterBackendCounters.cpp \
-        src/profiling/RequestCounterDirectoryCommandHandler.cpp \
-        src/profiling/SendCounterPacket.cpp \
-        src/profiling/SendThread.cpp \
-        src/profiling/SendTimelinePacket.cpp \
-        src/profiling/SocketProfilingConnection.cpp \
-        src/profiling/TimelinePacketWriterFactory.cpp \
-        src/profiling/TimelineUtilityMethods.cpp \
-        src/profiling/backends/BackendProfiling.cpp \
         src/armnnSerializer/Serializer.cpp \
         src/armnnSerializer/SerializerUtils.cpp \
         src/armnnDeserializer/Deserializer.cpp

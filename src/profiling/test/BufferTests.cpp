@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "BufferManager.hpp"
-#include "PacketBuffer.hpp"
-#include "ProfilingUtils.hpp"
+#include <client/src/BufferManager.hpp>
+#include <client/src/PacketBuffer.hpp>
+#include <client/src/ProfilingUtils.hpp>
 
 #include <common/include/SwTrace.hpp>
 

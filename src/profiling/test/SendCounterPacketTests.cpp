@@ -7,9 +7,9 @@
 #include "ProfilingTestUtils.hpp"
 #include "SendCounterPacketTests.hpp"
 
-#include <BufferManager.hpp>
-#include <ProfilingUtils.hpp>
-#include <SendCounterPacket.hpp>
+#include <client/src/BufferManager.hpp>
+#include <client/src/ProfilingUtils.hpp>
+#include <client/src/SendCounterPacket.hpp>
 
 #include <armnn/Utils.hpp>
 

@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include <SendCounterPacket.hpp>
-#include <SendThread.hpp>
-#include <ProfilingUtils.hpp>
-#include <IProfilingConnectionFactory.hpp>
+#include <client/src/SendCounterPacket.hpp>
+#include <client/src/SendThread.hpp>
+#include <client/src/ProfilingUtils.hpp>
+#include <client/src/IProfilingConnectionFactory.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
 

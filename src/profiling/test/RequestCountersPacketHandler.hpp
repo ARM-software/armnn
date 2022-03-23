@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "ProfilingUtils.hpp"
+#include <client/src/ProfilingUtils.hpp>
 
 #include <client/include/ILocalPacketHandler.hpp>
 #include <client/include/ProfilingOptions.hpp>

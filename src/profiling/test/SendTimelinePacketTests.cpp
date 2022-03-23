@@ -5,15 +5,17 @@
 
 #include "ProfilingMocks.hpp"
 #include "ProfilingTestUtils.hpp"
-
-#include <ArmNNProfilingServiceInitialiser.hpp>
-#include <BufferManager.hpp>
-#include <ProfilingService.hpp>
 #include "ProfilingOptionsConverter.hpp"
-#include <ProfilingUtils.hpp>
-#include <SendTimelinePacket.hpp>
+#include <Runtime.hpp>
+#include <ArmNNProfilingServiceInitialiser.hpp>
+
 #include <armnn/profiling/ArmNNProfiling.hpp>
-#include <TimelinePacketWriterFactory.hpp>
+
+#include <client/src/BufferManager.hpp>
+#include <client/src/ProfilingService.hpp>
+#include <client/src/ProfilingUtils.hpp>
+#include <client/src/SendTimelinePacket.hpp>
+#include <client/src/TimelinePacketWriterFactory.hpp>
 
 #include <common/include/LabelsAndEventClasses.hpp>
 #include <common/include/SwTrace.hpp>
@@ -22,7 +24,6 @@
 #include <doctest/doctest.h>
 
 #include <functional>
-#include <Runtime.hpp>
 
 using namespace arm::pipe;
 

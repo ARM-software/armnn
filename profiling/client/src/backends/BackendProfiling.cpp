@@ -4,7 +4,7 @@
 //
 
 #include "BackendProfiling.hpp"
-#include "RegisterBackendCounters.hpp"
+#include <client/src/RegisterBackendCounters.hpp>
 
 namespace arm
 {

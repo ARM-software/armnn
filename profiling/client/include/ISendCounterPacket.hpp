@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <client/include/backends/IBackendProfiling.hpp>
+#include "CounterValue.hpp"
 
 #include <common/include/ICounterDirectory.hpp>
 

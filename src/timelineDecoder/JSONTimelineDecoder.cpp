@@ -4,7 +4,8 @@
 //
 
 #include "JSONTimelineDecoder.hpp"
-#include "../profiling/ProfilingUtils.hpp"
+
+#include <client/src/ProfilingUtils.hpp>
 
 #include <string>
 

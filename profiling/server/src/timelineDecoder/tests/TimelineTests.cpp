@@ -10,10 +10,10 @@
 #include <server/include/timelineDecoder/TimelineDirectoryCaptureCommandHandler.hpp>
 #include <server/include/timelineDecoder/TimelineDecoder.hpp>
 
-#include <BufferManager.hpp>
-#include <ProfilingService.hpp>
-#include <PacketBuffer.hpp>
-#include <TimelinePacketWriterFactory.hpp>
+#include <client/src/BufferManager.hpp>
+#include <client/src/ProfilingService.hpp>
+#include <client/src/PacketBuffer.hpp>
+#include <client/src/TimelinePacketWriterFactory.hpp>
 
 #include <doctest/doctest.h>
 

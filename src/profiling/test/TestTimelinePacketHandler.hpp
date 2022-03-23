@@ -5,10 +5,11 @@
 
 #pragma once
 
-#include "ProfilingUtils.hpp"
 #include "TimelineModel.hpp"
 
 #include <client/include/ILocalPacketHandler.hpp>
+
+#include <client/src/ProfilingUtils.hpp>
 
 #include <common/include/Packet.hpp>
 

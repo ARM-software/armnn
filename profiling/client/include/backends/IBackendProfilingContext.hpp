@@ -5,6 +5,9 @@
 #pragma once
 
 #include "IBackendProfiling.hpp"
+
+#include <common/include/Optional.hpp>
+
 #include <vector>
 
 namespace arm
@@ -20,7 +23,7 @@ public:
     virtual uint16_t RegisterCounters(uint16_t currentMaxGlobalCounterID) = 0;
     virtual arm::pipe::Optional<std::string> ActivateCounters(
         uint32_t capturePeriod, const std::vector<uint16_t>& counterIds) = 0;
-    virtual std::vector<Timestamp> ReportCounterValues() = 0;
+    virtual std::vector<arm::pipe::Timestamp> ReportCounterValues() = 0;
     virtual bool EnableProfiling(bool flag) = 0;
     virtual bool EnableTimelineReporting(bool flag) = 0;
 };

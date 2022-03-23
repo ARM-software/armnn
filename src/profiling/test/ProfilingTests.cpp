@@ -5,27 +5,26 @@
 
 #include "ProfilingTests.hpp"
 #include "ProfilingTestUtils.hpp"
-
-#include <ArmNNProfilingServiceInitialiser.hpp>
-#include <CommandHandler.hpp>
-#include <ConnectionAcknowledgedCommandHandler.hpp>
-#include <PeriodicCounterCapture.hpp>
-#include <PeriodicCounterSelectionCommandHandler.hpp>
-#include <ProfilingStateMachine.hpp>
-#include <ProfilingUtils.hpp>
-#include <RegisterBackendCounters.hpp>
-#include <RequestCounterDirectoryCommandHandler.hpp>
 #include <Runtime.hpp>
-#include <SocketProfilingConnection.hpp>
-#include <SendCounterPacket.hpp>
-#include <SendThread.hpp>
-#include <SendTimelinePacket.hpp>
+#include <ArmNNProfilingServiceInitialiser.hpp>
+
+#include <client/src/CommandHandler.hpp>
+#include <client/src/ConnectionAcknowledgedCommandHandler.hpp>
+#include <client/src/PeriodicCounterCapture.hpp>
+#include <client/src/PeriodicCounterSelectionCommandHandler.hpp>
+#include <client/src/ProfilingStateMachine.hpp>
+#include <client/src/ProfilingUtils.hpp>
+#include <client/src/RegisterBackendCounters.hpp>
+#include <client/src/RequestCounterDirectoryCommandHandler.hpp>
+#include <client/src/SocketProfilingConnection.hpp>
+#include <client/src/SendCounterPacket.hpp>
+#include <client/src/SendThread.hpp>
+#include <client/src/SendTimelinePacket.hpp>
+#include <client/src/backends/BackendProfiling.hpp>
 
 #include <armnn/Utils.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
-
-#include <backends/BackendProfiling.hpp>
 
 #include <client/include/CounterIdMap.hpp>
 #include <client/include/Holder.hpp>

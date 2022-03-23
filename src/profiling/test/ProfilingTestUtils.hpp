@@ -5,11 +5,12 @@
 
 #pragma once
 
-#include "ProfilingUtils.hpp"
 #include "Runtime.hpp"
 
-#include <BufferManager.hpp>
-#include <ProfilingService.hpp>
+#include <client/src/BufferManager.hpp>
+#include <client/src/ProfilingService.hpp>
+#include <client/src/ProfilingUtils.hpp>
+
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
 

@@ -3,13 +3,15 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include <armnnUtils/Filesystem.hpp>
-#include <ProfilingService.hpp>
-#include "ProfilingTestUtils.hpp"
-#include "ProfilingOptionsConverter.hpp"
 #include "PrintPacketHeaderHandler.hpp"
+#include "ProfilingOptionsConverter.hpp"
+#include "ProfilingTestUtils.hpp"
 #include <Runtime.hpp>
 #include "TestTimelinePacketHandler.hpp"
+
+#include <armnnUtils/Filesystem.hpp>
+
+#include <client/src/ProfilingService.hpp>
 
 #include <doctest/doctest.h>
 

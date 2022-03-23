@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <IProfilingConnectionFactory.hpp>
-#include <ProfilingService.hpp>
-#include <ProfilingUtils.hpp>
-#include <SendCounterPacket.hpp>
-#include <SendThread.hpp>
+#include <client/src/IProfilingConnectionFactory.hpp>
+#include <client/src/ProfilingService.hpp>
+#include <client/src/ProfilingUtils.hpp>
+#include <client/src/SendCounterPacket.hpp>
+#include <client/src/SendThread.hpp>
 
 #include <armnn/BackendId.hpp>
 #include <armnn/profiling/ArmNNProfiling.hpp>

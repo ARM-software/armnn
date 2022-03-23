@@ -5,12 +5,7 @@
 
 #include "ArmNNProfilingServiceInitialiser.hpp"
 #include "MockBackendId.hpp"
-#include "PeriodicCounterCapture.hpp"
-#include "PeriodicCounterSelectionCommandHandler.hpp"
 #include "ProfilingOptionsConverter.hpp"
-#include "ProfilingStateMachine.hpp"
-#include "ProfilingUtils.hpp"
-#include "RequestCounterDirectoryCommandHandler.hpp"
 
 #include <TestUtils.hpp>
 
@@ -23,14 +18,21 @@
 
 #include <armnnTestUtils/MockBackend.hpp>
 
-#include <backends/BackendProfiling.hpp>
-
 #include <client/include/CounterIdMap.hpp>
 #include <client/include/Holder.hpp>
 #include <client/include/ISendTimelinePacket.hpp>
 #include <client/include/ProfilingOptions.hpp>
 
+#include <client/src/PeriodicCounterCapture.hpp>
+#include <client/src/PeriodicCounterSelectionCommandHandler.hpp>
+#include <client/src/ProfilingStateMachine.hpp>
+#include <client/src/ProfilingUtils.hpp>
+#include <client/src/RequestCounterDirectoryCommandHandler.hpp>
+
+#include <client/src/backends/BackendProfiling.hpp>
+
 #include <common/include/CounterDirectory.hpp>
+#include <common/include/PacketVersionResolver.hpp>
 
 #include <doctest/doctest.h>
 

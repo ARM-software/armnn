@@ -17,7 +17,7 @@
 
 
 ## Introduction
-These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 system. This build flow has been tested with Ubuntu 18.04 and 20.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Protobuf, Tflite, Flatbuffer and Compute Libraries.
+These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 Ubuntu Linux system. This build flow has been tested with Ubuntu 18.04 and 20.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Protobuf, Tflite, Flatbuffer and Compute Libraries.
 Start by creating a directory to contain all components:
 
 '''
@@ -180,7 +180,7 @@ cd ..
 curl -LO https://storage.googleapis.com/mirror.tensorflow.org/developer.arm.com/media/Files/downloads/gnu-a/8.3-2019.03/binrel/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz
 mkdir tflite-toolchains
 tar xvf gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu.tar.xz -C tflite-toolchains
-mkdir tflite/build
+mkdir -p tflite/build
 cd tflite/build
 ARMCC_PREFIX=$HOME/armnn-devenv/tflite-toolchains/gcc-arm-8.3-2019.03-x86_64-aarch64-linux-gnu/bin/aarch64-linux-gnu- \
 ARMCC_FLAGS="-funsafe-math-optimizations" \
@@ -196,8 +196,8 @@ cmake --build .
 
 ## Generate TF Lite Schema
 ```
-cd $HOME/armnn-devenv
-cp ../tensorflow/tensorflow/lite/schema/schema.fbs .
+cd $HOME/armnn-devenv/tflite
+cp $HOME/armnn-devenv/tensorflow/tensorflow/lite/schema/schema.fbs .
 ../flatbuffers-1.12.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
 ```
 
@@ -220,10 +220,10 @@ CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 -DBUILD_ONNX_PARSER=1 \
 -DBUILD_TF_LITE_PARSER=1 \
 -DTENSORFLOW_ROOT=$HOME/armnn-devenv/tensorflow \
+-DTF_LITE_SCHEMA_INCLUDE_PATH=$WORKING_DIR/tflite \
 -DFLATBUFFERS_ROOT=$HOME/armnn-devenv/flatbuffers-arm64 \
 -DFLATC_DIR=$HOME/armnn-devenv/flatbuffers-1.12.0/build \
 -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install \
--DPROTOBUF_ROOT=$HOME/armnn-devenv/google/x86_64_pb_install/ \
 -DPROTOBUF_LIBRARY_DEBUG=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0 \
 -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm64_pb_install/lib/libprotobuf.so.23.0.0
 ```
@@ -236,7 +236,6 @@ CXX=aarch64-linux-gnu-g++ CC=aarch64-linux-gnu-gcc cmake .. \
 * If you want to build Arm NN TF Lite Delegate, add the arguments:
 ```bash
 -DTFLITE_LIB_ROOT=$HOME/armnn-devenv/tflite/build \
--DTF_LITE_SCHEMA_INCLUDE_PATH=$HOME/armnn-devenv/tflite \
 -DBUILD_ARMNN_TFLITE_DELEGATE=1
 ```
 * Run the build
@@ -300,6 +299,22 @@ LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH ./delegate/DelegateUnitTests
 ```
 
 ## Troubleshooting and Errors:
+### Missing xxd
+* When Cross-compiling Arm NN if you are getting error
+```bash
+[ 62%] Generating SchemaText.cpp
+/bin/sh: 1: xxd: not found
+make[2]: *** [armnn/CMakeFiles/UnitTests.dir/build.make:63: armnn/SchemaText.cpp] Error 127
+make[1]: *** [CMakeFiles/Makefile2:674: armnn/CMakeFiles/UnitTests.dir/all] Error 2
+make[1]: *** Waiting for unfinished jobs....
+```
+* Missing xxd, this can be fixed by installing it:
+```bash
+sudo apt-get install xxd
+```
+
+<br><br>
+
 ### Missing libz.so.1
 * When compiling armNN:
 ```bash

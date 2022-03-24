@@ -24,16 +24,14 @@ All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` 
  mkdir -p $HOME/armnn-devenv/
  cd $HOME/armnn-devenv/
  # For Mac OS, change the NDK download link accordingly.
- wget https://dl.google.com/android/repository/android-ndk-r20b-linux-x86_64.zip
- unzip android-ndk-r20b-linux-x86_64.zip
- export NDK=$HOME/armnn-devenv/android-ndk-r20b
+ https://dl.google.com/android/repository/android-ndk-r23-linux.zip
+ unzip android-ndk-r23-linux.zip
+ export NDK=$HOME/armnn-devenv/android-ndk-r23
  export NDK_TOOLCHAIN_ROOT=$NDK/toolchains/llvm/prebuilt/linux-x86_64
  export PATH=$NDK_TOOLCHAIN_ROOT/bin/:$PATH
 
  # You may want to append the above export variables commands to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
  ```
-
-* With the android ndk-20b, you don't need to use the make_standalone_toolchain script to create a toolchain for a specific version of android. Android's current preference is for you to just specify the architecture and operating system while setting the compiler and just use the ndk directory.
 
 ## Build Google's Protobuf library (Optional)
 
@@ -122,9 +120,9 @@ Arm NN provides a script that downloads the version of Arm Compute Library that 
 git checkout $(../armnn/scripts/get_compute_library.sh -p) 
 ```
 * the Arm Compute Library: 
-  (Requires SCons if not previously installed: `sudo apt install scons`)
+  (Requires SCons if not previously installed: `sudo apt install scons`. scons 2.3 or above is required to build the library.)
 ```bash
-scons arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
+scons toolchain_prefix=llvm- compiler_prefix=aarch64-linux-android$ANDROID_API- arch=arm64-v8a neon=1 opencl=1 embed_kernels=1 extra_cxx_flags="-fPIC" \
  benchmark_tests=0 validation_tests=0 os=android -j16
 ```
 

@@ -25,7 +25,7 @@ QuantizedMultiplierSmallerThanOne::QuantizedMultiplierSmallerThanOne(float multi
     {
         const double q = std::frexp(multiplier, &m_RightShift);
         m_RightShift = -m_RightShift;
-        int64_t qFixed = static_cast<int64_t>(std::round(q * (1ll << 31)));
+        int64_t qFixed = static_cast<int64_t>(::round(q * (1ll << 31)));
         ARMNN_ASSERT(qFixed <= (1ll << 31));
         if (qFixed == (1ll << 31))
         {

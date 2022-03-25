@@ -102,7 +102,11 @@ public:
 private:
 
 
-    void AllocateWorkingMemory(std::lock_guard<std::mutex>& lock);
+    void AllocateWorkingMemory(
+#if !defined(ARMNN_DISABLE_THREADS)
+        std::lock_guard<std::mutex>& lock
+#endif
+    );
     void AllocateAndExecuteConstantWorkloads();
     void AllocateAndExecuteConstantWorkloadsAsync();
 
@@ -151,7 +155,9 @@ private:
     WorkloadQueue                      m_WorkloadQueue;
     WorkloadQueue                      m_OutputQueue;
 
+#if !defined(ARMNN_DISABLE_THREADS)
     mutable std::mutex m_WorkingMemMutex;
+#endif
 
     bool m_IsWorkingMemAllocated = false;
 

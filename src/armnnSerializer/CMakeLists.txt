@@ -29,7 +29,11 @@ if(BUILD_ARMNN_SERIALIZER)
         ../armnnDeserializer/Deserializer.cpp
         )
 
-    add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
+    if(BUILD_BARE_METAL)
+        add_library_ex(armnnSerializer STATIC ${armnn_serializer_sources})
+    else()
+        add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
+    endif()
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
     set_target_properties(armnnSerializer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})

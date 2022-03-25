@@ -3,6 +3,9 @@
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
+
+cmake_policy(SET CMP0077 NEW)
+
 option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 option(BUILD_TESTS "Build test applications" OFF)
@@ -33,6 +36,7 @@ option(BUILD_STATIC_PIPE_LIBS "Build Static PIPE libraries" OFF)
 option(BUILD_PIPE_ONLY "Build the PIPE libraries only" OFF)
 option(BUILD_ARMNN_TFLITE_DELEGATE "Build the Arm NN TfLite delegate" OFF)
 option(BUILD_MEMORY_STRATEGY_BENCHMARK "Build the MemoryBenchmark" OFF)
+option(BUILD_BARE_METAL "Disable features requiring operating system support" OFF)
 
 include(SelectLibraryConfigurations)
 
@@ -72,7 +76,8 @@ if(COMPILER_IS_GNU_LIKE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wno-psabi")
     endif()
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL MSVC)
-	# Disable C4996 (use of deprecated identifier) due to https://developercommunity.visualstudio.com/content/problem/252574/deprecated-compilation-warning-for-virtual-overrid.html
+    # Disable C4996 (use of deprecated identifier) due to
+    # https://developercommunity.visualstudio.com/content/problem/252574/deprecated-compilation-warning-for-virtual-overrid.html
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /wd4996")
     add_definitions(-DNO_STRICT=1)
 endif()
@@ -140,7 +145,9 @@ if (NOT BUILD_PIPE_ONLY)
 endif()
 
 # pthread
-find_dependency(Threads)
+if (NOT BUILD_BARE_METAL)
+find_package(Threads)
+endif()
 
 # Favour the protobuf passed on command line
 if(BUILD_ONNX_PARSER)
@@ -345,6 +352,7 @@ if(PROFILING_BACKEND_STREAMLINE)
     add_definitions(-DARMNN_STREAMLINE_ENABLED)
 endif()
 
+if(NOT BUILD_BARE_METAL)
 if(HEAP_PROFILING OR LEAK_CHECKING)
     # enable heap profiling for everything except for referencetests
     if(NOT ${PROJECT_NAME} STREQUAL "referencetests")
@@ -371,7 +379,7 @@ else()
     # Valgrind only works with gperftools version number <= 2.4
     CHECK_INCLUDE_FILE(valgrind/memcheck.h VALGRIND_FOUND)
 endif()
-
+endif()
 
 if(NOT BUILD_TF_LITE_PARSER)
     message(STATUS "Tensorflow Lite parser support is disabled")
@@ -404,6 +412,14 @@ if(BUILD_PYTHON_WHL OR BUILD_PYTHON_SRC)
     if(NOT ${SWIG_FOUND})
         message(FATAL_ERROR "SWIG 4.x requried to build PyArmNN, but not found")
     endif()
+endif()
+
+if(BUILD_BARE_METAL)
+    add_definitions(-DARMNN_BUILD_BARE_METAL
+                    -DARMNN_DISABLE_FILESYSTEM
+                    -DARMNN_DISABLE_PROCESSES
+                    -DARMNN_DISABLE_THREADS
+                    -DARMNN_DISABLE_SOCKETS)
 endif()
 
 # ArmNN source files required for all build options

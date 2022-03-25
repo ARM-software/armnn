@@ -29,6 +29,7 @@ void* DynamicBackendUtils::OpenHandle(const std::string& sharedObjectPath)
 
     return sharedObjectHandle;
 #else
+    armnn::IgnoreUnused(sharedObjectPath);
     throw RuntimeException("Dynamic backends not supported on this platform");
 #endif
 }
@@ -43,6 +44,7 @@ void DynamicBackendUtils::CloseHandle(const void* sharedObjectHandle)
 
     dlclose(const_cast<void*>(sharedObjectHandle));
 #else
+    armnn::IgnoreUnused(sharedObjectHandle);
     throw RuntimeException("Dynamic backends not supported on this platform");
 #endif
 }
@@ -148,6 +150,7 @@ bool DynamicBackendUtils::IsPathValid(const std::string& path)
         return false;
     }
 
+#if !defined(ARMNN_DISABLE_FILESYSTEM)
     fs::path fsPath(path);
 
     if (!fs::exists(fsPath))
@@ -167,6 +170,7 @@ bool DynamicBackendUtils::IsPathValid(const std::string& path)
         ARMNN_LOG(warning) << "WARNING: The given backend path \"" << path << "\" is not absolute";
         return false;
     }
+#endif // !defined(ARMNN_DISABLE_FILESYSTEM)
 
     return true;
 }
@@ -176,6 +180,7 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
     std::unordered_set<std::string> uniqueSharedObjects;
     std::vector<std::string> sharedObjects;
 
+#if !defined(ARMNN_DISABLE_FILESYSTEM)
     for (const std::string& backendPath : backendPaths)
     {
         using namespace fs;
@@ -254,6 +259,9 @@ std::vector<std::string> DynamicBackendUtils::GetSharedObjects(const std::vector
             }
         }
     }
+#else
+    armnn::IgnoreUnused(backendPaths);
+#endif // !defined(ARMNN_DISABLE_FILESYSTEM)
 
     return sharedObjects;
 }

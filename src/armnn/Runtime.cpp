@@ -205,7 +205,9 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
     }
 
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lockGuard(m_Mutex);
+#endif
 
         // Stores the network
         m_LoadedNetworks[networkIdOut] = std::move(loadedNetwork);
@@ -242,7 +244,9 @@ Status RuntimeImpl::UnloadNetwork(NetworkId networkId)
     std::unique_ptr<arm::pipe::TimelineUtilityMethods> timelineUtils =
         arm::pipe::TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService.get());
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lockGuard(m_Mutex);
+#endif
 
         // If timeline recording is on mark the Network end of life
         if (timelineUtils)
@@ -586,7 +590,9 @@ RuntimeImpl::~RuntimeImpl()
 
 LoadedNetwork* RuntimeImpl::GetLoadedNetworkPtr(NetworkId networkId) const
 {
+#if !defined(ARMNN_DISABLE_THREADS)
     std::lock_guard<std::mutex> lockGuard(m_Mutex);
+#endif
     return m_LoadedNetworks.at(networkId).get();
 }
 

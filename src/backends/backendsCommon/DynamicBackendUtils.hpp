@@ -80,6 +80,8 @@ EntryPointType DynamicBackendUtils::GetEntryPoint(const void* sharedObjectHandle
 
     return entryPoint;
 #else
+    armnn::IgnoreUnused(sharedObjectHandle);
+    armnn::IgnoreUnused(symbolName);
     throw RuntimeException("Dynamic backends not supported on this platform");
 #endif
 }

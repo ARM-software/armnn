@@ -6,7 +6,7 @@
 #include "armnn/Utils.hpp"
 #include "armnn/Version.hpp"
 
-#if !defined(BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
+#if !defined(ARMNN_BUILD_BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
 
 #include <sys/auxv.h>
 #include <asm/hwcap.h>
@@ -36,11 +36,11 @@ static DefaultLoggingConfiguration g_DefaultLoggingConfiguration;
 // Detect the presence of Neon on Linux
 bool NeonDetected()
 {
-#if !defined(BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
+#if !defined(ARMNN_BUILD_BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
     auto hwcaps= getauxval(AT_HWCAP);
 #endif
 
-#if !defined(BARE_METAL) && defined(__aarch64__)
+#if !defined(ARMNN_BUILD_BARE_METAL) && defined(__aarch64__)
 
     if (hwcaps & HWCAP_ASIMD)
     {
@@ -54,7 +54,7 @@ bool NeonDetected()
     }
 
 #endif
-#if !defined(BARE_METAL) && defined(__arm__)
+#if !defined(ARMNN_BUILD_BARE_METAL) && defined(__arm__)
 
     if (hwcaps & HWCAP_NEON)
     {

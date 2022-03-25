@@ -126,7 +126,9 @@ private:
     template<typename Func>
     void LoadedNetworkFuncSafe(NetworkId networkId, Func f)
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lockGuard(m_Mutex);
+#endif
         auto iter = m_LoadedNetworks.find(networkId);
         if (iter != m_LoadedNetworks.end())
         {
@@ -137,7 +139,9 @@ private:
     /// Loads any available/compatible dynamic backend in the runtime.
     void LoadDynamicBackends(const std::string& overrideBackendPath);
 
+#if !defined(ARMNN_DISABLE_THREADS)
     mutable std::mutex m_Mutex;
+#endif
 
     /// Map of Loaded Networks with associated GUID as key
     LoadedNetworks m_LoadedNetworks;

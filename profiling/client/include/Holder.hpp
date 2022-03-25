@@ -58,7 +58,9 @@ public:
                         const std::set<std::string>& activeBackends);
 
 private:
+#if !defined(ARMNN_DISABLE_THREADS)
     mutable std::mutex m_CaptureThreadMutex;
+#endif
     CaptureData m_CaptureData;
 };
 

@@ -2,7 +2,7 @@
 // Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-
+#if !defined(ARMNN_DISABLE_THREADS)
 
 #include <armnn/Threadpool.hpp>
 
@@ -204,3 +204,5 @@ void Threadpool::ProcessExecPriorities(uint32_t index)
 } // namespace experimental
 
 } // namespace armnn
+
+#endif

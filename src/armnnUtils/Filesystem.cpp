@@ -2,6 +2,7 @@
 // Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+#if !defined(ARMNN_DISABLE_FILESYSTEM)
 
 #include <armnnUtils/Filesystem.hpp>
 
@@ -31,5 +32,7 @@ fs::path NamedTempFile(const char* fileName)
     return namedTempFile;
 }
 
-}
-}
+} // namespace armnnUtils
+} // namespace Filesystem
+
+#endif // !defined(ARMNN_DISABLE_FILESYSTEM)

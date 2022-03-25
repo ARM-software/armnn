@@ -26,7 +26,9 @@ public:
     /// Return the next random Guid in the sequence
     inline ProfilingDynamicGuid NextGuid() override
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> sequencelock(m_SequenceMutex);
+#endif
         ProfilingDynamicGuid guid(m_Sequence);
         m_Sequence++;
         if (m_Sequence >= MIN_STATIC_GUID)
@@ -47,14 +49,18 @@ public:
     /// Reset the generator back to zero. Used mainly for test.
     inline void Reset()
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> sequencelock(m_SequenceMutex);
+#endif
         m_Sequence = 0;
     }
 
 private:
     std::hash<std::string> m_Hash;
     uint64_t m_Sequence;
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex m_SequenceMutex;
+#endif
 };
 
 } // namespace pipe

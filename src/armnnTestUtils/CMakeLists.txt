@@ -29,11 +29,21 @@ list(APPEND armnnTestUtils_sources
         TensorCopyUtils.cpp
         TestUtils.cpp
         TestUtils.hpp
+        )
+
+if(NOT BUILD_BARE_METAL)
+list(APPEND armnnTestUtils_sources
         UnitTests.cpp
         UnitTests.hpp
         )
+endif()
 
-add_library_ex(armnnTestUtils SHARED ${armnnTestUtils_sources})
+
+if(BUILD_BARE_METAL)
+    add_library_ex(armnnTestUtils STATIC ${armnnTestUtils_sources})
+else()
+    add_library_ex(armnnTestUtils SHARED ${armnnTestUtils_sources})
+endif()
 
 set_target_properties(armnnTestUtils PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
 

@@ -43,8 +43,9 @@ public:
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor) override
     {
         ARMNN_LOG(info) << "Using default async workload execution, this will network affect performance";
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lockGuard(m_AsyncWorkloadMutex);
-
+#endif
         m_Data.m_Inputs = workingMemDescriptor.m_Inputs;
         m_Data.m_Outputs = workingMemDescriptor.m_Outputs;
 
@@ -81,7 +82,9 @@ protected:
     const arm::pipe::ProfilingGuid m_Guid;
 
 private:
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex m_AsyncWorkloadMutex;
+#endif
 };
 
 // TypedWorkload used

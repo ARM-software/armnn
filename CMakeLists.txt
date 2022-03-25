@@ -438,7 +438,11 @@ foreach(lib ${armnnLibraries})
     list(APPEND armnn_sources $<TARGET_OBJECTS:${lib}>)
 endforeach()
 
-add_library_ex(armnn SHARED ${armnn_sources})
+if(BUILD_BARE_METAL)
+    add_library_ex(armnn STATIC ${armnn_sources})
+else()
+    add_library_ex(armnn SHARED ${armnn_sources})
+endif()
 
 target_compile_definitions(armnn PRIVATE "ARMNN_COMPILING_DLL")
 
@@ -479,6 +483,7 @@ endif()
 if(BUILD_ONNX_PARSER)
     install(TARGETS armnnOnnxParser
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 

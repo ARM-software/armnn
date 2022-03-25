@@ -28,12 +28,17 @@ private:
     static InferenceId nextID;
 
 public:
-    AsyncExecutionCallback(std::queue<InferenceId>& notificationQueue,
-                           std::mutex& mutex,
-                           std::condition_variable& condition)
+    AsyncExecutionCallback(std::queue<InferenceId>& notificationQueue
+#if !defined(ARMNN_DISABLE_THREADS)
+                           , std::mutex& mutex
+                           , std::condition_variable& condition
+#endif
+        )
         : m_NotificationQueue(notificationQueue)
+#if !defined(ARMNN_DISABLE_THREADS)
         , m_Mutex(mutex)
         , m_Condition(condition)
+#endif
         , m_InferenceId(++nextID)
     {}
 
@@ -53,8 +58,10 @@ public:
 
 private:
     std::queue<InferenceId>& m_NotificationQueue;
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex&              m_Mutex;
     std::condition_variable& m_Condition;
+#endif
 
     HighResolutionClock m_StartTime;
     HighResolutionClock m_EndTime;
@@ -73,8 +80,10 @@ public:
     std::shared_ptr<AsyncExecutionCallback> GetNotifiedCallback();
 
 private:
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex              m_Mutex;
     std::condition_variable m_Condition;
+#endif
     std::unordered_map<InferenceId, std::shared_ptr<AsyncExecutionCallback>> m_Callbacks;
     std::queue<InferenceId> m_NotificationQueue;
 };

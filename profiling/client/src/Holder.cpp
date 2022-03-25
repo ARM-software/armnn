@@ -52,8 +52,9 @@ const std::vector<uint16_t>& CaptureData::GetCounterIds() const
 
 CaptureData Holder::GetCaptureData() const
 {
+#if !defined(ARMNN_DISABLE_THREADS)
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);
-
+#endif
     return m_CaptureData;
 }
 
@@ -74,8 +75,9 @@ void Holder::SetCaptureData(uint32_t capturePeriod,
                             const std::vector<uint16_t>& counterIds,
                             const std::set<std::string>& activeBackends)
 {
+#if !defined(ARMNN_DISABLE_THREADS)
     std::lock_guard<std::mutex> lockGuard(m_CaptureThreadMutex);
-
+#endif
     m_CaptureData.SetCapturePeriod(capturePeriod);
     m_CaptureData.SetCounterIds(counterIds);
     m_CaptureData.SetActiveBackends(activeBackends);

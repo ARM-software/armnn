@@ -1087,13 +1087,18 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     }
 }
 
-void LoadedNetwork::AllocateWorkingMemory(std::lock_guard<std::mutex>& lock)
+void LoadedNetwork::AllocateWorkingMemory(
+#if !defined(ARMNN_DISABLE_THREADS)
+     std::lock_guard<std::mutex>& lock
+#endif
+    )
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Working Memory Allocation");
 
+#if !defined(ARMNN_DISABLE_THREADS)
     // this unused parameter makes sure we can only call this function with a valid lock
     IgnoreUnused(lock);
-
+#endif
     if (m_IsWorkingMemAllocated)
     {
         return;
@@ -1122,7 +1127,9 @@ void LoadedNetwork::AllocateWorkingMemory(std::lock_guard<std::mutex>& lock)
 
 void LoadedNetwork::FreeWorkingMemory()
 {
+#if !defined(ARMNN_DISABLE_THREADS)
     std::lock_guard<std::mutex> lockGuard(m_WorkingMemMutex);
+#endif
 
     if (!m_IsWorkingMemAllocated)
     {
@@ -1159,8 +1166,12 @@ bool LoadedNetwork::Execute(std::unique_ptr<TimelineUtilityMethods>& timelineUti
 
     try
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lockGuard(m_WorkingMemMutex);
         AllocateWorkingMemory(lockGuard);
+#else
+        AllocateWorkingMemory();
+#endif
 
         ProfilingDynamicGuid workloadInferenceID(0);
         auto ExecuteQueue = [&timelineUtils, &workloadInferenceID, &inferenceGuid](WorkloadQueue& queue)

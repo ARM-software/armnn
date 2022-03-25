@@ -30,6 +30,7 @@
     # will only build a static version of this common code
     # to simplify the build. No extra .so file to deploy to boards etc.
     add_library_ex(pipeCommon STATIC ${pipeCommon_sources})
+    target_link_libraries(pipeCommon fmt)
 
     target_compile_definitions(pipeCommon PRIVATE "ARMNN_COMPILING_DLL")
 

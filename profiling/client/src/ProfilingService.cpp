@@ -21,6 +21,7 @@ namespace pipe
 void ProfilingService::ResetExternalProfilingOptions(const arm::pipe::ProfilingOptions& options,
                                                      bool resetProfilingService)
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     // Update the profiling options
     m_Options = options;
     m_TimelineReporting = options.m_TimelineEnabled;
@@ -32,17 +33,23 @@ void ProfilingService::ResetExternalProfilingOptions(const arm::pipe::ProfilingO
         // Reset the profiling service
         Reset();
     }
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 bool ProfilingService::IsProfilingEnabled() const
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     return m_Options.m_EnableProfiling;
+#else
+    return false;
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 ProfilingState ProfilingService::ConfigureProfilingService(
         const ProfilingOptions& options,
         bool resetProfilingService)
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     ResetExternalProfilingOptions(options, resetProfilingService);
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     if (options.m_EnableProfiling)
@@ -87,10 +94,12 @@ ProfilingState ProfilingService::ConfigureProfilingService(
                 return m_StateMachine.GetCurrentState();
         }
     }
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::Update()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     if (!m_Options.m_EnableProfiling)
     {
         // Don't run if profiling is disabled
@@ -168,10 +177,12 @@ void ProfilingService::Update()
         throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
                                             static_cast<int>(currentState)));
     }
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::Disconnect()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     switch (currentState)
     {
@@ -188,16 +199,20 @@ void ProfilingService::Disconnect()
         throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
                                                         static_cast<int>(currentState)));
     }
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 // Store a profiling context returned from a backend that support profiling, and register its counters
-void ProfilingService::AddBackendProfilingContext(const std::string& backendId,
+void ProfilingService::AddBackendProfilingContext(
+    const std::string& backendId,
     std::shared_ptr<IBackendProfilingContext> profilingContext)
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     ARM_PIPE_ASSERT(profilingContext != nullptr);
     // Register the backend counters
     m_MaxGlobalCounterId = profilingContext->RegisterCounters(m_MaxGlobalCounterId);
     m_BackendProfilingContexts.emplace(backendId, std::move(profilingContext));
+#endif // ARMNN_BUILD_BARE_METAL
 }
 const ICounterDirectory& ProfilingService::GetCounterDirectory() const
 {
@@ -313,11 +328,14 @@ std::unique_ptr<ISendTimelinePacket> ProfilingService::GetSendTimelinePacket() c
 
 void ProfilingService::Initialize()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     m_Initialiser.InitialiseProfilingService(*this);
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::InitializeCounterValue(uint16_t counterUid)
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     // Increase the size of the counter index if necessary
     if (counterUid >= m_CounterIndex.size())
     {
@@ -330,10 +348,12 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
     // Register the new counter to the counter index for quick access
     std::atomic<uint32_t>* counterValuePtr = &(m_CounterValues.back());
     m_CounterIndex.at(counterUid) = counterValuePtr;
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::Reset()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     // Stop the profiling service...
     Stop();
 
@@ -347,10 +367,12 @@ void ProfilingService::Reset()
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
     m_BackendProfilingContexts.clear();
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::Stop()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     {   // only lock when we are updating the inference completed variable
         std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
         m_ServiceActive = false;
@@ -372,18 +394,22 @@ void ProfilingService::Stop()
 
     // ...then move to the "NotConnected" state
     m_StateMachine.TransitionToState(ProfilingState::NotConnected);
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     if (!IsCounterRegistered(counterUid))
     {
         throw arm::pipe::InvalidArgumentException(fmt::format("Counter UID {} is not registered", counterUid));
     }
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::NotifyBackendsForTimelineReporting()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     BackendProfilingContext::iterator it = m_BackendProfilingContexts.begin();
     while (it != m_BackendProfilingContexts.end())
     {
@@ -392,19 +418,23 @@ void ProfilingService::NotifyBackendsForTimelineReporting()
         // Increment the Iterator to point to next entry
         it++;
     }
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::NotifyProfilingServiceActive()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     {   // only lock when we are updating the inference completed variable
         std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
         m_ServiceActive = true;
     }
     m_ServiceActiveConditionVariable.notify_one();
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 void ProfilingService::WaitForProfilingServiceActivation(unsigned int timeout)
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -425,12 +455,16 @@ void ProfilingService::WaitForProfilingServiceActivation(unsigned int timeout)
         ARM_PIPE_LOG(warning) << ss.str();
     }
     return;
+#endif // ARMNN_BUILD_BARE_METAL
 }
 
 ProfilingService::~ProfilingService()
 {
+#if !defined(ARMNN_BUILD_BARE_METAL)
     Stop();
+#endif // ARMNN_BUILD_BARE_METAL
 }
+
 } // namespace pipe
 
 } // namespace arm

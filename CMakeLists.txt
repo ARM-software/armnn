@@ -442,6 +442,13 @@ add_library_ex(armnn SHARED ${armnn_sources})
 
 target_compile_definitions(armnn PRIVATE "ARMNN_COMPILING_DLL")
 
+# Generate a map file for debug mode only
+if(CMAKE_BUILD_TYPE MATCHES debug)
+    set_property(TARGET armnn APPEND_STRING PROPERTY
+        LINK_FLAGS " -Wl,-Map=libarmnnMapFile.map")
+    message(STATUS "Linker will generate mapfile " )
+endif()
+
 target_include_directories(armnn
     PUBLIC
         $<INSTALL_INTERFACE:include>

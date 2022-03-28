@@ -66,6 +66,7 @@ struct ExecuteNetworkParams
     TfLiteExecutor                m_TfLiteExecutor;
     size_t                        m_ThreadPoolSize;
     bool                          m_ImportInputsIfAligned;
+    bool                          m_ReuseBuffers;
 
     // Ensures that the parameters for ExecuteNetwork fit together
     void ValidateParams();

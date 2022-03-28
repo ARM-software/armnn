@@ -446,44 +446,6 @@ int MainImpl(const ExecuteNetworkParams& params,
                             << " input-tensor-data file/s which will be used to fill the input/s.\n";
         }
 
-        for(unsigned int j = 0; j < params.m_Iterations ; ++j)
-        {
-            std::vector<armnnUtils::TContainer> inputDataContainers;
-            for(unsigned int i = 0; i < numInputs; ++i)
-            {
-                // If there are fewer input files given than required for the execution of
-                // params.m_Iterations we simply start with the first input file again
-                size_t inputFileIndex = j * numInputs + i;
-                if (!params.m_InputTensorDataFilePaths.empty())
-                {
-                    inputFileIndex = inputFileIndex % params.m_InputTensorDataFilePaths.size();
-                }
-
-                armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
-                                                        armnn::EmptyOptional() :
-                                                        armnn::MakeOptional<std::string>(
-                                                            params.m_InputTensorDataFilePaths.at(inputFileIndex));
-
-                unsigned int numElements = model.GetInputSize(i);
-                if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
-                {
-                    // If the user has provided a tensor shape for the current input,
-                    // override numElements
-                    numElements = params.m_InputTensorShapes[i]->GetNumElements();
-                }
-
-                armnnUtils::TContainer tensorData;
-                PopulateTensorWithData(tensorData,
-                                       numElements,
-                                       params.m_InputTypes[i],
-                                       qParams,
-                                       dataFile);
-
-                inputDataContainers.push_back(tensorData);
-            }
-            inputs.push_back(inputDataContainers);
-        }
-
         const size_t numOutputs = inferenceModelParams.m_OutputBindings.size();
 
         // The user is allowed to specify the data type of each output tensor. It is used here to construct the
@@ -500,32 +462,32 @@ int MainImpl(const ExecuteNetworkParams& params,
                 case armnn::DataType::Float32:
                     if (params.m_OutputTypes[outputIdx].compare("float") != 0)
                     {
-                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type Float32. The " <<
-                                           "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
+                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type Float32. The "
+                                           << "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
                                            ". This may cause unexpected problems or random failures.";
                     }
                     break;
                 case armnn::DataType::QAsymmU8:
                     if (params.m_OutputTypes[outputIdx].compare("qasymmu8") != 0)
                     {
-                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type QAsymmU8. The " <<
-                                           "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
-                                           ". This may cause unexpected problemsor random failures.";
+                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type QAsymmU8. The "
+                                           << "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
+                                           ". This may cause unexpected problems or random failures.";
                     }
                     break;
                 case armnn::DataType::Signed32:
                     if (params.m_OutputTypes[outputIdx].compare("int") != 0)
                     {
-                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type Signed32. The " <<
-                                           "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
+                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type Signed32. The "
+                                           << "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
                                            ". This may cause unexpected problems or random failures.";
                     }
                     break;
                 case armnn::DataType::QAsymmS8:
                     if (params.m_OutputTypes[outputIdx].compare("qasymms8") != 0)
                     {
-                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type QAsymmS8. The " <<
-                                           "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
+                        ARMNN_LOG(warning) << "Model output index: " << outputIdx << " has data type QAsymmS8. The "
+                                           << "corresponding --output-type is " << params.m_OutputTypes[outputIdx] <<
                                            ". This may cause unexpected problems or random failures.";
                     }
                     break;
@@ -533,36 +495,79 @@ int MainImpl(const ExecuteNetworkParams& params,
                     break;
             }
         }
-        for (unsigned int j = 0; j < params.m_Iterations; ++j)
-        {
-            std::vector <armnnUtils::TContainer> outputDataContainers;
-            for (unsigned int i = 0; i < numOutputs; ++i)
-            {
-                if (params.m_OutputTypes[i].compare("float") == 0)
-                {
-                    outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
-                }
-                else if (params.m_OutputTypes[i].compare("int") == 0)
-                {
-                    outputDataContainers.push_back(std::vector<int>(model.GetOutputSize(i)));
-                }
-                else if (params.m_OutputTypes[i].compare("qasymm8") == 0 ||
-                         params.m_OutputTypes[i].compare("qasymmu8") == 0)
-                {
-                    outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
-                }
-                else if (params.m_OutputTypes[i].compare("qasymms8") == 0)
-                {
-                    outputDataContainers.push_back(std::vector<int8_t>(model.GetOutputSize(i)));
-                } else
-                {
-                    ARMNN_LOG(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
-                    return EXIT_FAILURE;
-                }
-            }
-            outputs.push_back(outputDataContainers);
-        }
 
+        if (!params.m_ReuseBuffers)
+        {
+            for (unsigned int j = 0; j < params.m_Iterations; ++j)
+            {
+                std::vector<armnnUtils::TContainer> inputDataContainers;
+                for (unsigned int i = 0; i < numInputs; ++i)
+                {
+                    // If there are fewer input files given than required for the execution of
+                    // params.m_Iterations we simply start with the first input file again
+                    size_t inputFileIndex = j * numInputs + i;
+                    if (!params.m_InputTensorDataFilePaths.empty())
+                    {
+                        inputFileIndex = inputFileIndex % params.m_InputTensorDataFilePaths.size();
+                    }
+
+                    armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
+                                                            armnn::EmptyOptional() :
+                                                            armnn::MakeOptional<std::string>(
+                                                                    params.m_InputTensorDataFilePaths.at(
+                                                                            inputFileIndex));
+
+                    unsigned int numElements = model.GetInputSize(i);
+                    if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
+                    {
+                        // If the user has provided a tensor shape for the current input,
+                        // override numElements
+                        numElements = params.m_InputTensorShapes[i]->GetNumElements();
+                    }
+
+                    armnnUtils::TContainer tensorData;
+                    PopulateTensorWithData(tensorData,
+                                           numElements,
+                                           params.m_InputTypes[i],
+                                           qParams,
+                                           dataFile);
+
+                    inputDataContainers.push_back(tensorData);
+                }
+                inputs.push_back(inputDataContainers);
+            }
+
+            for (unsigned int j = 0; j < params.m_Iterations; ++j)
+            {
+                std::vector<armnnUtils::TContainer> outputDataContainers;
+                for (unsigned int i = 0; i < numOutputs; ++i)
+                {
+                    if (params.m_OutputTypes[i].compare("float") == 0)
+                    {
+                        outputDataContainers.push_back(std::vector<float>(model.GetOutputSize(i)));
+                    }
+                    else if (params.m_OutputTypes[i].compare("int") == 0)
+                    {
+                        outputDataContainers.push_back(std::vector<int>(model.GetOutputSize(i)));
+                    }
+                    else if (params.m_OutputTypes[i].compare("qasymm8") == 0 ||
+                               params.m_OutputTypes[i].compare("qasymmu8") == 0)
+                    {
+                        outputDataContainers.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
+                    }
+                    else if (params.m_OutputTypes[i].compare("qasymms8") == 0)
+                    {
+                        outputDataContainers.push_back(std::vector<int8_t>(model.GetOutputSize(i)));
+                    }
+                    else
+                    {
+                        ARMNN_LOG(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
+                        return EXIT_FAILURE;
+                    }
+                }
+                outputs.push_back(outputDataContainers);
+            }
+        }
         if (params.m_Iterations > 1)
         {
             std::stringstream msg;
@@ -581,7 +586,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         }
 
         // Synchronous execution
-        if (!params.m_Concurrent)
+        if (!params.m_Concurrent && !params.m_ReuseBuffers)
         {
             for (size_t x = 0; x < params.m_Iterations; x++)
             {
@@ -648,6 +653,138 @@ int MainImpl(const ExecuteNetworkParams& params,
                 }
             }
         }
+        // Synchronous Execution using a single buffer for input and output data
+        else if(!params.m_Concurrent)
+        {
+            std::vector<armnnUtils::TContainer> input;
+            std::vector<armnnUtils::TContainer> output;
+
+            for (unsigned int i = 0; i < numInputs; ++i)
+            {
+                // If there are fewer input files given than required for the execution of
+                // params.m_Iterations we simply start with the first input file again
+                size_t inputFileIndex = numInputs + i;
+                if (!params.m_InputTensorDataFilePaths.empty())
+                {
+                    inputFileIndex = inputFileIndex % params.m_InputTensorDataFilePaths.size();
+                }
+
+                armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ?
+                                                        armnn::EmptyOptional() :
+                                                        armnn::MakeOptional<std::string>(
+                                                                params.m_InputTensorDataFilePaths.at(
+                                                                        inputFileIndex));
+
+                unsigned int numElements = model.GetInputSize(i);
+                if (params.m_InputTensorShapes.size() > i && params.m_InputTensorShapes[i])
+                {
+                    // If the user has provided a tensor shape for the current input,
+                    // override numElements
+                    numElements = params.m_InputTensorShapes[i]->GetNumElements();
+                }
+
+                armnnUtils::TContainer tensorData;
+                PopulateTensorWithData(tensorData,
+                                       numElements,
+                                       params.m_InputTypes[i],
+                                       qParams,
+                                       dataFile);
+
+                input.push_back(tensorData);
+            }
+
+            for (unsigned int i = 0; i < numOutputs; ++i)
+            {
+                if (params.m_OutputTypes[i].compare("float") == 0)
+                {
+                    output.push_back(std::vector<float>(model.GetOutputSize(i)));
+                } else if (params.m_OutputTypes[i].compare("int") == 0) {
+                    output.push_back(std::vector<int>(model.GetOutputSize(i)));
+                } else if (params.m_OutputTypes[i].compare("qasymm8") == 0 ||
+                           params.m_OutputTypes[i].compare("qasymmu8") == 0)
+                {
+                    output.push_back(std::vector<uint8_t>(model.GetOutputSize(i)));
+                } else if (params.m_OutputTypes[i].compare("qasymms8") == 0)
+                {
+                    output.push_back(std::vector<int8_t>(model.GetOutputSize(i)));
+                } else {
+                    ARMNN_LOG(fatal) << "Unsupported tensor data type \"" << params.m_OutputTypes[i] << "\". ";
+                    return EXIT_FAILURE;
+                }
+            }
+
+            std::vector<std::chrono::duration<double, std::milli>> timings;
+            timings.reserve(params.m_Iterations);
+            for (size_t x = 0; x < params.m_Iterations; x++)
+            {
+                // model.Run returns the inference time elapsed in EnqueueWorkload (in milliseconds)
+                auto inference_duration = model.Run(input, output);
+                timings.push_back(inference_duration);
+            }
+
+            if (params.m_GenerateTensorData)
+            {
+                ARMNN_LOG(warning) << "The input data was generated, note that the output will not be useful";
+            }
+            if (params.m_DontPrintOutputs)
+            {
+                ARMNN_LOG(info) << "Printing outputs to console is disabled.";
+            }
+
+            // Print output. This only needs to happen once as input is the same for each iteration.
+            const auto &infosOut = model.GetOutputBindingInfos();
+            for (size_t i = 0; i < numOutputs; i++)
+            {
+                const armnn::TensorInfo &infoOut = infosOut[i].second;
+
+                // We've made sure before that the number of output files either equals numOutputs, in which
+                // case we override those files when processing the results of each iteration (only the result
+                // of the last iteration will be stored), or there are enough
+                // output files for each output of each iteration.
+                size_t outputFileIndex = numOutputs + i;
+                if (!params.m_OutputTensorFiles.empty())
+                {
+                    outputFileIndex = outputFileIndex % params.m_OutputTensorFiles.size();
+                    ARMNN_LOG(info) << "Writing output " << i << " named: '"
+                                    << inferenceModelParams.m_OutputBindings[i] <<" to file: '"
+                                    << params.m_OutputTensorFiles[outputFileIndex] << "'";
+                }
+                auto outputTensorFile = params.m_OutputTensorFiles.empty()
+                                        ? ""
+                                        : params.m_OutputTensorFiles[outputFileIndex];
+
+                TensorPrinter printer(inferenceModelParams.m_OutputBindings[i],
+                                      infoOut,
+                                      outputTensorFile,
+                                      params.m_DequantizeOutput,
+                                      !params.m_DontPrintOutputs);
+                mapbox::util::apply_visitor(printer, output[i]);
+            }
+
+            for(auto inference: timings)
+            {
+
+                ARMNN_LOG(info) << "\nInference time: " << std::setprecision(2)
+                                << std::fixed << inference.count() << " ms\n";
+
+                // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
+                if (params.m_ThresholdTime != 0.0)
+                {
+                    ARMNN_LOG(info) << "Threshold time: " << std::setprecision(2)
+                                    << std::fixed << params.m_ThresholdTime << " ms";
+                    auto thresholdMinusInference = params.m_ThresholdTime - inference.count();
+                    ARMNN_LOG(info) << "Threshold time - Inference time: " << std::setprecision(2)
+                                    << std::fixed << thresholdMinusInference << " ms" << "\n";
+
+                    if (thresholdMinusInference < 0)
+                    {
+                        std::string errorMessage = "Elapsed inference time is greater than provided threshold time.";
+                        ARMNN_LOG(fatal) << errorMessage;
+                    }
+                }
+            }
+        }
+
         // Asynchronous execution using the Arm NN thread pool
         else if (params.m_ThreadPoolSize >= 1)
         {

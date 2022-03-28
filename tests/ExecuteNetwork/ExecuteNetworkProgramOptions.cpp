@@ -255,7 +255,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "Add unsupported operators as stand-in layers (where supported by parser)",
                  cxxopts::value<bool>(m_ExNetParams.m_ParseUnsupported)->default_value("false")->implicit_value("true"))
 
-                ("do-not-print-output",
+                ("N,do-not-print-output",
                  "The default behaviour of ExecuteNetwork is to print the resulting outputs on the console. "
                  "This behaviour can be changed by adding this flag to your command.",
                  cxxopts::value<bool>(m_ExNetParams.m_DontPrintOutputs)->default_value("false")->implicit_value("true"))
@@ -378,7 +378,11 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("MLGOTuningFilePath",
                 "Path to tuning file. Enables use of CL MLGO tuning",
-                cxxopts::value<std::string>(m_ExNetParams.m_MLGOTuningFilePath));
+                cxxopts::value<std::string>(m_ExNetParams.m_MLGOTuningFilePath))
+
+                ("R, reuse-buffers",
+                "If enabled then the IO buffers will be reused for each inference",
+                cxxopts::value<bool>(m_ExNetParams.m_ReuseBuffers)->default_value("false")->implicit_value("true"));
 
         m_CxxOptions.add_options("d) Profiling")
                 ("a,enable-external-profiling",

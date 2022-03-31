@@ -212,7 +212,7 @@ RUN cd $HOME/armnn-devenv && cd flatbuffers-1.12.0 && \
          -DFLATBUFFERS_BUILD_TESTS=0 && \
     make all install -j$(nproc)
 
-
+# Build arm32 version of Flatbuffers
 RUN cd $HOME/armnn-devenv && cd flatbuffers-1.12.0  && \
     mkdir build-arm32 && \
     cd build-arm32 && \

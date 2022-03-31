@@ -122,13 +122,13 @@ RUN apt-get update && apt-get install -y \
 # ENV PATH=$HOME/armnn-devenv/google/x86_64_pb_install/bin/:$PATH
 # ENV LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib/:$LD_LIBRARY_PATH
 
-# Download ArmNN
+# Download ArmNN 64-bit
 RUN cd $HOME/armnn-devenv && git clone "https://review.mlplatform.org/ml/armnn" && \
     cd armnn/ && git checkout master
 
+# Download ArmNN 32-bit
 RUN cd $HOME/armnn-devenv && git clone "https://review.mlplatform.org/ml/armnn" armnn-32 && \
     cd armnn-32/ && git checkout master
-
 
 # Build 64-bit Compute Library
 RUN cd $HOME/armnn-devenv/ && git clone https://review.mlplatform.org/ml/ComputeLibrary && \
@@ -191,7 +191,6 @@ RUN cd $HOME/armnn-devenv && \
     cd flatbuffers-1.12.0 && \
     rm -f CMakeCache.txt
 
-
 # Build native x86_64 version of Flatbuffers
 RUN cd $HOME/armnn-devenv && cd flatbuffers-1.12.0 && \
     mkdir build && \
@@ -230,15 +229,14 @@ RUN cd $HOME/armnn-devenv && git clone https://github.com/onnx/onnx.git && \
     LD_LIBRARY_PATH=$HOME/armnn-devenv/google/x86_64_pb_install/lib:$LD_LIBRARY_PATH \
     $HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc \
     onnx/onnx.proto --proto_path=. --proto_path=../google/x86_64_pb_install/include --cpp_out $HOME/armnn-devenv/onnx
-#
-# Generate TF Lite Schema
+
+# Generate TF Lite Schema 64-bit
 RUN cd $HOME/armnn-devenv && \
     cd tflite && \
     cp ../tensorflow/tensorflow/lite/schema/schema.fbs . && \
     ../flatbuffers-1.12.0/build/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
 
-
-# Generate TF Lite Schema
+# Generate TF Lite Schema 32-bit
 RUN cd $HOME/armnn-devenv && \
     cd tflite-32 && \
     cp ../tensorflow/tensorflow/lite/schema/schema.fbs . && \
@@ -294,3 +292,4 @@ RUN cd $HOME/armnn-devenv && \
     -DPROTOBUF_LIBRARY_RELEASE=$HOME/armnn-devenv/google/arm32_pb_install/lib/libprotobuf.so.23.0.0 \
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON && \
     make -j$(nproc)
+

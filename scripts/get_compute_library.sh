@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8a87983c90299dfc7d6fbda3dba312e7603d7074" #Setup automatic kernel window for dynamic fusion
+DEFAULT_CLFRAMEWORKREVISION="171fc3d160736e10f859c6f2a24d1c7a59bcd9e3" #Add CPU Pool3d FP16/32 implementation
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

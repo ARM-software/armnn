@@ -5,9 +5,9 @@
 
 <b>armnn-android</b> folder has the docker file to build a Android NDK container to build ARMNN.
 
-## [ArmNN on x86_64 for arm64](https://github.com/ARM-software/armnn/blob/branches/armnn_20_02/BuildGuideCrossCompilation.md)
+## [ArmNN on x86_64 for arm64 and arm32](https://github.com/ARM-software/armnn/blob/branches/armnn_20_02/BuildGuideCrossCompilation.md)
 
-<b>x86_64</b> folder has the docker file to build ArmNN under an x86_64 system to target an Arm64 system.
+<b>x86_64</b> folder has the docker file to build ArmNN under an x86_64 system to target an Arm64 and Arm32 systems.
 
 # To build a docker images
 ```bash

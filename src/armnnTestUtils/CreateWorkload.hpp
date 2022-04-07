@@ -483,8 +483,11 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     layerDesc.m_PadBottom = 1;
     layerDesc.m_StrideX = 2;
     layerDesc.m_StrideY = 4;
-    layerDesc.m_BiasEnabled = true;
+    layerDesc.m_BiasEnabled = false;
     layerDesc.m_DataLayout = dataLayout;
+
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
@@ -492,19 +495,25 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 8, 16} : TensorShape{2, 8, 16, 3};
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 2, 2, 10} : TensorShape{2, 2, 10, 2};
 
+    // As optimization isn't run member variables need to be updated.
     layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo(weightShape, DataType));
-    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
-
     layer->m_Weight->Allocate();
-    layer->m_Bias->Allocate();
+
+    armnn::TensorInfo weightsTensorInfo(weightShape, DataType, inputsQScale);
+    weightsTensorInfo.SetConstant();
 
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    auto const weights = graph.AddLayer<ConstantLayer>("weights");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
+    weights->m_LayerOutput = std::make_unique<ScopedTensorHandle>(weightsTensorInfo);
+    weights->m_LayerOutput->Allocate();
+
     // Connects up.
-    Connect(input, layer, TensorInfo(inputShape, DataType));
-    Connect(layer, output, TensorInfo(outputShape, DataType));
+    Connect(input, layer, TensorInfo(inputShape, DataType, inputsQScale));
+    Connect(weights, layer, weightsTensorInfo, 0, 1);
+    Connect(layer, output, TensorInfo(outputShape, DataType, outputQScale));
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
@@ -517,14 +526,11 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     CHECK(queueDescriptor.m_Parameters.m_PadRight == 3);
     CHECK(queueDescriptor.m_Parameters.m_PadTop == 1);
     CHECK(queueDescriptor.m_Parameters.m_PadBottom == 1);
-    CHECK(queueDescriptor.m_Parameters.m_BiasEnabled);
+    CHECK(!queueDescriptor.m_Parameters.m_BiasEnabled);
     CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
-    CHECK((queueDescriptor.m_Bias->GetTensorInfo() ==
-        TensorInfo({2}, GetBiasDataType(DataType))));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -548,18 +554,25 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dFusedActivationWithBlo
     layerDesc.m_BiasEnabled = true;
     layerDesc.m_DataLayout = dataLayout;
 
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
     TensorShape weightShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 5, 3} : TensorShape{2, 5, 3, 3};
     TensorShape inputShape  = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 3, 8, 16} : TensorShape{2, 8, 16, 3};
     TensorShape outputShape = (dataLayout == DataLayout::NCHW) ? TensorShape{2, 2, 2, 10} : TensorShape{2, 2, 10, 2};
-
+    // As optimization isn't run member variables need to be updated.
     layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo(weightShape, DataType));
     layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
 
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
+
+    armnn::TensorInfo weightsTensorInfo(weightShape, DataType, inputsQScale);
+    weightsTensorInfo.SetConstant();
+    armnn::TensorInfo biasTensorInfo({2}, DataType, inputsQScale);
+    biasTensorInfo.SetConstant();
 
     auto activationDesc = std::make_shared<ActivationDescriptor>();
     activationDesc->m_A        = 10.0f;
@@ -579,11 +592,20 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dFusedActivationWithBlo
 
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    auto const weights = graph.AddLayer<ConstantLayer>("weights");
+    auto const bias = graph.AddLayer<ConstantLayer>("bias");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
+    weights->m_LayerOutput = std::make_unique<ScopedTensorHandle>(weightsTensorInfo);
+    weights->m_LayerOutput->Allocate();
+    bias->m_LayerOutput = std::make_unique<ScopedTensorHandle>(biasTensorInfo);
+    bias->m_LayerOutput->Allocate();
+
     // Connects up.
-    Connect(input, layer, TensorInfo(inputShape, DataType));
-    Connect(layer, output, TensorInfo(outputShape, DataType));
+    Connect(input, layer, TensorInfo(inputShape, DataType, inputsQScale));
+    Connect(weights, layer, weightsTensorInfo, 0, 1);
+    Connect(bias, layer, biasTensorInfo, 0, 2);
+    Connect(layer, output, TensorInfo(outputShape, DataType, outputQScale));
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
@@ -606,11 +628,9 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dFusedActivationWithBlo
     CHECK(queueDescriptor.m_Parameters.m_PadBottom == 1);
     CHECK(queueDescriptor.m_Parameters.m_BiasEnabled);
     CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
+
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
-    CHECK((queueDescriptor.m_Bias->GetTensorInfo() ==
-        TensorInfo({2}, GetBiasDataType(DataType))));
-    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -630,28 +650,41 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadFastMathTest(a
     layerDesc.m_PadBottom = 0;
     layerDesc.m_StrideX = 1;
     layerDesc.m_StrideY = 1;
-    layerDesc.m_BiasEnabled = false;
+    layerDesc.m_BiasEnabled = true;
     layerDesc.m_DataLayout = dataLayout;
+
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
-    TensorShape weightShape = TensorShape{32, 32, 3, 3};
-    TensorShape inputShape  = TensorShape{1, 32, 149, 149};
-    TensorShape outputShape = TensorShape{1, 32, 147, 147};
-
+    TensorShape weightShape = TensorShape{ 32, 32, 3, 3 };
+    TensorShape biasShape = TensorShape{ 32 };
+    TensorShape inputShape = TensorShape{ 1, 32, 149, 149 };
+    TensorShape outputShape = TensorShape{ 1, 32, 147, 147 };
+    // As optimization isn't run member variables need to be updated.
     layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo(weightShape, DataType));
-    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({2}, GetBiasDataType(DataType)));
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo(biasShape, GetBiasDataType(DataType)));
 
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 
+    armnn::TensorInfo weightsTensorInfo(weightShape, DataType, inputsQScale);
+    weightsTensorInfo.SetConstant();
+    armnn::TensorInfo biasTensorInfo(biasShape, DataType, inputsQScale);
+    biasTensorInfo.SetConstant();
+
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    auto const weights = graph.AddLayer<ConstantLayer>("weights");
+    auto const bias = graph.AddLayer<ConstantLayer>("bias");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
     // Connects up.
     Connect(input, layer, TensorInfo(inputShape, DataType));
-    Connect(layer, output, TensorInfo(outputShape, DataType));
+    Connect(weights, layer, weightsTensorInfo, 0, 1);
+    Connect(bias, layer, biasTensorInfo, 0, 2);
+    Connect(layer, output, TensorInfo(outputShape, DataType, outputQScale));
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
@@ -666,9 +699,8 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadFastMathTest(a
     CHECK(queueDescriptor.m_Parameters.m_PadBottom == 0);
     CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo(weightShape, DataType)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -1074,9 +1106,9 @@ std::unique_ptr<QLstmWorkload> CreateQLstmWorkloadTest(armnn::IWorkloadFactory& 
     return workload;
 }
 
-template <typename Convolution2dWorkload, armnn::DataType DataType>
+template<typename Convolution2dWorkload, armnn::DataType DataType>
 std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(armnn::IWorkloadFactory& factory,
-                                                                       armnn::Graph&            graph)
+                                                                             armnn::Graph& graph)
 {
     // Creates the layer we're testing.
     Convolution2dDescriptor layerDesc;
@@ -1093,18 +1125,34 @@ std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(arm
     float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
     float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
 
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({ 2, 3, 3, 3 }, DataType, inputsQScale));
-    layer->m_Bias   = std::make_unique<ScopedTensorHandle>
-        (TensorInfo({2},  GetBiasDataType(DataType), inputsQScale));
+    TensorShape biasShape = TensorShape{ 2 };
+    TensorShape weightShape = TensorShape{ 2, 3, 3, 3 };
+    armnn::TensorInfo weightsTensorInfo(weightShape, DataType, inputsQScale);
+    weightsTensorInfo.SetConstant();
+    armnn::TensorInfo biasTensorInfo(biasShape, GetBiasDataType(DataType), inputsQScale);
+    biasTensorInfo.SetConstant();
+
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(weightsTensorInfo);
+    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(biasTensorInfo);
+
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    auto const weights = graph.AddLayer<ConstantLayer>("weights");
+    auto const bias = graph.AddLayer<ConstantLayer>("bias");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    weights->m_LayerOutput = std::make_unique<ScopedTensorHandle>(weightsTensorInfo);
+    weights->m_LayerOutput->Allocate();
+    bias->m_LayerOutput = std::make_unique<ScopedTensorHandle>(biasTensorInfo);
+    bias->m_LayerOutput->Allocate();
 
     // Connects up.
     Connect(input, layer, TensorInfo({2, 3, 6, 6}, DataType, inputsQScale));
+    Connect(weights, layer, weightsTensorInfo, 0, 1);
+    Connect(bias, layer, biasTensorInfo, 0, 2);
     Connect(layer, output, TensorInfo({2, 2, 6, 6}, DataType, outputQScale));
     CreateTensorHandles(graph, factory);
 
@@ -1120,12 +1168,10 @@ std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(arm
     CHECK(queueDescriptor.m_Parameters.m_PadBottom == 1);
     CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == true);
 
-    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 3);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({2, 3, 3, 3},
-        DataType, inputsQScale)));
-    CHECK((queueDescriptor.m_Bias->GetTensorInfo()
-                == TensorInfo({2},  GetBiasDataType(DataType), inputsQScale)));
+    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == weightsTensorInfo));
+    CHECK((queueDescriptor.m_Bias->GetTensorInfo() == biasTensorInfo));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;
@@ -2094,18 +2140,22 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
         armnn::ConstTensor biases(biasTensorInfo, biasData);
 
         // Create convolution layer with biases
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         convLayer = net->AddConvolution2dLayer(convDesc2d,
                                               weights,
                                               Optional<ConstTensor>(biases),
                                               convLayerName.c_str());
+        ARMNN_NO_DEPRECATE_WARN_END
     }
     else
     {
         // Create convolution layer without biases
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         convLayer = net->AddConvolution2dLayer(convDesc2d,
                                               weights,
                                               EmptyOptional(),
                                               convLayerName.c_str());
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     CHECK(convLayer);

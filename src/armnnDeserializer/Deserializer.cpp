@@ -1423,44 +1423,69 @@ void IDeserializer::DeserializerImpl::ParseConvolution2d(GraphPtr graph, unsigne
     CHECK_LAYERS(graph, 0, layerIndex);
     auto inputs = GetInputs(graph, layerIndex);
     CHECK_LOCATION();
-    CHECK_VALID_SIZE(inputs.size(), 1);
 
     auto outputs = GetOutputs(graph, layerIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_Convolution2dLayer();
+    auto flatBufferLayer = graph->layers()->Get(layerIndex)->layer_as_Convolution2dLayer();
+
     auto layerName = GetLayerName(graph, layerIndex);
-    auto serializerDescriptor = serializerLayer->descriptor();
+    auto flatbufferDescriptor = flatBufferLayer->descriptor();
 
     armnn::Convolution2dDescriptor descriptor;
-    descriptor.m_PadLeft = serializerDescriptor->padLeft();
-    descriptor.m_PadRight = serializerDescriptor->padRight();
-    descriptor.m_PadTop = serializerDescriptor->padTop();
-    descriptor.m_PadBottom = serializerDescriptor->padBottom();
-    descriptor.m_StrideX = serializerDescriptor->strideX();
-    descriptor.m_StrideY = serializerDescriptor->strideY();;
-    descriptor.m_DilationX = serializerDescriptor->dilationX();
-    descriptor.m_DilationY = serializerDescriptor->dilationY();;
-    descriptor.m_BiasEnabled = serializerDescriptor->biasEnabled();;
-    descriptor.m_DataLayout = ToDataLayout(serializerDescriptor->dataLayout());
+    descriptor.m_PadLeft = flatbufferDescriptor->padLeft();
+    descriptor.m_PadRight = flatbufferDescriptor->padRight();
+    descriptor.m_PadTop = flatbufferDescriptor->padTop();
+    descriptor.m_PadBottom = flatbufferDescriptor->padBottom();
+    descriptor.m_StrideX = flatbufferDescriptor->strideX();
+    descriptor.m_StrideY = flatbufferDescriptor->strideY();;
+    descriptor.m_DilationX = flatbufferDescriptor->dilationX();
+    descriptor.m_DilationY = flatbufferDescriptor->dilationY();;
+    descriptor.m_BiasEnabled = flatbufferDescriptor->biasEnabled();;
+    descriptor.m_DataLayout = ToDataLayout(flatbufferDescriptor->dataLayout());
 
-    armnn::ConstTensor weights = ToConstTensor(serializerLayer->weights());
-    armnn::ConstTensor biases;
+    armnn::IConnectableLayer* layer;
+    std::vector<unsigned int> ignoreSlots {};
 
-    armnn::Optional<armnn::ConstTensor> optionalBiases = armnn::EmptyOptional();
-    if (descriptor.m_BiasEnabled)
+    armnn::ConstTensor biasTensor;
+    // Weights and biases used to be always constant and were stored as members of the layer. This has changed and
+    // they are now passed as inputs. If they are constant then they will be stored in a ConstantLayer.
+    if (this->GetFeatureVersions(graph).m_ConstTensorsAsInputs <= 0)
     {
-        biases = ToConstTensor(serializerLayer->biases());
-        optionalBiases = armnn::Optional<armnn::ConstTensor>(biases);
+        // If the model stores weights and biases as members of the layer we have to read them from there
+        // but add them to their own ConstantLayer for compatibility
+        CHECK_VALID_SIZE(inputs.size(), 1);
+
+        layer = m_Network->AddConvolution2dLayer(descriptor,
+                                                 layerName.c_str());
+
+        armnn::ConstTensor weightsTensor = ToConstTensor(flatBufferLayer->weights());
+        auto weightsLayer = m_Network->AddConstantLayer(weightsTensor);
+        weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsTensor.GetInfo());
+        ignoreSlots.emplace_back(1u);
+
+        if (descriptor.m_BiasEnabled)
+        {
+            biasTensor = ToConstTensor(flatBufferLayer->biases());
+            auto biasLayer = m_Network->AddConstantLayer(biasTensor);
+            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+            biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensor.GetInfo());
+            ignoreSlots.emplace_back(2u);
+        }
     }
-    IConnectableLayer* layer = m_Network->AddConvolution2dLayer(descriptor,
-                                                                weights,
-                                                                optionalBiases,
-                                                                layerName.c_str());
+    else
+    {
+        layer = m_Network->AddConvolution2dLayer(descriptor,
+                                                 layerName.c_str());
+        uint32_t numInputs = descriptor.GetNumInputs();
+        CHECK_VALID_SIZE(inputs.size(), numInputs);
+    }
+
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
-    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterInputSlots(graph, layerIndex, layer, ignoreSlots);
     RegisterOutputSlots(graph, layerIndex, layer);
 }
 

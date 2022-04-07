@@ -28,6 +28,15 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                     bool isFastMathEnabled,
                                                     const ActivationDescriptor* activationDescriptor)
 {
+    // The implemented workload does support both const and non const
+    // weights. However, in the case of non const weights we'd have to call
+    // prepare or configure for each inference which we're not setup to do just yet.
+    if (!weights.IsConstant())
+    {
+        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                   "ArmNN ClConvolution2dWorkload does not support non constant weights."};
+    }
+
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
@@ -41,7 +50,12 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
-
+        // Same for bias as weights. We don't currently support non const.
+        if (!biases.value().IsConstant())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                       "ArmNN ClConvolution2dWorkload does not support non constant bias."};
+        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
@@ -72,6 +86,7 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload");
     const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
+    m_Data.ValidateInputsOutputs("ClConvolution2dWorkload", 1, 1);
 
     m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
     BuildArmComputeTensor(*m_KernelTensor, weightInfo, m_Data.m_Parameters.m_DataLayout);
@@ -84,8 +99,6 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
         m_BiasTensor = std::make_unique<arm_compute::CLTensor>();
         BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
     }
-
-    m_Data.ValidateInputsOutputs("ClConvolution2dWorkload", 1, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();

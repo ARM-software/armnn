@@ -79,8 +79,11 @@ void SetWeightAndBias(ConvolutionLayer* layer, const armnn::TensorInfo& weightIn
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 }
+armnn::SubgraphView::InputSlots CreateInputsFrom(armnn::Layer* layer,
+                                                 std::vector<unsigned int> ignoreSlots = {});
 
-armnn::SubgraphView::InputSlots CreateInputsFrom(const std::vector<armnn::Layer*>& layers);
+armnn::SubgraphView::InputSlots CreateInputsFrom(const std::vector<armnn::Layer*>& layers,
+                                                 std::vector<unsigned int> ignoreSlots = {});
 
 armnn::SubgraphView::OutputSlots CreateOutputsFrom(const std::vector<armnn::Layer*>& layers);
 

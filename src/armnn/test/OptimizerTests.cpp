@@ -441,6 +441,11 @@ void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
     Layer* input = graph.AddLayer<InputLayer>(0, "input");
     input->GetOutputSlot().SetTensorInfo(inputInfo);
 
+    ConstantLayer* weightsLayer = nullptr;
+    weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
+    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
+
     Convolution2dLayer* layer = graph.AddLayer<Convolution2dLayer>(desc, "conv2d");
     layer->m_Weight           = std::make_unique<armnn::ScopedTensorHandle>(weights);
     layer->GetOutputSlot().SetTensorInfo(outputInfo);
@@ -448,6 +453,7 @@ void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");
     input->GetOutputSlot().Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
 }
 
 TEST_CASE("Conv2dValidateTensorShapesFromInputs")
@@ -875,40 +881,70 @@ TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
     ConstTensor mean(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), meanVector);
     ConstTensor variance(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), varianceVector);
 
+    ConstantLayer* biasLayer = nullptr;
+
     // Define the network
     Graph graph;
     auto input     = graph.AddLayer<InputLayer>(0, "input");
+    auto weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
     auto conv      = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "convolution");
     auto batchNorm = graph.AddLayer<BatchNormalizationLayer>(batchNormDescriptor, "batchNorm");
     auto output    = graph.AddLayer<OutputLayer>(0, "output");
 
     // Set layer information
     input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
     conv->GetOutputSlot().SetTensorInfo(outputInfo);
+
     batchNorm->GetOutputSlot().SetTensorInfo(outputInfo);
-    conv->m_Weight        = std::make_unique<ScopedTensorHandle>(weights);
     batchNorm->m_Beta     = std::make_unique<ScopedTensorHandle>(beta);
     batchNorm->m_Gamma    = std::make_unique<ScopedTensorHandle>(gamma);
     batchNorm->m_Mean     = std::make_unique<ScopedTensorHandle>(mean);
     batchNorm->m_Variance = std::make_unique<ScopedTensorHandle>(variance);
+
     if (convolution2dDescriptor.m_BiasEnabled)
     {
         std::vector<float> biasVector = { 11 };
         ConstTensor bias(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), biasVector);
-        conv->m_Bias = std::make_unique<ScopedTensorHandle>(bias);
+        biasLayer =graph.AddLayer<ConstantLayer>("Bias");
+        biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(bias);
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
+        biasLayer->GetOutputSlot(0).Connect(conv->GetInputSlot(2));
+        conv->m_Bias = biasLayer->m_LayerOutput;
     }
 
     // Connect layers
     input->GetOutputSlot(0).Connect(conv->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(conv->GetInputSlot(1));
     conv->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
     batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
 
-    CHECK(4 == graph.GetNumLayers());
-    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<Convolution2dLayer>,
-                             &IsLayerOfType<BatchNormalizationLayer>,
-                             &IsLayerOfType<OutputLayer>));
+    // Temporary workaround to ensure the descriptor weights are populated
+    conv->m_Weight = weightsLayer->m_LayerOutput;
+
+    if (convolution2dDescriptor.m_BiasEnabled)
+    {
+        CHECK(6 == graph.GetNumLayers());
+        CHECK(CheckSequence(graph.cbegin(), graph.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<ConstantLayer>,
+                            &IsLayerOfType<ConstantLayer>,
+                            &IsLayerOfType<Convolution2dLayer>,
+                            &IsLayerOfType<BatchNormalizationLayer>,
+                            &IsLayerOfType<OutputLayer>));
+    }
+    else
+    {
+        CHECK(5 == graph.GetNumLayers());
+        CHECK(CheckSequence(graph.cbegin(), graph.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<ConstantLayer>,
+                            &IsLayerOfType<Convolution2dLayer>,
+                            &IsLayerOfType<BatchNormalizationLayer>,
+                            &IsLayerOfType<OutputLayer>));
+    }
 
     // Optimize graph
     armnn::Optimizer::Pass(graph, MakeOptimizations(FuseBatchNormIntoConvolution2DFloat32()));
@@ -918,11 +954,13 @@ TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
                (layer->GetNameStr() == "fused-batchNorm-into-convolution");
     };
 
-    CHECK(3 == graph.GetNumLayers());
+    CHECK(5 == graph.GetNumLayers());
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             checkFusedConv2d,
-                             &IsLayerOfType<OutputLayer>));
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<ConstantLayer>,
+                        &IsLayerOfType<ConstantLayer>,
+                        checkFusedConv2d,
+                        &IsLayerOfType<OutputLayer>));
 }
 
 // Tests that OptimizeForExclusiveConnections works, not fusing when not needed, using BatchNorm fusing as example

@@ -61,31 +61,35 @@ TEST_CASE("OptimizedViewsSubgraphLayerCount")
     Layer* const inputLayer = baseGraph.AddLayer<InputLayer>(0, "input");
 
     Convolution2dDescriptor convDescriptor;
-    PreCompiledDescriptor substitutionLayerDescriptor(1, 1);
+    PreCompiledDescriptor substitutionLayerDescriptor(2, 1);
     Layer* const convLayer1 = baseGraph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = baseGraph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+    Layer* const weightsLayer1 = baseGraph.AddLayer<ConstantLayer>("weights1");
+    Layer* const weightsLayer2 = baseGraph.AddLayer<ConstantLayer>("weights2");
     Layer* const substitutableCompiledLayer =
             baseGraph.AddLayer<PreCompiledLayer>(substitutionLayerDescriptor, "pre-compiled");
 
     Layer* const outputLayer = baseGraph.AddLayer<OutputLayer>(0, "output");
 
     inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    weightsLayer1->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(1));
     convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+    weightsLayer2->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(1));
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Subgraph for a failed layer
     SubgraphViewSelector::SubgraphViewPtr failedSubgraph =
-        CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+        CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                CreateOutputsFrom({convLayer1}),
                                {convLayer1});
     // Subgraph for an untouched layer
     SubgraphViewSelector::SubgraphViewPtr untouchedSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer2}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer2),
                                    CreateOutputsFrom({convLayer2}),
                                    {convLayer2});
     // Subgraph for a substitutable layer
     SubgraphViewSelector::SubgraphViewPtr substitutableSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                    CreateOutputsFrom({convLayer2}),
                                    {substitutableCompiledLayer});
     // Create a Graph containing a layer to substitute in
@@ -95,7 +99,7 @@ TEST_CASE("OptimizedViewsSubgraphLayerCount")
 
     // Subgraph for a substitution layer
     SubgraphViewSelector::SubgraphViewPtr substitutionSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({substitutionpreCompiledLayer}),
+            CreateSubgraphViewFrom(CreateInputsFrom(substitutionpreCompiledLayer),
                                    CreateOutputsFrom({substitutionpreCompiledLayer}),
                                    {substitutionpreCompiledLayer});
 
@@ -106,14 +110,14 @@ TEST_CASE("OptimizedViewsSubgraphLayerCount")
     view.AddUntouchedSubgraph(SubgraphView(*untouchedSubgraph));
 
     SubgraphViewSelector::SubgraphViewPtr baseSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                    CreateOutputsFrom({convLayer2}),
                                    {substitutionpreCompiledLayer});
     view.AddSubstitution({*baseSubgraph, *substitutionSubgraph});
 
     // Construct original subgraph to compare against
     SubgraphViewSelector::SubgraphViewPtr originalSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
             CreateOutputsFrom({convLayer2}),
             {convLayer1, convLayer2, substitutionpreCompiledLayer});
 
@@ -147,11 +151,11 @@ TEST_CASE("OptimizedViewsSubgraphLayerCountUsingGetINetwork")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Subgraph for a failed layer
-    SubgraphViewSelector::SubgraphViewPtr failedSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+    SubgraphViewSelector::SubgraphViewPtr failedSubgraph = CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                                                                   CreateOutputsFrom({convLayer1}),
                                                                                   {convLayer1});
     // Subgraph for an untouched layer
-    SubgraphViewSelector::SubgraphViewPtr untouchedSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer2}),
+    SubgraphViewSelector::SubgraphViewPtr untouchedSubgraph = CreateSubgraphViewFrom(CreateInputsFrom(convLayer2),
                                                                                      CreateOutputsFrom({convLayer2}),
                                                                                      {convLayer2});
 
@@ -162,21 +166,21 @@ TEST_CASE("OptimizedViewsSubgraphLayerCountUsingGetINetwork")
 
     // Subgraph for a substitution layer
     SubgraphViewSelector::SubgraphViewPtr substitutionSubgraph =
-        CreateSubgraphViewFrom(CreateInputsFrom({substitutionpreCompiledLayer}),
+        CreateSubgraphViewFrom(CreateInputsFrom(substitutionpreCompiledLayer),
                                                 CreateOutputsFrom({substitutionpreCompiledLayer}),
                                                 {substitutionpreCompiledLayer});
 
     view.AddFailedSubgraph(SubgraphView(*failedSubgraph));
     view.AddUntouchedSubgraph(SubgraphView(*untouchedSubgraph));
 
-    SubgraphViewSelector::SubgraphViewPtr baseSubgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+    SubgraphViewSelector::SubgraphViewPtr baseSubgraph = CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                                                                 CreateOutputsFrom({convLayer2}),
                                                                                 {substitutionpreCompiledLayer});
     view.AddSubstitution({*baseSubgraph, *substitutionSubgraph});
 
     // Construct original subgraph to compare against
     SubgraphViewSelector::SubgraphViewPtr originalSubgraph =
-        CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+        CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                                 CreateOutputsFrom({convLayer2}),
                                                 {convLayer1, convLayer2, substitutionpreCompiledLayer});
 
@@ -192,26 +196,31 @@ TEST_CASE("OptimizedViewsSubgraphLayerCountFailValidate")
     Layer* const inputLayer = baseGraph.AddLayer<InputLayer>(0, "input");
 
     Convolution2dDescriptor convDescriptor;
-    PreCompiledDescriptor substitutionLayerDescriptor(1, 1);
+    PreCompiledDescriptor substitutionLayerDescriptor(2, 1);
     Layer* const convLayer1 = baseGraph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = baseGraph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
+    Layer* const weightsLayer1 = baseGraph.AddLayer<ConstantLayer>("weights1");
+    Layer* const weightsLayer2 = baseGraph.AddLayer<ConstantLayer>("weights2");
     Layer* const substitutableCompiledLayer =
             baseGraph.AddLayer<PreCompiledLayer>(substitutionLayerDescriptor, "pre-compiled");
 
     Layer* const outputLayer = baseGraph.AddLayer<OutputLayer>(0, "output");
 
+
     inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    weightsLayer1->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(1));
     convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+    weightsLayer2->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(1));
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Subgraph for an untouched layer
     SubgraphViewSelector::SubgraphViewPtr untouchedSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer2}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer2),
                                    CreateOutputsFrom({convLayer2}),
                                    {convLayer2});
     // Subgraph for a substitutable layer
     SubgraphViewSelector::SubgraphViewPtr substitutableSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                    CreateOutputsFrom({convLayer2}),
                                    {substitutableCompiledLayer});
     // Create a Graph containing a layer to substitute in
@@ -221,7 +230,7 @@ TEST_CASE("OptimizedViewsSubgraphLayerCountFailValidate")
 
     // Subgraph for a substitution layer
     SubgraphViewSelector::SubgraphViewPtr substitutionSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({substitutionpreCompiledLayer}),
+            CreateSubgraphViewFrom(CreateInputsFrom(substitutionpreCompiledLayer),
                                    CreateOutputsFrom({substitutionpreCompiledLayer}),
                                    {substitutionpreCompiledLayer});
 
@@ -231,14 +240,14 @@ TEST_CASE("OptimizedViewsSubgraphLayerCountFailValidate")
     view.AddUntouchedSubgraph(SubgraphView(*untouchedSubgraph));
 
     SubgraphViewSelector::SubgraphViewPtr baseSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                    CreateOutputsFrom({convLayer2}),
                                    {substitutionpreCompiledLayer});
     view.AddSubstitution({*baseSubgraph, *substitutionSubgraph});
 
     // Construct original subgraph to compare against
     SubgraphViewSelector::SubgraphViewPtr originalSubgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+            CreateSubgraphViewFrom(CreateInputsFrom(convLayer1),
                                    CreateOutputsFrom({convLayer2}),
                                    {convLayer1, convLayer2, substitutionpreCompiledLayer});
 

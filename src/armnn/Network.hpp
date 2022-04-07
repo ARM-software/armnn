@@ -71,6 +71,10 @@ public:
                                       const char* name = nullptr);
 
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.11")
+    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const Optional<ConstTensor>& biases,
                                              const char* name = nullptr);
@@ -256,10 +260,6 @@ public:
     void ExecuteStrategy(IStrategy& strategy) const;
 
 private:
-    IConnectableLayer* AddConvolution2dLayerImpl(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                 const ConstTensor& weights,
-                                                 const Optional<ConstTensor>& biases,
-                                                 const char* name);
 
     bool GetShapeInferenceMethod();
     NetworkOptions m_NetworkOptions;

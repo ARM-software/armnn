@@ -51,17 +51,17 @@ void LayerVerifierBase::VerifyNameAndConnections(const armnn::IConnectableLayer*
 
         const armnn::TensorInfo& connectedInfo = connectedOutput->GetTensorInfo();
         CHECK(connectedInfo.GetShape() == m_InputTensorInfos[i].GetShape());
-        CHECK(
-            GetDataTypeName(connectedInfo.GetDataType()) == GetDataTypeName(m_InputTensorInfos[i].GetDataType()));
+        CHECK(GetDataTypeName(connectedInfo.GetDataType()) == GetDataTypeName(m_InputTensorInfos[i].GetDataType()));
 
-        // If weights and bias are connected to DepthwiseConvolution2d via Constant Layer we do not check.
-        // Constant Layer already disabled in SerializerTestUtils.hpp from entering function.
-        if (layer->GetType() == armnn::LayerType::DepthwiseConvolution2d &&
-            connectedOutput->GetOwningIConnectableLayer().GetType() != armnn::LayerType::Constant)
+        if (connectedInfo.HasMultipleQuantizationScales())
+        {
+            CHECK(connectedInfo.GetQuantizationScales() == m_InputTensorInfos[i].GetQuantizationScales());
+        }
+        else
         {
             CHECK(connectedInfo.GetQuantizationScale() == m_InputTensorInfos[i].GetQuantizationScale());
-            CHECK(connectedInfo.GetQuantizationOffset() == m_InputTensorInfos[i].GetQuantizationOffset());
         }
+        CHECK(connectedInfo.GetQuantizationOffset() == m_InputTensorInfos[i].GetQuantizationOffset());
     }
 
     for (unsigned int i = 0; i < m_OutputTensorInfos.size(); i++)

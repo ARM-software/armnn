@@ -119,16 +119,22 @@ TEST_CASE("CheckConvolution2dLayer")
     descriptor.m_StrideX = 2;
     descriptor.m_StrideY = 3;
     descriptor.m_DataLayout = DataLayout::NHWC;
+    descriptor.m_BiasEnabled = false;
 
     std::vector<float> data = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
     ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32, 0.0f, 0, true), data);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional());
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConvolution2dLayerVisitor visitor(descriptor);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, EmptyOptional());
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    weightsLayer->ExecuteStrategy(weightsVisitor);
     layer->ExecuteStrategy(visitor);
 }
 
@@ -148,11 +154,17 @@ TEST_CASE("CheckNamedConvolution2dLayer")
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
     ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32, 0.0f, 0, true), data);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional(), layerName);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConvolution2dLayerVisitor visitor(descriptor, layerName);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, EmptyOptional(), layerName);
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, layerName);
+
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    weightsLayer->ExecuteStrategy(weightsVisitor);
     layer->ExecuteStrategy(visitor);
 }
 
@@ -175,13 +187,21 @@ TEST_CASE("CheckConvolution2dLayerWithBiases")
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32, 0.0f, 0, true), biasData);
-    Optional<ConstTensor> optionalBiases(biases);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConstantLayerVisitor biasVisitor(biases);
+    TestConvolution2dLayerVisitor visitor(descriptor);
 
     NetworkImpl net;
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const biasLayer = net.AddConstantLayer(biases);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor);
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, optionalBiases);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+
+    biasLayer->ExecuteStrategy(biasVisitor);
+    weightsLayer->ExecuteStrategy(weightsVisitor);
     layer->ExecuteStrategy(visitor);
 }
 
@@ -205,13 +225,21 @@ TEST_CASE("CheckNamedConvolution2dLayerWithBiases")
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32, 0.0f, 0, true), biasData);
-    Optional<ConstTensor> optionalBiases(biases);
 
-    TestConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases, layerName);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConstantLayerVisitor biasVisitor(biases);
+    TestConvolution2dLayerVisitor visitor(descriptor, layerName);
 
     NetworkImpl net;
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const biasLayer = net.AddConstantLayer(biases);
+    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, layerName);
 
-    IConnectableLayer* const layer = net.AddConvolution2dLayer(descriptor, weights, optionalBiases, layerName);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+
+    biasLayer->ExecuteStrategy(biasVisitor);
+    weightsLayer->ExecuteStrategy(weightsVisitor);
     layer->ExecuteStrategy(visitor);
 }
 

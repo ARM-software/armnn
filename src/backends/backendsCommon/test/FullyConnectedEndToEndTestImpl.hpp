@@ -110,8 +110,11 @@ armnn::INetworkPtr CreateFullyConnectedNetworkNoConnectedWeightsExplicit(const a
 {
     armnn::INetworkPtr network(armnn::INetwork::Create());
 
+
+    ConstTensor biases;
+
     armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
-    armnn::IConnectableLayer* biasLayer   = network->AddInputLayer(2, "Bias_Input");
+    armnn::IConnectableLayer* biasLayer   = network->AddConstantLayer(biases, "Bias_Input");
     armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
     armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
 
@@ -402,16 +405,7 @@ void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
             IRuntime::CreationOptions options;
             IRuntimePtr               runtime(IRuntime::Create(options));
 
-            try
-            {
-                Optimize(*network, backends, runtime->GetDeviceSpec());
-                FAIL("LayerValidationException should have been thrown");
-            }
-            catch (const LayerValidationException& exc)
-            {
-                CHECK(strcmp(exc.what(), "Fully_Connected layer weights not set: Input slot(s) 1 not connected "
-                                         "to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
-            }
+            CHECK_THROWS_AS(Optimize(*network, backends, runtime->GetDeviceSpec()), LayerValidationException);
         }
         else if (!connectedBias)
         {
@@ -429,16 +423,7 @@ void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
             IRuntime::CreationOptions options;
             IRuntimePtr               runtime(IRuntime::Create(options));
 
-            try
-            {
-                Optimize(*network, backends, runtime->GetDeviceSpec());
-                FAIL("LayerValidationException should have been thrown");
-            }
-            catch (const LayerValidationException& exc)
-            {
-                CHECK(strcmp(exc.what(), "Fully_Connected layer bias not set: Input slot(s) 2 not connected "
-                                         "to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
-            }
+            CHECK_THROWS_AS(Optimize(*network, backends, runtime->GetDeviceSpec()), LayerValidationException);
         }
     }
     else if(!connectedWeights && !connectedBias)
@@ -452,17 +437,7 @@ void FullyConnectedErrorChecking(const std::vector<armnn::BackendId>& backends,
         IRuntime::CreationOptions options;
         IRuntimePtr               runtime(IRuntime::Create(options));
 
-        try
-        {
-            Optimize(*network, backends, runtime->GetDeviceSpec());
-            FAIL("LayerValidationException should have been thrown");
-        }
-        catch (const LayerValidationException& exc)
-        {
-            CHECK(strcmp(exc.what(), "Fully_Connected layer weights and bias not set: Input slot(s) 1 & 2 not "
-                                     "connected to an output slot on FullyConnected layer \"Fully_Connected\"") == 0);
-        }
-
+        CHECK_THROWS_AS(Optimize(*network, backends, runtime->GetDeviceSpec()), LayerValidationException);
     }
     else if(!tensorInfoSet)
     {

@@ -603,16 +603,19 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
     bool noWeightsAndBias = false;
 
     if ((layer->GetType() == armnn::LayerType::FullyConnected ||
+         layer->GetType() == armnn::LayerType::Convolution2d  ||
          layer->GetType() == armnn::LayerType::Convolution3d  ||
          layer->GetType() == armnn::LayerType::DepthwiseConvolution2d) && slotIndex > 0)
     {
+        message << std::endl;
+
         // If weights are not set and is bias enabled, also check if bias is set
         if (slotIndex == 1 && layer->GetNumInputSlots() == 3)
         {
             const IOutputSlot* biasSource = layer->GetInputSlot(2).GetConnectedOutputSlot();
             if (biasSource == NULL)
             {
-                message << layer->GetName() << " layer weights and bias not set: ";
+                message << "Weights and bias layers not set." << std::endl;
                 noWeightsAndBias = true;
             }
         }
@@ -622,11 +625,11 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
         {
             if (slotIndex == 1)
             {
-                message << layer->GetName() << " layer weights not set: ";
+                message << "Weights layer not set." << std::endl;
             }
             else
             {
-                message << layer->GetName() << " layer bias not set: ";
+                message << "Bias layer not set." << std::endl;
             }
         }
     }
@@ -634,9 +637,10 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
     std::string slotString = noWeightsAndBias ? "1 & 2" : std::to_string(slotIndex);
     message << "Input slot(s) "
             << slotString
-            << " not connected to an output slot on "
+            << " for "
             << GetLayerTypeAsCString(layer->GetType())
-            << " layer "
+            << " not connected to an output slot. " << std::endl
+            << "Layer name: "
             << std::quoted(layer->GetName());
     throw LayerValidationException(message.str());
 }

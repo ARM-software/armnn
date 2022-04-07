@@ -70,49 +70,68 @@ TEST_CASE("ReleaseBatchNormalizationLayerConstantDataTest")
 
  }
 
+TEST_CASE("ReleaseConvolution2dLayerConstantDataTest")
+{
+    Graph graph;
 
- TEST_CASE("ReleaseConvolution2dLayerConstantDataTest")
- {
-     Graph graph;
+    // create the layer we're testing
+    Convolution2dDescriptor layerDesc;
+    layerDesc.m_PadLeft = 3;
+    layerDesc.m_PadRight = 3;
+    layerDesc.m_PadTop = 1;
+    layerDesc.m_PadBottom = 1;
+    layerDesc.m_StrideX = 2;
+    layerDesc.m_StrideY = 4;
+    layerDesc.m_BiasEnabled = true;
 
-     // create the layer we're testing
-     Convolution2dDescriptor layerDesc;
-     layerDesc.m_PadLeft = 3;
-     layerDesc.m_PadRight = 3;
-     layerDesc.m_PadTop = 1;
-     layerDesc.m_PadBottom = 1;
-     layerDesc.m_StrideX = 2;
-     layerDesc.m_StrideY = 4;
-     layerDesc.m_BiasEnabled = true;
+    Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
-     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({ 2, 3, 5, 3 },
+                                                                      armnn::DataType::Float32));
+    layer->m_Bias = std::make_unique<ScopedTensorHandle>
+        (TensorInfo({ 2 }, GetBiasDataType(armnn::DataType::Float32)));
 
-     layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({2, 3, 5, 3},
-                                                                          armnn::DataType::Float32));
-     layer->m_Bias   = std::make_unique<ScopedTensorHandle>
-             (TensorInfo({2}, GetBiasDataType(armnn::DataType::Float32)));
+    layer->m_Weight->Allocate();
+    layer->m_Bias->Allocate();
 
-     layer->m_Weight->Allocate();
-     layer->m_Bias->Allocate();
+    ConstantLayer* weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
+    ConstantLayer* biasLayer = graph.AddLayer<ConstantLayer>("Bias");
 
-     // create extra layers
-     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
-     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(TensorInfo({ 2, 3, 5, 3 },
+                                                                      armnn::DataType::Float32));
 
-     // connect up
-     Connect(input, layer, TensorInfo({2, 3, 8, 16}, armnn::DataType::Float32));
-     Connect(layer, output, TensorInfo({2, 2, 2, 10}, armnn::DataType::Float32));
+    biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(
+        TensorInfo({2}, GetBiasDataType(armnn::DataType::Float32)));
 
-     // check the constants that they are not NULL
-     CHECK(layer->m_Weight != nullptr);
-     CHECK(layer->m_Bias != nullptr);
+    TensorInfo weightsInfo = weightsLayer->m_LayerOutput->GetTensorInfo();
+    weightsInfo.SetConstant();
+    TensorInfo biasInfo = biasLayer->m_LayerOutput->GetTensorInfo();
+    biasInfo.SetConstant();
 
-     // free up the constants..
-     layer->ReleaseConstantData();
 
-     // check the constants that they are NULL now
-     CHECK(layer->m_Weight == nullptr);
-     CHECK(layer->m_Bias == nullptr);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biasInfo);
+
+    // create extra layers
+    Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // connect up
+    Connect(input, layer, TensorInfo({ 2, 3, 8, 16 }, armnn::DataType::Float32));
+    weightsLayer->GetOutputSlot().Connect(layer->GetInputSlot(1));
+    biasLayer->GetOutputSlot().Connect(layer->GetInputSlot(2));
+    Connect(layer, output, TensorInfo({ 2, 2, 2, 10 }, armnn::DataType::Float32));
+
+    // check the constants that they are not NULL
+    CHECK(layer->m_Weight != nullptr);
+    CHECK(layer->m_Bias != nullptr);
+
+    // free up the constants..
+    layer->ReleaseConstantData();
+
+    // check the constants that they are NULL now
+    CHECK(layer->m_Weight == nullptr);
+    CHECK(layer->m_Bias == nullptr);
 }
 
 TEST_CASE("ReleaseDepthwiseConvolution2dLayerConstantDataTest")
@@ -131,8 +150,10 @@ TEST_CASE("ReleaseDepthwiseConvolution2dLayerConstantDataTest")
 
     DepthwiseConvolution2dLayer* const layer = graph.AddLayer<DepthwiseConvolution2dLayer>(layerDesc, "layer");
 
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({3, 3, 5, 3}, DataType::Float32));
-    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({9}, DataType::Float32));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(
+        TensorInfo({3, 3, 5, 3}, DataType::Float32));
+    layer->m_Bias = std::make_unique<ScopedTensorHandle>(
+        TensorInfo({9}, DataType::Float32));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 
@@ -170,10 +191,10 @@ TEST_CASE("ReleaseFullyConnectedLayerConstantDataTest")
     float inputsQScale = 1.0f;
     float outputQScale = 2.0f;
 
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({7, 20},
-                                                          DataType::QAsymmU8, inputsQScale, 0));
-    layer->m_Bias   = std::make_unique<ScopedTensorHandle>(TensorInfo({7},
-                                                          GetBiasDataType(DataType::QAsymmU8), inputsQScale));
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(
+        TensorInfo({7, 20}, DataType::QAsymmU8, inputsQScale, 0));
+    layer->m_Bias = std::make_unique<ScopedTensorHandle>(
+        TensorInfo({7}, GetBiasDataType(DataType::QAsymmU8), inputsQScale));
     layer->m_Weight->Allocate();
     layer->m_Bias->Allocate();
 

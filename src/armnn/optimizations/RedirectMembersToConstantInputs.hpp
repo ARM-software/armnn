@@ -29,6 +29,7 @@ public:
             case LayerType::BatchNormalization:
                 break;
             case LayerType::Convolution2d:
+                RedirectWeightsAndBiases<Convolution2dLayer>(&layer);
                 break;
             case LayerType::DepthwiseConvolution2d:
                 RedirectWeightsAndBiases<DepthwiseConvolution2dLayer>(&layer);

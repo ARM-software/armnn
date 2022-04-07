@@ -330,10 +330,10 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
                         if (layer->GetType() == LayerType::Constant)
                         {
+                            // Place the Constant Workloads into a queue so that they can be executed first
                             ConstWorkloads.push_back(m_WorkloadQueue.back().get());
                         }
                     }
-
                     // release the constant data in the layer..
                     layer->ReleaseConstantData();
                     break;
@@ -513,10 +513,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
             AllocateAndExecuteConstantWorkloadsAsync();
         }
     }
-
-    // If synchronous, execute all constant layer workloads as the FoldPad optimization
-    // may have created a new conv2d layer prior to the input constant layers which will
-    // cause a failure if constant workloads are not executed
+    // If synchronous, execute all constant layer workloads
     if (!networkProperties.m_AsyncEnabled)
     {
         for (auto workload: ConstWorkloads)

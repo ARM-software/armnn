@@ -23,16 +23,23 @@ namespace armnn
 // Instantiate the static member variable
 NullDescriptor Layer::m_NullDescriptor;
 
-template <typename LayerT>
-void AssertMultipleInputSlots(Layer& layer)
+void AssertNumberOfInputSlots(Layer& layer)
 {
-    if(PolymorphicDowncast<const LayerT*>(&(layer.GetParameters()))->m_BiasEnabled)
+    switch (layer.GetType())
     {
-        ARMNN_ASSERT(layer.GetNumInputSlots() == 3);
-    }
-    else
-    {
-        ARMNN_ASSERT(layer.GetNumInputSlots() == 2);
+        case LayerType::Convolution2d:
+        case LayerType::DepthwiseConvolution2d:
+        case LayerType::FullyConnected:
+        {
+            ARMNN_ASSERT(layer.GetNumInputSlots() == 2 ||
+                         layer.GetNumInputSlots() == 3);
+            break;
+        }
+        default:
+        {
+            ARMNN_ASSERT(layer.GetNumInputSlots() == 1);
+            break;
+        }
     }
 }
 
@@ -47,19 +54,7 @@ void InputSlot::Insert(Layer& layer)
         // Disconnects parent from this.
         prevSlot->Disconnect(*this);
 
-        switch (layer.GetType())
-        {
-            case LayerType::DepthwiseConvolution2d:
-            {
-                AssertMultipleInputSlots<DepthwiseConvolution2dDescriptor>(layer);
-                break;
-            }
-            default:
-            {
-                ARMNN_ASSERT(layer.GetNumInputSlots() == 1);
-                break;
-            }
-        }
+        AssertNumberOfInputSlots(layer);
 
         // Connects inserted layer to parent.
         int idx = prevSlot->Connect(layer.GetInputSlot(0));

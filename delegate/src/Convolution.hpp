@@ -160,29 +160,29 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = nullptr;
-
     // Set up filter and biases
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddConvolution2dLayer(descriptor);
+
     auto filter =
         CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[1]],
                           filterTensorInfo,
                           armnn::Optional<armnn::PermutationVector&>());
 
-    if(biasEnabled)
+    armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
+
+    if (biasEnabled)
     {
-        auto biases =
-            CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[2]],
-                              biasTensorInfo,
-                              armnn::Optional<armnn::PermutationVector&>());
-        layer = delegateData.m_Network->AddConvolution2dLayer(descriptor,
-                                                              filter,
-                                                              armnn::Optional<armnn::ConstTensor>(biases));
-    }
-    else
-    {
-        layer = delegateData.m_Network->AddConvolution2dLayer(descriptor,
-                                                              filter,
-                                                              armnn::EmptyOptional());
+        const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
+        if(tflite::IsConstantTensor(&tfLiteBiasTensor))
+        {
+            auto biasTensor = CreateConstTensor(&tfLiteBiasTensor, biasTensorInfo);
+            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
+            ARMNN_ASSERT(biasLayer != nullptr);
+            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+            biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensorInfo);
+        }
     }
 
     ARMNN_ASSERT(layer != nullptr);

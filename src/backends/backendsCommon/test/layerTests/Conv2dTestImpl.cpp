@@ -309,6 +309,7 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelDesc);
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -329,8 +330,15 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     }
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddInputToWorkload(data, info, kernelDesc, weightsHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
+    std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
+    if (biasEnabled)
+    {
+        biasHandle = tensorHandleFactory.CreateTensorHandle(biasDesc);
+        AddInputToWorkload(data, info, biasDesc, biasHandle.get());
+    }
     data.m_Weight = &weightsTensor;
     data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
@@ -349,8 +357,16 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
                                                                                 info);
     inputHandle->Allocate();
     outputHandle->Allocate();
+    weightsHandle->Allocate();
+
+    if (biasEnabled)
+    {
+        biasHandle->Allocate();
+        CopyDataToITensorHandle(biasHandle.get(), bias.data());
+    }
 
     CopyDataToITensorHandle(inputHandle.get(), inputData.data());
+    CopyDataToITensorHandle(weightsHandle.get(), kernel.data());
 
     ExecuteWorkload(*workload, memoryManager);
 
@@ -423,6 +439,8 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelDesc);
+    std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
 
     armnn::ScopedTensorHandle weightsTensor(kernelDesc);
     AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
@@ -444,15 +462,30 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
 
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddInputToWorkload(data, info, kernelDesc, weightsHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    if (biasEnabled)
+    {
+        biasHandle = tensorHandleFactory.CreateTensorHandle(biasDesc);
+        AddInputToWorkload(data, info, biasDesc, biasHandle.get());
+    }
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d,
                                                                                 data,
                                                                                 info);
     inputHandle->Allocate();
     outputHandle->Allocate();
+    weightsHandle->Allocate();
+
+    if (biasEnabled)
+    {
+        biasHandle->Allocate();
+        CopyDataToITensorHandle(biasHandle.get(), bias.data());
+    }
 
     CopyDataToITensorHandle(inputHandle.get(), inputData.data());
+    CopyDataToITensorHandle(weightsHandle.get(), kernel.data());
 
     ExecuteWorkload(*workload, memoryManager);
 
@@ -552,35 +585,52 @@ LayerTestResult<T,4> Convolution1dTestImpl(
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelInfo);
+    std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedTensorHandle         weightsTensor(kernelInfo);
-    armnn::ScopedTensorHandle         biasTensor(biasInfo);
+    armnn::ScopedTensorHandle weightsTensor(kernelInfo);
+    armnn::ScopedTensorHandle biasTensor(biasInfo);
 
     AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
 
     AddInputToWorkload(data, info, inputInfo, inputHandle.get());
+    AddInputToWorkload(data, info, kernelInfo, weightsHandle.get());
     AddOutputToWorkload(data, info, outputInfo, outputHandle.get());
 
-    data.m_Weight         = &weightsTensor;
-    data.m_Bias           = &biasTensor;
-    data.m_Parameters.m_StrideX        = 1;
-    data.m_Parameters.m_StrideY        = stride;
-    data.m_Parameters.m_PadLeft        = 0;
-    data.m_Parameters.m_PadRight       = 0;
-    data.m_Parameters.m_PadTop         = padSize;
-    data.m_Parameters.m_PadBottom      = padSize;
-    data.m_Parameters.m_BiasEnabled    = biasEnabled;
+    data.m_Weight = &weightsTensor;
+    data.m_Bias = &biasTensor;
+    data.m_Parameters.m_StrideX = 1;
+    data.m_Parameters.m_StrideY = stride;
+    data.m_Parameters.m_PadLeft = 0;
+    data.m_Parameters.m_PadRight = 0;
+    data.m_Parameters.m_PadTop = padSize;
+    data.m_Parameters.m_PadBottom = padSize;
+    data.m_Parameters.m_BiasEnabled = biasEnabled;
+
+    if (biasEnabled)
+    {
+        biasHandle = tensorHandleFactory.CreateTensorHandle(biasInfo);
+        AddInputToWorkload(data, info, biasInfo, biasHandle.get());
+    }
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d,
                                                                                 data,
                                                                                 info);
     inputHandle->Allocate();
     outputHandle->Allocate();
+    weightsHandle->Allocate();
+
+    if (biasEnabled)
+    {
+        biasHandle->Allocate();
+        CopyDataToITensorHandle(biasHandle.get(), biasData.data());
+    }
 
     CopyDataToITensorHandle(inputHandle.get(), inputData.data());
+    CopyDataToITensorHandle(weightsHandle.get(), kernelData.data());
 
     ExecuteWorkload(*workload, memoryManager);
 
@@ -1364,18 +1414,30 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     std::vector<T> expectedOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> biasHandle = tensorHandleFactory.CreateTensorHandle(biasDesc);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelDesc);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
+
     armnn::ScopedTensorHandle weightsTensor(kernelDesc);
     armnn::ScopedTensorHandle biasTensor(biasDesc);
 
+    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
+    AddInputToWorkload(data, info, kernelDesc, weightsHandle.get());
+    AddInputToWorkload(data, info, biasDesc, biasHandle.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
+    // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
+    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
+    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
+    AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernel.data());
     AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
+    AllocateAndCopyDataToITensorHandle(biasHandle.get(), bias.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
 
-    AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
-    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
     data.m_Weight = &weightsTensor;
     data.m_Bias = &biasTensor;
     data.m_Parameters.m_StrideX = strideX;
@@ -1387,11 +1449,15 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     data.m_Parameters.m_BiasEnabled = true;
 
     std::unique_ptr<armnn::ITensorHandle> outputHandleRef = refTensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandleRef = refTensorHandleFactory.CreateTensorHandle(kernelDesc);
+    std::unique_ptr<armnn::ITensorHandle> biasHandleRef = refTensorHandleFactory.CreateTensorHandle(biasDesc);
     std::unique_ptr<armnn::ITensorHandle> inputHandleRef = refTensorHandleFactory.CreateTensorHandle(inputTensorInfo);
 
     armnn::Convolution2dQueueDescriptor refData = data;
     armnn::WorkloadInfo                 refInfo = info;
     SetWorkloadInput(refData, refInfo, 0, inputTensorInfo, inputHandleRef.get());
+    SetWorkloadInput(refData, refInfo, 1, kernelDesc, weightsHandleRef.get());
+    SetWorkloadInput(refData, refInfo, 2, biasDesc, biasHandleRef.get());
     SetWorkloadOutput(refData, refInfo, 0, outputTensorInfo, outputHandleRef.get());
 
     std::unique_ptr<armnn::IWorkload> workload
@@ -1401,12 +1467,16 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
 
     outputHandleRef->Allocate();
     inputHandleRef->Allocate();
+    weightsHandleRef->Allocate();
+    biasHandleRef->Allocate();
 
     inputHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), input.data());
     CopyDataToITensorHandle(inputHandleRef.get(), input.data());
+    CopyDataToITensorHandle(weightsHandleRef.get(), kernel.data());
+    CopyDataToITensorHandle(biasHandleRef.get(), bias.data());
 
     ExecuteWorkload(*workload, memoryManager);
 
@@ -3622,6 +3692,8 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
 
     std::unique_ptr<ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
     std::unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelInfo);
+    std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
 
     WorkloadInfo workloadInfo;
     ScopedTensorHandle weightTensor(kernelInfo);
@@ -3636,6 +3708,14 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     queueDescriptor.m_Bias       = &biasTensor;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
+    AddInputToWorkload(queueDescriptor, workloadInfo, kernelInfo, weightsHandle.get());
+
+    if (descriptor.m_BiasEnabled)
+    {
+        biasHandle = tensorHandleFactory.CreateTensorHandle(biasInfo);
+        AddInputToWorkload(queueDescriptor, workloadInfo, biasInfo, biasHandle.get());
+    }
+
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
 
     std::unique_ptr<IWorkload> workload= workloadFactory.CreateWorkload(armnn::LayerType::Convolution2d,
@@ -3643,8 +3723,16 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
                                                                         workloadInfo);
     inputHandle->Allocate();
     outputHandle->Allocate();
+    weightsHandle->Allocate();
 
+    if (descriptor.m_BiasEnabled)
+    {
+        biasHandle->Allocate();
+        CopyDataToITensorHandle(biasHandle.get(), biasData.data());
+    }
     CopyDataToITensorHandle(inputHandle.get(), inputData.data());
+    CopyDataToITensorHandle(weightsHandle.get(), kernelData.data());
+
 
     ExecuteWorkload(*workload, memoryManager);
 

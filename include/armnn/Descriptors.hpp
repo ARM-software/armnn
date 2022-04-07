@@ -524,6 +524,8 @@ struct Convolution2dDescriptor : BaseDescriptor
                m_BiasEnabled == rhs.m_BiasEnabled &&
                m_DataLayout  == rhs.m_DataLayout;
     }
+    uint32_t GetNumInputs() const;
+
 
     /// Padding left value in the width dimension.
     uint32_t             m_PadLeft;

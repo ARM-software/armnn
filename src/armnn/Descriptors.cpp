@@ -425,16 +425,10 @@ int StridedSliceDescriptor::GetStopForAxis(const TensorShape& inputShape,
 
 }
 
-uint32_t FullyConnectedDescriptor::GetNumViews() const
+uint32_t GetNumInputs(bool biasEnabled)
 {
-    return GetNumInputs();
-}
-
-uint32_t FullyConnectedDescriptor::GetNumInputs() const
-{
-    // Return 2 otherwise check if bias is enabled
     unsigned int numInputs = 2;
-    if (m_BiasEnabled)
+    if (biasEnabled)
     {
         numInputs = 3;
     }
@@ -443,24 +437,27 @@ uint32_t FullyConnectedDescriptor::GetNumInputs() const
 
 uint32_t Convolution3dDescriptor::GetNumInputs() const
 {
-    // Return 2 otherwise check if bias is enabled
-    unsigned int numInputs = 2;
-    if (m_BiasEnabled)
-    {
-        numInputs = 3;
-    }
-    return numInputs;
+    return armnn::GetNumInputs(m_BiasEnabled);
+}
+
+uint32_t Convolution2dDescriptor::GetNumInputs() const
+{
+    return armnn::GetNumInputs(m_BiasEnabled);
+}
+
+uint32_t FullyConnectedDescriptor::GetNumInputs() const
+{
+    return armnn::GetNumInputs(m_BiasEnabled);
+}
+
+uint32_t FullyConnectedDescriptor::GetNumViews() const
+{
+    return armnn::GetNumInputs(m_BiasEnabled);
 }
 
 uint32_t DepthwiseConvolution2dDescriptor::GetNumInputs() const
 {
-    // Return 2 otherwise check if bias is enabled
-    unsigned int numInputs = 2;
-    if (m_BiasEnabled)
-    {
-        numInputs = 3;
-    }
-    return numInputs;
+    return armnn::GetNumInputs(m_BiasEnabled);
 }
 
 }

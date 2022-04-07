@@ -83,35 +83,23 @@ IConnectableLayer* INetwork::AddConcatLayer(const ConcatDescriptor& concatDescri
 
 
 IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const Optional<ConstTensor>& biases,
                                                    const char* name)
 {
-    return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
+    return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor, name);
 }
 
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const char* name)
+                                                    const ConstTensor& weights,
+                                                    const Optional<ConstTensor>& biases,
+                                                    const char* name)
 {
-    Optional<ConstTensor> biases;
-    return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
-}
-
-
-IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const ConstTensor& biases,
-                                                   const char* name )
-{
-
     return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor,
                                                weights,
                                                armnn::Optional<ConstTensor>(biases),
                                                name);
 }
-
+ARMNN_NO_DEPRECATE_WARN_END
 
 IConnectableLayer* INetwork::AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,
                                                    const char* name)
@@ -2012,25 +2000,33 @@ IConnectableLayer* NetworkImpl::AddConcatLayer(const ConcatDescriptor& concatDes
     return m_Graph->AddLayer<ConcatLayer>(concatDescriptor, name);
 }
 
-IConnectableLayer* NetworkImpl::AddConvolution2dLayerImpl(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                          const ConstTensor& weights,
-                                                          const Optional<ConstTensor>& biases,
-                                                          const char* name)
+IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                                      const char* name)
 {
-    if (convolution2dDescriptor.m_BiasEnabled && !biases.has_value())
-    {
-        throw InvalidArgumentException("AddConvolution2dLayer: biases cannot be empty");
-    }
+    return m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
+}
 
-    const auto layer = m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
-
+IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                                      const ConstTensor& weights,
+                                                      const Optional<ConstTensor>& biases,
+                                                      const char* name)
+{
+    auto layer = m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
+    // Add a constant layer for weights
+    ConstantLayer* weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
+    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
     layer->m_Weight = std::make_shared<ScopedTensorHandle>(weights);
-
-    if (convolution2dDescriptor.m_BiasEnabled)
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    // Add a constant layer for biases
+    if (biases.has_value() && convolution2dDescriptor.m_BiasEnabled)
     {
+        ConstantLayer* biasLayer = m_Graph->AddLayer<ConstantLayer>("Bias");
+        biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(biases.value());
         layer->m_Bias = std::make_shared<ScopedTensorHandle>(biases.value());
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
+        biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
     }
-
     return layer;
 }
 
@@ -2042,31 +2038,6 @@ IConnectableLayer* NetworkImpl::AddConvertFp16ToFp32Layer(const char* name)
 IConnectableLayer* NetworkImpl::AddConvertFp32ToFp16Layer(const char* name)
 {
     return m_Graph->AddLayer<ConvertFp32ToFp16Layer>(name);
-}
-
-IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                  const ConstTensor& weights,
-                                                  const Optional<ConstTensor>& biases,
-                                                  const char* name)
-{
-    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
-}
-
-IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                  const ConstTensor& weights,
-                                                  const char* name)
-{
-    Optional<ConstTensor> biases;
-    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
-}
-
-IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                  const ConstTensor& weights,
-                                                  const ConstTensor& biases,
-                                                  const char* name)
-{
-    Optional<ConstTensor> optionalBiases(biases);
-    return AddConvolution2dLayerImpl(convolution2dDescriptor, weights, optionalBiases, name);
 }
 
 IConnectableLayer* NetworkImpl::AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,

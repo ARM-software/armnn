@@ -42,7 +42,7 @@ class IOutputSlot
 public:
     virtual unsigned int GetNumConnections() const = 0;
     virtual const IInputSlot* GetConnection(unsigned int index) const = 0;
-    virtual IInputSlot* GetConnection(unsigned int index) = 0;
+    virtual IInputSlot* GetConnection(unsigned int outputindex) = 0;
 
     virtual void SetTensorInfo(const TensorInfo& tensorInfo) = 0;
     virtual const TensorInfo& GetTensorInfo() const = 0;
@@ -293,10 +293,18 @@ public:
 
     /// Adds a 2D convolution layer to the network.
     /// @param convolution2dDescriptor - Description of the 2D convolution layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
+                                             const char* name = nullptr);
+
+    /// Adds a 2D convolution layer to the network.
+    /// @param convolution2dDescriptor - Description of the 2D convolution layer.
     /// @param weights - Tensor for the weights data.
     /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const Optional<ConstTensor>& biases,
@@ -331,9 +339,8 @@ public:
     /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const char* name = nullptr);
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+                                                      const char* name = nullptr);
 
     /// Adds a 2D depthwise convolution layer to the network.
     /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.

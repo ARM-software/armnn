@@ -146,8 +146,22 @@ Layer2dT* FoldPadIntoLayer2dImpl(Graph& graph, InputSlot& connection)
     const std::string name = std::string("folded-") + padLayer.GetName() + "-into-" + layer2d.GetName();
     auto& newLayer2d = *graph.InsertNewLayer<Layer2dT>(padLayer.GetInputSlot(0), newLayer2dDescriptor, name.c_str());
 
-    // Reconnect the pad layer with its original parent.
     newLayer2d.GetOutputSlot().MoveAllConnections(parentSlot);
+    // Start at 1 to connect only weights and bias
+    for (unsigned int i = 1; i < layer2d.GetNumInputSlots(); ++i)
+    {
+        if (layer2d.GetInputSlot(i).GetConnectedOutputSlot() != nullptr)
+        {
+            Layer& tgtLayer = layer2d.GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
+            // Ensure we are definitely connecting the necessary constant layers
+            if (tgtLayer.GetType() == armnn::LayerType::Constant)
+            {
+                // Remove old connection and connect to new layer2d
+                tgtLayer.GetOutputSlot(0).Disconnect(layer2d.GetInputSlot(i));
+                tgtLayer.GetOutputSlot(0).Connect(newLayer2d.GetInputSlot(i));
+            }
+        }
+    }
 
     // Moves connections in old layer2d layer output to new layer.
     // Old layer2d layer will be removed as it's left unconnected.
@@ -168,14 +182,19 @@ public:
         {
             const auto conv2dLayer = PolymorphicDowncast<Convolution2dLayer*>(&connection.GetOwningLayer());
             // Copy weights and bias to the new convolution layer
-            ARMNN_ASSERT_MSG(conv2dLayer->m_Weight != nullptr,
-                             "FoldPadIntoConvolution2d: Weights data should not be null.");
+            ARMNN_ASSERT_MSG(newConv2dLayer->GetInputSlot(1).GetConnection() != nullptr,
+                             "FoldPadIntoConvolution2d: New convolution layer is missing connection to weights layer");
+
+            // Deprecated 22.11
             newConv2dLayer->m_Weight = std::move(conv2dLayer->m_Weight);
 
             if (conv2dLayer->GetParameters().m_BiasEnabled)
             {
-                ARMNN_ASSERT_MSG(conv2dLayer->m_Bias != nullptr,
-                                 "FoldPadIntoConvolution2d: Bias data should not be null if bias is enabled.");
+                ARMNN_ASSERT_MSG(newConv2dLayer->GetInputSlot(2).GetConnection() != nullptr,
+                                 "FoldPadIntoConvolution2d: New convolution layer is missing "
+                                 "connection to bias layer.");
+
+                // Deprecated 22.11
                 newConv2dLayer->m_Bias = std::move(conv2dLayer->m_Bias);
             }
         }
@@ -191,26 +210,25 @@ class FoldPadIntoDepthwiseConvolution2dImpl
 public:
     void Run(Graph& graph, InputSlot& connection) const
     {
-        const auto newLayer2d = FoldPadIntoLayer2dImpl<DepthwiseConvolution2dLayer>(graph, connection);
+        const auto newConv2dLayer = FoldPadIntoLayer2dImpl<DepthwiseConvolution2dLayer>(graph, connection);
 
-        if (newLayer2d != nullptr)
+        if (newConv2dLayer != nullptr)
         {
-            const auto layer2d = PolymorphicDowncast<DepthwiseConvolution2dLayer*>(&connection.GetOwningLayer());
+            const auto conv2dLayer = PolymorphicDowncast<DepthwiseConvolution2dLayer*>(&connection.GetOwningLayer());
+            // Copy weights and bias to the new convolution layer
+            ARMNN_ASSERT_MSG(newConv2dLayer->GetInputSlot(1).GetConnection() != nullptr,
+            "FoldPadIntoDepthwiseConvolution2d: New convolution layer is missing connection to weights layer");
 
-            // Move weights and bias layer connections to the new convolution layer
-            ARMNN_ASSERT_MSG(layer2d->GetInputSlot(1).GetConnection() != nullptr,
-                             "FoldPadIntoDepthwiseConvolution2d: Weights data should not be null.");
-            Layer& weightLayer = layer2d->GetInputSlot(1).GetConnectedOutputSlot()->GetOwningLayer();
-            weightLayer.GetOutputSlot(0).Disconnect(layer2d->GetInputSlot(1));
-            weightLayer.GetOutputSlot(0).Connect(newLayer2d->GetInputSlot(1));
+            // Deprecated 22.11
+            newConv2dLayer->m_Weight = std::move(conv2dLayer->m_Weight);
 
-            if (layer2d->GetParameters().m_BiasEnabled)
+            if (conv2dLayer->GetParameters().m_BiasEnabled)
             {
-                ARMNN_ASSERT_MSG(layer2d->GetInputSlot(2).GetConnection() != nullptr,
-                                "FoldPadIntoDepthwiseConvolution2d: Bias data should not be null if bias is enabled.");
-                Layer& biasLayer = layer2d->GetInputSlot(2).GetConnectedOutputSlot()->GetOwningLayer();
-                biasLayer.GetOutputSlot(0).Disconnect(layer2d->GetInputSlot(2));
-                biasLayer.GetOutputSlot(0).Connect(newLayer2d->GetInputSlot(2));
+                ARMNN_ASSERT_MSG(newConv2dLayer->GetInputSlot(2).GetConnection() != nullptr,
+                                 "FoldPadIntoConvolution2d: New convolution layer is missing "
+                                 "connection to bias layer.");
+                // Deprecated 22.11
+                newConv2dLayer->m_Bias = std::move(conv2dLayer->m_Bias);
             }
         }
     }

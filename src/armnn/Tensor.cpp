@@ -362,9 +362,7 @@ TensorInfo::TensorInfo(unsigned int numDimensions,
                        float quantizationScale,
                        int32_t quantizationOffset,
                        bool isConstant)
-    : m_Shape(numDimensions, dimensionSizes)
-    , m_DataType(dataType)
-        , m_IsConstant(isConstant)
+    : m_Shape(numDimensions, dimensionSizes), m_DataType(dataType), m_IsConstant(isConstant)
 {
     SetQuantizationScale(quantizationScale);
     SetQuantizationOffset(quantizationOffset);

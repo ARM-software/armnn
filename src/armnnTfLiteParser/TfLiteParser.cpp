@@ -417,6 +417,9 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
         case tflite::TensorType_FLOAT32:
             type = armnn::DataType::Float32;
             break;
+        case tflite::TensorType_FLOAT16:
+            type = armnn::DataType::Float16;
+            break;
         case tflite::TensorType_INT8:
             if (tensorPtr->quantization->zero_point.size() == 1)
             {
@@ -1067,58 +1070,64 @@ void TfLiteParserImpl::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
 
     CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
 
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
     Convolution2dDescriptor desc;
-    desc.m_BiasEnabled = false;
+    inputs.size() == 3 ?
+        desc.m_BiasEnabled = true : desc.m_BiasEnabled = false;
     desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
     desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
     desc.m_DataLayout = armnn::DataLayout::NHWC;
     desc.m_DilationX = CHECKED_NON_NEGATIVE(options->dilation_w_factor);
     desc.m_DilationY = CHECKED_NON_NEGATIVE(options->dilation_h_factor);
 
-    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(inputs.size(), 2, 3);
-
-    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
-    CHECK_VALID_SIZE(outputs.size(), 1);
-
-    armnn::TensorInfo inputTensorInfo  = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
     armnn::TensorInfo filterTensorInfo = ToTensorInfo(inputs[1]);
 
     // assuming input is NHWC
     unsigned int inputHeight = inputTensorInfo.GetShape()[1];
-    unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
+    unsigned int inputWidth = inputTensorInfo.GetShape()[2];
 
     // assuming the filter is OHWI : Output, H, W, Input
     // which is essentially the same as NHWC
     unsigned int filterHeight = filterTensorInfo.GetShape()[1];
-    unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+    unsigned int filterWidth = filterTensorInfo.GetShape()[2];
 
     CalcPadding(inputHeight, filterHeight, desc.m_StrideY,
                 desc.m_DilationY, desc.m_PadTop, desc.m_PadBottom, options->padding);
     CalcPadding(inputWidth, filterWidth, desc.m_StrideX,
                 desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
-    auto filterTensorAndData = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo, inputTensorInfo.GetDataType());
-    armnn::IConnectableLayer* layer = nullptr;
+    // Add the first input and weights tensor to the registration list.
+    // The constant weights will be added by SetupConstantLayers.
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    std::vector<unsigned int> tensorIndexesToRegister = { inputTensorIndexes[0], inputTensorIndexes[1] };
 
     auto layerName = fmt::format("Conv2D:{}:{}", subgraphIndex, operatorIndex);
+    armnn::IConnectableLayer* layer = m_Network->AddConvolution2dLayer(desc, layerName.c_str());
 
-    if (inputs.size() == 3)
+    if (IsConstTensor(inputs[1]) && inputTensorInfo.GetDataType() == DataType::Float32 &&
+        (filterTensorInfo.GetDataType() == DataType::QAsymmU8 ||
+            filterTensorInfo.GetDataType() == DataType::QAsymmS8))
     {
-        desc.m_BiasEnabled = true;
-        armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensorNonPermuted(inputs[2], biasTensorInfo, inputTensorInfo.GetDataType());
-        layer = m_Network->AddConvolution2dLayer(desc,
-                                                 filterTensorAndData.first,
-                                                 Optional<ConstTensor>(biasTensorAndData.first),
-                                                 layerName.c_str());
+        m_ConstantsToDequantize.emplace_back(inputs[1]->buffer);
     }
-    else
+
+    if (desc.m_BiasEnabled)
     {
-        layer = m_Network->AddConvolution2dLayer(desc,
-                                                 filterTensorAndData.first,
-                                                 EmptyOptional(),
-                                                 layerName.c_str());
+        armnn::TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
+
+        // Add the biases input to the registration list, a constant layer will be added by SetupConstantLayers.
+        tensorIndexesToRegister.emplace_back(inputTensorIndexes[2]);
+
+        if (IsConstTensor(inputs[2]) && inputTensorInfo.GetDataType() == DataType::Float32 &&
+            (filterTensorInfo.GetDataType() == DataType::QAsymmU8 ||
+                filterTensorInfo.GetDataType() == DataType::QAsymmS8))
+        {
+            m_ConstantsToDequantize.emplace_back(inputs[2]->buffer);
+        }
     }
 
     ARMNN_ASSERT(layer != nullptr);
@@ -1128,13 +1137,12 @@ void TfLiteParserImpl::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, tensorIndexesToRegister);
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, { outputTensorIndexes[0] });
 }
 
 // Conv3D support was added in TF 2.5, so for backwards compatibility a hash define is needed.
@@ -1261,7 +1269,6 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
                 desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
     // ArmNN uses the same filter tensor layout at TfLite [1, H, W, O] no need for any permutation
-    auto filterTensor = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo);
     auto layerName = fmt::format("DepthwiseConv2D:{}:{}", subgraphIndex, operatorIndex);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -1275,7 +1282,6 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
     {
         desc.m_BiasEnabled = true;
         TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensorNonPermuted(inputs[2], biasTensorInfo);
 
         // Add the biases input to the registration list, a constant layer will be added by SetupConstantLayers.
         tensorIndexesToRegister.emplace_back(inputTensorIndexes[2]);

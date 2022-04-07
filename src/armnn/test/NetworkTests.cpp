@@ -77,18 +77,18 @@ TEST_CASE("NetworkModification")
     armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), convWeightsData);
 
     armnn::Convolution2dDescriptor convDesc2d;
-    armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d,
-                                                                          weights,
-                                                                          armnn::EmptyOptional(),
-                                                                          "conv layer");
+    armnn::IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights, "conv const weights");
+    armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d, "conv layer");
     CHECK(convLayer);
+    CHECK(weightsLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1));
 
     armnn::FullyConnectedDescriptor fullyConnectedDesc;
 
     // Constant layer that now holds weights data for FullyConnected
-    armnn::IConnectableLayer* const constantWeightsLayer = net.AddConstantLayer(weights, "const weights");
+    armnn::IConnectableLayer* const constantWeightsLayer = net.AddConstantLayer(weights, "fc const weights");
     armnn::IConnectableLayer* const fullyConnectedLayer = net.AddFullyConnectedLayer(fullyConnectedDesc,
                                                                                      "fully connected");
     CHECK(constantWeightsLayer);
@@ -155,12 +155,13 @@ TEST_CASE("NetworkModification")
     multiplicationLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     //Tests that all layers are present in the graph.
-    CHECK(net.GetGraph().GetNumLayers() == 12);
+    CHECK(net.GetGraph().GetNumLayers() == 13);
 
     //Tests that the vertices exist and have correct names.
     CHECK(GraphHasNamedLayer(net.GetGraph(), "input layer"));
     CHECK(GraphHasNamedLayer(net.GetGraph(), "conv layer"));
-    CHECK(GraphHasNamedLayer(net.GetGraph(), "const weights"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "conv const weights"));
+    CHECK(GraphHasNamedLayer(net.GetGraph(), "fc const weights"));
     CHECK(GraphHasNamedLayer(net.GetGraph(), "fully connected"));
     CHECK(GraphHasNamedLayer(net.GetGraph(), "pooling2d"));
     CHECK(GraphHasNamedLayer(net.GetGraph(), "activation"));
@@ -239,8 +240,8 @@ TEST_CASE("NetworkModification")
     CHECK(AreAllLayerInputSlotsConnected(*outputLayer));
 
     // Checks connectivity.
-    checkOneOutputToOneInputConnection(inputLayer, convLayer, 0);
-    checkOneOutputToTwoInputConnectionForTwoDifferentLayers(convLayer, constantWeightsLayer, fullyConnectedLayer, 1, 0);
+    checkOneOutputToTwoInputConnectionForTwoDifferentLayers(inputLayer, weightsLayer, convLayer, 0, 0);
+    checkOneOutputToTwoInputConnectionForTwoDifferentLayers(convLayer, constantWeightsLayer, fullyConnectedLayer, 2, 0);
     checkOneOutputToOneInputConnection(fullyConnectedLayer, poolingLayer, 2, 1);
     checkOneOutputToOneInputConnection(poolingLayer, activationLayer);
     checkOneOutputToOneInputConnection(activationLayer, normalizationLayer);
@@ -619,10 +620,12 @@ TEST_CASE("ObtainConv2DDescriptorFromIConnectableLayer")
     convDesc2d.m_DilationY = 3;
     convDesc2d.m_BiasEnabled = false;
     convDesc2d.m_DataLayout = armnn::DataLayout::NCHW;
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d,
                                                                           weights,
                                                                           armnn::EmptyOptional(),
                                                                           "conv layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     CHECK(convLayer);
 
     const armnn::BaseDescriptor& descriptor = convLayer->GetParameters();

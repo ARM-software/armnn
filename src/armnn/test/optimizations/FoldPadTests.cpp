@@ -47,6 +47,12 @@ TEST_CASE("FoldPadLayerIntoConvolution2dLayer")
     std::vector<float> weightsVector(18);
     ConstTensor        weights(TensorInfo(4, weightsShape, DataType::Float32, 0.0f, 0, true), weightsVector);
 
+    ConstantLayer* weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
+    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
+
+    TensorInfo weightsInfo = weightsLayer->m_LayerOutput->GetTensorInfo();
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+
     Convolution2dLayer* conv2dLayer = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "conv2d");
     conv2dLayer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
     conv2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
@@ -56,6 +62,7 @@ TEST_CASE("FoldPadLayerIntoConvolution2dLayer")
     // Connect up layers - input -> pad -> conv2d -> output
     input->GetOutputSlot().Connect(padLayer->GetInputSlot(0));
     padLayer->GetOutputSlot().Connect(conv2dLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot().Connect(conv2dLayer->GetInputSlot(1));
     conv2dLayer->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     auto checkSimpleConv2d = [](const Layer* const layer)->bool {
@@ -69,10 +76,11 @@ TEST_CASE("FoldPadLayerIntoConvolution2dLayer")
     };
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<PadLayer>,
-                             checkSimpleConv2d,
-                             &IsLayerOfType<OutputLayer>));
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<PadLayer>,
+                        &IsLayerOfType<ConstantLayer>,
+                        checkSimpleConv2d,
+                        &IsLayerOfType<OutputLayer>));
 
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FoldPadIntoConvolution2d()));
 
@@ -87,9 +95,10 @@ TEST_CASE("FoldPadLayerIntoConvolution2dLayer")
     };
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             checkPadFoldedIntoConv2d,
-                             &IsLayerOfType<OutputLayer>));
+                        &IsLayerOfType<InputLayer>,
+                        checkPadFoldedIntoConv2d,
+                        &IsLayerOfType<ConstantLayer>,
+                        &IsLayerOfType<OutputLayer>));
 }
 
 TEST_CASE("FoldPadLayerIntoDepthwiseConvolution2dLayer")
@@ -628,12 +637,12 @@ TEST_CASE("FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutOptimizatio
         TensorInfo            biasInfo({4}, DataType::Float32, 0.0f, 0, true);
         ConstTensor           bias(biasInfo, biasVector);
         Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
-
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         IConnectableLayer* conv2dLayer = network->AddConvolution2dLayer(convDescriptor,
                                                                         weights,
                                                                         optionalBias,
                                                                         "Conv2D");
-
+        ARMNN_NO_DEPRECATE_WARN_END
         TensorInfo outputInfo(4, outputShape, DataType::Float32);
         conv2dLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 

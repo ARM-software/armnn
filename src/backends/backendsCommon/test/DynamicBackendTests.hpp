@@ -1465,7 +1465,7 @@ void CreateReferenceDynamicBackendTestImpl()
     Convolution2dQueueDescriptor convolution2dQueueDescriptor;
     WorkloadInfo workloadInfo
     {
-        { inputInfo },
+        { inputInfo, weightInfo },
         { outputInfo }
     };
     convolution2dQueueDescriptor.m_Inputs.push_back(nullptr);

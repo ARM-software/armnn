@@ -225,27 +225,13 @@ LayerType* FuseConvolution2dLayer(OptimizationViews& optimizationViews,
                                   ActivationDescriptor& activationDesc,
                                   std::string name)
 {
-    std::shared_ptr<ConstTensorHandle> weightHandle = baseLayer->m_Weight;
-    TensorInfo weightInfo = weightHandle->GetTensorInfo();
+    IConnectableLayer* replacement = optimizationViews.GetINetwork()
+                                                      ->AddConvolution2dLayer(baseLayer->GetParameters(), name.c_str());
 
-    std::shared_ptr<ConstTensorHandle> biasHandle = baseLayer->m_Bias;
-    ConstTensor biasTensor;
-    if (!biasHandle)
-    {
-        biasTensor = ConstTensor();
-    }
-    else
-    {
-        biasTensor = ConstTensor(biasHandle->GetTensorInfo(), biasHandle->Map(true));
-    }
-
-    IConnectableLayer* replacement =
-        optimizationViews.GetINetwork()->
-            AddConvolution2dLayer(baseLayer->GetParameters(),
-                                  ConstTensor(weightInfo, weightHandle->Map(true)),
-                                  Optional<ConstTensor>(biasTensor),
-                                  name.c_str());
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    replacementLayer->m_Weight = std::move(baseLayer->m_Weight);
+    replacementLayer->m_Bias = std::move(baseLayer->m_Bias);
 
     FuseLayer(optimizationViews,
               baseLayer,
@@ -263,8 +249,9 @@ LayerType* FuseDepthwiseConvolution2dLayer(OptimizationViews& optimizationViews,
                                            ActivationDescriptor& activationDesc,
                                            std::string name)
 {
-    IConnectableLayer* replacement = optimizationViews.GetINetwork()->
-        AddDepthwiseConvolution2dLayer(baseLayer->GetParameters(), name.c_str());
+    IConnectableLayer* replacement =
+        optimizationViews.GetINetwork()->AddDepthwiseConvolution2dLayer(baseLayer->GetParameters(), name.c_str());
+
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
     replacementLayer->m_Weight = std::move(baseLayer->m_Weight);

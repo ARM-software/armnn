@@ -42,7 +42,7 @@ struct Convolution2dTest
 {
     using LayerType = Convolution2dLayer;
     static const bool isElementWise = false;
-    static const bool isConstTensorAsInputSupported = false;
+    static const bool isConstTensorAsInputSupported = true;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }  // NHWCin
     static TensorShape GetOutputShape()  { return TensorShape( {1, 3, 3, 4}); }  // NHWCout
@@ -69,8 +69,9 @@ struct Convolution2dTest
         TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
         ConstTensor        weights(weightsInfo, weightsVector);
         Optional<ConstTensor> optionalBias;
-
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         return network->AddConvolution2dLayer(descriptor, weights, optionalBias, name);
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,

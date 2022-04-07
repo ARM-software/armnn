@@ -275,8 +275,6 @@ TEST_CASE("Convolution2dTest")
 {
     const TensorShape inputShape{1, 1, 10, 10};
 
-    Graph graph;
-
     Convolution2dDescriptor descriptor;
 
     descriptor.m_PadLeft = 0;
@@ -288,16 +286,9 @@ TEST_CASE("Convolution2dTest")
     descriptor.m_DilationX = 3;
     descriptor.m_DilationY = 3;
 
-    auto layer = BuildGraph<Convolution2dLayer>(&graph,
-                                                 {inputShape},
-                                                 descriptor,
-                                                 "conv2d");
-
-    const float Datum = 0.0f;
-    ConstTensor weights({{1, 1, 3, 3}, DataType::Float32, 0.0f, 0, true}, &Datum);
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
-
-    RunShapeInferenceTest<Convolution2dLayer>(layer, {{ 1, 1, 4, 4 }});
+    CreateGraphAndRunTest<Convolution2dLayer>({ inputShape, { 1, 1, 3, 3 } },
+                                              { { 1, 1, 4, 4 } }, descriptor,
+                                              "convd");
 }
 
 TEST_CASE("DebugLayerTest")

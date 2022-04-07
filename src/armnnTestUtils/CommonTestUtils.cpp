@@ -9,14 +9,41 @@
 
 using namespace armnn;
 
-SubgraphView::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers)
+SubgraphView::InputSlots CreateInputsFrom(Layer* layer,
+                                          std::vector<unsigned int> ignoreSlots)
 {
     SubgraphView::InputSlots result;
-    for (auto&& layer : layers)
+    for (auto&& it = layer->BeginInputSlots(); it != layer->EndInputSlots(); ++it)
+    {
+        if (std::find(ignoreSlots.begin(), ignoreSlots.end(), it->GetSlotIndex()) != ignoreSlots.end())
+        {
+            continue;
+        }
+        else
+        {
+            result.push_back(&(*it));
+        }
+    }
+        return result;
+}
+
+// ignoreSlots assumes you want to ignore the same slots all on layers within the vector
+SubgraphView::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers,
+                                          std::vector<unsigned int> ignoreSlots)
+{
+    SubgraphView::InputSlots result;
+    for (auto&& layer: layers)
     {
         for (auto&& it = layer->BeginInputSlots(); it != layer->EndInputSlots(); ++it)
         {
-            result.push_back(&(*it));
+            if (std::find(ignoreSlots.begin(), ignoreSlots.end(), it->GetSlotIndex()) != ignoreSlots.end())
+            {
+                continue;
+            }
+            else
+            {
+                result.push_back(&(*it));
+            }
         }
     }
     return result;

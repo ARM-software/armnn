@@ -1246,11 +1246,12 @@ bool RefLayerSupport::IsDequantizeSupported(const TensorInfo& input,
 {
    bool supported = true;
 
-    std::array<DataType,4> supportedInputTypes = {
+    std::array<DataType,5> supportedInputTypes = {
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Float16
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedInputTypes), reasonIfUnsupported,

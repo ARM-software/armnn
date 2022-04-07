@@ -66,6 +66,7 @@ bool IsLayerSupported(const armnn::Layer* layer)
     {
         case armnn::LayerType::Input:
         case armnn::LayerType::Output:
+        case armnn::LayerType::Constant:
         case armnn::LayerType::Addition:
         case armnn::LayerType::Convolution2d:
             // Layer supported

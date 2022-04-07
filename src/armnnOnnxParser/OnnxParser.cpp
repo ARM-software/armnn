@@ -1754,6 +1754,8 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
     }
 
     armnn::IConnectableLayer* layer;
+    std::vector<std::string> tensorIndexes= {node.input(0), node.input(1)};
+
     auto weightTensor = CreateConstTensor(node.input(1));
 
     if (node.input_size() == 3)
@@ -1766,7 +1768,9 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
                                              CHECK_LOCATION().AsString()));
         }
         desc.m_BiasEnabled = true;
+        tensorIndexes.emplace_back(node.input(2));
         auto biasTensor = CreateConstTensor(node.input(2));
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         layer = m_Network->AddConvolution2dLayer(desc,
                                                  weightTensor.first,
                                                  Optional<ConstTensor>(biasTensor.first),
@@ -1778,6 +1782,7 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
                                                  weightTensor.first,
                                                  EmptyOptional(),
                                                  node.name().c_str());
+        ARMNN_NO_DEPRECATE_WARN_END
     }
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1788,7 +1793,7 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
-    RegisterInputSlots(layer, {node.input(0)});
+    RegisterInputSlots(layer, tensorIndexes);
 
     // register the output connection slots for the layer, connections are made after all layers have been created
     RegisterOutputSlots(layer, {node.output(0)});

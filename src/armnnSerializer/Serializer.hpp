@@ -145,7 +145,6 @@ private:
 
     void SerializeConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                      const armnn::Convolution2dDescriptor& descriptor,
-                                     const std::vector<armnn::ConstTensor>& constants,
                                      const char* name = nullptr);
 
     void SerializeConvolution3dLayer(const armnn::IConnectableLayer* layer,

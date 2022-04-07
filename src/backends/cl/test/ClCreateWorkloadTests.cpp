@@ -471,6 +471,8 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dClCompiledContext
     auto tensorHandleFactory = ClWorkloadFactoryHelper::GetTensorHandleFactory(memoryManager);
 
     std::unique_ptr<ITensorHandle> inputHandle  = tensorHandleFactory.CreateTensorHandle(inputInfo);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelInfo);
+    std::unique_ptr<armnn::ITensorHandle> biasHandle = tensorHandleFactory.CreateTensorHandle(biasInfo);
     std::unique_ptr<ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
 
 
@@ -487,6 +489,8 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dClCompiledContext
     queueDescriptor.m_Bias       = &biasTensor;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
+    AddInputToWorkload(queueDescriptor, workloadInfo, kernelInfo, weightsHandle.get());
+    AddInputToWorkload(queueDescriptor, workloadInfo, biasInfo, biasHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
 
     // Initialize our m_CLCompileContext using default device and context

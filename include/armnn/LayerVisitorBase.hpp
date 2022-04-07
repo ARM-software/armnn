@@ -72,6 +72,10 @@ public:
                                  const Optional<ConstTensor>&,
                                  const char*) override { DefaultPolicy::Apply(__func__); }
 
+    void VisitConvolution2dLayer(const IConnectableLayer*,
+                                 const Convolution2dDescriptor&,
+                                 const char*) override { DefaultPolicy::Apply(__func__); }
+
     void VisitDepthToSpaceLayer(const IConnectableLayer*,
                                 const DepthToSpaceDescriptor&,
                                 const char*) override { DefaultPolicy::Apply(__func__); }

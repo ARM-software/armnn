@@ -347,12 +347,9 @@ void SerializerStrategy::SerializeConstantLayer(const armnn::IConnectableLayer* 
 // Build FlatBuffer for Convolution2dLayer
 void SerializerStrategy::SerializeConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                                      const armnn::Convolution2dDescriptor& descriptor,
-                                                     const std::vector<armnn::ConstTensor>& constants,
                                                      const char* name)
 {
     IgnoreUnused(name);
-
-    const armnn::ConstTensor weights = constants[0];
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Convolution2d);
@@ -368,21 +365,11 @@ void SerializerStrategy::SerializeConvolution2dLayer(const armnn::IConnectableLa
                                                               descriptor.m_DilationY,
                                                               descriptor.m_BiasEnabled,
                                                               GetFlatBufferDataLayout(descriptor.m_DataLayout));
-    auto flatBufferWeightsConstTensorInfo = CreateConstTensorInfo(weights);
-    flatbuffers::Offset<serializer::ConstTensor> flatBufferBiasesConstTensorInfo;
-
-    if (constants.size() > 1)
-    {
-        const armnn::ConstTensor biases = constants[1];
-        flatBufferBiasesConstTensorInfo = CreateConstTensorInfo(biases);
-    }
 
     // Create the FlatBuffer Convolution2dLayer
     auto flatBufferLayer = CreateConvolution2dLayer(m_flatBufferBuilder,
                                                     flatBufferBaseLayer,
-                                                    flatBufferDescriptor,
-                                                    flatBufferWeightsConstTensorInfo,
-                                                    flatBufferBiasesConstTensorInfo);
+                                                    flatBufferDescriptor);
 
     // Add the AnyLayer to the FlatBufferLayers
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_Convolution2dLayer);
@@ -2048,7 +2035,6 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
                     static_cast<const armnn::Convolution2dDescriptor&>(descriptor);
             SerializeConvolution2dLayer(layer,
                                         layerDescriptor,
-                                        constants,
                                         name);
             break;
         }

@@ -102,9 +102,19 @@ public:
     /// function is invoked.
     /// @param layer - pointer to the layer which is calling back to this visit function.
     /// @param convolution2dDescriptor - Description of the 2D convolution layer.
+    /// @param name - Optional name for the layer.
+    virtual void VisitConvolution2dLayer(const IConnectableLayer* layer,
+                                         const Convolution2dDescriptor& convolution2dDescriptor,
+                                         const char* name = nullptr) = 0;
+
+    /// Function that a 2D convolution layer should call back to when its Accept(ILayerVisitor&)
+    /// function is invoked.
+    /// @param layer - pointer to the layer which is calling back to this visit function.
+    /// @param convolution2dDescriptor - Description of the 2D convolution layer.
     /// @param weights - Tensor for the weights data.
     /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
     /// @param name - Optional name for the layer.
+    ARMNN_DEPRECATED_MSG("Use VisitConvolution2dLayer without ConstTensors")
     virtual void VisitConvolution2dLayer(const IConnectableLayer* layer,
                                          const Convolution2dDescriptor& convolution2dDescriptor,
                                          const ConstTensor& weights,

@@ -11,7 +11,6 @@
 
 #include <doctest/doctest.h>
 
-
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
 #include "Network.hpp"
@@ -320,10 +319,13 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     convDesc2d.m_PadTop = 1;
     convDesc2d.m_PadBottom = 1;
     convDesc2d.m_DataLayout = DataLayout::NHWC;
+
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
                                                                           weights,
                                                                           armnn::EmptyOptional(),
                                                                           "conv");
+    ARMNN_NO_DEPRECATE_WARN_END
     ARMNN_ASSERT(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
@@ -876,10 +878,12 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     convDesc2d.m_PadTop = 1;
     convDesc2d.m_PadBottom = 1;
     convDesc2d.m_DataLayout = DataLayout::NHWC;
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
                                                                           weights,
                                                                           armnn::EmptyOptional(),
                                                                           "conv");
+    ARMNN_NO_DEPRECATE_WARN_END
     ARMNN_ASSERT(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
@@ -1094,10 +1098,12 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     convDesc2d.m_PadTop = 1;
     convDesc2d.m_PadBottom = 1;
     convDesc2d.m_DataLayout = DataLayout::NHWC;
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
                                                                           weights,
                                                                           armnn::EmptyOptional(),
                                                                           "conv");
+    ARMNN_NO_DEPRECATE_WARN_END
     ARMNN_ASSERT(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));

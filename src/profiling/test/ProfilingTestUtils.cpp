@@ -424,8 +424,9 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     conv2dDesc.m_PadTop = 2;
     conv2dDesc.m_PadBottom = 2;
     conv2dDesc.m_BiasEnabled = true;
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* conv2d = net->AddConvolution2dLayer(conv2dDesc, weights, optionalBiases);
-
+    ARMNN_NO_DEPRECATE_WARN_END
     // Abs layer
     armnn::ElementwiseUnaryDescriptor absDesc;
     armnn::IConnectableLayer* const abs = net->AddElementwiseUnaryLayer(absDesc, "abs");
@@ -515,7 +516,6 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     // Input layer
     // Input layer entity
     VerifyTimelineEntityBinaryPacketData(input->GetGuid(), readableData, offset);
-
     // Name Entity
     ProfilingGuid inputLabelGuid = VerifyTimelineLabelBinaryPacketData(
         arm::pipe::EmptyOptional(), "input", readableData, offset);
@@ -543,6 +543,159 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                arm::pipe::EmptyOptional(),
                                                optNetGuid,
                                                input->GetGuid(),
+                                               LabelsAndEventClasses::CHILD_GUID,
+                                               readableData,
+                                               offset);
+
+    // Weights layer
+    //  We will not check the GUID from the packets since we haven't direct access to the layer
+    //  The GUID will change depending on the number of tests ran since we do are not explicitly resetting the
+    //  ProfilingGuid counter at the beginning of this test
+
+
+    // Weights layer entity
+    VerifyTimelineEntityBinaryPacketData( arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Name entity
+    ProfilingGuid weightsNameLabelGuid = VerifyTimelineLabelBinaryPacketData(
+        arm::pipe::EmptyOptional(), "Weights", readableData, offset);
+
+    // Entity - Name relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               weightsNameLabelGuid,
+                                               LabelsAndEventClasses::NAME_GUID,
+                                               readableData,
+                                               offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               LabelsAndEventClasses::LAYER_GUID,
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
+
+    // Network - Weights layer relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               optNetGuid,
+                                               arm::pipe::EmptyOptional(),
+                                               LabelsAndEventClasses::CHILD_GUID,
+                                               readableData,
+                                               offset);
+
+    // Weights workload
+    // Weights workload entity
+    ProfilingGuid weightsWorkloadGuid = VerifyTimelineEntityBinaryPacketData(
+        arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               weightsWorkloadGuid,
+                                               LabelsAndEventClasses::WORKLOAD_GUID,
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
+
+    // BackendId entity
+    ProfilingGuid backendIdLabelGuid = VerifyTimelineLabelBinaryPacketData(
+        arm::pipe::EmptyOptional(), backendId.Get(), readableData, offset);
+
+    // Entity - BackendId relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               weightsWorkloadGuid,
+                                               backendIdLabelGuid,
+                                               LabelsAndEventClasses::BACKENDID_GUID,
+                                               readableData,
+                                               offset);
+
+
+    // Weights layer - Weights workload relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               weightsWorkloadGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
+                                               readableData,
+                                               offset);
+
+    // Bias layer
+    //  We will not check the GUID from the packets since we haven't direct access to the layer
+    //  The GUID will change depending on the number of tests ran since we do are not explicitly resetting the
+    //  ProfilingGuid counter at the beginning of this test
+
+    // Bias layer entity
+    VerifyTimelineEntityBinaryPacketData(arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Name entity
+    ProfilingGuid biasNameLabelGuid = VerifyTimelineLabelBinaryPacketData(
+        arm::pipe::EmptyOptional(), "Bias", readableData, offset);
+
+    // Entity - Name relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               biasNameLabelGuid,
+                                               LabelsAndEventClasses::NAME_GUID,
+                                               readableData,
+                                               offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               LabelsAndEventClasses::LAYER_GUID,
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
+
+    // Network - Bias layer relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               optNetGuid,
+                                               arm::pipe::EmptyOptional(),
+                                               LabelsAndEventClasses::CHILD_GUID,
+                                               readableData,
+                                               offset);
+
+    // Bias workload
+    // Bias workload entity
+    ProfilingGuid biasWorkloadGuid = VerifyTimelineEntityBinaryPacketData(
+        arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               biasWorkloadGuid,
+                                               LabelsAndEventClasses::WORKLOAD_GUID,
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
+
+    // BackendId entity
+    backendIdLabelGuid = VerifyTimelineLabelBinaryPacketData(
+        arm::pipe::EmptyOptional(), backendId.Get(), readableData, offset);
+
+    // Entity - BackendId relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               biasWorkloadGuid,
+                                               backendIdLabelGuid,
+                                               LabelsAndEventClasses::BACKENDID_GUID,
+                                               readableData,
+                                               offset);
+
+
+    // Bias layer - Bias workload relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               biasWorkloadGuid,
                                                LabelsAndEventClasses::CHILD_GUID,
                                                readableData,
                                                offset);
@@ -591,6 +744,24 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                readableData,
                                                offset);
 
+    // Weights layer - Conv2d layer relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               conv2d->GetGuid(),
+                                               LabelsAndEventClasses::CONNECTION_GUID,
+                                               readableData,
+                                               offset);
+
+    // Bias layer - Conv2d layer relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               arm::pipe::EmptyOptional(),
+                                               conv2d->GetGuid(),
+                                               LabelsAndEventClasses::CONNECTION_GUID,
+                                               readableData,
+                                               offset);
+
     // Conv2d workload
     // Conv2d workload entity
     ProfilingGuid conv2DWorkloadGuid = VerifyTimelineEntityBinaryPacketData(
@@ -606,7 +777,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                offset);
 
     // BackendId entity
-    ProfilingGuid backendIdLabelGuid = VerifyTimelineLabelBinaryPacketData(
+    backendIdLabelGuid = VerifyTimelineLabelBinaryPacketData(
         arm::pipe::EmptyOptional(), backendId.Get(), readableData, offset);
 
     // Entity - BackendId relationship
@@ -884,7 +1055,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     // Validate inference data
     size = inferenceReadableBuffer->GetSize();
 
-    CHECK(size == 1228 + 10 * ThreadIdSize);
+    CHECK(size == 1748 + 10 * ThreadIdSize);
 
     readableData = inferenceReadableBuffer->GetReadableData();
     CHECK(readableData != nullptr);
@@ -892,7 +1063,7 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     offset = 0;
 
     // Verify Header
-    VerifyTimelineHeaderBinary(readableData, offset, 1220 + 10 * ThreadIdSize);
+    VerifyTimelineHeaderBinary(readableData, offset, 1740 + 10 * ThreadIdSize);
 
     // Inference timeline trace
     // Inference entity
@@ -988,6 +1159,126 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
                                                arm::pipe::EmptyOptional(),
                                                inputWorkloadExecutionGuid,
                                                inputWorkloadExecutionEOLEventId,
+                                               LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                               readableData,
+                                               offset);
+
+   // Weights workload execution
+    // Weights workload execution entity
+    ProfilingGuid weightsWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
+        arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               weightsWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
+
+    // Inference - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               inferenceGuid,
+                                               weightsWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
+                                               readableData,
+                                               offset);
+
+    // Workload - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               weightsWorkloadGuid,
+                                               weightsWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::EXECUTION_OF_GUID,
+                                               readableData,
+                                               offset);
+
+    // Start Weights workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    ProfilingGuid weightsWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
+        arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Weights workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               weightsWorkloadExecutionGuid,
+                                               weightsWorkloadExecutionSOLEventGuid,
+                                               LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                               readableData,
+                                               offset);
+
+    // End of Weights workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    ProfilingGuid weightsWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
+        arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Weights workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               weightsWorkloadExecutionGuid,
+                                               weightsWorkloadExecutionEOLEventGuid,
+                                               LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
+                                               readableData,
+                                               offset);
+
+   // Bias workload execution
+    // Bias workload execution entity
+    ProfilingGuid biasWorkloadExecutionGuid = VerifyTimelineEntityBinaryPacketData(
+        arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Entity - Type relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::LabelLink,
+                                               arm::pipe::EmptyOptional(),
+                                               biasWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::WORKLOAD_EXECUTION_GUID,
+                                               LabelsAndEventClasses::TYPE_GUID,
+                                               readableData,
+                                               offset);
+
+    // Inference - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               inferenceGuid,
+                                               biasWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::CHILD_GUID,
+                                               readableData,
+                                               offset);
+
+    // Workload - Workload execution relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::RetentionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               biasWorkloadGuid,
+                                               biasWorkloadExecutionGuid,
+                                               LabelsAndEventClasses::EXECUTION_OF_GUID,
+                                               readableData,
+                                               offset);
+
+    // Start Bias workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    ProfilingGuid biasWorkloadExecutionSOLEventGuid = VerifyTimelineEventBinaryPacket(
+        arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Bias workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               biasWorkloadExecutionGuid,
+                                               biasWorkloadExecutionSOLEventGuid,
+                                               LabelsAndEventClasses::ARMNN_PROFILING_SOL_EVENT_CLASS,
+                                               readableData,
+                                               offset);
+
+    // End of Bias workload execution life
+    // Event packet - timeline, threadId, eventGuid
+    ProfilingGuid biasWorkloadExecutionEOLEventGuid = VerifyTimelineEventBinaryPacket(
+        arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), arm::pipe::EmptyOptional(), readableData, offset);
+
+    // Bias workload execution - event relationship
+    VerifyTimelineRelationshipBinaryPacketData(ProfilingRelationshipType::ExecutionLink,
+                                               arm::pipe::EmptyOptional(),
+                                               biasWorkloadExecutionGuid,
+                                               biasWorkloadExecutionEOLEventGuid,
                                                LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS,
                                                readableData,
                                                offset);

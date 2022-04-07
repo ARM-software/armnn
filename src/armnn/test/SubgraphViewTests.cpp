@@ -42,28 +42,44 @@ bool AreAnySubgraphLayersPresentInGraph(const SubgraphView::IConnectableLayers &
 //
 // this helper only works if all layers where the inputs connect to are not selected
 //
-SubgraphView::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers)
+SubgraphView::InputSlots CreateInputsFrom(const std::vector<Layer*>& layers,
+                                            std::vector<int> ignoreSlots = {})
 {
     SubgraphView::InputSlots result;
     for (auto&& layer : layers)
     {
         for (auto&& it = layer->BeginInputSlots(); it != layer->EndInputSlots(); ++it)
         {
-            result.push_back(&(*it));
+            if (std::find(ignoreSlots.begin(), ignoreSlots.end(), it->GetSlotIndex()) != ignoreSlots.end())
+            {
+                continue;
+            }
+            else
+            {
+                result.push_back(&(*it));
+            }
         }
     }
     return result;
 }
 
 /// Duplication for IConnectableLayer
-SubgraphView::IInputSlots CreateIInputsFrom(const std::vector<armnn::IConnectableLayer*>& layers)
+SubgraphView::IInputSlots CreateIInputsFrom(const std::vector<armnn::IConnectableLayer*>& layers,
+                                            std::vector<int> ignoreSlots = {})
 {
     SubgraphView::IInputSlots result;
-    for (auto&& layer : layers)
+    for (auto&& layer: layers)
     {
-        for (unsigned int i = 0 ; i < layer->GetNumInputSlots(); ++i)
+        for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
         {
-            result.push_back(&(layer->GetInputSlot(i)));
+            if (std::find(ignoreSlots.begin(), ignoreSlots.end(), i) != ignoreSlots.end())
+            {
+                continue;
+            }
+            else
+            {
+                result.push_back(&(layer->GetInputSlot(i)));
+            }
         }
     }
     return result;
@@ -241,7 +257,7 @@ TEST_CASE("SubgraphViewSlots")
 
     // Construct sub-graph
     SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({},
-                                                                            CreateIInputsFrom({convLayer1}),
+                                                                            CreateIInputsFrom({convLayer1}, {1, 2}),
                                                                             CreateIOutputsFrom({convLayer2}));
 
     // Test that both old and new are initialized
@@ -327,17 +343,20 @@ TEST_CASE("SingleInputSingleOutput")
     Convolution2dDescriptor convDescriptor;
     Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
-
+    Layer* const weightsLayer1 = graph.AddLayer<ConstantLayer>("weights1");
+    Layer* const weightsLayer2 = graph.AddLayer<ConstantLayer>("weights2");
     Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
 
     inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    weightsLayer1->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(1));
     convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+    weightsLayer2->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(1));
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
     SubgraphViewSelector::SubgraphViewPtr subgraph =
             CreateSubgraphViewFrom({},
-                                   CreateIInputsFrom({convLayer1}),
+                                   CreateIInputsFrom({convLayer1}, {1}),
                                    CreateIOutputsFrom({convLayer2}));
 
     // Save sub-graph connections for comparison after substitution
@@ -377,7 +396,7 @@ TEST_CASE("SingleInputSingleOutputAddPrecompiledLayerSubstituteSubgraph1")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
                                                                             CreateOutputsFrom({convLayer2}),
                                                                             {});
 
@@ -421,7 +440,7 @@ TEST_CASE("SingleInputSingleOutputAddPrecompiledLayerSubstituteSubgraph2")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
                                                                             CreateOutputsFrom({convLayer2}),
                                                                             {});
 
@@ -467,7 +486,7 @@ TEST_CASE("SingleInputSingleOutputSubstituteGraph")
 
     // Construct sub-graph
     SubgraphViewSelector::SubgraphViewPtr subgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}),
+            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
                                    CreateOutputsFrom({convLayer2}),
                                    {});
 
@@ -519,7 +538,7 @@ TEST_CASE("MultiInputSingleOutput")
     concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    auto subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}),
+    auto subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}, {1}),
                                                                   CreateOutputsFrom({concatLayer}),
                                                                    {});
 
@@ -621,7 +640,7 @@ TEST_CASE("MultiInputMultiOutput")
 
     // Construct sub-graph
     SubgraphViewSelector::SubgraphViewPtr subgraph =
-            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}),
+            CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}, {1}),
                                    CreateOutputsFrom({convLayer1, convLayer2}),
                                    {});
 
@@ -942,7 +961,8 @@ TEST_CASE("MultipleSimpleSubgraphs")
     // This test case represents the scenario when we have two distinct subgraphs
     // in a simple linear network. The selected nodes are the M* and the
     // non-selected ones are the X*
-    //
+    //             W2 ->->
+    //                   |
     // X1 -> M1 -> M2 -> X2 -> M3 -> X3
     //
     // The expected results is two subgraphs, one with {M1, M2} and another one
@@ -952,12 +972,17 @@ TEST_CASE("MultipleSimpleSubgraphs")
 
     // the graph is constructed in reverse order
     auto x3 = graph.AddLayer<OutputLayer>(0, "output");
+
     auto m3 = graph.InsertNewLayer<ActivationLayer>(x3->GetInputSlot(0),
                                                     ActivationDescriptor{},
                                                     "m3");
+
     auto x2 = graph.InsertNewLayer<Convolution2dLayer>(m3->GetInputSlot(0),
-                                                       Convolution2dDescriptor{},
-                                                       "x2");
+                                                                        Convolution2dDescriptor{},
+                                                                        "x2");
+
+    auto w2 = graph.InsertNewLayer<ConstantLayer>(x2->GetInputSlot(1), "w2");
+
     auto m2 = graph.InsertNewLayer<ActivationLayer>(x2->GetInputSlot(0),
                                                     ActivationDescriptor{},
                                                     "m2");
@@ -966,6 +991,7 @@ TEST_CASE("MultipleSimpleSubgraphs")
                                                     "m1");
     graph.InsertNewLayer<InputLayer>(m1->GetInputSlot(0), 0, "x1");
 
+    IgnoreUnused(w2);
     // All selected 'M*' layers will be of Activation type
     SubgraphViewSelector::Subgraphs subgraphs =
         SubgraphViewSelector::SelectSubgraphs(
@@ -1636,10 +1662,17 @@ TEST_CASE("SingleSubgraph")
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
     convLayer2->SetBackendId(Compute::GpuAcc);
 
+    Layer* const weights1 = graph.AddLayer<ConstantLayer>("weights1");
+    weights1->SetBackendId(Compute::GpuAcc);
+    Layer* const weights2 = graph.AddLayer<ConstantLayer>("weights2");
+    weights2->SetBackendId(Compute::GpuAcc);
+
     Layer* const outputLayer = graph.AddLayer<OutputLayer>(0, "output");
 
     inputLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
+    weights1->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(1));
     convLayer1->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(0));
+    weights2->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(1));
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // GpuAcc sub graph selector
@@ -1702,6 +1735,9 @@ TEST_CASE("MultipleSubgraphs")
     Layer* const convLayer1 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv1");
     Layer* const convLayer2 = graph.AddLayer<Convolution2dLayer>(convDescriptor, "conv2");
 
+    Layer* const weights1 = graph.AddLayer<ConstantLayer>("weights1");
+    Layer* const weights2 = graph.AddLayer<ConstantLayer>("weights2");
+
     OriginsDescriptor concatDescriptor(2);
     Layer* const pConcatLayer = graph.AddLayer<ConcatLayer>(concatDescriptor, "concat");
     pConcatLayer->SetBackendId(Compute::CpuAcc);
@@ -1711,7 +1747,9 @@ TEST_CASE("MultipleSubgraphs")
     inputLayer->GetOutputSlot(0).Connect(splitterLayer->GetInputSlot(0));
     splitterLayer->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(0));
     splitterLayer->GetOutputSlot(1).Connect(convLayer2->GetInputSlot(0));
+    weights1->GetOutputSlot(0).Connect(convLayer1->GetInputSlot(1));
     convLayer1->GetOutputSlot(0).Connect(pConcatLayer->GetInputSlot(0));
+    weights2->GetOutputSlot(0).Connect(convLayer2->GetInputSlot(1));
     convLayer2->GetOutputSlot(0).Connect(pConcatLayer->GetInputSlot(1));
     pConcatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 

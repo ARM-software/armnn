@@ -21,22 +21,18 @@ class TestConvolution2dLayerVisitor : public TestLayerVisitor
 {
 public:
     explicit TestConvolution2dLayerVisitor(const Convolution2dDescriptor& convolution2dDescriptor,
-                                           const ConstTensor& weights,
-                                           const Optional<ConstTensor>& biases,
                                            const char* name = nullptr)
         : TestLayerVisitor(name)
         , m_Descriptor(convolution2dDescriptor)
-        , m_Weights(weights)
-        , m_Biases(biases)
     {}
 
     virtual ~TestConvolution2dLayerVisitor() {}
 
     void ExecuteStrategy(const armnn::IConnectableLayer* layer,
-                             const armnn::BaseDescriptor& descriptor,
-                             const std::vector<armnn::ConstTensor>& constants,
-                             const char* name,
-                             const armnn::LayerBindingId id = 0) override
+                         const armnn::BaseDescriptor& descriptor,
+                         const std::vector<armnn::ConstTensor>& constants,
+                         const char* name,
+                         const armnn::LayerBindingId id = 0) override
     {
         armnn::IgnoreUnused(descriptor, constants, id);
         switch (layer->GetType())
@@ -46,12 +42,6 @@ public:
                 CheckLayerPointer(layer);
                 CheckLayerName(name);
                 CheckDescriptor(static_cast<const armnn::Convolution2dDescriptor&>(descriptor));
-                CheckConstTensors(m_Weights, constants[0]);
-                if (m_Biases.has_value())
-                {
-                    CHECK(constants.size() == 2);
-                    CheckConstTensors(m_Biases.value(), constants[1]);
-                }
                 break;
             }
             default:
@@ -66,8 +56,6 @@ protected:
 
 private:
     Convolution2dDescriptor m_Descriptor;
-    ConstTensor m_Weights;
-    Optional<ConstTensor> m_Biases;
 };
 
 class TestDepthwiseConvolution2dLayerVisitor : public TestLayerVisitor

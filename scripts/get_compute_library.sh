@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="171fc3d160736e10f859c6f2a24d1c7a59bcd9e3" #Add CPU Pool3d FP16/32 implementation
+DEFAULT_CLFRAMEWORKREVISION="e33c55640b5e6e6af193a41a3376e2a01a321a35" #[arm_gemm] Use static validate to find arm_gemm kernels.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

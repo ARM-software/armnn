@@ -4,8 +4,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-cmake_policy(SET CMP0077 NEW)
-
 option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 option(BUILD_TESTS "Build test applications" OFF)

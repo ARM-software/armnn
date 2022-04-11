@@ -41,13 +41,6 @@ void Stack(const StackQueueDescriptor& data,
         return;
     }
 
-    // Initialise output data
-    unsigned int numOutputElements = 1;
-    for (unsigned int i=0; i<outputNumDims; ++i)
-    {
-        numOutputElements *= outputDims[i];
-    }
-
     const unsigned int iNumTensors = static_cast<unsigned int>(data.m_Inputs.size());
     const unsigned int iBatchSize  = inputDims[0];
     const unsigned int iChannels   = (inputNumDims > 1) ? inputDims[1] : 1;

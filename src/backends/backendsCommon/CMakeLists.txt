@@ -3,11 +3,16 @@
 # SPDX-License-Identifier: MIT
 #
 
+if(NOT BUILD_BARE_METAL)
 list(APPEND armnnBackendsCommon_sources
     DynamicBackend.cpp
     DynamicBackend.hpp
     DynamicBackendUtils.cpp
     DynamicBackendUtils.hpp
+)
+endif()
+
+list(APPEND armnnBackendsCommon_sources
     IBackendContext.hpp
     IBackendInternal.cpp
     IMemoryManager.hpp

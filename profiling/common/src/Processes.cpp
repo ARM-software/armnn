@@ -18,10 +18,14 @@ namespace pipe
 
 int GetCurrentProcessId()
 {
+#if !defined(ARMNN_DISABLE_PROCESSES)
 #if defined(__unix__) || defined(__APPLE__)
     return getpid();
 #elif defined(_MSC_VER)
     return ::GetCurrentProcessId();
+#endif
+#else
+    return 0;
 #endif
 }
 

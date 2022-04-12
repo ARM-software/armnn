@@ -8,6 +8,8 @@
 // is needed (typically just forwarding the parameters to a differently named function).
 // Some of the APIs are in fact completely identical and so no forwarding function is needed.
 
+#if !defined(ARMNN_DISABLE_SOCKETS)
+
 #pragma once
 
 #if defined(__unix__) || defined(__APPLE__)
@@ -77,3 +79,5 @@ Socket Accept(Socket s, sockaddr* addr, socklen_t* addrlen, int flags);
 
 } // namespace arm
 } // namespace pipe
+
+#endif

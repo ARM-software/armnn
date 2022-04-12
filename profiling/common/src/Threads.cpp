@@ -26,6 +26,7 @@ namespace pipe
 
 int GetCurrentThreadId()
 {
+#if !defined(ARMNN_DISABLE_THREADS)
 #if defined(__linux__)
     return static_cast<int>(gettid());
 #elif defined(_MSC_VER)
@@ -38,6 +39,9 @@ int GetCurrentThreadId()
         return 0;
     }
     return static_cast<int>(threadId);
+#endif
+#else
+    return 0;
 #endif
 }
 

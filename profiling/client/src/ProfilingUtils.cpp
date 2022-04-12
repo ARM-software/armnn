@@ -13,6 +13,7 @@
 
 #include <armnn/Version.hpp>
 
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <limits>
@@ -593,11 +594,7 @@ TimelinePacketStatus WriteTimelineEventBinary(uint64_t timestamp,
 
 uint64_t GetTimestamp()
 {
-#if USE_CLOCK_MONOTONIC_RAW
-    using clock = armnn::MonotonicClockRaw;
-#else
     using clock = std::chrono::steady_clock;
-#endif
 
     // Take a timestamp
     auto timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(clock::now().time_since_epoch());

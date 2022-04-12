@@ -17,8 +17,11 @@
 #include <common/include/Packet.hpp>
 
 #include <atomic>
+
+#if !defined(ARMNN_DISABLE_THREADS)
 #include <mutex>
 #include <thread>
+#endif
 
 namespace arm
 {
@@ -34,7 +37,7 @@ public:
                            IReadCounterValues& readCounterValue,
                            const ICounterMappings& counterIdMap,
                            const std::unordered_map<std::string,
-                               std::shared_ptr<IBackendProfilingContext>>& backendProfilingContexts)
+                           std::shared_ptr<IBackendProfilingContext>>& backendProfilingContexts)
             : m_CaptureDataHolder(data)
             , m_IsRunning(false)
             , m_KeepRunning(false)
@@ -58,7 +61,9 @@ private:
     const Holder&             m_CaptureDataHolder;
     bool                      m_IsRunning;
     std::atomic<bool>         m_KeepRunning;
+#if !defined(ARMNN_DISABLE_THREADS)
     std::thread               m_PeriodCaptureThread;
+#endif
     IReadCounterValues&       m_ReadCounterValues;
     ISendCounterPacket&       m_SendCounterPacket;
     const ICounterMappings&   m_CounterIdMap;

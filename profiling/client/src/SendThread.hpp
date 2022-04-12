@@ -17,9 +17,11 @@
 #include <common/include/ICounterDirectory.hpp>
 
 #include <atomic>
+#if !defined(ARMNN_DISABLE_THREADS)
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#endif
 #include <type_traits>
 
 namespace arm
@@ -57,9 +59,11 @@ private:
     IBufferManager& m_BufferManager;
     ISendCounterPacket& m_SendCounterPacket;
     int m_Timeout;
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex m_WaitMutex;
     std::condition_variable m_WaitCondition;
     std::thread m_SendThread;
+#endif
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;
     // m_ReadyToRead will be protected by m_WaitMutex
@@ -67,9 +71,10 @@ private:
     // m_PacketSent will be protected by m_PacketSentWaitMutex
     bool m_PacketSent;
     std::exception_ptr m_SendThreadException;
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex m_PacketSentWaitMutex;
     std::condition_variable m_PacketSentWaitCondition;
-
+#endif
 };
 
 } // namespace pipe

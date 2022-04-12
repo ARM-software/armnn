@@ -35,7 +35,9 @@ private:
     // MACOSX does not support abstract UDS
     const char* m_GatorNamespace = "/tmp/gatord_namespace";
 #endif
+#if !defined(ARMNN_DISABLE_SOCKETS)
     arm::pipe::PollFd m_Socket[1]{};
+#endif
 };
 
 } // namespace pipe

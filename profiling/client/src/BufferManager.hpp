@@ -8,8 +8,10 @@
 #include "IBufferManager.hpp"
 #include "IConsumer.hpp"
 
-#include <condition_variable>
+#if !defined(ARMNN_DISABLE_THREADS)
 #include <mutex>
+#endif
+
 #include <vector>
 #include <queue>
 
@@ -61,11 +63,13 @@ private:
     // List of readable packet buffers
     std::queue<IPacketBufferPtr> m_ReadableList;
 
+#if !defined(ARMNN_DISABLE_THREADS)
     // Mutex for available packet buffer list
     std::mutex m_AvailableMutex;
 
     // Mutex for readable packet buffer list
     std::mutex m_ReadableMutex;
+#endif
 
     // Consumer thread to notify packet is ready to read
     IConsumer* m_Consumer = nullptr;

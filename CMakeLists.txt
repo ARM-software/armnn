@@ -51,6 +51,9 @@ endif()
 
 include(GNUInstallDirs)
 
+add_subdirectory(profiling/common/src)
+add_subdirectory(profiling/client/src)
+
 add_subdirectory(samples)
 add_subdirectory(src/armnnTfLiteParser)
 add_subdirectory(src/armnnSerializer)
@@ -474,7 +477,10 @@ target_link_libraries(armnn PUBLIC armnnUtils)
 target_link_libraries(armnn PUBLIC pipeCommon)
 target_link_libraries(armnn PUBLIC pipeClient)
 
-target_link_libraries(armnn PUBLIC ${CMAKE_DL_LIBS})
+if(NOT BUILD_BARE_METAL)
+    target_link_libraries(armnn PUBLIC ${CMAKE_DL_LIBS})
+endif()
+
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL Windows)
     target_link_libraries(armnn PUBLIC Ws2_32.lib)
 endif()
@@ -871,8 +877,6 @@ endif()
 
 if(BUILD_TIMELINE_DECODER)
     add_subdirectory(profiling/server/src/timelineDecoder)
-    add_subdirectory(profiling/common/src)
-    add_subdirectory(profiling/client/src)
     add_subdirectory(src/timelineDecoder)
 endif()
 

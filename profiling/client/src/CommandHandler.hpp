@@ -11,7 +11,9 @@
 #include <common/include/CommandHandlerRegistry.hpp>
 
 #include <atomic>
+#if !defined(ARMNN_DISABLE_THREADS)
 #include <thread>
+#endif
 
 namespace arm
 {
@@ -30,7 +32,9 @@ public:
           m_StopAfterTimeout(stopAfterTimeout),
           m_IsRunning(false),
           m_KeepRunning(false),
+#if !defined(ARMNN_DISABLE_THREADS)
           m_CommandThread(),
+#endif
           m_CommandHandlerRegistry(commandHandlerRegistry),
           m_PacketVersionResolver(packetVersionResolver)
     {}
@@ -38,7 +42,6 @@ public:
 
     void SetTimeout(uint32_t timeout) { m_Timeout.store(timeout); }
     void SetStopAfterTimeout(bool stopAfterTimeout) { m_StopAfterTimeout.store(stopAfterTimeout); }
-
     void Start(IProfilingConnection& profilingConnection);
     void Stop();
     bool IsRunning() const { return m_IsRunning.load(); }
@@ -50,7 +53,9 @@ private:
     std::atomic<bool>     m_StopAfterTimeout;
     std::atomic<bool>     m_IsRunning;
     std::atomic<bool>     m_KeepRunning;
+#if !defined(ARMNN_DISABLE_THREADS)
     std::thread           m_CommandThread;
+#endif
 
     arm::pipe::CommandHandlerRegistry& m_CommandHandlerRegistry;
     arm::pipe::PacketVersionResolver&  m_PacketVersionResolver;

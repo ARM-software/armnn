@@ -31,7 +31,9 @@ void PeriodicCounterCapture::Start()
     m_KeepRunning.store(true);
 
     // Start the new capture thread.
+#if !defined(ARMNN_DISABLE_THREADS)
     m_PeriodCaptureThread = std::thread(&PeriodicCounterCapture::Capture, this, std::ref(m_ReadCounterValues));
+#endif
 }
 
 void PeriodicCounterCapture::Stop()
@@ -39,12 +41,14 @@ void PeriodicCounterCapture::Stop()
     // Signal the capture thread to stop
     m_KeepRunning.store(false);
 
+#if !defined(ARMNN_DISABLE_THREADS)
     // Check that the capture thread is running
     if (m_PeriodCaptureThread.joinable())
     {
         // Wait for the capture thread to complete operations
         m_PeriodCaptureThread.join();
     }
+#endif
 
     // Mark the capture thread as not running
     m_IsRunning = false;
@@ -85,7 +89,9 @@ void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
         if (capturePeriod == 0)
         {
             // No data capture, wait the indicated capture period (milliseconds), if it is not zero
+#if !defined(ARMNN_DISABLE_THREADS)
             std::this_thread::sleep_for(std::chrono::milliseconds(50u));
+#endif
             continue;
         }
 
@@ -129,7 +135,9 @@ void PeriodicCounterCapture::Capture(IReadCounterValues& readCounterValues)
         });
 
         // Wait the indicated capture period (microseconds)
+#if !defined(ARMNN_DISABLE_THREADS)
         std::this_thread::sleep_for(std::chrono::microseconds(capturePeriod));
+#endif
     }
     while (m_KeepRunning.load());
 }

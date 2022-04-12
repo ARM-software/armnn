@@ -9,6 +9,10 @@
 #include <common/include/NumericCast.hpp>
 #include <common/include/ProfilingException.hpp>
 
+#if defined(ARMNN_DISABLE_THREADS)
+#include <common/include/IgnoreUnused.hpp>
+#endif
+
 #include <cstring>
 
 namespace arm
@@ -36,11 +40,15 @@ void SendThread::SetReadyToRead()
 {
     // We need to wait for the send thread to release its mutex
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lck(m_WaitMutex);
+#endif
         m_ReadyToRead = true;
     }
     // Signal the send thread that there's something to read in the buffer
+#if !defined(ARMNN_DISABLE_THREADS)
     m_WaitCondition.notify_one();
+#endif
 }
 
 void SendThread::Start(IProfilingConnection& profilingConnection)
@@ -52,10 +60,12 @@ void SendThread::Start(IProfilingConnection& profilingConnection)
         return;
     }
 
+#if !defined(ARMNN_DISABLE_THREADS)
     if (m_SendThread.joinable())
     {
         m_SendThread.join();
     }
+#endif
 
     // Mark the send thread as running
     m_IsRunning.store(true);
@@ -70,7 +80,11 @@ void SendThread::Start(IProfilingConnection& profilingConnection)
     m_PacketSent = false;
 
     // Start the send thread
+#if !defined(ARMNN_DISABLE_THREADS)
     m_SendThread = std::thread(&SendThread::Send, this, std::ref(profilingConnection));
+#else
+    IgnoreUnused(profilingConnection);
+#endif
 }
 
 void SendThread::Stop(bool rethrowSendThreadExceptions)
@@ -79,6 +93,7 @@ void SendThread::Stop(bool rethrowSendThreadExceptions)
     m_KeepRunning.store(false);
 
     // Check that the send thread is running
+#if !defined(ARMNN_DISABLE_THREADS)
     if (m_SendThread.joinable())
     {
         // Kick the send thread out of the wait condition
@@ -86,6 +101,7 @@ void SendThread::Stop(bool rethrowSendThreadExceptions)
         // Wait for the send thread to complete operations
         m_SendThread.join();
     }
+#endif
 
     // Check if the send thread exception has to be rethrown
     if (!rethrowSendThreadExceptions)
@@ -147,17 +163,19 @@ void SendThread::Send(IProfilingConnection& profilingConnection)
 
             // Wait condition lock scope - Begin
             {
+#if !defined(ARMNN_DISABLE_THREADS)
                 std::unique_lock<std::mutex> lock(m_WaitMutex);
 
                 bool timeout = m_WaitCondition.wait_for(lock,
                                                         std::chrono::milliseconds(std::max(m_Timeout, 1000)),
                                                         [&]{ return m_ReadyToRead; });
                 // If we get notified we need to flush the buffer again
-                if(timeout)
+                if (timeout)
                 {
                     // Otherwise if we just timed out don't flush the buffer
                     continue;
                 }
+#endif
                 //reset condition variable predicate for next use
                 m_ReadyToRead = false;
             }
@@ -167,20 +185,25 @@ void SendThread::Send(IProfilingConnection& profilingConnection)
         default:
             // Wait condition lock scope - Begin
             {
+#if !defined(ARMNN_DISABLE_THREADS)
                 std::unique_lock<std::mutex> lock(m_WaitMutex);
-
+#endif
                 // Normal working state for the send thread
                 // Check if the send thread is required to enforce a timeout wait policy
                 if (m_Timeout < 0)
                 {
                     // Wait indefinitely until notified that something to read has become available in the buffer
+#if !defined(ARMNN_DISABLE_THREADS)
                     m_WaitCondition.wait(lock, [&] { return m_ReadyToRead; });
+#endif
                 }
                 else
                 {
                     // Wait until the thread is notified of something to read from the buffer,
                     // or check anyway after the specified number of milliseconds
+#if !defined(ARMNN_DISABLE_THREADS)
                     m_WaitCondition.wait_for(lock, std::chrono::milliseconds(m_Timeout), [&] { return m_ReadyToRead; });
+#endif
                 }
 
                 //reset condition variable predicate for next use
@@ -246,25 +269,33 @@ void SendThread::FlushBuffer(IProfilingConnection& profilingConnection, bool not
     {
         // Wait for the parent thread to release its mutex if necessary
         {
+#if !defined(ARMNN_DISABLE_THREADS)
             std::lock_guard<std::mutex> lck(m_PacketSentWaitMutex);
+#endif
             m_PacketSent = true;
         }
         // Notify to any watcher that something has been sent
+#if !defined(ARMNN_DISABLE_THREADS)
         m_PacketSentWaitCondition.notify_one();
+#endif
     }
 }
 
 bool SendThread::WaitForPacketSent(uint32_t timeout = 1000)
 {
+#if !defined(ARMNN_DISABLE_THREADS)
     std::unique_lock<std::mutex> lock(m_PacketSentWaitMutex);
     // Blocks until notified that at least a packet has been sent or until timeout expires.
     bool timedOut = m_PacketSentWaitCondition.wait_for(lock,
                                                        std::chrono::milliseconds(timeout),
                                                        [&] { return m_PacketSent; });
-
     m_PacketSent = false;
 
     return timedOut;
+#else
+    IgnoreUnused(timeout);
+    return false;
+#endif
 }
 
 } // namespace pipe

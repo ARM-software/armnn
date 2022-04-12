@@ -17,12 +17,15 @@
 #include <server/include/timelineDecoder/DirectoryCaptureCommandHandler.hpp>
 
 #include <atomic>
-#include <condition_variable>
 #include <fstream>
 #include <map>
-#include <mutex>
 #include <queue>
+
+#if !defined(ARMNN_DISABLE_THREADS)
+#include <condition_variable>
+#include <mutex>
 #include <thread>
+#endif
 
 namespace arm
 {
@@ -111,8 +114,10 @@ private:
     std::queue<arm::pipe::Packet> m_PacketQueue;
     TargetEndianness m_Endianness;
 
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex m_PacketAvailableMutex;
     std::condition_variable m_ConditionPacketAvailable;
+#endif
 
     std::vector<ILocalPacketHandlerSharedPtr> m_PacketHandlers;
     std::map<uint32_t, std::vector<ILocalPacketHandlerSharedPtr>> m_IndexedHandlers;
@@ -121,11 +126,13 @@ private:
     // List of readable packets for the local packet handlers
     std::queue<arm::pipe::Packet> m_ReadableList;
     // Mutex and condition variable for the readable packet list
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex m_ReadableMutex;
     std::condition_variable m_ConditionPacketReadable;
     // thread that takes items from the readable list and dispatches them
     // to the handlers.
     std::thread m_LocalHandlersThread;
+#endif
     // atomic booleans that control the operation of the local handlers thread
     std::atomic<bool> m_IsRunning;
     std::atomic<bool> m_KeepRunning;

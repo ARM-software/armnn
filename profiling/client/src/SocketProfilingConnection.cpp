@@ -20,6 +20,7 @@ namespace pipe
 
 SocketProfilingConnection::SocketProfilingConnection()
 {
+#if !defined(ARMNN_DISABLE_SOCKETS)
     arm::pipe::Initialize();
     memset(m_Socket, 0, sizeof(m_Socket));
     // Note: we're using Linux specific SOCK_CLOEXEC flag.
@@ -59,15 +60,21 @@ SocketProfilingConnection::SocketProfilingConnection()
             m_Socket[0].fd,
             errno);
     }
+#endif
 }
 
 bool SocketProfilingConnection::IsOpen() const
 {
+#if !defined(ARMNN_DISABLE_SOCKETS)
     return m_Socket[0].fd > 0;
+#else
+    return false;
+#endif
 }
 
 void SocketProfilingConnection::Close()
 {
+#if !defined(ARMNN_DISABLE_SOCKETS)
     if (arm::pipe::Close(m_Socket[0].fd) != 0)
     {
         throw arm::pipe::SocketConnectionException(
@@ -77,6 +84,7 @@ void SocketProfilingConnection::Close()
     }
 
     memset(m_Socket, 0, sizeof(m_Socket));
+#endif
 }
 
 bool SocketProfilingConnection::WritePacket(const unsigned char* buffer, uint32_t length)
@@ -85,12 +93,16 @@ bool SocketProfilingConnection::WritePacket(const unsigned char* buffer, uint32_
     {
         return false;
     }
-
+#if !defined(ARMNN_DISABLE_SOCKETS)
     return arm::pipe::Write(m_Socket[0].fd, buffer, length) != -1;
+#else
+    return false;
+#endif
 }
 
 arm::pipe::Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
 {
+#if !defined(ARMNN_DISABLE_SOCKETS)
     // Is there currently at least a header worth of data waiting to be read?
     int bytes_available = 0;
     arm::pipe::Ioctl(m_Socket[0].fd, FIONREAD, &bytes_available);
@@ -156,10 +168,16 @@ arm::pipe::Packet SocketProfilingConnection::ReadPacket(uint32_t timeout)
 
         return ReceivePacket();
     }
+#else
+    IgnoreUnused(timeout);
+    throw arm::pipe::TimeoutException(
+        "SocketProfilingConnection: Cannot use ReadPacket function with sockets disabled");
+#endif
 }
 
 arm::pipe::Packet SocketProfilingConnection::ReceivePacket()
 {
+#if !defined(ARMNN_DISABLE_SOCKETS)
     char header[8] = {};
     long receiveResult = arm::pipe::Read(m_Socket[0].fd, &header, sizeof(header));
     // We expect 8 as the result here. 0 means EOF, socket is closed. -1 means there been some other kind of error.
@@ -219,6 +237,10 @@ arm::pipe::Packet SocketProfilingConnection::ReceivePacket()
     }
 
     return arm::pipe::Packet(metadataIdentifier, dataLength, packetData);
+#else
+    throw arm::pipe::TimeoutException(
+        "SocketProfilingConnection: Cannot use ReceivePacket function with sockets disabled");
+#endif
 }
 
 } // namespace pipe

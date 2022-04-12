@@ -261,8 +261,10 @@ private:
     uint16_t                    m_MaxGlobalCounterId;
 
     // Signalling to let external actors know when service is active or not
+#if !defined(ARMNN_DISABLE_THREADS)
     std::mutex m_ServiceActiveMutex;
     std::condition_variable m_ServiceActiveConditionVariable;
+#endif
     bool m_ServiceActive;
 
     IInitialiseProfilingService& m_Initialiser;

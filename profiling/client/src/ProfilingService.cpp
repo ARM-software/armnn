@@ -10,6 +10,11 @@
 #include <common/include/ProfilingGuid.hpp>
 #include <common/include/SocketConnectionException.hpp>
 
+#if defined(ARMNN_BUILD_BARE_METAL)
+#include <common/include/IgnoreUnused.hpp>
+#endif
+
+
 #include <fmt/format.h>
 
 namespace arm
@@ -33,6 +38,9 @@ void ProfilingService::ResetExternalProfilingOptions(const arm::pipe::ProfilingO
         // Reset the profiling service
         Reset();
     }
+#else
+    IgnoreUnused(options);
+    IgnoreUnused(resetProfilingService);
 #endif // ARMNN_BUILD_BARE_METAL
 }
 
@@ -94,6 +102,10 @@ ProfilingState ProfilingService::ConfigureProfilingService(
                 return m_StateMachine.GetCurrentState();
         }
     }
+#else
+    IgnoreUnused(options);
+    IgnoreUnused(resetProfilingService);
+    return ProfilingState::Uninitialised;
 #endif // ARMNN_BUILD_BARE_METAL
 }
 
@@ -212,6 +224,9 @@ void ProfilingService::AddBackendProfilingContext(
     // Register the backend counters
     m_MaxGlobalCounterId = profilingContext->RegisterCounters(m_MaxGlobalCounterId);
     m_BackendProfilingContexts.emplace(backendId, std::move(profilingContext));
+#else
+    IgnoreUnused(backendId);
+    IgnoreUnused(profilingContext);
 #endif // ARMNN_BUILD_BARE_METAL
 }
 const ICounterDirectory& ProfilingService::GetCounterDirectory() const
@@ -348,6 +363,8 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
     // Register the new counter to the counter index for quick access
     std::atomic<uint32_t>* counterValuePtr = &(m_CounterValues.back());
     m_CounterIndex.at(counterUid) = counterValuePtr;
+#else
+    IgnoreUnused(counterUid);
 #endif // ARMNN_BUILD_BARE_METAL
 }
 
@@ -404,6 +421,8 @@ inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
     {
         throw arm::pipe::InvalidArgumentException(fmt::format("Counter UID {} is not registered", counterUid));
     }
+#else
+    IgnoreUnused(counterUid);
 #endif // ARMNN_BUILD_BARE_METAL
 }
 
@@ -454,7 +473,8 @@ void ProfilingService::WaitForProfilingServiceActivation(unsigned int timeout)
         ss << "Timed out waiting on profiling service activation for " << elapsed.count() << " ms";
         ARM_PIPE_LOG(warning) << ss.str();
     }
-    return;
+#else
+    IgnoreUnused(timeout);
 #endif // ARMNN_BUILD_BARE_METAL
 }
 

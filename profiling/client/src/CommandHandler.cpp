@@ -8,6 +8,10 @@
 
 #include <common/include/Logging.hpp>
 
+#if defined(ARMNN_DISABLE_THREADS)
+#include <common/include/IgnoreUnused.hpp>
+#endif
+
 namespace arm
 {
 
@@ -21,24 +25,32 @@ void CommandHandler::Start(IProfilingConnection& profilingConnection)
         return;
     }
 
+#if !defined(ARMNN_DISABLE_THREADS)
     if (m_CommandThread.joinable())
     {
         m_CommandThread.join();
     }
+#endif
 
     m_IsRunning.store(true);
     m_KeepRunning.store(true);
+#if !defined(ARMNN_DISABLE_THREADS)
     m_CommandThread = std::thread(&CommandHandler::HandleCommands, this, std::ref(profilingConnection));
+#else
+    IgnoreUnused(profilingConnection);
+#endif
 }
 
 void CommandHandler::Stop()
 {
     m_KeepRunning.store(false);
 
+#if !defined(ARMNN_DISABLE_THREADS)
     if (m_CommandThread.joinable())
     {
         m_CommandThread.join();
     }
+#endif
 }
 
 void CommandHandler::HandleCommands(IProfilingConnection& profilingConnection)

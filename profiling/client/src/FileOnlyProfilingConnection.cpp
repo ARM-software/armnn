@@ -11,7 +11,10 @@
 
 #include <algorithm>
 #include <iostream>
-#include <thread>
+
+#if defined(ARMNN_DISABLE_THREADS)
+#include <common/include/IgnoreUnused.hpp>
+#endif
 
 namespace arm
 {
@@ -97,12 +100,14 @@ void FileOnlyProfilingConnection::Close()
     }
     // dispose of the processing thread
     m_KeepRunning.store(false);
+#if !defined(ARMNN_DISABLE_THREADS)
     if (m_LocalHandlersThread.joinable())
     {
         // make sure the thread wakes up and sees it has to stop
         m_ConditionPacketReadable.notify_one();
         m_LocalHandlersThread.join();
     }
+#endif
 }
 
 bool FileOnlyProfilingConnection::WritePacket(const unsigned char* buffer, uint32_t length)
@@ -116,14 +121,19 @@ bool FileOnlyProfilingConnection::WritePacket(const unsigned char* buffer, uint3
 void FileOnlyProfilingConnection::ReturnPacket(arm::pipe::Packet& packet)
 {
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lck(m_PacketAvailableMutex);
+#endif
         m_PacketQueue.push(std::move(packet));
     }
+#if !defined(ARMNN_DISABLE_THREADS)
     m_ConditionPacketAvailable.notify_one();
+#endif
 }
 
 arm::pipe::Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
 {
+#if !defined(ARMNN_DISABLE_THREADS)
     std::unique_lock<std::mutex> lck(m_PacketAvailableMutex);
 
     // Here we are using m_PacketQueue.empty() as a predicate variable
@@ -135,6 +145,9 @@ arm::pipe::Packet FileOnlyProfilingConnection::ReadPacket(uint32_t timeout)
         arm::pipe::Packet empty;
         return empty;
     }
+#else
+    IgnoreUnused(timeout);
+#endif
 
     arm::pipe::Packet returnedPacket = std::move(m_PacketQueue.front());
     m_PacketQueue.pop();
@@ -188,13 +201,17 @@ void FileOnlyProfilingConnection::StartProcessingThread()
         return;
     }
     // make sure if there was one running before it is joined
+#if !defined(ARMNN_DISABLE_THREADS)
     if (m_LocalHandlersThread.joinable())
     {
         m_LocalHandlersThread.join();
     }
+#endif
     m_IsRunning.store(true);
     m_KeepRunning.store(true);
+#if !defined(ARMNN_DISABLE_THREADS)
     m_LocalHandlersThread = std::thread(&FileOnlyProfilingConnection::ServiceLocalHandlers, this);
+#endif
 }
 
 void FileOnlyProfilingConnection::ForwardPacketToHandlers(arm::pipe::Packet& packet)
@@ -208,14 +225,18 @@ void FileOnlyProfilingConnection::ForwardPacketToHandlers(arm::pipe::Packet& pac
         return;
     }
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         std::unique_lock<std::mutex> readableListLock(m_ReadableMutex);
+#endif
         if (!m_KeepRunning.load())
         {
             return;
         }
         m_ReadableList.push(std::move(packet));
     }
+#if !defined(ARMNN_DISABLE_THREADS)
     m_ConditionPacketReadable.notify_one();
+#endif
 }
 
 void FileOnlyProfilingConnection::ServiceLocalHandlers()
@@ -225,17 +246,23 @@ void FileOnlyProfilingConnection::ServiceLocalHandlers()
         arm::pipe::Packet returnedPacket;
         bool readPacket = false;
         {   // only lock while we are taking the packet off the incoming list
+#if !defined(ARMNN_DISABLE_THREADS)
             std::unique_lock<std::mutex> lck(m_ReadableMutex);
+#endif
             if (m_Timeout < 0)
             {
+#if !defined(ARMNN_DISABLE_THREADS)
                 m_ConditionPacketReadable.wait(lck,
                                                [&] { return !m_ReadableList.empty(); });
+#endif
             }
             else
             {
+#if !defined(ARMNN_DISABLE_THREADS)
                 m_ConditionPacketReadable.wait_for(lck,
                                                    std::chrono::milliseconds(std::max(m_Timeout, 1000)),
                                                    [&] { return !m_ReadableList.empty(); });
+#endif
             }
             if (m_KeepRunning.load())
             {

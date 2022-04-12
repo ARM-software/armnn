@@ -212,6 +212,11 @@ bool RefLayerSupport::IsLayerSupported(const LayerType& type,
                                      infos[2],
                                      *(PolymorphicDowncast<const GatherDescriptor*>(&descriptor)),
                                      reasonIfUnsupported);
+        case LayerType::GatherNd:
+            return IsGatherNdSupported(infos[0],
+                                       infos[1],
+                                       infos[2],
+                                       reasonIfUnsupported);
         case LayerType::Input:
             return IsInputSupported(infos[0], reasonIfUnsupported);
         case LayerType::InstanceNormalization:
@@ -1587,6 +1592,38 @@ bool RefLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                       "Reference Fully Connected: bias must have 1 dimension.");
 
     }
+
+    return supported;
+}
+
+bool RefLayerSupport::IsGatherNdSupported(const armnn::TensorInfo& input0,
+                                          const armnn::TensorInfo& input1,
+                                          const armnn::TensorInfo& output,
+                                          armnn::Optional<std::string&> reasonIfUnsupported) const
+{
+    bool supported = true;
+    std::array<DataType,7> supportedTypes =
+    {
+            DataType::BFloat16,
+            DataType::Float32,
+            DataType::Float16,
+            DataType::QAsymmS8,
+            DataType::QAsymmU8,
+            DataType::QSymmS16,
+            DataType::Signed32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input0, supportedTypes), reasonIfUnsupported,
+                                  "Reference GatherNd: input type not supported");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference GatherNd: output type not supported");
+
+    supported &= CheckSupportRule(TypeIs(input1, DataType::Signed32), reasonIfUnsupported,
+                                  "Reference GatherNd: indices (input1) type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(input0, output), reasonIfUnsupported,
+                                  "Reference GatherNd: input and output types not matching");
 
     return supported;
 }

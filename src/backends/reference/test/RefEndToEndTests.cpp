@@ -19,6 +19,7 @@
 #include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FullyConnectedEndToEndTestImpl.hpp>
 #include <backendsCommon/test/GatherEndToEndTestImpl.hpp>
+#include <backendsCommon/test/GatherNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
@@ -718,6 +719,36 @@ TEST_CASE("RefGatherMultiDimUint8Test")
 TEST_CASE("RefGatherMultiDimInt16Test")
 {
     GatherMultiDimEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefGatherNdFloatTest")
+{
+    GatherNdEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefGatherNdUint8Test")
+{
+    GatherNdEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("RefGatherNdInt16Test")
+{
+    GatherNdEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefGatherNdMultiDimFloatTest")
+{
+    GatherNdMultiDimEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefGatherNdMultiDimUint8Test")
+{
+    GatherNdMultiDimEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("RefGatherNdMultiDimInt16Test")
+{
+    GatherNdMultiDimEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
 }
 
 // DepthToSpace

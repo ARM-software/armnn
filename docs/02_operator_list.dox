@@ -1455,6 +1455,51 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>All
     </table>
 <tr>
+  <td rowspan="3">GatherNdLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform the gatherNd operation.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>TBD
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>TBD
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>TBD
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>TBD
+    </table>
+<tr>
   <td rowspan="1">InputLayer
   <td rowspan="1" style="width:200px;"> Special layer used to provide input data to the computational network.
   <td rowspan="1">

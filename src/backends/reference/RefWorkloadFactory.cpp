@@ -353,6 +353,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
             auto gatherQueueDescriptor = PolymorphicDowncast<const GatherQueueDescriptor*>(&descriptor);
             return std::make_unique<RefGatherWorkload>(*gatherQueueDescriptor, info);
         }
+        case LayerType::GatherNd:
+        {
+            auto gatherNdQueueDescriptor = PolymorphicDowncast<const GatherNdQueueDescriptor*>(&descriptor);
+            return std::make_unique<RefGatherNdWorkload>(*gatherNdQueueDescriptor, info);
+        }
         case LayerType::Input:
         {
             auto inputQueueDescriptor = PolymorphicDowncast<const InputQueueDescriptor*>(&descriptor);

@@ -655,6 +655,21 @@ bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
                                             reasonIfUnsupported);
 }
 
+bool LayerSupportHandle::IsGatherNdSupported(const TensorInfo& input0,
+                                             const TensorInfo& input1,
+                                             const TensorInfo& output,
+                                             Optional<std::string&> reasonIfUnsupported)
+{
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::GatherNd,
+                                            infos,
+                                            BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported);
+}
+
 bool LayerSupportHandle::IsInputSupported(const TensorInfo& input,
                                           Optional<std::string&> reasonIfUnsupported)
 {

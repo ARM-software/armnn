@@ -73,6 +73,7 @@ BACKEND_SOURCES := \
         workloads/RefFillWorkload.cpp \
         workloads/RefFloorWorkload.cpp \
         workloads/RefFullyConnectedWorkload.cpp \
+        workloads/RefGatherNdWorkload.cpp \
         workloads/RefGatherWorkload.cpp \
         workloads/RefInstanceNormalizationWorkload.cpp \
         workloads/RefL2NormalizationWorkload.cpp \

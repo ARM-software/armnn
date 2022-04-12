@@ -244,6 +244,8 @@ list(APPEND armnn_sources
     src/armnn/layers/FullyConnectedLayer.cpp
     src/armnn/layers/GatherLayer.cpp
     src/armnn/layers/GatherLayer.hpp
+    src/armnn/layers/GatherNdLayer.cpp
+    src/armnn/layers/GatherNdLayer.hpp
     src/armnn/layers/InputLayer.hpp
     src/armnn/layers/InputLayer.cpp
     src/armnn/layers/InstanceNormalizationLayer.hpp

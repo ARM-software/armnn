@@ -2718,6 +2718,41 @@ void RsqrtQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
+void GatherNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"GatherNdQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& indicesTensorInfo = workloadInfo.m_InputTensorInfos[1];
+    if (indicesTensorInfo.GetDataType() != DataType::Signed32)
+    {
+        throw InvalidArgumentException(descriptorName + ": Indices tensor type must be Int32.");
+    }
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+            {
+                    DataType::BFloat16,
+                    DataType::Float16,
+                    DataType::Float32,
+                    DataType::QAsymmS8,
+                    DataType::QAsymmU8,
+                    DataType::QSymmS16,
+                    DataType::Signed32,
+            };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+
+    unsigned int outputDim  = outputTensorInfo.GetNumDimensions();
+    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, outputDim, "output");
+}
+
 void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"GatherQueueDescriptor"};

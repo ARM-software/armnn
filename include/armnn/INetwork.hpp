@@ -651,6 +651,11 @@ public:
     IConnectableLayer* AddGatherLayer(const GatherDescriptor& descriptor,
                                               const char* name = nullptr);
 
+    /// Add GatherNd layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddGatherNdLayer(const char* name = nullptr);
+
     /// Adds a switch layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.

@@ -42,6 +42,7 @@
 #include "RefFillWorkload.hpp"
 #include "RefFloorWorkload.hpp"
 #include "RefFullyConnectedWorkload.hpp"
+#include "RefGatherNdWorkload.hpp"
 #include "RefGatherWorkload.hpp"
 #include "RefInstanceNormalizationWorkload.hpp"
 #include "RefL2NormalizationWorkload.hpp"

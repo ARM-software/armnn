@@ -509,6 +509,17 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                           reason);
             break;
         }
+        case LayerType::GatherNd:
+        {
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject.IsGatherNdSupported(OverrideDataType(input0, dataType),
+                                                            input1,
+                                                            OverrideDataType(output, dataType),
+                                                            reason);
+            break;
+        }
         case LayerType::Input:
         {
             const TensorInfo& input = layer.GetOutputSlot(0).GetTensorInfo();

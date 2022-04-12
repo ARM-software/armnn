@@ -118,6 +118,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefFloorWorkload.hpp
     RefFullyConnectedWorkload.cpp
     RefFullyConnectedWorkload.hpp
+    RefGatherNdWorkload.cpp
+    RefGatherNdWorkload.hpp
     RefGatherWorkload.cpp
     RefGatherWorkload.hpp
     RefInstanceNormalizationWorkload.cpp

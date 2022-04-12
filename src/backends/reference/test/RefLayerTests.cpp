@@ -2155,6 +2155,18 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsMultiDimIndicesUint8, GatherMu
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsMultiDimIndicesInt16, GatherMultiDimParamsMultiDimIndicesInt16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsMultiDimIndicesInt32, GatherMultiDimParamsMultiDimIndicesInt32Test)
 
+
+// GatherNd
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd2dFloat32, SimpleGatherNd2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd3dFloat32, SimpleGatherNd3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd4dFloat32, SimpleGatherNd4dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd2dInt8, SimpleGatherNd2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd3dInt8, SimpleGatherNd3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd4dInt8, SimpleGatherNd4dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd2dInt32, SimpleGatherNd2dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd3dInt32, SimpleGatherNd3dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd4dInt32, SimpleGatherNd4dTest<DataType::Signed32>)
+
 // Abs
 ARMNN_AUTO_TEST_CASE_WITH_THF(Abs2d, Abs2dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Abs3d, Abs3dTest<DataType::Float32>)

@@ -130,6 +130,8 @@ public:
     IConnectableLayer* AddGatherLayer(const GatherDescriptor& gatherDescriptor,
                                       const char* name = nullptr);
 
+    IConnectableLayer* AddGatherNdLayer(const char* name = nullptr);
+
     IConnectableLayer* AddInstanceNormalizationLayer(const InstanceNormalizationDescriptor& desc,
                                                      const char* name = nullptr);
 

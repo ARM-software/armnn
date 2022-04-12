@@ -251,4 +251,11 @@ std::tuple<ConstTensor, unsigned int> Convert1HWOtoMIHW(const ConstTensorHandle*
                                                         const DataLayout& dataLayout,
                                                         void* permuteBuffer);
 
+/// Calculates the key index values needed for GatherNd: N, ND, K, W, C (N is always 1)
+///
+/// \param inputInfo0 - TensorInfo of the corresponding input tensor: params
+/// \param inputInfo1 - TensorInfo of the corresponding input tensor: indices
+/// \return - A map with names and values for  N, ND, K, W, C
+std::map<std::string, unsigned int> CalculateGatherNdKeyIndices(TensorInfo inputInfo0, TensorInfo inputInfo1);
+
 }  //namespace armnn

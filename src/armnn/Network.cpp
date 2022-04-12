@@ -379,6 +379,11 @@ IConnectableLayer* INetwork::AddGatherLayer(const GatherDescriptor& descriptor,
     return pNetworkImpl->AddGatherLayer(descriptor, name);
 }
 
+IConnectableLayer* INetwork::AddGatherNdLayer(const char* name)
+{
+    return pNetworkImpl->AddGatherNdLayer(name);
+}
+
 IConnectableLayer* INetwork::AddSwitchLayer(const char* name)
 {
     return pNetworkImpl->AddSwitchLayer(name);
@@ -2442,15 +2447,20 @@ IConnectableLayer* NetworkImpl::AddDequantizeLayer(const char* name)
 }
 
 IConnectableLayer* NetworkImpl::AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
-                                                 const char* name)
+                                                     const char* name)
 {
     return m_Graph->AddLayer<StridedSliceLayer>(stridedSliceDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddGatherLayer(const GatherDescriptor& gatherDescriptor,
-                                           const char* name)
+                                               const char* name)
 {
     return m_Graph->AddLayer<GatherLayer>(gatherDescriptor, name);
+}
+
+IConnectableLayer* NetworkImpl::AddGatherNdLayer(const char* name)
+{
+    return m_Graph->AddLayer<GatherNdLayer>(name);
 }
 
 IConnectableLayer* NetworkImpl::AddMergeLayer(const char* name)

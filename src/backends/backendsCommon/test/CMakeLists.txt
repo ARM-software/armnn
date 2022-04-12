@@ -30,6 +30,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     FillEndToEndTestImpl.hpp
     FullyConnectedEndToEndTestImpl.hpp
     GatherEndToEndTestImpl.hpp
+    GatherNdEndToEndTestImpl.hpp
     InstanceNormalizationEndToEndTestImpl.cpp
     InstanceNormalizationEndToEndTestImpl.hpp
     IsLayerSupportedTestImpl.hpp
@@ -113,6 +114,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/FloorTestImpl.hpp
     layerTests/FullyConnectedTestImpl.cpp
     layerTests/FullyConnectedTestImpl.hpp
+    layerTests/GatherNdTestImpl.cpp
+    layerTests/GatherNdTestImpl.hpp
     layerTests/GatherTestImpl.cpp
     layerTests/GatherTestImpl.hpp
     layerTests/InstanceNormalizationTestImpl.cpp

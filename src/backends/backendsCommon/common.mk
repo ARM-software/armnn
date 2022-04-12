@@ -68,6 +68,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/FillTestImpl.cpp \
     test/layerTests/FloorTestImpl.cpp \
     test/layerTests/FullyConnectedTestImpl.cpp \
+    test/layerTests/GatherNdTestImpl.cpp \
     test/layerTests/GatherTestImpl.cpp \
     test/layerTests/InstanceNormalizationTestImpl.cpp \
     test/layerTests/L2NormalizationTestImpl.cpp \

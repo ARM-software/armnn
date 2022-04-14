@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="e33c55640b5e6e6af193a41a3376e2a01a321a35" #[arm_gemm] Use static validate to find arm_gemm kernels.
+DEFAULT_CLFRAMEWORKREVISION="fecdb8f664e8e4dfdfa2a121c0a2e46352a2e4a1" #Add documentations about compiler_prefix and toolchain_prefix
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

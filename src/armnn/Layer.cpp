@@ -23,6 +23,19 @@ namespace armnn
 // Instantiate the static member variable
 NullDescriptor Layer::m_NullDescriptor;
 
+template <typename LayerT>
+void AssertMultipleInputSlots(Layer& layer)
+{
+    if(PolymorphicDowncast<const LayerT*>(&(layer.GetParameters()))->m_BiasEnabled)
+    {
+        ARMNN_ASSERT(layer.GetNumInputSlots() == 3);
+    }
+    else
+    {
+        ARMNN_ASSERT(layer.GetNumInputSlots() == 2);
+    }
+}
+
 void InputSlot::Insert(Layer& layer)
 {
     ARMNN_ASSERT(layer.GetNumOutputSlots() == 1);
@@ -34,8 +47,21 @@ void InputSlot::Insert(Layer& layer)
         // Disconnects parent from this.
         prevSlot->Disconnect(*this);
 
+        switch (layer.GetType())
+        {
+            case LayerType::DepthwiseConvolution2d:
+            {
+                AssertMultipleInputSlots<DepthwiseConvolution2dDescriptor>(layer);
+                break;
+            }
+            default:
+            {
+                ARMNN_ASSERT(layer.GetNumInputSlots() == 1);
+                break;
+            }
+        }
+
         // Connects inserted layer to parent.
-        ARMNN_ASSERT(layer.GetNumInputSlots() == 1);
         int idx = prevSlot->Connect(layer.GetInputSlot(0));
         prevSlot->SetEdgeStrategy(armnn::numeric_cast<unsigned int>(idx), EdgeStrategy::Undefined);
 

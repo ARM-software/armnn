@@ -324,10 +324,13 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
         case LayerType::DepthwiseConvolution2d:
         {
             auto cLayer = PolymorphicDowncast<const DepthwiseConvolution2dLayer*>(&layer);
-            const TensorInfo& input = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
-                                                       dataType);
-            const TensorInfo& output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
-            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
+            const TensorInfo& input   = OverrideDataType(layer.GetInputSlot(0).GetConnection()->GetTensorInfo(),
+                                                         dataType);
+            const TensorInfo& output  = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
+            const TensorInfo& weights = OverrideDataType(layer.GetInputSlot(1).GetConnection()->GetTensorInfo(),
+                                                         dataType);
+
+            ARMNN_ASSERT(cLayer->GetInputSlot(1).GetConnection() != nullptr);
 
             const DepthwiseConvolution2dDescriptor& descriptor = cLayer->GetParameters();
 
@@ -335,17 +338,16 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                biases =
-                    OverrideDataType(cLayer->m_Bias->GetTensorInfo(), GetBiasTypeFromWeightsType(dataType));
+                biases = OverrideDataType(cLayer->GetInputSlot(2).GetConnection()->GetTensorInfo(),
+                                          GetBiasTypeFromWeightsType(dataType));
             }
 
-            result = layerSupportObject.IsDepthwiseConvolutionSupported(
-                                                     input,
-                                                     output,
-                                                     descriptor,
-                                                     OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType),
-                                                     biases,
-                                                     reason);
+            result = layerSupportObject.IsDepthwiseConvolutionSupported(input,
+                                                                        output,
+                                                                        descriptor,
+                                                                        weights,
+                                                                        biases,
+                                                                        reason);
             break;
         }
         case LayerType::Dequantize:

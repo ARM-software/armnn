@@ -1227,7 +1227,6 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
     CHECK_SUPPORTED_FUSED_ACTIVATION(options, subgraphIndex, operatorIndex);
 
     DepthwiseConvolution2dDescriptor desc;
-    desc.m_BiasEnabled = false;
     desc.m_StrideX = CHECKED_NON_NEGATIVE(options->stride_w);
     desc.m_StrideY = CHECKED_NON_NEGATIVE(options->stride_h);
     desc.m_DataLayout = armnn::DataLayout::NHWC;
@@ -1235,6 +1234,11 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
 
     auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(inputs.size(), 2, 3);
+    if (inputs.size() == 3)
+    {
+        desc.m_BiasEnabled = true;
+    }
+
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
     desc.m_DilationX = CHECKED_NON_NEGATIVE(options->dilation_w_factor);
@@ -1257,26 +1261,24 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
                 desc.m_DilationX, desc.m_PadLeft, desc.m_PadRight, options->padding);
 
     // ArmNN uses the same filter tensor layout at TfLite [1, H, W, O] no need for any permutation
-    auto filterTensor = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo, inputTensorInfo.GetDataType());
-    armnn::IConnectableLayer* layer = nullptr;
+    auto filterTensor = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo);
     auto layerName = fmt::format("DepthwiseConv2D:{}:{}", subgraphIndex, operatorIndex);
 
-    if (inputs.size() == 3)
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    // Add the first input and weights tensor to the registration list.
+    // The constant weights will be added by SetupConstantLayers.
+    std::vector<unsigned int> tensorIndexesToRegister = {inputTensorIndexes[0], inputTensorIndexes[1]};
+
+    armnn::IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(desc, layerName.c_str());
+
+    if (desc.m_BiasEnabled)
     {
         desc.m_BiasEnabled = true;
         TensorInfo biasTensorInfo = ToTensorInfo(inputs[2]);
-        auto biasTensorAndData = CreateConstTensorNonPermuted(inputs[2], biasTensorInfo, inputTensorInfo.GetDataType());
-        layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
-                                                          filterTensor.first,
-                                                          Optional<ConstTensor>(biasTensorAndData.first),
-                                                          layerName.c_str());
-    }
-    else
-    {
-        layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
-                                                          filterTensor.first,
-                                                          EmptyOptional(),
-                                                          layerName.c_str());
+        auto biasTensorAndData = CreateConstTensorNonPermuted(inputs[2], biasTensorInfo);
+
+        // Add the biases input to the registration list, a constant layer will be added by SetupConstantLayers.
+        tensorIndexesToRegister.emplace_back(inputTensorIndexes[2]);
     }
     ARMNN_ASSERT(layer != nullptr);
 
@@ -1285,8 +1287,7 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
-    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, tensorIndexesToRegister);
 
     layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
     // register the output connection slots for the layer, connections are made after all layers have been created

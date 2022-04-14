@@ -553,11 +553,8 @@ TEST_CASE("SerializeDepthwiseConvolution2d")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const depthwiseConvLayer =
-        network->AddDepthwiseConvolution2dLayer(descriptor,
-                                                weights,
-                                                armnn::Optional<armnn::ConstTensor>(biases),
-                                                layerName.c_str());
+    armnn::IConnectableLayer* const depthwiseConvLayer = network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                                                                 layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(0));
@@ -566,12 +563,20 @@ TEST_CASE("SerializeDepthwiseConvolution2d")
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
     depthwiseConvLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights);
+    weightsLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(1u));
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+
+     armnn::IConnectableLayer* const biasLayer = network->AddConstantLayer(biases);
+    biasLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(2u));
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biases.GetInfo());
+
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor>& constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::DepthwiseConvolution2dDescriptor> verifier(
-            layerName, {inputInfo}, {outputInfo}, descriptor, constants);
+        layerName, {inputInfo, weightsInfo, biasesInfo}, {outputInfo}, descriptor, constants);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
@@ -610,11 +615,8 @@ TEST_CASE("SerializeDepthwiseConvolution2dWithPerAxisParams")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const depthwiseConvLayer =
-        network->AddDepthwiseConvolution2dLayer(descriptor,
-                                                weights,
-                                                armnn::Optional<armnn::ConstTensor>(biases),
-                                                layerName.c_str());
+    armnn::IConnectableLayer* const depthwiseConvLayer = network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                                                                 layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(0));
@@ -623,12 +625,75 @@ TEST_CASE("SerializeDepthwiseConvolution2dWithPerAxisParams")
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
     depthwiseConvLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights);
+    weightsLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(1u));
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+
+    armnn::IConnectableLayer* const biasLayer = network->AddConstantLayer(biases);
+    biasLayer->GetOutputSlot(0).Connect(depthwiseConvLayer->GetInputSlot(2u));
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biases.GetInfo());
+
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     CHECK(deserializedNetwork);
 
     const std::vector<armnn::ConstTensor>& constants {weights, biases};
     LayerVerifierBaseWithDescriptorAndConstants<armnn::DepthwiseConvolution2dDescriptor> verifier(
-            layerName, {inputInfo}, {outputInfo}, descriptor, constants);
+            layerName, {inputInfo, kernelInfo, biasInfo}, {outputInfo}, descriptor, constants);
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+TEST_CASE("SerializeDepthwiseConvolution2dWeightsAndBiasesAsConstantLayers")
+{
+    const std::string layerName("depthwiseConvolution2d");
+    const armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+
+    const armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    armnn::ConstTensor weights(weightsInfo, weightsData);
+
+    std::vector<float> biasesData = GenerateRandomData<float>(biasesInfo.GetNumElements());
+    armnn::ConstTensor biases(biasesInfo, biasesData);
+
+    armnn::DepthwiseConvolution2dDescriptor descriptor;
+    descriptor.m_PadLeft     = 1;
+    descriptor.m_PadRight    = 1;
+    descriptor.m_PadTop      = 1;
+    descriptor.m_PadBottom   = 1;
+    descriptor.m_StrideX     = 2;
+    descriptor.m_StrideY     = 2;
+    descriptor.m_DilationX   = 2;
+    descriptor.m_DilationY   = 2;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights, "Weights");
+    armnn::IConnectableLayer* const biasesLayer = network->AddConstantLayer(biases, "Biases");
+    armnn::IConnectableLayer* const convLayer   = network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                                                          layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(2));
+    convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    biasesLayer->GetOutputSlot(0).SetTensorInfo(biasesInfo);
+    convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    const std::vector<armnn::ConstTensor>& constants {weights, biases};
+    LayerVerifierBaseWithDescriptorAndConstants<armnn::DepthwiseConvolution2dDescriptor> verifier(
+        layerName, {inputInfo, weightsInfo, biasesInfo}, {outputInfo}, descriptor, constants);
+
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 

@@ -331,18 +331,11 @@ TEST_CASE("DepthwiseConvolutionTest")
     descriptor.m_DataLayout = DataLayout::NHWC;
     descriptor.m_BiasEnabled = false;
 
-    Graph graph;
-
-    auto layer = BuildGraph<DepthwiseConvolution2dLayer>(&graph,
-                                                        {{ 8, 16, 2, 1 }},
-                                                        descriptor,
-                                                        "depthwiseconv2d");
-
-    const float Datum = 0.0f;
-    ConstTensor weights({{ 2, 5, 3, 2 }, DataType::Float32, 0.0f, 0, true}, &Datum);
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
-
-    RunShapeInferenceTest<DepthwiseConvolution2dLayer>(layer, {{ 8, 18, 1, 2 }});
+    CreateGraphAndRunTest<DepthwiseConvolution2dLayer>({{ 8, 16, 2, 1 },   // input
+                                                        { 2, 5, 3, 2 }},   // weights
+                                                       {{ 8, 18, 1, 2 }}, // output
+                                                       descriptor,
+                                                       "conv2d");
 }
 
 TEST_CASE("DequantizeTest")

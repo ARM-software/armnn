@@ -439,6 +439,32 @@ bool LayerSupportHandle::IsDepthwiseConvolutionSupported(
     TensorInfo biasesVal =  biases.has_value() ? biases.value() : TensorInfo();
     TensorInfos infos{input, output, weights, biasesVal};
 
+    Optional<const BackendOptions::BackendOption> capability ;
+    if(!m_BackendId.IsUndefined())
+    {
+        capability = GetCapability("ConstantTensorsAsInputs", m_BackendId);
+        if(!capability.has_value() || capability.value().GetValue().AsBool() == false)
+        {
+            if(!weights.IsConstant())
+            {
+                return false;
+            }
+            if(descriptor.m_BiasEnabled)
+            {
+                if(!biases.value().IsConstant())
+                {
+                    return false;
+                }
+            }
+            // At the first stage we will only print a warning. this is to give
+            // backend developers a chance to adopt and read weights from input slots.
+            ARMNN_LOG(warning) << "The backend makes use of a deprecated interface to read constant tensors. "
+                                  "If you are a backend developer please find more information in our "
+                                  "doxygen documentation on github https://github.com/ARM-software/armnn "
+                                  "under the keyword 'ConstTensorsAsInputs'.";
+        }
+    }
+
     return m_LayerSupport->IsLayerSupported(LayerType::DepthwiseConvolution2d,
                                             infos,
                                             descriptor,
@@ -491,6 +517,32 @@ bool LayerSupportHandle::IsDilatedDepthwiseConvolutionSupported(
 {
     TensorInfo biasesVal =  biases.has_value() ? biases.value() : TensorInfo();
     TensorInfos infos{input, output, weights, biasesVal};
+
+    Optional<const BackendOptions::BackendOption> capability ;
+    if(!m_BackendId.IsUndefined())
+    {
+        capability = GetCapability("ConstantTensorsAsInputs", m_BackendId);
+        if(!capability.has_value() || capability.value().GetValue().AsBool() == false)
+        {
+            if(!weights.IsConstant())
+            {
+                return false;
+            }
+            if(descriptor.m_BiasEnabled)
+            {
+                if(!biases.value().IsConstant())
+                {
+                    return false;
+                }
+            }
+            // At the first stage we will only print a warning. this is to give
+            // backend developers a chance to adopt and read weights from input slots.
+            ARMNN_LOG(warning) << "The backend makes use of a deprecated interface to read constant tensors. "
+                                  "If you are a backend developer please find more information in our "
+                                  "doxygen documentation on github https://github.com/ARM-software/armnn "
+                                  "under the keyword 'ConstTensorsAsInputs'.";
+        }
+    }
 
     return m_LayerSupport->IsLayerSupported(LayerType::DepthwiseConvolution2d,
                                             infos,
@@ -590,8 +642,8 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
                 if (reasonIfUnsupported.has_value())
                 {
                     reasonIfUnsupported.value() =
-                            "This backend might not support non constant weights. "
-                            "If weights are constant make sure to set IsConstant when creating TensorInfo";
+                        "This backend might not support non constant weights. "
+                        "If weights are constant make sure to set IsConstant when creating TensorInfo";
                 }
 
                 return false;
@@ -603,8 +655,8 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
                     if (reasonIfUnsupported.has_value())
                     {
                         reasonIfUnsupported.value() =
-                                "This backend might not support non constant weights. "
-                                "If weights are constant make sure to set IsConstant when creating TensorInfo";
+                            "This backend might not support non constant bias. "
+                            "If bias are constant make sure to set IsConstant when creating TensorInfo";
                     }
                     return false;
                 }

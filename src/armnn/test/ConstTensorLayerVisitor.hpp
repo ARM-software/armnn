@@ -74,13 +74,9 @@ class TestDepthwiseConvolution2dLayerVisitor : public TestLayerVisitor
 {
 public:
     explicit TestDepthwiseConvolution2dLayerVisitor(const DepthwiseConvolution2dDescriptor& descriptor,
-                                                    const ConstTensor& weights,
-                                                    const Optional<ConstTensor>& biases,
                                                     const char* name = nullptr)
         : TestLayerVisitor(name)
         , m_Descriptor(descriptor)
-        , m_Weights(weights)
-        , m_Biases(biases)
     {}
 
     virtual ~TestDepthwiseConvolution2dLayerVisitor() {}
@@ -99,12 +95,6 @@ public:
                 CheckLayerPointer(layer);
                 CheckLayerName(name);
                 CheckDescriptor(static_cast<const armnn::DepthwiseConvolution2dDescriptor&>(descriptor));
-                CheckConstTensors(m_Weights, constants[0]);
-                if (m_Biases.has_value())
-                {
-                    CHECK(constants.size() == 2);
-                    CheckConstTensors(m_Biases.value(), constants[1]);
-                }
                 break;
             }
             default:
@@ -119,8 +109,6 @@ protected:
 
 private:
     DepthwiseConvolution2dDescriptor m_Descriptor;
-    ConstTensor m_Weights;
-    Optional<ConstTensor> m_Biases;
 };
 
 class TestFullyConnectedLayerVistor : public TestLayerVisitor

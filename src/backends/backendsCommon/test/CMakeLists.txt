@@ -21,6 +21,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DataTypeUtils.hpp
     DefaultAsyncExecuteTest.cpp
     DepthToSpaceEndToEndTestImpl.hpp
+    DepthwiseConvolution2dEndToEndTests.hpp
     DequantizeEndToEndTestImpl.hpp
     DetectionPostProcessEndToEndTestImpl.hpp
     DynamicBackendTests.cpp

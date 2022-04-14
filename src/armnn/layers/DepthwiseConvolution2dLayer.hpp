@@ -16,8 +16,10 @@ class DepthwiseConvolution2dLayer : public LayerWithParameters<DepthwiseConvolut
 {
 public:
     /// A unique pointer to store Weight values.
+    /// @Note Deprecated. Bias are stored in ConstantLayers now.
     std::shared_ptr<ConstTensorHandle> m_Weight;
     /// A unique pointer to store Bias values.
+    /// @Note Deprecated. Bias are stored in ConstantLayers now.
     std::shared_ptr<ConstTensorHandle> m_Bias;
 
     /// Makes a workload for the DepthwiseConvolution2d type.
@@ -60,6 +62,8 @@ protected:
 
     /// Retrieve the handles to the constant values stored by the layer.
     /// @return A vector of the constant tensors stored by this layer.
+    /// @Note Deprecated. GetConstantTensorsByRef is deprecated. m_Weights and m_Bias
+    ///                   should be connected to layer as Constant Layers instead."
     ConstantTensors GetConstantTensorsByRef() override;
 };
 

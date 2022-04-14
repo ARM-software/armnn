@@ -158,7 +158,6 @@ private:
 
     void SerializeDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                               const armnn::DepthwiseConvolution2dDescriptor& descriptor,
-                                              const std::vector<armnn::ConstTensor>& constants,
                                               const char* name = nullptr);
 
     void SerializeDequantizeLayer(const armnn::IConnectableLayer* layer,

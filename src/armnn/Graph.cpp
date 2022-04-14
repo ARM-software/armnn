@@ -603,7 +603,8 @@ void Graph::ConstructErrorMessageForUnconnectedInputs(Layer* const layer,
     bool noWeightsAndBias = false;
 
     if ((layer->GetType() == armnn::LayerType::FullyConnected ||
-         layer->GetType() == armnn::LayerType::Convolution3d) && slotIndex > 0)
+         layer->GetType() == armnn::LayerType::Convolution3d  ||
+         layer->GetType() == armnn::LayerType::DepthwiseConvolution2d) && slotIndex > 0)
     {
         // If weights are not set and is bias enabled, also check if bias is set
         if (slotIndex == 1 && layer->GetNumInputSlots() == 3)

@@ -121,7 +121,10 @@ struct ConstantAddFixture : public ParserFlatbuffersSerializeFixture
                                         },
                                 }],
                             }}},
-                }]
+                }],
+                featureVersions: {
+                    weightsLayoutScheme: 1,
+                }
          }
         )";
         SetupSingleInputSingleOutput("InputLayer1", "OutputLayer");

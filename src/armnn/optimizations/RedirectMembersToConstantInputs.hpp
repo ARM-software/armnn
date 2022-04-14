@@ -31,6 +31,7 @@ public:
             case LayerType::Convolution2d:
                 break;
             case LayerType::DepthwiseConvolution2d:
+                RedirectWeightsAndBiases<DepthwiseConvolution2dLayer>(&layer);
                 break;
             case LayerType::DetectionPostProcess:
                 break;
@@ -80,7 +81,7 @@ private:
     }
 };
 
-using RedirectMembersToConstantInputs = OptimizeForType<FullyConnectedLayer, RedirectMembersToConstantInputsImpl>;
+using RedirectMembersToConstantInputs = OptimizeForType<Layer, RedirectMembersToConstantInputsImpl>;
 
 } // namespace optimizations
 } // namespace armnn

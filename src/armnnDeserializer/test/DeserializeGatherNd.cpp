@@ -115,7 +115,10 @@ struct GatherNdFixture : public ParserFlatbuffersSerializeFixture
                                         },
                                 }],
                             }}},
-                }]
+                }],
+                featureVersions: {
+                    weightsLayoutScheme: 1,
+                }
                  } )";
 
         Setup();

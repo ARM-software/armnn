@@ -90,7 +90,7 @@ struct DWConvolution2dTest
 public:
     using LayerType = DepthwiseConvolution2dLayer;
     static const bool isElementWise = false;
-    static const bool isConstTensorAsInputSupported = false;
+    static const bool isConstTensorAsInputSupported = true;
 
     static TensorShape GetInputShape()   { return TensorShape( {1, 4, 4, 3}); }   // [N,H,W,Cin]
     static TensorShape GetOutputShape()  { return TensorShape( {1, 3, 3, 12}); }  // [N,H,W,Cout]
@@ -104,32 +104,35 @@ public:
                                                float scale = 1.f,
                                                int32_t offset = 0)
     {
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+
         DepthwiseConvolution2dDescriptor descriptor;
         descriptor.m_BiasEnabled = false;
         descriptor.m_DataLayout  = DataLayout::NHWC;
         descriptor.m_StrideX     = 1;
         descriptor.m_StrideY     = 1;
 
-        std::vector<float> weightsData   = { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
-                                            11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-                                            21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-                                            31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42};
-        std::vector<T>     weightsVector = armnnUtils::QuantizedVector<T>(weightsData, scale, offset);
-        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
-        ConstTensor        weights(weightsInfo, weightsVector);
-        Optional<ConstTensor> optionalBias;
-
-        return network->AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBias, name);
+        return network->AddDepthwiseConvolution2dLayer(descriptor, name);
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
                                                              float scale = 1.f,
                                                              int32_t offset = 0)
     {
-        IgnoreUnused(network);
-        IgnoreUnused(scale);
-        IgnoreUnused(offset);
-        return {};
+        std::vector<float> weightsData   = { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
+                                             11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                                             21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+                                             31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42};
+        std::vector<T>     weightsVector = armnnUtils::QuantizedVector<T>(weightsData, scale, offset);
+        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
+        ConstTensor        weights(weightsInfo, weightsVector);
+
+        IConnectableLayer* weightsLayer = network->AddConstantLayer(weights, "Weights");
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+
+        std::vector<IConnectableLayer*> layers = { weightsLayer };
+        return layers;
     }
 };
 
@@ -390,10 +393,10 @@ INetworkPtr CreateNetwork(ActivationDescriptor activationDescriptor, bool preven
                                                                      "activation");
 
     IConnectableLayer* outputLayer  = network->AddOutputLayer(0);
-    IConnectableLayer* output2Layer = preventFusing?network->AddOutputLayer(1):nullptr;
+    IConnectableLayer* output2Layer = preventFusing ? network->AddOutputLayer(1) : nullptr;
 
     // If ConstTensorAsInputs is supported weights and bias are stored as constant layers.
-    if(LayerTest::isConstTensorAsInputSupported)
+    if (LayerTest::isConstTensorAsInputSupported)
     {
         std::vector<IConnectableLayer*> constantLayers = LayerTest::AddConstantLayers(network.get(),
                                                                                       scale,

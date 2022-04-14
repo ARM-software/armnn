@@ -230,11 +230,16 @@ TEST_CASE("CheckDepthwiseConvolution2dLayer")
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
     ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32, 0.0f, 0, true), data);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional());
-
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, EmptyOptional());
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor);
+
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    weightsLayer->ExecuteStrategy(weightsVisitor);
     layer->ExecuteStrategy(visitor);
 }
 
@@ -254,14 +259,16 @@ TEST_CASE("CheckNamedDepthwiseConvolution2dLayer")
     std::vector<unsigned int> dimensions = {1, 1, 3, 3};
     ConstTensor weights(TensorInfo(4, dimensions.data(), DataType::Float32, 0.0f, 0, true), data);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, EmptyOptional(), layerName);
-
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor,
-                                                                        weights,
-                                                                        EmptyOptional(),
-                                                                        layerName);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, layerName);
+
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, layerName);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    weightsLayer->ExecuteStrategy(weightsVisitor);
     layer->ExecuteStrategy(visitor);
 }
 
@@ -284,13 +291,21 @@ TEST_CASE("CheckDepthwiseConvolution2dLayerWithBiases")
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32, 0.0f, 0, true), biasData);
-    Optional<ConstTensor> optionalBiases(biases);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConstantLayerVisitor biasesVisitor(biases);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBiases);
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const biasesLayer = net.AddConstantLayer(biases);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+
+    weightsLayer->ExecuteStrategy(weightsVisitor);
+    biasesLayer->ExecuteStrategy(biasesVisitor);
     layer->ExecuteStrategy(visitor);
 }
 
@@ -314,13 +329,21 @@ TEST_CASE("CheckNamedDepthwiseConvolution2dLayerWithBiases")
     std::vector<float> biasData = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
     std::vector<unsigned int> biasDimensions = {1, 1, 3, 3};
     ConstTensor biases(TensorInfo(4, biasDimensions.data(), DataType::Float32, 0.0f, 0, true), biasData);
-    Optional<ConstTensor> optionalBiases(biases);
 
-    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, weights, optionalBiases, layerName);
+    TestConstantLayerVisitor weightsVisitor(weights);
+    TestConstantLayerVisitor biasesVisitor(biases);
+    TestDepthwiseConvolution2dLayerVisitor visitor(descriptor, layerName);
 
     NetworkImpl net;
 
-    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, weights, optionalBiases, layerName);
+    IConnectableLayer* const weightsLayer = net.AddConstantLayer(weights);
+    IConnectableLayer* const biasesLayer = net.AddConstantLayer(biases);
+    IConnectableLayer* const layer = net.AddDepthwiseConvolution2dLayer(descriptor, layerName);
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+
+    weightsLayer->ExecuteStrategy(weightsVisitor);
+    biasesLayer->ExecuteStrategy(biasesVisitor);
     layer->ExecuteStrategy(visitor);
 }
 

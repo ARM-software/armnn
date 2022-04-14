@@ -329,10 +329,19 @@ public:
 
     /// Adds a 2D depthwise convolution layer to the network.
     /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const char* name = nullptr);
+
+    /// Adds a 2D depthwise convolution layer to the network.
+    /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
     /// @param weights - Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].
     /// @param biases Optional tensor for the bias data. If specified, must match the output tensor shape.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
     IConnectableLayer* AddDepthwiseConvolution2dLayer(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,

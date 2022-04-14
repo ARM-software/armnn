@@ -129,12 +129,22 @@ IConnectableLayer* INetwork::AddDepthToSpaceLayer(const DepthToSpaceDescriptor& 
 
 IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
     const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+    const char* name)
+{
+    return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, name);
+}
+
+
+ARMNN_NO_DEPRECATE_WARN_BEGIN
+IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
+    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
     const ConstTensor& weights,
     const Optional<ConstTensor>& biases,
     const char* name)
 {
     return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
 }
+ARMNN_NO_DEPRECATE_WARN_END
 
 
 IConnectableLayer* INetwork::AddDequantizeLayer(const char* name)
@@ -1727,7 +1737,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 PermuteAsReshape(),
                                                 TransposeAsReshape(),
                                                 OptimizeConsecutiveReshapes(),
-                                                RedirectMembersToConstantInputs(),
                                                 FoldPadIntoConvolution2d(),
                                                 FoldPadIntoDepthwiseConvolution2d(),
                                                 FoldPadIntoPooling2d(),
@@ -1736,7 +1745,8 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FuseBatchNormIntoConvolution2DFloat32(),
                                                 FuseBatchNormIntoConvolution2DFloat16(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat32(),
-                                                FuseBatchNormIntoDepthwiseConvolution2DFloat16()));
+                                                FuseBatchNormIntoDepthwiseConvolution2DFloat16(),
+                                                RedirectMembersToConstantInputs()));
 
     // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
     if (options.m_ReduceFp32ToFp16)
@@ -2066,36 +2076,41 @@ IConnectableLayer* NetworkImpl::AddDepthToSpaceLayer(const DepthToSpaceDescripto
     return m_Graph->AddLayer<DepthToSpaceLayer>(depthToSpaceDescriptor, name);
 }
 
-IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayerImpl(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const Optional<ConstTensor>& biases,
-        const char* name)
+IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
+    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+    const char* name)
 {
-    if (convolution2dDescriptor.m_BiasEnabled && !biases.has_value())
-    {
-        throw InvalidArgumentException("AddDepthwiseConvolution2dLayer: biases cannot be empty");
-    }
-
-    const auto layer = m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
-
-    layer->m_Weight = std::make_shared<ScopedTensorHandle>(weights);
-
-    if (convolution2dDescriptor.m_BiasEnabled)
-    {
-        layer->m_Bias = std::make_shared<ScopedTensorHandle>(biases.value());
-    }
-
-    return layer;
+    return m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const Optional<ConstTensor>& biases,
-        const char* name)
+    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+    const ConstTensor& weights,
+    const Optional<ConstTensor>& biases,
+    const char* name)
 {
-    return AddDepthwiseConvolution2dLayerImpl(convolution2dDescriptor, weights, biases, name);
+    auto layer = m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
+
+    // Add a constant layer for weights
+    ConstantLayer* weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
+    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
+    layer->m_Weight = std::make_shared<ScopedTensorHandle>(weights);
+
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
+
+    // Add a constant layer for biases
+    if (biases.has_value() && convolution2dDescriptor.m_BiasEnabled)
+    {
+        ConstantLayer* biasLayer = m_Graph->AddLayer<ConstantLayer>("Bias");
+        biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(biases.value());
+        layer->m_Bias = std::make_shared<ScopedTensorHandle>(biases.value());
+
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
+        biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
+    }
+
+    return layer;
 }
 
 IConnectableLayer* NetworkImpl::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,

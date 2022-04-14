@@ -1146,23 +1146,30 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
     layerDesc.m_BiasEnabled = false;
     layerDesc.m_DataLayout  = dataLayout;
 
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+
+    TensorShape weightShape({1, 4, 4, 2});
+    TensorShape inputShape = (dataLayout == DataLayout::NCHW) ?
+                             TensorShape{ 2, 2, 5, 5 } : TensorShape{ 2, 5, 5, 2 };
+    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ?
+                              TensorShape{ 2, 2, 5, 5 } : TensorShape{ 2, 5, 5, 2 };
+
     DepthwiseConvolution2dLayer* const layer = graph.AddLayer<DepthwiseConvolution2dLayer>(layerDesc, "layer");
 
-    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo({1, 4, 4, 2}, DataType)); // [ 1, H, W, I*M ]
+    // As optimization isn't run member variables need to be updated.
+    layer->m_Weight = std::make_unique<ScopedTensorHandle>(TensorInfo(weightShape, DataType)); // [ 1, H, W, I*M ]
     layer->m_Weight->Allocate();
 
     // Creates extra layers.
     Layer* const input = graph.AddLayer<InputLayer>(0, "input");
+    Layer* const weights = graph.AddLayer<ConstantLayer>("weights");
     Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
 
-    TensorShape inputShape = (dataLayout == DataLayout::NCHW) ?
-                TensorShape{ 2, 2, 5, 5 } : TensorShape{ 2, 5, 5, 2 };
-    TensorShape outputShape = (dataLayout == DataLayout::NCHW) ?
-                TensorShape{ 2, 2, 5, 5 } : TensorShape{ 2, 5, 5, 2 };
-
     // Connects up.
-    Connect(input, layer, TensorInfo(inputShape, DataType));
-    Connect(layer, output, TensorInfo(outputShape, DataType));
+    Connect(input, layer, TensorInfo(inputShape, DataType, inputsQScale));
+    Connect(weights, layer, TensorInfo(weightShape, DataType, inputsQScale, 0.0f, true), 0, 1);
+    Connect(layer, output, TensorInfo(outputShape, DataType, outputQScale));
     CreateTensorHandles(graph, factory);
 
     // Makes the workload and checks it.
@@ -1178,9 +1185,8 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
     CHECK(queueDescriptor.m_Parameters.m_BiasEnabled == false);
     CHECK((queueDescriptor.m_Parameters.m_DataLayout == dataLayout));
 
-    CHECK(queueDescriptor.m_Inputs.size() == 1);
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
-    CHECK((queueDescriptor.m_Weight->GetTensorInfo() == TensorInfo({1, 4, 4, 2}, DataType)));
 
     // Returns so we can do extra, backend-specific tests.
     return workload;

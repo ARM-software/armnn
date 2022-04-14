@@ -373,14 +373,14 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
 
                                 if (baseLayer->GetParameters().m_BiasEnabled)
                                 {
-                                    biases = baseLayer->m_Bias->GetTensorInfo();
+                                    biases = baseLayer->GetInputSlot(2).GetConnectedOutputSlot()->GetTensorInfo();
                                 }
 
                                 arm_compute::Status status = ClDepthwiseConvolutionWorkloadValidate(
                                         baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
                                         activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
                                         baseLayer->GetParameters(),
-                                        baseLayer->m_Weight->GetTensorInfo(),
+                                        baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
                                         biases,
                                         &activationDesc);
 

@@ -128,20 +128,16 @@ TEST_CASE("OptimizedViewsSubgraphLayerCountUsingGetINetwork")
     IConnectableLayer* const inputLayer = view.GetINetwork()->AddInputLayer(0, "input");
 
     DepthwiseConvolution2dDescriptor convDescriptor;
-    PreCompiledDescriptor substitutionLayerDescriptor(1, 1);
+    PreCompiledDescriptor substitutionLayerDescriptor(2, 1);
     CompiledBlobPtr blobPtr;
     BackendId backend = Compute::CpuRef;
 
     Layer* convLayer1 = PolymorphicDowncast<Layer*>(
         view.GetINetwork()->AddDepthwiseConvolution2dLayer(convDescriptor,
-                                                           ConstTensor(),
-                                                           Optional<ConstTensor>(),
                                                            "conv1"));
 
     Layer* convLayer2 = PolymorphicDowncast<Layer*>(
         view.GetINetwork()->AddDepthwiseConvolution2dLayer(convDescriptor,
-                                                           ConstTensor(),
-                                                           Optional<ConstTensor>(),
                                                            "conv2"));
 
     IConnectableLayer* const outputLayer = view.GetINetwork()->AddOutputLayer(0, "output");

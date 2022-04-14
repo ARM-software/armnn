@@ -126,14 +126,18 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConvolution2dLayer")
 
     auto* depthwiseConv2dLayer = graph.AddLayer<DepthwiseConvolution2dLayer>(depthwiseConvolution2dDescriptor,
                                                                              "depthwiseConv2d");
-    depthwiseConv2dLayer->m_Weight = std::make_unique<ScopedTensorHandle>(weights);
+    auto* weightsLayer = graph.AddLayer<ConstantLayer>("weights");
+
+    weightsLayer->GetOutputSlot().SetTensorInfo(weights.GetInfo());
     depthwiseConv2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
+    depthwiseConv2dLayer->m_Weight = std::make_shared<ScopedTensorHandle>(weights);
 
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");
 
     // Connect up layers - input -> pad -> depthwiseConv2d -> output
     input->GetOutputSlot().Connect(padLayer->GetInputSlot(0));
     padLayer->GetOutputSlot().Connect(depthwiseConv2dLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot().Connect(depthwiseConv2dLayer->GetInputSlot(1));
     depthwiseConv2dLayer->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     auto checkSimpleDepthwiseConv2d = [](const Layer* const layer)->bool {
@@ -151,6 +155,7 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConvolution2dLayer")
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<PadLayer>,
                              checkSimpleDepthwiseConv2d,
+                             &IsLayerOfType<ConstantLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     armnn::Optimizer::Pass(graph, MakeOptimizations(FoldPadIntoDepthwiseConvolution2d()));
@@ -170,6 +175,7 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConvolution2dLayer")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              checkPadFoldedIntoDepthwiseConv2d,
+                             &IsLayerOfType<ConstantLayer>,
                              &IsLayerOfType<OutputLayer>));
 }
 
@@ -741,11 +747,8 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOp
         std::vector<float>    biasVector   = {5, 6, 7, 8, 9, 10, 11, 12, 5, 6, 7, 8};
         TensorInfo            biasInfo({12}, DataType::Float32, 0.0f, 0, true);
         ConstTensor           bias(biasInfo, biasVector);
-        Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
 
         IConnectableLayer* conv2dLayer = network->AddDepthwiseConvolution2dLayer(convDescriptor,
-                                                                                 weights,
-                                                                                 optionalBias,
                                                                                  "DepthwiseConv2D");
 
         TensorInfo outputInfo(4, outputShape, DataType::Float32);
@@ -757,6 +760,14 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOp
         inputLayer->GetOutputSlot(0).Connect(padLayer->GetInputSlot(0));
         padLayer->GetOutputSlot(0).Connect(conv2dLayer->GetInputSlot(0));
         conv2dLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+        auto weightsLayer = network->AddConstantLayer(weights, "Weights");
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+        weightsLayer->GetOutputSlot(0).Connect(conv2dLayer->GetInputSlot(1));
+
+        auto biasLayer = network->AddConstantLayer(bias, "Bias");
+        biasLayer->GetOutputSlot(0).SetTensorInfo(bias.GetInfo());
+        biasLayer->GetOutputSlot(0).Connect(conv2dLayer->GetInputSlot(2));
 
         // Create ArmNN runtime
         IRuntimePtr          run              = IRuntime::Create(IRuntime::CreationOptions());    // default options

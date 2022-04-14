@@ -78,6 +78,10 @@ public:
 
     void VisitDepthwiseConvolution2dLayer(const IConnectableLayer*,
                                           const DepthwiseConvolution2dDescriptor&,
+                                          const char*) override { DefaultPolicy::Apply(__func__); }
+
+    void VisitDepthwiseConvolution2dLayer(const IConnectableLayer*,
+                                          const DepthwiseConvolution2dDescriptor&,
                                           const ConstTensor&,
                                           const Optional<ConstTensor>&,
                                           const char*) override { DefaultPolicy::Apply(__func__); }

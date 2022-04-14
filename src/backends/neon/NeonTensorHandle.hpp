@@ -241,6 +241,7 @@ private:
                 break;
             case arm_compute::DataType::QSYMM8:
             case arm_compute::DataType::QASYMM8_SIGNED:
+            case arm_compute::DataType::QSYMM8_PER_CHANNEL:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int8_t*>(memory),
                                                                  this->GetTensor());
                 break;

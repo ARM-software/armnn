@@ -272,6 +272,8 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
         timelineUtils->MarkEntityWithLabel(networkGuid, ss.str(), LabelsAndEventClasses::PROCESS_ID_GUID);
     }
 
+    std::vector<IWorkload*> ConstWorkloads;
+
     //Then create workloads.
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_CreateWorkloads");
@@ -325,6 +327,11 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     else
                     {
                         m_WorkloadQueue.push_back(std::move(workload));
+
+                        if (layer->GetType() == LayerType::Constant)
+                        {
+                            ConstWorkloads.push_back(m_WorkloadQueue.back().get());
+                        }
                     }
 
                     // release the constant data in the layer..
@@ -506,6 +513,17 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
             AllocateAndExecuteConstantWorkloadsAsync();
         }
     }
+
+    // If synchronous, execute all constant layer workloads as the FoldPad optimization
+    // may have created a new conv2d layer prior to the input constant layers which will
+    // cause a failure if constant workloads are not executed
+    if (!networkProperties.m_AsyncEnabled)
+    {
+        for (auto workload: ConstWorkloads)
+        {
+            workload->Execute();
+        }
+    }
 }
 
 void LoadedNetwork::AllocateAndExecuteConstantWorkloads()
@@ -518,8 +536,6 @@ void LoadedNetwork::AllocateAndExecuteConstantWorkloads()
         pair.second->Execute();
     }
 }
-
-
 
 void LoadedNetwork::AllocateAndExecuteConstantWorkloadsAsync()
 {

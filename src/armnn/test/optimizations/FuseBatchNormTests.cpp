@@ -24,6 +24,7 @@ class Conv2dTest
 public:
     using ConvDescriptorType            = armnn::Convolution2dDescriptor;
     using ConvLayerType                 = armnn::Convolution2dLayer;
+    static const bool isConstTensorAsInputSupported = false;
 
     static IConnectableLayer *AddConvolution(INetwork *network,
                                              const Convolution2dDescriptor &descriptor,
@@ -33,6 +34,19 @@ public:
     {
         return network->AddConvolution2dLayer(descriptor, weights, biases, name);
     }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork *network,
+                                                             const Convolution2dDescriptor &descriptor,
+                                                             const ConstTensor &weights,
+                                                             const Optional<ConstTensor> &biases)
+    {
+        IgnoreUnused(network);
+        IgnoreUnused(descriptor);
+        IgnoreUnused(weights);
+        IgnoreUnused(biases);
+
+        return {};
+    }
 };
 
 class DepthwiseConv2dTest
@@ -40,6 +54,7 @@ class DepthwiseConv2dTest
 public:
     using ConvDescriptorType            = armnn::DepthwiseConvolution2dDescriptor;
     using ConvLayerType                 = armnn::DepthwiseConvolution2dLayer;
+    static const bool isConstTensorAsInputSupported = true;
 
     static IConnectableLayer *AddConvolution(INetwork *network,
                                              const DepthwiseConvolution2dDescriptor &descriptor,
@@ -47,7 +62,29 @@ public:
                                              const Optional<ConstTensor> &biases,
                                              const char *name)
     {
-        return network->AddDepthwiseConvolution2dLayer(descriptor, weights, biases, name);
+        IgnoreUnused(weights);
+        IgnoreUnused(biases);
+
+        return network->AddDepthwiseConvolution2dLayer(descriptor, name);
+    }
+
+    static std::vector<IConnectableLayer*> AddConstantLayers(INetwork *network,
+                                                             const DepthwiseConvolution2dDescriptor &descriptor,
+                                                             const ConstTensor &weights,
+                                                             const Optional<ConstTensor> &biases)
+    {
+        auto weightsLayer = network->AddConstantLayer(weights, "Weights");
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+        std::vector<IConnectableLayer*> layers = {weightsLayer};
+
+        if (descriptor.m_BiasEnabled)
+        {
+            auto biasLayer = network->AddConstantLayer(biases.value(), "Bias");
+            biasLayer->GetOutputSlot(0).SetTensorInfo(biases.value().GetInfo());
+            layers.emplace_back(biasLayer);
+        }
+
+        return layers;
     }
 };
 
@@ -73,7 +110,7 @@ template <typename Conv2dTest,
           armnn::DataType ArmnnType,
           typename ConvDescriptorType = typename Conv2dTest::ConvDescriptorType,
           typename T = armnn::ResolveType<ArmnnType>>
-INetworkPtr CreatNetwork(bool depthwise, bool preventFusing)
+INetworkPtr CreateNetwork(bool depthwise, bool preventFusing)
 {
     // Define layers information
     ConvDescriptorType convolution2dDescriptor;
@@ -110,11 +147,6 @@ INetworkPtr CreatNetwork(bool depthwise, bool preventFusing)
     TensorInfo weightsInfo(4, weightsDimensionSizes, ArmnnType, 0.0f, 0, true);
     ConstTensor weights(weightsInfo, weightsVector);
 
-    std::vector<T> biasVector = GetVector<T>(outputDimensionSizes[3], 3.3f, 0.1f);
-    TensorInfo biasInfo(1, outputChannelSize, ArmnnType, 0.0f, 0, true);
-    ConstTensor bias(biasInfo, biasVector);
-    Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
-
     std::vector<T> betaVector     = GetVector<T>(outputDimensionSizes[3], 0.0f, 0.2f);
     std::vector<T> gammaVector    = GetVector<T>(outputDimensionSizes[3], 0.5f, 0.1f);
     std::vector<T> meanVector     = GetVector<T>(outputDimensionSizes[3], 0.1f, 0.1f);
@@ -133,7 +165,7 @@ INetworkPtr CreatNetwork(bool depthwise, bool preventFusing)
     IConnectableLayer* convLayer      = Conv2dTest::AddConvolution(network.get(),
                                                                    convolution2dDescriptor,
                                                                    weights,
-                                                                   optionalBias,
+                                                                   Optional<ConstTensor>(),
                                                                    "convolution");
 
     IConnectableLayer* batchNormLayer = network->AddBatchNormalizationLayer(batchNormDescriptor,
@@ -149,6 +181,21 @@ INetworkPtr CreatNetwork(bool depthwise, bool preventFusing)
     if (preventFusing)
     {
         output2Layer                  = network->AddOutputLayer(1);
+    }
+
+    // If ConstTensorAsInputs is supported weights and bias are stored as constant layers.
+    if (Conv2dTest::isConstTensorAsInputSupported)
+    {
+        std::vector<IConnectableLayer*> constantLayers = Conv2dTest::AddConstantLayers(network.get(),
+                                                                                       convolution2dDescriptor,
+                                                                                       weights,
+                                                                                       Optional<ConstTensor>());
+
+        // Connect constant layers to receiverLayer.
+        for (unsigned int i = 0; i < constantLayers.size(); ++i)
+        {
+            constantLayers[i]->GetOutputSlot(0).Connect(convLayer->GetInputSlot(i + 1));
+        }
     }
 
     // Set layer information
@@ -178,7 +225,7 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
 {
     // FIRST NETWORK: Fused
     // Construct ArmNN network
-    INetworkPtr networkFused = CreatNetwork<Conv2dTest, ArmnnType>(depthwise, false);
+    INetworkPtr networkFused = CreateNetwork<Conv2dTest, ArmnnType>(depthwise, false);
 
     // Create ArmNN runtime
     IRuntimePtr run = IRuntime::Create(IRuntime::CreationOptions()); // default options
@@ -194,12 +241,26 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
                (layer->GetNameStr() == "fused-batchNorm-into-convolution");
     };
 
-    CHECK(3 == graphFused.GetNumLayers());
-    CHECK(CheckSequence(graphFused.cbegin(),
-                             graphFused.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             checkFusedConv2d,
-                             &IsLayerOfType<OutputLayer>));
+    if (Conv2dTest::isConstTensorAsInputSupported)
+    {
+        CHECK(5 == graphFused.GetNumLayers());
+        CHECK(CheckSequence(graphFused.cbegin(),
+                            graphFused.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            &IsLayerOfType<ConstantLayer>,
+                            &IsLayerOfType<ConstantLayer>,
+                            checkFusedConv2d,
+                            &IsLayerOfType<OutputLayer>));
+    }
+    else
+    {
+        CHECK(3 == graphFused.GetNumLayers());
+        CHECK(CheckSequence(graphFused.cbegin(),
+                            graphFused.cend(),
+                            &IsLayerOfType<InputLayer>,
+                            checkFusedConv2d,
+                            &IsLayerOfType<OutputLayer>));
+    }
 
     // Load network into runtime
     NetworkId networkIdentifier;
@@ -227,7 +288,7 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
 
     // SECOND NETWORK: NotFused
     // Construct ArmNN network
-    INetworkPtr networkNotFused = CreatNetwork<Conv2dTest, ArmnnType>(depthwise, true);
+    INetworkPtr networkNotFused = CreateNetwork<Conv2dTest, ArmnnType>(depthwise, true);
 
     // Create ArmNN runtime
     IRuntimePtr runNotFused = IRuntime::Create(IRuntime::CreationOptions()); // default options
@@ -237,14 +298,29 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
 
     Graph& graphNotFused = GetGraphForTesting(optNetNotFused.get());
 
-    CHECK(5 == graphNotFused.GetNumLayers());
-    CHECK(CheckSequence(graphNotFused.cbegin(),
-                             graphNotFused.cend(),
-                             &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<ConvLayerType>,
-                             &IsLayerOfType<armnn::BatchNormalizationLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>));
+    if (Conv2dTest::isConstTensorAsInputSupported)
+    {
+        CHECK(6 == graphNotFused.GetNumLayers());
+        CHECK(CheckSequence(graphNotFused.cbegin(),
+                            graphNotFused.cend(),
+                            &IsLayerOfType<armnn::InputLayer>,
+                            &IsLayerOfType<armnn::ConstantLayer>,
+                            &IsLayerOfType<ConvLayerType>,
+                            &IsLayerOfType<armnn::BatchNormalizationLayer>,
+                            &IsLayerOfType<armnn::OutputLayer>,
+                            &IsLayerOfType<armnn::OutputLayer>));
+    }
+    else
+    {
+        CHECK(5 == graphNotFused.GetNumLayers());
+        CHECK(CheckSequence(graphNotFused.cbegin(),
+                            graphNotFused.cend(),
+                            &IsLayerOfType<armnn::InputLayer>,
+                            &IsLayerOfType<ConvLayerType>,
+                            &IsLayerOfType<armnn::BatchNormalizationLayer>,
+                            &IsLayerOfType<armnn::OutputLayer>,
+                            &IsLayerOfType<armnn::OutputLayer>));
+    }
 
     // Load network into runtime
     NetworkId networkIdentifierNotFused;

@@ -1042,11 +1042,16 @@ void OnnxParserImpl::AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, 
     desc.m_StrideY      = convDesc.m_StrideY;
     desc.m_BiasEnabled  = convDesc.m_BiasEnabled;
 
-    armnn::IConnectableLayer* layer;
+    armnn::IConnectableLayer* layer = m_Network->AddDepthwiseConvolution2dLayer(desc, node.name().c_str());
+    std::vector<std::string> tensorIndexes= {node.input(0), node.input(1)};
 
     // weights come in as [O,1,H,W] from ONNX and need to be converted to ArmNNs dephtwise weights layout [1,H,W,O]
     armnn::PermutationVector perVec {3,0,1,2};
     auto weightTensor = CreateConstTensor(node.input(1), perVec);
+
+    IConnectableLayer* weightsLayer = m_Network->AddConstantLayer(weightTensor.first);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightTensor.first.GetInfo());
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
 
     if (node.input_size() == 3)
     {
@@ -1057,20 +1062,16 @@ void OnnxParserImpl::AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, 
                                              node.name(),
                                              CHECK_LOCATION().AsString()));
         }
+
         desc.m_BiasEnabled = true;
         auto biasTensor = CreateConstTensor(node.input(2));
-        layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
-                                                          weightTensor.first,
-                                                          Optional<ConstTensor>(biasTensor.first),
-                                                          node.name().c_str());
+        tensorIndexes.emplace_back(node.input(2));
+
+        IConnectableLayer* biasLayer = m_Network->AddConstantLayer(biasTensor.first);
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensor.first.GetInfo());
+        biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
     }
-    else
-    {
-        layer = m_Network->AddDepthwiseConvolution2dLayer(desc,
-                                                          weightTensor.first,
-                                                          EmptyOptional(),
-                                                          node.name().c_str());
-    }
+
     ARMNN_ASSERT(layer != nullptr);
 
     auto outputInfo = ComputeOutputInfo({ node.output(0) }, layer,
@@ -1081,7 +1082,7 @@ void OnnxParserImpl::AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, 
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
-    RegisterInputSlots(layer, {node.input(0)});
+    RegisterInputSlots(layer, tensorIndexes);
 
     // register the output connection slots for the layer, connections are made after all layers have been created
     RegisterOutputSlots(layer, {node.output(0)});

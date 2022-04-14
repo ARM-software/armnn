@@ -96,6 +96,11 @@ public:
 
     IConnectableLayer* AddDepthwiseConvolution2dLayer(
         const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const char* name = nullptr);
+
+    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
         const ConstTensor& weights,
         const Optional<ConstTensor>& biases,
         const char* name = nullptr);
@@ -255,11 +260,6 @@ private:
                                                  const ConstTensor& weights,
                                                  const Optional<ConstTensor>& biases,
                                                  const char* name);
-
-    IConnectableLayer* AddDepthwiseConvolution2dLayerImpl(const DepthwiseConvolution2dDescriptor& conv2dDescriptor,
-                                                          const ConstTensor& weights,
-                                                          const Optional<ConstTensor>& biases,
-                                                          const char* name);
 
     bool GetShapeInferenceMethod();
     NetworkOptions m_NetworkOptions;

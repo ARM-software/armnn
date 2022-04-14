@@ -19,16 +19,41 @@ RefDepthwiseConvolution2dWorkload::RefDepthwiseConvolution2dWorkload(
         const DepthwiseConvolution2dQueueDescriptor& descriptor, const WorkloadInfo& info)
         : RefBaseWorkload<DepthwiseConvolution2dQueueDescriptor>(descriptor, info)
 {
-    m_Weight = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Weight));
-    const TensorInfo& rFilterInfo = m_Weight->GetTensorInfo();
-    m_FilterShape = rFilterInfo.GetShape();
-    m_FilterDecoder = MakeDecoder<float>(rFilterInfo, m_Weight->Map(true));
+    WorkloadInfo detailsInfo;
+    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
+    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[1]);
 
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
-        m_Bias = std::make_unique<ScopedTensorHandle>(*(descriptor.m_Bias));
-        const TensorInfo& biasInfo = m_Bias->GetTensorInfo();
-        m_BiasDecoder = MakeDecoder<float>(biasInfo, m_Bias->Map(true));
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[2]);
+    }
+
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("RefDepthwiseConvolution2dWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
+}
+
+void RefDepthwiseConvolution2dWorkload::PostAllocationConfigure()
+{
+    PostAllocationConfigure(m_Data.m_Inputs, m_Data.m_Outputs);
+}
+
+void RefDepthwiseConvolution2dWorkload::PostAllocationConfigure(std::vector<ITensorHandle*> inputs,
+                                                                std::vector<ITensorHandle*> outputs)
+{
+    IgnoreUnused(outputs);
+
+    const TensorInfo& rFilterInfo = GetTensorInfo(inputs[1]);
+    m_FilterShape = rFilterInfo.GetShape();
+    m_FilterDecoder = MakeDecoder<float>(rFilterInfo);
+
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        const TensorInfo& biasInfo = GetTensorInfo(inputs[2]);
+        m_BiasDecoder = MakeDecoder<float>(biasInfo);
     }
 }
 
@@ -39,6 +64,8 @@ void RefDepthwiseConvolution2dWorkload::Execute() const
 
 void RefDepthwiseConvolution2dWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
 {
+    PostAllocationConfigure(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+
     Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
 }
 
@@ -53,6 +80,12 @@ void RefDepthwiseConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inpu
 
     const TensorShape& inputShape = GetTensorInfo(inputs[0]).GetShape();
     const TensorShape& outputShape = GetTensorInfo(outputs[0]).GetShape();
+
+    m_FilterDecoder->Reset(inputs[1]->Map());
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        m_BiasDecoder->Reset(inputs[2]->Map());
+    }
 
     Convolve(inputShape, *inputDecoder, outputShape, *OutputEncoder,
              m_FilterShape, *m_FilterDecoder, m_Data.m_Parameters.m_BiasEnabled, m_BiasDecoder.get(),

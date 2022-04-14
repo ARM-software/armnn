@@ -441,12 +441,9 @@ void SerializerStrategy::SerializeDepthToSpaceLayer(const armnn::IConnectableLay
 
 void SerializerStrategy::SerializeDepthwiseConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                                               const armnn::DepthwiseConvolution2dDescriptor& descriptor,
-                                                              const std::vector<armnn::ConstTensor>& constants,
                                                               const char* name)
 {
     IgnoreUnused(name);
-
-    const armnn::ConstTensor& weights = constants[0];
 
     auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_DepthwiseConvolution2d);
     auto fbDescriptor = CreateDepthwiseConvolution2dDescriptor(m_flatBufferBuilder,
@@ -461,20 +458,9 @@ void SerializerStrategy::SerializeDepthwiseConvolution2dLayer(const armnn::IConn
                                                                descriptor.m_BiasEnabled,
                                                                GetFlatBufferDataLayout(descriptor.m_DataLayout));
 
-    flatbuffers::Offset<serializer::ConstTensor> fbWeightsConstTensorInfo = CreateConstTensorInfo(weights);
-    flatbuffers::Offset<serializer::ConstTensor> fbBiasesConstTensorInfo;
-
-    if (constants.size() > 1)
-    {
-        const armnn::ConstTensor& biases = constants[1];
-        fbBiasesConstTensorInfo = CreateConstTensorInfo(biases);
-    }
-
     auto flatBufferLayer = CreateDepthwiseConvolution2dLayer(m_flatBufferBuilder,
                                                              fbBaseLayer,
-                                                             fbDescriptor,
-                                                             fbWeightsConstTensorInfo,
-                                                             fbBiasesConstTensorInfo);
+                                                             fbDescriptor);
 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_DepthwiseConvolution2dLayer);
 }
@@ -2090,7 +2076,6 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
                     static_cast<const armnn::DepthwiseConvolution2dDescriptor&>(descriptor);
             SerializeDepthwiseConvolution2dLayer(layer,
                                                  layerDescriptor,
-                                                 constants,
                                                  name);
             break;
         }

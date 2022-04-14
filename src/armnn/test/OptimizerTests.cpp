@@ -478,11 +478,10 @@ void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputSh
 {
     armnn::TensorInfo inputInfo(4, inputShape, DataType::Float32);
     armnn::TensorInfo outputInfo(4, outputShape, DataType::Float32);
+    armnn::TensorInfo weightsInfo(TensorShape(4, weightsShape), armnn::DataType::Float32, 0.0f, 0, true);
 
     std::vector<float> weightsVector(18);
-    armnn::ConstTensor weights(
-            armnn::TensorInfo(4, weightsShape, armnn::DataType::Float32, 0.0f, 0, true),
-            weightsVector);
+    armnn::ConstTensor weights(weightsInfo, weightsVector);
 
     DepthwiseConvolution2dDescriptor desc;
     desc.m_BiasEnabled = false;
@@ -490,15 +489,19 @@ void CreateDepthwiseConvolution2dGraph(Graph &graph, const unsigned int* inputSh
     desc.m_StrideY     = 1;
     desc.m_DataLayout  = dataLayout;
 
-    Layer* input = graph.AddLayer<InputLayer>(0, "input");
-    input->GetOutputSlot().SetTensorInfo(inputInfo);
-
+    InputLayer* input                  = graph.AddLayer<InputLayer>(0, "input");
     DepthwiseConvolution2dLayer* layer = graph.AddLayer<DepthwiseConvolution2dLayer>(desc, "depthwiseConv2d");
-    layer->m_Weight                    = std::make_unique<armnn::ScopedTensorHandle>(weights);
-    layer->GetOutputSlot().SetTensorInfo(outputInfo);
+    ConstantLayer* weightsLayer        = graph.AddLayer<ConstantLayer>("weights");
+    OutputLayer* output                = graph.AddLayer<OutputLayer>(0, "output");
 
-    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+    layer->GetOutputSlot().SetTensorInfo(outputInfo);
+    weightsLayer->GetOutputSlot().SetTensorInfo(weightsInfo);
+
+    weightsLayer->m_LayerOutput = std::make_unique<armnn::ScopedTensorHandle>(weights);
+
     input->GetOutputSlot().Connect(layer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot().Connect(layer->GetInputSlot(1));
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
 }
 

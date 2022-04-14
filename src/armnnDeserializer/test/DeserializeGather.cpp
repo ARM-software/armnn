@@ -119,7 +119,10 @@ struct GatherFixture : public ParserFlatbuffersSerializeFixture
                                         },
                                 }],
                             }}},
-                }]
+                }],
+                featureVersions: {
+                    weightsLayoutScheme: 1,
+                }
                  } )";
 
         Setup();

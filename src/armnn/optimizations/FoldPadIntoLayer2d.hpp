@@ -191,21 +191,26 @@ class FoldPadIntoDepthwiseConvolution2dImpl
 public:
     void Run(Graph& graph, InputSlot& connection) const
     {
-        const auto newConv2dLayer = FoldPadIntoLayer2dImpl<DepthwiseConvolution2dLayer>(graph, connection);
+        const auto newLayer2d = FoldPadIntoLayer2dImpl<DepthwiseConvolution2dLayer>(graph, connection);
 
-        if (newConv2dLayer != nullptr)
+        if (newLayer2d != nullptr)
         {
-            const auto conv2dLayer = PolymorphicDowncast<DepthwiseConvolution2dLayer*>(&connection.GetOwningLayer());
-            // Copy weights and bias to the new convolution layer
-            ARMNN_ASSERT_MSG(conv2dLayer->m_Weight != nullptr,
-                             "FoldPadIntoDepthwiseConvolution2d: Weights data should not be null.");
-            newConv2dLayer->m_Weight = std::move(conv2dLayer->m_Weight);
+            const auto layer2d = PolymorphicDowncast<DepthwiseConvolution2dLayer*>(&connection.GetOwningLayer());
 
-            if (conv2dLayer->GetParameters().m_BiasEnabled)
+            // Move weights and bias layer connections to the new convolution layer
+            ARMNN_ASSERT_MSG(layer2d->GetInputSlot(1).GetConnection() != nullptr,
+                             "FoldPadIntoDepthwiseConvolution2d: Weights data should not be null.");
+            Layer& weightLayer = layer2d->GetInputSlot(1).GetConnectedOutputSlot()->GetOwningLayer();
+            weightLayer.GetOutputSlot(0).Disconnect(layer2d->GetInputSlot(1));
+            weightLayer.GetOutputSlot(0).Connect(newLayer2d->GetInputSlot(1));
+
+            if (layer2d->GetParameters().m_BiasEnabled)
             {
-                ARMNN_ASSERT_MSG(conv2dLayer->m_Bias != nullptr,
+                ARMNN_ASSERT_MSG(layer2d->GetInputSlot(2).GetConnection() != nullptr,
                                 "FoldPadIntoDepthwiseConvolution2d: Bias data should not be null if bias is enabled.");
-                newConv2dLayer->m_Bias = std::move(conv2dLayer->m_Bias);
+                Layer& biasLayer = layer2d->GetInputSlot(2).GetConnectedOutputSlot()->GetOwningLayer();
+                biasLayer.GetOutputSlot(0).Disconnect(layer2d->GetInputSlot(2));
+                biasLayer.GetOutputSlot(0).Connect(newLayer2d->GetInputSlot(2));
             }
         }
     }

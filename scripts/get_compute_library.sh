@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="0a486cf66c70b4bd9b0ea8ba9dc5b42f52ed16c3" #Enable dynamic cl tuning for dynamically fused kernels
+DEFAULT_CLFRAMEWORKREVISION="5e549fa8ff058eb06cb74de43b9f89a08d0b4a9c" #Add CLPool3d Int8 Support
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

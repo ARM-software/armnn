@@ -67,14 +67,15 @@ fi
 
 # Check Compute Library changes from repo
 cd ${dComputeLib}
-if [ $(git rev-parse HEAD) = $(git ls-remote $(git rev-parse --abbrev-ref @{u} | 
-sed 's/\// /g') | cut -f1) ]
+# shellcheck disable=SC1083
+if [ "$(git rev-parse HEAD)" = "$(git ls-remote "$(git rev-parse --abbrev-ref @{u} |
+sed 's/\// /g')" | cut -f1)" ]
 then
     echo "Compute Lib Up-to-date"
 else 
     echo "New changes are availble for Compute Library repo."
     echo "Do you wanna update (y/n)?"
-    read answer
+    read -r answer
     if [ "$answer" != "${answer#[Yy]}" ] ;then
         updateComputeLib
     fi
@@ -82,8 +83,9 @@ fi
 
 # Check Tensorflow changes from repo
 cd ${dTensorflow}
-if [ $(git rev-parse HEAD) = $(git ls-remote $(git rev-parse --abbrev-ref @{u} | 
-sed 's/\// /g') | cut -f1) ]
+# shellcheck disable=SC1083
+if [ "$(git rev-parse HEAD)" = "$(git ls-remote "$(git rev-parse --abbrev-ref @{u} |
+sed 's/\// /g')" | cut -f1)" ]
 then
     echo "Tensrflow Lib Up-to-date"
 else 
@@ -99,15 +101,16 @@ fi
 
 # Check FlatBuffer changes from repo
 cd ${dFlatBuffer}
-if [ $(git rev-parse HEAD) = $(git ls-remote $(git rev-parse --abbrev-ref @{u} | 
-sed 's/\// /g') | cut -f1) ]
+# shellcheck disable=SC1083
+if [ "$(git rev-parse HEAD)" = "$(git ls-remote "$(git rev-parse --abbrev-ref @{u} |
+sed 's/\// /g')" | cut -f1)" ]
 then
     echo "FlatBuffer Up-to-date"
 else 
     echo "FlatBuffer Not Up-to-date"
     echo "New changes are availble for Compute Library repo."
     echo "Do you wanna update (y/n)?"
-    read answer
+    read -r answer
     if [ "$answer" != "${answer#[Yy]}" ] ;then
         updateFlatBuffer
     fi

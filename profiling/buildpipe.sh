@@ -16,10 +16,9 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
     SOURCE="$DIR/$TARGET" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
   fi
 done
-RDIR="$( dirname "$SOURCE" )"
 DIR="$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )"
 
-CMD=$( basename $0 )
+CMD=$( basename "$0" )
 
 usage() {
   echo "Usage: $CMD [options]"
@@ -49,28 +48,32 @@ shift $((OPTIND - 1))
 
 if [ $CLEAN == 1 ]; then
     echo "removing ${DIR}/build"
-    rm -rf ${DIR}/build
+    rm -rf "${DIR}"/build
 fi
 
 BUILD_DIR="build"
-[ -d build ] || mkdir build
+[ -d build ] || ( mkdir build || exit )
 echo $WINDOWS
 if [ "$WINDOWS" -eq "1" ]; then
     echo "doing windows"
-    cd $BUILD_DIR
+    cd $BUILD_DIR || exit
     [ -d windows ] || mkdir windows
     BUILD_DIR=$BUILD_DIR/windows
-    cd $DIR
+    cd "$DIR" || exit
 fi
 # lower case TYPE in a posix compliant manner
 LC_TYPE=$(echo "$TYPE" | tr '[:upper:]' '[:lower:]')
-if [ ${LC_TYPE} == "debug" ]; then
-    DEBUGDIR=($DIR/$BUILD_DIR/debug)
-    [ -d $DEBUGDIR ] || (cd ${BUILD_DIR} && mkdir debug && cd ..)
+if [ "${LC_TYPE}" == "debug" ]; then
+    DEBUGDIR=("$DIR/$BUILD_DIR/debug")
+    # shellcheck disable=SC2128
+    [ -d "$DEBUGDIR" ] || (cd ${BUILD_DIR} && ( mkdir debug || exit ) && cd ..)
+    # shellcheck disable=SC2128
     BUILD_DIR=$DEBUGDIR
 else
-    RELEASEDIR=($DIR/$BUILD_DIR/release)
-    [ -d $RELEASEDIR ] || (cd ${BUILD_DIR} && mkdir release && cd ..)
+    RELEASEDIR=("$DIR/$BUILD_DIR/release")
+    # shellcheck disable=SC2128
+    [ -d "$RELEASEDIR" ] || (cd "${BUILD_DIR}" && ( mkdir release || exit ) && cd ..)
+    # shellcheck disable=SC2128
     BUILD_DIR=$RELEASEDIR
 fi
 
@@ -84,8 +87,8 @@ if [ "$WINDOWS" -eq "1" ]; then
     CMARGS="$CMARGS \
            -DCMAKE_TOOLCHAIN_FILE=${DIR}/toolchain-x86-ubuntu-mingw64.cmake"
 fi
-MAKE=make
+MAKE="make"
 
-cd ${BUILD_DIR}
+cd "${BUILD_DIR}" || exit
 pwd
-( eval $CMAKE $CMARGS $DIR && eval ${MAKE} $MAKEFLAGS )
+( eval $CMAKE "$CMARGS" "$DIR" && eval ${MAKE} "$MAKEFLAGS" )

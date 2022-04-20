@@ -24,7 +24,7 @@ then
   exit 1
 fi
 
-mkdir -p ${OUTPUT_DIR}
+mkdir -p "${OUTPUT_DIR}"
 ERR=$?
 if [ $ERR -ne 0 ]
 then
@@ -54,11 +54,11 @@ fi
 
 OLD_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 #hardware_types.proto and autotuning.proto not required
-find tensorflow -type f -name '*.proto' | grep -v autotuning | grep -v hardware_types | while read i; do
-  LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH:${PROTOBUF_INSTALL_DIR}/lib $PROTOBUF_INSTALL_DIR/bin/protoc $i \
+find tensorflow -type f -name '*.proto' | grep -v autotuning | grep -v hardware_types | while read -r i; do
+  LD_LIBRARY_PATH=$OLD_LD_LIBRARY_PATH:${PROTOBUF_INSTALL_DIR}/lib $PROTOBUF_INSTALL_DIR/bin/protoc "$i" \
     --proto_path=. \
     --proto_path=${PROTOBUF_INSTALL_DIR}/include \
-    --cpp_out $OUTPUT_DIR
+    --cpp_out "$OUTPUT_DIR"
   EXIT_CODE=$?
   if [ $EXIT_CODE -ne 0 ]; then
     echo "Failed to make proto files"

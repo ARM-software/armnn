@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-CMD=$( basename $0 )
+CMD=$( basename "$0" )
 
 # Revision or tag that Arm NN has been tested with:
 DEFAULT_TENSORFLOW_REVISION="tags/v2.5.0" # Release 2.5.0 tag
@@ -38,11 +38,11 @@ function AssertZeroExitCode {
 TENSORFLOW_REVISION=$DEFAULT_TENSORFLOW_REVISION
 
 # process the options given
-while getopts "s:ph\?:" opt; do
+while getopts "s:ph" opt; do
   case "$opt" in
     s) TENSORFLOW_REVISION="$OPTARG";;
     p) PrintDefaultTensorFlowSha;;
-    h|\?) Usage;;
+    h) Usage;;
   esac
 done
 shift $((OPTIND - 1))
@@ -62,8 +62,8 @@ while [ -h "$SRC" ]; do
   [[ $SRC != /* ]] && SRC="$DIR/$SRC"
 done
 DIR="$( cd -P "$( dirname "$SRC" )" >/dev/null && pwd )"
-pushd ${DIR} > /dev/null
-cd ../..
+pushd "${DIR}" > /dev/null
+cd ../.. || exit
 
 # Clone TensorFlow if we don't already have a directory
 if [ ! -d tensorflow ]; then
@@ -75,7 +75,7 @@ pushd tensorflow > /dev/null
 
 # Checkout the TensorFlow revision
 echo "Checking out ${TENSORFLOW_REVISION}"
-git fetch && git checkout ${TENSORFLOW_REVISION}
+git fetch && git checkout "${TENSORFLOW_REVISION}"
 AssertZeroExitCode "Fetching and checking out ${TENSORFLOW_REVISION} failed"
 # If the target tensorflow revision includes a branch we also need to do a pull.
 # This generally occurs with a release branch.
@@ -88,5 +88,5 @@ popd > /dev/null # out of tensorflow
 popd > /dev/null # back to wherever we were when called
 # Make sure the SHA of the revision that was checked out is the last line
 # of output from the script... just in case we ever need it.
-echo $TENSORFLOW_REVISION
+echo "$TENSORFLOW_REVISION"
 exit 0

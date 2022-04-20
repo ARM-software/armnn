@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-CMD=$( basename $0 )
+CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
@@ -34,11 +34,10 @@ function AssertZeroExitCode {
 }
 
 # process the options given
-while getopts "s:phg:" opt; do
+while getopts "s:ph" opt; do
   case "$opt" in
     s) CLFRAMEWORK_SHA="$OPTARG";;
     p) PrintDefaultClframeworkSha;;
-    g) DUMMY="$OPTARG";; # continue to accept -g for backward compatibility
     h|\?) usage;;
   esac
 done
@@ -59,7 +58,8 @@ while [ -h "$SRC" ]; do
   [[ $SRC != /* ]] && SRC="$DIR/$SRC"
 done
 DIR="$( cd -P "$( dirname "$SRC" )" >/dev/null && pwd )"
-pushd ${DIR} > /dev/null
+pushd "${DIR}" > /dev/null
+# shellcheck disable=SC2164
 cd ../..
 
 if [ ! -d clframework ]; then
@@ -73,7 +73,7 @@ if [ ! -z "$CLFRAMEWORK_SHA" ]; then
     CLFRAMEWORKREVISION=$CLFRAMEWORK_SHA
 fi
 
-git fetch && git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout ${CLFRAMEWORKREVISION}
+git fetch && git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout "${CLFRAMEWORKREVISION}"
 AssertZeroExitCode "Fetching and checking out ${CLFRAMEWORKREVISION} failed"
 # If the target ACL revision includes a branch we also need to do a pull.
 # This generally occurs with a release branch.
@@ -83,12 +83,13 @@ if [[ "${CLFRAMEWORKREVISION}" == *"branches"* ]]; then
 fi
 
 # Set commit hook so we can submit reviews to gerrit
-(curl -Lo `git rev-parse --git-dir`/hooks/commit-msg https://review.mlplatform.org/tools/hooks/commit-msg; chmod +x `git rev-parse --git-dir`/hooks/commit-msg)
+# shellcheck disable=SC2006
+(curl -Lo "$(git rev-parse --git-dir)"/hooks/commit-msg https://review.mlplatform.org/tools/hooks/commit-msg; chmod +x "$(git rev-parse --git-dir)"/hooks/commit-msg)
 AssertZeroExitCode "Setting commit hooks failed"
 
 popd > /dev/null # out of clframework
 popd > /dev/null # back to wherever we were when called
 # Make sure the SHA of the revision that was checked out is the last line
 # of output from the script... just in case we ever need it.
-echo $CLFRAMEWORKREVISION
+echo "$CLFRAMEWORKREVISION"
 exit 0

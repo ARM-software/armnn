@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="5e549fa8ff058eb06cb74de43b9f89a08d0b4a9c" #Add CLPool3d Int8 Support
+DEFAULT_CLFRAMEWORKREVISION="01a8adebad130517678c2f5e6b97041a6e026048" #Fix Duplicate Template in Pooling3dFixture
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

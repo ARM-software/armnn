@@ -680,9 +680,9 @@ bool LayerSupportBase::IsTransposeSupported(const TensorInfo&, // input
 bool LayerSupportBase::IsUnidirectionalSequenceLstmSupported(const TensorInfo&, // input
                                                              const TensorInfo&, // outputStateIn
                                                              const TensorInfo&, // cellStateIn
+                                                             const TensorInfo&, // outputStateOut
+                                                             const TensorInfo&, // cellStateOut
                                                              const TensorInfo&, // output
-                                                             const Optional<TensorInfo>&, // hiddenStateOut
-                                                             const Optional<TensorInfo>&, // cellStateOut
                                                              const LstmDescriptor&, // descriptor
                                                              const LstmInputParamsInfo&, // paramsInfo
                                                              Optional<std::string&> reasonIfUnsupported) const

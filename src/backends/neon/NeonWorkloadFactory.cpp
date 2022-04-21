@@ -558,7 +558,20 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
         case LayerType::UnidirectionalSequenceLstm :
         {
             auto desc = PolymorphicDowncast<const UnidirectionalSequenceLstmQueueDescriptor*>(&descriptor);
-            return MakeWorkloadHelper<NeonUnidirectionalSequenceLstmFloatWorkload, NullWorkload>(*desc, info);
+
+            if ((info.m_InputTensorInfos[0].GetDataType() == armnn::DataType::Float32) &&
+                (info.m_InputTensorInfos[1].GetDataType() == armnn::DataType::Float32) &&
+                (info.m_InputTensorInfos[2].GetDataType() == armnn::DataType::Float32) &&
+                (info.m_OutputTensorInfos[0].GetDataType() == armnn::DataType::Float32) &&
+                (info.m_OutputTensorInfos[1].GetDataType() == armnn::DataType::Float32) &&
+                (info.m_OutputTensorInfos[2].GetDataType() == armnn::DataType::Float32))
+            {
+                return std::make_unique<NeonUnidirectionalSequenceLstmFloatWorkload>(*desc, info);
+            }
+            else
+            {
+                return std::make_unique<NeonUnidirectionalSequenceLstmWorkload>(*desc, info);
+            }
         }
         default:
             return nullptr;

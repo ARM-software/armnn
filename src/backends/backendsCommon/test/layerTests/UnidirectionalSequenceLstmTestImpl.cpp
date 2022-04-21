@@ -31,7 +31,7 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
     armnn::DataType constantDataType = armnn::DataType::Float32)
 {
     IgnoreUnused(memoryManager);
-    unsigned int batchSize = armnn::numeric_cast<unsigned int>(inputShape[1]);
+    unsigned int batchSize = armnn::numeric_cast<unsigned int>(inputShape[0]);
     unsigned int inputSize = armnn::numeric_cast<unsigned int>(inputShape[2]);
     unsigned int outputSize = armnn::numeric_cast<unsigned int>(outputExpectedShape[2]);
     unsigned numUnits = outputSize;
@@ -39,7 +39,8 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
     armnn::TensorInfo inputTensorInfo({1, batchSize , inputSize}, ArmnnType,  qScale, qOffset );
     armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, ArmnnType, qScale, qOffset);
-
+    armnn::TensorInfo outputStateOutTensorInfo({ batchSize, 1, outputSize }, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateOutTensorInfo({ batchSize, 1, outputSize }, ArmnnType, qScale, qOffset);
     armnn::TensorInfo outputTensorInfo({1, batchSize, outputSize}, ArmnnType, qScale, qOffset);
 
     std::vector<T> inputVector;
@@ -48,6 +49,8 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
     std::vector<T> cellStateInVector(batchSize * numUnits, T());
     std::vector<T> outputStateInVector(batchSize * outputSize, T());
 
+    std::vector<T> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<T> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::vector<T> outputVector;
@@ -59,6 +62,10 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
                                               tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -68,6 +75,8 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfo4({numUnits}, constantDataType , qScale, qOffset);
@@ -184,6 +193,8 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
 
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -192,6 +203,8 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<T, 3>(actualOutput,
@@ -222,7 +235,8 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo cellStateInTensorInfo({batchSize, numUnits}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
-
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, ArmnnType, qScale, qOffset);
 
     std::vector<T> inputVector;
@@ -231,6 +245,8 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     std::vector<T> cellStateInVector(batchSize * numUnits, T());
     std::vector<T> outputStateInVector(batchSize * outputSize, T());
 
+    std::vector<T> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<T> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::vector<T> outputVector;
@@ -242,6 +258,10 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
         tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -251,6 +271,8 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfo4({numUnits}, constantDataType, qScale, qOffset);
@@ -359,6 +381,8 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
 
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -367,6 +391,8 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<T, 3>(actualOutput,
@@ -398,7 +424,8 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     armnn::TensorInfo inputTensorInfo({timeSize, batchSize, inputSize}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo cellStateInTensorInfo({batchSize, numUnits}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, ArmnnType, qScale, qOffset);
-
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({timeSize, batchSize, outputSize}, ArmnnType, qScale, qOffset);
 
     std::vector<T> inputVector;
@@ -407,6 +434,8 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     std::vector<T> cellStateInVector(batchSize * numUnits, T());
     std::vector<T> outputStateInVector(batchSize * outputSize, T());
 
+    std::vector<T> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<T> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
 
     std::vector<T> outputVector;
@@ -418,6 +447,10 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
         tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -427,6 +460,8 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfo4({numUnits}, constantDataType, qScale, qOffset);
@@ -535,6 +570,8 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
 
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -543,6 +580,8 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<T, 3>(actualOutput,
@@ -644,6 +683,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
 
     const std::vector<float> inputVector = { 1., 2., 3., 4., 5., 4.,
@@ -654,6 +695,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     const std::vector<float> expectedOutput = { -0.0135612f, -0.0263441f, 0.0314008f, -0.00883455f, 0.00763052f,
@@ -668,6 +711,11 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
             tensorHandleFactory.CreateTensorHandle(cellStateInTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
             tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
+
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -676,6 +724,9 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
+
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfo5({outputSize}, armnn::DataType::Float32);
@@ -849,6 +900,9 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
+
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -857,6 +911,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,
@@ -880,6 +936,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
 
     const std::vector<float> inputVector = { 1., 2., 3., 4., 5., 4.,
@@ -889,6 +947,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     const std::vector<float> expectedOutput = { 0.0642256f, 0.0343966f, 0.184122f, 0.114717f,
@@ -904,6 +964,10 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
             tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -913,6 +977,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfo4({outputSize}, armnn::DataType::Float32);
@@ -1074,6 +1140,9 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
+
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -1082,6 +1151,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerNoCifgWithPeepholeWithP
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,
@@ -1105,7 +1176,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjec
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize, numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
 
     std::vector<float> inputVector = { 1., 2., 3., 4., 5., 4.,
@@ -1115,6 +1187,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjec
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     std::vector<float> outputVector = { -0.0129257f, -0.070531f, -0.153508f, -0.0392391f,
@@ -1130,6 +1204,10 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjec
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
         tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -1139,6 +1217,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjec
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfo4({numUnits}, armnn::DataType::Float32);
@@ -1236,6 +1316,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjec
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
 
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -1244,6 +1326,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjec
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,
@@ -1267,7 +1351,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8Test(
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize, numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
 
     const std::vector<float> inputVector = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
@@ -1277,6 +1362,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8Test(
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     const std::vector<float> outputVector = { -0.0142517f, -0.0198845f, -0.0120569f, -0.0116868f,
@@ -1292,7 +1379,12 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8Test(
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
         tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -1301,6 +1393,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8Test(
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfoNumFp({numUnits}, armnn::DataType::Float32);
@@ -1376,6 +1470,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8Test(
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
 
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -1384,6 +1480,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8Test(
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,
@@ -1407,7 +1505,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8TimeMajorTest(
     armnn::TensorInfo inputTensorInfo({timeSize, batchSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize, numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({timeSize, batchSize, outputSize}, armnn::DataType::Float32);
 
     const std::vector<float> inputVector = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
@@ -1417,6 +1516,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8TimeMajorTest(
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     const std::vector<float> outputVector = { -0.0142517f, -0.0198845f, -0.0120122f, -0.0116868f,
@@ -1431,7 +1532,12 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8TimeMajorTest(
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
         tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
     armnn::WorkloadInfo info;
@@ -1440,6 +1546,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8TimeMajorTest(
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfoNumFp({numUnits}, armnn::DataType::Float32);
@@ -1516,6 +1624,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8TimeMajorTest(
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
 
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -1524,6 +1634,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8TimeMajorTest(
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,
@@ -1547,6 +1659,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
 
     const std::vector<float> inputVector = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
@@ -1556,6 +1670,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     const std::vector<float> expectedOutput = { 0.612103f, 1.56788f, 0.31966f, 1.42956f,
@@ -1570,6 +1686,11 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
             tensorHandleFactory.CreateTensorHandle(cellStateInTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
             tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
+
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -1578,6 +1699,9 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
+
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfoOut({outputSize}, armnn::DataType::Float32);
@@ -1679,6 +1803,9 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
+
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -1687,6 +1814,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,
@@ -1710,6 +1839,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize , numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize , outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
 
     const std::vector<float> inputVector = { 1., 8., 3., 4., 5., 4.,
@@ -1719,6 +1850,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     const std::vector<float> expectedOutput = { 0.0471276f, 0.0168155f, 0.0789885f, 0.16550f,
@@ -1734,6 +1867,10 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
             tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+            tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -1743,6 +1880,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfoOut({outputSize}, armnn::DataType::Float32);
@@ -1871,6 +2010,9 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
     inputHandle->Allocate();
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
+
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -1879,6 +2021,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerInt8NoCifgWithPeepholeW
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,
@@ -1902,7 +2046,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoPr
     armnn::TensorInfo inputTensorInfo({batchSize, timeSize, inputSize}, armnn::DataType::Float32);
     armnn::TensorInfo cellStateInTensorInfo({batchSize, numUnits}, armnn::DataType::Float32);
     armnn::TensorInfo outputStateInTensorInfo({batchSize, outputSize}, armnn::DataType::Float32);
-
+    armnn::TensorInfo outputStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
+    armnn::TensorInfo cellStateOutTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
     armnn::TensorInfo outputTensorInfo({batchSize, timeSize, outputSize}, armnn::DataType::Float32);
 
     const std::vector<float> inputVector = { 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.4f,
@@ -1912,6 +2057,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoPr
     std::vector<float> cellStateInVector(batchSize * numUnits, 0.f);
     std::vector<float> outputStateInVector(batchSize * outputSize, 0.f);
 
+    std::vector<float> actualOutputStateOut(outputStateOutTensorInfo.GetNumElements());
+    std::vector<float> actualCellStateOut(cellStateOutTensorInfo.GetNumElements());
     std::vector<float> actualOutput(outputTensorInfo.GetNumElements());
 
     const std::vector<float> outputVector = { -0.0072104f, -0.00991171f, -0.00650478f, -0.00713055f,
@@ -1927,6 +2074,10 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoPr
     std::unique_ptr<armnn::ITensorHandle> outputStateInHandle =
         tensorHandleFactory.CreateTensorHandle(outputStateInTensorInfo);
 
+    std::unique_ptr<armnn::ITensorHandle> outputStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(outputStateOutTensorInfo);
+    std::unique_ptr<armnn::ITensorHandle> cellStateOutHandle =
+        tensorHandleFactory.CreateTensorHandle(cellStateOutTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::UnidirectionalSequenceLstmQueueDescriptor data;
@@ -1936,6 +2087,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoPr
     AddInputToWorkload(data, info, outputStateInTensorInfo, outputStateInHandle.get());
     AddInputToWorkload(data, info, cellStateInTensorInfo, cellStateInHandle.get());
 
+    AddOutputToWorkload(data, info, outputStateOutTensorInfo, outputStateOutHandle.get());
+    AddOutputToWorkload(data, info, cellStateOutTensorInfo, cellStateOutHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
     armnn::TensorInfo tensorInfoNumFp({numUnits}, armnn::DataType::Float32);
@@ -2009,6 +2162,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoPr
     outputStateInHandle->Allocate();
     cellStateInHandle->Allocate();
 
+    outputStateOutHandle->Allocate();
+    cellStateOutHandle->Allocate();
     outputHandle->Allocate();
 
     CopyDataToITensorHandle(inputHandle.get(), inputVector.data());
@@ -2017,6 +2172,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoPr
 
     workload->Execute();
 
+    CopyDataFromITensorHandle(actualOutputStateOut.data(), outputStateOutHandle.get());
+    CopyDataFromITensorHandle(actualCellStateOut.data(), cellStateOutHandle.get());
     CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
 
     return LayerTestResult<float, 3>(actualOutput,

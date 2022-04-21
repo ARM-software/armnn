@@ -77,6 +77,7 @@
 #include "workloads/NeonTransposeConvolution2dWorkload.hpp"
 #include "workloads/NeonTransposeWorkload.hpp"
 #include "workloads/NeonUnidirectionalSequenceLstmFloatWorkload.hpp"
+#include "workloads/NeonUnidirectionalSequenceLstmWorkload.hpp"
 #endif
 
 namespace armnn
@@ -1436,23 +1437,44 @@ bool NeonLayerSupport::IsTransposeSupported(const TensorInfo& input,
 bool NeonLayerSupport::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
                                                              const TensorInfo& outputStateIn,
                                                              const TensorInfo& cellStateIn,
+                                                             const TensorInfo& outputStateOut,
+                                                             const TensorInfo& cellStateOut,
                                                              const TensorInfo& output,
-                                                             const Optional<TensorInfo>& hiddenStateOutput,
-                                                             const Optional<TensorInfo>& cellStateOutput,
                                                              const UnidirectionalSequenceLstmDescriptor& descriptor,
                                                              const LstmInputParamsInfo& paramsInfo,
                                                              Optional<std::string&> reasonIfUnsupported) const
 {
-    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonUnidirectionalSequenceLstmFloatWorkloadValidate,
-                                   reasonIfUnsupported,
-                                   input,
-                                   outputStateIn,
-                                   cellStateIn,
-                                   output,
-                                   hiddenStateOutput,
-                                   cellStateOutput,
-                                   descriptor,
-                                   paramsInfo);
+    if (input.GetDataType() == armnn::DataType::QAsymmS8 &&
+        outputStateIn.GetDataType() == armnn::DataType::QAsymmS8 &&
+        cellStateIn.GetDataType() == armnn::DataType::QSymmS16 &&
+        outputStateOut.GetDataType() == armnn::DataType::QAsymmS8 &&
+        cellStateOut.GetDataType() == armnn::DataType::QSymmS16 &&
+        output.GetDataType() == armnn::DataType::QAsymmS8)
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonUnidirectionalSequenceLstmWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       outputStateIn,
+                                       cellStateIn,
+                                       outputStateOut,
+                                       cellStateOut,
+                                       output,
+                                       descriptor,
+                                       paramsInfo);
+    }
+    else
+    {
+        FORWARD_WORKLOAD_VALIDATE_FUNC(NeonUnidirectionalSequenceLstmFloatWorkloadValidate,
+                                       reasonIfUnsupported,
+                                       input,
+                                       outputStateIn,
+                                       cellStateIn,
+                                       outputStateOut,
+                                       cellStateOut,
+                                       output,
+                                       descriptor,
+                                       paramsInfo);
+    }
 }
 
 } // namespace armnn

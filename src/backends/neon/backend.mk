@@ -85,7 +85,8 @@ BACKEND_SOURCES := \
         workloads/NeonSubtractionWorkload.cpp \
         workloads/NeonTransposeConvolution2dWorkload.cpp \
         workloads/NeonTransposeWorkload.cpp \
-        workloads/NeonUnidirectionalSequenceLstmFloatWorkload.cpp
+        workloads/NeonUnidirectionalSequenceLstmFloatWorkload.cpp \
+        workloads/NeonUnidirectionalSequenceLstmWorkload.cpp
 
 else
 

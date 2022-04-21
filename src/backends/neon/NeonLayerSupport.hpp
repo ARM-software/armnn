@@ -339,9 +339,9 @@ public:
     bool IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
                                                const TensorInfo& outputStateIn,
                                                const TensorInfo& cellStateIn,
+                                               const TensorInfo& outputStateOut,
+                                               const TensorInfo& cellStateOut,
                                                const TensorInfo& output,
-                                               const Optional<TensorInfo>& hiddenStateOutput,
-                                               const Optional<TensorInfo>& cellStateOutput,
                                                const UnidirectionalSequenceLstmDescriptor& descriptor,
                                                const LstmInputParamsInfo& paramsInfo,
                                                Optional<std::string&> reasonIfUnsupported) const override;

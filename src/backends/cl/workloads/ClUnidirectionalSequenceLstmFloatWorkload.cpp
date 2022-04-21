@@ -41,17 +41,17 @@ ClUnidirectionalSequenceLstmFloatWorkload::ClUnidirectionalSequenceLstmFloatWork
                                          GetGuid());
 
     const arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[2])->GetTensor();
 
     TensorInfo inputInfo = info.m_InputTensorInfos[0];
-    TensorInfo outputInfo = info.m_OutputTensorInfos[0];
+    TensorInfo outputInfo = info.m_OutputTensorInfos[2];
 
     arm_compute::DataType armComputeDataType = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetDataType();
     armnn::DataType armnnDataType = GetArmNNDataType(armComputeDataType);
 
     TensorShape inputLayerShape = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetShape();
     TensorShape cellStateLayerShape = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetShape();
-    TensorShape outputLayerShape = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetShape();
+    TensorShape outputLayerShape = static_cast<IClTensorHandle*>(m_Data.m_Outputs[2])->GetShape();
 
     unsigned int maxTime = m_Data.m_Parameters.m_TimeMajor ? inputLayerShape[0] : inputLayerShape[1];
     unsigned int batchSize = m_Data.m_Parameters.m_TimeMajor ? inputLayerShape[1] : inputLayerShape[0];

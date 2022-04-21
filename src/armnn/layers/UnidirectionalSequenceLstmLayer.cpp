@@ -15,7 +15,7 @@ namespace armnn
 {
 
 UnidirectionalSequenceLstmLayer::UnidirectionalSequenceLstmLayer(const LstmDescriptor& param, const char* name)
-        : LayerWithParameters(3, 1, LayerType::UnidirectionalSequenceLstm, param, name)
+        : LayerWithParameters(3, 3, LayerType::UnidirectionalSequenceLstm, param, name)
 {
 }
 
@@ -171,7 +171,7 @@ void UnidirectionalSequenceLstmLayer::ValidateTensorShapesFromInputs()
 {
     VerifyLayerConnections(3, CHECK_LOCATION());
 
-    const TensorShape& outputShape = GetOutputSlot(0).GetTensorInfo().GetShape();
+    const TensorShape& outputShape = GetOutputSlot(2).GetTensorInfo().GetShape();
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 

@@ -3616,7 +3616,7 @@ void IDeserializer::DeserializerImpl::ParseUnidirectionalSequenceLstm(GraphPtr g
     CHECK_VALID_SIZE(inputs.size(), 3);
 
     auto outputs = GetOutputs(graph, layerIndex);
-    CHECK_VALID_SIZE(outputs.size(), 1);
+    CHECK_VALID_SIZE(outputs.size(), 3);
 
     auto flatBufferLayer = graph->layers()->Get(layerIndex)->layer_as_UnidirectionalSequenceLstmLayer();
     auto layerName = GetLayerName(graph, layerIndex);
@@ -3714,8 +3714,14 @@ void IDeserializer::DeserializerImpl::ParseUnidirectionalSequenceLstm(GraphPtr g
                                                                              lstmInputParams,
                                                                              layerName.c_str());
 
-    armnn::TensorInfo outputTensorInfo1 = ToTensorInfo(outputs[0]);
-    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo1);
+    armnn::TensorInfo outputTensorInfo0 = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo0);
+
+    armnn::TensorInfo outputTensorInfo1 = ToTensorInfo(outputs[1]);
+    layer->GetOutputSlot(1).SetTensorInfo(outputTensorInfo1);
+
+    armnn::TensorInfo outputTensorInfo2 = ToTensorInfo(outputs[2]);
+    layer->GetOutputSlot(2).SetTensorInfo(outputTensorInfo2);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

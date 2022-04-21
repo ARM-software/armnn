@@ -133,6 +133,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonTransposeWorkload.hpp
     NeonUnidirectionalSequenceLstmFloatWorkload.cpp
     NeonUnidirectionalSequenceLstmFloatWorkload.hpp
+    NeonUnidirectionalSequenceLstmWorkload.cpp
+    NeonUnidirectionalSequenceLstmWorkload.hpp
     NeonWorkloads.hpp
     NeonWorkloadUtils.hpp
 )

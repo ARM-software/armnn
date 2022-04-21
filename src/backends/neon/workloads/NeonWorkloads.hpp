@@ -69,3 +69,4 @@
 #include "NeonTransposeConvolution2dWorkload.hpp"
 #include "NeonTransposeWorkload.hpp"
 #include "NeonUnidirectionalSequenceLstmFloatWorkload.hpp"
+#include "NeonUnidirectionalSequenceLstmWorkload.hpp"

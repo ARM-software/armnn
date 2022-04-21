@@ -1367,7 +1367,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& cellStateIn = OverrideDataType(layer.GetInputSlot(2).GetConnection()->GetTensorInfo(),
                                                              dataType);
             // Outputs
-            const TensorInfo&  output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
+            const TensorInfo& outputStateOut = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
+            const TensorInfo& cellStateOut = OverrideDataType(layer.GetOutputSlot(1).GetTensorInfo(), dataType);
+            const TensorInfo& output = OverrideDataType(layer.GetOutputSlot(2).GetTensorInfo(), dataType);
 
             // Basic parameters
             const TensorInfo& inputToForgetWeights
@@ -1481,15 +1483,12 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                 paramsInfo.m_OutputLayerNormWeights = &optOutputLayerNormWeights;
             }
 
-            Optional<TensorInfo> hiddenStateOut;
-            Optional<TensorInfo> cellStateOut;
-
             result = layerSupportObject.IsUnidirectionalSequenceLstmSupported(input,
                                                                               outputStateIn,
                                                                               cellStateIn,
-                                                                              output,
-                                                                              hiddenStateOut,
+                                                                              outputStateOut,
                                                                               cellStateOut,
+                                                                              output,
                                                                               descriptor,
                                                                               paramsInfo,
                                                                               reason);

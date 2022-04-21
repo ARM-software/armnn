@@ -9,8 +9,9 @@
 #include <armnn/LstmParams.hpp>
 #include <armnn/backends/Workload.hpp>
 #include <armnn/backends/WorkloadData.hpp>
+#include "NeonBaseWorkload.hpp"
 
-#include "arm_compute/runtime/NEON/functions/NELSTMLayer.h"
+#include "arm_compute/runtime/NEON/functions/NEQLSTMLayer.h"
 #include "arm_compute/runtime/NEON/functions/NEPermute.h"
 #include "arm_compute/runtime/NEON/functions/NESplit.h"
 #include "arm_compute/runtime/NEON/functions/NEConcatenateLayer.h"
@@ -18,11 +19,11 @@
 namespace armnn
 {
 
-class NeonUnidirectionalSequenceLstmFloatWorkload : public FloatWorkload<UnidirectionalSequenceLstmQueueDescriptor>
+class NeonUnidirectionalSequenceLstmWorkload : public NeonBaseWorkload<UnidirectionalSequenceLstmQueueDescriptor>
 {
 public:
-    NeonUnidirectionalSequenceLstmFloatWorkload(const UnidirectionalSequenceLstmQueueDescriptor& descriptor,
-                                                const WorkloadInfo& info);
+    NeonUnidirectionalSequenceLstmWorkload(const UnidirectionalSequenceLstmQueueDescriptor& descriptor,
+                                           const WorkloadInfo& info);
     virtual void Execute() const override;
 
 private:
@@ -30,13 +31,10 @@ private:
     //
     // ACL layers required to fully form a Unidirectional Sequence LSTM layer.
     //
-
-    // permutation for input (only used when input is batch major)
     mutable std::unique_ptr<arm_compute::NEPermute> m_Permute1;
     mutable std::unique_ptr<arm_compute::IFunction> m_Splitter;
-    mutable std::vector<std::unique_ptr<arm_compute::NELSTMLayer>> m_Layers;
+    mutable std::vector<std::unique_ptr<arm_compute::NEQLSTMLayer>> m_Layers;
     mutable std::unique_ptr<arm_compute::NEConcatenateLayer> m_Concat;
-    // permutation for output (only used when input is batch major)
     mutable std::unique_ptr<arm_compute::NEPermute> m_Permute2;
 
     //
@@ -60,8 +58,6 @@ private:
     std::unique_ptr<arm_compute::Tensor> m_ProjectionWeightsTensor;
     std::unique_ptr<arm_compute::Tensor> m_ProjectionBiasTensor;
 
-    std::unique_ptr<arm_compute::Tensor> m_ScratchBuffer;
-
     std::unique_ptr<arm_compute::Tensor> m_InputLayerNormWeightsTensor;
     std::unique_ptr<arm_compute::Tensor> m_ForgetLayerNormWeightsTensor;
     std::unique_ptr<arm_compute::Tensor> m_CellLayerNormWeightsTensor;
@@ -82,13 +78,13 @@ private:
 };
 
 arm_compute::Status
-NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
-                                                    const TensorInfo& outputStateIn,
-                                                    const TensorInfo& cellStateIn,
-                                                    const TensorInfo& outputStateOut,
-                                                    const TensorInfo& cellStateOut,
-                                                    const TensorInfo& output,
-                                                    const UnidirectionalSequenceLstmDescriptor& descriptor,
-                                                    const LstmInputParamsInfo& paramsInfo);
+NeonUnidirectionalSequenceLstmWorkloadValidate(const TensorInfo& input,
+                                               const TensorInfo& outputStateIn,
+                                               const TensorInfo& cellStateIn,
+                                               const TensorInfo& outputStateOut,
+                                               const TensorInfo& cellStateOut,
+                                               const TensorInfo& output,
+                                               const UnidirectionalSequenceLstmDescriptor& descriptor,
+                                               const LstmInputParamsInfo& paramsInfo);
 
 } //namespace armnn

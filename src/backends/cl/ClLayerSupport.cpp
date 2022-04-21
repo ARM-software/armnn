@@ -1444,9 +1444,9 @@ bool ClLayerSupport::IsTransposeSupported(const TensorInfo& input,
 bool ClLayerSupport::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
                                                            const TensorInfo& outputStateIn,
                                                            const TensorInfo& cellStateIn,
+                                                           const TensorInfo& outputStateOut,
+                                                           const TensorInfo& cellStateOut,
                                                            const TensorInfo& output,
-                                                           const Optional<TensorInfo>& hiddenStateOutput,
-                                                           const Optional<TensorInfo>& cellStateOutput,
                                                            const UnidirectionalSequenceLstmDescriptor& descriptor,
                                                            const LstmInputParamsInfo& paramsInfo,
                                                            Optional<std::string&> reasonIfUnsupported) const
@@ -1456,9 +1456,9 @@ bool ClLayerSupport::IsUnidirectionalSequenceLstmSupported(const TensorInfo& inp
                                    input,
                                    outputStateIn,
                                    cellStateIn,
+                                   outputStateOut,
+                                   cellStateOut,
                                    output,
-                                   hiddenStateOutput,
-                                   cellStateOutput,
                                    descriptor,
                                    paramsInfo);
 }

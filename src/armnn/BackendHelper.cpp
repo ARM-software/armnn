@@ -1332,16 +1332,14 @@ bool LayerSupportHandle::IsTransposeSupported(const TensorInfo& input,
 bool LayerSupportHandle::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
                                                                const TensorInfo& outputStateIn,
                                                                const TensorInfo& cellStateIn,
+                                                               const TensorInfo& outputStateOut,
+                                                               const TensorInfo& cellStateOut,
                                                                const TensorInfo& output,
-                                                               const Optional<TensorInfo>& hiddenStateOutput,
-                                                               const Optional<TensorInfo>& cellStateOutput,
                                                                const LstmDescriptor& descriptor,
                                                                const LstmInputParamsInfo& paramsInfo,
                                                                Optional<std::string&> reasonIfUnsupported)
 {
-    TensorInfo hiddenStateOutputVal =  hiddenStateOutput.has_value() ? hiddenStateOutput.value() : TensorInfo();
-    TensorInfo cellStateOutputVal   =  cellStateOutput.has_value() ? cellStateOutput.value() : TensorInfo();
-    TensorInfos infos{input, outputStateIn, cellStateIn, hiddenStateOutputVal, cellStateOutputVal, output};
+    TensorInfos infos{input, outputStateIn, cellStateIn, outputStateOut, cellStateOut, output};
 
     return m_LayerSupport->IsLayerSupported(LayerType::UnidirectionalSequenceLstm,
                                             infos,

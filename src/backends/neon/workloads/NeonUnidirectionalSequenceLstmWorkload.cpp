@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "NeonUnidirectionalSequenceLstmFloatWorkload.hpp"
+#include "NeonUnidirectionalSequenceLstmWorkload.hpp"
 #include "NeonWorkloadUtils.hpp"
 
 #include <aclCommon/ArmComputeUtils.hpp>
@@ -18,6 +18,7 @@
 
 namespace
 {
+
 unsigned int CalcAclAxis(unsigned int numDimensions, unsigned int axis)
 {
     return (numDimensions - axis) - 1;
@@ -28,34 +29,35 @@ namespace armnn
 {
 using namespace armcomputetensorutils;
 
-NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloatWorkload
+NeonUnidirectionalSequenceLstmWorkload::NeonUnidirectionalSequenceLstmWorkload
     (const UnidirectionalSequenceLstmQueueDescriptor& descriptor, const WorkloadInfo& info)
-    : FloatWorkload<UnidirectionalSequenceLstmQueueDescriptor>(descriptor, info)
+    : NeonBaseWorkload<UnidirectionalSequenceLstmQueueDescriptor>(descriptor, info)
 {
     // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonUnidirectionalSequenceLstmFloatWorkload_Construct",
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonUnidirectionalSequenceLstmWorkload_Construct",
                                          descriptor.m_Parameters,
                                          info,
                                          GetGuid());
 
-    const arm_compute::ITensor& input = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[2])->GetTensor();
+    // Input/Output tensors
+    const arm_compute::ITensor& input         = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ITensor& outputStateIn       = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    const arm_compute::ITensor& cellStateIn   = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+
+    arm_compute::ITensor& outputStateOut = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ITensor& cellStateOut   = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[1])->GetTensor();
+    arm_compute::ITensor& output         = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[2])->GetTensor();
 
     TensorInfo inputInfo = info.m_InputTensorInfos[0];
-    TensorInfo outputInfo = info.m_OutputTensorInfos[0];
-
-    arm_compute::DataType armComputeDataType = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetDataType();
-    armnn::DataType armnnDataType = GetArmNNDataType(armComputeDataType);
+    TensorInfo outputInfo = info.m_OutputTensorInfos[2];
 
     TensorShape inputLayerShape = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetShape();
-    TensorShape cellStateLayerShape = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[2])->GetShape();
     TensorShape outputLayerShape = static_cast<IAclTensorHandle*>(m_Data.m_Outputs[2])->GetShape();
 
     unsigned int maxTime = m_Data.m_Parameters.m_TimeMajor ? inputLayerShape[0] : inputLayerShape[1];
     unsigned int batchSize = m_Data.m_Parameters.m_TimeMajor ? inputLayerShape[1] : inputLayerShape[0];
     unsigned int inputSize = inputLayerShape[2];
     unsigned int outputSize = outputLayerShape[2];
-    unsigned int numUnits = cellStateLayerShape[1];
 
     const TensorShape timeMajorShapeInput({maxTime, batchSize, inputSize});
     const TensorShape timeMajorShapeOutput({maxTime, batchSize, outputSize});
@@ -148,6 +150,17 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
     //
     arm_compute::LSTMParams<arm_compute::ITensor> lstm_param;
 
+    lstm_param.set_cell_clip_params(descriptor.m_Parameters.m_ClippingThresCell);
+    lstm_param.set_projection_clip_params(descriptor.m_Parameters.m_ClippingThresProj);
+
+    lstm_param.set_matmul_scale_params(descriptor.m_Parameters.m_InputIntermediateScale,
+                                       descriptor.m_Parameters.m_ForgetIntermediateScale,
+                                       descriptor.m_Parameters.m_CellIntermediateScale,
+                                       descriptor.m_Parameters.m_OutputIntermediateScale);
+
+    lstm_param.set_hidden_state_params(descriptor.m_Parameters.m_HiddenStateZeroPoint,
+                                       descriptor.m_Parameters.m_HiddenStateScale);
+
     m_InputToForgetWeightsTensor = std::make_unique<arm_compute::Tensor>();
     BuildArmComputeTensor(*m_InputToForgetWeightsTensor, m_Data.m_InputToForgetWeights->GetTensorInfo());
 
@@ -192,7 +205,6 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
 
         m_InputGateBiasTensor = std::make_unique<arm_compute::Tensor>();
         BuildArmComputeTensor(*m_InputGateBiasTensor, m_Data.m_InputGateBias->GetTensorInfo());
-
         lstm_param.set_cifg_params(m_InputToInputWeightsTensor.get(),
                                    m_RecurrentToInputWeightsTensor.get(),
                                    m_Data.m_CellToInputWeights ? m_CellToInputWeightsTensor.get() : nullptr,
@@ -249,32 +261,6 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
                                                   m_OutputLayerNormWeightsTensor.get());
     }
 
-    arm_compute::ITensor& output_state_in = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor& cell_state_in   = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
-
-    arm_compute::ITensor& output_state_out = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor& cell_state_out = static_cast<IAclTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
-
-    m_ScratchBuffer = std::make_unique<arm_compute::Tensor>();
-    if (m_Data.m_Parameters.m_CifgEnabled)
-    {
-        // scratch_buffer [num_units * 3, batch_size] with CIFG
-        BuildArmComputeTensor(*m_ScratchBuffer, TensorInfo({batchSize, numUnits * 3}, armnnDataType));
-    }
-    else
-    {
-        // scratch_buffer [num_units * 4, batch_size] without CIFG
-        BuildArmComputeTensor(*m_ScratchBuffer, TensorInfo({batchSize, numUnits * 4}, armnnDataType));
-    }
-
-    // Need to be set at negative threshold to be compatible for ACL
-    float cell_threshold       = m_Data.m_Parameters.m_ClippingThresCell;
-    float projection_threshold = m_Data.m_Parameters.m_ClippingThresProj;
-
-    // For preparing the object for the class ActivationLayerInfo, consider 5 situations
-    arm_compute::ActivationLayerInfo activationLayerInfo =
-        ConvertLstmActivationFuncToAclLayerInfo(m_Data.m_Parameters.m_ActivationFunc);
-
     for (unsigned int i = 0; i != maxTime; ++i)
     {
         // Set LSTM input and output ITensors depending on:
@@ -289,7 +275,7 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
         if (maxTime == 1 && m_Data.m_Parameters.m_TimeMajor)
         {
             TensorShape inputShape = GetTensorShape(input.info()->tensor_shape(), 1U);
-            TensorShape outputShape = GetTensorShape((&output)->info()->tensor_shape(), 1U);
+            TensorShape outputShape = GetTensorShape(output.info()->tensor_shape(), 1U);
 
             TensorShape inputShapeShrink({inputShape[1], inputShape[2]});
             TensorShape outputShapeShrink({outputShape[1], outputShape[2]});
@@ -324,7 +310,8 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
             outputLSTM = const_cast<arm_compute::ITensor*>(m_ConcatInputs[i]);
         }
 
-        std::unique_ptr<arm_compute::NELSTMLayer> lstm_layer(new arm_compute::NELSTMLayer());
+        std::unique_ptr<arm_compute::NEQLSTMLayer> lstm_layer(new arm_compute::NEQLSTMLayer());
+
         lstm_layer->configure(inputLSTM,
                               m_InputToForgetWeightsTensor.get(),
                               m_InputToCellWeightsTensor.get(),
@@ -335,21 +322,15 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
                               m_ForgetGateBiasTensor.get(),
                               m_CellBiasTensor.get(),
                               m_OutputGateBiasTensor.get(),
-                              &output_state_in,
-                              &cell_state_in,
-                              m_ScratchBuffer.get(),
-                              &output_state_out,
-                              &cell_state_out,
+                              &cellStateIn,
+                              &outputStateIn,
+                              &cellStateOut,
+                              &outputStateOut,
                               outputLSTM,
-                              lstm_param,
-                              activationLayerInfo,
-                              cell_threshold,
-                              projection_threshold);
+                              lstm_param);
 
         m_Layers.emplace_back(std::move(lstm_layer));
     }
-
-    armcomputetensorutils::InitialiseArmComputeTensorEmpty(*m_ScratchBuffer);
 
     InitializeArmComputeTensorData(*m_InputToForgetWeightsTensor, m_Data.m_InputToForgetWeights);
     InitializeArmComputeTensorData(*m_InputToCellWeightsTensor, m_Data.m_InputToCellWeights);
@@ -420,15 +401,15 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
         {
             m_ConcatInputs[i]->info()->set_tensor_shape(BuildArmComputeTensorShape(shapeExpandTimeMajor));
         }
-
         ConcatDescriptor  concatDescriptor(maxTime, numberDimensions);  // maxTime = num inputs (aka. number of views).
+
         for (unsigned int inputIdx = 0u; inputIdx < maxTime; ++inputIdx)
         {
             concatDescriptor.SetViewOriginCoord(inputIdx, dimension, inputIdx);
             concatDescriptor.SetConcatAxis(dimension);
         }
-
         m_Concat.reset(new arm_compute::NEConcatenateLayer());
+
         unsigned int aclAxisConcat = CalcAclAxis(concatDescriptor.GetNumDimensions(), concatDescriptor.GetConcatAxis());
         if (!m_Data.m_Parameters.m_TimeMajor)
         {
@@ -481,9 +462,9 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
     FreeUnusedTensors();
 }
 
-void NeonUnidirectionalSequenceLstmFloatWorkload::Execute() const
+void NeonUnidirectionalSequenceLstmWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonUnidirectionalSequenceLstmFloatWorkload_Execute", GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonUnidirectionalSequenceLstmWorkload_Execute", GetGuid());
     if (m_Permute1)
     {
         m_Permute1->run();
@@ -507,17 +488,17 @@ void NeonUnidirectionalSequenceLstmFloatWorkload::Execute() const
 }
 
 arm_compute::Status
-NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
-                                                    const TensorInfo& outputStateIn,
-                                                    const TensorInfo& cellStateIn,
-                                                    const TensorInfo& outputStateOut,
-                                                    const TensorInfo& cellStateOut,
-                                                    const TensorInfo& output,
-                                                    const UnidirectionalSequenceLstmDescriptor& descriptor,
-                                                    const LstmInputParamsInfo& paramsInfo)
+NeonUnidirectionalSequenceLstmWorkloadValidate(const TensorInfo& input,
+                                               const TensorInfo& outputStateIn,
+                                               const TensorInfo& cellStateIn,
+                                               const TensorInfo& outputStateOut,
+                                               const TensorInfo& cellStateOut,
+                                               const TensorInfo& output,
+                                               const UnidirectionalSequenceLstmDescriptor& descriptor,
+                                               const LstmInputParamsInfo& paramsInfo)
 {
     TensorShape inputLayerShape = input.GetShape();
-    TensorShape outputLayerShape = outputStateIn.GetShape();
+    TensorShape outputLayerShape = output.GetShape();
 
     unsigned int maxTime = descriptor.m_TimeMajor ? inputLayerShape[0] : inputLayerShape[1];
     unsigned int batchSize = descriptor.m_TimeMajor ? inputLayerShape[1] : inputLayerShape[0];
@@ -611,6 +592,8 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
 
     const TensorInfo& scratchBuffer = TensorInfo(cellStateIn.GetShape(), input.GetDataType());
 
+    lstm_params_info.set_cell_clip_params(descriptor.m_ClippingThresCell);
+    lstm_params_info.set_projection_clip_params(descriptor.m_ClippingThresProj);
     // The inputs and outputs
     const arm_compute::TensorInfo aclOutputStateInInfo = BuildArmComputeTensorInfo(outputStateIn);
     const arm_compute::TensorInfo aclCellStateInInfo = BuildArmComputeTensorInfo(cellStateIn);
@@ -651,7 +634,6 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
     arm_compute::TensorInfo aclForgetLayerNormWeightsInfo;
     arm_compute::TensorInfo aclCellLayerNormWeightsInfo;
     arm_compute::TensorInfo aclOutputLayerNormWeightsInfo;
-
 
     if (!descriptor.m_CifgEnabled)
     {
@@ -706,12 +688,12 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
                                                         &aclOutputLayerNormWeightsInfo);
     }
 
-    // Need to be set at negative threshold to be compatible for ACL
-    float cell_threshold = descriptor.m_ClippingThresCell;
-    float projection_threshold = descriptor.m_ClippingThresProj;
+    lstm_params_info.set_matmul_scale_params(descriptor.m_InputIntermediateScale,
+                                             descriptor.m_ForgetIntermediateScale,
+                                             descriptor.m_CellIntermediateScale,
+                                             descriptor.m_OutputIntermediateScale);
 
-    arm_compute::ActivationLayerInfo activationLayerInfo =
-        ConvertLstmActivationFuncToAclLayerInfo(descriptor.m_ActivationFunc);
+    lstm_params_info.set_hidden_state_params(descriptor.m_HiddenStateZeroPoint, descriptor.m_HiddenStateScale);
 
     for (unsigned int i = 0; i != maxTime; ++i)
     {
@@ -763,31 +745,22 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
             outputLSTM = const_cast<arm_compute::ITensorInfo*>(concatInputsTensorInfosPtr[i]);
         }
 
-        statusLSTM = arm_compute::NELSTMLayer::validate(inputLSTM,
-                                                        &aclInputToForgetWeightsInfo,
-                                                        &aclInputToCellWeightsInfo,
-                                                        &aclInputToOutputWeightsInfo,
-                                                        &aclRecurrentToForgetWeightsInfo,
-                                                        &aclRecurrentToCellWeightsInfo,
-                                                        &aclRecurrentToOutputWeightsInfo,
-                                                        &aclForgetGateBiasInfo,
-                                                        &aclCellBiasInfo,
-                                                        &aclOutputGateBiasInfo,
-                                                        &aclOutputStateInInfo,
-                                                        &aclCellStateInInfo,
-                                                        &aclScratchBufferInfo,
-                                                        &aclOutputStateOutInfo,
-                                                        &aclCellStateOutInfo,
-                                                        outputLSTM,
-                                                        lstm_params_info,
-                                                        activationLayerInfo,
-                                                        cell_threshold,
-                                                        projection_threshold);
-
-        if (statusLSTM.error_code() != arm_compute::ErrorCode::OK)
-        {
-            break;
-        }
+        statusLSTM = arm_compute::NEQLSTMLayer::validate(inputLSTM,
+                                                         &aclInputToForgetWeightsInfo,
+                                                         &aclInputToCellWeightsInfo,
+                                                         &aclInputToOutputWeightsInfo,
+                                                         &aclRecurrentToForgetWeightsInfo,
+                                                         &aclRecurrentToCellWeightsInfo,
+                                                         &aclRecurrentToOutputWeightsInfo,
+                                                         &aclForgetGateBiasInfo,
+                                                         &aclCellBiasInfo,
+                                                         &aclOutputGateBiasInfo,
+                                                         &aclCellStateInInfo,
+                                                         &aclOutputStateInInfo,
+                                                         &aclCellStateOutInfo,
+                                                         &aclOutputStateOutInfo,
+                                                         outputLSTM,
+                                                         lstm_params_info);
     }
 
     //
@@ -878,7 +851,7 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
     }
 }
 
-void NeonUnidirectionalSequenceLstmFloatWorkload::FreeUnusedTensors()
+void NeonUnidirectionalSequenceLstmWorkload::FreeUnusedTensors()
 {
     FreeTensorIfUnused(m_InputToInputWeightsTensor);
     FreeTensorIfUnused(m_InputToForgetWeightsTensor);
@@ -901,7 +874,6 @@ void NeonUnidirectionalSequenceLstmFloatWorkload::FreeUnusedTensors()
     FreeTensorIfUnused(m_ForgetLayerNormWeightsTensor);
     FreeTensorIfUnused(m_CellLayerNormWeightsTensor);
     FreeTensorIfUnused(m_OutputLayerNormWeightsTensor);
-    FreeTensorIfUnused(m_ScratchBuffer);
 }
 
 } //namespace armnn

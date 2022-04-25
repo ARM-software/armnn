@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="01a8adebad130517678c2f5e6b97041a6e026048" #Fix Duplicate Template in Pooling3dFixture
+DEFAULT_CLFRAMEWORKREVISION="fa6877f94b12ec80235e55bcfe5a9b6fdc009cf0" #[CpuGemmConv2d] Extract skip_im2col and skip_col2im computation.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

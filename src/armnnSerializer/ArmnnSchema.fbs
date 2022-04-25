@@ -181,6 +181,7 @@ enum LayerType : uint {
     ChannelShuffle = 64,
     Convolution3d = 65,
     Pooling3d = 66,
+    GatherNd = 67,
 }
 
 // Base layer table to be used as part of other layers
@@ -380,6 +381,10 @@ table GatherLayer {
 
 table GatherDescriptor {
     axis:int = 0;
+}
+
+table GatherNdLayer {
+    base:LayerBase;
 }
 
 /// @deprecated Use ComparisonLayer instead
@@ -1072,6 +1077,7 @@ union Layer {
     ChannelShuffleLayer,
     Convolution3dLayer,
     Pooling3dLayer,
+    GatherNdLayer,
 }
 
 table AnyLayer {

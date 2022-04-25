@@ -234,6 +234,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_FillLayer]                   = &DeserializerImpl::ParseFill;
     m_ParserFunctions[Layer_FloorLayer]                  = &DeserializerImpl::ParseFloor;
     m_ParserFunctions[Layer_GatherLayer]                 = &DeserializerImpl::ParseGather;
+    m_ParserFunctions[Layer_GatherNdLayer]               = &DeserializerImpl::ParseGatherNd;
     m_ParserFunctions[Layer_GreaterLayer]                = &DeserializerImpl::ParseGreater;
     m_ParserFunctions[Layer_InstanceNormalizationLayer]  = &DeserializerImpl::ParseInstanceNormalization;
     m_ParserFunctions[Layer_L2NormalizationLayer]        = &DeserializerImpl::ParseL2Normalization;
@@ -331,6 +332,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_FloorLayer()->base();
         case Layer::Layer_GatherLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_GatherLayer()->base();
+        case Layer::Layer_GatherNdLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_GatherNdLayer()->base();
         case Layer::Layer_GreaterLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_GreaterLayer()->base();
         case Layer::Layer_InputLayer:
@@ -2925,6 +2928,26 @@ void IDeserializer::DeserializerImpl::ParseGather(GraphPtr graph, unsigned int l
 
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddGatherLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseGatherNd(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddGatherNdLayer(layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

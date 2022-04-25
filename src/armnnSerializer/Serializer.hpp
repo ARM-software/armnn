@@ -191,6 +191,9 @@ private:
                               const armnn::GatherDescriptor& gatherDescriptor,
                               const char* name = nullptr);
 
+    void SerializeGatherNdLayer(const armnn::IConnectableLayer* layer,
+                                const char* name = nullptr);
+
     void SerializeInputLayer(const armnn::IConnectableLayer* layer,
                          armnn::LayerBindingId id,
                          const char* name = nullptr);

@@ -587,6 +587,17 @@ void SerializerStrategy::SerializeGatherLayer(const armnn::IConnectableLayer* la
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_GatherLayer);
 }
 
+void SerializerStrategy::SerializeGatherNdLayer(const armnn::IConnectableLayer* layer,
+                                                const char* name)
+{
+    IgnoreUnused(name);
+
+    auto fbGatherNdBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_GatherNd);
+    auto flatBufferLayer     = serializer::CreateGatherNdLayer(m_flatBufferBuilder, fbGatherNdBaseLayer);
+
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_GatherNdLayer);
+}
+
 void SerializerStrategy::SerializeInstanceNormalizationLayer(
     const armnn::IConnectableLayer* layer,
     const armnn::InstanceNormalizationDescriptor& instanceNormalizationDescriptor,
@@ -2132,6 +2143,11 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
             const armnn::GatherDescriptor& layerDescriptor =
                     static_cast<const armnn::GatherDescriptor&>(descriptor);
             SerializeGatherLayer(layer, layerDescriptor, name);
+            break;
+        }
+        case armnn::LayerType::GatherNd :
+        {
+            SerializeGatherNdLayer(layer, name);
             break;
         }
         case armnn::LayerType::Input:

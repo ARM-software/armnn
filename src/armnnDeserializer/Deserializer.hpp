@@ -108,6 +108,7 @@ private:
     void ParseFloor(GraphPtr graph, unsigned int layerIndex);
     void ParseFullyConnected(GraphPtr graph, unsigned int layerIndex);
     void ParseGather(GraphPtr graph, unsigned int layerIndex);
+    void ParseGatherNd(GraphPtr graph, unsigned int layerIndex);
     void ParseGreater(GraphPtr graph, unsigned int layerIndex);
     void ParseInstanceNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParseL2Normalization(GraphPtr graph, unsigned int layerIndex);

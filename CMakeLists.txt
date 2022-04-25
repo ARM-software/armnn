@@ -743,6 +743,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeFloor.cpp
             src/armnnDeserializer/test/DeserializeFullyConnected.cpp
             src/armnnDeserializer/test/DeserializeGather.cpp
+            src/armnnDeserializer/test/DeserializeGatherNd.cpp
             src/armnnDeserializer/test/DeserializeInstanceNormalization.cpp
             src/armnnDeserializer/test/DeserializeL2Normalization.cpp
             src/armnnDeserializer/test/DeserializeLogSoftmax.cpp

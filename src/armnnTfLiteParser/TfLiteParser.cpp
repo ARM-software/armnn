@@ -696,6 +696,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_FLOOR_DIV]               = &TfLiteParserImpl::ParseFloorDiv;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParserImpl::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_GATHER]                  = &TfLiteParserImpl::ParseGather;
+    m_ParserFunctions[tflite::BuiltinOperator_GATHER_ND]               = &TfLiteParserImpl::ParseGatherNd;
     m_ParserFunctions[tflite::BuiltinOperator_GREATER]                 = &TfLiteParserImpl::ParseGreater;
     m_ParserFunctions[tflite::BuiltinOperator_GREATER_EQUAL]           = &TfLiteParserImpl::ParseGreaterOrEqual;
     m_ParserFunctions[tflite::BuiltinOperator_HARD_SWISH]              = &TfLiteParserImpl::ParseHardSwish;
@@ -3957,6 +3958,31 @@ void TfLiteParserImpl::ParseGather(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Gather:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddGatherLayer(gatherDescriptor, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParserImpl::ParseGatherNd(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    TfLiteParserImpl::TensorRawPtrVector inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+    TfLiteParserImpl::TensorRawPtrVector outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+    armnn::TensorInfo indicesTensorInfo = ToTensorInfo(inputs[1]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+
+    auto layerName = fmt::format("GatherNd:{}:{}", subgraphIndex, operatorIndex);
+    IConnectableLayer* layer = m_Network->AddGatherNdLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 

@@ -137,6 +137,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - FLOOR_DIV
 - FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - GATHER
+- GATHER_ND
 - GREATER
 - GREATER_EQUAL
 - HARD_SWISH

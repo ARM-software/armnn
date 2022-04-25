@@ -631,6 +631,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/FloorDiv.cpp
              src/armnnTfLiteParser/test/FullyConnected.cpp
              src/armnnTfLiteParser/test/Gather.cpp
+             src/armnnTfLiteParser/test/GatherNd.cpp
              src/armnnTfLiteParser/test/L2Normalization.cpp
              src/armnnTfLiteParser/test/LeakyRelu.cpp
              src/armnnTfLiteParser/test/LoadScopeDynamicTensor.cpp

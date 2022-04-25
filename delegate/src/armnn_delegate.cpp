@@ -18,6 +18,7 @@
 #include "Fill.hpp"
 #include "FullyConnected.hpp"
 #include "Gather.hpp"
+#include "GatherNd.hpp"
 #include "LogicalBinary.hpp"
 #include "Lstm.hpp"
 #include "Normalization.hpp"
@@ -635,6 +636,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                        tfLiteNode,
                                        nodeIndex,
                                        kTfLiteBuiltinGather);
+        case kTfLiteBuiltinGatherNd:
+            return VisitGatherNdOperator(delegateData,
+                                         tfLiteContext,
+                                         tfLiteNode,
+                                         nodeIndex,
+                                         kTfLiteBuiltinGatherNd);
         case kTfLiteBuiltinGreater:
             return VisitComparisonOperator(delegateData,
                                            tfLiteContext,

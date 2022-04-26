@@ -10,7 +10,7 @@ CMD=$( basename $0 )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="fa6877f94b12ec80235e55bcfe5a9b6fdc009cf0" #[CpuGemmConv2d] Extract skip_im2col and skip_col2im computation.
+DEFAULT_CLFRAMEWORKREVISION="c827e99fc46521f43719b0c2d1b6f05d66abf68c" #Update Neon™ pooling kernel.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -48,6 +48,7 @@ BACKEND_SOURCES := \
         workloads/NeonFloorFloatWorkload.cpp \
         workloads/NeonFullyConnectedWorkload.cpp \
         workloads/NeonGatherWorkload.cpp \
+        workloads/NeonGatherNdWorkload.cpp \
         workloads/NeonInstanceNormalizationWorkload.cpp \
         workloads/NeonL2NormalizationFloatWorkload.cpp \
         workloads/NeonLogWorkload.cpp \

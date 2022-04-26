@@ -56,6 +56,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonFullyConnectedWorkload.hpp
     NeonGatherWorkload.cpp
     NeonGatherWorkload.hpp
+    NeonGatherNdWorkload.cpp
+    NeonGatherNdWorkload.hpp
     NeonInstanceNormalizationWorkload.cpp
     NeonInstanceNormalizationWorkload.hpp
     NeonL2NormalizationFloatWorkload.cpp

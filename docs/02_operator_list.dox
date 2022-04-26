@@ -1481,13 +1481,19 @@ where N = batches, C = channels, H = height, W = width
   <td>CpuAcc
   <td>
       <ul>
-       <li>TBD
+       <li>All
       </ul>
   <td>
-    <table>
-    <tr><th>
-    <tr><td>TBD
-    </table>
+      <table>
+       <tr><th>
+       <tr><td>BFLOAT16
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
 <tr>
   <td>GpuAcc
   <td>

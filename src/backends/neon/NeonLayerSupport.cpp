@@ -54,6 +54,7 @@
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonGatherWorkload.hpp"
+#include "workloads/NeonGatherNdWorkload.hpp"
 #include "workloads/NeonPadWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
 #include "workloads/NeonPooling2dWorkload.hpp"
@@ -349,6 +350,11 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
                                      infos[2],
                                      *(PolymorphicDowncast<const GatherDescriptor*>(&descriptor)),
                                      reasonIfUnsupported);
+        case LayerType::GatherNd:
+            return IsGatherNdSupported(infos[0],
+                                       infos[1],
+                                       infos[2],
+                                       reasonIfUnsupported);
         case LayerType::Input:
             return IsInputSupported(infos[0], reasonIfUnsupported);
         case LayerType::InstanceNormalization:
@@ -996,6 +1002,18 @@ bool NeonLayerSupport::IsGatherSupported(const TensorInfo& input0,
                                    input1,
                                    output,
                                    descriptor);
+}
+
+bool NeonLayerSupport::IsGatherNdSupported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
+                                           const TensorInfo& output,
+                                           Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonGatherNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool NeonLayerSupport::IsInputSupported(const TensorInfo& input,

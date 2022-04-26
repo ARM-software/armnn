@@ -346,6 +346,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
             auto gatherQueueDescriptor = PolymorphicDowncast<const GatherQueueDescriptor*>(&descriptor);
             return std::make_unique<NeonGatherWorkload>(*gatherQueueDescriptor, info);
         }
+        case LayerType::GatherNd :
+        {
+            auto gatherNdQueueDescriptor = PolymorphicDowncast<const GatherNdQueueDescriptor*>(&descriptor);
+            return std::make_unique<NeonGatherNdWorkload>(*gatherNdQueueDescriptor, info);
+        }
         case LayerType::Input :
         {
             auto inputQueueDescriptor = PolymorphicDowncast<const InputQueueDescriptor*>(&descriptor);

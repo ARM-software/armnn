@@ -2,7 +2,9 @@
 
 - [Introduction](#introduction)
 - [Download the Android NDK and make a standalone toolchain](#download-the-android-ndk-and-make-a-standalone-toolchain)
+- [Install Cmake](#install-cmake)
 - [Build Google's Protobuf library](#build-google-s-protobuf-library)
+- [Build Flatbuffers](#build-flatbuffers)
 - [Download Arm NN](#download-arm-nn)
 - [Build Arm Compute Library](#build-arm-compute-library)
 - [Build Arm NN](#build-arm-nn)
@@ -35,9 +37,23 @@ All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` 
 
 * With the android ndk-20b, you don't need to use the make_standalone_toolchain script to create a toolchain for a specific version of android. Android's current preference is for you to just specify the architecture and operating system while setting the compiler and just use the ndk directory.
 
+## Install Cmake
+Cmake 3.19rc3 is required to build Arm NN.
+
+'''
+cd $HOME/armnn-devenv
+sudo apt-get install libssl-dev
+wget https://github.com/Kitware/CMake/releases/download/v3.19.0-rc3/cmake-3.19.0-rc3.tar.gz
+tar -zxvf cmake-3.19.0-rc3.tar.gz
+cd cmake-3.19.0-rc3
+./bootstrap --prefix=$HOME/armnn-devenv/cmake/install
+make all install
+cd..
+'''
+
 ## Build Google's Protobuf library (Optional)
 
-* Clone protobuf: 
+* Clone protobuf:
   (Requires Git if not previously installed: `sudo apt install git`)
 ```bash
 mkdir $HOME/armnn-devenv/google
@@ -75,6 +91,30 @@ cd ..
 ```
 
 Note: The ANDROID_API variable should be set to the Android API version number you are using. E.g. "30" for Android R.
+
+## Build Flatbuffers
+
+* Download Flatbuffers
+```bash
+cd $HOME/armnn-devenv
+wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz
+tar xf flatbuffers-1.12.0.tar.gz
+```
+
+* Build Flatbuffers
+```bash
+cd flatbuffers-1.12.0
+rm -f CMakeCache.txt
+rm -rf build
+mkdir build
+cd build
+CXXFLAGS="-fPIC" $CMAKE .. \
+          -DFLATBUFFERS_BUILD_FLATC=1 \
+          -DCMAKE_INSTALL_PREFIX:PATH=$WORKING_DIR/flatbuffers
+
+make all install
+```
+Note: -fPIC is added to allow users to use the libraries in shared objects.
 
 ## Download Arm NN
 * Clone Arm NN: 
@@ -148,6 +188,8 @@ cmake .. \
     -DARMCOMPUTE_BUILD_DIR=$HOME/armnn-devenv/ComputeLibrary/build \
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
+    -DFLATBUFFERS_ROOT=$HOME/armnn-devenv/flatbuffers \
+    -DFLATC_DIR=$HOME/armnn-devenv/flatbuffers-1.12.0/build \
 ```
 
 To include standalone sample dynamic backend tests, add the argument to enable the tests and the dynamic backend path to the CMake command:

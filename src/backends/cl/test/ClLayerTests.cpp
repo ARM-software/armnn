@@ -1018,6 +1018,17 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Gather1dParamsUint8, ClContextControlFixture, G
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherMultiDimParamsFloat32, ClContextControlFixture, GatherMultiDimParamsFloat32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherMultiDimParamsUint8, ClContextControlFixture, GatherMultiDimParamsUint8Test)
 
+// GatherNd
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd2dFloat32, ClContextControlFixture, SimpleGatherNd2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd3dFloat32, ClContextControlFixture, SimpleGatherNd3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd4dFloat32, ClContextControlFixture, SimpleGatherNd4dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd2dInt8, ClContextControlFixture, SimpleGatherNd2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd3dInt8, ClContextControlFixture, SimpleGatherNd3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd4dInt8, ClContextControlFixture, SimpleGatherNd4dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd2dInt32, ClContextControlFixture, SimpleGatherNd2dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd3dInt32, ClContextControlFixture, SimpleGatherNd3dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd4dInt32, ClContextControlFixture, SimpleGatherNd4dTest<DataType::Signed32>)
+
 // Reshape
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleReshapeFloat32, ClContextControlFixture, SimpleReshapeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleReshapeInt8, ClContextControlFixture, SimpleReshapeTest<DataType::QAsymmS8>)

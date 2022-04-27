@@ -41,6 +41,7 @@
 #include "workloads/ClFloorFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClGatherWorkload.hpp"
+#include "workloads/ClGatherNdWorkload.hpp"
 #include "workloads/ClInstanceNormalizationWorkload.hpp"
 #include "workloads/ClL2NormalizationFloatWorkload.hpp"
 #include "workloads/ClLogWorkload.hpp"
@@ -372,6 +373,11 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
                                      infos[2],
                                      *(PolymorphicDowncast<const GatherDescriptor*>(&descriptor)),
                                      reasonIfUnsupported);
+        case LayerType::GatherNd:
+            return IsGatherNdSupported(infos[0],
+                                       infos[1],
+                                       infos[2],
+                                       reasonIfUnsupported);
         case LayerType::Input:
             return IsInputSupported(infos[0], reasonIfUnsupported);
         case LayerType::InstanceNormalization:
@@ -1019,6 +1025,18 @@ bool ClLayerSupport::IsGatherSupported(const TensorInfo& input0,
                                    input1,
                                    output,
                                    descriptor);
+}
+
+bool ClLayerSupport::IsGatherNdSupported(const TensorInfo& input0,
+                                         const TensorInfo& input1,
+                                         const TensorInfo& output,
+                                         Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClGatherNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input0,
+                                   input1,
+                                   output);
 }
 
 bool ClLayerSupport::IsInputSupported(const TensorInfo& input,

@@ -25,6 +25,7 @@
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"
 #include "ClGatherWorkload.hpp"
+#include "ClGatherNdWorkload.hpp"
 #include "ClInstanceNormalizationWorkload.hpp"
 #include "ClL2NormalizationFloatWorkload.hpp"
 #include "ClLogWorkload.hpp"

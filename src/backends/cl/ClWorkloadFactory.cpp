@@ -463,6 +463,11 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
             auto gatherQueueDescriptor = PolymorphicDowncast<const GatherQueueDescriptor*>(&descriptor);
             return MakeWorkload<ClGatherWorkload>(*gatherQueueDescriptor, info, m_CLCompileContext);
         }
+        case LayerType::GatherNd :
+        {
+            auto gatherNdQueueDescriptor = PolymorphicDowncast<const GatherNdQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClGatherNdWorkload>(*gatherNdQueueDescriptor, info, m_CLCompileContext);
+        }
         case LayerType::Input :
         {
             auto inputQueueDescriptor = PolymorphicDowncast<const InputQueueDescriptor*>(&descriptor);

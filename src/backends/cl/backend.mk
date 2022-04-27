@@ -50,6 +50,7 @@ BACKEND_SOURCES := \
         workloads/ClFloorFloatWorkload.cpp \
         workloads/ClFullyConnectedWorkload.cpp \
         workloads/ClGatherWorkload.cpp \
+        workloads/ClGatherNdWorkload.cpp \
         workloads/ClInstanceNormalizationWorkload.cpp \
         workloads/ClL2NormalizationFloatWorkload.cpp \
         workloads/ClLogWorkload.cpp \

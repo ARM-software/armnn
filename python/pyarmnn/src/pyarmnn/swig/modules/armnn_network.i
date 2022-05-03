@@ -631,6 +631,18 @@ public:
 
     %feature("docstring",
         "
+        Add GatherNd layer to the network.
+
+        Args:
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddGatherNdLayer;
+    armnn::IConnectableLayer* AddGatherNdLayer(const char* name = nullptr);
+
+    %feature("docstring",
+        "
         Adds an Instance Normalization layer to the network.
 
         Args:

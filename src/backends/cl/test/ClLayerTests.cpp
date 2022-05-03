@@ -517,6 +517,7 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleL2Pooling2d,
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_IgnorePaddingSimpleL2Pooling2dUint8,
                                  ClContextControlFixture,
                                  IgnorePaddingSimpleL2Pooling2dUint8Test)
+
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingL2Pooling2dSize3,
                                  ClContextControlFixture,
                                  IgnorePaddingL2Pooling2dSize3Test)
@@ -617,9 +618,19 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleMaxPooling3dSize2x2x2Stride1x1x1,
                                  SimpleMaxPooling3dSize2x2x2Stride1x1x1Test,
                                  DataLayout::NDHWC)
 
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleMaxPooling3dSize2x2x2Stride1x1x1Uint8,
+                                 ClContextControlFixture,
+                                 SimpleMaxPooling3dSize2x2x2Stride1x1x1Uint8Test,
+                                 DataLayout::NDHWC)
+
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleMaxPooling3d,
                                  ClContextControlFixture,
                                  SimpleMaxPooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleMaxPooling3dUint8,
+                                 ClContextControlFixture,
+                                 SimpleMaxPooling3dUint8Test,
                                  DataLayout::NDHWC)
 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleMaxPooling3d,
@@ -627,14 +638,29 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleMaxPooling3d,
                                  IgnorePaddingSimpleMaxPooling3dTest,
                                  DataLayout::NDHWC)
 
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleMaxPooling3dUint8,
+                                 ClContextControlFixture,
+                                 IgnorePaddingSimpleMaxPooling3dUint8Test,
+                                 DataLayout::NDHWC)
+
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAveragePooling3d,
                                  ClContextControlFixture,
                                  SimpleAveragePooling3dTest,
                                  DataLayout::NDHWC)
 
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAveragePooling3dUint8,
+                                 ClContextControlFixture,
+                                 SimpleAveragePooling3dUint8Test,
+                                 DataLayout::NDHWC)
+
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(LargeTensorsAveragePooling3d,
                                  ClContextControlFixture,
                                  LargeTensorsAveragePooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(LargeTensorsAveragePooling3dUint8,
+                                 ClContextControlFixture,
+                                 LargeTensorsAveragePooling3dUint8Test,
                                  DataLayout::NDHWC)
 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(IgnorePaddingSimpleAveragePooling3d,
@@ -657,9 +683,19 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareMaxPooling3d,
                                  AsymmetricNonSquareMaxPooling3dTest,
                                  DataLayout::NDHWC)
 
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareMaxPooling3dUint8,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareMaxPooling3dUint8Test,
+                                 DataLayout::NDHWC)
+
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareAveragePooling3d,
                                  ClContextControlFixture,
                                  AsymmetricNonSquareAveragePooling3dTest,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareAveragePooling3dUint8,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareAveragePooling3dUint8Test,
                                  DataLayout::NDHWC)
 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(AsymmetricNonSquareL2Pooling3d,
@@ -672,9 +708,19 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_AsymmetricNonSquareMaxPooling3dWith
                                  AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolTest,
                                  DataLayout::NDHWC)
 
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPool,
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolUint8,
                                  ClContextControlFixture,
-                                 AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolTest,
+                                 AsymmetricNonSquareMaxPooling3dWithPaddingOnlyPoolUint8Test,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolUint8,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolUint8Test,
+                                 DataLayout::NDHWC)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolUint8,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareAveragePooling3dWithPaddingOnlyPoolUint8Test,
                                  DataLayout::NDHWC)
 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTEDAsymmetricNonSquareL2Pooling3dWithPaddingOnlyPool,
@@ -682,13 +728,20 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTEDAsymmetricNonSquareL2Pooling3dWithPa
                                  AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolTest,
                                  DataLayout::NDHWC)
 
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTEDAsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolUint8,
+                                 ClContextControlFixture,
+                                 AsymmetricNonSquareL2Pooling3dWithPaddingOnlyPoolUint8Test,
+                                 DataLayout::NDHWC)
+
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAveragePooling3d,
                                  ClContextControlFixture,
                                  SimpleAveragePooling3dTest,
                                  DataLayout::NDHWC)
 
-
-
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAveragePooling3dUint8,
+                                 ClContextControlFixture,
+                                 SimpleAveragePooling3dUint8Test,
+                                 DataLayout::NDHWC)
 
 // Add
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleAdd, ClContextControlFixture, AdditionTest)

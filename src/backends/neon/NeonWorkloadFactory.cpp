@@ -461,6 +461,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
             auto pooling2dQueueDescriptor = PolymorphicDowncast<const Pooling2dQueueDescriptor*>(&descriptor);
             return std::make_unique<NeonPooling2dWorkload>(*pooling2dQueueDescriptor, info);
         }
+        case LayerType::Pooling3d :
+        {
+            auto pooling3dQueueDescriptor = PolymorphicDowncast<const Pooling3dQueueDescriptor*>(&descriptor);
+            return std::make_unique<NeonPooling3dWorkload>(*pooling3dQueueDescriptor, info);
+        }
         case LayerType::PreCompiled :
         {
             auto preCompiledQueueDescriptor = PolymorphicDowncast<const PreCompiledQueueDescriptor*>(&descriptor);

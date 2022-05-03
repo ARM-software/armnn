@@ -94,6 +94,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonPermuteWorkload.hpp
     NeonPooling2dWorkload.cpp
     NeonPooling2dWorkload.hpp
+    NeonPooling3dWorkload.hpp
+    NeonPooling3dWorkload.cpp
     NeonPreluWorkload.cpp
     NeonPreluWorkload.hpp
     NeonQLstmWorkload.cpp

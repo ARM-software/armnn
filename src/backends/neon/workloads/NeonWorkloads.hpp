@@ -49,6 +49,7 @@
 #include "NeonPadWorkload.hpp"
 #include "NeonPermuteWorkload.hpp"
 #include "NeonPooling2dWorkload.hpp"
+#include "NeonPooling3dWorkload.hpp"
 #include "NeonPreluWorkload.hpp"
 #include "NeonQLstmWorkload.hpp"
 #include "NeonQuantizedLstmWorkload.hpp"

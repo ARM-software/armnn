@@ -58,6 +58,7 @@
 #include "workloads/NeonPadWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
 #include "workloads/NeonPooling2dWorkload.hpp"
+#include "workloads/NeonPooling3dWorkload.hpp"
 #include "workloads/NeonPreluWorkload.hpp"
 #include "workloads/NeonQLstmWorkload.hpp"
 #include "workloads/NeonQuantizeWorkload.hpp"
@@ -435,6 +436,11 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
                                         infos[1],
                                         *(PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor)),
                                         reasonIfUnsupported);
+        case LayerType::Pooling3d:
+            return IsPooling3dSupported(infos[0],
+                                        infos[1],
+                                        *(PolymorphicDowncast<const Pooling3dDescriptor*>(&descriptor)),
+                                        reasonIfUnsupported);
         case LayerType::Prelu:
             return IsPreluSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::QLstm:
@@ -578,7 +584,7 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
         default:
             // layers not supported in neon by default:
             // debug, fakequantization, precompiled,
-            // standin, switch, pooling3d
+            // standin, switch
             return false;
     }
 }
@@ -1211,6 +1217,14 @@ bool NeonLayerSupport::IsPooling2dSupported(const TensorInfo& input,
                                             Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonPooling2dWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool NeonLayerSupport::IsPooling3dSupported(const TensorInfo& input,
+                                            const TensorInfo& output,
+                                            const Pooling3dDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonPooling3dWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
 }
 
 bool NeonLayerSupport::IsPreluSupported(const armnn::TensorInfo &input,

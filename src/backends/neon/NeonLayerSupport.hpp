@@ -246,7 +246,10 @@ public:
                               const TensorInfo& output,
                               const Pooling2dDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
+    bool IsPooling3dSupported(const TensorInfo& input,
+                              const TensorInfo& output,
+                              const Pooling3dDescriptor& descriptor,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
     bool IsPreluSupported(const TensorInfo& input,
                           const TensorInfo& alpha,
                           const TensorInfo& output,

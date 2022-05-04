@@ -19,10 +19,10 @@ LayerTestResult<T, 4> SimpleFloorTest(
 {
     IgnoreUnused(memoryManager);
     armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, ArmnnType);
-    inputTensorInfo.SetQuantizationScale(0.1f);
+    inputTensorInfo.SetQuantizationScale(1.0f);
 
     armnn::TensorInfo outputTensorInfo(inputTensorInfo);
-    outputTensorInfo.SetQuantizationScale(0.1f);
+    outputTensorInfo.SetQuantizationScale(1.0f);
 
     std::vector<T> input = ConvertToDataType<ArmnnType>(
         {
@@ -80,9 +80,14 @@ SimpleFloorTest<armnn::DataType::Float16>(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
-
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
 SimpleFloorTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed32>, 4>
+SimpleFloorTest<armnn::DataType::Signed32>(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory);

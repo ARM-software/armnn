@@ -1500,11 +1500,12 @@ bool RefLayerSupport::IsFloorSupported(const TensorInfo& input,
     IgnoreUnused(output);
     bool supported = true;
 
-    std::array<DataType,3> supportedTypes =
+    std::array<DataType,4> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
-        DataType::Float16
+        DataType::Float16,
+        DataType::Signed32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

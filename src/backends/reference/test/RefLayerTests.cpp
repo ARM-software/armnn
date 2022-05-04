@@ -1643,6 +1643,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFillS32, SimpleFillTest<DataType::Signed32>)
 // Floor
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorFloat16, SimpleFloorTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorInt32, SimpleFloorTest<DataType::Signed32>)
 
 // Reshape
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeFloat32, SimpleReshapeTest<DataType::Float32>)

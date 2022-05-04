@@ -141,4 +141,17 @@ TEST_CASE_FIXTURE(SimpleRsqrtFixture, "ParseRsqrt")
                                                                 0.2f, 0.125f, 0.1f} }});
 }
 
+struct SimpleSqrtFixture : public ElementWiseUnaryFixture
+{
+    SimpleSqrtFixture() : ElementWiseUnaryFixture("SQRT", "FLOAT32", "[ 1, 2, 3, 1 ]", "[ 1, 2, 3, 1 ]") {}
+};
+
+TEST_CASE_FIXTURE(SimpleSqrtFixture, "ParseSqrt")
+{
+    RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor", { 9.0f, 4.0f, 16.0f,
+                                                                25.0f, 36.0f, 49.0f } }},
+                                         {{ "outputTensor",{ 3.0f, 2.0f, 4.0f,
+                                                             5.0f, 6.0f, 7.0f} }});
+}
+
 }

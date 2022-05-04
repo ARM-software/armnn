@@ -174,6 +174,7 @@ private:
     void ParseShape(size_t subgraphIndex, size_t operatorIndex);
     void ParseSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSqrt(size_t subgraphIndex, size_t operatorIndex);
     void ParseSpaceToBatchND(size_t subgraphIndex, size_t operatorIndex);
     void ParseSplit(size_t subgraphIndex, size_t operatorIndex);
     void ParseSplitV(size_t subgraphIndex, size_t operatorIndex);

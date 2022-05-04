@@ -730,6 +730,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_BILINEAR]         = &TfLiteParserImpl::ParseResizeBilinear;
     m_ParserFunctions[tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR] = &TfLiteParserImpl::ParseResizeNearestNeighbor;
     m_ParserFunctions[tflite::BuiltinOperator_RSQRT]                   = &TfLiteParserImpl::ParseRsqrt;
+    m_ParserFunctions[tflite::BuiltinOperator_SQRT]                    = &TfLiteParserImpl::ParseSqrt;
     m_ParserFunctions[tflite::BuiltinOperator_SHAPE]                   = &TfLiteParserImpl::ParseShape;
     m_ParserFunctions[tflite::BuiltinOperator_SLICE]                   = &TfLiteParserImpl::ParseSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]                 = &TfLiteParserImpl::ParseSoftmax;
@@ -4178,6 +4179,11 @@ void TfLiteParserImpl::ParseNeg(size_t subgraphIndex, size_t operatorIndex)
 void TfLiteParserImpl::ParseRsqrt(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Rsqrt);
+}
+
+void TfLiteParserImpl::ParseSqrt(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Sqrt);
 }
 
 void TfLiteParserImpl::ParseElementwiseUnary(size_t subgraphIndex, size_t operatorIndex, UnaryOperation unaryOperation)

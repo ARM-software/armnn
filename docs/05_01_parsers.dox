@@ -176,6 +176,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - SPLIT
 - SPLIT_V
 - SQUEEZE
+- SQRT
 - STRIDED_SLICE
 - SUB
 - SUM

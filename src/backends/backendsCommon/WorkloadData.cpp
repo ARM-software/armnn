@@ -1953,8 +1953,7 @@ void FloorQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
-        DataType::QSymmS16,
-        DataType::Signed32
+        DataType::QSymmS16
     };
 
     ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);

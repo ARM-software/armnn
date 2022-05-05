@@ -72,6 +72,7 @@
 #include "workloads/NeonSpaceToBatchNdWorkload.hpp"
 #include "workloads/NeonSpaceToDepthWorkload.hpp"
 #include "workloads/NeonSplitterWorkload.hpp"
+#include "workloads/NeonSqrtWorkload.hpp"
 #include "workloads/NeonStackWorkload.hpp"
 #include "workloads/NeonStridedSliceWorkload.hpp"
 #include "workloads/NeonSubtractionWorkload.hpp"
@@ -938,6 +939,11 @@ bool NeonLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            output);
         case UnaryOperation::Sin:
             FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSinWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Sqrt:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSqrtWorkloadValidate,
                                            reasonIfUnsupported,
                                            input,
                                            output);

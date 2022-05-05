@@ -81,6 +81,7 @@ BACKEND_SOURCES := \
         workloads/NeonSpaceToBatchNdWorkload.cpp \
         workloads/NeonSpaceToDepthWorkload.cpp \
         workloads/NeonSplitterWorkload.cpp \
+        workloads/NeonSqrtWorkload.cpp \
         workloads/NeonStackWorkload.cpp \
         workloads/NeonStridedSliceWorkload.cpp \
         workloads/NeonSubtractionWorkload.cpp \

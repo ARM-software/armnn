@@ -4341,12 +4341,21 @@ armnn::IConnectableLayer* TfLiteParserImpl::AddFusedActivationLayer(armnn::IConn
 armnn::IConnectableLayer* TfLiteParserImpl::AddFusedFloorLayer(armnn::IConnectableLayer* prevLayer,
                                                                unsigned int outputSlot)
 {
+
+    auto& prevOutputSlot = prevLayer->GetOutputSlot(outputSlot);
+    DataType dataType = prevOutputSlot.GetTensorInfo().GetDataType();
+
+    if (dataType == DataType::Signed32)
+    {
+        return prevLayer;
+    }
+
     std::string layerName = prevLayer->GetName();
     IConnectableLayer* floorLayer = m_Network->AddFloorLayer(layerName.c_str());
 
-    auto & prevOutputSlot = prevLayer->GetOutputSlot(outputSlot);
     prevOutputSlot.Connect(floorLayer->GetInputSlot(0));
     floorLayer->GetOutputSlot(0).SetTensorInfo(prevOutputSlot.GetTensorInfo());
+
     return floorLayer;
 }
 

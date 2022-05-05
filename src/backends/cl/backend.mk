@@ -82,6 +82,7 @@ BACKEND_SOURCES := \
         workloads/ClSpaceToBatchNdWorkload.cpp \
         workloads/ClSpaceToDepthWorkload.cpp \
         workloads/ClSplitterWorkload.cpp \
+        workloads/ClSqrtWorkload.cpp \
         workloads/ClStackWorkload.cpp \
         workloads/ClStridedSliceWorkload.cpp \
         workloads/ClSubtractionWorkload.cpp \

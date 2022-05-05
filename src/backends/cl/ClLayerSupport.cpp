@@ -74,6 +74,7 @@
 #include "workloads/ClSpaceToBatchNdWorkload.hpp"
 #include "workloads/ClSpaceToDepthWorkload.hpp"
 #include "workloads/ClSplitterWorkload.hpp"
+#include "workloads/ClSqrtWorkload.hpp"
 #include "workloads/ClStackWorkload.hpp"
 #include "workloads/ClStridedSliceWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
@@ -954,6 +955,11 @@ bool ClLayerSupport::IsElementwiseUnarySupported(const TensorInfo& input,
                                            output);
         case UnaryOperation::Sin:
             FORWARD_WORKLOAD_VALIDATE_FUNC(ClSinWorkloadValidate,
+                                           reasonIfUnsupported,
+                                           input,
+                                           output);
+        case UnaryOperation::Sqrt:
+            FORWARD_WORKLOAD_VALIDATE_FUNC(ClSqrtWorkloadValidate,
                                            reasonIfUnsupported,
                                            input,
                                            output);

@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_02" # Release 22.02
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c827e99fc46521f43719b0c2d1b6f05d66abf68c" #Update Neon™ pooling kernel.
+#DEFAULT_CLFRAMEWORKREVISION="c827e99fc46521f43719b0c2d1b6f05d66abf68c" #Update Neon™ pooling kernel.
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

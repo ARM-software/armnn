@@ -31,7 +31,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
     TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
-    bool biasEnabled = (numInputs == 3);
+    bool biasEnabled = IsOptionalOperandPresent(tfLiteNode, 2);
 
     const TfLiteTensor* tfLiteTensors = tfLiteContext->tensors;
     const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[0]];
@@ -52,9 +52,9 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    const armnn::TensorInfo& inputTensorInfo   = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    armnn::TensorInfo weightsTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteWeightsTensor);
-    const armnn::TensorInfo& outputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
+    armnn::TensorInfo weightsTensorInfo       = GetTensorInfoForTfLiteTensor(tfLiteWeightsTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
     // Fully Connected Layer accepts two dimensional weights input
     int32_t weightsDimension = static_cast<int32_t>(weightsTensorInfo.GetNumDimensions());

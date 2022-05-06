@@ -586,11 +586,13 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
 
 bool IsOptionalOperandPresent(TfLiteNode* tfLiteNode, const int operandIndex)
 {
-    if (tfLiteNode->inputs->data[operandIndex] < 0) {
+    // If the inputs array has fewer than operandIndex entries or if the entry at operandIndex has a value of -1 or
+    // less then the input is not present.
+    if (tfLiteNode->inputs->size > operandIndex && tfLiteNode->inputs->data[operandIndex] >= 0)
+    {
         return true;
     }
     return false;
-
 }
 
 TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,

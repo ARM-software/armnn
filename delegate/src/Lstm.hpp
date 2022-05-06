@@ -52,7 +52,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     // Set the params structure for the AddLstmLayer call
     armnn::LstmInputParams params;
 
-    if (!IsOptionalOperandPresent(tfLiteNode, 1))
+    if (IsOptionalOperandPresent(tfLiteNode, 1))
     {
         params.m_InputToInputWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 1);
     }
@@ -62,7 +62,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     params.m_InputToOutputWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 4);
 
     // Recurrent weight tensors of size {n_cell, n_output}
-    if (!IsOptionalOperandPresent(tfLiteNode, 5))
+    if (IsOptionalOperandPresent(tfLiteNode, 5))
     {
         params.m_RecurrentToInputWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 5);
     }
@@ -72,23 +72,23 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     params.m_RecurrentToOutputWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 8);
 
     // Peephole weights tensors of size {n_cell}, representing a diagonal matrix.
-    if (!IsOptionalOperandPresent(tfLiteNode, 9))
+    if (IsOptionalOperandPresent(tfLiteNode, 9))
     {
         params.m_CellToInputWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 9);
     }
 
-    if (!IsOptionalOperandPresent(tfLiteNode, 10))
+    if (IsOptionalOperandPresent(tfLiteNode, 10))
     {
         params.m_CellToForgetWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 10);
     }
 
-    if (!IsOptionalOperandPresent(tfLiteNode, 11))
+    if (IsOptionalOperandPresent(tfLiteNode, 11))
     {
         params.m_CellToOutputWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 11);
     }
 
     // Gates bias tensors of size {n_cell}
-    if (!IsOptionalOperandPresent(tfLiteNode, 12))
+    if (IsOptionalOperandPresent(tfLiteNode, 12))
     {
         params.m_InputGateBias = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 12);
     }
@@ -98,12 +98,12 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     params.m_OutputGateBias = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 15);
 
     // Projection weight tensor of size {n_output, n_cell}
-    if (!IsOptionalOperandPresent(tfLiteNode, 16))
+    if (IsOptionalOperandPresent(tfLiteNode, 16))
     {
         params.m_ProjectionWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 16);
     }
     // Projection bias tensor of size {n_output}
-    if (!IsOptionalOperandPresent(tfLiteNode, 17))
+    if (IsOptionalOperandPresent(tfLiteNode, 17))
     {
         params.m_ProjectionBias = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 17);
     }
@@ -113,22 +113,22 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     armnn::TensorInfo cellStateInInfo = GetTensorInfoForTfLiteTensor(tfLiteTensors[tfLiteNode->inputs->data[19]]);
 
     // Layer norm coefficient tensors of size {n_cell}, representing a diagonal matrix.
-    if (tfLiteNode->inputs->size >= 21 && !IsOptionalOperandPresent(tfLiteNode, 20))
+    if (IsOptionalOperandPresent(tfLiteNode, 20))
     {
         params.m_InputLayerNormWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 20);
     }
 
-    if (tfLiteNode->inputs->size >= 22 && !IsOptionalOperandPresent(tfLiteNode, 21))
+    if (IsOptionalOperandPresent(tfLiteNode, 21))
     {
         params.m_ForgetLayerNormWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 21);
     }
 
-    if (tfLiteNode->inputs->size >= 23 && !IsOptionalOperandPresent(tfLiteNode, 22))
+    if (IsOptionalOperandPresent(tfLiteNode, 22))
     {
         params.m_CellLayerNormWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 22);
     }
 
-    if (tfLiteNode->inputs->size >= 24 && !IsOptionalOperandPresent(tfLiteNode, 23))
+    if (IsOptionalOperandPresent(tfLiteNode, 23))
     {
         params.m_OutputLayerNormWeights = GetConstTensorForTfLiteTensor(tfLiteTensors, tfLiteNode, 23);
     }

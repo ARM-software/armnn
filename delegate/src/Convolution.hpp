@@ -35,7 +35,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     armnn::Convolution2dDescriptor descriptor;
     const auto params = reinterpret_cast<TfLiteConvParams*>(tfLiteNode->builtin_data);
 
-    bool biasEnabled = tfLiteNode->inputs->size > 2;
+    bool biasEnabled = IsOptionalOperandPresent(tfLiteNode, 2);
     descriptor.m_BiasEnabled = biasEnabled;
     descriptor.m_StrideX = NonNegative(params->stride_width, nodeIndex);
     descriptor.m_StrideY = NonNegative(params->stride_height, nodeIndex);
@@ -225,7 +225,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     armnn::Convolution3dDescriptor descriptor;
     const auto params = reinterpret_cast<TfLiteConv3DParams*>(tfLiteNode->builtin_data);
 
-    bool biasEnabled = tfLiteNode->inputs->size == 3 ? true : false;
+    bool biasEnabled = IsOptionalOperandPresent(tfLiteNode, 2);
     descriptor.m_BiasEnabled = biasEnabled;
     descriptor.m_DataLayout = armnn::DataLayout::NDHWC;
     descriptor.m_StrideX = NonNegative(params->stride_width, nodeIndex);
@@ -382,7 +382,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     }
     TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
 
-    bool biasEnabled = tfLiteNode->inputs->size > 2;
+    bool biasEnabled = IsOptionalOperandPresent(tfLiteNode, 2);
 
     armnn::DepthwiseConvolution2dDescriptor descriptor;
     const auto params = reinterpret_cast<TfLiteDepthwiseConvParams*>(tfLiteNode->builtin_data);

@@ -100,6 +100,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/SpaceToBatchNdTestImpl.cpp \
     test/layerTests/SpaceToDepthTestImpl.cpp \
     test/layerTests/SplitterTestImpl.cpp \
+    test/layerTests/SqrtTestImpl.cpp \
     test/layerTests/StackTestImpl.cpp \
     test/layerTests/StridedSliceTestImpl.cpp \
     test/layerTests/SubtractionTestImpl.cpp \

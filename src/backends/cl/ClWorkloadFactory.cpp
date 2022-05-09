@@ -435,6 +435,8 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
                 }
                 case UnaryOperation::Sin:
                     return std::make_unique<ClSinWorkload>(*elementwiseUnaryQueueDescriptor, info, m_CLCompileContext);
+                case UnaryOperation::Sqrt:
+                    return std::make_unique<ClSqrtWorkload>(*elementwiseUnaryQueueDescriptor, info, m_CLCompileContext);
                 default:
                     return nullptr;
             }

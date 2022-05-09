@@ -60,6 +60,7 @@
 #include "ClSpaceToBatchNdWorkload.hpp"
 #include "ClSpaceToDepthWorkload.hpp"
 #include "ClSplitterWorkload.hpp"
+#include "ClSqrtWorkload.hpp"
 #include "ClStackWorkload.hpp"
 #include "ClStridedSliceWorkload.hpp"
 #include "ClSubtractionWorkload.hpp"

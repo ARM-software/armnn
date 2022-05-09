@@ -1705,6 +1705,20 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt3dQuantisedAsymm8, Rsqrt3dTest<DataType::QAsy
 ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt2dQuantisedSymm16, Rsqrt2dTest<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt3dQuantisedSymm16, Rsqrt3dTest<DataType::QSymmS16>)
 
+// Sqrt
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt2d, Sqrt2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt3d, Sqrt3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SqrtZero, SqrtZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SqrtNegative, SqrtNegativeTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt2dFloat16, Sqrt2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt3dFloat16, Sqrt3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt2dQuantisedAsymmS8, Sqrt2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt3dQuantisedAsymmS8, Sqrt3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt2dQuantisedAsymm8, Sqrt2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt3dQuantisedAsymm8, Sqrt3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt2dQuantisedSymm16, Sqrt2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt3dQuantisedSymm16, Sqrt3dTest<DataType::QSymmS16>)
+
 // Permute
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimplePermuteBFloat16, SimplePermuteTest<DataType::BFloat16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(PermuteBFloat16ValueSet1Test, PermuteValueSet1Test<DataType::BFloat16>)

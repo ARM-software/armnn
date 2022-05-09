@@ -1790,6 +1790,12 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Rsqrt3d, ClContextControlFixture, Rsqrt3dTest<D
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(RsqrtZero, ClContextControlFixture, RsqrtZeroTest<DataType::Float32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(RsqrtNegative, ClContextControlFixture, RsqrtNegativeTest<DataType::Float32>)
 
+// Sqrt
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Sqrt2d, ClContextControlFixture, Sqrt2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Sqrt3d, ClContextControlFixture, Sqrt3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SqrtZero, ClContextControlFixture, SqrtZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SqrtNegative, ClContextControlFixture, SqrtNegativeTest<DataType::Float32>)
+
 // Quantize
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(QuantizeSimpleUint8, ClContextControlFixture, QuantizeSimpleUint8Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(QuantizeClampUint8, ClContextControlFixture, QuantizeClampUint8Test)

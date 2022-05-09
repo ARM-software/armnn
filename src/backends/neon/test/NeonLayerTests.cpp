@@ -1424,6 +1424,12 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Rsqrt3d, Rsqrt3dTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RsqrtZero, RsqrtZeroTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RsqrtNegative, RsqrtNegativeTest<DataType::Float32>)
 
+// Sqrt
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt2d, Sqrt2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Sqrt3d, Sqrt3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SqrtZero, SqrtZeroTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SqrtNegative, SqrtNegativeTest<DataType::Float32>)
+
 // ArgMinMax
 ARMNN_AUTO_TEST_CASE_WITH_THF(ArgMinFloat32, ArgMinSimpleTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ArgMaxFloat32, ArgMaxSimpleTest<DataType::Float32>)

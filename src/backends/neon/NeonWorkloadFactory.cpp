@@ -320,6 +320,8 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
                 }
                 case UnaryOperation::Sin:
                     return std::make_unique<NeonSinWorkload>(*elementwiseUnaryQueueDescriptor, info);
+                case UnaryOperation::Sqrt:
+                    return std::make_unique<NeonSqrtWorkload>(*elementwiseUnaryQueueDescriptor, info);
                 default:
                     return nullptr;
             }

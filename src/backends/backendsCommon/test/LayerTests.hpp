@@ -68,6 +68,7 @@
 #include <backendsCommon/test/layerTests/SpaceToBatchNdTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SpaceToDepthTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SplitterTestImpl.hpp>
+#include <backendsCommon/test/layerTests/SqrtTestImpl.hpp>
 #include <backendsCommon/test/layerTests/StackTestImpl.hpp>
 #include <backendsCommon/test/layerTests/StridedSliceTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SubtractionTestImpl.hpp>

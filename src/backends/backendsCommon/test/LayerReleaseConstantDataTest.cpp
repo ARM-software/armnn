@@ -108,7 +108,6 @@ TEST_CASE("ReleaseConvolution2dLayerConstantDataTest")
     TensorInfo biasInfo = biasLayer->m_LayerOutput->GetTensorInfo();
     biasInfo.SetConstant();
 
-
     weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
     biasLayer->GetOutputSlot(0).SetTensorInfo(biasInfo);
 
@@ -123,15 +122,15 @@ TEST_CASE("ReleaseConvolution2dLayerConstantDataTest")
     Connect(layer, output, TensorInfo({ 2, 2, 2, 10 }, armnn::DataType::Float32));
 
     // check the constants that they are not NULL
-    CHECK(layer->m_Weight != nullptr);
-    CHECK(layer->m_Bias != nullptr);
+    CHECK(weightsLayer->m_LayerOutput != nullptr);
+    CHECK(biasLayer->m_LayerOutput != nullptr);
 
     // free up the constants..
     layer->ReleaseConstantData();
 
     // check the constants that they are NULL now
-    CHECK(layer->m_Weight == nullptr);
-    CHECK(layer->m_Bias == nullptr);
+    CHECK(weightsLayer->m_LayerOutput == nullptr);
+    CHECK(biasLayer->m_LayerOutput == nullptr);
 }
 
 TEST_CASE("ReleaseDepthwiseConvolution2dLayerConstantDataTest")

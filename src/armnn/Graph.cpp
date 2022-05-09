@@ -652,4 +652,9 @@ const std::shared_ptr<IProfiler>& Graph::GetProfiler() const
     return m_Profiler;
 }
 
+void Graph::SetLayersOutOfOrder()
+{
+    m_LayersInOrder = false;
+}
+
 } // namespace armnn

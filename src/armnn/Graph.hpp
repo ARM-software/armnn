@@ -229,6 +229,8 @@ public:
 
     const std::shared_ptr<IProfiler>& GetProfiler() const;
 
+    void SetLayersOutOfOrder();
+
 private:
     template <typename LayerT>
     class LayerInGraphBase;

@@ -143,7 +143,10 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
     bool useExternalMemoryManager = false;
     bool useInternalMemoryManager = false;
-    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().TopologicalSort();
+    Graph& order = m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph();
+    // Ensure Topological order
+    order.SetLayersOutOfOrder();
+    order.TopologicalSort();
 
     if (!networkProperties.m_AsyncEnabled)
     {

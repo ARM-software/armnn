@@ -139,6 +139,13 @@ void Convolution2dLayer::ValidateTensorShapesFromInputs()
 
 Layer::ConstantTensors Convolution2dLayer::GetConstantTensorsByRef()
 {
+    Layer::ConstantTensors tensors = GetConnectedConstantAsInputTensors();
+
+    if (!tensors.empty())
+    {
+        return tensors;
+    }
+
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_Weight, m_Bias};
 }

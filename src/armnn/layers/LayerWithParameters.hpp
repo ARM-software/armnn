@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#include "ConstantLayer.hpp"
 #include <Layer.hpp>
 
 namespace armnn
@@ -54,6 +55,34 @@ protected:
     {
         strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
     }
+
+    Layer::ConstantTensors GetConnectedConstantAsInputTensors()
+    {
+        Layer::ConstantTensors tensors;
+        for (unsigned int i = 0; i < GetNumInputSlots(); ++i)
+        {
+            if (GetInputSlot(i).GetConnection() && GetInputSlot(i).GetConnection()->GetTensorInfo().IsConstant())
+            {
+                auto &inputLayer = GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
+                if (inputLayer.GetType() == armnn::LayerType::Constant)
+                {
+                    auto &constantLayer = static_cast<ConstantLayer&>(inputLayer);
+
+                    tensors.push_back(constantLayer.m_LayerOutput);
+                }
+            }
+        }
+        if (tensors.empty())
+        {
+            const std::string warningMessage{"GetConnectedConstantAsInputTensors() called on Layer with no "
+                                             "connected Constants as Input Tensors."};
+            ARMNN_LOG(warning) << warningMessage;
+        }
+        return tensors;
+    }
 };
+
+
+
 
 } // namespace

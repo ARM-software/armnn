@@ -27,9 +27,9 @@ public:
 
 private:
     arm_compute::Tensor m_FlattenedCoeff;
-    arm_compute::Tensor m_outputMul;
+    arm_compute::Tensor m_OutputMul;
     arm_compute::Tensor m_FlattenedIndices;
-    arm_compute::Tensor m_outputGather;
+    arm_compute::Tensor m_OutputGather;
 
     mutable arm_compute::NEPixelWiseMultiplication m_MulLayer;
     mutable arm_compute::NEReductionOperation m_ReduceSumLayer;

@@ -55,7 +55,7 @@ arm_compute::Status NeonGatherNdWorkloadValidate(const TensorInfo& paramsInfo,
                                                                        &aclFlattenedIndicesInfo,
                                                                        static_cast<unsigned int>(coords[0]),
                                                                        arm_compute::ReductionOperation::SUM,
-                                                                       false);;
+                                                                       false);
 
     /// Validate Gather
     // Params with shape { K, C }
@@ -126,10 +126,10 @@ NeonGatherNdWorkload::NeonGatherNdWorkload(const GatherNdQueueDescriptor& descri
 
     // Calculate the m_FlattenedCoeff
     TensorShape paramsShape = paramsInfo.GetShape();
-    std::vector<unsigned int> flattenedCoeff(keyIndices["ND"], 1);
+    std::vector<int32_t> flattenedCoeff(keyIndices["ND"], 1);
     for (unsigned int i = 1; i < keyIndices["ND"]; ++i)
     {
-        flattenedCoeff[i - 1] = paramsShape[i];
+        flattenedCoeff[i - 1] = static_cast<int32_t>(paramsShape[i]);
     }
     for (unsigned int i = keyIndices["ND"] - 1; i > 0; --i)
     {
@@ -139,18 +139,20 @@ NeonGatherNdWorkload::NeonGatherNdWorkload(const GatherNdQueueDescriptor& descri
     flattenedCoeff_Info.SetShape({ keyIndices["ND"] });
     BuildArmComputeTensor(m_FlattenedCoeff, flattenedCoeff_Info);
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_FlattenedCoeff);
-    CopyArmComputeITensorData(flattenedCoeff.data(), m_FlattenedCoeff);
+    ARMNN_ASSERT_MSG(indicesInfo.GetDataType() == DataType::Signed32,
+                     "flattenedCoeff must be same data type as m_FlattenedCoeff");
+    CopyArmComputeITensorData<int32_t>(flattenedCoeff.data(), m_FlattenedCoeff);
 
     // Prepare the tensor to store the output of the multiplication
     armnn::TensorInfo outputMul_Info = indicesInfo;
     outputMul_Info.SetShape({ keyIndices["W"], keyIndices["ND"] });
-    BuildArmComputeTensor(m_outputMul, outputMul_Info);
-    armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_outputMul);
+    BuildArmComputeTensor(m_OutputMul, outputMul_Info);
+    armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_OutputMul);
 
     // Multiply
     m_MulLayer.configure(&indices,
                          &m_FlattenedCoeff,
-                         &m_outputMul,
+                         &m_OutputMul,
                          1.0f,
                          arm_compute::ConvertPolicy::WRAP,
                          arm_compute::RoundingPolicy::TO_ZERO,
@@ -158,10 +160,10 @@ NeonGatherNdWorkload::NeonGatherNdWorkload(const GatherNdQueueDescriptor& descri
 
     // Reduce Sum
     const std::vector<unsigned int> armnnReduceAxes(1, 1);
-    arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(m_outputMul.info()->num_dimensions(),
+    arm_compute::Coordinates coords = BuildArmComputeReductionCoordinates(m_OutputMul.info()->num_dimensions(),
                                                                           outputMul_Info.GetNumDimensions(),
                                                                           armnnReduceAxes);
-    m_ReduceSumLayer.configure(&m_outputMul,
+    m_ReduceSumLayer.configure(&m_OutputMul,
                                &m_FlattenedIndices,
                                static_cast<unsigned int>(coords[0]),
                                arm_compute::ReductionOperation::SUM,
@@ -176,13 +178,13 @@ NeonGatherNdWorkload::NeonGatherNdWorkload(const GatherNdQueueDescriptor& descri
     // (the original outputInfo has the shape given by gatherNd)
     armnn::TensorInfo outputGather_Info = outputInfo;
     outputGather_Info.SetShape({ keyIndices["W"], keyIndices["C"] });
-    BuildArmComputeTensor(m_outputGather, outputGather_Info);
-    armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_outputGather);
+    BuildArmComputeTensor(m_OutputGather, outputGather_Info);
+    armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_OutputGather);
 
-    m_GatherLayer.configure(&input, &m_FlattenedIndices, &m_outputGather, ComputeAclAxis(0, paramsInfo));
+    m_GatherLayer.configure(&input, &m_FlattenedIndices, &m_OutputGather, ComputeAclAxis(0, paramsInfo));
 
     // Reshape output to the original output shape
-    m_ReshapeLayer.configure(&m_outputGather, &output);
+    m_ReshapeLayer.configure(&m_OutputGather, &output);
 }
 
 void NeonGatherNdWorkload::Execute() const

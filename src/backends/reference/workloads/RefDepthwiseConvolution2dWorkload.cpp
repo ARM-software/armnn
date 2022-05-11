@@ -64,8 +64,6 @@ void RefDepthwiseConvolution2dWorkload::Execute() const
 
 void RefDepthwiseConvolution2dWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
 {
-    PostAllocationConfigure(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
-
     Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
 }
 
@@ -73,22 +71,22 @@ void RefDepthwiseConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inpu
                                                 std::vector<ITensorHandle*> outputs) const
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefDepthwiseConvolution2dWorkload_Execute");
-    std::unique_ptr<Decoder<float>> pBiasDecoder{};
 
-    std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(GetTensorInfo(inputs[0]), inputs[0]->Map());
-    std::unique_ptr<Encoder<float>> OutputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]), outputs[0]->Map());
-
-    const TensorShape& inputShape = GetTensorInfo(inputs[0]).GetShape();
+    const TensorShape& inputShape  = GetTensorInfo(inputs[0]).GetShape();
     const TensorShape& outputShape = GetTensorInfo(outputs[0]).GetShape();
+    const TensorShape& filterShape = GetTensorInfo(inputs[1]).GetShape();
 
-    m_FilterDecoder->Reset(inputs[1]->Map());
+    std::unique_ptr<Decoder<float>> inputDecoder  = MakeDecoder<float>(GetTensorInfo(inputs[0]), inputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]), outputs[0]->Map());
+    std::unique_ptr<Decoder<float>> filterDecoder = MakeDecoder<float>(GetTensorInfo(inputs[1]), inputs[1]->Map());
+    std::unique_ptr<Decoder<float>> biasDecoder{};
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        m_BiasDecoder->Reset(inputs[2]->Map());
+       biasDecoder = MakeDecoder<float>(GetTensorInfo(inputs[2]), inputs[2]->Map());
     }
 
-    Convolve(inputShape, *inputDecoder, outputShape, *OutputEncoder,
-             m_FilterShape, *m_FilterDecoder, m_Data.m_Parameters.m_BiasEnabled, m_BiasDecoder.get(),
+    Convolve(inputShape, *inputDecoder, outputShape, *outputEncoder,
+             filterShape, *filterDecoder, m_Data.m_Parameters.m_BiasEnabled, biasDecoder.get(),
              m_Data.m_Parameters.m_DataLayout, m_Data.m_Parameters.m_PadTop, m_Data.m_Parameters.m_PadLeft,
              m_Data.m_Parameters.m_StrideX, m_Data.m_Parameters.m_StrideY,
              m_Data.m_Parameters.m_DilationX,

@@ -1713,6 +1713,20 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
         inputData = tmp;
     }
 
+    std::vector<T> kernelData;
+    kernelData.assign(kernel.data(), kernel.data() + kernelHeight * kernelWidth * outputChannels);
+    if (workloadFactory.GetBackendId() == armnn::BackendId("GpuAcc") ||
+        workloadFactory.GetBackendId() == armnn::BackendId("CpuAcc"))
+    {
+        if (layout == armnn::DataLayout::NCHW)
+        {
+            std::vector<T> tmp(kernelData.size());
+            kernelDesc.SetShape(armnnUtils::Permuted(kernelDesc.GetShape(), {0, 2, 3, 1}));
+            armnnUtils::Permute(kernelDesc.GetShape(), {0, 2, 3, 1}, kernelData.data(), tmp.data(), sizeof(T));
+            kernelData = tmp;
+        }
+    }
+
     // Construct the output data, with bias applied, as appropriate.
     std::vector<T> outputData;
     outputData.assign(outputExpected.data(), outputExpected.data() + outputChannels*outputHeight*outputWidth);
@@ -1751,8 +1765,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
     //    Cannot PolymorphicDowncast from ScopedTensorHandle->RefTensorHandle.
     //    Need to PolymorphicDowncast from ITensorHandle->RefTensorHandle.
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
-    AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernel.data()); // required for ConstantTensor
+    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data());
+    AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernelData.data()); // required for ConstantTensor
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddInputToWorkload(data, info, kernelDesc, weightsHandle.get());
@@ -1880,6 +1894,18 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
             },
             kernelDesc.GetQuantizationScale(),
             kernelDesc.GetQuantizationOffset()));
+
+    if (workloadFactory.GetBackendId() == armnn::BackendId("GpuAcc") ||
+        workloadFactory.GetBackendId() == armnn::BackendId("CpuAcc"))
+    {
+        if (layout == armnn::DataLayout::NCHW)
+        {
+            std::vector<T> tmp(kernelData.size());
+            kernelDesc.SetShape(armnnUtils::Permuted(kernelDesc.GetShape(), {0, 2, 3, 1}));
+            armnnUtils::Permute(kernelDesc.GetShape(), {0, 2, 3, 1}, kernelData.data(), tmp.data(), sizeof(T));
+            kernelData = tmp;
+        }
+    }
 
     // Manually calculated.
     std::vector<T> outputImage(
@@ -2077,6 +2103,18 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
             kernelDesc.GetQuantizationScale(),
             kernelDesc.GetQuantizationOffset()));
 
+    if (workloadFactory.GetBackendId() == armnn::BackendId("GpuAcc") ||
+        workloadFactory.GetBackendId() == armnn::BackendId("CpuAcc"))
+    {
+        if (layout == armnn::DataLayout::NCHW)
+        {
+            std::vector<T> tmp(kernelData.size());
+            kernelDesc.SetShape(armnnUtils::Permuted(kernelDesc.GetShape(), {0, 2, 3, 1}));
+            armnnUtils::Permute(kernelDesc.GetShape(), {0, 2, 3, 1}, kernelData.data(), tmp.data(), sizeof(T));
+            kernelData = tmp;
+        }
+    }
+
     // Manually calculated.
     std::vector<T> originalOutputImage = std::vector<T>(
         QuantizedVector<T>({
@@ -2251,6 +2289,20 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
         biasDesc.SetQuantizationOffset(0);
     }
 
+    std::vector<T> kernelData;
+    kernelData.assign(originalKernel.data(), originalKernel.data() + kernelHeight*kernelWidth*outputChannels);
+    if (workloadFactory.GetBackendId() == armnn::BackendId("GpuAcc") ||
+        workloadFactory.GetBackendId() == armnn::BackendId("CpuAcc"))
+    {
+        if (layout == armnn::DataLayout::NCHW)
+        {
+            std::vector<T> tmp(kernelData.size());
+            kernelDesc.SetShape(armnnUtils::Permuted(kernelDesc.GetShape(), {0, 2, 3, 1}));
+            armnnUtils::Permute(kernelDesc.GetShape(), {0, 2, 3, 1}, kernelData.data(), tmp.data(), sizeof(T));
+            kernelData = tmp;
+        }
+    }
+
     // Construct input data
     std::vector<T> input;
     input.assign(originalInput.data(), originalInput.data() + 1*inputChannels*inputHeight*inputWidth);
@@ -2309,8 +2361,8 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
     // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
     // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, originalKernel.data()); // required for QueueDescriptor
-    AllocateAndCopyDataToITensorHandle(weightsHandle.get(), originalKernel.data()); // required for ConstantTensor
+    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data()); // required for QueueDescriptor
+    AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernelData.data()); // required for ConstantTensor
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddInputToWorkload(data, info, kernelDesc, weightsHandle.get());
@@ -3029,22 +3081,37 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     auto kernel = MakeRandomTensor<T>(kernelDesc, 891234, 0.0f, 255.0f);
     auto bias   = MakeRandomTensor<typename FullyConnectedBiasTypeForInputType<T>::Type>(biasDesc, 1028, 0.0f, 255.0f);
 
+    armnn::TensorInfo aclKernelDescriptor = kernelDesc;
+    std::vector<T> aclKernelData;
+    aclKernelData.assign(kernel.data(), kernel.data() + kernelHeight * kernelWidth * outputChannels);
+    if (workloadFactory.GetBackendId() == armnn::BackendId("GpuAcc") ||
+        workloadFactory.GetBackendId() == armnn::BackendId("CpuAcc"))
+    {
+        if (layout == armnn::DataLayout::NCHW)
+        {
+            std::vector<T> tmp(kernel.size());
+            aclKernelDescriptor.SetShape(armnnUtils::Permuted(kernelDesc.GetShape(), {0, 2, 3, 1}));
+            armnnUtils::Permute(kernelDesc.GetShape(), {0, 2, 3, 1}, kernel.data(), tmp.data(), sizeof(T));
+            aclKernelData = tmp;
+        }
+    }
+
     std::vector<T> actualOutput(outputTensorInfo.GetNumElements());
     std::vector<T> expectedOutput(outputTensorInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputTensorInfo);
-    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelDesc);
+    std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(aclKernelDescriptor);
     std::unique_ptr<armnn::ITensorHandle> biasHandle = tensorHandleFactory.CreateTensorHandle(biasDesc);
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
 
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
 
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+    armnn::ScopedTensorHandle weightsTensor(aclKernelDescriptor);
     armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
-    AddInputToWorkload(data, info, kernelDesc, weightsHandle.get());
+    AddInputToWorkload(data, info, aclKernelDescriptor, weightsHandle.get());
     AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
@@ -3052,8 +3119,8 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
     // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
     // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
-    AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernel.data());
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
+    AllocateAndCopyDataToITensorHandle(weightsHandle.get(), aclKernelData.data());
+    AllocateAndCopyDataToITensorHandle(&weightsTensor, aclKernelData.data());
     AllocateAndCopyDataToITensorHandle(biasHandle.get(), bias.data());
     AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
 
@@ -3787,6 +3854,18 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
         1, 1, 1, 1,
         1, 1, 1, 1
     };
+
+    if (workloadFactory.GetBackendId() == armnn::BackendId("GpuAcc") ||
+        workloadFactory.GetBackendId() == armnn::BackendId("CpuAcc"))
+    {
+        if (layout == armnn::DataLayout::NCHW)
+        {
+            std::vector<int8_t> tmp(kernelData.size());
+            kernelInfo.SetShape(armnnUtils::Permuted(kernelInfo.GetShape(), {0, 2, 3, 1}));
+            armnnUtils::Permute(kernelInfo.GetShape(), {0, 2, 3, 1}, kernelData.data(), tmp.data(), sizeof(int8_t));
+            kernelData = tmp;
+        }
+    }
 
     std::vector<int32_t> biasData =
     {

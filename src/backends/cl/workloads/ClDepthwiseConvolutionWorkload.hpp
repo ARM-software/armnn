@@ -34,11 +34,6 @@ public:
 
 protected:
     std::unique_ptr<arm_compute::IFunction> m_DepthwiseConvolutionLayer;
-
-    std::unique_ptr<arm_compute::CLTensor> m_KernelTensor;
-    std::unique_ptr<arm_compute::CLTensor> m_BiasTensor;
-
-    void FreeUnusedTensors();
 };
 
 } //namespace armnn

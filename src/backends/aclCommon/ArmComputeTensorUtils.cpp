@@ -8,6 +8,8 @@
 #include "armnn/Exceptions.hpp"
 #include <armnn/Descriptors.hpp>
 
+#include <fmt/format.h>
+
 namespace armnn
 {
 namespace armcomputetensorutils
@@ -340,6 +342,27 @@ arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo
             throw InvalidArgumentException("Unsupported DataType: [" +
                                            std::to_string(static_cast<int>(tensorInfo->data_type())) + "]");
     }
+}
+
+unsigned int ComputeDepthwiseConv2dDepthMultiplier(armnn::DataLayout layout,
+                                                   const arm_compute::TensorShape& weightsShape,
+                                                   const arm_compute::TensorShape& inputShape)
+{
+    unsigned int depthMultiplier;
+    if (layout == armnn::DataLayout::NHWC)
+    {
+        depthMultiplier = static_cast<uint32_t>(weightsShape[0]) / static_cast<uint32_t>(inputShape[0]);
+    }
+    else if (layout == armnn::DataLayout::NCHW)
+    {
+        depthMultiplier = static_cast<uint32_t>(weightsShape[2]) / static_cast<uint32_t>(inputShape[2]);
+    }
+    else
+    {
+        throw InvalidArgumentException(fmt::format("Unknown data layout for tensor conversion: {}",
+                                                   GetDataLayoutName(layout)));
+    }
+    return depthMultiplier;
 }
 
 } // namespace armcomputetensorutils

@@ -1416,24 +1416,6 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
                         descriptorName, m_Parameters.m_StrideX, m_Parameters.m_StrideY));
     }
 
-    const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
-
-    // Expected weight shape: [ 1, H, W, I*M ] - This shape does NOT depend on the data layout
-    // inputChannels * channelMultiplier should be equal to outputChannels.
-    const unsigned int numWeightOutputChannels = weightTensorInfo.GetShape()[3]; // I*M=Cout
-    const unsigned int numOutputChannels       = outputTensorInfo.GetShape()[channelIndex];
-    if (numWeightOutputChannels != numOutputChannels)
-    {
-        throw InvalidArgumentException(fmt::format(
-            "{0}: The weight format in armnn is expected to be [1, H, W, Cout]."
-            "But 4th dimension is not equal to Cout. Cout = {1} Provided weight shape: [{2}, {3}, {4}, {5}]",
-            descriptorName,
-            numOutputChannels,
-            weightTensorInfo.GetShape()[0],
-            weightTensorInfo.GetShape()[1],
-            weightTensorInfo.GetShape()[2],
-            weightTensorInfo.GetShape()[3]));
-    }
     if (weightTensorInfo.GetShape()[0] != 1)
     {
         throw InvalidArgumentException(fmt::format(
@@ -1444,6 +1426,29 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
                 weightTensorInfo.GetShape()[1],
                 weightTensorInfo.GetShape()[2],
                 weightTensorInfo.GetShape()[3]));
+    }
+
+    const unsigned int channelIndex = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : 3;
+    const unsigned int numWeightOutputChannelsRefFormat = weightTensorInfo.GetShape()[3];
+    const unsigned int numWeightOutputChannelsAclFormat = weightTensorInfo.GetShape()[1];
+    const unsigned int numOutputChannels = outputTensorInfo.GetShape()[channelIndex];
+
+    // Weights format has two valid options: [1, H, W, Cout] (CpuRef) or [1, Cout, H, W] (CpuAcc/GpuAcc).
+    bool validRefFormat = (numWeightOutputChannelsRefFormat == numOutputChannels);
+    bool validAclFormat = (numWeightOutputChannelsAclFormat == numOutputChannels);
+
+    if (!(validRefFormat || validAclFormat))
+    {
+        throw InvalidArgumentException(fmt::format(
+            "{0}: The weight format in armnn is expected to be [1, H, W, Cout] (CpuRef) or [1, Cout, H, W] "
+            "(CpuAcc/GpuAcc). But neither the 4th (CpuRef) or 2nd (CpuAcc/GpuAcc) dimension is equal to Cout."
+            "Cout = {1} Provided weight shape: [{2}, {3}, {4}, {5}]",
+            descriptorName,
+            numOutputChannels,
+            weightTensorInfo.GetShape()[0],
+            weightTensorInfo.GetShape()[1],
+            weightTensorInfo.GetShape()[2],
+            weightTensorInfo.GetShape()[3]));
     }
 
     ValidateWeightDataType(inputTensorInfo, weightTensorInfo, descriptorName);

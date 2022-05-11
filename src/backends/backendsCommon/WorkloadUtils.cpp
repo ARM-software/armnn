@@ -175,12 +175,14 @@ std::tuple<TensorInfo, unsigned int> Convert1HWOTensorInfoToAcl(const TensorInfo
     TensorInfo weightsPermuted;
     if (dataLayout == armnn::DataLayout::NHWC)
     {
-        // No permutation required. Data layouts are the same.
+        // No permutation required. Input and weights data layouts are the same.
         aclDepthMultiplier = weightInfo.GetShape()[3] / inputInfo.GetShape()[3];
         weightsPermuted = weightInfo;
     }
+
     else if (dataLayout == armnn::DataLayout::NCHW)
     {
+        // Weights permutation required. Weights [N,H,W,C] and input [N,C,H,W] data layouts are different.
         // [ 1, H, W, I*M] --> [ 1, I * M, H, W ]
         aclDepthMultiplier = weightInfo.GetShape()[3] / inputInfo.GetShape()[1];
         PermutationVector permutationVector{ 0, 2, 3, 1 };

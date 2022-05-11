@@ -77,6 +77,11 @@ arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsign
 /// Gets the appropriate PixelValue for the TensorInfo DataType
 arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo, float pixelValue);
 
+/// Computes the depth multiplier parameter for the Depthwise Conv2d ACL workload.
+unsigned int ComputeDepthwiseConv2dDepthMultiplier(armnn::DataLayout layout,
+                                                   const arm_compute::TensorShape& weightsShape,
+                                                   const arm_compute::TensorShape& inputShape);
+
 /// Utility function used to setup an arm_compute::PadStrideInfo object from an armnn layer descriptor.
 template <typename Descriptor>
 arm_compute::PadStrideInfo BuildArmComputePadStrideInfo(const Descriptor &descriptor)

@@ -33,11 +33,6 @@ public:
 
 private:
     mutable std::unique_ptr<arm_compute::IFunction> m_pDepthwiseConvolutionLayer;
-
-    std::unique_ptr<arm_compute::Tensor> m_KernelTensor;
-    std::unique_ptr<arm_compute::Tensor> m_BiasTensor;
-
-    void FreeUnusedTensors();
 };
 
 } // namespace armnn

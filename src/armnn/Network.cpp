@@ -1167,6 +1167,11 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
         auto backendObjPtr = backends.find(selectedBackend)->second.get();
         ARMNN_ASSERT(backendObjPtr);
 
+        if(selectedBackend == armnn::Compute::GpuAcc || selectedBackend == armnn::Compute::CpuAcc)
+        {
+            Optimizer::Pass(optGraph, MakeOptimizations(optimizations::PermuteDepthwiseConv2dWeights()));
+        }
+
         // Select sub-graphs based on backend
         SubgraphViewSelector::Subgraphs subgraphs =
                 SubgraphViewSelector::SelectSubgraphs(optGraph,

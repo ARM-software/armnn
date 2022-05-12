@@ -29,7 +29,7 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                                       bool isFastMathEnabled,
                                                       const ActivationDescriptor* activationDescriptor)
 {
-    // The implemented workload does support both const and non const
+    // arm_compute::NEConvolutionLayer supports both const and non const
     // weights. However, in the case of non const weights we'd have to call
     // prepare or configure for each inference which we're not setup to do just yet.
     if (!weights.IsConstant())
@@ -40,7 +40,8 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
 
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
-    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
+    arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
+    aclWeightsInfo.set_are_values_constant(weights.IsConstant());
 
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
                                                                       descriptor.m_DilationY);
@@ -58,6 +59,7 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
                                        "ArmNN NeonConvolution2dWorkload does not support non constant bias."};
         }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
+        aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 
@@ -86,7 +88,8 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
 {
     using arm_compute::NEConvolutionLayer;
 
-    m_Data.ValidateInputsOutputs("NeonConvolution2dWorkload", 1, 1);
+    uint32_t numInputs = m_Data.m_Parameters.m_BiasEnabled ? 3: 2;
+    m_Data.ValidateInputsOutputs("NeonConvolution2dWorkload", numInputs, 1);
 
     arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
@@ -97,7 +100,6 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
 
     m_KernelTensor = std::make_unique<arm_compute::Tensor>();
     BuildArmComputeTensor(*m_KernelTensor, m_Data.m_Weight->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
-
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
@@ -148,7 +150,7 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonConvolution2dWorkload_Construct",
                                          descriptor.m_Parameters,
                                          detailsInfo,
-                                         this->GetGuid());
+                                         GetGuid());
 
     m_ConvolutionLayer.reset(convolutionLayer.release());
 
@@ -162,7 +164,8 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     }
 
     m_ConvolutionLayer->prepare();
-    FreeUnusedTensors();
+    FreeTensorIfUnused(m_KernelTensor);
+    FreeTensorIfUnused(m_BiasTensor);
 }
 
 void NeonConvolution2dWorkload::Execute() const
@@ -174,12 +177,6 @@ void NeonConvolution2dWorkload::Execute() const
 arm_compute::ConvolutionMethod NeonConvolution2dWorkload::GetConvolutionMethod() const
 {
     return m_ConvolutionMethod;
-}
-
-void NeonConvolution2dWorkload::FreeUnusedTensors()
-{
-    FreeTensorIfUnused(m_KernelTensor);
-    FreeTensorIfUnused(m_BiasTensor);
 }
 
 } //namespace armnn

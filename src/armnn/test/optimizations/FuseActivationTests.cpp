@@ -56,32 +56,35 @@ struct Convolution2dTest
                                                float scale = 1.f,
                                                int32_t offset = 0)
     {
+        IgnoreUnused(scale);
+        IgnoreUnused(offset);
+
         Convolution2dDescriptor descriptor;
         descriptor.m_DataLayout  = DataLayout::NHWC;
         descriptor.m_StrideX     = 1;
         descriptor.m_StrideY     = 1;
 
-        std::vector<float> weightsData   = {  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
-                                             11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
-                                             21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-                                             31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42};
-        std::vector<T>     weightsVector = armnnUtils::QuantizedVector<T>(weightsData, scale, offset);
-        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
-        ConstTensor        weights(weightsInfo, weightsVector);
-        Optional<ConstTensor> optionalBias;
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        return network->AddConvolution2dLayer(descriptor, weights, optionalBias, name);
-        ARMNN_NO_DEPRECATE_WARN_END
+        return network->AddConvolution2dLayer(descriptor, name);
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
                                                              float scale = 1.f,
                                                              int32_t offset = 0)
     {
-        IgnoreUnused(network);
-        IgnoreUnused(scale);
-        IgnoreUnused(offset);
-        return {};
+
+        std::vector<float> weightsData   = {  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12,
+                                             11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                                             21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+                                             31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42 };
+        std::vector<T>     weightsVector = armnnUtils::QuantizedVector<T>(weightsData, scale, offset);
+        TensorInfo         weightsInfo(GetWeightsShape(), ArmnnType, scale, offset, true);
+        ConstTensor        weights(weightsInfo, weightsVector);
+
+        IConnectableLayer* weightsLayer = network->AddConstantLayer(weights, "Weights");
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+
+        std::vector<IConnectableLayer*> layers = { weightsLayer };
+        return layers;
     }
 };
 

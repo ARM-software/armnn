@@ -60,12 +60,7 @@ protected:
 private:
     mutable arm_compute::CLConvolutionLayer m_ConvolutionLayer;
 
-    std::unique_ptr<arm_compute::CLTensor> m_KernelTensor;
-    std::unique_ptr<arm_compute::CLTensor> m_BiasTensor;
-
     arm_compute::ConvolutionMethod m_ConvolutionMethod;
-
-    void FreeUnusedTensors();
 
     std::unique_ptr<ICLTensorProxy> m_InputProxy;
     std::unique_ptr<ICLTensorProxy> m_OutputProxy;

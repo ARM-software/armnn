@@ -28,7 +28,7 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                     bool isFastMathEnabled,
                                                     const ActivationDescriptor* activationDescriptor)
 {
-    // The implemented workload does support both const and non const
+    // The arm_compute::CLConvolutionLayer supports both const and non const
     // weights. However, in the case of non const weights we'd have to call
     // prepare or configure for each inference which we're not setup to do just yet.
     if (!weights.IsConstant())
@@ -39,7 +39,8 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
 
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
-    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
+    arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);
+    aclWeightsInfo.set_are_values_constant(weights.IsConstant());
 
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
                                                                       descriptor.m_DilationY);
@@ -57,6 +58,7 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                        "ArmNN ClConvolution2dWorkload does not support non constant bias."};
         }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
+        aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 
@@ -85,31 +87,31 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     , m_ConvolutionLayer(memoryManager)
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload");
-    const TensorInfo& weightInfo = m_Data.m_Weight->GetTensorInfo();
-    m_Data.ValidateInputsOutputs("ClConvolution2dWorkload", 1, 1);
-
-    m_KernelTensor = std::make_unique<arm_compute::CLTensor>();
-    BuildArmComputeTensor(*m_KernelTensor, weightInfo, m_Data.m_Parameters.m_DataLayout);
 
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(m_Data.m_Parameters.m_DilationX,
                                                                       m_Data.m_Parameters.m_DilationY);
 
-    if (m_Data.m_Parameters.m_BiasEnabled)
-    {
-        m_BiasTensor = std::make_unique<arm_compute::CLTensor>();
-        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
-    }
+    uint32_t numInputs = m_Data.m_Parameters.m_BiasEnabled ? 3: 2;
+    m_Data.ValidateInputsOutputs("ClConvolution2dWorkload", numInputs, 1);
 
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ICLTensor& weights = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    arm_compute::ICLTensor* bias  = nullptr;
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        bias = &static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+    }
 
     // Create Proxy tensor and set the initial tensor handle to it
     m_InputProxy = std::make_unique<ICLTensorProxy>(&input);
     m_OutputProxy = std::make_unique<ICLTensorProxy>(&output);
 
+
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
+    weights.info()->set_data_layout(aclDataLayout);
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
@@ -119,8 +121,8 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_configure");
         m_ConvolutionLayer.configure(clCompileContext,
                                      m_InputProxy.get(),
-                                     m_KernelTensor.get(),
-                                     m_BiasTensor.get(),
+                                     &weights,
+                                     bias,
                                      m_OutputProxy.get(),
                                      padStrideInfo,
                                      arm_compute::WeightsInfo(),
@@ -131,7 +133,7 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 
     m_ConvolutionMethod =
         m_ConvolutionLayer.get_convolution_method(input.info(),
-                                                  m_KernelTensor->info(),
+                                                  weights.info(),
                                                   output.info(),
                                                   padStrideInfo,
                                                   arm_compute::WeightsInfo(),
@@ -156,39 +158,18 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClConvolution2dWorkload_Construct",
                                          descriptor.m_Parameters,
                                          detailsInfo,
-                                         this->GetGuid());
-
-    InitializeArmComputeClTensorData(*m_KernelTensor, m_Data.m_Weight);
-
-    if (m_BiasTensor)
-    {
-        InitializeArmComputeClTensorData(*m_BiasTensor, m_Data.m_Bias);
-    }
-
-    // Force Compute Library to perform the necessary copying and reshaping, after which
-    // delete all the input tensors that will no longer be needed
-    {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_prepare");
-        m_ConvolutionLayer.prepare();
-    }
-    FreeUnusedTensors();
+                                         GetGuid());
 }
 
 void ClConvolution2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConvolution2dWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConvolution2dWorkload_Execute", GetGuid());
     RunClFunction(m_ConvolutionLayer, CHECK_LOCATION());
 }
 
 arm_compute::ConvolutionMethod ClConvolution2dWorkload::GetConvolutionMethod() const
 {
     return m_ConvolutionMethod;
-}
-
-void ClConvolution2dWorkload::FreeUnusedTensors()
-{
-    FreeTensorIfUnused(m_KernelTensor);
-    FreeTensorIfUnused(m_BiasTensor);
 }
 
 void ClConvolution2dWorkload::Reconfigure()

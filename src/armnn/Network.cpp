@@ -1832,6 +1832,9 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ConvertConstants");
         Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
         Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
+
+        // Once the constants are converted we can now safely call RedirectMembersToConstantInputs
+        Optimizer::Pass(optGraph, MakeOptimizations(RedirectMembersToConstantInputs()));
     }
     return optNet;
 }

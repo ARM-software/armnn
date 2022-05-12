@@ -45,9 +45,6 @@ private:
     std::unique_ptr<arm_compute::Tensor> m_BiasTensor;
 
     arm_compute::ConvolutionMethod m_ConvolutionMethod;
-
-    void FreeUnusedTensors();
-
 };
 
 } //namespace armnn

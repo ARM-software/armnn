@@ -36,27 +36,6 @@ RefDepthwiseConvolution2dWorkload::RefDepthwiseConvolution2dWorkload(
                                          this->GetGuid());
 }
 
-void RefDepthwiseConvolution2dWorkload::PostAllocationConfigure()
-{
-    PostAllocationConfigure(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefDepthwiseConvolution2dWorkload::PostAllocationConfigure(std::vector<ITensorHandle*> inputs,
-                                                                std::vector<ITensorHandle*> outputs)
-{
-    IgnoreUnused(outputs);
-
-    const TensorInfo& rFilterInfo = GetTensorInfo(inputs[1]);
-    m_FilterShape = rFilterInfo.GetShape();
-    m_FilterDecoder = MakeDecoder<float>(rFilterInfo);
-
-    if (m_Data.m_Parameters.m_BiasEnabled)
-    {
-        const TensorInfo& biasInfo = GetTensorInfo(inputs[2]);
-        m_BiasDecoder = MakeDecoder<float>(biasInfo);
-    }
-}
-
 void RefDepthwiseConvolution2dWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);

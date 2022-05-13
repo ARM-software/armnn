@@ -28,22 +28,37 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                        const FullyConnectedDescriptor& descriptor,
                                                        const ActivationDescriptor* activationDescriptor)
 {
+    // The NEON implemented workload does support both const and non const
+    // weights. However, in the case of non const weights we'd have to call
+    // prepare or configure for each inference which we're not setup to do just yet.
+    if (!weights.IsConstant())
+    {
+        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                    "Arm NN NeonFullyConnectedWorkload does not support non constant weights."};
+    }
     const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
-    const arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);
+    arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);
+    aclWeights.set_are_values_constant(weights.IsConstant());
 
     arm_compute::TensorInfo aclBiases;
     arm_compute::TensorInfo* optionalAclBiases = nullptr;
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
+        // Same for bias as weights. We don't currently support non const.
+        if (!biases.value().IsConstant())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                        "Arm NN NeonFullyConnectedWorkload does not support non constant bias."};
+        }
         aclBiases = BuildArmComputeTensorInfo(biases.value());
+        aclBiases.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiases = &aclBiases;
     }
 
     const arm_compute::FullyConnectedLayerInfo fullyConnectedLayerInfo =
         ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor, activationDescriptor);
-
     return arm_compute::NEFullyConnectedLayer::validate(&aclInput,
                                                         &aclWeights,
                                                         optionalAclBiases,
@@ -61,45 +76,26 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
     arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
+    // Copy the weights' tensor into arm_compute tensor.
     m_WeightsTensor = std::make_unique<arm_compute::Tensor>();
     BuildArmComputeTensor(*m_WeightsTensor, m_Data.m_Weight->GetTensorInfo());
-
+    InitializeArmComputeTensorData(*m_WeightsTensor, m_Data.m_Weight);
+    
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
+        // Copy the biases tensor into arm_compute tensor.
         m_BiasesTensor = std::make_unique<arm_compute::Tensor>();
-        BuildArmComputeTensor(*m_BiasesTensor, m_Data.m_Bias->GetTensorInfo());
+        BuildArmComputeTensor(*m_BiasesTensor,  m_Data.m_Bias->GetTensorInfo());
+        InitializeArmComputeTensorData(*m_BiasesTensor, m_Data.m_Bias);
     }
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
-
     arm_compute::FullyConnectedLayerInfo fc_info =
         ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
 
     auto layer = std::make_unique<arm_compute::NEFullyConnectedLayer>(memoryManager);
     layer->configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
     m_FullyConnectedLayer.reset(layer.release());
-
-    // Allocate
-    if (m_Data.m_Weight->GetTensorInfo().GetDataType() == DataType::QAsymmU8)
-    {
-        InitializeArmComputeTensorData(*m_WeightsTensor, m_Data.m_Weight);
-    }
-    else
-    {
-        InitializeArmComputeTensorData(*m_WeightsTensor, m_Data.m_Weight);
-    }
-
-    if (m_BiasesTensor)
-    {
-        if (m_Data.m_Bias->GetTensorInfo().GetDataType() == DataType::Signed32)
-        {
-            InitializeArmComputeTensorData(*m_BiasesTensor, m_Data.m_Bias);
-        }
-        else
-        {
-            InitializeArmComputeTensorData(*m_BiasesTensor, m_Data.m_Bias);
-        }
-    }
 
     // Add details for profiling output
     WorkloadInfo detailsInfo;
@@ -118,22 +114,16 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
                                          detailsInfo,
                                          this->GetGuid());
 
-    // Force Compute Library to perform the necessary copying and reshaping, after which
-    // delete all the input tensors that will no longer be needed
+    // Force Compute Library to perform the necessary copying and reshaping.
     m_FullyConnectedLayer->prepare();
-    FreeUnusedTensors();
+    FreeTensorIfUnused(m_WeightsTensor);
+    FreeTensorIfUnused(m_BiasesTensor);
 }
 
 void NeonFullyConnectedWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonFullyConnectedWorkload_Execute", this->GetGuid());
     m_FullyConnectedLayer->run();
-}
-
-void NeonFullyConnectedWorkload::FreeUnusedTensors()
-{
-    FreeTensorIfUnused(m_WeightsTensor);
-    FreeTensorIfUnused(m_BiasesTensor);
 }
 
 } //namespace armnn

@@ -131,7 +131,6 @@ TEST_SUITE("BackendCapability")
 
 namespace
 {
-
 #if defined(ARMNNREF_ENABLED) || defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 void CapabilityTestHelper(BackendCapabilities &capabilities,
                           std::vector<std::pair<std::string, bool>> capabilityVector)
@@ -198,7 +197,7 @@ TEST_CASE ("Neon_Backends_Capability_Test")
                          {{"NonConstWeights", false},
                           {"AsyncExecution", false},
                           {"ProtectedContentAllocation", false},
-                          {"ConstantTensorsAsInputs", false},
+                          {"ConstantTensorsAsInputs", true},
                           {"PreImportIOTensors", false},
                           {"ExternallyManagedMemory", true},
                           {"MultiAxisPacking", false}});
@@ -217,7 +216,7 @@ TEST_CASE ("Cl_Backends_Capability_Test")
                          {{"NonConstWeights", false},
                           {"AsyncExecution", false},
                           {"ProtectedContentAllocation", true},
-                          {"ConstantTensorsAsInputs", false},
+                          {"ConstantTensorsAsInputs", true},
                           {"PreImportIOTensors", false},
                           {"ExternallyManagedMemory", true},
                           {"MultiAxisPacking", false}});

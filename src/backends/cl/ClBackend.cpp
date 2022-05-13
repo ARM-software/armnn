@@ -398,18 +398,19 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                             else if (base.GetType() == LayerType::FullyConnected)
                             {
                                 FullyConnectedLayer* baseLayer = PolymorphicDowncast<FullyConnectedLayer*>(&base);
+                                FullyConnectedDescriptor descriptor = baseLayer->GetParameters();
 
+                                // As bias is optional only try to get TensorInfo from input if bias is enabled.
                                 Optional<TensorInfo> biases;
-
-                                if (baseLayer->GetParameters().m_BiasEnabled)
+                                if (descriptor.m_BiasEnabled)
                                 {
-                                    biases = baseLayer->m_Bias->GetTensorInfo();
+                                    biases = baseLayer->GetInputSlot(2).GetConnectedOutputSlot()->GetTensorInfo();
                                 }
 
                                 arm_compute::Status status = ClFullyConnectedWorkloadValidate(
                                         baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
                                         activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
-                                        baseLayer->m_Weight->GetTensorInfo(),
+                                        baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
                                         biases,
                                         baseLayer->GetParameters(),
                                         &activationDesc);

@@ -30,6 +30,15 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
                                                            const Optional<TensorInfo>& biases,
                                                            const ActivationDescriptor* activationDescriptor)
 {
+    // The CL implemented workload does support both const and non const
+    // weights. However, in the case of non const weights we'd have to call
+    // prepare or configure for each inference which we're not setup to do just yet.
+    if (!weights.IsConstant())
+    {
+        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                   "ArmNN ClDepthwiseConv2dWorkload does not support non constant weights."};
+    }
+
     const arm_compute::TensorInfo aclInputInfo  = BuildArmComputeTensorInfo(input,  descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
 
@@ -47,14 +56,22 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
     std::tie(weightsPermuted, aclDepthMultiplier) = Convert1HWOTensorInfoToAcl(weights, input,descriptor.m_DataLayout);
 
     // Convert the weights into the compute library format
-    const arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weightsPermuted, descriptor.m_DataLayout);
+    arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weightsPermuted, descriptor.m_DataLayout);
+    aclWeightsInfo.set_are_values_constant(weights.IsConstant());
 
     arm_compute::TensorInfo aclBiasesInfo;
     arm_compute::TensorInfo* optionalAclBiasesInfo = nullptr;
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
+        // Same for bias as weights. We don't currently support non const.
+        if (!biases.value().IsConstant())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                       "ArmNN ClDepthwiseConv2dWorkload does not support non constant bias."};
+        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
+        aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 

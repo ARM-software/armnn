@@ -373,7 +373,7 @@ TEST_CASE("DepthwiseConv2dUtils")
 
     TensorInfo inputInfo({1, 1, 10, 10 }, dataType);
     TensorInfo outputInfo;
-    TensorInfo weightsInfo3x3({ 1, 3, 3, 1 }, dataType); // [1,H,W,I*M]
+    TensorInfo weightsInfo3x3({ 1, 3, 3, 1 }, dataType, 0, 0, true); // [1,H,W,I*M]
     TensorInfo biasesInfo;
 
     DepthwiseConvolution2dDescriptor descriptor;
@@ -432,14 +432,14 @@ TEST_CASE("DepthwiseConv2dUtils")
                                                             weightsInfo3x3, biasesInfo));
 
     // Supported weights shape 1x1
-    TensorInfo weightsInfo1x1({ 1, 1, 1, 1 }, DataType::Float32);
+    TensorInfo weightsInfo1x1({ 1, 1, 1, 1 }, DataType::Float32, 0, 0, true);
     descriptor = MakeDepthwiseConv2dDesc(1, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo1x1, descriptor, dataType);
     CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,
                                                             weightsInfo1x1, biasesInfo));
 
     // Supported shape 2x2
-    TensorInfo weightsInfo2x2({ 1, 2, 2, 1 }, DataType::Float32);
+    TensorInfo weightsInfo2x2({ 1, 2, 2, 1 }, DataType::Float32, 0, 0, true);
     descriptor = MakeDepthwiseConv2dDesc(1, 1);
     outputInfo = CreateOutputTensorInfo(inputInfo, weightsInfo2x2, descriptor, dataType);
     CHECK(layerSupport.IsDepthwiseConvolutionSupported(inputInfo, outputInfo, descriptor,

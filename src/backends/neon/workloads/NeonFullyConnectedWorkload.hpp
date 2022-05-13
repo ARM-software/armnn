@@ -33,11 +33,9 @@ public:
 
 private:
     std::unique_ptr<arm_compute::IFunction> m_FullyConnectedLayer;
-
     std::unique_ptr<arm_compute::Tensor> m_WeightsTensor;
     std::unique_ptr<arm_compute::Tensor> m_BiasesTensor;
 
-    void FreeUnusedTensors();
 };
 
 } //namespace armnn

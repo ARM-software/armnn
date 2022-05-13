@@ -35,11 +35,6 @@ public:
 
 private:
     mutable arm_compute::CLFullyConnectedLayer m_FullyConnectedLayer;
-
-    std::unique_ptr<arm_compute::CLTensor> m_WeightsTensor;
-    std::unique_ptr<arm_compute::CLTensor> m_BiasesTensor;
-
-    void FreeUnusedTensors();
 };
 
 } //namespace armnn

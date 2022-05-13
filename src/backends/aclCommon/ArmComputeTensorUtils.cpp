@@ -147,6 +147,10 @@ arm_compute::TensorShape BuildArmComputeTensorShape(const armnn::TensorShape& te
 
 // Utility function used to build a TensorInfo object, that can be used to initialise
 // ARM Compute Tensor and CLTensor allocators.
+// Note: this utility ignores the value of armnn::TensorInfo.IsConstant(). ACL tensors
+// default to constant but Arm NN ones default to non constant. In the cases where
+// we expect ACL to treat a tensor as constant that value must be set after this
+// utility has been called.
 arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo)
 {
     bool multiScales = tensorInfo.HasMultipleQuantizationScales();

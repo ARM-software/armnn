@@ -23,22 +23,37 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                      const FullyConnectedDescriptor& descriptor,
                                                      const ActivationDescriptor* activationDescriptor)
 {
+    // The CL implemented workload does support both const and non const
+    // weights. However, in the case of non const weights we'd have to call
+    // prepare or configure for each inference which we're not setup to do just yet.
+    if (!weights.IsConstant())
+    {
+        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                    "Arm NN ClFullyConnectedWorkload does not support non constant weights."};
+    }
     const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
-    const arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);
+    arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);
+    aclWeights.set_are_values_constant(weights.IsConstant());
 
     arm_compute::TensorInfo aclBiases;
     arm_compute::TensorInfo* optionalAclBiases = nullptr;
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
+        // Same for bias as weights. We don't currently support non const.
+        if (!biases.value().IsConstant())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                        "Arm NN ClFullyConnectedWorkload does not support non constant bias."};
+        }
         aclBiases = BuildArmComputeTensorInfo(biases.value());
+        aclBiases.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiases = &aclBiases;
     }
 
     const arm_compute::FullyConnectedLayerInfo fullyConnectedLayerInfo =
         ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor, activationDescriptor);
-
     return arm_compute::CLFullyConnectedLayer::validate(&aclInput,
                                                         &aclWeights,
                                                         optionalAclBiases,
@@ -70,58 +85,40 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
                                          detailsInfo,
                                          this->GetGuid());
 
-    m_WeightsTensor = std::make_unique<arm_compute::CLTensor>();
-    BuildArmComputeTensor(*m_WeightsTensor, m_Data.m_Weight->GetTensorInfo());
-
-    if (m_Data.m_Parameters.m_BiasEnabled)
-    {
-        m_BiasesTensor = std::make_unique<arm_compute::CLTensor>();
-        BuildArmComputeTensor(*m_BiasesTensor, m_Data.m_Bias->GetTensorInfo());
-    }
-
-    m_Data.ValidateInputsOutputs("ClFullyConnectedWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("ClFullyConnectedWorkload", descriptor.m_Parameters.GetNumInputs(),
+                                 1);
 
     arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ICLTensor& weights = PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+
+    arm_compute::ICLTensor* bias  = nullptr;
+    if (m_Data.m_Parameters.m_BiasEnabled)
+    {
+        bias = &PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+    }
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
     arm_compute::FullyConnectedLayerInfo fc_info =
-        ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
+            ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters,
+                                                                        activationInfo);
 
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClFullyConnectedWorkload_configure");
         m_FullyConnectedLayer.configure(clCompileContext,
                                         &input,
-                                        m_WeightsTensor.get(),
-                                        m_BiasesTensor.get(),
+                                        &weights,
+                                        bias,
                                         &output,
                                         fc_info);
     }
-
-    InitializeArmComputeClTensorData(*m_WeightsTensor, m_Data.m_Weight);
-
-    if (m_BiasesTensor)
-    {
-        InitializeArmComputeClTensorData(*m_BiasesTensor, m_Data.m_Bias);
-    }
-
-    // Force Compute Library to perform the necessary copying and reshaping, after which
-    // delete all the input tensors that will no longer be needed
-    m_FullyConnectedLayer.prepare();
-    FreeUnusedTensors();
 }
 
 void ClFullyConnectedWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClFullyConnectedWorkload_Execute", this->GetGuid());
     RunClFunction(m_FullyConnectedLayer, CHECK_LOCATION());
-}
-
-void ClFullyConnectedWorkload::FreeUnusedTensors()
-{
-    FreeTensorIfUnused(m_WeightsTensor);
-    FreeTensorIfUnused(m_BiasesTensor);
 }
 
 } //namespace armnn

@@ -1739,6 +1739,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FuseBatchNormIntoConvolution2DFloat16(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat32(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat16(),
+                                                ConvertConstDequantisationLayersToConstLayers(),
                                                 RedirectMembersToConstantInputs()));
 
     // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16

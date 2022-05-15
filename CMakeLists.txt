@@ -528,6 +528,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp
         src/armnn/test/optimizations/AddBroadcastReshapeLayerTests.cpp
+        src/armnn/test/optimizations/ConvertConstDequantisationLayersToConstLayersTest.cpp
         src/armnn/test/optimizations/ConvertConstantsBFloatTests.cpp
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp

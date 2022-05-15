@@ -2903,19 +2903,24 @@ void DequantizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-    if (!IsQuantizedType(inputTensorInfo.GetDataType()))
+    std::vector<DataType> inputSupportedTypes =
     {
-        throw InvalidArgumentException(descriptorName + ": Input to dequantize layer must be quantized type.");
-    }
+            DataType::QAsymmS8,
+            DataType::QAsymmU8,
+            DataType::QSymmS8,
+            DataType::QSymmS16,
+            DataType::Float16
+    };
+    ValidateDataTypes(inputTensorInfo, inputSupportedTypes, descriptorName);
 
-    std::vector<DataType> supportedTypes =
+    std::vector<DataType> outputSupportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16
     };
 
-    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, outputSupportedTypes, descriptorName);
 }
 
 void MergeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

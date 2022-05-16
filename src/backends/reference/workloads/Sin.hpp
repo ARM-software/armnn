@@ -9,9 +9,12 @@
 
 namespace armnn
 {
-    template<typename T>
-struct sin : public std::unary_function<T, T>
+template<typename T>
+struct sin
     {
+        typedef T result_type;
+        typedef T argument_type;
+
         T
         operator () (const T&  inputData) const
         {

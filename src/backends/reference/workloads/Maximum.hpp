@@ -9,9 +9,12 @@
 
 namespace armnn
 {
-    template<typename T>
-struct maximum : public std::binary_function<T, T, T>
+template<typename T>
+struct maximum
     {
+        typedef T result_type;
+        typedef T first_argument_type;
+
         T
         operator () (const T&  inputData0, const T&  inputData1) const
         {

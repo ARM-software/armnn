@@ -308,7 +308,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     DelegateData delegateData(delegate->m_Options.GetBackends());
 
     // Build ArmNN Network
-    armnn::NetworkOptions networkOptions = {};
+    armnn::NetworkOptions networkOptions = delegate->m_Options.GetOptimizerOptions().m_ModelOptions;
     armnn::NetworkId networkId;
     delegateData.m_Network = armnn::INetwork::Create(networkOptions);
 

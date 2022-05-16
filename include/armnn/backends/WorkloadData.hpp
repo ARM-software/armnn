@@ -29,6 +29,16 @@ struct QueueDescriptor
 
     virtual ~QueueDescriptor() = default;
 
+    void ValidateTensorNumDimensions(const TensorInfo& tensor,
+                                     std::string const& descName,
+                                     unsigned int numDimensions,
+                                     std::string const& tensorName) const;
+
+    void ValidateTensorNumDimNumElem(const TensorInfo& tensorInfo,
+                                     unsigned int numDimension,
+                                     unsigned int numElements,
+                                     std::string const& tensorName) const;
+
     void ValidateInputsOutputs(const std::string& descName,
                                unsigned int numExpectedIn,
                                unsigned int numExpectedOut) const;
@@ -38,6 +48,8 @@ struct QueueDescriptor
     {
         return static_cast<T*>(m_AdditionalInfoObject);
     }
+
+    bool m_AllowExpandedDims = false;
 
 protected:
     QueueDescriptor()

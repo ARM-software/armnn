@@ -29,9 +29,11 @@ public:
     struct TfLiteParserOptions
     {
         TfLiteParserOptions()
-            : m_StandInLayerForUnsupported(false),
+            : m_AllowExpandedDims(false),
+              m_StandInLayerForUnsupported(false),
               m_InferAndValidate(false) {}
 
+        bool m_AllowExpandedDims;
         bool m_StandInLayerForUnsupported;
         bool m_InferAndValidate;
     };

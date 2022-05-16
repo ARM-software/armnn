@@ -238,6 +238,7 @@ public:
     }
 
     ShapeInferenceMethod GetShapeInferenceMethod() const { return m_ShapeInferenceMethod; };
+    bool GetAllowExpandedDims() const { return m_AllowExpandedDims; };
 
     const std::vector<InputSlot>& GetInputSlots() const { return m_InputSlots; }
     const std::vector<OutputSlot>& GetOutputSlots() const { return m_OutputSlots; }
@@ -343,6 +344,11 @@ public:
         m_ShapeInferenceMethod = shapeInferenceMethod;
     }
 
+    void SetAllowExpandedDims(bool allowExpandedDims)
+    {
+        m_AllowExpandedDims = allowExpandedDims;
+    }
+
     template<typename T>
     std::shared_ptr<T> GetAdditionalInformation() const
     {
@@ -427,6 +433,8 @@ private:
     /// Used for sorting.
     mutable LayerPriority m_Priority = 0;
     mutable bool m_Visiting = false;
+
+    bool m_AllowExpandedDims = false;
 
     LayerGuid m_Guid;
 

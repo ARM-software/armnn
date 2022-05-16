@@ -26,6 +26,8 @@ namespace armnn
 
 Graph::Graph(const Graph& other)
 :   m_LayersInOrder(other.m_LayersInOrder)
+,   m_AllowExpandedDims(other.m_AllowExpandedDims)
+,   m_ShapeInferenceMethod(other.m_ShapeInferenceMethod)
 ,   m_Profiler(other.m_Profiler)
 {
     std::unordered_map<const Layer*, Layer*> otherToClonedMap;

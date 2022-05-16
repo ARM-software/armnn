@@ -262,6 +262,7 @@ public:
 private:
 
     bool GetShapeInferenceMethod();
+    bool GetAllowExpandedDims();
     NetworkOptions m_NetworkOptions;
 
     std::unique_ptr<Graph> m_Graph;

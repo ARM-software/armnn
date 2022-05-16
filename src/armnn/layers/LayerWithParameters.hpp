@@ -43,6 +43,7 @@ protected:
     WorkloadInfo PrepInfoAndDesc(QueueDescriptor& descriptor) const
     {
         descriptor.m_Parameters = m_Param;
+        descriptor.m_AllowExpandedDims = GetAllowExpandedDims();
         return Layer::PrepInfoAndDesc(descriptor);
     }
 

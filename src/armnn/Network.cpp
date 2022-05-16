@@ -1158,6 +1158,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
         if(selectedBackend == armnn::Compute::GpuAcc || selectedBackend == armnn::Compute::CpuAcc)
         {
             Optimizer::Pass(optGraph, MakeOptimizations(optimizations::PermuteDepthwiseConv2dWeights()));
+            Optimizer::Pass(optGraph, MakeOptimizations(optimizations::FusePermuteIntoConstLayer()));
         }
 
         // Select sub-graphs based on backend
@@ -1719,6 +1720,10 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         optGraph.InferTensorInfos();
     }
 
+    // Need to FusePermuteIntoConstantLayer before FoldPadIntoDepthwiseConvolution2d or
+    // FuseBatchNormIntoDepthwiseConvolution2D optimizations are called.
+    Optimizer::Pass(optGraph, MakeOptimizations(FusePermuteIntoConstLayer()));
+
     // Perform optimisation passes
     Optimizer::Pass(optGraph, MakeOptimizations(SquashEqualPermuteSiblings(),
                                                 SquashEqualTransposeSiblings(),
@@ -1739,8 +1744,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FuseBatchNormIntoConvolution2DFloat16(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat32(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat16(),
-                                                ConvertConstDequantisationLayersToConstLayers(),
-                                                RedirectMembersToConstantInputs()));
+                                                ConvertConstDequantisationLayersToConstLayers()));
 
     // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
     if (options.m_ReduceFp32ToFp16)

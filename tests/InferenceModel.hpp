@@ -95,6 +95,7 @@ struct Params
     std::vector<armnn::BackendId>   m_ComputeDevices;
     std::string                     m_DynamicBackendsPath;
     size_t                          m_SubgraphId;
+    bool                            m_AllowExpandedDims;
     bool                            m_IsModelBinary;
     bool                            m_VisualizePostOptimizationModel;
     bool                            m_EnableFp16TurboMode;
@@ -117,6 +118,7 @@ struct Params
     Params()
         : m_ComputeDevices{}
         , m_SubgraphId(0)
+        , m_AllowExpandedDims(false)
         , m_IsModelBinary(true)
         , m_VisualizePostOptimizationModel(false)
         , m_EnableFp16TurboMode(false)
@@ -268,6 +270,7 @@ public:
 
         // Create a network from a file on disk
         IParser::TfLiteParserOptions options;
+        options.m_AllowExpandedDims          = params.m_AllowExpandedDims;
         options.m_StandInLayerForUnsupported = params.m_ParseUnsupported;
         options.m_InferAndValidate           = params.m_InferOutputShape;
         auto parser(IParser::Create(options));

@@ -232,6 +232,11 @@ void ExecuteNetworkParams::ValidateParams()
     {
         ARMNN_LOG(warning) << "No input files provided, input tensors will be filled with 0s.";
     }
+
+    if (m_AllowExpandedDims && m_InferOutputShape)
+    {
+        throw armnn::InvalidArgumentException("infer-output-shape and allow-expanded-dims cannot be used together.");
+    }
 }
 
 #if defined(ARMNN_TFLITE_DELEGATE)
@@ -277,6 +282,22 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
     options.m_ModelOptions.push_back(gpuAcc);
     options.m_ModelOptions.push_back(cpuAcc);
 
+    if (m_InferOutputShape)
+    {
+        armnn::BackendOptions networkOption("ShapeInferenceMethod",
+                                            {
+                                                    {"InferAndValidate", true}
+                                            });
+        options.m_ModelOptions.push_back(networkOption);
+    }
+    if (m_AllowExpandedDims)
+    {
+        armnn::BackendOptions networkOption("AllowExpandedDims",
+                                            {
+                                                    {"AllowExpandedDims", true}
+                                            });
+        options.m_ModelOptions.push_back(networkOption);
+    }
     delegateOptions.SetOptimizerOptions(options);
 
     // If v,visualize-optimized-model is enabled then construct a file name for the dot file.

@@ -276,7 +276,7 @@ std::unique_ptr<ICustomAllocator> ClBackend::GetDefaultAllocator() const
 OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                   const ModelOptions& modelOptions) const
 {
-    OptimizationViews optimizationViews;
+    OptimizationViews optimizationViews(modelOptions);
 
     auto it = subgraph.endIConnectable();
     bool isFastMathEnabled = false;

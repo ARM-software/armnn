@@ -19,6 +19,7 @@ LayerType* Layer::CloneBase(Graph& graph, Params&& ... params) const
     layer->SetBackendId(GetBackendId());
     layer->SetGuid(GetGuid());
     layer->SetShapeInferenceMethod(m_ShapeInferenceMethod);
+    layer->SetAllowExpandedDims(m_AllowExpandedDims);
 
     return layer;
 }

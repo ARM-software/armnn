@@ -1854,16 +1854,35 @@ IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
 
 bool NetworkImpl::GetShapeInferenceMethod()
 {
-    if (m_NetworkOptions.size() > 0 && m_NetworkOptions[0].GetBackendId().Get() == "ShapeInferenceMethod")
-    {
-        return m_NetworkOptions[0].GetOption(0).GetValue().AsBool();
-    }
+    bool shapeInferenceMethod = false;
 
-    return false;
+    ParseOptions(m_NetworkOptions, "ShapeInferenceMethod", [&](std::string name, const BackendOptions::Var& value)
+    {
+        if (name == "InferAndValidate")
+        {
+            shapeInferenceMethod |= value.AsBool();
+        }
+    });
+    return shapeInferenceMethod;
 }
+
+bool NetworkImpl::GetAllowExpandedDims()
+{
+    bool allowExpandedDims = false;
+
+    ParseOptions(m_NetworkOptions, "AllowExpandedDims", [&](std::string name, const BackendOptions::Var& value)
+    {
+        if (name == "AllowExpandedDims")
+        {
+            allowExpandedDims |= value.AsBool();
+        }
+    });
+    return allowExpandedDims;
+}
+
 NetworkImpl::NetworkImpl(NetworkOptions networkOptions)
 : m_NetworkOptions(networkOptions),
-  m_Graph(std::make_unique<Graph>(GetShapeInferenceMethod()))
+  m_Graph(std::make_unique<Graph>(GetShapeInferenceMethod(), GetAllowExpandedDims()))
 {}
 
 NetworkImpl::~NetworkImpl()

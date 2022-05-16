@@ -163,6 +163,17 @@ public:
      *    Possible values: [filenameString] \n
      *    Description: Serialize the optimized network to the file specified in "dot" format.
      *
+     *    Option key: "infer-output-shape" \n
+     *    Possible values: ["true"/"false"] \n
+     *    Description: Infers output tensor shape from input tensor shape and validate where applicable.
+     *
+     *    Option key: "allow-expanded-dims" \n
+     *    Possible values: ["true"/"false"] \n
+     *    Description: If true will disregard dimensions with a size of 1 when validating tensor shapes but tensor
+     *                 sizes must still match. \n
+     *                 This is an Experimental parameter that is incompatible with "infer-output-shape". \n
+     *                 This parameter may be removed in a later update.
+     *
      * @param[in]     option_keys     Delegate option names
      * @param[in]     options_values  Delegate option values
      * @param[in]     num_options     Number of delegate options

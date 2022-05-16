@@ -52,7 +52,8 @@ public:
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override;
     IBackendInternal::ILayerSupportSharedPtr GetLayerSupport(const ModelOptions& modelOptions) const override;
 
-    OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph) const override;
+    OptimizationViews OptimizeSubgraphView(const SubgraphView& subgraph,
+                                           const ModelOptions& modelOptions) const override;
 
     std::vector<ITensorHandleFactory::FactoryId> GetHandleFactoryPreferences() const override;
 

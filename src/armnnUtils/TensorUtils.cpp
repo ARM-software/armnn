@@ -131,6 +131,22 @@ TensorShape ExpandDims(const TensorShape& tensorShape, int axis)
     return TensorShape(outputDim, outputShape.data());
 }
 
+std::vector<unsigned int> SqueezeDims(const TensorShape& tensorShape)
+{
+    unsigned int outputDimSize = 0;
+    std::vector<unsigned int> squeezedDims;
+
+    for (unsigned int i = 0; i < tensorShape.GetNumDimensions(); ++i)
+    {
+        if (tensorShape[i] != 1)
+        {
+            squeezedDims.push_back(tensorShape[i]);
+            ++outputDimSize;
+        }
+    }
+    return squeezedDims;
+}
+
 unsigned int GetNumElementsBetween(const TensorShape& shape,
                                    const unsigned int firstAxisInclusive,
                                    const unsigned int lastAxisExclusive)

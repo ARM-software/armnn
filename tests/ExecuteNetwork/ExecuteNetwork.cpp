@@ -389,6 +389,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         // Creates an InferenceModel, which will parse the model and load it into an IRuntime.
         typename InferenceModel<TParser, TDataType>::Params inferenceModelParams;
         inferenceModelParams.m_ModelPath                      = params.m_ModelPath;
+        inferenceModelParams.m_AllowExpandedDims              = params.m_AllowExpandedDims;
         inferenceModelParams.m_IsModelBinary                  = params.m_IsModelBinary;
         inferenceModelParams.m_ComputeDevices                 = params.m_ComputeDevices;
         inferenceModelParams.m_DynamicBackendsPath            = params.m_DynamicBackendsPath;

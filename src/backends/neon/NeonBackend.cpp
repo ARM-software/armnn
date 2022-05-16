@@ -139,9 +139,10 @@ IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport(const Mode
     return layerSupport;
 }
 
-OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph) const
+OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
+                                                    const ModelOptions& modelOptions) const
 {
-    OptimizationViews optimizationViews;
+    OptimizationViews optimizationViews(modelOptions);
 
     auto it = subgraph.endIConnectable();
     std::map<LayerGuid, Layer*> untouched;

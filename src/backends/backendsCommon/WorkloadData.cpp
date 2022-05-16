@@ -107,18 +107,6 @@ void ValidateNumOutputs(const WorkloadInfo& workloadInfo, std::string const& des
 }
 
 //---------------------------------------------------------------
-void ValidateTensorNumDimensions(const TensorInfo& tensor,
-                                 std::string const& descName,
-                                 unsigned int numDimensions,
-                                 std::string const& tensorName)
-{
-    if (tensor.GetNumDimensions() != numDimensions)
-    {
-        throw InvalidArgumentException(descName + ": Expected " + to_string(numDimensions) + " but got " +
-            to_string(tensor.GetNumDimensions()) + " dimensions for " +
-            tensorName + " tensor.");
-    }
-}
 
 //---------------------------------------------------------------
 void ValidateTensorNumElements(const TensorInfo& tensor,
@@ -132,17 +120,6 @@ void ValidateTensorNumElements(const TensorInfo& tensor,
                                        to_string(tensor.GetNumElements()) + " elements for " +
                                        tensorName + " tensor.");
     }
-}
-
-//---------------------------------------------------------------
-void ValidateTensorNumDimNumElem(const TensorInfo& tensorInfo,
-                                 unsigned int numDimension,
-                                 unsigned int numElements,
-                                 std::string const& tensorName)
-{
-    const std::string functionName{"ValidateTensorNumDimNumElem"};
-    ValidateTensorNumDimensions(tensorInfo, functionName, numDimension, tensorName);
-    ValidateTensorNumElements(tensorInfo, functionName, numElements, tensorName);
 }
 
 //---------------------------------------------------------------
@@ -444,6 +421,56 @@ void ValidatePerAxisQuantization(const TensorInfo& inputInfo,
 
 } // anonymous namespace
 
+//---------------------------------------------------------------
+void QueueDescriptor::ValidateTensorNumDimensions(const TensorInfo& tensor,
+                                                  std::string const& descName,
+                                                  unsigned int numDimensions,
+                                                  std::string const& tensorName) const
+{
+    // If we're allowing expanded dimensions then numDimensions becomes the minimum number of Dimensions we can allow.
+    // Throw an Exception if the tensors has fewer than numDimensions or if the squeezed dimensions are greater than
+    // numDimensions.
+    if (m_AllowExpandedDims)
+    {
+        unsigned int squeezedDims = 0;
+
+        for (unsigned int i = 0; i < tensor.GetNumDimensions(); ++i)
+        {
+            if (tensor.GetShape()[i] != 1)
+            {
+                ++squeezedDims;
+            }
+        }
+        if (tensor.GetNumDimensions() < numDimensions || squeezedDims > numDimensions)
+        {
+            throw InvalidArgumentException(descName + ": Expected " + to_string(numDimensions) + " or less but got " +
+                                           to_string(tensor.GetNumDimensions()) + " dimensions for " +
+                                           tensorName + " tensor.");
+        }
+    }
+    else
+    {
+        if (tensor.GetNumDimensions() != numDimensions)
+        {
+            throw InvalidArgumentException(descName + ": Expected " + to_string(numDimensions) + " but got " +
+                                           to_string(tensor.GetNumDimensions()) + " dimensions for " +
+                                           tensorName + " tensor.");
+        }
+    }
+}
+
+//---------------------------------------------------------------
+void QueueDescriptor::ValidateTensorNumDimNumElem(const TensorInfo& tensorInfo,
+                                 unsigned int numDimension,
+                                 unsigned int numElements,
+                                 std::string const& tensorName) const
+{
+    const std::string functionName{"ValidateTensorNumDimNumElem"};
+    ValidateTensorNumDimensions(tensorInfo, functionName, numDimension, tensorName);
+    ValidateTensorNumElements(tensorInfo, functionName, numElements, tensorName);
+}
+
+//---------------------------------------------------------------
 void QueueDescriptor::ValidateInputsOutputs(const std::string& descName,
     unsigned int numExpectedIn, unsigned int numExpectedOut) const
 {

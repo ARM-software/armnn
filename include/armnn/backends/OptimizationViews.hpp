@@ -13,7 +13,7 @@ namespace armnn
 class OptimizationViews
 {
 public:
-    OptimizationViews() = default;
+    OptimizationViews(NetworkOptions networkOptions = {}) : m_INetwork(INetwork::Create(networkOptions)) {}
     OptimizationViews(const OptimizationViews&) = delete;
     OptimizationViews& operator=(const OptimizationViews&) = delete;
     OptimizationViews(OptimizationViews&&) = default;

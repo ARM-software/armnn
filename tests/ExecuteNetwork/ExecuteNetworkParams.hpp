@@ -25,6 +25,7 @@ struct ExecuteNetworkParams
         TfliteInterpreter
     };
 
+    bool                          m_AllowExpandedDims;
     std::string                   m_CachedNetworkFilePath;
     std::vector<armnn::BackendId> m_ComputeDevices;
     bool                          m_Concurrent;

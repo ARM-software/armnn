@@ -793,16 +793,27 @@ INetworkPtr TfLiteParserImpl::CreateNetworkFromModel()
 
     using NetworkOptions = std::vector<BackendOptions>;
     NetworkOptions networkOptions = {};
-    if (m_Options && m_Options.value().m_InferAndValidate)
+    if (m_Options)
     {
-        BackendOptions shapeInferenceMethodOption("ShapeInferenceMethod",
-                                                  {
-                                                      { "InferAndValidate", true }
-                                                  });
+        if (m_Options.value().m_InferAndValidate)
+        {
+            BackendOptions shapeInferenceMethodOption("ShapeInferenceMethod",
+                                                      {
+                                                          { "InferAndValidate", true }
+                                                      });
 
-        networkOptions.push_back(shapeInferenceMethodOption);
+            networkOptions.push_back(shapeInferenceMethodOption);
+        }
+        if (m_Options.value().m_AllowExpandedDims)
+        {
+            BackendOptions shapeInferenceMethodOption("AllowExpandedDims",
+                                                      {
+                                                          { "AllowExpandedDims", true }
+                                                      });
+
+            networkOptions.push_back(shapeInferenceMethodOption);
+        }
     }
-
     m_Network = INetwork::Create(networkOptions);
     ARMNN_ASSERT(m_Model.get() != nullptr);
 

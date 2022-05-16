@@ -156,6 +156,24 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         {
             optimizerOptions.m_Debug = armnn::stringUtils::StringToBool(options_values[i]);
         }
+            // Infer output-shape
+        else if (std::string(options_keys[i]) == std::string("infer-output-shape"))
+        {
+            armnn::BackendOptions backendOption("ShapeInferenceMethod",
+            {
+                { "InferAndValidate", armnn::stringUtils::StringToBool(options_values[i]) }
+            });
+            optimizerOptions.m_ModelOptions.push_back(backendOption);
+        }
+            // Allow expanded dims
+        else if (std::string(options_keys[i]) == std::string("allow-expanded-dims"))
+        {
+            armnn::BackendOptions backendOption("AllowExpandedDims",
+            {
+                { "AllowExpandedDims", armnn::stringUtils::StringToBool(options_values[i]) }
+            });
+            optimizerOptions.m_ModelOptions.push_back(backendOption);
+        }
             // Process memory-import
         else if (std::string(options_keys[i]) == std::string("memory-import"))
         {

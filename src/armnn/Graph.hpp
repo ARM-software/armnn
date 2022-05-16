@@ -95,8 +95,9 @@ public:
         const Graph& m_Graph;
     };
 
-    Graph(bool shapeInferenceMethod = false)
+    Graph(bool shapeInferenceMethod = false, bool allowExpandedDims = false)
         : m_LayersInOrder(true)
+        , m_AllowExpandedDims(allowExpandedDims)
         , m_ShapeInferenceMethod(shapeInferenceMethod ? ShapeInferenceMethod::InferAndValidate :
                                                         ShapeInferenceMethod::ValidateOnly)
         , m_Profiler(std::make_shared<IProfiler>())
@@ -118,11 +119,12 @@ public:
         m_LayersInOrder = std::move(other.m_LayersInOrder);
         m_Views         = std::move(other.m_Views);
         m_Profiler      = std::move(other.m_Profiler);
-
         other.ForEachLayer([this](Layer* otherLayer)
         {
             otherLayer->Reparent(*this, m_Layers.end());
         });
+        m_AllowExpandedDims    = other.m_AllowExpandedDims;
+        m_ShapeInferenceMethod = other.m_ShapeInferenceMethod;
 
         ARMNN_ASSERT(other.m_PosInGraphMap.empty());
         ARMNN_ASSERT(other.m_Layers.empty());
@@ -272,8 +274,11 @@ private:
     mutable LayerList m_Layers;
     mutable bool m_LayersInOrder;
 
+    bool m_AllowExpandedDims;
+
     std::map<const GraphEvent, std::list<IGraphObservable*>> m_Views;
     ShapeInferenceMethod m_ShapeInferenceMethod;
+
     std::shared_ptr<IProfiler> m_Profiler;
 
     // Throws exception due to a layer input not being connected to an output slot.
@@ -424,6 +429,7 @@ inline LayerT* Graph::AddLayer(Args&&... args)
     LayerT* const layer = new LayerInGraph<LayerT>(*this, std::forward<Args>(args)...);
 
     layer->SetShapeInferenceMethod(m_ShapeInferenceMethod);
+    layer->SetAllowExpandedDims(m_AllowExpandedDims);
 
     NotifyObservables(GraphEvent::LayerAdded, layer);
 

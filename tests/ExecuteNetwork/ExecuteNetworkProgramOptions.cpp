@@ -228,6 +228,13 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "parser)",
                  cxxopts::value<bool>(m_ExNetParams.m_InferOutputShape)->default_value("false")->implicit_value("true"))
 
+                ("allow-expanded-dims",
+                 "If true will disregard dimensions with a size of 1 when validating tensor shapes. Tensor sizes must "
+                 "still match. This is an Experimental parameter that is incompatible with infer-output-shape. "
+                 "This parameter may be removed in a later update. ",
+                 cxxopts::value<bool>(m_ExNetParams.m_AllowExpandedDims)->default_value("false")
+                 ->implicit_value("true"))
+
                 ("iterations",
                  "Number of iterations to run the network for, default is set to 1. "
                  "If you wish to run the model with different input data for every execution you can do so by "

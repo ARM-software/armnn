@@ -885,11 +885,11 @@ TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
 
     // Define the network
     Graph graph;
-    auto input     = graph.AddLayer<InputLayer>(0, "input");
+    auto input        = graph.AddLayer<InputLayer>(0, "input");
     auto weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
-    auto conv      = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "convolution");
-    auto batchNorm = graph.AddLayer<BatchNormalizationLayer>(batchNormDescriptor, "batchNorm");
-    auto output    = graph.AddLayer<OutputLayer>(0, "output");
+    auto conv         = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "convolution");
+    auto batchNorm    = graph.AddLayer<BatchNormalizationLayer>(batchNormDescriptor, "batchNorm");
+    auto output       = graph.AddLayer<OutputLayer>(0, "output");
 
     // Set layer information
     input->GetOutputSlot().SetTensorInfo(inputInfo);

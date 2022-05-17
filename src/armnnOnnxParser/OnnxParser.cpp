@@ -1762,10 +1762,15 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
         }
     }
 
-    armnn::IConnectableLayer* layer;
+    node.input_size() == 3 ? desc.m_BiasEnabled = true : desc.m_BiasEnabled = false;
+    armnn::IConnectableLayer* layer = m_Network->AddConvolution2dLayer(desc, node.name().c_str());
     std::vector<std::string> tensorIndexes= {node.input(0), node.input(1)};
 
     auto weightTensor = CreateConstTensor(node.input(1));
+
+    IConnectableLayer* weightsLayer = m_Network->AddConstantLayer(weightTensor.first);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightTensor.first.GetInfo());
+    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
 
     if (node.input_size() == 3)
     {
@@ -1777,22 +1782,15 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
                                              CHECK_LOCATION().AsString()));
         }
         desc.m_BiasEnabled = true;
-        tensorIndexes.emplace_back(node.input(2));
         auto biasTensor = CreateConstTensor(node.input(2));
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        layer = m_Network->AddConvolution2dLayer(desc,
-                                                 weightTensor.first,
-                                                 Optional<ConstTensor>(biasTensor.first),
-                                                 node.name().c_str());
+
+        IConnectableLayer* biasLayer = m_Network->AddConstantLayer(biasTensor.first);
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensor.first.GetInfo());
+        biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+
+        tensorIndexes.emplace_back(node.input(2));
     }
-    else
-    {
-        layer = m_Network->AddConvolution2dLayer(desc,
-                                                 weightTensor.first,
-                                                 EmptyOptional(),
-                                                 node.name().c_str());
-        ARMNN_NO_DEPRECATE_WARN_END
-    }
+
     ARMNN_ASSERT(layer != nullptr);
 
     auto outputInfo = ComputeOutputInfo({ node.output(0) }, layer,

@@ -2122,8 +2122,14 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
     convDesc2d.m_BiasEnabled = biasEnabled;
     convDesc2d.m_DataLayout = armnn::DataLayout::NHWC;
 
-    armnn::IConnectableLayer* convLayer = nullptr;
+
     const std::string convLayerName("conv layer");
+
+    armnn::IConnectableLayer* convLayer = net->AddConvolution2dLayer(convDesc2d, convLayerName.c_str());
+
+    IConnectableLayer* weightsLayer = net->AddConstantLayer(weights);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1u));
 
     if (biasEnabled)
     {
@@ -2139,23 +2145,10 @@ std::pair<armnn::IOptimizedNetworkPtr, std::unique_ptr<PreCompiledWorkload>> Cre
 
         armnn::ConstTensor biases(biasTensorInfo, biasData);
 
-        // Create convolution layer with biases
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        convLayer = net->AddConvolution2dLayer(convDesc2d,
-                                              weights,
-                                              Optional<ConstTensor>(biases),
-                                              convLayerName.c_str());
-        ARMNN_NO_DEPRECATE_WARN_END
-    }
-    else
-    {
-        // Create convolution layer without biases
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        convLayer = net->AddConvolution2dLayer(convDesc2d,
-                                              weights,
-                                              EmptyOptional(),
-                                              convLayerName.c_str());
-        ARMNN_NO_DEPRECATE_WARN_END
+        IConnectableLayer* biasLayer = net->AddConstantLayer(biases);
+
+        biasLayer->GetOutputSlot(0).SetTensorInfo(biases.GetInfo());
+        biasLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(2u));
     }
 
     CHECK(convLayer);

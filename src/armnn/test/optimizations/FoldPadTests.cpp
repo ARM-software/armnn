@@ -636,13 +636,9 @@ TEST_CASE("FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutOptimizatio
         std::vector<float>    biasVector   = {5, 6, 7, 8};
         TensorInfo            biasInfo({4}, DataType::Float32, 0.0f, 0, true);
         ConstTensor           bias(biasInfo, biasVector);
-        Optional<ConstTensor> optionalBias = Optional<ConstTensor>(bias);
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        IConnectableLayer* conv2dLayer = network->AddConvolution2dLayer(convDescriptor,
-                                                                        weights,
-                                                                        optionalBias,
-                                                                        "Conv2D");
-        ARMNN_NO_DEPRECATE_WARN_END
+
+        IConnectableLayer* conv2dLayer = network->AddConvolution2dLayer(convDescriptor, "Conv2D");
+
         TensorInfo outputInfo(4, outputShape, DataType::Float32);
         conv2dLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
@@ -652,6 +648,14 @@ TEST_CASE("FoldPadLayerIntoConv2dLayer_ExecuteInferenceWithAndWithoutOptimizatio
         inputLayer->GetOutputSlot(0).Connect(padLayer->GetInputSlot(0));
         padLayer->GetOutputSlot(0).Connect(conv2dLayer->GetInputSlot(0));
         conv2dLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+        auto weightsLayer = network->AddConstantLayer(weights, "Weights");
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+        weightsLayer->GetOutputSlot(0).Connect(conv2dLayer->GetInputSlot(1));
+
+        auto biasLayer = network->AddConstantLayer(bias, "Bias");
+        biasLayer->GetOutputSlot(0).SetTensorInfo(bias.GetInfo());
+        biasLayer->GetOutputSlot(0).Connect(conv2dLayer->GetInputSlot(2));
 
         // Create ArmNN runtime
         IRuntimePtr          run              = IRuntime::Create(IRuntime::CreationOptions());    // default options

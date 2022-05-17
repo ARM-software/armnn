@@ -402,14 +402,16 @@ TEST_CASE("OptimizeNetworkCopy")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const convLayer   =
-            network->AddConvolution2dLayer(descriptor,
-                                           weights,
-                                           armnn::Optional<armnn::ConstTensor>(biases),
-                                           layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const convLayer   = network->AddConvolution2dLayer(descriptor, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+    armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights);
+    armnn::IConnectableLayer* biasLayer = network->AddConstantLayer(biases);
+
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1u));
+
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biasesInfo);
+    biasLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(2u));
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
     convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));

@@ -978,8 +978,8 @@ TEST_CASE("MultipleSimpleSubgraphs")
                                                     "m3");
 
     auto x2 = graph.InsertNewLayer<Convolution2dLayer>(m3->GetInputSlot(0),
-                                                                        Convolution2dDescriptor{},
-                                                                        "x2");
+                                                       Convolution2dDescriptor{},
+                                                       "x2");
 
     auto w2 = graph.InsertNewLayer<ConstantLayer>(x2->GetInputSlot(1), "w2");
 

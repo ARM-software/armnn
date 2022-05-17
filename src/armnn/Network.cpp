@@ -90,9 +90,9 @@ IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor
 
 ARMNN_NO_DEPRECATE_WARN_BEGIN
 IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                    const ConstTensor& weights,
-                                                    const Optional<ConstTensor>& biases,
-                                                    const char* name)
+                                                   const ConstTensor& weights,
+                                                   const Optional<ConstTensor>& biases,
+                                                   const char* name)
 {
     return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor,
                                                weights,

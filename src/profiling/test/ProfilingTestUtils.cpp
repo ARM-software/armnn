@@ -424,9 +424,18 @@ void VerifyPostOptimisationStructureTestImpl(armnn::BackendId backendId)
     conv2dDesc.m_PadTop = 2;
     conv2dDesc.m_PadBottom = 2;
     conv2dDesc.m_BiasEnabled = true;
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer* conv2d = net->AddConvolution2dLayer(conv2dDesc, weights, optionalBiases);
-    ARMNN_NO_DEPRECATE_WARN_END
+
+    IConnectableLayer* conv2d = net->AddConvolution2dLayer(conv2dDesc);
+
+    armnn::IConnectableLayer* weightsLayer = net->AddConstantLayer(weights, "Weights");
+    armnn::IConnectableLayer* biasLayer = net->AddConstantLayer(biases, "Bias");
+
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightInfo);
+    weightsLayer->GetOutputSlot(0).Connect(conv2d->GetInputSlot(1u));
+
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biasInfo);
+    biasLayer->GetOutputSlot(0).Connect(conv2d->GetInputSlot(2u));
+
     // Abs layer
     armnn::ElementwiseUnaryDescriptor absDesc;
     armnn::IConnectableLayer* const abs = net->AddElementwiseUnaryLayer(absDesc, "abs");

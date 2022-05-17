@@ -320,13 +320,13 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     convDesc2d.m_PadBottom = 1;
     convDesc2d.m_DataLayout = DataLayout::NHWC;
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
-                                                                          weights,
-                                                                          armnn::EmptyOptional(),
-                                                                          "conv");
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d, "conv");
+    armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights);
+
     ARMNN_ASSERT(convLayer);
+
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1u));
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
@@ -878,13 +878,13 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     convDesc2d.m_PadTop = 1;
     convDesc2d.m_PadBottom = 1;
     convDesc2d.m_DataLayout = DataLayout::NHWC;
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
-                                                                          weights,
-                                                                          armnn::EmptyOptional(),
-                                                                          "conv");
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d, "conv");
     ARMNN_ASSERT(convLayer);
+
+    armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights);
+
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1u));
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
@@ -1098,13 +1098,14 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     convDesc2d.m_PadTop = 1;
     convDesc2d.m_PadBottom = 1;
     convDesc2d.m_DataLayout = DataLayout::NHWC;
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d,
-                                                                          weights,
-                                                                          armnn::EmptyOptional(),
-                                                                          "conv");
-    ARMNN_NO_DEPRECATE_WARN_END
+
+    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d, "conv");
     ARMNN_ASSERT(convLayer);
+
+    armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights);
+
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1u));
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);

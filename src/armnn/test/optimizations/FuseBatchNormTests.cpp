@@ -31,9 +31,10 @@ public:
                                              const Optional<ConstTensor> &biases,
                                              const char *name)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        return network->AddConvolution2dLayer(descriptor, weights, biases, name);
-        ARMNN_NO_DEPRECATE_WARN_END
+        IgnoreUnused(weights);
+        IgnoreUnused(biases);
+
+        return network->AddConvolution2dLayer(descriptor, name);
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork *network,
@@ -41,12 +42,18 @@ public:
                                                              const ConstTensor &weights,
                                                              const Optional<ConstTensor> &biases)
     {
-        IgnoreUnused(network);
-        IgnoreUnused(descriptor);
-        IgnoreUnused(weights);
-        IgnoreUnused(biases);
+        auto weightsLayer = network->AddConstantLayer(weights, "Weights");
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+        std::vector<IConnectableLayer*> layers = {weightsLayer};
 
-        return {};
+        if (descriptor.m_BiasEnabled)
+        {
+            auto biasLayer = network->AddConstantLayer(biases.value(), "Bias");
+            biasLayer->GetOutputSlot(0).SetTensorInfo(biases.value().GetInfo());
+            layers.emplace_back(biasLayer);
+        }
+
+        return layers;
     }
 };
 

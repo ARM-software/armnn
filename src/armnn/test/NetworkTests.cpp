@@ -605,10 +605,6 @@ TEST_CASE("ObtainConv2DDescriptorFromIConnectableLayer")
 {
     armnn::NetworkImpl net;
 
-    unsigned int dims[] = { 10,1,1,1 };
-    std::vector<float> convWeightsData(10);
-    armnn::ConstTensor weights(armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true), convWeightsData);
-
     armnn::Convolution2dDescriptor convDesc2d;
     convDesc2d.m_PadLeft = 2;
     convDesc2d.m_PadRight = 3;
@@ -620,12 +616,7 @@ TEST_CASE("ObtainConv2DDescriptorFromIConnectableLayer")
     convDesc2d.m_DilationY = 3;
     convDesc2d.m_BiasEnabled = false;
     convDesc2d.m_DataLayout = armnn::DataLayout::NCHW;
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d,
-                                                                          weights,
-                                                                          armnn::EmptyOptional(),
-                                                                          "conv layer");
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const convLayer = net.AddConvolution2dLayer(convDesc2d, "conv layer");
     CHECK(convLayer);
 
     const armnn::BaseDescriptor& descriptor = convLayer->GetParameters();

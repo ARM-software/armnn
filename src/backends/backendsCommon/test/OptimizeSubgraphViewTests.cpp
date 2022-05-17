@@ -315,7 +315,7 @@ SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph1(Graph& graph, Layer
     const TensorInfo inputInfo ({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
     const TensorInfo outputInfo({  1, 16, 16, 16 }, DataType::QAsymmU8, 1.0f, 0);
     TensorInfo weightInfo({ 16,  1,  1, 16 }, DataType::QAsymmU8, 0.9f, 0);
-    TensorInfo biasInfo  ({  1,  1,  1, 16 }, DataType::Signed32,        0.9f, 0);
+    TensorInfo biasInfo({ 1, 1, 1, 16 }, DataType::Signed32, 0.9f, 0);
 
     weightInfo.SetConstant(true);
     biasInfo.SetConstant(true);

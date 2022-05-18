@@ -5,16 +5,6 @@
 
 #pragma once
 
-#include "Activation.hpp"
-#include "ArgMinMax.hpp"
-#include "BatchNormImpl.hpp"
-#include "ConvImpl.hpp"
-#include "Concatenate.hpp"
-#include "ElementwiseFunction.hpp"
-#include "FullyConnected.hpp"
-#include "Gather.hpp"
-#include "Pooling2d.hpp"
-#include "Pooling3d.hpp"
 #include "RefActivationWorkload.hpp"
 #include "RefArgMinMaxWorkload.hpp"
 #include "RefBatchNormalizationWorkload.hpp"
@@ -74,8 +64,3 @@
 #include "RefTransposeConvolution2dWorkload.hpp"
 #include "RefTransposeWorkload.hpp"
 #include "RefUnidirectionalSequenceLstmWorkload.hpp"
-#include "RefWorkloadUtils.hpp"
-#include "Resize.hpp"
-#include "Softmax.hpp"
-#include "Splitter.hpp"
-#include "TensorBufferArrayView.hpp"

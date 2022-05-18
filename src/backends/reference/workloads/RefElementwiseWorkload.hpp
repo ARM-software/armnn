@@ -21,15 +21,15 @@ template <typename Functor, typename ParentDescriptor, typename armnn::StringMap
 class RefElementwiseWorkload : public RefBaseWorkload<ParentDescriptor>
 {
 public:
-    using InType = typename ElementwiseBinaryFunction<Functor>::InType;
-    using OutType = typename ElementwiseBinaryFunction<Functor>::OutType;
-    using RefBaseWorkload<ParentDescriptor>::m_Data;
-
     RefElementwiseWorkload(const ParentDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
     void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
 
 private:
+    using InType = typename ElementwiseBinaryFunction<Functor>::InType;
+    using OutType = typename ElementwiseBinaryFunction<Functor>::OutType;
+    using RefBaseWorkload<ParentDescriptor>::m_Data;
+
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };
 

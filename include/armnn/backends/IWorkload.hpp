@@ -23,6 +23,8 @@ class IWorkload {
 public:
     virtual ~IWorkload() {}
 
+    // Note: do not call for async networks via ExecuteAsync or otherwise,
+    // as async networks memory is allocated outside the workload.
     virtual void PostAllocationConfigure() = 0;
 
     virtual void Execute() const = 0;

@@ -1381,6 +1381,32 @@ bool LayerSupportHandle::IsTransposeSupported(const TensorInfo& input,
                                             reasonIfUnsupported);
 }
 
+// Forwarding function to maintain ABI stability
+bool LayerSupportHandle::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
+                                                               const TensorInfo& outputStateIn,
+                                                               const TensorInfo& cellStateIn,
+                                                               const TensorInfo& output,
+                                                               const Optional<TensorInfo>& hiddenStateOutput,
+                                                               const Optional<TensorInfo>& cellStateOutput,
+                                                               const LstmDescriptor& descriptor,
+                                                               const LstmInputParamsInfo& paramsInfo,
+                                                               Optional<std::string&> reasonIfUnsupported)
+{
+    TensorInfo hiddenStateOutputVal =  hiddenStateOutput.has_value() ? hiddenStateOutput.value() : TensorInfo();
+    TensorInfo cellStateOutputVal   =  cellStateOutput.has_value() ? cellStateOutput.value() : TensorInfo();
+    TensorInfos infos{input, outputStateIn, cellStateIn, hiddenStateOutputVal, cellStateOutputVal, output};
+
+    return IsUnidirectionalSequenceLstmSupported(input,
+                                                 outputStateIn,
+                                                 cellStateIn,
+                                                 hiddenStateOutputVal,
+                                                 cellStateOutputVal,
+                                                 output,
+                                                 descriptor,
+                                                 paramsInfo,
+                                                 reasonIfUnsupported);
+}
+
 bool LayerSupportHandle::IsUnidirectionalSequenceLstmSupported(const TensorInfo& input,
                                                                const TensorInfo& outputStateIn,
                                                                const TensorInfo& cellStateIn,

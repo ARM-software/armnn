@@ -411,6 +411,19 @@ public:
                               const TransposeDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use function without "
+                                      "Optional TensorInfos", "23.02")
+    bool IsUnidirectionalSequenceLstmSupported(
+            const TensorInfo& input,
+            const TensorInfo& outputStateIn,
+            const TensorInfo& cellStateIn,
+            const TensorInfo& output,
+            const Optional<TensorInfo>& hiddenStateOutput,
+            const Optional<TensorInfo>& cellStateOutput,
+            const LstmDescriptor& descriptor,
+            const LstmInputParamsInfo& paramsInfo,
+            Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
     bool IsUnidirectionalSequenceLstmSupported(
         const TensorInfo& input,
         const TensorInfo& outputStateIn,

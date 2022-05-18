@@ -32,26 +32,6 @@ RefConvolution3dWorkload::RefConvolution3dWorkload(
                                          this->GetGuid());
 }
 
-void RefConvolution3dWorkload::PostAllocationConfigure()
-{
-    PostAllocationConfigure(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefConvolution3dWorkload::PostAllocationConfigure(std::vector<ITensorHandle*> inputs,
-                                                       std::vector<ITensorHandle*> outputs)
-{
-    IgnoreUnused(outputs);
-    const TensorInfo& rFilterInfo = GetTensorInfo(inputs[1]);
-    m_FilterShape = rFilterInfo.GetShape();
-    m_FilterDecoder = MakeDecoder<float>(rFilterInfo);
-
-    if (m_Data.m_Parameters.m_BiasEnabled)
-    {
-        const TensorInfo& biasInfo = GetTensorInfo(inputs[2]);
-        m_BiasDecoder = MakeDecoder<float>(biasInfo);
-    }
-}
-
 void RefConvolution3dWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
@@ -59,8 +39,6 @@ void RefConvolution3dWorkload::Execute() const
 
 void RefConvolution3dWorkload::ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)
 {
-    PostAllocationConfigure(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
-
     Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
 }
 
@@ -74,14 +52,17 @@ void RefConvolution3dWorkload::Execute(std::vector<ITensorHandle*> inputs, std::
     const TensorShape& inputShape = GetTensorInfo(inputs[0]).GetShape();
     const TensorShape& outputShape = GetTensorInfo(outputs[0]).GetShape();
 
-    m_FilterDecoder->Reset(inputs[1]->Map());
+    const auto& filterInfo = GetTensorInfo(inputs[1]);
+    std::unique_ptr<Decoder<float>> filterDecoder = MakeDecoder<float>(GetTensorInfo(inputs[1]), inputs[1]->Map());
+    std::unique_ptr<Decoder<float>> biasDecoder;
+
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        m_BiasDecoder->Reset(inputs[2]->Map());
+        biasDecoder = MakeDecoder<float>(GetTensorInfo(inputs[2]), inputs[2]->Map());
     }
 
-    Convolve3d(inputShape, *inputDecoder, outputShape, *outputEncoder, m_FilterShape,
-               *m_FilterDecoder, m_Data.m_Parameters.m_BiasEnabled, m_BiasDecoder.get(),
+    Convolve3d(inputShape, *inputDecoder, outputShape, *outputEncoder, filterInfo.GetShape(),
+               *filterDecoder, m_Data.m_Parameters.m_BiasEnabled, biasDecoder.get(),
                m_Data.m_Parameters.m_DataLayout,
                m_Data.m_Parameters.m_PadTop, m_Data.m_Parameters.m_PadLeft, m_Data.m_Parameters.m_PadFront,
                m_Data.m_Parameters.m_StrideX, m_Data.m_Parameters.m_StrideY, m_Data.m_Parameters.m_StrideZ,

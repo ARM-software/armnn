@@ -388,7 +388,9 @@ struct DepthwiseConvolution2dDescriptor
     bool       m_BiasEnabled;
     DataLayout m_DataLayout;
 
-     bool operator ==(const DepthwiseConvolution2dDescriptor& rhs) const;
+    bool operator ==(const DepthwiseConvolution2dDescriptor& rhs) const;
+
+    uint32_t GetNumInputs() const;
 };
 
 %feature("docstring",
@@ -544,7 +546,13 @@ struct InstanceNormalizationDescriptor
         m_PeepholeEnabled (bool): Enable/disable peephole. Default: false.
         m_ProjectionEnabled (bool): Enable/disable the projection layer. Default: false.
         m_LayerNormEnabled (bool): Enable/disable layer normalization. Default: false.
-
+        m_TimeMajor (bool): Enable/disable time major. Default: false.
+        m_InputIntermediateScale (float): Input intermediate quantization scale. Default: 0.0.
+        m_ForgetIntermediateScale (float): Forget intermediate quantization scale. Default: 0.0.
+        m_CellIntermediateScale (float): Cell intermediate quantization scale. Default: 0.0.
+        m_OutputIntermediateScale (float): Output intermediate quantization scale. Default: 0.0.
+        m_HiddenStateZeroPoint (int): Hidden State zero point. Default: 0.
+        m_HiddenStateScale (float): Hidden State quantization scale. Default: 0.0.
     ") LstmDescriptor;
 struct LstmDescriptor
 {
@@ -557,6 +565,13 @@ struct LstmDescriptor
     bool m_PeepholeEnabled;
     bool m_ProjectionEnabled;
     bool m_LayerNormEnabled;
+    bool m_TimeMajor;
+    float m_InputIntermediateScale;
+    float m_ForgetIntermediateScale;
+    float m_CellIntermediateScale;
+    float m_OutputIntermediateScale;
+    int32_t m_HiddenStateZeroPoint;
+    float m_HiddenStateScale;
 
     bool operator ==(const LstmDescriptor& rhs) const;
 };

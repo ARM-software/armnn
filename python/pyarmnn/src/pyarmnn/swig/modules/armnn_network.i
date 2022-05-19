@@ -534,6 +534,22 @@ public:
 
     %feature("docstring",
         "
+        Adds a 2D Depthwise Convolution layer to the network.
+
+        Args:
+            convolution2dDescriptor (DepthwiseConvolution2dDescriptor): Description of the 2D depthwise convolution layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddDepthwiseConvolution2dLayer;
+
+    armnn::IConnectableLayer* AddDepthwiseConvolution2dLayer(
+        const armnn::DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+        const char* name = nullptr);
+
+    %feature("docstring",
+        "
         Adds a Dequantize layer to the network.
 
         Args:
@@ -543,7 +559,6 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddDequantizeLayer;
     armnn::IConnectableLayer* AddDequantizeLayer(const char* name = nullptr);
-
 
     %feature("docstring",
         "
@@ -869,7 +884,6 @@ public:
     armnn::IConnectableLayer* AddQuantizedLstmLayer(const armnn::QuantizedLstmInputParams& params,
                                                      const char* name = nullptr);
 
-
     %feature("docstring",
         "
         Adds a Rank layer to the network.
@@ -923,7 +937,6 @@ public:
         ") AddResizeLayer;
     armnn::IConnectableLayer* AddResizeLayer(const armnn::ResizeDescriptor& resizeDescriptor,
                                               const char* name = nullptr);
-
 
     %feature("docstring",
         "
@@ -1184,7 +1197,6 @@ public:
         }
     }
 
-
     %feature("docstring",
         "
         Adds a 2D Depthwise Convolution layer to the network.
@@ -1205,6 +1217,7 @@ public:
         const armnn::ConstTensor* biases = nullptr,
         const char* name = nullptr) {
 
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         if (biases) {
             return $self->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights,
                                                  armnn::Optional<armnn::ConstTensor>(*biases), name);
@@ -1212,7 +1225,9 @@ public:
             return $self->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights,
                                                  armnn::Optional<armnn::ConstTensor>(), name);
         }
+        ARMNN_NO_DEPRECATE_WARN_END
     }
+
 }
 
 %feature("docstring",

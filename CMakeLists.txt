@@ -835,6 +835,7 @@ if(BUILD_UNIT_TESTS)
     endif()
 
     if(BUILD_ARMNN_SERIALIZER AND ARMNNREF)
+        target_include_directories(UnitTests SYSTEM PRIVATE generated)
         target_include_directories(UnitTests SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/armnnSerializer)
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnSerializer)

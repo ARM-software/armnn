@@ -12,13 +12,14 @@ if(BUILD_ARMNN_DESERIALIZER)
 
     add_custom_command(
         # Generate an ArmnnSchema_generated.h file if it doesn't exist, or update it when necessary otherwise
-        OUTPUT ArmnnSchema_generated.h DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../armnnSerializer/ArmnnSchema.fbs
-        COMMAND ${FLATC} -o ${CMAKE_CURRENT_BINARY_DIR} --cpp ${CMAKE_CURRENT_SOURCE_DIR}/../armnnSerializer/ArmnnSchema.fbs
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../../generated/ArmnnSchema_generated.h DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../armnnSerializer/ArmnnSchema.fbs
+        COMMAND ${FLATC} -o ${CMAKE_CURRENT_SOURCE_DIR}/../../generated --cpp ${CMAKE_CURRENT_SOURCE_DIR}/../armnnSerializer/ArmnnSchema.fbs
     )
+    set_property(SOURCE Deserializer.cpp APPEND PROPERTY OBJECT_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../../generated/ArmnnSchema_generated.h)
+    set_directory_properties(PROPERTIES ADDITIONAL_CLEAN_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../../generated/)
 
     set(armnn_deserializer_sources)
     list(APPEND armnn_deserializer_sources
-            ArmnnSchema_generated.h
             Deserializer.hpp
             Deserializer.cpp
         )
@@ -26,9 +27,15 @@ if(BUILD_ARMNN_DESERIALIZER)
     add_library_ex(armnnDeserializer SHARED ${armnn_deserializer_sources})
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
+
     set_target_properties(armnnDeserializer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
     target_include_directories(armnnDeserializer PRIVATE ../armnn)
     target_include_directories(armnnDeserializer PRIVATE ../armnnUtils)
+    target_include_directories(armnnDeserializer PRIVATE ../../generated)
+
+    list(APPEND armnn_deserializer_sources
+            ArmnnSchema_generated.h
+        )
 
     # System include to suppress warnings for flatbuffers generated files
     target_include_directories(armnnDeserializer SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

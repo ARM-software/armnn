@@ -6,6 +6,7 @@
 LOCAL_PATH := $(call my-dir)
 
 # Configure these paths if you move the source or Khronos headers
+ARMNN_GENERATED_HEADER_PATH := $(LOCAL_PATH)/generated
 OPENCL_HEADER_PATH := $(LOCAL_PATH)/../clframework/include
 NN_HEADER_PATH := $(LOCAL_PATH)/../../../../frameworks/ml/nn/runtime/include
 ARMNN_HEADER_PATH := $(LOCAL_PATH)/include
@@ -92,6 +93,7 @@ LOCAL_EXPORT_C_INCLUDES := \
 LOCAL_C_INCLUDES := \
         $(OPENCL_HEADER_PATH) \
         $(NN_HEADER_PATH) \
+        $(ARMNN_GENERATED_HEADER_PATH) \
         $(ARMNN_PROFILING_INCLUDE_PATH) \
         $(ARMNN_PROFILING_COMMON_INCLUDE_PATH) \
         $(ARMNN_PROFILING_CLIENT_INCLUDE_PATH) \
@@ -373,6 +375,7 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 LOCAL_C_INCLUDES := \
         $(OPENCL_HEADER_PATH) \
         $(NN_HEADER_PATH) \
+        $(ARMNN_GENERATED_HEADER_PATH) \
         $(ARMNN_PROFILING_INCLUDE_PATH) \
         $(ARMNN_PROFILING_COMMON_INCLUDE_PATH) \
         $(ARMNN_PROFILING_CLIENT_INCLUDE_PATH) \

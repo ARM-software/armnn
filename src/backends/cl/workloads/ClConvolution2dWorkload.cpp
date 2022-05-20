@@ -28,15 +28,6 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
                                                     bool isFastMathEnabled,
                                                     const ActivationDescriptor* activationDescriptor)
 {
-    // The arm_compute::CLConvolutionLayer supports both const and non const
-    // weights. However, in the case of non const weights we'd have to call
-    // prepare or configure for each inference which we're not setup to do just yet.
-    if (!weights.IsConstant())
-    {
-        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                   "ArmNN ClConvolution2dWorkload does not support non constant weights."};
-    }
-
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input, descriptor.m_DataLayout);
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(output, descriptor.m_DataLayout);
     arm_compute::TensorInfo aclWeightsInfo = BuildArmComputeTensorInfo(weights, descriptor.m_DataLayout);

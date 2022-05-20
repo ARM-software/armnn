@@ -23,14 +23,6 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
                                                      const FullyConnectedDescriptor& descriptor,
                                                      const ActivationDescriptor* activationDescriptor)
 {
-    // The CL implemented workload does support both const and non const
-    // weights. However, in the case of non const weights we'd have to call
-    // prepare or configure for each inference which we're not setup to do just yet.
-    if (!weights.IsConstant())
-    {
-        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                    "Arm NN ClFullyConnectedWorkload does not support non constant weights."};
-    }
     const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
     arm_compute::TensorInfo aclWeights = BuildArmComputeTensorInfo(weights);

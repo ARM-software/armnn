@@ -76,19 +76,19 @@ bool HasCapability(const BackendOptions::BackendOption& capability, const Backen
             {
                 return capability.GetValue().AsBool() == backendCapability.GetValue().AsBool();
             }
-            else if(capability.GetValue().IsFloat() && backendCapability.GetValue().IsFloat())
+            else if (capability.GetValue().IsFloat() && backendCapability.GetValue().IsFloat())
             {
                 return capability.GetValue().AsFloat() == backendCapability.GetValue().AsFloat();
             }
-            else if(capability.GetValue().IsInt() && backendCapability.GetValue().IsInt())
+            else if (capability.GetValue().IsInt() && backendCapability.GetValue().IsInt())
             {
                 return capability.GetValue().AsInt() == backendCapability.GetValue().AsInt();
             }
-            else if(capability.GetValue().IsString() && backendCapability.GetValue().IsString())
+            else if (capability.GetValue().IsString() && backendCapability.GetValue().IsString())
             {
                 return capability.GetValue().AsString() == backendCapability.GetValue().AsString();
             }
-            else if(capability.GetValue().IsUnsignedInt() && backendCapability.GetValue().IsUnsignedInt())
+            else if (capability.GetValue().IsUnsignedInt() && backendCapability.GetValue().IsUnsignedInt())
             {
                 return capability.GetValue().AsUnsignedInt() == backendCapability.GetValue().AsUnsignedInt();
             }
@@ -374,20 +374,31 @@ bool LayerSupportHandle::IsConvolution2dSupported(const TensorInfo& input,
     TensorInfos infos{input, output, weights, biasesVal};
 
     Optional<const BackendOptions::BackendOption> capability ;
-    if(!m_BackendId.IsUndefined())
+    if (!m_BackendId.IsUndefined())
     {
-        capability = GetCapability("ConstantTensorsAsInputs", m_BackendId);
-        if(!capability.has_value() || capability.value().GetValue().AsBool() == false)
+        capability = GetCapability("NonConstWeights", m_BackendId);
+        if (!capability.has_value() || capability.value().GetValue().AsBool() == false)
         {
-            if(!weights.IsConstant())
+            if (!weights.IsConstant())
             {
+                if (reasonIfUnsupported.has_value())
+                {
+                    reasonIfUnsupported.value() =
+                        "Backend is not capable of supporting dynamic weights (NonConstWeights) and "
+                        "Convolution2d weights are set as dynamic (non constant). ";
+                }
                 return false;
             }
-            if (descriptor.m_BiasEnabled && !biases.has_value())
+            if (descriptor.m_BiasEnabled && !biasesVal.IsConstant())
             {
+                if (reasonIfUnsupported.has_value())
+                {
+                    reasonIfUnsupported.value() =
+                            "Backend is not capable of supporting dynamic biases (NonConstWeights) and "
+                            "Convolution2d biases are set as dynamic (non constant). ";
+                }
                 return false;
             }
-
 
             // At the first stage we will only print a warning. this is to give
             // backend developers a chance to adopt and read weights from input slots.
@@ -465,21 +476,30 @@ bool LayerSupportHandle::IsDepthwiseConvolutionSupported(
     TensorInfos infos{input, output, weights, biasesVal};
 
     Optional<const BackendOptions::BackendOption> capability ;
-    if(!m_BackendId.IsUndefined())
+    if (!m_BackendId.IsUndefined())
     {
-        capability = GetCapability("ConstantTensorsAsInputs", m_BackendId);
-        if(!capability.has_value() || capability.value().GetValue().AsBool() == false)
+        capability = GetCapability("NonConstWeights", m_BackendId);
+        if (!capability.has_value() || capability.value().GetValue().AsBool() == false)
         {
-            if(!weights.IsConstant())
+            if (!weights.IsConstant())
             {
+                if (reasonIfUnsupported.has_value())
+                {
+                    reasonIfUnsupported.value() =
+                            "Backend is not capable of supporting dynamic weights (NonConstWeights) and "
+                            "DepthwiseConvolution2d weights are set as dynamic (non constant). ";
+                }
                 return false;
             }
-            if(descriptor.m_BiasEnabled)
+            if (descriptor.m_BiasEnabled && !biasesVal.IsConstant())
             {
-                if(!biases.value().IsConstant())
+                if (reasonIfUnsupported.has_value())
                 {
-                    return false;
+                    reasonIfUnsupported.value() =
+                            "Backend is not capable of supporting dynamic biases (NonConstWeights) and "
+                            "DepthwiseConvolution2d biases are set as dynamic (non constant). ";
                 }
+                return false;
             }
             // At the first stage we will only print a warning. this is to give
             // backend developers a chance to adopt and read weights from input slots.
@@ -544,21 +564,30 @@ bool LayerSupportHandle::IsDilatedDepthwiseConvolutionSupported(
     TensorInfos infos{input, output, weights, biasesVal};
 
     Optional<const BackendOptions::BackendOption> capability ;
-    if(!m_BackendId.IsUndefined())
+    if (!m_BackendId.IsUndefined())
     {
-        capability = GetCapability("ConstantTensorsAsInputs", m_BackendId);
-        if(!capability.has_value() || capability.value().GetValue().AsBool() == false)
+        capability = GetCapability("NonConstWeights", m_BackendId);
+        if (!capability.has_value() || capability.value().GetValue().AsBool() == false)
         {
-            if(!weights.IsConstant())
+            if (!weights.IsConstant())
             {
+                if (reasonIfUnsupported.has_value())
+                {
+                    reasonIfUnsupported.value() =
+                            "Backend is not capable of supporting dynamic weights (NonConstWeights) and "
+                            "DilatedDepthwiseConvolution2d weights are set as dynamic (non constant). ";
+                }
                 return false;
             }
-            if(descriptor.m_BiasEnabled)
+            if (descriptor.m_BiasEnabled && !biasesVal.IsConstant())
             {
-                if(!biases.value().IsConstant())
+                if (reasonIfUnsupported.has_value())
                 {
-                    return false;
+                    reasonIfUnsupported.value() =
+                            "Backend is not capable of supporting dynamic biases (NonConstWeights) and "
+                            "DilatedDepthwiseConvolution2d biases are set as dynamic (non constant). ";
                 }
+                return false;
             }
             // At the first stage we will only print a warning. this is to give
             // backend developers a chance to adopt and read weights from input slots.
@@ -657,34 +686,44 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
                                                    const FullyConnectedDescriptor& descriptor,
                                                    Optional<std::string&> reasonIfUnsupported)
 {
-    if(!m_BackendId.IsUndefined())
+    TensorInfos infos{input, output, weights, biases};
+
+    Optional<const BackendOptions::BackendOption> capability;
+    if (!m_BackendId.IsUndefined())
     {
-        auto capability = GetCapability("ConstantTensorsAsInputs", m_BackendId);
-        if(!capability.has_value() || capability.value().GetValue().AsBool() == false)
+        capability = GetCapability("NonConstWeights", m_BackendId);
+        if (!capability.has_value() || capability.value().GetValue().AsBool() == false)
         {
-            if(!weights.IsConstant())
+            if (!descriptor.m_ConstantWeights)
             {
                 if (reasonIfUnsupported.has_value())
                 {
                     reasonIfUnsupported.value() =
-                        "This backend might not support non constant weights. "
-                        "If weights are constant make sure to set IsConstant when creating TensorInfo";
+                            "Backend is not capable of supporting dynamic weights (NonConstWeights) and "
+                            "FullyConnected descriptor indicates that weights are dynamic (non constant). ";
+                }
+                return false;
+            }
+            if (!weights.IsConstant())
+            {
+                if (reasonIfUnsupported.has_value())
+                {
+                    reasonIfUnsupported.value() =
+                            "Backend is not capable of supporting dynamic weights (NonConstWeights) and "
+                            "FullyConnected weights are set as dynamic (non constant). ";
                 }
 
                 return false;
             }
-            if(descriptor.m_BiasEnabled)
+            if (descriptor.m_BiasEnabled && !biases.IsConstant())
             {
-                if(!biases.IsConstant())
+                if (reasonIfUnsupported.has_value())
                 {
-                    if (reasonIfUnsupported.has_value())
-                    {
-                        reasonIfUnsupported.value() =
-                            "This backend might not support non constant bias. "
-                            "If bias are constant make sure to set IsConstant when creating TensorInfo";
-                    }
-                    return false;
+                    reasonIfUnsupported.value() =
+                            "Backend is not capable of supporting dynamic biases (NonConstWeights) and "
+                            "FullyConnected biases are set as dynamic (non constant). ";
                 }
+                return false;
             }
 
             // At the first stage we will only print a warning. this is to give
@@ -694,19 +733,7 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
                                   "doxygen documentation on github https://github.com/ARM-software/armnn "
                                   "under the keyword 'ConstTensorsAsInputs'.";
         }
-
-        if(!descriptor.m_ConstantWeights)
-        {
-            capability = GetCapability("NonConstWeights", m_BackendId);
-            if (capability.has_value() && capability.value().GetValue().AsBool() == true)
-            {
-                return true;
-            }
-            return false;
-        }
     }
-
-    TensorInfos infos{input, output, weights, biases};
 
     return m_LayerSupport->IsLayerSupported(LayerType::FullyConnected,
                                             infos,

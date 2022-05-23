@@ -71,34 +71,50 @@ TEST_CASE("Fp32NetworkToBf16OptimizationConv2DTest")
     input->GetOutputSlot().SetTensorInfo(infoFP32);
 
     armnn::Convolution2dDescriptor descriptor;
-
+    descriptor.m_BiasEnabled = true;
     auto conv = graph.AddLayer<armnn::Convolution2dLayer>(descriptor, "conv2d");
-    conv->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weights);
-    conv->m_Bias = std::make_unique<armnn::ScopedTensorHandle>(bias);
     conv->GetOutputSlot().SetTensorInfo(infoFP32);
+
+    auto weightsLayer = graph.AddLayer<armnn::ConstantLayer>("Weights");
+    weightsLayer->m_LayerOutput = std::make_shared<armnn::ScopedTensorHandle>(weights);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
+
+    auto biasLayer = graph.AddLayer<armnn::ConstantLayer>("Bias");
+    biasLayer->m_LayerOutput = std::make_shared<armnn::ScopedTensorHandle>(bias);
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
 
     auto output = graph.AddLayer<armnn::OutputLayer>(1, "output");
 
     // Connect up the layers
     input->GetOutputSlot().Connect(conv->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(conv->GetInputSlot(1));
+    biasLayer->GetOutputSlot(0).Connect(conv->GetInputSlot(2));
     conv->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::Convolution2dLayer>, &IsLayerOfType<armnn::OutputLayer>));
+                        &IsLayerOfType<armnn::Convolution2dLayer>, &IsLayerOfType<armnn::ConstantLayer>,
+                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::OutputLayer>));
 
     // Run the optimizer
-    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(Fp32NetworkToBf16Converter()));
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(RedirectMembersToConstantInputs(),
+                                                           Fp32NetworkToBf16Converter()));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>, &IsLayerOfType<armnn::Convolution2dLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>));
+                        &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
+                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
+                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::Convolution2dLayer>,
+                        &IsLayerOfType<armnn::OutputLayer>));
 
     armnn::TensorInfo inputTensor = conv->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+    armnn::TensorInfo weightTensor = conv->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
+    armnn::TensorInfo biasTensor = conv->GetInputSlot(2).GetConnectedOutputSlot()->GetTensorInfo();
     armnn::TensorInfo outputTensor = conv->GetOutputSlot(0).GetTensorInfo();
     CHECK((conv->GetDataType() == armnn::DataType::BFloat16));
     CHECK((conv->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::BFloat16));
     CHECK((conv->m_Bias->GetTensorInfo().GetDataType() == armnn::DataType::Float32));
     CHECK((inputTensor.GetDataType() == armnn::DataType::BFloat16));
+    CHECK((weightTensor.GetDataType() == armnn::DataType::BFloat16));
+    CHECK((biasTensor.GetDataType() == armnn::DataType::Float32));
     CHECK((outputTensor.GetDataType() == armnn::DataType::Float32));
 
     // Check whether data matches expected Bf16 data
@@ -141,34 +157,50 @@ TEST_CASE("Fp32NetworkToBf16OptimizationFullyConnectedTest")
     input->GetOutputSlot().SetTensorInfo(infoFP32);
 
     armnn::FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = true;
 
     auto fc = graph.AddLayer<armnn::FullyConnectedLayer>(descriptor, "fully");
-    fc->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weights);
-    fc->m_Bias = std::make_unique<armnn::ScopedTensorHandle>(bias);
     fc->GetOutputSlot().SetTensorInfo(infoFP32);
+
+    auto weightsLayer = graph.AddLayer<armnn::ConstantLayer>("Weights");
+    weightsLayer->m_LayerOutput = std::make_shared<armnn::ScopedTensorHandle>(weights);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
+
+    auto biasLayer = graph.AddLayer<armnn::ConstantLayer>("Bias");
+    biasLayer->m_LayerOutput = std::make_shared<armnn::ScopedTensorHandle>(bias);
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
 
     auto output = graph.AddLayer<armnn::OutputLayer>(1, "output");
 
     // Connect up the layers
     input->GetOutputSlot().Connect(fc->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(fc->GetInputSlot(1));
+    biasLayer->GetOutputSlot(0).Connect(fc->GetInputSlot(2));
     fc->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::FullyConnectedLayer>, &IsLayerOfType<armnn::OutputLayer>));
+                        &IsLayerOfType<armnn::FullyConnectedLayer>, &IsLayerOfType<armnn::ConstantLayer>,
+                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::OutputLayer>));
 
     // Run the optimizer
-    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(Fp32NetworkToBf16Converter()));
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(RedirectMembersToConstantInputs(),
+                                                           Fp32NetworkToBf16Converter()));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>, &IsLayerOfType<armnn::FullyConnectedLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>));
+                        &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>, &IsLayerOfType<armnn::ConstantLayer>,
+                        &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>, &IsLayerOfType<armnn::ConstantLayer>,
+                        &IsLayerOfType<armnn::FullyConnectedLayer>, &IsLayerOfType<armnn::OutputLayer>));
 
     armnn::TensorInfo inputTensor = fc->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+    armnn::TensorInfo weightTensor = fc->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
+    armnn::TensorInfo biasTensor = fc->GetInputSlot(2).GetConnectedOutputSlot()->GetTensorInfo();
     armnn::TensorInfo outputTensor = fc->GetOutputSlot(0).GetTensorInfo();
     CHECK((fc->GetDataType() == armnn::DataType::BFloat16));
     CHECK((fc->m_Weight->GetTensorInfo().GetDataType() == armnn::DataType::BFloat16));
     CHECK((fc->m_Bias->GetTensorInfo().GetDataType() == armnn::DataType::Float32));
     CHECK((inputTensor.GetDataType() == armnn::DataType::BFloat16));
+    CHECK((weightTensor.GetDataType() == armnn::DataType::BFloat16));
+    CHECK((biasTensor.GetDataType() == armnn::DataType::Float32));
     CHECK((outputTensor.GetDataType() == armnn::DataType::Float32));
 
     // Check whether data matches expected Bf16 data

@@ -1274,7 +1274,7 @@ TEST_CASE("SerializeGatherNd")
                 : LayerVerifierBase(layerName, inputInfos, outputInfos) {}
 
         void ExecuteStrategy(const armnn::IConnectableLayer* layer,
-                             const armnn::BaseDescriptor& descriptor,
+                             const armnn::BaseDescriptor&,
                              const std::vector<armnn::ConstTensor>& constants,
                              const char* name,
                              const armnn::LayerBindingId id = 0) override

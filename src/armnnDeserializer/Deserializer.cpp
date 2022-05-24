@@ -1272,14 +1272,14 @@ void IDeserializer::DeserializerImpl::ParseBatchToSpaceNd(GraphPtr graph, unsign
     auto flatBufferCrops = flatBufferDescriptor->crops();
     auto flatBufferBlockShape = flatBufferDescriptor->blockShape();
 
-    if (flatBufferCrops->Length() % 2 != 0)
+    if (flatBufferCrops->size() % 2 != 0)
     {
         throw ParseException(fmt::format("The size of crops must be divisible by 2 {}", CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::pair<unsigned int, unsigned int>> crops;
-    crops.reserve(flatBufferCrops->Length() / 2);
-    for (unsigned int i = 0; i < flatBufferCrops->Length() - 1; i += 2)
+    crops.reserve(flatBufferCrops->size() / 2);
+    for (unsigned int i = 0; i < flatBufferCrops->size() - 1; i += 2)
     {
         crops.emplace_back(flatBufferCrops->Get(i), flatBufferCrops->Get(i+1));
     }
@@ -2179,15 +2179,15 @@ void IDeserializer::DeserializerImpl::ParsePad(GraphPtr graph, unsigned int laye
     auto paddingMode = flatBufferDescriptor->paddingMode();
     float padValue = flatBufferDescriptor->padValue();
 
-    if (flatBufferPadList->Length() % 2 != 0)
+    if (flatBufferPadList->size() % 2 != 0)
     {
         throw ParseException(fmt::format("The size of the pad list must be divisible by 2 {}",
                                          CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::pair<unsigned int, unsigned int>> padList;
-    padList.reserve(flatBufferPadList->Length() / 2);
-    for (unsigned int i = 0; i < flatBufferPadList->Length() - 1; i += 2)
+    padList.reserve(flatBufferPadList->size() / 2);
+    for (unsigned int i = 0; i < flatBufferPadList->size() - 1; i += 2)
     {
         padList.emplace_back(flatBufferPadList->Get(i), flatBufferPadList->Get(i+1));
     }
@@ -2219,7 +2219,7 @@ void IDeserializer::DeserializerImpl::ParsePermute(GraphPtr graph, unsigned int 
     auto outputInfo = ToTensorInfo(outputs[0]);
 
     auto layerName = GetLayerName(graph, layerIndex);
-    const armnn::PermuteDescriptor descriptor(armnn::PermutationVector(dimsMapping->data(), dimsMapping->Length()));
+    const armnn::PermuteDescriptor descriptor(armnn::PermutationVector(dimsMapping->data(), dimsMapping->size()));
 
     IConnectableLayer* layer = m_Network->AddPermuteLayer(descriptor, layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
@@ -2727,15 +2727,15 @@ void IDeserializer::DeserializerImpl::ParseSpaceToBatchNd(GraphPtr graph, unsign
     auto flatBufferPadList = flatBufferDescriptor->padList();
     auto flatBufferBlockShape = flatBufferDescriptor->blockShape();
 
-    if (flatBufferPadList->Length() % 2 != 0)
+    if (flatBufferPadList->size() % 2 != 0)
     {
         throw ParseException(fmt::format("The size of the pad list must be divisible by 2 {}",
                                          CHECK_LOCATION().AsString()));
     }
 
     std::vector<std::pair<unsigned int, unsigned int>> padList;
-    padList.reserve(flatBufferPadList->Length() / 2);
-    for (unsigned int i = 0; i < flatBufferPadList->Length() - 1; i += 2)
+    padList.reserve(flatBufferPadList->size() / 2);
+    for (unsigned int i = 0; i < flatBufferPadList->size() - 1; i += 2)
     {
         padList.emplace_back(flatBufferPadList->Get(i), flatBufferPadList->Get(i+1));
     }
@@ -2911,7 +2911,7 @@ void IDeserializer::DeserializerImpl::ParseSlice(GraphPtr graph, unsigned int la
     auto fbBegin = fbDescriptor->begin();
     auto fbSize  = fbDescriptor->size();
 
-    if (fbBegin->Length() != fbSize->Length())
+    if (fbBegin->size() != fbSize->size())
     {
         throw ParseException(fmt::format("Begin and size descriptors must have the same length {}",
                                          CHECK_LOCATION().AsString()));
@@ -2947,8 +2947,8 @@ void IDeserializer::DeserializerImpl::ParseStridedSlice(GraphPtr graph, unsigned
     auto flatBufferEnd = flatBufferDescriptor->end();
     auto flatBufferStride = flatBufferDescriptor->stride();
 
-    if (!(flatBufferBegin->Length() == flatBufferEnd->Length() &&
-          flatBufferBegin->Length() == flatBufferStride->Length()))
+    if (!(flatBufferBegin->size() == flatBufferEnd->size() &&
+          flatBufferBegin->size() == flatBufferStride->size()))
     {
         throw ParseException(fmt::format("The size of the begin, end, and stride must be equal {}",
                                          CHECK_LOCATION().AsString()));
@@ -3542,7 +3542,7 @@ void IDeserializer::DeserializerImpl::ParseTranspose(GraphPtr graph, unsigned in
     auto outputInfo = ToTensorInfo(outputs[0]);
 
     auto layerName = GetLayerName(graph, layerIndex);
-    const armnn::TransposeDescriptor descriptor(armnn::PermutationVector(dimsMapping->data(), dimsMapping->Length()));
+    const armnn::TransposeDescriptor descriptor(armnn::PermutationVector(dimsMapping->data(), dimsMapping->size()));
 
     IConnectableLayer* layer = m_Network->AddTransposeLayer(descriptor, layerName.c_str());
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);

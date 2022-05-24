@@ -110,16 +110,14 @@ int TfLiteDelegateMainImpl(const ExecuteNetworkParams& params, const armnn::IRun
         std::cout << "Running on TfLite without ArmNN delegate\n";
     }
 
-    // Load (or generate) input data for inference
-    armnn::Optional<std::string> dataFile = params.m_GenerateTensorData
-                                            ? armnn::EmptyOptional()
-                                            : armnn::MakeOptional<std::string>(params.m_InputTensorDataFilePaths[0]);
-
     const size_t numInputs = params.m_InputNames.size();
-
     // Populate input tensor of interpreter
     for(unsigned int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
     {
+        // Load (or generate) input data for inference
+        armnn::Optional<std::string> dataFile = params.m_GenerateTensorData ? armnn::EmptyOptional() :
+            armnn::MakeOptional<std::string>(params.m_InputTensorDataFilePaths[inputIndex]);
+
         int input = tfLiteInterpreter->inputs()[inputIndex];
         TfLiteIntArray* inputDims = tfLiteInterpreter->tensor(input)->dims;
 

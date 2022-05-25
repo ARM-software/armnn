@@ -120,7 +120,7 @@ private:
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);
     // Conv3D support was added in TF 2.5, so for backwards compatibility a hash define is needed.
-    #if defined(ARMNN_POST_TFLITE_2_3)
+    #if defined(ARMNN_POST_TFLITE_2_4)
     void ParseConv3D(size_t subgraphIndex, size_t operatorIndex);
     #endif
     void ParseDepthToSpace(size_t subgraphIndex, size_t operatorIndex);

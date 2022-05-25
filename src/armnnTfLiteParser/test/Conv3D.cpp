@@ -7,7 +7,7 @@
 #include <sstream>
 
 // Conv3D support was added in TF 2.5, so for backwards compatibility a hash define is needed.
-#if defined(ARMNN_POST_TFLITE_2_3)
+#if defined(ARMNN_POST_TFLITE_2_4)
 TEST_SUITE("TensorflowLiteParser_Conv3D")
 {
 struct SimpleConv3DFixture : public ParserFlatbuffersFixture

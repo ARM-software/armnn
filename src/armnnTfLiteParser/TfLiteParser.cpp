@@ -684,7 +684,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParserImpl::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParserImpl::ParseConv2D;
     // Conv3D support was added in TF 2.5, so for backwards compatibility a hash define is needed.
-    #if defined(ARMNN_POST_TFLITE_2_3)
+    #if defined(ARMNN_POST_TFLITE_2_4)
     m_ParserFunctions[tflite::BuiltinOperator_CONV_3D]                 = &TfLiteParserImpl::ParseConv3D;
     #endif
     m_ParserFunctions[tflite::BuiltinOperator_CUSTOM]                  = &TfLiteParserImpl::ParseCustomOperator;
@@ -1160,7 +1160,7 @@ void TfLiteParserImpl::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
 }
 
 // Conv3D support was added in TF 2.5, so for backwards compatibility a hash define is needed.
-#if defined(ARMNN_POST_TFLITE_2_3)
+#if defined(ARMNN_POST_TFLITE_2_4)
 void TfLiteParserImpl::ParseConv3D(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);

@@ -456,13 +456,6 @@ IConnectableLayer* INetwork::AddChannelShuffleLayer(const ChannelShuffleDescript
     return pNetworkImpl->AddChannelShuffleLayer(descriptor, name);
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void INetwork::Accept(ILayerVisitor& visitor) const
-{
-    return pNetworkImpl->Accept(visitor);
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 void INetwork::ExecuteStrategy(IStrategy& strategy) const
 {
     return pNetworkImpl->ExecuteStrategy(strategy);
@@ -2908,16 +2901,6 @@ IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor&
 
     return layer;
 }
-
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void NetworkImpl::Accept(ILayerVisitor& visitor) const
-{
-    for (auto layer : GetGraph())
-    {
-        layer->Accept(visitor);
-    };
-}
-ARMNN_NO_DEPRECATE_WARN_END
 
 void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const
 {

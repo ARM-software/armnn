@@ -318,11 +318,9 @@ void ConcatLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ConcatLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ConcatLayer::Accept(ILayerVisitor& visitor) const
+void ConcatLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitConcatLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn armnn

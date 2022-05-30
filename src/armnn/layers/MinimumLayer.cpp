@@ -32,11 +32,9 @@ MinimumLayer* MinimumLayer::Clone(Graph& graph) const
     return CloneBase<MinimumLayer>(graph, GetName());
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void MinimumLayer::Accept(ILayerVisitor& visitor) const
+void MinimumLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitMinimumLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

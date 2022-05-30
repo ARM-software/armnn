@@ -49,14 +49,6 @@ void MemImportLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "MemImportLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void MemImportLayer::Accept(ILayerVisitor& visitor) const
-{
-    IgnoreUnused(visitor);
-    throw armnn::Exception("MemImportLayer should not appear in an input graph");
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 void MemImportLayer::ExecuteStrategy(IStrategy& strategy) const
 {
     IgnoreUnused(strategy);

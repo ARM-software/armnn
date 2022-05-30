@@ -450,11 +450,6 @@ uint32_t FullyConnectedDescriptor::GetNumInputs() const
     return armnn::GetNumInputs(m_BiasEnabled);
 }
 
-uint32_t FullyConnectedDescriptor::GetNumViews() const
-{
-    return armnn::GetNumInputs(m_BiasEnabled);
-}
-
 uint32_t DepthwiseConvolution2dDescriptor::GetNumInputs() const
 {
     return armnn::GetNumInputs(m_BiasEnabled);

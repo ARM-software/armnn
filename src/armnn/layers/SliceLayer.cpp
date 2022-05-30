@@ -59,11 +59,9 @@ std::vector<TensorShape> SliceLayer::InferOutputShapes(const std::vector<TensorS
     return std::vector<TensorShape>({ outputShape });
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void SliceLayer::Accept(ILayerVisitor& visitor) const
+void SliceLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitSliceLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

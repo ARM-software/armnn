@@ -7,7 +7,6 @@
 #include <armnn/BackendOptions.hpp>
 #include <armnn/Deprecated.hpp>
 #include <armnn/DescriptorsFwd.hpp>
-#include <armnn/ILayerVisitor.hpp>
 #include <armnn/IStrategy.hpp>
 #include <armnn/NetworkFwd.hpp>
 #include <armnn/Optional.hpp>
@@ -94,18 +93,6 @@ public:
 
     /// Returns the unique id of the layer
     virtual LayerGuid GetGuid() const = 0;
-
-    // The Accept function needs to be wrapped in a no warn macro to avoid deprecation warnings from
-    // the deprecated ILayerVisitor which is used in the function.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    /// Apply a visitor to this layer
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Accept is deprecated. The ILayerVisitor that works in conjunction with this "
-                                      "Accept function is deprecated. Use IStrategy in combination with "
-                                      "ExecuteStrategy instead, which is an ABI/API stable version of the "
-                                      "visitor pattern.",
-                                      "22.05")
-    virtual void Accept(ILayerVisitor& visitor) const = 0;
-    ARMNN_NO_DEPRECATE_WARN_END
 
     /// Apply a visitor to this layer
     virtual void ExecuteStrategy(IStrategy& strategy) const = 0;
@@ -764,17 +751,6 @@ public:
     IConnectableLayer* AddChannelShuffleLayer(const ChannelShuffleDescriptor& descriptor,
                                               const char* name = nullptr);
 
-    // The Accept function needs to be wrapped in a no warn macro to avoid deprecation warnings from
-    // the deprecated ILayerVisitor which is used in the function.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    /// Apply a visitor to this layer
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Accept is deprecated. The ILayerVisitor that works in conjunction with this "
-                                      "Accept function is deprecated. Use IStrategy in combination with "
-                                      "ExecuteStrategy instead, which is an ABI/API stable version of the "
-                                      "visitor pattern.",
-                                      "22.05")
-    void Accept(ILayerVisitor& visitor) const;
-    ARMNN_NO_DEPRECATE_WARN_END
 
     void ExecuteStrategy(IStrategy& strategy) const;
 

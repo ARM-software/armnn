@@ -103,11 +103,9 @@ void MeanLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShape, m_ShapeInferenceMethod, "MeanLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void MeanLayer::Accept(ILayerVisitor& visitor) const
+void MeanLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitMeanLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

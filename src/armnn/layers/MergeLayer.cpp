@@ -58,11 +58,9 @@ std::vector<TensorShape> MergeLayer::InferOutputShapes(const std::vector<TensorS
     return {inputShapes[0]};
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void MergeLayer::Accept(ILayerVisitor& visitor) const
+void MergeLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitMergeLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

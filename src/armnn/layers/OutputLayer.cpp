@@ -37,11 +37,9 @@ void OutputLayer::ValidateTensorShapesFromInputs()
                                                "OutputLayer: Input slot must be connected.");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void OutputLayer::Accept(ILayerVisitor& visitor) const
+void OutputLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitOutputLayer(this, GetBindingId(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName(), GetBindingId());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

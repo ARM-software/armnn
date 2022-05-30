@@ -62,15 +62,6 @@ void ConstantLayer::ValidateTensorShapesFromInputs()
                outShape);
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ConstantLayer::Accept(ILayerVisitor& visitor) const
-{
-    ManagedConstTensorHandle managedLayerOutput(m_LayerOutput);
-    ConstTensor layerOutputTensor(managedLayerOutput.GetTensorInfo(), managedLayerOutput.Map());
-    visitor.VisitConstantLayer(this, layerOutputTensor, GetName());
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 void ConstantLayer::ExecuteStrategy(IStrategy& strategy) const
 {
     ManagedConstTensorHandle managedLayerOutput(m_LayerOutput);

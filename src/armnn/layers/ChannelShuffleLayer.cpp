@@ -47,11 +47,4 @@ void ChannelShuffleLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ChannelShuffleLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ChannelShuffleLayer::Accept(ILayerVisitor& visitor) const
-{
-    IgnoreUnused(visitor);
-    throw armnn::Exception("ChannelShuffleLayer: VisitChannelShuffleLayer is not implemented");
-}
-ARMNN_NO_DEPRECATE_WARN_END
 }

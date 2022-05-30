@@ -32,11 +32,9 @@ MultiplicationLayer* MultiplicationLayer::Clone(Graph& graph) const
     return CloneBase<MultiplicationLayer>(graph, GetName());
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void MultiplicationLayer::Accept(ILayerVisitor& visitor) const
+void MultiplicationLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitMultiplicationLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

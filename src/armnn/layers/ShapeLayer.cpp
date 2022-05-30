@@ -59,13 +59,6 @@ std::vector<TensorShape> ShapeLayer::InferOutputShapes(const std::vector<TensorS
     return std::vector<TensorShape>({ outputShape });
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ShapeLayer::Accept(ILayerVisitor& visitor) const
-{
-    IgnoreUnused(visitor);
-    throw armnn::Exception("ShapeLayer VisitShapeLayer is not implemented");
-}
-ARMNN_NO_DEPRECATE_WARN_END
 
 void ShapeLayer::ExecuteStrategy(IStrategy& strategy) const
 {

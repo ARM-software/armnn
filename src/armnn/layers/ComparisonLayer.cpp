@@ -74,11 +74,9 @@ void ComparisonLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ComparisonLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ComparisonLayer::Accept(ILayerVisitor& visitor) const
+void ComparisonLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitComparisonLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

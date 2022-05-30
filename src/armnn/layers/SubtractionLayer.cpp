@@ -32,11 +32,9 @@ SubtractionLayer* SubtractionLayer::Clone(Graph& graph) const
     return CloneBase<SubtractionLayer>(graph, GetName());
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void SubtractionLayer::Accept(ILayerVisitor& visitor) const
+void SubtractionLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitSubtractionLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

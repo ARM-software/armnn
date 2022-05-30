@@ -51,11 +51,9 @@ void FillLayer::ValidateTensorShapesFromInputs()
         inferredShapes[0][0]);
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void FillLayer::Accept(ILayerVisitor& visitor) const
+void FillLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitFillLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

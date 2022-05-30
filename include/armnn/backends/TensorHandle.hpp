@@ -251,17 +251,4 @@ private:
     std::shared_ptr<ConstTensorHandle> m_TensorHandle;
 };
 
-using ConstCpuTensorHandle ARMNN_DEPRECATED_MSG_REMOVAL_DATE("ConstCpuTensorHandle is deprecated, "
-                                                "use ConstTensorHandle instead", "22.05") = ConstTensorHandle;
-using CpuTensorHandle ARMNN_DEPRECATED_MSG_REMOVAL_DATE("CpuTensorHandle is deprecated, "
-                                           "use TensorHandle instead", "22.05") = TensorHandle;
-using ScopedCpuTensorHandle ARMNN_DEPRECATED_MSG_REMOVAL_DATE("ScopedCpuTensorHandle is deprecated, "
-                                                 "use ScopedTensorHandle instead", "22.05") = ScopedTensorHandle;
-using PassthroughCpuTensorHandle ARMNN_DEPRECATED_MSG_REMOVAL_DATE("PassthroughCpuTensorHandle is deprecated, use "
-                                                      "PassthroughTensorHandle instead",
-                                                      "22.05") = PassthroughTensorHandle;
-using ConstPassthroughCpuTensorHandle ARMNN_DEPRECATED_MSG_REMOVAL_DATE("ConstPassthroughCpuTensorHandle is "
-                                                           "deprecated, use ConstPassthroughTensorHandle "
-                                                           "instead", "22.05") = ConstPassthroughTensorHandle;
-
 } // namespace armnn

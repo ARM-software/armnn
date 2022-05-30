@@ -73,11 +73,9 @@ void PadLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "PadLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void PadLayer::Accept(ILayerVisitor& visitor) const
+void PadLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitPadLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

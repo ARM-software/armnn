@@ -55,11 +55,9 @@ void ElementwiseUnaryLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, GetLayerTypeAsCString(GetType()));
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ElementwiseUnaryLayer::Accept(ILayerVisitor& visitor) const
+void ElementwiseUnaryLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitElementwiseUnaryLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

@@ -48,11 +48,9 @@ void RsqrtLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "RsqrtLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void RsqrtLayer::Accept(ILayerVisitor& visitor) const
+void RsqrtLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitRsqrtLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

@@ -86,11 +86,9 @@ void ArgMinMaxLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ArgMinMaxLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ArgMinMaxLayer::Accept(ILayerVisitor& visitor) const
+void ArgMinMaxLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitArgMinMaxLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

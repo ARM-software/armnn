@@ -7,6 +7,9 @@
 #include <armnn/DescriptorsFwd.hpp>
 #include <armnn/Types.hpp>
 
+#include <armnn/NetworkFwd.hpp>
+#include <armnn/TensorFwd.hpp>
+
 namespace armnn
 {
 
@@ -17,7 +20,7 @@ IStrategy() {}
 virtual ~IStrategy() {}
 
 public:
-virtual void ExecuteStrategy(const armnn::IConnectableLayer* layer,
+virtual void ExecuteStrategy(const IConnectableLayer* layer,
                              const armnn::BaseDescriptor& descriptor,
                              const std::vector<armnn::ConstTensor>& constants,
                              const char* name,

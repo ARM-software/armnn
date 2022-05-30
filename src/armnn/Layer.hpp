@@ -476,4 +476,4 @@ private:
     LayerBindingId m_Id;
 };
 
-}
+} //namespace armnn

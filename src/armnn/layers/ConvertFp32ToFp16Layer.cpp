@@ -47,14 +47,12 @@ void ConvertFp32ToFp16Layer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "LayerName");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ConvertFp32ToFp16Layer::Accept(ILayerVisitor& visitor) const
+void ConvertFp32ToFp16Layer::ExecuteStrategy(IStrategy& strategy) const
 {
     // These conversion layers are only inserted by the
     // optimizer and so will never be in an input graph.
-    IgnoreUnused(visitor);
+    IgnoreUnused(strategy);
     throw armnn::Exception("ConvertFp32ToFp16Layer should never appear in an input graph");
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

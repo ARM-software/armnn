@@ -102,11 +102,9 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShape, m_ShapeInferenceMethod, "ReduceLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void ReduceLayer::Accept(ILayerVisitor& visitor) const
+void ReduceLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitReduceLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

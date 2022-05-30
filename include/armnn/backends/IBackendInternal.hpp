@@ -172,10 +172,6 @@ public:
         return BackendCapabilities("IBackendInternal NullCapabilities");
     };
 
-    /// Returns true if backend support the capability false otherwise
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated in favour of GetCapability", "22.05")
-    virtual bool HasCapability(BackendCapability /*capabilityClass*/) const { return false; }
-
     /// Signals the backend to use a custom memory allocator provided by the user
     ///
     /// \param allocator - a pointer to the provided ICustomAllocator to use with this backend

@@ -46,11 +46,9 @@ void NormalizationLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "NormalizationLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void NormalizationLayer::Accept(ILayerVisitor& visitor) const
+void NormalizationLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitNormalizationLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

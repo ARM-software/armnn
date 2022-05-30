@@ -95,11 +95,9 @@ void StackLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "StackLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void StackLayer::Accept(ILayerVisitor& visitor) const
+void StackLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitStackLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn armnn

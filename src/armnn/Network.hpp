@@ -253,10 +253,6 @@ public:
 
     IConnectableLayer* AddConvertFp32ToFp16Layer(const char* name = nullptr);
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    void Accept(ILayerVisitor& visitor) const;
-    ARMNN_NO_DEPRECATE_WARN_END
-
     void ExecuteStrategy(IStrategy& strategy) const;
 
 private:

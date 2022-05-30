@@ -116,11 +116,9 @@ void PreluLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "PreluLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void PreluLayer::Accept(ILayerVisitor& visitor) const
+void PreluLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitPreluLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

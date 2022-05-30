@@ -45,9 +45,7 @@ public:
                m_Param.m_TargetShape == PolymorphicDowncast<const ReshapeLayer*>(&other)->m_Param.m_TargetShape;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    void Accept(ILayerVisitor& visitor) const override;
-    ARMNN_NO_DEPRECATE_WARN_END
+    void ExecuteStrategy(IStrategy& strategy) const override;
 
 
 protected:

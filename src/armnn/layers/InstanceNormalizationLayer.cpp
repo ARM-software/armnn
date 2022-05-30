@@ -46,11 +46,9 @@ void InstanceNormalizationLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "InstanceNormalizationLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void InstanceNormalizationLayer::Accept(ILayerVisitor& visitor) const
+void InstanceNormalizationLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitInstanceNormalizationLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

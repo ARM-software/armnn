@@ -96,26 +96,12 @@ public:
         return m_FirstLayer->GetGuid();
     }
 
-    // The Accept function needs to be wrapped in a no warn macro to avoid deprecation warnings from
-    // the deprecated ILayerVisitor which is used in the function.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Accept is deprecated. The ILayerVisitor that works in conjunction with this "
-                                      "Accept function is deprecated. Use IStrategy in combination with "
-                                      "ExecuteStrategy instead, which is an ABI/API stable version of the "
-                                      "visitor pattern.",
-                                      "22.05")
-    virtual void Accept(armnn::ILayerVisitor& visitor) const override
-    {
-        // Do not expect this function to be used so not providing an implementation
-    }
-    ARMNN_NO_DEPRECATE_WARN_END
-
     virtual void ExecuteStrategy(armnn::IStrategy& strategy) const override
     {
         // Do not expect this function to be used so not providing an implementation
         // if an implementation is required and the chain contains more than two operators
         // would have to provide a way to record the intermediate layers so they could be
-        // visited... the same applies to the Accept method above and the BackendSelectionHint
+        // visited... the same applies to the BackendSelectionHint
         // below.
     }
 

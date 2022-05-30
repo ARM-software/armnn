@@ -241,11 +241,9 @@ void SplitterLayer::ValidateTensorShapesFromInputs()
     }
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void SplitterLayer::Accept(ILayerVisitor& visitor) const
+void SplitterLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitSplitterLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

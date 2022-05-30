@@ -35,11 +35,7 @@ public:
     /// @return Does not return anything. Throws Exception if called.
     std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
-    /// Accepts a visitor object and calls VisitStandInLayer() method.
-    /// @param visitor The visitor on which to call VisitStandInLayer() method.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    void Accept(ILayerVisitor& visitor) const override;
-    ARMNN_NO_DEPRECATE_WARN_END
+    void ExecuteStrategy(IStrategy& strategy) const override;
 
 
 protected:

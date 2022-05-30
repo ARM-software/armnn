@@ -7,8 +7,6 @@
 
 #include "LayerCloneBase.hpp"
 
-#include <armnn/ILayerVisitor.hpp>
-
 namespace armnn
 {
 
@@ -45,11 +43,9 @@ void QuantizeLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "QuantizeLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void QuantizeLayer::Accept(ILayerVisitor& visitor) const
+void QuantizeLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitQuantizeLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } //namespace armnn

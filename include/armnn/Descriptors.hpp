@@ -480,11 +480,7 @@ struct FullyConnectedDescriptor : BaseDescriptor
                && m_ConstantWeights == rhs.m_ConstantWeights;
     }
 
-    /// Get the number of views/inputs.
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use GetNumInputs instead", "22.05")
-    uint32_t GetNumViews() const;
-
-    /// Get the number of views/inputs.
+    /// Get the number of inputs.
     uint32_t GetNumInputs() const;
 
     /// Enable/disable bias.

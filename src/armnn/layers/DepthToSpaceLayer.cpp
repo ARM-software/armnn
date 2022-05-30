@@ -75,11 +75,9 @@ void DepthToSpaceLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DepthToSpaceLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void DepthToSpaceLayer::Accept(ILayerVisitor& visitor) const
+void DepthToSpaceLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitDepthToSpaceLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

@@ -45,11 +45,9 @@ void LogSoftmaxLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "LogSoftmaxLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void LogSoftmaxLayer::Accept(ILayerVisitor& visitor) const
+void LogSoftmaxLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitLogSoftmaxLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

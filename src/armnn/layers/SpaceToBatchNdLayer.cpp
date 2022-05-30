@@ -83,11 +83,9 @@ void SpaceToBatchNdLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "SpaceToBatchNdLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void SpaceToBatchNdLayer::Accept(ILayerVisitor& visitor) const
+void SpaceToBatchNdLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitSpaceToBatchNdLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace

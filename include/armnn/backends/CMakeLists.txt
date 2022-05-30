@@ -4,7 +4,6 @@
 #
 
 list(APPEND armnnBackendsAPI_sources
-     CpuTensorHandleFwd.hpp
      TensorHandleFwd.hpp
      DynamicBackend.hpp
      IBackendInternal.hpp

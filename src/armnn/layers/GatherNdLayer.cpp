@@ -93,12 +93,4 @@ void GatherNdLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "GatherNdLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void GatherNdLayer::Accept(ILayerVisitor& visitor) const
-{
-    IgnoreUnused(visitor);
-    throw armnn::Exception("GatherNdLayer VisitGatherNdLayer is not implemented");
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 } // namespace armnn

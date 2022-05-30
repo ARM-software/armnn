@@ -49,14 +49,6 @@ void PreCompiledLayer::SetPreCompiledObject(PreCompiledObjectPtr preCompiledObje
     m_PreCompiledObject = std::move(preCompiledObject);
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void PreCompiledLayer::Accept(ILayerVisitor& visitor) const
-{
-    IgnoreUnused(visitor);
-    throw armnn::Exception("PreCompiledLayer should not appear in an input graph");
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 void PreCompiledLayer::ExecuteStrategy(IStrategy& strategy) const
 {
     IgnoreUnused(strategy);

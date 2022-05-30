@@ -71,24 +71,6 @@ Layer::ConstantTensors BatchNormalizationLayer::GetConstantTensorsByRef()
     return {m_Mean, m_Variance, m_Beta, m_Gamma};
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void BatchNormalizationLayer::Accept(ILayerVisitor& visitor) const
-{
-    ManagedConstTensorHandle managedMean(m_Mean);
-    ManagedConstTensorHandle managedVariance(m_Variance);
-    ManagedConstTensorHandle managedBeta(m_Beta);
-    ManagedConstTensorHandle managedGamma(m_Gamma);
-
-    ConstTensor meanTensor(managedMean.GetTensorInfo(), managedMean.Map());
-    ConstTensor varianceTensor(managedVariance.GetTensorInfo(), managedVariance.Map());
-    ConstTensor betaTensor(managedBeta.GetTensorInfo(), managedBeta.Map());
-    ConstTensor gammaTensor(managedGamma.GetTensorInfo(), managedGamma.Map());
-
-    visitor.VisitBatchNormalizationLayer(
-            this, GetParameters(), meanTensor, varianceTensor, betaTensor, gammaTensor, GetName());
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 void BatchNormalizationLayer::ExecuteStrategy(IStrategy& strategy) const
 {
     ManagedConstTensorHandle managedMean(m_Mean);

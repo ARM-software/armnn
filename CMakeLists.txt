@@ -160,13 +160,11 @@ list(APPEND armnn_sources
     include/armnn/backends/ILayerSupport.hpp
     include/armnn/backends/ICustomAllocator.hpp
     include/armnn/IAsyncExecutionCallback.hpp
-    include/armnn/ILayerVisitor.hpp
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp
     include/armnn/IRuntime.hpp
     include/armnn/IStrategy.hpp
     include/armnn/IWorkingMemHandle.hpp
-    include/armnn/LayerVisitorBase.hpp
     include/armnn/Logging.hpp
     include/armnn/LstmParams.hpp
     include/armnn/MemorySources.hpp

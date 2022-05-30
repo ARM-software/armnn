@@ -72,11 +72,9 @@ void LogicalBinaryLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "LogicalBinaryLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void LogicalBinaryLayer::Accept(ILayerVisitor& visitor) const
+void LogicalBinaryLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitLogicalBinaryLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

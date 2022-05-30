@@ -5,7 +5,6 @@
 
 #include <doctest/doctest.h>
 
-#include <armnn/LayerVisitorBase.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IBackendInternal.hpp>

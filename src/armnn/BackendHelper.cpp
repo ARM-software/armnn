@@ -110,22 +110,6 @@ bool HasCapability(const BackendOptions::BackendOption& backendOption, const arm
     return false;
 }
 
-/// Convenience function to check a capability on a backend
-bool IsCapabilitySupported(const armnn::BackendId& backend, armnn::BackendCapability capability)
-{
-    bool hasCapability = false;
-    auto const& backendRegistry = armnn::BackendRegistryInstance();
-    if (backendRegistry.IsBackendRegistered(backend))
-    {
-        auto factoryFunc = backendRegistry.GetFactory(backend);
-        auto backendObject = factoryFunc();
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        hasCapability = backendObject->HasCapability(capability);
-        ARMNN_NO_DEPRECATE_WARN_END
-    }
-    return hasCapability;
-}
-
 unsigned int GetNumberOfCacheFiles(const armnn::BackendId& backend)
 {
     auto const& backendRegistry = armnn::BackendRegistryInstance();

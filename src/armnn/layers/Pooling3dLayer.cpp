@@ -121,11 +121,9 @@ void Pooling3dLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "Pooling3dLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void Pooling3dLayer::Accept(ILayerVisitor& visitor) const
+void Pooling3dLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitPooling3dLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

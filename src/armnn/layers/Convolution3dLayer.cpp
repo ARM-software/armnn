@@ -124,14 +124,6 @@ void Convolution3dLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "Convolution3dLayer");
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void Convolution3dLayer::Accept(ILayerVisitor& visitor) const
-{
-    IgnoreUnused(visitor);
-    throw armnn::Exception("Convolution3dLayer: VisitConvolution3dLayer is not implemented");
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 void Convolution3dLayer::ExecuteStrategy(IStrategy& strategy) const
 {
     strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());

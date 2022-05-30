@@ -31,11 +31,9 @@ MaximumLayer* MaximumLayer::Clone(Graph& graph) const
     return CloneBase<MaximumLayer>(graph, GetName());
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void MaximumLayer::Accept(ILayerVisitor& visitor) const
+void MaximumLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitMaximumLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

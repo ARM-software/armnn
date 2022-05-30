@@ -4,9 +4,7 @@
 //
 #pragma once
 
-#include <armnn/ILayerVisitor.hpp>
 #include <armnn/IStrategy.hpp>
-#include <armnn/LayerVisitorBase.hpp>
 
 #include <armnnSerializer/ISerializer.hpp>
 

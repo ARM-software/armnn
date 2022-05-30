@@ -95,11 +95,9 @@ std::vector<TensorShape> BatchToSpaceNdLayer::InferOutputShapes(const std::vecto
     return std::vector<TensorShape>({ outputShape });
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void BatchToSpaceNdLayer::Accept(ILayerVisitor& visitor) const
+void BatchToSpaceNdLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitBatchToSpaceNdLayer(this, GetParameters(), GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

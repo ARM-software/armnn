@@ -5,7 +5,6 @@
 
 #include <GraphUtils.hpp>
 
-#include <armnn/LayerVisitorBase.hpp>
 
 #include <Network.hpp>
 

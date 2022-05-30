@@ -52,11 +52,9 @@ void SwitchLayer::ValidateTensorShapesFromInputs()
             GetOutputSlot(1).GetTensorInfo().GetShape(), inferredShapes[1], m_ShapeInferenceMethod, "SwitchLayer", 1);
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void SwitchLayer::Accept(ILayerVisitor& visitor) const
+void SwitchLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    visitor.VisitSwitchLayer(this, GetName());
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

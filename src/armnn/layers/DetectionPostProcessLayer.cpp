@@ -79,16 +79,6 @@ Layer::ConstantTensors DetectionPostProcessLayer::GetConstantTensorsByRef()
     return { m_Anchors };
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-void DetectionPostProcessLayer::Accept(ILayerVisitor& visitor) const
-{
-    ManagedConstTensorHandle managedAnchors(m_Anchors);
-    ConstTensor anchorTensor(managedAnchors.GetTensorInfo(), managedAnchors.Map());
-    visitor.VisitDetectionPostProcessLayer(this, GetParameters(), anchorTensor, GetName());
-    m_Anchors->Unmap();
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 void DetectionPostProcessLayer::ExecuteStrategy(IStrategy& strategy) const
 {
     ManagedConstTensorHandle managedAnchors(m_Anchors);

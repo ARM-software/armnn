@@ -29,7 +29,7 @@ Contains:
                                that can not be reduced will be left in Fp32.
     m_ReduceFp32ToFp16 (bool): Reduces Fp32 network to Fp16 for faster processing. Layers
                                that can not be reduced will be left in Fp32.
-    m_ImportEnabled (bool):    Enable memory import.
+    m_ImportEnabled (bool):    Enable memory import of inport tensors.
     m_shapeInferenceMethod:    The ShapeInferenceMethod modifies how the output shapes are treated.
                                When ValidateOnly is selected, the output shapes are inferred from the input parameters
                                of the layer and any mismatch is reported.
@@ -38,6 +38,7 @@ Contains:
                                with tensors which rank or dimension sizes are not specified explicitly, however this
                                information can be calculated from the inputs.
     m_ModelOptions:            List of backends optimisation options.
+    m_ExportEnabled (bool):    Enable memory export of output tensors.
 
 ") OptimizerOptions;
 
@@ -51,7 +52,8 @@ struct OptimizerOptions
                      bool reduceFp32ToBf16 = false,
                      ShapeInferenceMethod shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly,
                      bool importEnabled = false,
-                     std::vector<armnn::BackendOptions> modelOptions = {});
+                     std::vector<armnn::BackendOptions> modelOptions = {},
+                     bool exportEnabled = false);
 
     bool m_ReduceFp32ToBf16;
     bool m_ReduceFp32ToFp16;
@@ -59,6 +61,7 @@ struct OptimizerOptions
     ShapeInferenceMethod m_shapeInferenceMethod;
     bool m_ImportEnabled;
     std::vector<armnn::BackendOptions> m_ModelOptions;
+    bool m_ExportEnabled;
 };
 %model_options_clear;
 

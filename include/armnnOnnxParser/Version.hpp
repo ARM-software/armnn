@@ -14,7 +14,7 @@ namespace armnnOnnxParser
 
 // OnnxParser version components
 #define ONNX_PARSER_MAJOR_VERSION 24
-#define ONNX_PARSER_MINOR_VERSION 4
+#define ONNX_PARSER_MINOR_VERSION 5
 #define ONNX_PARSER_PATCH_VERSION 0
 
 /// ONNX_PARSER_VERSION: "X.Y.Z"

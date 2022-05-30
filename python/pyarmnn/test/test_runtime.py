@@ -156,8 +156,8 @@ def test_load_network_properties_provided(random_runtime):
     opt_network, _ = ann.Optimize(network, preferred_backends,
                                   runtime.GetDeviceSpec(), ann.OptimizerOptions())
 
-    inputSource = ann.MemorySource_Malloc
-    outputSource = ann.MemorySource_Malloc
+    inputSource = ann.MemorySource_Undefined
+    outputSource = ann.MemorySource_Undefined
     properties = ann.INetworkProperties(False, inputSource, outputSource)
     net_id, messages = runtime.LoadNetwork(opt_network, properties)
     assert "" == messages

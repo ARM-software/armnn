@@ -144,10 +144,11 @@ struct OptimizerOptions
         , m_ImportEnabled(false)
         , m_ModelOptions()
         , m_ProfilingEnabled(false)
+        , m_ExportEnabled(false)
     {}
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16, bool importEnabled,
-                     ModelOptions modelOptions = {})
+                     ModelOptions modelOptions = {}, bool exportEnabled = false)
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
@@ -155,6 +156,7 @@ struct OptimizerOptions
         , m_ImportEnabled(importEnabled)
         , m_ModelOptions(modelOptions)
         , m_ProfilingEnabled(false)
+        , m_ExportEnabled(exportEnabled)
     {
         if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
         {
@@ -164,7 +166,7 @@ struct OptimizerOptions
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false,
                      ShapeInferenceMethod shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly,
-                     bool importEnabled = false, ModelOptions modelOptions = {})
+                     bool importEnabled = false, ModelOptions modelOptions = {}, bool exportEnabled = false)
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
@@ -172,6 +174,7 @@ struct OptimizerOptions
         , m_ImportEnabled(importEnabled)
         , m_ModelOptions(modelOptions)
         , m_ProfilingEnabled(false)
+        , m_ExportEnabled(exportEnabled)
     {
         if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
         {
@@ -189,6 +192,7 @@ struct OptimizerOptions
         stream << "\tShapeInferenceMethod: " <<
         (m_shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly ? "ValidateOnly" : "InferAndValidate") << "\n";
         stream << "\tImportEnabled: " << m_ImportEnabled << "\n";
+        stream << "\tExportEnabled: " << m_ExportEnabled << "\n";
         stream << "\tProfilingEnabled: " << m_ProfilingEnabled << "\n";
 
         stream << "\tModelOptions: \n";
@@ -234,6 +238,9 @@ struct OptimizerOptions
 
     // Enable profiling dump of the optimizer phase
     bool m_ProfilingEnabled;
+
+    // Enable Export
+    bool m_ExportEnabled;
 };
 
 class IWorkloadFactory;

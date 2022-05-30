@@ -173,7 +173,7 @@ TEST_CASE ("ArmnnDelegateModelOptions_CpuAcc_Test")
                                  });
     modelOptions.push_back(cpuAcc);
 
-    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions);
+    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions, false);
     armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
     DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,

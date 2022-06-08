@@ -263,7 +263,7 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
         case LayerType::ArgMinMax :
         {
             auto argMinMaxQueueDescriptor = PolymorphicDowncast<const ArgMinMaxQueueDescriptor*>(&descriptor);
-            return std::make_unique<ClArgMinMaxWorkload>(*argMinMaxQueueDescriptor, info, m_CLCompileContext);
+            return MakeWorkload<ClArgMinMaxWorkload>(*argMinMaxQueueDescriptor, info, m_CLCompileContext);
         }
         case LayerType::BatchNormalization :
         {

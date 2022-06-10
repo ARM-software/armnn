@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -495,6 +495,32 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
 {
     switch (tfLiteRegistration->builtin_code)
     {
+        case kTfLiteBuiltinCustom:
+        {
+#if defined(ARMNN_POST_TFLITE_2_5)
+            // Custom operators are defined by the name rather than the builtin code.
+            // Parse the custom_name param in the registration to point to the correct visitor function.
+            std::string customOperatorName = tfLiteRegistration->custom_name;
+            if ( customOperatorName == "AveragePool3D" )
+            {
+                return VisitPooling3dOperator(delegateData,
+                                            tfLiteContext,
+                                            tfLiteNode,
+                                            nodeIndex,
+                                            customOperatorName);
+            }
+            else if (customOperatorName == "MaxPool3D")
+            {
+                return VisitPooling3dOperator(delegateData,
+                                            tfLiteContext,
+                                            tfLiteNode,
+                                            nodeIndex,
+                                            customOperatorName);
+            }
+#endif
+            // Invalid or unsupported custom operator
+            return kTfLiteError;
+        }
         case kTfLiteBuiltinAbs:
             return VisitElementwiseUnaryOperator(delegateData,
                                                  tfLiteContext,
@@ -520,7 +546,7 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                           nodeIndex,
                                           kTfLiteBuiltinArgMin);
         case kTfLiteBuiltinAveragePool2d:
-            return VisitPoolingOperator(delegateData,
+            return VisitPooling2dOperator(delegateData,
                                         tfLiteContext,
                                         tfLiteNode,
                                         nodeIndex,
@@ -667,7 +693,7 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                 nodeIndex,
                                                 kTfLiteBuiltinL2Normalization);
         case kTfLiteBuiltinL2Pool2d:
-            return VisitPoolingOperator(delegateData,
+            return VisitPooling2dOperator(delegateData,
                                         tfLiteContext,
                                         tfLiteNode,
                                         nodeIndex,
@@ -729,7 +755,7 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                      nodeIndex,
                                      kTfLiteBuiltinLstm);
         case kTfLiteBuiltinMaxPool2d:
-            return VisitPoolingOperator(delegateData,
+            return VisitPooling2dOperator(delegateData,
                                         tfLiteContext,
                                         tfLiteNode,
                                         nodeIndex,

@@ -43,6 +43,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 
+- AVERAGE_POOL_3D
+
 - BATCH_TO_SPACE_ND
 
 - CAST
@@ -106,6 +108,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - MAXIMUM
 
 - MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+
+- MAX_POOL_3D
 
 - MEAN
 

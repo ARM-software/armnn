@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -177,6 +177,8 @@ if(BUILD_UNIT_TESTS)
         src/test/PadTestHelper.hpp
         src/test/Pooling2dTest.cpp
         src/test/Pooling2dTestHelper.hpp
+        src/test/Pooling3dTest.cpp
+        src/test/Pooling3dTestHelper.hpp
         src/test/PreluTest.cpp
         src/test/PreluTestHelper.hpp
         src/test/QuantizationTest.cpp

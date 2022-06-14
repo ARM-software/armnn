@@ -1,3 +1,8 @@
+#
+# Copyright © 2018 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
 # Function which creates appropriate "source groups" (filter folders in Visual Studio) for the given list of source files
 function(createSourceGroups source1)
     set(sources ${source1} ${ARGN})

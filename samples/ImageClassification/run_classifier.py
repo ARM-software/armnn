@@ -1,3 +1,7 @@
+#
+# Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
 import argparse
 from pathlib import Path
 from typing import Union

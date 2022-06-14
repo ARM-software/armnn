@@ -1,3 +1,8 @@
+#
+# Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
 add_executable(MemoryStrategyBenchmark
                MemoryStrategyBenchmark.cpp
                TestBlocks.hpp

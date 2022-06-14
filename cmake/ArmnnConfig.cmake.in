@@ -1,3 +1,7 @@
+#
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
 
 get_filename_component(ARMNN_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" DIRECTORY)
 set(ARMNN_CONFIG_FILE ${CMAKE_CURRENT_LIST_FILE})

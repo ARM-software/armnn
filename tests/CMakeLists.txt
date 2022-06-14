@@ -1,3 +1,8 @@
+#
+# Copyright © 2018-2022 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
 # UnitTests
 include(CheckIncludeFiles)
 

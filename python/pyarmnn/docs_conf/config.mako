@@ -1,3 +1,7 @@
+##
+## Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+## SPDX-License-Identifier: MIT
+##
 <%!
     # Template configuration. Copy over in your template directory
     # (used with --template-dir) and adapt as required.

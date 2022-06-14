@@ -2,16 +2,18 @@
 //
 // Copyright (c) 2012-2017 Christian Rau <rauy@users.sourceforge.net>
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation 
-// files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, 
-// modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the 
+// SPDX-License-Identifier: MIT
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation
+// files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy,
+// modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the
 // Software is furnished to do so, subject to the following conditions:
 //
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 //
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-// WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // Version 1.12.0
@@ -195,8 +197,8 @@
 
 
 /// Default rounding mode.
-/// This specifies the rounding mode used for all conversions between [half](\ref half_float::half)s and `float`s as well as 
-/// for the half_cast() if not specifying a rounding mode explicitly. It can be redefined (before including half.hpp) to one 
+/// This specifies the rounding mode used for all conversions between [half](\ref half_float::half)s and `float`s as well as
+/// for the half_cast() if not specifying a rounding mode explicitly. It can be redefined (before including half.hpp) to one
 /// of the standard rounding modes using their respective constants or the equivalent values of `std::float_round_style`:
 ///
 /// `std::float_round_style`         | value | rounding
@@ -207,30 +209,30 @@
 /// `std::round_toward_infinity`     | 2     | toward positive infinity
 /// `std::round_toward_neg_infinity` | 3     | toward negative infinity
 ///
-/// By default this is set to `-1` (`std::round_indeterminate`), which uses truncation (round toward zero, but with overflows 
-/// set to infinity) and is the fastest rounding mode possible. It can even be set to `std::numeric_limits<float>::round_style` 
+/// By default this is set to `-1` (`std::round_indeterminate`), which uses truncation (round toward zero, but with overflows
+/// set to infinity) and is the fastest rounding mode possible. It can even be set to `std::numeric_limits<float>::round_style`
 /// to synchronize the rounding mode with that of the underlying single-precision implementation.
 #ifndef HALF_ROUND_STYLE
 	#define HALF_ROUND_STYLE	-1			// = std::round_indeterminate
 #endif
 
 /// Tie-breaking behaviour for round to nearest.
-/// This specifies if ties in round to nearest should be resolved by rounding to the nearest even value. By default this is 
-/// defined to `0` resulting in the faster but slightly more biased behaviour of rounding away from zero in half-way cases (and 
-/// thus equal to the round() function), but can be redefined to `1` (before including half.hpp) if more IEEE-conformant 
+/// This specifies if ties in round to nearest should be resolved by rounding to the nearest even value. By default this is
+/// defined to `0` resulting in the faster but slightly more biased behaviour of rounding away from zero in half-way cases (and
+/// thus equal to the round() function), but can be redefined to `1` (before including half.hpp) if more IEEE-conformant
 /// behaviour is needed.
 #ifndef HALF_ROUND_TIES_TO_EVEN
 	#define HALF_ROUND_TIES_TO_EVEN	0		// ties away from zero
 #endif
 
 /// Value signaling overflow.
-/// In correspondence with `HUGE_VAL[F|L]` from `<cmath>` this symbol expands to a positive value signaling the overflow of an 
+/// In correspondence with `HUGE_VAL[F|L]` from `<cmath>` this symbol expands to a positive value signaling the overflow of an
 /// operation, in particular it just evaluates to positive infinity.
 #define HUGE_VALH	std::numeric_limits<half_float::half>::infinity()
 
 /// Fast half-precision fma function.
-/// This symbol is only defined if the fma() function generally executes as fast as, or faster than, a separate 
-/// half-precision multiplication followed by an addition. Due to the internal single-precision implementation of all 
+/// This symbol is only defined if the fma() function generally executes as fast as, or faster than, a separate
+/// half-precision multiplication followed by an addition. Due to the internal single-precision implementation of all
 /// arithmetic operations, this is in fact always the case.
 #define FP_FAST_FMAH	1
 
@@ -366,7 +368,7 @@ namespace half_float
 		};
 
 		/// SFINAE helper for generic half-precision functions.
-		/// This class template has to be specialized for each valid combination of argument types to provide a corresponding 
+		/// This class template has to be specialized for each valid combination of argument types to provide a corresponding
 		/// `type` member equivalent to \a T.
 		/// \tparam T type to return
 		template<typename T,typename,typename=void,typename=void> struct enable {};

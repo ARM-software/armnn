@@ -2,6 +2,8 @@
 
 Copyright (c) 2014, 2015, 2016, 2017 Jarryd Beck
 
+SPDX-License-Identifier: MIT
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -1228,7 +1230,7 @@ namespace cxxopts
     public:
 
     ParseResult() {}
-     
+
     ParseResult(const ParseResult&) = default;
 
     ParseResult(NameHashMap&& keys, ParsedHashMap&& values, std::vector<KeyValue> sequential, std::vector<std::string>&& unmatched_args)

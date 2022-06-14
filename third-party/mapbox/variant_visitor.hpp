@@ -1,3 +1,8 @@
+//
+// Copyright (c) MapBox All rights reserved.
+// SPDX-License-Identifier: BSD-3-Clause
+//
+
 #ifndef MAPBOX_UTIL_VARIANT_VISITOR_HPP
 #define MAPBOX_UTIL_VARIANT_VISITOR_HPP
 
@@ -15,7 +20,7 @@ struct visitor<Fn> : Fn
     using Fn::operator();
 
     template<typename T>
-    visitor(T&& fn) : Fn(std::forward<T>(fn)) {}    
+    visitor(T&& fn) : Fn(std::forward<T>(fn)) {}
 };
 
 template <typename Fn, typename... Fns>
@@ -36,7 +41,7 @@ visitor<typename std::decay<Fns>::type...> make_visitor(Fns&&... fns)
     return visitor<typename std::decay<Fns>::type...>
         (std::forward<Fns>(fns)...);
 }
-    
+
 } // namespace util
 } // namespace mapbox
 

@@ -1,2 +1,7 @@
+#
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020 NXP. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
 requests==2.23.0
 pdoc3==0.6.3

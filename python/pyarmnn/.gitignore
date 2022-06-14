@@ -1,7 +1,11 @@
+#
+# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+
 # Generated pyarmnn files
 src/pyarmnn/_generated/*
 !src/pyarmnn/_generated/.keep
 !src/pyarmnn/_generated/*.py
 !src/pyarmnn/_generated/*.cpp
 **/include
-

@@ -1,3 +1,7 @@
+#
+# Copyright © 2018-2021 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
 macro (addDllCopyCommand target sourceDebug sourceRelease)
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different

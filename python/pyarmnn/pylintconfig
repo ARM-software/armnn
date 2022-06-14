@@ -1,4 +1,8 @@
 [MASTER]
+#
+# Copyright © 2020-2021 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
 
 # Add files or directories to the ignore list. They should be base names, not
 # paths.

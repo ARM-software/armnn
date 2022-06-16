@@ -29,6 +29,7 @@ public:
     virtual const IOutputSlot* GetConnection() const = 0;
     virtual IOutputSlot* GetConnection() = 0;
     virtual const IConnectableLayer& GetOwningIConnectableLayer() const = 0;
+    virtual IConnectableLayer& GetOwningIConnectableLayer() = 0;
 
 protected:
    /// Not user deletable.
@@ -56,6 +57,7 @@ public:
     virtual LayerGuid GetOwningLayerGuid() const = 0;
 
     virtual const IConnectableLayer& GetOwningIConnectableLayer() const = 0;
+    virtual IConnectableLayer& GetOwningIConnectableLayer() = 0;
 
 protected:
     /// Not user deletable.

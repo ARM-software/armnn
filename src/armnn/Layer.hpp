@@ -57,6 +57,7 @@ public:
     OutputSlot* GetConnectedOutputSlot() { return m_Connection; }
 
     const IConnectableLayer& GetOwningIConnectableLayer() const override;
+    IConnectableLayer& GetOwningIConnectableLayer() override;
 
     /// Links the slot to an output slot or breaks an existing link if passing nullptr.
     void SetConnection(OutputSlot* source)
@@ -118,6 +119,7 @@ public:
     Layer& GetOwningLayer() const { return m_OwningLayer; }
 
     const IConnectableLayer& GetOwningIConnectableLayer() const override;
+    IConnectableLayer& GetOwningIConnectableLayer() override;
 
     LayerGuid GetOwningLayerGuid() const override;
 

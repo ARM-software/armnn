@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="894659a98e76d84bf209da27d8ecb6d9ed05b13d" #Add support for 2d and 3d indices for axis 1
+DEFAULT_CLFRAMEWORKREVISION="586fff9f1e30ad06b52aec3332f956cc25cfe56f" #Fix build error v8.2-a-sve
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

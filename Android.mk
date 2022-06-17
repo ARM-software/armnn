@@ -5,6 +5,14 @@
 
 LOCAL_PATH := $(call my-dir)
 
+ARMNN_ANDROID_MK_ENABLED := 1
+
+ifeq ($(ARMNN_ANDROID_MK_ENABLE),0)
+ARMNN_ANDROID_MK_ENABLED := 0
+endif
+
+ifeq ($(ARMNN_ANDROID_MK_ENABLED),1)
+
 # Configure these paths if you move the source or Khronos headers
 ARMNN_GENERATED_HEADER_PATH := $(LOCAL_PATH)/generated
 OPENCL_HEADER_PATH := $(LOCAL_PATH)/../clframework/include
@@ -523,3 +531,5 @@ LOCAL_SHARED_LIBRARIES += \
 endif
 
 include $(BUILD_EXECUTABLE)
+
+endif # ARMNN_ENABLE

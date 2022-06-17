@@ -33,25 +33,38 @@ if(BUILD_ARMNN_SERIALIZER)
     if(BUILD_BARE_METAL)
         add_library_ex(armnnSerializer STATIC ${armnn_serializer_sources})
     else()
+        # We're going to export both an OBJECT library and a SHARED library here.
+        # In some instances it's easier to include the serializer directly into
+        # the target executable or library rather than have yet another .so.
+        add_library(armnnSerializerObj OBJECT ${armnn_serializer_sources})
         add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
     endif()
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
 
     set_target_properties(armnnSerializer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-
+    target_include_directories(armnnSerializerObj PRIVATE ../armnn)
+    target_include_directories(armnnSerializerObj PRIVATE ../armnnUtils)
     target_include_directories(armnnSerializer PRIVATE ../armnn)
     target_include_directories(armnnSerializer PRIVATE ../armnnUtils)
     target_include_directories(armnnSerializer PRIVATE ../../generated)
+    target_include_directories(armnnSerializerObj PRIVATE ../../generated)
 
     list(APPEND armnn_serializer_sources
         ArmnnSchema_generated.h
         )
 
     # System include to suppress warnings for flatbuffers generated files
+    target_include_directories(armnnSerializerObj SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
     target_include_directories(armnnSerializer SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
     target_link_libraries(armnnSerializer armnn ${FLATBUFFERS_LIBRARY})
+
+    install(TARGETS armnnSerializerObj
+            EXPORT  armnn-targets
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
 
     install(TARGETS armnnSerializer
             EXPORT  armnn-targets

@@ -1,0 +1,43 @@
+diff --git a/common/types/src/SharedMemoryAndroid.cpp b/common/types/src/SharedMemoryAndroid.cpp
+index c361a1eb6..3c09c5f4d 100644
+--- a/common/types/src/SharedMemoryAndroid.cpp
++++ b/common/types/src/SharedMemoryAndroid.cpp
+@@ -115,8 +115,23 @@ GeneralResult<SharedMemory> allocateSharedMemory(size_t size) {
+     return createSharedMemoryFromUniqueFd(size, prot, std::move(fd), offset);
+ }
+ 
+-GeneralResult<Mapping> map(const Memory::Ashmem& /*memory*/) {
+-    return NN_ERROR(ErrorStatus::INVALID_ARGUMENT) << "Cannot map ashmem memory";
++//GeneralResult<Mapping> map(const Memory::Ashmem& /*memory*/) {
++//    return NN_ERROR(ErrorStatus::INVALID_ARGUMENT) << "Cannot map ashmem memory";
++//}
++
++GeneralResult<Mapping> map(const Memory::Ashmem& memory) {
++    constexpr off64_t offset = 0;
++    constexpr int prot = PROT_READ | PROT_WRITE;
++    std::shared_ptr<base::MappedFile> mapping =
++            base::MappedFile::FromFd(memory.fd, offset, memory.size, prot);
++    if (mapping == nullptr || mapping->data() == nullptr) {
++        return NN_ERROR() << "Can't mmap the file descriptor.";
++    }
++    return Mapping{
++            .pointer = mapping->data(),
++            .size = memory.size,
++            .context = std::move(mapping),
++    };
+ }
+ 
+ #endif  // NN_COMPATIBILITY_LIBRARY_BUILD
+diff --git a/runtime/NeuralNetworks.cpp b/runtime/NeuralNetworks.cpp
+index 678888e9f..805a600bb 100644
+--- a/runtime/NeuralNetworks.cpp
++++ b/runtime/NeuralNetworks.cpp
+@@ -1927,7 +1927,7 @@ int SL_ANeuralNetworksDevice_forEachVendorExtensionOperandTypeInformation(
+ #define NNCL_FUNC(symbol) .symbol = symbol
+ 
+ NnApiSLDriverImplFL7 slDriverImpl{
+-        .base{.implFeatureLevel = ANEURALNETWORKS_FEATURE_LEVEL_7},
++        .base={.implFeatureLevel = ANEURALNETWORKS_FEATURE_LEVEL_7},
+         NNCL_FUNC(ANeuralNetworksBurst_create),
+         NNCL_FUNC(ANeuralNetworksBurst_free),
+         NNCL_FUNC(ANeuralNetworksCompilation_createForDevices),

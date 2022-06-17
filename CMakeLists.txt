@@ -116,7 +116,7 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/Transpose.cpp
     )
 
-add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
+add_library_ex(armnnUtils OBJECT ${armnnUtils_sources})
 target_include_directories(armnnUtils PRIVATE src/backends)
 
 if(BUILD_ONNX_PARSER)

@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -116,7 +116,9 @@ list(APPEND armnnUtils_sources
     src/armnnUtils/Transpose.cpp
     )
 
-add_library_ex(armnnUtils OBJECT ${armnnUtils_sources})
+add_library(armnnUtilsObj OBJECT ${armnnUtils_sources})
+add_library_ex(armnnUtils STATIC ${armnnUtils_sources})
+
 target_include_directories(armnnUtils PRIVATE src/backends)
 
 if(BUILD_ONNX_PARSER)
@@ -816,7 +818,7 @@ if(BUILD_UNIT_TESTS)
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
 
     target_link_libraries(UnitTests armnn)
-    target_link_libraries(UnitTests armnnUtils)
+    target_link_libraries(UnitTests $<TARGET_OBJECTS:armnnUtilsObj>)
     target_link_libraries(UnitTests armnnTestUtils)
 
     if(BUILD_GATORD_MOCK)
@@ -961,6 +963,14 @@ install(
     EXPORT  armnn-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(
+   TARGETS armnnUtilsObj
+   EXPORT  armnn-targets
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   OBJECTS DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 ####################################################

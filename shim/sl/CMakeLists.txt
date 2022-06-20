@@ -489,7 +489,7 @@ list(APPEND armnn_support_library_sources
         canonical/SystemPropertiesUtils.hpp
         support_library_service.cpp)
 
-list(APPEND armnn_support_library_sources "$<TARGET_OBJECTS:Armnn::armnnUtils>")
+list(APPEND armnn_support_library_sources "$<TARGET_OBJECTS:Armnn::armnnUtilsObj>")
 list(APPEND armnn_support_library_sources "$<TARGET_OBJECTS:Armnn::armnnSerializerObj>")
 add_library(armnn_support_library SHARED ${armnn_support_library_sources})
 

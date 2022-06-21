@@ -142,7 +142,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClImportEndToEnd")
     // Optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -339,7 +338,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     // Optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -472,7 +470,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp16toFp32EndToE
     // Optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(network.GetGraph(), backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -616,7 +613,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp32toFp16EndToE
     // Optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(network.GetGraph(), backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -751,7 +747,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportSimpleConvertFp32toFp16
     // Optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(network.GetGraph(), backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -901,7 +896,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     // Optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -1123,7 +1117,6 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     // Optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);

@@ -1362,7 +1362,7 @@ ITensorHandleFactory::FactoryId CalculateSlotOptionForOutput(BackendsMap& backen
 ITensorHandleFactory::FactoryId CalculateSlotOption(BackendsMap& backends,
                                                     OutputSlot& outputSlot,
                                                     TensorHandleFactoryRegistry& registry,
-                                                    bool exportEnabled)
+                                                    bool importEnabled)
 {
     // First ensure the from backends can support the TensorHandeAPI
     Layer& layer = outputSlot.GetOwningLayer();
@@ -1390,7 +1390,7 @@ ITensorHandleFactory::FactoryId CalculateSlotOption(BackendsMap& backends,
     std::map<ITensorHandleFactory::FactoryId, int> factoryScores;
     for (auto&& pref : srcPrefs)
     {
-        if (exportEnabled)
+        if (importEnabled)
         {
             ITensorHandleFactory* factory = registry.GetFactory(pref);
             if (outputConnection)
@@ -1602,13 +1602,12 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
                                               BackendsMap& backends,
                                               TensorHandleFactoryRegistry& registry,
                                               bool importEnabled,
-                                              bool exportEnabled,
                                               Optional<std::vector<std::string>&> errMessages)
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_SelectTensorHandleStrategy");
     OptimizationResult result;
 
-    optGraph.ForEachLayer([&backends, &registry, &result, &errMessages, importEnabled, exportEnabled](Layer* layer)
+    optGraph.ForEachLayer([&backends, &registry, &result, &errMessages, importEnabled](Layer* layer)
     {
         ARMNN_ASSERT(layer);
 
@@ -1633,7 +1632,7 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
                     slotOption = CalculateSlotOptionForOutput(backends, outputSlot, registry);
                     break;
                 default:
-                    slotOption = CalculateSlotOption(backends, outputSlot, registry, exportEnabled);
+                    slotOption = CalculateSlotOption(backends, outputSlot, registry, importEnabled);
                     break;
             }
             outputSlot.SetTensorHandleFactory(slotOption);
@@ -1697,15 +1696,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
 
     std::unique_ptr<Graph> graph = std::make_unique<Graph>(inGraph);
 
-    // We need to pass on the information about whether import and export is enabled to the LoadNetwork phase.
-    // The mechanism to do that is to add model options to the optimized network.
-    armnn::BackendOptions importExport("Global",
-                                        {{"ImportEnabled", options.m_ImportEnabled},
-                                         {"ExportEnabled", options.m_ExportEnabled}});
-    ModelOptions optimizedOptions(options.m_ModelOptions);
-    optimizedOptions.push_back(importExport);
-
-    auto optNet = IOptimizedNetworkPtr(new IOptimizedNetwork(std::move(graph), optimizedOptions),
+    auto optNet = IOptimizedNetworkPtr(new IOptimizedNetwork(std::move(graph), options.m_ModelOptions),
                                        &IOptimizedNetwork::Destroy);
 
     IOptimizedNetwork* optNetObjPtr = optNet.get();
@@ -1828,9 +1819,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                                    backends,
                                                                    tensorHandleFactoryRegistry,
                                                                    options.m_ImportEnabled,
-                                                                   options.m_ExportEnabled,
                                                                    messages);
-
     if (strategyResult.m_Error)
     {
         // Failed to apply the backend-specific optimizations

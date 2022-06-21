@@ -394,20 +394,14 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
         // Load graph into runtime
         std::string errorMessage;
         armnn::Status loadingStatus;
-        armnn::MemorySource inputSource = armnn::MemorySource::Undefined;
-        armnn::MemorySource outputSource = armnn::MemorySource::Undefined;
-        // There's a bit of an assumption here that the delegate will only support Malloc memory source.
+        armnn::MemorySource memorySource = armnn::MemorySource::Undefined;
         if (delegate->m_Options.GetOptimizerOptions().m_ImportEnabled)
         {
-            inputSource = armnn::MemorySource::Malloc;
-        }
-        if (delegate->m_Options.GetOptimizerOptions().m_ExportEnabled)
-        {
-            outputSource = armnn::MemorySource::Malloc;
+            memorySource = armnn::MemorySource::Malloc;
         }
         armnn::INetworkProperties networkProperties(false,
-                                                    inputSource,
-                                                    outputSource,
+                                                    memorySource,
+                                                    memorySource,
                                                     delegate->m_Options.GetInternalProfilingState(),
                                                     delegate->m_Options.GetInternalProfilingDetail());
         loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,

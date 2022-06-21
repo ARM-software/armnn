@@ -73,7 +73,7 @@ TEST_CASE("Neon_Cl_DirectCompatibility_Test")
     graph.TopologicalSort();
 
     std::vector<std::string> errors;
-    auto result = SelectTensorHandleStrategy(graph, backends, registry, true, true, errors);
+    auto result = SelectTensorHandleStrategy(graph, backends, registry, true, errors);
 
     CHECK(result.m_Error == false);
     CHECK(result.m_Warning == false);

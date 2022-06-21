@@ -71,8 +71,7 @@ def test_optimizer_options_with_model_opt():
                           False,
                           ShapeInferenceMethod_InferAndValidate,
                           True,
-                          [a],
-                          True)
+                          [a])
 
     mo = oo.m_ModelOptions
 
@@ -113,8 +112,7 @@ def test_optimizer_options_fail():
                          False,
                          ShapeInferenceMethod_InferAndValidate,
                          True,
-                         a,
-                         True)
+                         a)
 
     assert "Wrong number or type of arguments" in str(err.value)
 
@@ -124,8 +122,7 @@ def test_optimizer_options_fail():
                          True,
                          ShapeInferenceMethod_InferAndValidate,
                          True,
-                         [a],
-                         True)
+                         [a])
 
     assert "BFloat16 and Float16 optimization cannot be enabled at the same time" in str(err.value)
 

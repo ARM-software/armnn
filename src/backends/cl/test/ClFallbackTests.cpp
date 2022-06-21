@@ -50,7 +50,6 @@ TEST_CASE("ClImportEnabledFallbackToNeon")
     // optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -331,7 +330,6 @@ TEST_CASE("ClImportEnabledFallbackSubgraphToNeon")
     // optimize the network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());

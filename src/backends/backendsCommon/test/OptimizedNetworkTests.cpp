@@ -421,7 +421,7 @@ TEST_CASE("OptimizeNetworkCopy")
 
     std::vector<armnn::BackendId> preferredBackends { "CpuRef" };
     armnn::ModelOptions modelOptions;
-    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions, false);
+    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions);
     std::vector<std::string> errorMessages;
 
     // optimize the network.

@@ -56,9 +56,9 @@ public:
     armnn::TensorInfo GetOutputTensorInfo(NetworkId networkId, LayerBindingId layerId) const;
 
     std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors,
-                                              MemorySource forceImportMemorySource);
+                                              MemorySource forceImportMemorySource = MemorySource::Undefined);
     std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors,
-                                                MemorySource forceImportMemorySource);
+                                                MemorySource forceImportMemorySource = MemorySource::Undefined);
 
     void ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds);
     void ClearImportedOutputs(NetworkId networkId, const std::vector<ImportedOutputId> outputIds);

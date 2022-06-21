@@ -286,9 +286,10 @@ LayerInputHandle ConvertToLayerInputHandle(const Operation& operation,
                     armnn::IConnectableLayer* constantLayer =
                         data.m_Network->AddConstantLayer(tensorPin.GetConstTensor());
                     armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
-                    outputSlot.SetTensorInfo(tensorPin.GetConstTensor().GetInfo());
+                    armnn::TensorInfo constantTensorInfo = tensorPin.GetConstTensor().GetInfo();
+                    outputSlot.SetTensorInfo(constantTensorInfo);
 
-                    return LayerInputHandle(true, &outputSlot, operandTensorInfo);
+                    return LayerInputHandle(true, &outputSlot, constantTensorInfo);
                 }
                 else
                 {

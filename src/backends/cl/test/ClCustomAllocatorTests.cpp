@@ -120,6 +120,7 @@ TEST_CASE("ClCustomAllocatorTest")
     // Optimise ArmNN network
     OptimizerOptions optOptions;
     optOptions.m_ImportEnabled = true;
+    optOptions.m_ExportEnabled = true;
     armnn::IOptimizedNetworkPtr optNet = Optimize(*myNetwork, {"GpuAcc"}, run->GetDeviceSpec(), optOptions);
     CHECK(optNet);
 

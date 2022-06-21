@@ -204,7 +204,9 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    OptimizerOptions optimizedOptions;
+    optimizedOptions.m_ImportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
     // Loads it into the runtime.
@@ -269,7 +271,10 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    OptimizerOptions optimizedOptions;
+    optimizedOptions.m_ImportEnabled = true;
+    optimizedOptions.m_ExportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
     // Loads it into the runtime.
@@ -340,7 +345,10 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    OptimizerOptions optimizedOptions;
+    optimizedOptions.m_ImportEnabled = true;
+    optimizedOptions.m_ExportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
     // Loads it into the runtime.
@@ -424,7 +432,9 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    OptimizerOptions optimizedOptions;
+    optimizedOptions.m_ImportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     INFO("Load Network");
     // Load it into the runtime. It should pass.
@@ -514,7 +524,9 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    OptimizerOptions optimizedOptions;
+    optimizedOptions.m_ExportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     INFO("Load Network");
     // Load it into the runtime. It should pass.
@@ -601,7 +613,10 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    OptimizerOptions optimizedOptions;
+    optimizedOptions.m_ImportEnabled = true;
+    optimizedOptions.m_ExportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     INFO("Load Network");
     // Load it into the runtime. It should pass.
@@ -694,7 +709,10 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
     activation->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
 
     // Optimize the network
-    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec());
+    OptimizerOptions optimizedOptions;
+    optimizedOptions.m_ImportEnabled = true;
+    optimizedOptions.m_ExportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     // Loads it into the runtime.
     NetworkId netId;

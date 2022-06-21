@@ -93,7 +93,7 @@ TEST_CASE("RuntimePreImportInputs")
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
     std::string er;
-    armnn::INetworkProperties networkProperties(true, MemorySource::Malloc, MemorySource::Undefined);
+    armnn::INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(networkId,
                          Optimize(*testNetwork, backends, runtime->GetDeviceSpec()),
                          er,
@@ -107,7 +107,7 @@ TEST_CASE("RuntimePreImportInputs")
     ConstTensor inputTensor2({{4}, armnn::DataType::Signed32, 0.0f, 0, true}, inputData2.data());
     Tensor outputTensor({{4}, armnn::DataType::Signed32}, output.data());
 
-    auto importedInputVec1 = runtime->ImportInputs(networkId, {{0, inputTensor1}});
+    auto importedInputVec1 = runtime->ImportInputs(networkId, {{0, inputTensor1}}, MemorySource::Malloc);
     CHECK(importedInputVec1.size() == 1);
     CHECK(importedInputVec1[0] == 0);
 
@@ -118,7 +118,7 @@ TEST_CASE("RuntimePreImportInputs")
         CHECK(val == 30);
     }
 
-    auto importedInputVec2 = runtime->ImportInputs(networkId, {{1, inputTensor2}});
+    auto importedInputVec2 = runtime->ImportInputs(networkId, {{1, inputTensor2}}, MemorySource::Malloc);
     CHECK(importedInputVec2.size() == 1);
     CHECK(importedInputVec2[0] == 1);
 
@@ -146,7 +146,7 @@ TEST_CASE("RuntimePreImportInputs")
     // Incorrect layer binding id and ImportedInputId
     CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{-2, inputTensor2}}, {{2, outputTensor}}, {10});,
                     armnn::InvalidArgumentException);
-    auto importedInputVec3 = runtime->ImportInputs(networkId, {{1, inputTensor2}});
+    auto importedInputVec3 = runtime->ImportInputs(networkId, {{1, inputTensor2}}, MemorySource::Malloc);
     CHECK(importedInputVec3[0] == 2);
     // Too many ImportedInputIds
     CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0, 1, 2});,
@@ -175,6 +175,7 @@ TEST_CASE("RuntimePreImportInputs")
     // Trying to delete unknown pre-imported tensor
     CHECK_THROWS_AS(runtime->ClearImportedInputs(networkId, {10});, armnn::InvalidArgumentException);
 }
+
 TEST_CASE("RuntimePreImportOutputs")
 {
     armnn::IRuntime::CreationOptions options;
@@ -216,7 +217,7 @@ TEST_CASE("RuntimePreImportOutputs")
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
 
     std::string er;
-    armnn::INetworkProperties networkProperties(true, MemorySource::Malloc, MemorySource::Malloc);
+    armnn::INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(networkId,
                          Optimize(*testNetwork, backends, runtime->GetDeviceSpec()),
                          er,
@@ -257,7 +258,7 @@ TEST_CASE("RuntimePreImportOutputs")
     runtime->Execute(*memHandle.get(),inputTensors, {output1, output2});
     testOutputs();
 
-    auto importedOutputVec = runtime->ImportOutputs(networkId, {output1, output2 });
+    auto importedOutputVec = runtime->ImportOutputs(networkId, {output1, output2 }, MemorySource::Malloc);
     CHECK(importedOutputVec.size() == 2);
     CHECK(importedOutputVec[0] == 0);
     CHECK(importedOutputVec[1] == 1);
@@ -271,7 +272,7 @@ TEST_CASE("RuntimePreImportOutputs")
     runtime->Execute(*memHandle.get(), inputTensors, {output2}, {}, {0});
     testOutputs();
 
-    auto importedInputVec = runtime->ImportInputs(networkId, inputTensors);
+    auto importedInputVec = runtime->ImportInputs(networkId, inputTensors, MemorySource::Malloc);
     CHECK(importedInputVec.size() == 2);
     CHECK(importedInputVec[0] == 0);
     CHECK(importedInputVec[1] == 1);
@@ -1291,6 +1292,178 @@ TEST_CASE("ProfilingEnableCpuRef")
 TEST_CASE("ProfilingPostOptimisationStructureCpuRef")
 {
     VerifyPostOptimisationStructureTestImpl(armnn::Compute::CpuRef);
+}
+
+TEST_CASE("RuntimeOptimizeImportOff_LoadNetworkImportOn")
+{
+    // In this test case we'll optimize a network with both import and export disabled. Then we'll attempt to load
+    // that network but specify that the import memory source is Malloc.
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::NetworkId networkId = 1;
+    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
+
+    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
+    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
+
+    TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
+
+    inputLayer1->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    inputLayer2->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    addLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    addLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+
+    OptimizerOptions optimizedOptions;
+    // Hard set import and export to off.
+    optimizedOptions.m_ImportEnabled = false;
+    optimizedOptions.m_ExportEnabled = false;
+    IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
+    CHECK(optNet);
+
+    std::string er;
+    // Load the network passing an import memory source.
+    armnn::INetworkProperties networkProperties1(true, MemorySource::Malloc, MemorySource::Undefined);
+    // There should be an InvalidArgumentException.
+    runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
+    CHECK(er.find("However, it was disabled when this network was optimized") != -1);
+}
+
+TEST_CASE("RuntimeOptimizeExportOff_LoadNetworkExportOn")
+{
+    // In this test case we'll optimize a network with both import and export disabled. Then we'll attempt to load
+    // that network but specify that the export memory source as Malloc.
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::NetworkId networkId = 1;
+    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
+
+    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
+    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
+
+    TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
+
+    inputLayer1->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    inputLayer2->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    addLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    addLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+
+    OptimizerOptions optimizedOptions;
+    // Hard set import and export to off.
+    optimizedOptions.m_ImportEnabled = false;
+    optimizedOptions.m_ExportEnabled = false;
+    IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
+    CHECK(optNet);
+
+    std::string er;
+    // Load the network passing an import memory source.
+    armnn::INetworkProperties networkProperties1(true, MemorySource::Undefined, MemorySource::Malloc);
+    // There should be an InvalidArgumentException.
+    runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
+    CHECK(er.find("However, it was disabled when this network was optimized") != -1);
+}
+
+TEST_CASE("RuntimeOptimizeImportOn_LoadNetworkImportOff")
+{
+    // In this test case we'll optimize a network with import enabled. Then we'll attempt to load
+    // that network but specify that the import memory source is Undefined.
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::NetworkId networkId = 1;
+    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
+
+    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
+    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
+
+    TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
+
+    inputLayer1->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    inputLayer2->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    addLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    addLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+
+    OptimizerOptions optimizedOptions;
+    // Hard set import and export to off.
+    optimizedOptions.m_ImportEnabled = true;
+    optimizedOptions.m_ExportEnabled = false;
+    IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
+    CHECK(optNet);
+
+    std::string er;
+    // Load the network passing an import memory source.
+    armnn::INetworkProperties networkProperties1(true, MemorySource::Undefined, MemorySource::Undefined);
+    // There should be an InvalidArgumentException.
+    runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
+    CHECK(er.find("However, it was enabled when this network was optimized") != -1);
+}
+
+TEST_CASE("RuntimeOptimizeExportOn_LoadNetworkExportOff")
+{
+    // In this test case we'll optimize a network with export enabled. Then we'll attempt to load
+    // that network but specify that the export memory source is Undefined.
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::NetworkId networkId = 1;
+    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
+
+    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
+    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
+
+    TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
+
+    inputLayer1->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    inputLayer2->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    addLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    addLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
+
+    OptimizerOptions optimizedOptions;
+    // Hard set import and export to off.
+    optimizedOptions.m_ImportEnabled = false;
+    optimizedOptions.m_ExportEnabled = true;
+    IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
+    CHECK(optNet);
+
+    std::string er;
+    // Load the network passing an import memory source.
+    armnn::INetworkProperties networkProperties1(true, MemorySource::Undefined, MemorySource::Undefined);
+    // There should be an InvalidArgumentException.
+    runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
+    CHECK(er.find("However, it was enabled when this network was optimized") != -1);
 }
 
 }

@@ -18,7 +18,7 @@ def test_dev_version():
 
     importlib.reload(v)
 
-    assert "29.0.0.dev1" == v.__version__
+    assert "30.0.0.dev1" == v.__version__
 
     del os.environ["PYARMNN_DEV_VER"]
     del v
@@ -30,7 +30,7 @@ def test_arm_version_not_affected():
 
     importlib.reload(v)
 
-    assert "29.0.0" == v.__arm_ml_version__
+    assert "30.0.0" == v.__arm_ml_version__
 
     del os.environ["PYARMNN_DEV_VER"]
     del v

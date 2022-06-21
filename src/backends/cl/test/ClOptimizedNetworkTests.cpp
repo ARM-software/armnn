@@ -130,7 +130,7 @@ TEST_CASE("FastMathEnabledTestOnGpuAcc")
 
     auto modelOptionsOut = GetModelOptionsForTesting(optimizedNet.get());
 
-    CHECK(modelOptionsOut.size() == 1);
+    CHECK(modelOptionsOut.size() == 2); // FastMathEnabled and the Global to hold the import export values.
     CHECK(modelOptionsOut[0].GetOption(0).GetName() == "FastMathEnabled");
     CHECK(modelOptionsOut[0].GetOption(0).GetValue().AsBool() == true);
 }

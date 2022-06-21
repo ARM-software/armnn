@@ -300,6 +300,7 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
                                               BackendsMap& backends,
                                               TensorHandleFactoryRegistry& registry,
                                               bool importEnabled,
+                                              bool exportEnabled,
                                               Optional<std::vector<std::string>&> errMessages);
 
 OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,

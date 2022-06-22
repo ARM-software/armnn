@@ -89,7 +89,8 @@ public:
         std::shared_ptr<std::vector<android::nn::RunTimePoolInfo>>& pMemPools,
         armnn::InputTensors& inputTensors,
         armnn::OutputTensors& outputTensors,
-        CanonicalExecutionContext  callback) const;
+        CanonicalExecutionContext  callback,
+        const bool pointerMemory = false) const;
 
     Priority GetModelPriority() const;
 
@@ -113,7 +114,8 @@ private:
     ErrorStatus PrepareMemoryForIO(armnn::InputTensors& inputs,
                                    armnn::OutputTensors& outputs,
                                    std::vector<android::nn::RunTimePoolInfo>& memPools,
-                                   const Request& request) const;
+                                   const Request& request,
+                                   const bool pointerMemory = false) const;
 
     template <typename TensorBindingCollection>
     void DumpTensorsIfRequired(char const* tensorNamePrefix, const TensorBindingCollection& tensorBindings) const;

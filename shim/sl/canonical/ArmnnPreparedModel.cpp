@@ -252,13 +252,14 @@ ErrorStatus ArmnnPreparedModel::PrepareMemoryForOutputs(
 ErrorStatus ArmnnPreparedModel::PrepareMemoryForIO(armnn::InputTensors& inputs,
                                                    armnn::OutputTensors& outputs,
                                                    std::vector<android::nn::RunTimePoolInfo>& memPools,
-                                                   const Request& request) const
+                                                   const Request& request,
+                                                   const bool pointerMemory) const
 {
     //Check memory pools are not empty
     // add the inputs and outputs with their data
     try
     {
-        if (!setRunTimePoolInfosFromMemoryPools(&memPools, request.pools))
+        if (!pointerMemory && !setRunTimePoolInfosFromMemoryPools(&memPools, request.pools))
         {
             return ErrorStatus::INVALID_ARGUMENT;
         }
@@ -329,35 +330,12 @@ ExecutionResult<std::pair<std::vector<OutputShape>, Timing>> ArmnnPreparedModel:
     auto inputTensors = std::make_shared<armnn::InputTensors>();
     auto outputTensors = std::make_shared<armnn::OutputTensors>();
 
-    ErrorStatus theErrorStatus = ErrorStatus::NONE;
-
     auto isPointerTypeMemory = IsPointerTypeMemory(request);
-    nn::RequestRelocation relocation;
-    if (isPointerTypeMemory)
-    {
-        std::optional<nn::Request> maybeRequestInShared;
-        auto executionResult =
-                nn::convertRequestFromPointerToShared(
-                        &request, nn::kDefaultRequestMemoryAlignment, nn::kMinMemoryPadding,
-                        &maybeRequestInShared, &relocation);
-        if(!executionResult.has_value())
-        {
-            VLOG(DRIVER) << "ArmnnPreparedModel::PrepareMemoryForIO::Failed to convertRequestFromPointerToShared.";
-            return NN_ERROR(ErrorStatus::GENERAL_FAILURE)
-                          << "ArmnnPreparedModel convertRequestFromPointerToShared failed";
-        }
-        const nn::Request& requestInShared = std::move(executionResult).value();
-        if (relocation.input)
-        {
-            relocation.input->flush();
-        }
-
-        theErrorStatus = PrepareMemoryForIO(*inputTensors, *outputTensors, *memPools, requestInShared);
-    }
-    else
-    {
-        theErrorStatus = PrepareMemoryForIO(*inputTensors, *outputTensors, *memPools, request);
-    }
+    ErrorStatus theErrorStatus = PrepareMemoryForIO(*inputTensors,
+                                                    *outputTensors,
+                                                    *memPools,
+                                                    request,
+                                                    isPointerTypeMemory);
 
     switch(theErrorStatus)
     {
@@ -383,16 +361,12 @@ ExecutionResult<std::pair<std::vector<OutputShape>, Timing>> ArmnnPreparedModel:
     Timing theTiming;
 
     VLOG(DRIVER) << "ArmnnPreparedModel::execute(...) before ExecuteGraph";
-    auto errorStatus = ExecuteGraph(memPools, *inputTensors, *outputTensors, ctx);
+    auto errorStatus = ExecuteGraph(memPools, *inputTensors, *outputTensors, ctx, isPointerTypeMemory);
     if (errorStatus != ErrorStatus::NONE)
     {
         return NN_ERROR(errorStatus) << "execute() failed";
     }
     VLOG(DRIVER) << "ArmnnPreparedModel::execute(...) after ExecuteGraph";
-    if (isPointerTypeMemory && relocation.output)
-    {
-        relocation.output->flush();
-    }
 
     return std::make_pair(outputShapes, theTiming);
 }
@@ -401,7 +375,8 @@ ErrorStatus ArmnnPreparedModel::ExecuteGraph(
     std::shared_ptr<std::vector<android::nn::RunTimePoolInfo>>& pMemPools,
     armnn::InputTensors& inputTensors,
     armnn::OutputTensors& outputTensors,
-    CanonicalExecutionContext ctx) const
+    CanonicalExecutionContext ctx,
+    const bool pointerMemory) const
 {
     VLOG(DRIVER) << "ArmnnPreparedModel::ExecuteGraph(...)";
 
@@ -416,7 +391,23 @@ ErrorStatus ArmnnPreparedModel::ExecuteGraph(
         armnn::Status status;
         VLOG(DRIVER) << "ArmnnPreparedModel::ExecuteGraph m_AsyncModelExecutionEnabled false";
 
-        status = m_Runtime->EnqueueWorkload(m_NetworkId, inputTensors, outputTensors);
+        if (pointerMemory)
+        {
+            std::vector<armnn::ImportedInputId> importedInputIds;
+            importedInputIds = m_Runtime->ImportInputs(m_NetworkId, inputTensors, armnn::MemorySource::Malloc);
+
+            std::vector<armnn::ImportedOutputId> importedOutputIds;
+            importedOutputIds = m_Runtime->ImportOutputs(m_NetworkId, outputTensors, armnn::MemorySource::Malloc);
+            status = m_Runtime->EnqueueWorkload(m_NetworkId,
+                                                inputTensors,
+                                                outputTensors,
+                                                importedInputIds,
+                                                importedOutputIds);
+        }
+        else
+        {
+            status = m_Runtime->EnqueueWorkload(m_NetworkId, inputTensors, outputTensors);
+        }
 
         if (ctx.measureTimings == MeasureTiming::YES)
         {
@@ -439,7 +430,10 @@ ErrorStatus ArmnnPreparedModel::ExecuteGraph(
         return ErrorStatus::GENERAL_FAILURE;
     }
 
-    CommitPools(*pMemPools);
+    if (!pointerMemory)
+    {
+        CommitPools(*pMemPools);
+    }
     DumpTensorsIfRequired("Output", outputTensors);
 
     if (ctx.measureTimings == MeasureTiming::YES)
@@ -519,35 +513,12 @@ GeneralResult<std::pair<SyncFence, ExecuteFencedInfoCallback>> ArmnnPreparedMode
     auto inputTensors = std::make_shared<armnn::InputTensors>();
     auto outputTensors = std::make_shared<armnn::OutputTensors>();
 
-    ErrorStatus theErrorStatus = ErrorStatus::NONE;
-
     auto isPointerTypeMemory = IsPointerTypeMemory(request);
-    nn::RequestRelocation relocation;
-    if (isPointerTypeMemory)
-    {
-        std::optional<nn::Request> maybeRequestInShared;
-        auto executionResult =
-                nn::convertRequestFromPointerToShared(
-                        &request, nn::kDefaultRequestMemoryAlignment, nn::kMinMemoryPadding,
-                        &maybeRequestInShared, &relocation);
-        if(!executionResult.has_value())
-        {
-            VLOG(DRIVER) << "ArmnnPreparedModel::PrepareMemoryForIO::Failed to convertRequestFromPointerToShared.";
-            return NN_ERROR(ErrorStatus::GENERAL_FAILURE)
-                                     << "ArmnnPreparedModel convertRequestFromPointerToShared failed";
-        }
-        const nn::Request& requestInShared = std::move(executionResult).value();
-        if (relocation.input)
-        {
-            relocation.input->flush();
-        }
-
-        theErrorStatus = PrepareMemoryForIO(*inputTensors, *outputTensors, *memPools, requestInShared);
-    }
-    else
-    {
-        theErrorStatus = PrepareMemoryForIO(*inputTensors, *outputTensors, *memPools, request);
-    }
+    ErrorStatus theErrorStatus = PrepareMemoryForIO(*inputTensors,
+                                                    *outputTensors,
+                                                    *memPools,
+                                                    request,
+                                                    isPointerTypeMemory);
 
     if (theErrorStatus != ErrorStatus::NONE)
     {
@@ -565,12 +536,8 @@ GeneralResult<std::pair<SyncFence, ExecuteFencedInfoCallback>> ArmnnPreparedMode
     }
 
     VLOG(DRIVER) << "ArmnnCanonicalPreparedModel::executeFenced(...) before ExecuteGraph";
-    auto errorStatus = ExecuteGraph(memPools, *inputTensors, *outputTensors, ctx);
+    auto errorStatus = ExecuteGraph(memPools, *inputTensors, *outputTensors, ctx, isPointerTypeMemory);
     VLOG(DRIVER) << "ArmnnCanonicalPreparedModel::executeFenced(...) after ExecuteGraph";
-    if (isPointerTypeMemory && relocation.output)
-    {
-         relocation.output->flush();
-    }
 
     ExecuteFencedInfoCallback armnnFencedExecutionCallback =
             [timingSinceLaunch, timingAfterFence, errorStatus]() {

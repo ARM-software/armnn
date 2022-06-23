@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="586fff9f1e30ad06b52aec3332f956cc25cfe56f" #Fix build error v8.2-a-sve
+DEFAULT_CLFRAMEWORKREVISION="14ce09453682618a53544152c3fe8efd5fa7b2c9" #Drop support on armv7a on Android
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

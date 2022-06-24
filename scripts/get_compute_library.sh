@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="14ce09453682618a53544152c3fe8efd5fa7b2c9" #Drop support on armv7a on Android
+DEFAULT_CLFRAMEWORKREVISION="700b913ed9257c44147372378bc8a0dadcfd2ac2" #Select neon LUT Hard-Swish kernel on all devices
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

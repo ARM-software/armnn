@@ -29,6 +29,7 @@ public:
     virtual IOutputSlot* GetConnection() = 0;
     virtual const IConnectableLayer& GetOwningIConnectableLayer() const = 0;
     virtual IConnectableLayer& GetOwningIConnectableLayer() = 0;
+    virtual unsigned int GetSlotIndex() const = 0;
 
 protected:
    /// Not user deletable.

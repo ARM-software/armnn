@@ -156,7 +156,7 @@ public:
     /// Backend users should edit this working copy and then add it as a SubstitutionPair, along with original
     /// SubgraphView, to the OptimizationViews returned by OptimizeSubgraphView.
     /// ArmNN will then decide on whether or not to carry out Substitution of the two SubgraphViews.
-    SubgraphView GetWorkingCopy();
+    SubgraphView GetWorkingCopy() const;
 
     /// These methods should be called on a working copy subgraph created from GetWorkingCopy.
     /// They take a SubgraphView pattern to replace and the substitute layer or subgraphView to substitute in.

@@ -51,7 +51,7 @@ public:
     ~InputSlot();
 
     Layer& GetOwningLayer() const { return m_OwningLayer; }
-    unsigned int GetSlotIndex() const { return m_SlotIndex; }
+    unsigned int GetSlotIndex() const override { return m_SlotIndex; }
 
     const OutputSlot* GetConnectedOutputSlot() const { return m_Connection; }
     OutputSlot* GetConnectedOutputSlot() { return m_Connection; }
@@ -73,7 +73,7 @@ public:
     // Inserts single-output existing layer at this point in the graph.
     void Insert(Layer& layer);
 
-    // IInputSlot
+    // InputSlot
 
     const IOutputSlot* GetConnection() const override;
     IOutputSlot* GetConnection() override;

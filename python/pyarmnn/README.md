@@ -135,9 +135,11 @@ Alternatively, you can install from source. This is the more reliable way but re
 
 While installing from sources, you have the freedom of choosing Arm NN libraries location. Set environment variables *ARMNN_LIB* and *ARMNN_INCLUDE* to point to Arm NN libraries and headers.
 If you want to use system default locations, just set *ARMNN_INCLUDE* to point to Arm NN headers.
+Additionally, *LD_LIBRARY_PATH* may need to be updated to the Arm NN libraries location due to dependencies of the same shared library files being 'not found'.
 
 ```bash
 $ export  ARMNN_LIB=/path/to/libs
+$ export  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/libs
 $ export  ARMNN_INCLUDE=/full/path/to/armnn/include:/full/path/to/armnn/profiling/common/include
 ```
 

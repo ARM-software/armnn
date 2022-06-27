@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="700b913ed9257c44147372378bc8a0dadcfd2ac2" #Select neon LUT Hard-Swish kernel on all devices
+DEFAULT_CLFRAMEWORKREVISION="41eb2d92c89274200d59ff97653e2bd66819b310" #Improve LUT Neon Hard-Swish
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

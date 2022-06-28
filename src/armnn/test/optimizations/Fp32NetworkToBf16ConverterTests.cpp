@@ -92,18 +92,23 @@ TEST_CASE("Fp32NetworkToBf16OptimizationConv2DTest")
     conv->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::Convolution2dLayer>, &IsLayerOfType<armnn::ConstantLayer>,
-                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::OutputLayer>));
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::Convolution2dLayer>,
+                                                      &IsLayerOfType<armnn::OutputLayer>));
 
     // Run the optimizer
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(RedirectMembersToConstantInputs(),
                                                            Fp32NetworkToBf16Converter()));
 
+    CHECK(7 == graph.GetNumLayers());
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
-                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
-                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::Convolution2dLayer>,
-                        &IsLayerOfType<armnn::OutputLayer>));
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
+                                                      &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
+                                                      &IsLayerOfType<armnn::Convolution2dLayer>,
+                                                      &IsLayerOfType<armnn::OutputLayer>));
 
     armnn::TensorInfo inputTensor = conv->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
     armnn::TensorInfo weightTensor = conv->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
@@ -179,17 +184,23 @@ TEST_CASE("Fp32NetworkToBf16OptimizationFullyConnectedTest")
     fc->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::FullyConnectedLayer>, &IsLayerOfType<armnn::ConstantLayer>,
-                        &IsLayerOfType<armnn::ConstantLayer>, &IsLayerOfType<armnn::OutputLayer>));
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::FullyConnectedLayer>,
+                                                      &IsLayerOfType<armnn::OutputLayer>));
 
     // Run the optimizer
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(RedirectMembersToConstantInputs(),
                                                            Fp32NetworkToBf16Converter()));
 
+    CHECK(7 == graph.GetNumLayers());
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>, &IsLayerOfType<armnn::ConstantLayer>,
-                        &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>, &IsLayerOfType<armnn::ConstantLayer>,
-                        &IsLayerOfType<armnn::FullyConnectedLayer>, &IsLayerOfType<armnn::OutputLayer>));
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::ConstantLayer>,
+                                                      &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
+                                                      &IsLayerOfType<armnn::ConvertFp32ToBf16Layer>,
+                                                      &IsLayerOfType<armnn::FullyConnectedLayer>,
+                                                      &IsLayerOfType<armnn::OutputLayer>));
 
     armnn::TensorInfo inputTensor = fc->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
     armnn::TensorInfo weightTensor = fc->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
@@ -214,6 +225,5 @@ TEST_CASE("Fp32NetworkToBf16OptimizationFullyConnectedTest")
     CHECK(data[6] == armnn::BFloat16(-3.1072295E29f)); // 0xF07B
     CHECK(data[7] == armnn::BFloat16(-9.131327E-10f)); // 0xB07B
 }
-
 
 }

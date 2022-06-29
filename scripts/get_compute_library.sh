@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b1fcefddf3f59219a9d7930d607175b7e6c39347" #Implement new Elementwise Dynamic Fusion Operators: Div, Floor
+DEFAULT_CLFRAMEWORKREVISION="d8804fdc4254f614e48296e5a4efef2833ba4163" #Fix OpenCL Winograd output transform
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

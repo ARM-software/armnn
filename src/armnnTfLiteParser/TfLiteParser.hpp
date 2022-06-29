@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -146,6 +146,7 @@ private:
     void ParseLocalResponseNormalization(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogicalNot(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
+    void ParseLogSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseL2Normalization(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaxPool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseMaximum(size_t subgraphIndex, size_t operatorIndex);

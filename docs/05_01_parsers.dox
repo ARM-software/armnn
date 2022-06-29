@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2022 Arm Ltd and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -146,6 +146,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - LESS_EQUAL
 - LOGICAL_NOT
 - LOGISTIC
+- LOG_SOFTMAX
 - L2_NORMALIZATION
 - MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - MAXIMUM

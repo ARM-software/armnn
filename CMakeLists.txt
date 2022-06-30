@@ -805,7 +805,7 @@ if(BUILD_UNIT_TESTS)
         list(APPEND unittest_sources $<TARGET_OBJECTS:${lib}>)
     endforeach()
 
-    add_executable(UnitTests ${unittest_sources})
+    add_executable(UnitTests ${unittest_sources}  $<TARGET_OBJECTS:armnnUtilsObj>)
     target_include_directories(UnitTests PRIVATE src/armnn)
     target_include_directories(UnitTests PRIVATE src/armnnUtils)
     target_include_directories(UnitTests PRIVATE src/armnnTestUtils)
@@ -824,7 +824,6 @@ if(BUILD_UNIT_TESTS)
     target_link_libraries(UnitTests ${CMAKE_THREAD_LIBS_INIT})
 
     target_link_libraries(UnitTests armnn)
-    target_link_libraries(UnitTests $<TARGET_OBJECTS:armnnUtilsObj>)
     target_link_libraries(UnitTests armnnTestUtils)
 
     if(BUILD_GATORD_MOCK)

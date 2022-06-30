@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,9 +20,10 @@ void RefPermuteWorkload<DataType>::Execute() const
 }
 
 template <armnn::DataType DataType>
-void RefPermuteWorkload<DataType>::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefPermuteWorkload<DataType>::ExecuteAsync(ExecutionData& executionData)
 {
-    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 template <armnn::DataType DataType>

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,13 +46,14 @@ struct Workload0 : BaseWorkload<ElementwiseUnaryQueueDescriptor>
         }
     }
 
-    void ExecuteAsync(WorkingMemDescriptor& desc)
+    void ExecuteAsync(ExecutionData& executionData)
     {
-        int* inVals = static_cast<int*>(desc.m_Inputs[0][0].Map());
-        int* outVals = static_cast<int*>(desc.m_Outputs[0][0].Map());
+        WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+        int* inVals = static_cast<int*>(workingMemDescriptor->m_Inputs[0][0].Map());
+        int* outVals = static_cast<int*>(workingMemDescriptor->m_Outputs[0][0].Map());
 
         for (unsigned int i = 0;
-             i < desc.m_Inputs[0][0].GetShape().GetNumElements();
+             i < workingMemDescriptor->m_Inputs[0][0].GetShape().GetNumElements();
              ++i)
         {
             outVals[i] = inVals[i] + outVals[i];
@@ -147,7 +148,10 @@ TEST_CASE("TestAsyncExecute")
     workingMemDescriptor0.m_Inputs = std::vector<ITensorHandle*>{&asyncInput0};
     workingMemDescriptor0.m_Outputs = std::vector<ITensorHandle*>{&asyncOutput0};
 
-    workload0.get()->ExecuteAsync(workingMemDescriptor0);
+    ExecutionData executionData;
+    executionData.m_Data = &workingMemDescriptor0;
+
+    workload0.get()->ExecuteAsync(executionData);
 
     // Inputs are also changed by the execute/executeAsync calls to make sure there is no interference with them
     ValidateTensor(workingMemDescriptor0.m_Outputs[0], expectedExecuteAsyncval);
@@ -183,7 +187,10 @@ TEST_CASE("TestDefaultAsyncExecute")
     workingMemDescriptor.m_Inputs = std::vector<ITensorHandle*>{&asyncInput};
     workingMemDescriptor.m_Outputs = std::vector<ITensorHandle*>{&asyncOutput};
 
-    workload1.get()->ExecuteAsync(workingMemDescriptor);
+    ExecutionData executionData;
+    executionData.m_Data = &workingMemDescriptor;
+
+    workload1.get()->ExecuteAsync(executionData);
 
     // workload1 has no AsyncExecute implementation and so should use the default workload AsyncExecute
     // implementation which will call  workload1.Execute() in a thread safe manner
@@ -225,6 +232,8 @@ TEST_CASE("TestDefaultAsyncExeuteWithThreads")
     workingMemDescriptor1.m_Inputs = std::vector<ITensorHandle*>{&asyncInput1};
     workingMemDescriptor1.m_Outputs = std::vector<ITensorHandle*>{&asyncOutput1};
 
+    ExecutionData executionData1;
+    executionData1.m_Data = &workingMemDescriptor1;
 
     ScopedTensorHandle asyncInput2(constInputTensor2);
     ScopedTensorHandle asyncOutput2(constOutputTensor2);
@@ -233,16 +242,19 @@ TEST_CASE("TestDefaultAsyncExeuteWithThreads")
     workingMemDescriptor2.m_Inputs = std::vector<ITensorHandle*>{&asyncInput2};
     workingMemDescriptor2.m_Outputs = std::vector<ITensorHandle*>{&asyncOutput2};
 
+    ExecutionData executionData2;
+    executionData2.m_Data = &workingMemDescriptor2;
+
     std::thread thread1 = std::thread([&]()
                                       {
-                                          workload.get()->ExecuteAsync(workingMemDescriptor1);
-                                          workload.get()->ExecuteAsync(workingMemDescriptor1);
+                                          workload.get()->ExecuteAsync(executionData1);
+                                          workload.get()->ExecuteAsync(executionData1);
                                       });
 
     std::thread thread2 = std::thread([&]()
                                       {
-                                          workload.get()->ExecuteAsync(workingMemDescriptor2);
-                                          workload.get()->ExecuteAsync(workingMemDescriptor2);
+                                          workload.get()->ExecuteAsync(executionData2);
+                                          workload.get()->ExecuteAsync(executionData2);
                                       });
 
     thread1.join();

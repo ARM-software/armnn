@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,20 +19,22 @@ WorkingMemHandle::WorkingMemHandle(NetworkId networkId,
         std::vector<InputMemDescriptorCoords> inputLayerInfo,
         std::vector<OutputMemDescriptorCoords> outputLayerInfo,
         std::vector<WorkingMemDescriptor> workingMemDescriptors,
-        std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap,
         std::unique_ptr<MemoryManager> memoryManager,
         std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>> tensorMemory,
         std::vector<std::unique_ptr<ITensorHandle>> managedTensorHandles,
-        std::vector<std::unique_ptr<ITensorHandle>> unmanagedTensorHandles)
+        std::vector<std::unique_ptr<ITensorHandle>> unmanagedTensorHandles,
+        std::vector<std::pair<BackendId, ExecutionData>> executionDataVec,
+        BackendPtrMap* backends)
     : m_NetworkId(networkId)
     , m_WorkingMemDescriptors(workingMemDescriptors)
-    , m_WorkingMemDescriptorMap(workingMemDescriptorMap)
     , m_MemoryManager(std::move(memoryManager))
     , m_TensorMemory(std::move(tensorMemory))
     , m_ManagedTensorHandles(std::move(managedTensorHandles))
     , m_UnmanagedTensorHandles(std::move(unmanagedTensorHandles))
     , m_InputSize(numeric_cast<DifferenceType>(inputLayerInfo.size()))
     , m_IsAllocated(false)
+    , m_ExecutionDataVec(executionDataVec)
+    , m_Backends(backends)
 {
     for (const auto& inputInfo : inputLayerInfo)
     {
@@ -108,6 +110,15 @@ void WorkingMemHandle::Allocate()
     for (unsigned int i = 0; i < m_TensorMemory.size(); ++i)
     {
         m_ManagedTensorHandles[i]->Import(m_TensorMemory[i].first->m_Data, m_TensorMemory[i].second);
+    }
+
+    // Assign previously allocated ExecutionData. Needs to be assigned after allocation so the void* are allocated.
+    for (unsigned int i = 0; i < m_ExecutionDataVec.size(); ++i)
+    {
+        auto& backend = m_Backends->at(m_ExecutionDataVec[i].first);
+
+        ExecutionData executionData = backend->CreateExecutionData(GetWorkingMemDescriptorAt(i));
+        m_ExecutionDataVec[i].second = executionData;
     }
 }
 

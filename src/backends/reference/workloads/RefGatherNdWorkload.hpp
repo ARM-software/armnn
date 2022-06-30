@@ -15,7 +15,7 @@ class RefGatherNdWorkload : public RefBaseWorkload<GatherNdQueueDescriptor>
 public:
     using RefBaseWorkload<GatherNdQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
-    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+    void ExecuteAsync(ExecutionData& executionData)  override;
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 

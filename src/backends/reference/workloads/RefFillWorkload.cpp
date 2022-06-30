@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,9 +19,10 @@ void RefFillWorkload::Execute() const
     Execute(m_Data.m_Outputs);
 }
 
-void RefFillWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefFillWorkload::ExecuteAsync(ExecutionData& executionData)
 {
-    Execute(workingMemDescriptor.m_Outputs);
+    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+    Execute(workingMemDescriptor->m_Outputs);
 }
 
 void RefFillWorkload::Execute(std::vector<ITensorHandle*> outputs) const

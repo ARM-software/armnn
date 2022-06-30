@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,7 +16,7 @@ class RefConvertFp32ToFp16Workload : public Float32ToFloat16Workload<ConvertFp32
 public:
     using Float32ToFloat16Workload<ConvertFp32ToFp16QueueDescriptor>::Float32ToFloat16Workload;
     void Execute() const override;
-    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor)  override;
+    void ExecuteAsync(ExecutionData& executionData)  override;
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };

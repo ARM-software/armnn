@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,9 +21,10 @@ void RefDebugWorkload<DataType>::Execute() const
 }
 
 template<armnn::DataType DataType>
-void RefDebugWorkload<DataType>::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefDebugWorkload<DataType>::ExecuteAsync(ExecutionData& executionData)
 {
-    Execute(workingMemDescriptor.m_Inputs);
+    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+    Execute(workingMemDescriptor->m_Inputs);
 }
 
 template<armnn::DataType DataType>

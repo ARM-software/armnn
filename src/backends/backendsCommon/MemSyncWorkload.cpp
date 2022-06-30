@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,11 +27,13 @@ void SyncMemGenericWorkload::Execute() const
     m_TensorHandle->Unmap();
 }
 
-void SyncMemGenericWorkload::ExecuteAsync(WorkingMemDescriptor& descriptor)
+void SyncMemGenericWorkload::ExecuteAsync(ExecutionData& executionData)
 {
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "SyncMemGeneric_Execute_WorkingMemDescriptor");
-    descriptor.m_Inputs[0]->Map(true);
-    descriptor.m_Inputs[0]->Unmap();
+
+    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+    workingMemDescriptor->m_Inputs[0]->Map(true);
+    workingMemDescriptor->m_Inputs[0]->Unmap();
 }
 
 } //namespace armnn

@@ -9,12 +9,14 @@
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
 #include "WorkingMemHandle.hpp"
+#include "ExecutionData.hpp"
 
 #include <armnn/BackendHelper.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
 
 #include <armnn/backends/TensorHandle.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 #include <armnn/backends/MemCopyWorkload.hpp>
 
@@ -642,9 +644,13 @@ void LoadedNetwork::AllocateAndExecuteConstantWorkloadsAsync()
             m_ConstantTensorHandles[layer->GetGuid()] = tensorHandle;
             tensorHandle->Allocate();
 
+            auto& backend = m_Backends.at(layer->GetBackendId());
+
             WorkingMemDescriptor memDesc;
             memDesc.m_Outputs.push_back(tensorHandle);
-            m_ConstantWorkloads[layer->GetGuid()]->ExecuteAsync(memDesc);
+
+            ExecutionData executionData = backend->CreateExecutionData(memDesc);
+            m_ConstantWorkloads[layer->GetGuid()]->ExecuteAsync(executionData);
         }
     }
 }
@@ -1717,15 +1723,15 @@ void LoadedNetwork::ClearImportedOutputs(const std::vector<ImportedOutputId> out
             throw InvalidArgumentException(fmt::format("ClearImportedOutputs::Unknown ImportedOutputId: {}", id));
         }
 
-       auto& importedTensorHandle = m_PreImportedOutputHandles[id].m_TensorHandle;
-       if (!importedTensorHandle)
-       {
-           throw InvalidArgumentException(
-                   fmt::format("ClearImportedOutputs::ImportedOutput with id: {} has already been deleted", id));
-       }
-       // Call Unimport then destroy the tensorHandle
-       importedTensorHandle->Unimport();
-       importedTensorHandle = {};
+        auto& importedTensorHandle = m_PreImportedOutputHandles[id].m_TensorHandle;
+        if (!importedTensorHandle)
+        {
+            throw InvalidArgumentException(
+                    fmt::format("ClearImportedOutputs::ImportedOutput with id: {} has already been deleted", id));
+        }
+        // Call Unimport then destroy the tensorHandle
+        importedTensorHandle->Unimport();
+        importedTensorHandle = {};
     }
 }
 
@@ -1882,7 +1888,6 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
             const auto& preimportedHandle = importedOutputPin.m_TensorHandle;
 
             auto outputConnections = workingMemHandle.GetOutputConnection(layerBindingId);
-
             for (auto it : outputConnections)
             {
                 *it = preimportedHandle.get();
@@ -1895,7 +1900,7 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
         ARMNN_LOG(error) << "An error occurred attempting to execute a workload: " << error.what();
         executionSucceeded = false;
     };
-   ProfilingDynamicGuid workloadInferenceID(0);
+    ProfilingDynamicGuid workloadInferenceID(0);
 
     try
     {
@@ -1907,7 +1912,8 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
                 workloadInferenceID = timelineUtils->RecordWorkloadInferenceAndStartOfLifeEvent(workload->GetGuid(),
                                                                                                 inferenceGuid);
             }
-            workload->ExecuteAsync(workingMemHandle.GetWorkingMemDescriptorAt(i));
+
+            workload->ExecuteAsync(workingMemHandle.GetExecutionDataAt(i).second);
 
             if (timelineUtils)
             {
@@ -1961,7 +1967,7 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
     std::vector<std::unique_ptr<ITensorHandle>> unmanagedTensorHandles;
 
     std::vector<WorkingMemDescriptor> workingMemDescriptors;
-    std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap;
+    std::vector<std::pair<BackendId, ExecutionData>> executionDataVec;
 
     auto GetTensorHandle = [&](Layer* layer, const OutputSlot& outputSlot)
     {
@@ -2142,13 +2148,19 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
                 handleInfo.m_InputMemDescriptorCoords.m_InputSlotCoords.emplace_back(connectionLocation);
             }
         }
-        workingMemDescriptorMap.insert({layer->GetGuid(), workingMemDescriptor});
 
         // Input/Output layers/workloads will not be executed, so the descriptor is not added to workingMemDescriptors
         // However we will still need to manage the tensorHandle
         if (!isInputLayer)
         {
+            // Simply auto initialise ExecutionData here, so it's added only for the layer that require execution.
+            // The memory and data will be allocated/assigned for the void* in WorkingMemHandle::Allocate.
+            std::pair<BackendId, ExecutionData> dataPair;
+            dataPair.first = layer->GetBackendId();
+
+            executionDataVec.push_back(dataPair);
             workingMemDescriptors.push_back(workingMemDescriptor);
+
             layerIndex++;
         }
     }
@@ -2185,11 +2197,12 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
                                               inputConnectionsInfo,
                                               outputConnectionsInfo,
                                               workingMemDescriptors,
-                                              workingMemDescriptorMap,
                                               std::move(externalMemoryManager),
                                               std::move(tensorMemory),
                                               std::move(managedTensorHandles),
-                                              std::move(unmanagedTensorHandles));
+                                              std::move(unmanagedTensorHandles),
+                                              executionDataVec,
+                                              &m_Backends);
 }
 
 void LoadedNetwork::RegisterDebugCallback(const DebugCallbackFunction& func)

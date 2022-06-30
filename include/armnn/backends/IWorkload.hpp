@@ -13,7 +13,7 @@ namespace armnn
 namespace experimental
 {
 
-struct WorkingMemDescriptor;
+struct ExecutionData;
 
 } // end experimental namespace
 
@@ -30,7 +30,7 @@ public:
 
     virtual void Execute() const = 0;
 
-    virtual void ExecuteAsync(WorkingMemDescriptor& desc) = 0;
+    virtual void ExecuteAsync(ExecutionData& executionData) = 0;
 
     virtual arm::pipe::ProfilingGuid GetGuid() const = 0;
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,9 +27,10 @@ void RefLogicalBinaryWorkload::Execute() const
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefLogicalBinaryWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefLogicalBinaryWorkload::ExecuteAsync(ExecutionData& executionData)
 {
-    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefLogicalBinaryWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const

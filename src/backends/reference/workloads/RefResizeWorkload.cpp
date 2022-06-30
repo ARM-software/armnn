@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,9 +22,10 @@ void RefResizeWorkload::Execute() const
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefResizeWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefResizeWorkload::ExecuteAsync(ExecutionData& executionData)
 {
-    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefResizeWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const

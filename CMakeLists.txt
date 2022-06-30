@@ -340,6 +340,7 @@ list(APPEND armnn_sources
     src/armnn/DeviceSpec.hpp
     src/armnn/DllExport.hpp
     src/armnn/Exceptions.cpp
+    src/armnn/ExecutionData.hpp
     src/armnn/ExecutionFrame.cpp
     src/armnn/ExecutionFrame.hpp
     src/armnn/Graph.cpp

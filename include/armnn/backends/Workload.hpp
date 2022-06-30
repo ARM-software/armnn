@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -8,6 +8,7 @@
 #include "WorkloadData.hpp"
 #include "WorkloadInfo.hpp"
 #include "WorkingMemDescriptor.hpp"
+#include "ExecutionData.hpp"
 
 #include <armnn/Logging.hpp>
 
@@ -40,14 +41,15 @@ public:
         m_Data.Validate(info);
     }
 
-    void ExecuteAsync(WorkingMemDescriptor& workingMemDescriptor) override
+    void ExecuteAsync(ExecutionData& executionData) override
     {
         ARMNN_LOG(info) << "Using default async workload execution, this will network affect performance";
 #if !defined(ARMNN_DISABLE_THREADS)
         std::lock_guard<std::mutex> lockGuard(m_AsyncWorkloadMutex);
 #endif
-        m_Data.m_Inputs = workingMemDescriptor.m_Inputs;
-        m_Data.m_Outputs = workingMemDescriptor.m_Outputs;
+        WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+        m_Data.m_Inputs = workingMemDescriptor->m_Inputs;
+        m_Data.m_Outputs = workingMemDescriptor->m_Outputs;
 
         Execute();
     };

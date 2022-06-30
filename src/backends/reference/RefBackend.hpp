@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -62,6 +62,10 @@ public:
     };
 
     std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
+
+    ExecutionData CreateExecutionData(WorkingMemDescriptor& workingMemDescriptor) const override;
+
+    void UpdateExecutionData(ExecutionData& executionData, WorkingMemDescriptor& workingMemDescriptor) const override;
 };
 
 } // namespace armnn

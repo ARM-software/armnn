@@ -18,9 +18,10 @@ void RefGatherNdWorkload::Execute() const
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefGatherNdWorkload::ExecuteAsync(WorkingMemDescriptor &workingMemDescriptor)
+void RefGatherNdWorkload::ExecuteAsync(ExecutionData& executionData)
 {
-    Execute(workingMemDescriptor.m_Inputs, workingMemDescriptor.m_Outputs);
+    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
+    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefGatherNdWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const

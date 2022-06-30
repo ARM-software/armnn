@@ -1,16 +1,18 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
+#include "ExecutionData.hpp"
 #include "Layer.hpp"
 #include "Network.hpp"
 #include "WorkingMemDescriptor.hpp"
 
 #include <armnn/IWorkingMemHandle.hpp>
 #include <armnn/Tensor.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
 
 #include <unordered_map>
 #include <mutex>
@@ -22,6 +24,7 @@ namespace armnn
 namespace experimental
 {
 
+using BackendPtrMap = std::unordered_map<BackendId, IBackendInternalUniquePtr>;
 
 class WorkingMemHandle final : public IWorkingMemHandle
 {
@@ -48,11 +51,12 @@ public:
                      std::vector<InputMemDescriptorCoords> inputLayerInfo,
                      std::vector<OutputMemDescriptorCoords> outputLayerInfo,
                      std::vector<WorkingMemDescriptor> workingMemDescriptors,
-                     std::unordered_map<LayerGuid, WorkingMemDescriptor> workingMemDescriptorMap,
                      std::unique_ptr<MemoryManager> memoryManager,
                      std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>> tensorMemory,
                      std::vector<std::unique_ptr<ITensorHandle>> managedTensorHandles,
-                     std::vector<std::unique_ptr<ITensorHandle>> unmanagedTensorHandles);
+                     std::vector<std::unique_ptr<ITensorHandle>> unmanagedTensorHandles,
+                     std::vector<std::pair<BackendId, ExecutionData>> executionDataVec,
+                     BackendPtrMap* backends);
 
     ~WorkingMemHandle()
     { Free(); }
@@ -75,19 +79,19 @@ public:
         return m_IsAllocated;
     }
 
-    /// Get the WorkingMemDescriptor for a Layer.
-    WorkingMemDescriptor& GetWorkingMemDescriptor(LayerGuid id) override
-    {
-        auto result = m_WorkingMemDescriptorMap.find(id);
-        ARMNN_ASSERT(result != m_WorkingMemDescriptorMap.end());
-        return result->second;
-    }
-
     /// Get the WorkingMemDescriptor at an index. The WorkingMemDescriptors are stored in the same order as
     /// the Workloads in a topologically sorted graph.
     WorkingMemDescriptor& GetWorkingMemDescriptorAt(unsigned int id) override
     {
         return m_WorkingMemDescriptors[id];
+    }
+
+    /// Get the ExecutionData at an index.
+    /// The ExecutionData is paired with a BackendId to be able to call backend specific functions upon it.
+    /// The ExecutionData are stored in the same order as the Workloads in a topologically sorted graph.
+    std::pair<BackendId, ExecutionData>& GetExecutionDataAt(unsigned int id) override
+    {
+        return m_ExecutionDataVec[id];
     }
 
     ITensorHandle* GetInputHandle(LayerBindingId layerBindingId) const
@@ -129,13 +133,11 @@ private:
     std::unordered_map<LayerBindingId, std::vector<std::vector<ITensorHandle*>::iterator>> m_OutputConnectionMap;
 
     std::vector<WorkingMemDescriptor> m_WorkingMemDescriptors;
-    std::unordered_map<LayerGuid, WorkingMemDescriptor> m_WorkingMemDescriptorMap;
 
     std::unique_ptr<MemoryManager> m_MemoryManager;
 
     // Memory to be imported into the tensorHandles after allocation
     std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>> m_TensorMemory;
-
 
     // Tensors that will need to be allocated internally within armnn
     std::vector<std::unique_ptr<ITensorHandle>> m_ManagedTensorHandles;
@@ -151,6 +153,10 @@ private:
     DifferenceType m_InputSize;
 
     bool m_IsAllocated;
+
+    std::vector<std::pair<BackendId, ExecutionData>> m_ExecutionDataVec;
+
+    BackendPtrMap* m_Backends;
 };
 
 } // end experimental namespace

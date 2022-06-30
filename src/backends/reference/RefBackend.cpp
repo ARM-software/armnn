@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -101,6 +101,18 @@ void RefBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegistry
 std::unique_ptr<ICustomAllocator> RefBackend::GetDefaultAllocator() const
 {
     return std::make_unique<DefaultAllocator>();
+}
+
+ExecutionData RefBackend::CreateExecutionData(WorkingMemDescriptor& workingMemDescriptor) const
+{
+    ExecutionData executionData;
+    executionData.m_Data = &workingMemDescriptor;
+    return executionData;
+}
+
+void RefBackend::UpdateExecutionData(ExecutionData& executionData, WorkingMemDescriptor& workingMemDescriptor) const
+{
+    executionData.m_Data = &workingMemDescriptor;
 }
 
 } // namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -101,7 +101,6 @@ public:
                     CL_IMPORT_TYPE_HOST_ARM,
                     0
                 };
-
                 return ClImport(importProperties, memory);
             }
             if (source == MemorySource::DmaBuf)
@@ -185,59 +184,14 @@ public:
         }
     }
 
-    virtual bool CanBeImported(void* memory, MemorySource source) override
+    virtual bool CanBeImported(void* /*memory*/, MemorySource source) override
     {
         if (m_ImportFlags & static_cast<MemorySourceFlags>(source))
         {
             if (source == MemorySource::Malloc)
             {
-                const cl_import_properties_arm importProperties[] =
-                        {
-                                CL_IMPORT_TYPE_ARM,
-                                CL_IMPORT_TYPE_HOST_ARM,
-                                0
-                        };
-
-                size_t totalBytes = m_Tensor.info()->total_size();
-
-                // Round the size of the mapping to match the CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE
-                // This does not change the size of the buffer, only the size of the mapping the buffer is mapped to
-                // We do this to match the behaviour of the Import function later on.
-                auto cachelineAlignment =
-                        arm_compute::CLKernelLibrary::get().get_device().getInfo<CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE>();
-                auto roundedSize = totalBytes;
-                if (totalBytes % cachelineAlignment != 0)
-                {
-                    roundedSize = cachelineAlignment + totalBytes - (totalBytes % cachelineAlignment);
-                }
-
-                cl_int error = CL_SUCCESS;
-                cl_mem buffer;
-                buffer = clImportMemoryARM(arm_compute::CLKernelLibrary::get().context().get(),
-                                           CL_MEM_READ_WRITE, importProperties, memory, roundedSize, &error);
-
-                // If we fail to map we know the import will not succeed and can return false.
-                // There is no memory to be released if error is not CL_SUCCESS
-                if (error != CL_SUCCESS)
-                {
-                    return false;
-                }
-                else
-                {
-                    // If import was successful we can release the mapping knowing import will succeed at workload
-                    // execution and return true
-                    error = clReleaseMemObject(buffer);
-                    if (error == CL_SUCCESS)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        // If we couldn't release the mapping this constitutes a memory leak and throw an exception
-                        throw MemoryImportException("ClImportTensorHandle::Failed to unmap cl_mem buffer: "
-                                                    + std::to_string(error));
-                    }
-                }
+                // Returning true as ClImport() function will decide if memory can be imported or not
+                return true;
             }
         }
         else

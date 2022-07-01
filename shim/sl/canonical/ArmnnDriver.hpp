@@ -39,12 +39,6 @@ public:
     ~ArmnnDriver()
     {
         VLOG(DRIVER) << "ArmnnDriver::~ArmnnDriver()";
-        // Unload the networks
-        for (auto& netId : ArmnnDriverImpl::GetLoadedNetworks())
-        {
-            m_Runtime->UnloadNetwork(netId);
-        }
-        ArmnnDriverImpl::ClearNetworks();
     }
 
 public:

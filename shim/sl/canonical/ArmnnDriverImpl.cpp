@@ -114,11 +114,6 @@ bool ArmnnDriverImpl::ValidateDataCacheHandle(const std::vector<SharedHandle>& d
     return ValidateSharedHandle(dataCacheHandle[0]);
 }
 
-std::vector<armnn::NetworkId>& ArmnnDriverImpl::GetLoadedNetworks()
-{
-    return m_NetworkIDs;
-}
-
 GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModel(
     const armnn::IRuntimePtr& runtime,
     const armnn::IGpuAccTunedParametersPtr& clTunedParameters,
@@ -317,7 +312,6 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModel(
                                             options.GetBackends().end(),
                                             armnn::Compute::GpuAcc) != options.GetBackends().end());
 
-    m_NetworkIDs.push_back(netId);
     auto preparedModel = std::make_shared<const ArmnnPreparedModel>(netId,
                                                                     runtime.get(),
                                                                     model,
@@ -355,8 +349,6 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModel(
     }
     return std::move(preparedModel);
 }
-
-std::vector<armnn::NetworkId> ArmnnDriverImpl::m_NetworkIDs = {};
 
 GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModelFromCache(
     const armnn::IRuntimePtr& runtime,
@@ -537,7 +529,6 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModelFromCache(
         return NN_ERROR(ErrorStatus::GENERAL_FAILURE) << message.str();
     }
 
-    m_NetworkIDs.push_back(netId);
     return std::make_shared<const ArmnnPreparedModel>(netId,
                                                       runtime.get(),
                                                       options.GetRequestInputsAndOutputsDumpDir(),
@@ -551,11 +542,6 @@ const Capabilities& ArmnnDriverImpl::GetCapabilities(const armnn::IRuntimePtr& r
     VLOG(DRIVER) << "ArmnnDriverImpl::GetCapabilities()";
     static const Capabilities theCapabilities = GenerateCapabilities();
     return theCapabilities;
-}
-
-void ArmnnDriverImpl::ClearNetworks()
-{
-    m_NetworkIDs.clear();
 }
 
 } // namespace armnn_driver

@@ -45,15 +45,9 @@ public:
 
     static const Capabilities& GetCapabilities(const armnn::IRuntimePtr& runtime);
 
-    static std::vector<armnn::NetworkId>& GetLoadedNetworks();
-
-    static void ClearNetworks();
-
 private:
     static bool ValidateSharedHandle(const SharedHandle& sharedHandle);
     static bool ValidateDataCacheHandle(const std::vector<SharedHandle>& dataCacheHandle, const size_t dataSize);
-
-    static std::vector<armnn::NetworkId> m_NetworkIDs;
 };
 
 } // namespace armnn_driver

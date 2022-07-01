@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1466,13 +1466,21 @@ std::vector<ImportedInputId> LoadedNetwork::ImportInputs(const InputTensors& inp
                     std::make_unique<ConstPassthroughTensorHandle>(inputTensor.second.GetInfo(),
                                                                    inputTensor.second.GetMemoryArea());
 
-            if (outputTensorHandle->CanBeImported(passThroughTensorHandle->Map(), forceImportMemorySource)
-                && (outputTensorHandle->Import(passThroughTensorHandle->Map(), forceImportMemorySource)))
+            try
             {
-                importedInputs.push_back(inputIndex);
+                if (outputTensorHandle->CanBeImported(passThroughTensorHandle->Map(), forceImportMemorySource)
+                    && (outputTensorHandle->Import(passThroughTensorHandle->Map(), forceImportMemorySource)))
+                {
+                    importedInputs.push_back(inputIndex);
+                }
+                passThroughTensorHandle->Unmap();
             }
-            passThroughTensorHandle->Unmap();
-
+            catch(const MemoryImportException& exception)
+            {
+                ARMNN_LOG(error) << "An error occurred attempting to import input_"
+                                           << inputIndex << " : " << exception.what();
+                passThroughTensorHandle->Unmap();
+            }
             inputIndex++;
         }
 
@@ -1576,7 +1584,6 @@ std::vector<ImportedOutputId> LoadedNetwork::ImportOutputs(const OutputTensors& 
         for (const BindableLayer* const outputLayer : graph.GetOutputLayers())
         {
             auto inputTensorHandle = m_PreImportedOutputHandles[outputIndex].m_TensorHandle.get();
-
             if (!inputTensorHandle)
             {
                 outputIndex++;
@@ -1596,11 +1603,19 @@ std::vector<ImportedOutputId> LoadedNetwork::ImportOutputs(const OutputTensors& 
             }
 
             const auto outputTensor = *it;
-            // Check if the output memory can be imported
-            if (inputTensorHandle->CanBeImported(outputTensor.second.GetMemoryArea(), forceImportMemorySource)
-                && inputTensorHandle->Import(outputTensor.second.GetMemoryArea(), forceImportMemorySource))
+            try
             {
-                importedOutputs.push_back(outputIndex);
+                // Check if the output memory can be imported
+                if (inputTensorHandle->CanBeImported(outputTensor.second.GetMemoryArea(), forceImportMemorySource)
+                    && inputTensorHandle->Import(outputTensor.second.GetMemoryArea(), forceImportMemorySource))
+                {
+                    importedOutputs.push_back(outputIndex);
+                }
+            }
+            catch(const MemoryImportException& exception)
+            {
+                ARMNN_LOG(error) << "An error occurred attempting to import output_"
+                                 << outputIndex << " : " << exception.what();
             }
             outputIndex++;
         }

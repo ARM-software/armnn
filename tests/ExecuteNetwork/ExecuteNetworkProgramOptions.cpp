@@ -1,10 +1,11 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ExecuteNetworkProgramOptions.hpp"
 #include "NetworkExecutionUtils/NetworkExecutionUtils.hpp"
+#include "InferenceTest.hpp"
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Exceptions.hpp>
@@ -50,6 +51,8 @@ void CheckOptionDependency(const cxxopts::ParseResult& result,
 
 void CheckOptionDependencies(const cxxopts::ParseResult& result)
 {
+    CheckOptionDependency(result, "model-path", "model-format");
+    CheckOptionDependency(result, "input-tensor-shape", "model-path");
     CheckOptionDependency(result, "tuning-level", "tuning-path");
 }
 
@@ -116,8 +119,10 @@ void CheckRequiredOptions(const cxxopts::ParseResult& result)
 
     // For each option in option-group "a) Required
     std::vector<std::string> requiredOptions{"compute",
-                                             "model-path"
-                                             };
+                                             "model-format",
+                                             "model-path",
+                                             "input-name",
+                                             "output-name"};
 
     bool requiredMissing = false;
     for(auto const&  str : requiredOptions)
@@ -139,39 +144,13 @@ void CheckForDeprecatedOptions(const cxxopts::ParseResult& result)
     if(result.count("simultaneous-iterations") > 0)
     {
         ARMNN_LOG(warning) << "DEPRECATED: The program option 'simultaneous-iterations' is deprecated and will be "
-                              "removed soon. Please use the option '\"P, enable-thread-pool\"' instead.";
+                              "removed soon. Please use the option 'iterations' combined with 'concurrent' instead.";
     }
     if(result.count("armnn-tflite-delegate") > 0)
     {
         ARMNN_LOG(warning) << "DEPRECATED: The program option 'armnn-tflite-delegate' is deprecated and will be "
                               "removed soon. Please use the option 'tflite-executor' instead.";
     }
-    if(result.count("concurrent") > 0)
-    {
-        ARMNN_LOG(warning) << "DEPRECATED: The program option 'concurrent' is deprecated and will be "
-                              "removed soon. Please use the option '\"P, enable-thread-pool\"' instead.";
-    }
-    if(result.count("input-type") > 0)
-    {
-        ARMNN_LOG(warning) << "DEPRECATED: The program option 'input-type' is deprecated and will be "
-                              "removed soon. The input-types are now automatically set.";
-    }
-    if(result.count("output-type") > 0)
-    {
-        ARMNN_LOG(warning) << "DEPRECATED: The program option 'output-type' is deprecated and will be "
-                              "removed soon. The output-types are now automatically set.";
-    }
-    if(result.count("output-name") > 0)
-    {
-        ARMNN_LOG(warning) << "DEPRECATED: The program option 'output-name' is deprecated and will be "
-                              "removed soon. The output-names are now automatically set.";
-    }
-    if(result.count("model-format") > 0)
-    {
-        ARMNN_LOG(warning) << "DEPRECATED: The program option 'input-name' is deprecated and will be "
-                              "removed soon. The model-format are now automatically set.";
-    }
-
 }
 
 void ProgramOptions::ValidateExecuteNetworkParams()
@@ -208,9 +187,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::vector<std::string>>())
 
                 ("f,model-format",
-                 "armnn-binary, onnx-binary, onnx-text, tflite-binary"
-                 "DEPRECATED: The program option 'input-name' is deprecated and will be "
-                 "removed soon. The model-format are now automatically set.",
+                 "armnn-binary, onnx-binary, onnx-text, tflite-binary",
                  cxxopts::value<std::string>())
 
                 ("m,model-path",
@@ -218,13 +195,11 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::string>(m_ExNetParams.m_ModelPath))
 
                 ("i,input-name",
-                 "Identifier of the input tensors in the network separated by comma."
-                 "This option is not required, but can be used to set the order of inputs",
+                 "Identifier of the input tensors in the network separated by comma.",
                  cxxopts::value<std::string>())
 
                 ("o,output-name",
-                 "Identifier of the output tensors in the network separated by comma."
-                 "This option is not required, but can be used to set the order of outputs",
+                 "Identifier of the output tensors in the network separated by comma.",
                  cxxopts::value<std::string>());
 
         m_CxxOptions.add_options("b) General")
@@ -233,16 +208,10 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "If left empty (the default), dynamic backends will not be used.",
                  cxxopts::value<std::string>(m_RuntimeOptions.m_DynamicBackendsPath))
 
-                ("P, thread-pool-size",
-                 "Run the network using the Arm NN thread pool with the number of threads provided. ",
-                 cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("0"))
-
                 ("n,concurrent",
                  "This option is for Arm NN internal asynchronous testing purposes. "
                  "False by default. If set to true will use std::launch::async or the Arm NN thread pool, "
-                 "if 'thread-pool-size' is greater than 0, for asynchronous execution."
-                 "DEPRECATED: The program option 'concurrent' is deprecated and will be "
-                 "removed soon. Please use the option '\"P, enable-thread-pool\"' instead.",
+                 "if 'thread-pool-size' is greater than 0, for asynchronous execution.",
                  cxxopts::value<bool>(m_ExNetParams.m_Concurrent)->default_value("false")->implicit_value("true"))
 
                 ("d,input-tensor-data",
@@ -266,7 +235,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<bool>(m_ExNetParams.m_AllowExpandedDims)->default_value("false")
                  ->implicit_value("true"))
 
-                ("I,iterations",
+                ("iterations",
                  "Number of iterations to run the network for, default is set to 1. "
                  "If you wish to run the model with different input data for every execution you can do so by "
                  "supplying more input file paths to the 'input-tensor-data' option. "
@@ -303,7 +272,6 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "If unset, default to not quantized. Accepted values (true or false)"
                  " (Not available when executing ArmNNTfLiteDelegate or TfliteInterpreter)",
                  cxxopts::value<bool>(m_ExNetParams.m_QuantizeInput)->default_value("false")->implicit_value("true"))
-
                 ("r,threshold-time",
                  "Threshold time is the maximum allowed time for inference measured in milliseconds. If the actual "
                  "inference time is greater than the threshold time, the test will fail. By default, no threshold "
@@ -333,17 +301,13 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                 ("y,input-type",
                  "The type of the input tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined inputs. "
-                 "Accepted values (float, int, qasymms8 or qasymmu8)."
-                 "DEPRECATED: The program option 'input-type' is deprecated and will be "
-                 "removed soon. The input-types are now automatically set.",
+                 "Accepted values (float, int, qasymms8 or qasymmu8).",
                  cxxopts::value<std::string>())
 
                 ("z,output-type",
                  "The type of the output tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined outputs. "
-                 "Accepted values (float, int,  qasymms8 or qasymmu8)."
-                 "DEPRECATED: The program option 'output-type' is deprecated and will be "
-                 "removed soon. The input-types are now automatically set.",
+                 "Accepted values (float, int,  qasymms8 or qasymmu8).",
                  cxxopts::value<std::string>())
 
                 ("T,tflite-executor",
@@ -353,21 +317,23 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "tflite is the TfliteInterpreter",
                  cxxopts::value<std::string>()->default_value("parser"))
 
-                ("C, compare-output",
-                "Number of Arm NN threads to use when running the network asynchronously via the Arm NN thread pool. "
-                "The default is set to 0 which equals disabled. If 'thread-pool-size' is greater than 0 the "
-                "'concurrent' option is automatically set to true.",
-                cxxopts::value<std::string>(m_ExNetParams.m_ComparisonFile))
+                ("D,armnn-tflite-delegate",
+                 "Enable Arm NN TfLite delegate. "
+                 "DEPRECATED: This option is deprecated please use tflite-executor instead",
+                 cxxopts::value<bool>(m_ExNetParams.m_EnableDelegate)->default_value("false")->implicit_value("true"))
 
-                ("B, compare-output-with-backend",
-                 "Compare the output of the network with a different backend.",
-                 cxxopts::value<std::vector<std::string>>())
+                ("simultaneous-iterations",
+                 "Number of simultaneous iterations to async-run the network for, default is set to 1 (disabled). "
+                 "When thread-pool-size is set the Arm NN thread pool is used. Otherwise std::launch::async is used."
+                 "DEPRECATED: This option is deprecated and will be removed soon. "
+                 "Please use the option 'iterations' combined with 'concurrent' instead.",
+                 cxxopts::value<size_t>(m_ExNetParams.m_SimultaneousIterations)->default_value("1"))
 
-                ("A, compare-with-tflite",
-                 "Compare the outout of the network with the tflite ref model.",
-                 cxxopts::value<bool>(m_ExNetParams.m_CompareWithTflite)->default_value("false")
-                                                                        ->implicit_value("true"));
-
+                ("thread-pool-size",
+                 "Number of Arm NN threads to use when running the network asynchronously via the Arm NN thread pool. "
+                 "The default is set to 0 which equals disabled. If 'thread-pool-size' is greater than 0 the "
+                 "'concurrent' option is automatically set to true.",
+                 cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("0"));
 
         m_CxxOptions.add_options("c) Optimization")
                 ("bf16-turbo-mode",
@@ -503,22 +469,21 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     CheckOptionDependencies(m_CxxResult);
     CheckForDeprecatedOptions(m_CxxResult);
 
-    if ((m_ExNetParams.m_OutputDetailsToStdOut ||
-         m_ExNetParams.m_OutputDetailsOnlyToStdOut) &&
-        !m_ExNetParams.m_EnableProfiling)
-    {
-        throw cxxopts::OptionParseException("You must enable profiling if you would like to output layer details");
-    }
-
     // Some options can't be assigned directly because they need some post-processing:
     auto computeDevices = GetOptionValue<std::vector<std::string>>("compute", m_CxxResult);
     m_ExNetParams.m_ComputeDevices = GetBackendIDs(computeDevices);
+    m_ExNetParams.m_ModelFormat =
+            armnn::stringUtils::StringTrimCopy(GetOptionValue<std::string>("model-format", m_CxxResult));
     m_ExNetParams.m_InputNames =
             ParseStringList(GetOptionValue<std::string>("input-name", m_CxxResult), ",");
     m_ExNetParams.m_InputTensorDataFilePaths =
             ParseStringList(GetOptionValue<std::string>("input-tensor-data", m_CxxResult), ",");
     m_ExNetParams.m_OutputNames =
             ParseStringList(GetOptionValue<std::string>("output-name", m_CxxResult), ",");
+    m_ExNetParams.m_InputTypes =
+            ParseStringList(GetOptionValue<std::string>("input-type", m_CxxResult), ",");
+    m_ExNetParams.m_OutputTypes =
+            ParseStringList(GetOptionValue<std::string>("output-type", m_CxxResult), ",");
     m_ExNetParams.m_OutputTensorFiles =
             ParseStringList(GetOptionValue<std::string>("write-outputs-to-file", m_CxxResult), ",");
     m_ExNetParams.m_GenerateTensorData =
@@ -552,13 +517,13 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     {
         m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate;
     }
-
-    // Set concurrent to true if the user expects to run inferences asynchronously
-    if (m_ExNetParams.m_Concurrent)
+    if (m_ExNetParams.m_SimultaneousIterations > 1)
     {
-       m_ExNetParams.m_ThreadPoolSize = 1;
+        m_ExNetParams.m_Iterations = m_ExNetParams.m_SimultaneousIterations;
+        m_ExNetParams.m_Concurrent = true;
     }
 
+    // Set concurrent to true if the user expects to run inferences asynchronously
     if (m_ExNetParams.m_ThreadPoolSize > 0)
     {
         m_ExNetParams.m_Concurrent = true;
@@ -578,7 +543,7 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
             std::vector<unsigned int> dims = ParseArray(ss);
 
             m_ExNetParams.m_InputTensorShapes.push_back(
-                    armnn::TensorShape{static_cast<unsigned int>(dims.size()), dims.data()});
+                    std::make_unique<armnn::TensorShape>(static_cast<unsigned int>(dims.size()), dims.data()));
         }
     }
 
@@ -603,12 +568,5 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     }
 
     ValidateRuntimeOptions();
-
-    auto comparisonComputDevices = GetOptionValue<std::vector<std::string>>("compare-output-with-backend", m_CxxResult);
-
-    if (!comparisonComputDevices.empty())
-    {
-        m_ExNetParams.m_ComparisonComputeDevices = GetBackendIDs(comparisonComputDevices);
-    }
 }
 

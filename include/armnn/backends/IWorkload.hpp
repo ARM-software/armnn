@@ -1,10 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
 #include <armnn/Types.hpp>
+#include <armnn/backends/WorkloadInfo.hpp>
 
 namespace armnn
 {
@@ -44,6 +45,11 @@ public:
     virtual void ReplaceOutputTensorHandle(ITensorHandle* /*output*/, unsigned int /*slot*/) = 0;
 
     virtual void RegisterDebugCallback(const DebugCallbackFunction& /*func*/) {}
+
+    virtual armnn::Optional<armnn::MemoryRequirements> GetMemoryRequirements()
+    {
+        return armnn::EmptyOptional();
+    }
 };
 
 } //namespace armnn

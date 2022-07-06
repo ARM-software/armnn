@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -19,7 +19,7 @@ namespace pipe
 
 class ProfilingGuid;
 
-} // namespace armn
+} // namespace arm
 } // namespace pipe
 
 /// Define LayerGuid type.

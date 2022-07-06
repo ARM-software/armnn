@@ -252,27 +252,23 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
 
             IBackendInternal* backend = it.first->second.get();
 
-            if (networkProperties.m_AsyncEnabled &&
-                !HasCapability(BackendOptions::BackendOption{"AsyncExecution", true}, backend->GetCapabilities()))
+            // If we're doing async execution verify that the backend supports it and ExternallyManagedMemory.
+            if (networkProperties.m_AsyncEnabled)
             {
-                std::string er = backend->GetId();
-                er += " does not support AsyncExecution";
-                throw BackendCapabilityException(er);
-            }
-
-            if (networkProperties.m_AsyncEnabled &&
-                !HasCapability(BackendOptions::BackendOption{"ExternallyManagedMemory", true},
+                if (!HasCapability(BackendOptions::BackendOption{"AsyncExecution", true}, backend->GetCapabilities()))
+                {
+                    std::string er = backend->GetId();
+                    er += " does not support AsyncExecution";
+                    throw BackendCapabilityException(er);
+                }
+                if (!HasCapability(BackendOptions::BackendOption{"ExternallyManagedMemory", true},
                 backend->GetCapabilities()))
-            {
-                std::string er = backend->GetId();
-                er += " does not support ExternallyManagedMemory\n";
-                er += "AsyncEnabled networks require all backends to support ExternallyManagedMemory";
-                throw BackendCapabilityException(er);
-            }
-
-            if (HasCapability(BackendOptions::BackendOption{"ExternallyManagedMemory", true},backend->GetCapabilities())
-                && (m_NetworkProperties.m_ExternalMemoryManagementEnabled ||  m_NetworkProperties.m_AsyncEnabled))
-            {
+                {
+                    std::string er = backend->GetId();
+                    er += " does not support ExternallyManagedMemory\n";
+                    er += "AsyncEnabled networks require all backends to support ExternallyManagedMemory";
+                    throw BackendCapabilityException(er);
+                }
                 m_SupportsExternallyManagedMemory[backend->GetId()] = true;
                 useExternalMemoryManager = true;
             }
@@ -864,7 +860,9 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
     // Data that must be kept alive for the entire execution of the workload.
     WorkloadData workloadData(inputTensors, outputTensors);
 
-    if (graph.GetNumInputs() != inputTensors.size())
+    // Input tensors can be provided as parameters or pre imported. Either way the number of
+    // tensors should match the number of inputs.
+    if (graph.GetNumInputs() != (inputTensors.size() + preImportedInputIds.size()))
     {
         throw InvalidArgumentException("Number of inputs provided does not match network.");
     }
@@ -874,11 +872,6 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "PrepareInputs");
         m_InputQueue.clear();
         m_InputQueue.reserve(graph.GetNumInputs());
-
-        if (preImportedInputIds.size() > graph.GetNumInputs())
-        {
-            throw InvalidArgumentException("Invalid number of preImportedInputIds");
-        }
 
         unsigned int inputIndex = 0;
         unsigned int importedInputIdIndex = 0;
@@ -1437,9 +1430,10 @@ std::vector<ImportedInputId> LoadedNetwork::ImportInputs(const InputTensors& inp
         {
             throw MemoryImportException("ImportInputs: Memory Import failed, NetworkProperties.m_ImportEnabled");
         }
-        if (inputTensors.size() != m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetNumInputs())
+        // The number of pre imported tensors should not exceed the number of inputs.
+        if (inputTensors.size() > m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetNumInputs())
         {
-            throw MemoryImportException("ImportInputs: Force Import failed, incorrect number of tensors");
+            throw MemoryImportException("ImportInputs: The number of tensors provided exceeds the number of inputs.");
         }
 
         std::vector<ImportedInputId> importedInputs;

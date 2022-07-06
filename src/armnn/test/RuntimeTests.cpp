@@ -1466,4 +1466,70 @@ TEST_CASE("RuntimeOptimizeExportOn_LoadNetworkExportOff")
     CHECK(er.find("However, it was enabled when this network was optimized") != -1);
 }
 
+TEST_CASE("SyncExecutePreImportInputsHappyPath")
+{
+    // In this test case we'll mix "Pre Import" and pass by reference tensors as input.
+    //
+    // * Create a small network that takes two inputs.
+    // * Optimize it specifying that the inputs and outputs will not be imported or exported.
+    // * Create some malloc input and output tensors.
+    // * Use ImportInputs to import only one of the two inputs.
+    // * Call EnqueueWorkload passing one input tensor and one reference to a pre-imported tensor.
+
+    armnn::IRuntime::CreationOptions options;
+    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
+    armnn::NetworkId networkId = 1;
+    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
+
+    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
+    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    auto addLayer    = testNetwork->AddAdditionLayer("add layer");
+    auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
+
+    TensorInfo tensorInfo{ { 4 }, armnn::DataType::Signed32 };
+
+    inputLayer1->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    inputLayer2->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
+    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    addLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+    addLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+
+    std::string er;
+    armnn::INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    runtime->LoadNetwork(networkId, Optimize(*testNetwork, backends, runtime->GetDeviceSpec()), er, networkProperties);
+
+    std::vector<int> inputData1(4, 10);
+    std::vector<int> inputData2(4, 20);
+    std::vector<int> output(4);
+
+    ConstTensor inputTensor1({ { 4 }, armnn::DataType::Signed32, 0.0f, 0, true }, inputData1.data());
+    ConstTensor inputTensor2({ { 4 }, armnn::DataType::Signed32, 0.0f, 0, true }, inputData2.data());
+    Tensor outputTensor({ { 4 }, armnn::DataType::Signed32 }, output.data());
+
+    // An extra check here: the number of inputs provided to ImportInputs should not exceed the number of inputs
+    // to the network.
+    CHECK_THROWS_AS(runtime->ImportInputs(networkId, { { 0, inputTensor1 }, { 0, inputTensor1 }, { 0, inputTensor1 } },
+                                          MemorySource::Malloc),
+                    armnn::MemoryImportException);
+
+    // Pre Import one of the two input tensors.
+    std::vector<ImportedOutputId> importedInputVec =
+        runtime->ImportInputs(networkId, { { 0, inputTensor1 } }, MemorySource::Malloc);
+    CHECK(importedInputVec.size() == 1);
+    CHECK(importedInputVec[0] == 0);
+
+    // We've pre-imported tensor 1 and we'll pass tensor 2 by reference.
+    InputTensors inputTensors{ { 1, inputTensor2 } };
+    OutputTensors outputTensors{ { 2, outputTensor } };
+
+    // Do the inference
+    auto ret = runtime->EnqueueWorkload(networkId, inputTensors, outputTensors, importedInputVec,
+                                        std::vector<ImportedOutputId>());
+    REQUIRE(ret == Status::Success);
+}
 }

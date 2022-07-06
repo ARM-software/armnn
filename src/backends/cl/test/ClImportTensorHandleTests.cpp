@@ -397,11 +397,14 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     INFO("Run ImportInputs");
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    // We expect the import to have succeeded.
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
-
+    // We expect the import to have succeeded.
+    CHECK(importedOutputIds.size() == 1);
     // Do the inference
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -536,11 +539,15 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp16toFp32EndToE
     INFO("Run ImportInputs");
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    // We expect the import to have succeeded.
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    // We expect the import to have succeeded.
+    CHECK(importedOutputIds.size() == 1);
 
     // Do the inference
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -680,11 +687,15 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp32toFp16EndToE
     INFO("Run ImportInputs");
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    // We expect the import to have succeeded.
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    // We expect the import to have succeeded.
+    CHECK(importedOutputIds.size() == 1);
 
     // Do the inference
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -798,11 +809,13 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportSimpleConvertFp32toFp16
     INFO("Run ImportInputs");
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    CHECK(importedOutputIds.size() == 1);
 
     // Do the inference
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -838,7 +851,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
 /*
  * This is a test to check the functionality of the Forced Import functionality when using repeated inferences that
  * require switching from importing to copy. For the first inference we create aligned Pointers and check they are
- * imported correctly. For the second we use similar pointers but don't use PreImporting to force fall back to copy.
+ * imported correctly. For the second we use similar pointers but don't use PreImporting.
  */
     // Create runtime in which test will run
     IRuntime::CreationOptions options;
@@ -959,11 +972,15 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     INFO("Run ImportInputs");
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    // We expect the import to have succeeded.
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    // We expect the import to have succeeded.
+    CHECK(importedOutputIds.size() == 1);
 
     // Do the inference
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -1246,11 +1263,13 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     INFO("Run ImportInputs");
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensorsImport, MemorySource::Malloc);
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensorsImport, MemorySource::Malloc);
+    CHECK(importedOutputIds.size() == 1);
 
     // Do the inference with pre-imported inputs/outputs
-    runtime->EnqueueWorkload(netId, inputTensorsImport, outputTensorsImport, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
     // Sync the outputs so we can read the data
     arm_compute::CLScheduler::get().sync();
 

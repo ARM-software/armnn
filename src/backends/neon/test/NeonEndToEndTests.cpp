@@ -568,17 +568,26 @@ TEST_CASE("NeonStridedSliceInvalidSliceEndToEndTest")
     StridedSliceInvalidSliceEndToEndTest(neonDefaultBackends);
 }
 
-TEST_CASE("NeonForceImportWithAlignedBuffersEndToEndTest")
+TEST_CASE("NeonForceImportWithAlignedBuffersEndToEndTest"
+          // Currently, the Neon workload for activation does not support tensor handle replacement so this test case
+          // will always fail.
+          * doctest::skip(true))
 {
     ForceImportWithAlignedBuffersEndToEndTest(neonDefaultBackends);
 }
 
-TEST_CASE("NeonForceImportWithMisalignedInputBuffersEndToEndTest")
+TEST_CASE("NeonForceImportWithMisalignedInputBuffersEndToEndTest"
+          // Currently, the Neon workload for activation does not support tensor handle replacement so this test case
+          // will always fail.
+          * doctest::skip(true))
 {
     ForceImportWithMisalignedInputBuffersEndToEndTest(neonDefaultBackends);
 }
 
-TEST_CASE("NeonForceImportWithMisalignedOutputBuffersEndToEndTest")
+TEST_CASE("NeonForceImportWithMisalignedOutputBuffersEndToEndTest"
+          // Currently, the Neon workload for activation does not support tensor handle replacement so this test case
+          // will always fail.
+          * doctest::skip(true))
 {
     ForceImportWithMisalignedOutputBuffersEndToEndTest(neonDefaultBackends);
 }

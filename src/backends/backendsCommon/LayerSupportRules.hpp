@@ -186,4 +186,12 @@ struct TensorNumDimensionsAreCorrect : public Rule
     }
 };
 
+struct TensorNumDimensionsAreGreaterOrEqualTo : public Rule
+{
+    TensorNumDimensionsAreGreaterOrEqualTo(const TensorInfo& info, unsigned int numDimensionsToCompare)
+    {
+        m_Res = info.GetNumDimensions() >= numDimensionsToCompare;
+    }
+};
+
 } //namespace armnn

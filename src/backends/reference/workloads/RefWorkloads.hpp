@@ -7,6 +7,7 @@
 
 #include "RefActivationWorkload.hpp"
 #include "RefArgMinMaxWorkload.hpp"
+#include "RefBatchMatMulWorkload.hpp"
 #include "RefBatchNormalizationWorkload.hpp"
 #include "RefBatchToSpaceNdWorkload.hpp"
 #include "RefCastWorkload.hpp"

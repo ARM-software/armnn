@@ -785,4 +785,9 @@ struct ChannelShuffleQueueDescriptor : QueueDescriptorWithParameters<ChannelShuf
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct BatchMatMulQueueDescriptor : QueueDescriptorWithParameters<BatchMatMulDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

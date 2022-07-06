@@ -13,7 +13,7 @@ namespace armnn
 {
 
 ARMNN_NO_DEPRECATE_WARN_BEGIN
-// IsLayerSupport() forwards to the deprecated virtual methods depending on input LayerType.
+// IsLayerSupported() forwards to the deprecated virtual methods depending on input LayerType.
 // Allows backends continue to behave as before maintaining backward compatibility.
 bool ILayerSupport::IsLayerSupported(const LayerType& type,
                                      const std::vector<TensorInfo>& infos,

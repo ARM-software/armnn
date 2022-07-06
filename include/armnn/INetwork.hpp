@@ -752,6 +752,12 @@ public:
     IConnectableLayer* AddChannelShuffleLayer(const ChannelShuffleDescriptor& descriptor,
                                               const char* name = nullptr);
 
+    /// Add a BatchMatMul layer to the network
+    /// @param descriptor - Parameters for the BatchMatMul operation
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer
+    IConnectableLayer* AddBatchMatMulLayer(const BatchMatMulDescriptor& descriptor,
+                                           const char* name = nullptr);
 
     void ExecuteStrategy(IStrategy& strategy) const;
 

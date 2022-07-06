@@ -10,6 +10,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     ArgMinMax.cpp
     ArgMinMax.hpp
     BaseIterator.hpp
+    BatchMatMulImpl.cpp
+    BatchMatMulImpl.hpp
     BatchNormImpl.cpp
     BatchNormImpl.hpp
     BatchToSpaceNd.cpp
@@ -69,6 +71,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefArgMinMaxWorkload.cpp
     RefArgMinMaxWorkload.hpp
     RefBaseWorkload.hpp
+    RefBatchMatMulWorkload.cpp
+    RefBatchMatMulWorkload.hpp
     RefBatchNormalizationWorkload.cpp
     RefBatchNormalizationWorkload.hpp
     RefBatchToSpaceNdWorkload.cpp

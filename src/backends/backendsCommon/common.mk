@@ -46,6 +46,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/ActivationTestImpl.cpp \
     test/layerTests/AdditionTestImpl.cpp \
     test/layerTests/ArgMinMaxTestImpl.cpp \
+    test/layerTests/BatchMatMulTestImpl.cpp \
     test/layerTests/BatchNormalizationTestImpl.cpp \
     test/layerTests/CastTestImpl.cpp \
     test/layerTests/ChannelShuffleTestImpl.cpp \

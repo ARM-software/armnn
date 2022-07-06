@@ -9,6 +9,7 @@
 #include <backendsCommon/test/layerTests/ActivationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/AdditionTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ArgMinMaxTestImpl.hpp>
+#include <backendsCommon/test/layerTests/BatchMatMulTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchNormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchToSpaceNdTestImpl.hpp>
 #include <backendsCommon/test/layerTests/CastTestImpl.hpp>

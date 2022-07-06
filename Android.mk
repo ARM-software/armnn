@@ -208,6 +208,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ActivationLayer.cpp \
         src/armnn/layers/AdditionLayer.cpp \
         src/armnn/layers/ArgMinMaxLayer.cpp \
+        src/armnn/layers/BatchMatMulLayer.cpp \
         src/armnn/layers/BatchNormalizationLayer.cpp \
         src/armnn/layers/BatchToSpaceNdLayer.cpp \
         src/armnn/layers/CastLayer.cpp \

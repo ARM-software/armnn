@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -20,6 +20,18 @@ struct WorkloadInfo
     Optional<TensorInfo> m_WeightsTensorInfo = EmptyOptional();
     Optional<TensorInfo> m_BiasTensorInfo = EmptyOptional();
     Optional<std::string> m_ConvolutionMethod = EmptyOptional();
+};
+
+struct MemoryInfo
+{
+    unsigned int   m_OutputSlotIndex;
+    size_t         m_Size{ 0 };
+    size_t         m_Alignment{ 64 };
+};
+
+struct MemoryRequirements
+{
+    armnn::Optional<std::vector<MemoryInfo>> m_IntraLayerTensors;
 };
 
 } //namespace armnn

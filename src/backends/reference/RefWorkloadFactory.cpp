@@ -170,6 +170,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
             auto argMinMaxQueueDescriptor = PolymorphicDowncast<const ArgMinMaxQueueDescriptor*>(&descriptor);
             return std::make_unique<RefArgMinMaxWorkload>(*argMinMaxQueueDescriptor, info);
         }
+        case LayerType::BatchMatMul:
+        {
+            auto batchMatMulQueueDescriptor = PolymorphicDowncast<const BatchMatMulQueueDescriptor*>(&descriptor);
+            return std::make_unique<RefBatchMatMulWorkload>(*batchMatMulQueueDescriptor, info);
+        }
         case LayerType::BatchNormalization :
         {
             auto batchNormQueueDescriptor = PolymorphicDowncast<const BatchNormalizationQueueDescriptor*>(&descriptor);

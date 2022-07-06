@@ -79,6 +79,12 @@ bool RefLayerSupport::IsLayerSupported(const LayerType& type,
                                         infos[1],
                                         *(PolymorphicDowncast<const ArgMinMaxDescriptor*>(&descriptor)),
                                         reasonIfUnsupported);
+        case LayerType::BatchMatMul:
+            return IsBatchMatMulSupported(infos[0],
+                                          infos[1],
+                                          infos[2],
+                                          *(PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor)),
+                                          reasonIfUnsupported);
         case LayerType::BatchNormalization:
             return IsBatchNormalizationSupported(infos[0],
                                                  infos[1],
@@ -638,6 +644,52 @@ bool RefLayerSupport::IsArgMinMaxSupported(const armnn::TensorInfo &input, const
                                   "Reference ArgMinMax: input is not a supported type.");
     supported &= CheckSupportRule(TypeAnyOf(output, supportedOutputTypes), reasonIfUnsupported,
                                   "Reference ArgMinMax: output type not supported");
+
+    return supported;
+}
+
+bool RefLayerSupport::IsBatchMatMulSupported(const TensorInfo& inputX,
+                                             const TensorInfo& inputY,
+                                             const TensorInfo& output,
+                                             const BatchMatMulDescriptor& descriptor,
+                                             Optional<std::string &> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+
+    std::array<DataType, 6> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS16
+    };
+
+    bool supported = true;
+
+    supported &= CheckSupportRule(TypeAnyOf(inputX, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch matrix multiplication: input X is not a supported type");
+
+    supported &= CheckSupportRule(TypeAnyOf(inputY, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch matrix multiplication: input Y is not a supported type");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Reference batch matrix multiplication: output is not a supported type");
+
+    supported &= CheckSupportRule(TypesAreEqual(inputX, inputY), reasonIfUnsupported,
+                                  "Reference batch matrix multiplication: input X and input Y types are mismatched");
+
+    supported &= CheckSupportRule(TypesAreEqual(inputX, output), reasonIfUnsupported,
+                                  "Reference batch matrix multiplication: inputs and output types are mismatched");
+
+    supported &= CheckSupportRule(TensorNumDimensionsAreGreaterOrEqualTo(inputX, 2),
+                                  reasonIfUnsupported,
+                                  "Reference batch matrix multiplication: input X is not of rank 2 or greater");
+
+    supported &= CheckSupportRule(TensorNumDimensionsAreGreaterOrEqualTo(inputY, 2),
+                                  reasonIfUnsupported,
+                                  "Reference batch matrix multiplication: input Y is not of rank 2 or greater");
 
     return supported;
 }

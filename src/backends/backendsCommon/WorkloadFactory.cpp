@@ -133,6 +133,22 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                     reason);
             break;
         }
+        case LayerType::BatchMatMul:
+        {
+            auto cLayer = PolymorphicDowncast<const BatchMatMulLayer*>(&layer);
+            const BatchMatMulDescriptor& descriptor = cLayer->GetParameters();
+
+            const TensorInfo& input0 = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input1 = layer.GetInputSlot(1).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject.IsBatchMatMulSupported(
+                            OverrideDataType(input0, dataType),
+                            OverrideDataType(input1, dataType),
+                            OverrideDataType(output, dataType),
+                            descriptor,
+                            reason);
+            break;
+        }
         case LayerType::BatchNormalization:
         {
             auto cLayer = PolymorphicDowncast<const BatchNormalizationLayer*>(&layer);

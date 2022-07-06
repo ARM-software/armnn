@@ -49,6 +49,9 @@ public:
     IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
                                          const char* name = nullptr);
 
+    IConnectableLayer* AddBatchMatMulLayer(const BatchMatMulDescriptor& desc,
+                                           const char* name = nullptr);
+
     IConnectableLayer* AddBatchNormalizationLayer(const BatchNormalizationDescriptor& desc,
                                                   const ConstTensor& mean,
                                                   const ConstTensor& variance,

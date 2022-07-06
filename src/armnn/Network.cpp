@@ -456,6 +456,12 @@ IConnectableLayer* INetwork::AddChannelShuffleLayer(const ChannelShuffleDescript
     return pNetworkImpl->AddChannelShuffleLayer(descriptor, name);
 }
 
+IConnectableLayer* INetwork::AddBatchMatMulLayer(const BatchMatMulDescriptor &descriptor,
+                                                 const char* name)
+{
+    return pNetworkImpl->AddBatchMatMulLayer(descriptor, name);
+}
+
 void INetwork::ExecuteStrategy(IStrategy& strategy) const
 {
     return pNetworkImpl->ExecuteStrategy(strategy);
@@ -2874,6 +2880,11 @@ IConnectableLayer* NetworkImpl::AddUnidirectionalSequenceLstmLayer(
                 std::make_shared<ScopedTensorHandle>(*(params.m_OutputLayerNormWeights));
     }
     return layer;
+}
+
+IConnectableLayer* NetworkImpl::AddBatchMatMulLayer(const BatchMatMulDescriptor& desc, const char* name)
+{
+    return m_Graph->AddLayer<BatchMatMulLayer>(desc, name);
 }
 
 IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,

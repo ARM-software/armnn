@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -9,6 +9,7 @@
 #include "layers/ActivationLayer.hpp"
 #include "layers/AdditionLayer.hpp"
 #include "layers/ArgMinMaxLayer.hpp"
+#include "layers/BatchMatMulLayer.hpp"
 #include "layers/BatchNormalizationLayer.hpp"
 #include "layers/BatchToSpaceNdLayer.hpp"
 #include "layers/CastLayer.hpp"
@@ -110,6 +111,7 @@ constexpr LayerType LayerEnumOf(const T* = nullptr);
 DECLARE_LAYER(Activation)
 DECLARE_LAYER(Addition)
 DECLARE_LAYER(ArgMinMax)
+DECLARE_LAYER(BatchMatMul)
 DECLARE_LAYER(BatchNormalization)
 DECLARE_LAYER(BatchToSpaceNd)
 DECLARE_LAYER(Cast)

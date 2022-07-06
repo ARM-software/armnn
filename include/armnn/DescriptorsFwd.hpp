@@ -11,6 +11,7 @@ struct BaseDescriptor;
 
 struct ActivationDescriptor;
 struct ArgMinMaxDescriptor;
+struct BatchMatMulDescriptor;
 struct BatchNormalizationDescriptor;
 struct BatchToSpaceNdDescriptor;
 struct ChannelShuffleDescriptor;

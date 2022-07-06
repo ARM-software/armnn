@@ -187,6 +187,8 @@ list(APPEND armnn_sources
     src/armnn/layers/AdditionLayer.cpp
     src/armnn/layers/ArgMinMaxLayer.hpp
     src/armnn/layers/ArgMinMaxLayer.cpp
+    src/armnn/layers/BatchMatMulLayer.hpp
+    src/armnn/layers/BatchMatMulLayer.cpp
     src/armnn/layers/BatchNormalizationLayer.hpp
     src/armnn/layers/BatchNormalizationLayer.cpp
     src/armnn/layers/BatchToSpaceNdLayer.hpp

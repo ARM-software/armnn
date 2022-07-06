@@ -179,6 +179,22 @@ bool LayerSupportHandle::IsArgMinMaxSupported(const TensorInfo& input,
                                             reasonIfUnsupported);
 }
 
+bool LayerSupportHandle::IsBatchMatMulSupported(const TensorInfo& input0,
+                                                const TensorInfo& input1,
+                                                const TensorInfo& output,
+                                                const BatchMatMulDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported)
+{
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::BatchMatMul,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported);
+}
+
 bool LayerSupportHandle::IsBatchNormalizationSupported(const TensorInfo& input,
                                                        const TensorInfo& output,
                                                        const TensorInfo& mean,

@@ -221,14 +221,18 @@ public:
     /// ImportInputs separates the importing and mapping of InputTensors from network execution.
     /// Allowing for a set of InputTensors to be imported and mapped once, but used in execution many times.
     /// This function is not thread safe and must not be used while other threads are calling Execute().
-    /// Only compatible with AsyncEnabled networks and aligned memory import
+    /// No exceptions are thrown for failed imports. It is the caller's responsibility to check whether
+    /// tensors have been successfully imported by comparing returned ids with those passed in the InputTensors.
+    /// Whether a tensor can be imported or not is backend specific.
     std::vector<ImportedInputId> ImportInputs(NetworkId networkId, const InputTensors& inputTensors,
                                               MemorySource forceImportMemorySource = MemorySource::Undefined);
 
     /// ImportOutputs separates the importing and mapping of OutputTensors from network execution.
     /// Allowing for a set of OutputTensors to be imported and mapped once, but used in execution many times.
     /// This function is not thread safe and must not be used while other threads are calling Execute().
-    /// Only compatible with AsyncEnabled networks and aligned memory import
+    /// No exceptions are thrown for failed imports. It is the caller's responsibility to check whether
+    /// tensors have been successfully imported by comparing returned ids with those passed in the OutputTensors.
+    /// Whether a tensor can be imported or not is backend specific.
     std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors,
                                                 MemorySource forceImportMemorySource = MemorySource::Undefined);
 

@@ -887,10 +887,12 @@ inline void ForceImportWithAlignedBuffersEndToEndTest(std::vector<BackendId> bac
     runtime->GetProfiler(netId)->EnableProfiling(true);
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    CHECK(importedOutputIds.size() == 1);
     // Do the inference and force the import as the memory is aligned.
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -997,11 +999,14 @@ inline void ForceImportWithMisalignedInputBuffersEndToEndTest(std::vector<Backen
     runtime->GetProfiler(netId)->EnableProfiling(true);
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    // We expect the import to have failed.
+    CHECK(importedInputIds.size() == 0);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    CHECK(importedOutputIds.size() == 1);
 
     // Do the inference and force the import as the memory is misaligned.
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, inputTensors, OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -1113,11 +1118,14 @@ inline void ForceImportWithMisalignedOutputBuffersEndToEndTest(std::vector<Backe
     runtime->GetProfiler(netId)->EnableProfiling(true);
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    CHECK(importedInputIds.size() == 1);
+    // We expect this to fail.
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    CHECK(importedOutputIds.size() == 0);
 
-    // Do the inference and force the import as the memory is misaligned.
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    // Even if importing the output failed we still expect to be able to get it to work.
+    runtime->EnqueueWorkload(netId, InputTensors(), outputTensors, importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.Print() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -1233,8 +1241,12 @@ inline void ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(std::vect
     runtime->GetProfiler(netId)->EnableProfiling(true);
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    // Import should have failed.
+    CHECK(importedInputIds.size() == 0);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    // Import should have failed.
+    CHECK(importedOutputIds.size() == 0);
 
     // Do the inference and force the import as the memory is misaligned.
     runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
@@ -1339,10 +1351,12 @@ inline void ForceImportRepeatedInferencesEndToEndTest(std::vector<BackendId> bac
     runtime->GetProfiler(netId)->EnableProfiling(true);
     std::vector<ImportedInputId> importedInputIds =
         runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    CHECK(importedInputIds.size() == 1);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    CHECK(importedOutputIds.size() == 1);
     // Do the inference and force the import as the memory is aligned.
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
     ProfilerManager& profilerManager = armnn::ProfilerManager::GetInstance();
@@ -1408,7 +1422,11 @@ inline void ForceImportRepeatedInferencesEndToEndTest(std::vector<BackendId> bac
         {0,armnn::Tensor(runtime->GetOutputTensorInfo(netId, 0), misalignedOutputPtr)}
     };
     importedInputIds = runtime->ImportInputs(netId, inputTensorsMisaligned, MemorySource::Malloc);
+    // Import should fail.
+    CHECK(importedInputIds.size() == 0);
     importedOutputIds = runtime->ImportOutputs(netId, outputTensorsMisaligned, MemorySource::Malloc);
+    // Import should fail.
+    CHECK(importedOutputIds.size() == 0);
 
     // Do the inference and force the import as the memory is misaligned.
     runtime->EnqueueWorkload(netId,
@@ -1527,8 +1545,12 @@ inline void ForceImportRepeatedInferencesInvertedEndToEndTest(std::vector<Backen
     runtime->GetProfiler(netId)->EnableProfiling(true);
     std::vector<ImportedInputId>  importedInputIds =
         runtime->ImportInputs(netId, inputTensorsMisaligned, MemorySource::Malloc);
+    // Import should fail.
+    CHECK(importedInputIds.size() == 0);
     std::vector<ImportedOutputId> importedOutputIds =
         runtime->ImportOutputs(netId, outputTensorsMisaligned, MemorySource::Malloc);
+    // Import should fail.
+    CHECK(importedOutputIds.size() == 0);
 
     // Do the inference and force the import as the memory is misaligned.
     runtime->EnqueueWorkload(netId,
@@ -1593,9 +1615,11 @@ inline void ForceImportRepeatedInferencesInvertedEndToEndTest(std::vector<Backen
     };
 
     importedInputIds = runtime->ImportInputs(netId, inputTensors, MemorySource::Malloc);
+    CHECK(importedInputIds.size() == 1);
     importedOutputIds = runtime->ImportOutputs(netId, outputTensors, MemorySource::Malloc);
+    CHECK(importedOutputIds.size() == 1);
     // Do the inference and force the import as the memory is aligned.
-    runtime->EnqueueWorkload(netId, inputTensors, outputTensors, importedInputIds, importedOutputIds);
+    runtime->EnqueueWorkload(netId, InputTensors(), OutputTensors(), importedInputIds, importedOutputIds);
 
     // Retrieve the Profiler.AnalyzeEventsAndWriteResults() output to get the workload execution
     // We need to use AnalyzeEventsAndWriteResults here to make sure the second inference has been profiled

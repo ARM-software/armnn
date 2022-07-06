@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -88,6 +88,7 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
 
 void ArmNNExecutor::ExecuteAsync()
 {
+#if !defined(ARMNN_DISABLE_THREADS)
     std::vector<std::shared_ptr<armnn::IWorkingMemHandle>> memHandles;
     std::unique_ptr<armnn::Threadpool> threadpool;
     armnn::AsyncCallbackManager callbackManager;
@@ -157,6 +158,7 @@ void ArmNNExecutor::ExecuteAsync()
     ARMNN_LOG(info) << "Overall Inference time: " << std::setprecision(2)
                     << std::fixed << totalInferenceDuration.count() << " ms\n";
 
+#endif
 }
 
 void ArmNNExecutor::ExecuteSync()

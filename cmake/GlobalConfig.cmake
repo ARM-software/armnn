@@ -1,5 +1,5 @@
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -42,6 +42,19 @@ option(BUILD_BARE_METAL "Disable features requiring operating system support" OF
 option(BUILD_SHARED_LIBS "Determines if Armnn will be built statically or dynamically.
                           This is an experimental feature and not fully supported.
                           Only the ArmNN core and the Delegate can be built statically." ON)
+option(EXECUTE_NETWORK_STATIC " This is a limited experimental build that is entirely static.
+                                It currently only supports being set by changing the current CMake default options like so:
+                                BUILD_TF_LITE_PARSER=1/0
+                                BUILD_ARMNN_SERIALIZER=1/0
+                                ARMCOMPUTENEON=1/0
+                                ARMNNREF=1/0
+                                ARMCOMPUTECL=0
+                                BUILD_ONNX_PARSER=0
+                                BUILD_ARMNN_TFLITE_DELEGATE=0
+                                BUILD_TIMELINE_DECODER=0
+                                BUILD_BASE_PIPE_SERVER=0
+                                BUILD_UNIT_TESTS=0
+                                BUILD_GATORD_MOCK=0" OFF)
 
 include(SelectLibraryConfigurations)
 
@@ -137,6 +150,21 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_P
 
 include(CMakeFindDependencyMacro)
 
+
+if(EXECUTE_NETWORK_STATIC)
+    add_definitions(-DARMNN_DISABLE_SOCKETS
+                    -DBUILD_SHARED_LIBS=0
+                    -DARMNN_EXECUTE_NETWORK_STATIC)
+endif()
+
+if(BUILD_BARE_METAL)
+    add_definitions(-DARMNN_BUILD_BARE_METAL
+            -DARMNN_DISABLE_FILESYSTEM
+            -DARMNN_DISABLE_PROCESSES
+            -DARMNN_DISABLE_THREADS
+            -DARMNN_DISABLE_SOCKETS)
+endif()
+
 if (NOT BUILD_PIPE_ONLY)
   # cxxopts (Alternative to boost::program_options)
   find_path(CXXOPTS_INCLUDE cxxopts/cxxopts.hpp PATHS third-party NO_CMAKE_FIND_ROOT_PATH)
@@ -149,9 +177,17 @@ if (NOT BUILD_PIPE_ONLY)
   include_directories(SYSTEM "${GHC_INCLUDE}")
 endif()
 
+if(NOT BUILD_SHARED_LIBS)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
+endif()
+
 # pthread
 if (NOT BUILD_BARE_METAL)
 find_package(Threads)
+endif()
+
+if (EXECUTE_NETWORK_STATIC)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc -static -pthread")
 endif()
 
 # Favour the protobuf passed on command line
@@ -388,7 +424,7 @@ if(PROFILING_BACKEND_STREAMLINE)
     add_definitions(-DARMNN_STREAMLINE_ENABLED)
 endif()
 
-if(NOT BUILD_BARE_METAL)
+if(NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
 if(HEAP_PROFILING OR LEAK_CHECKING)
     find_path(HEAP_PROFILER_INCLUDE gperftools/heap-profiler.h
             PATHS ${GPERFTOOLS_ROOT}/include
@@ -443,14 +479,6 @@ if(BUILD_PYTHON_WHL OR BUILD_PYTHON_SRC)
     if(NOT ${SWIG_FOUND})
         message(FATAL_ERROR "SWIG 4.x requried to build PyArmNN, but not found")
     endif()
-endif()
-
-if(BUILD_BARE_METAL)
-    add_definitions(-DARMNN_BUILD_BARE_METAL
-                    -DARMNN_DISABLE_FILESYSTEM
-                    -DARMNN_DISABLE_PROCESSES
-                    -DARMNN_DISABLE_THREADS
-                    -DARMNN_DISABLE_SOCKETS)
 endif()
 
 # ArmNN source files required for all build options

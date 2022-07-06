@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 if(BUILD_TF_LITE_PARSER)
@@ -11,7 +11,11 @@ if(BUILD_TF_LITE_PARSER)
         TfLiteParser.cpp
         )
 
-    add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
+    if(EXECUTE_NETWORK_STATIC)
+        add_library_ex(armnnTfLiteParser OBJECT ${armnn_tf_lite_parser_sources})
+    else()
+        add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
+    endif()
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
     set_target_properties(armnnTfLiteParser PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})

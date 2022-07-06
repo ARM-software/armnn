@@ -1,5 +1,5 @@
 #
-# Copyright © 2018-2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -21,7 +21,7 @@ target_include_directories(inferenceTest PRIVATE ../src/armnnUtils)
 target_include_directories(inferenceTest PRIVATE ../src/backends)
 target_include_directories(inferenceTest PRIVATE ../third-party/stb)
 
-if (BUILD_TF_LITE_PARSER)
+if (BUILD_TF_LITE_PARSER AND NOT EXECUTE_NETWORK_STATIC)
     macro(TfLiteParserTest testName sources)
         add_executable_ex(${testName} ${sources})
         target_include_directories(${testName} PRIVATE ../src/armnnUtils)
@@ -112,7 +112,7 @@ if (BUILD_TF_LITE_PARSER)
 
 endif()
 
-if (BUILD_ONNX_PARSER)
+if (BUILD_ONNX_PARSER AND NOT EXECUTE_NETWORK_STATIC)
     macro(OnnxParserTest testName sources)
         add_executable_ex(${testName} ${sources})
         target_include_directories(${testName} PRIVATE ../src/armnnUtils)
@@ -139,7 +139,6 @@ if (BUILD_ONNX_PARSER)
 endif()
 
 if (BUILD_ARMNN_SERIALIZER
-        OR BUILD_TF_PARSER
         OR BUILD_TF_LITE_PARSER
         OR BUILD_ONNX_PARSER
         OR BUILD_ARMNN_TFLITE_DELEGATE)
@@ -168,21 +167,30 @@ if (BUILD_ARMNN_SERIALIZER
     target_include_directories(ExecuteNetwork PRIVATE ../src/armnnUtils)
     target_include_directories(ExecuteNetwork PRIVATE ../src/backends)
     target_include_directories(ExecuteNetwork PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
-    if (BUILD_ARMNN_SERIALIZER)
-        target_link_libraries(ExecuteNetwork armnnSerializer)
+    if(EXECUTE_NETWORK_STATIC)
+        target_link_libraries(ExecuteNetwork
+                -Wl,--whole-archive
+                armnnSerializer
+                armnnTfLiteParser
+                armnn
+                pthread
+                -Wl,--no-whole-archive
+                )
+    else()
+        if (BUILD_ARMNN_SERIALIZER)
+            target_link_libraries(ExecuteNetwork armnnSerializer)
+        endif()
+        if (BUILD_TF_LITE_PARSER)
+            target_link_libraries(ExecuteNetwork armnnTfLiteParser)
+        endif()
+        if (BUILD_ONNX_PARSER)
+            target_link_libraries(ExecuteNetwork armnnOnnxParser)
+        endif()
+        if (BUILD_ARMNN_TFLITE_DELEGATE)
+            target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnDelegate)
+        endif()
+        target_link_libraries(ExecuteNetwork armnn)
     endif()
-
-    if (BUILD_TF_LITE_PARSER)
-        target_link_libraries(ExecuteNetwork armnnTfLiteParser)
-    endif()
-    if (BUILD_ONNX_PARSER)
-        target_link_libraries(ExecuteNetwork armnnOnnxParser)
-    endif()
-    if (BUILD_ARMNN_TFLITE_DELEGATE)
-        target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnDelegate)
-    endif()
-    target_link_libraries(ExecuteNetwork armnn)
 
    target_link_libraries(ExecuteNetwork ${CMAKE_THREAD_LIBS_INIT})
    addDllCopyCommands(ExecuteNetwork)

@@ -1,5 +1,5 @@
 #
-# Copyright © 2018-2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -446,7 +446,7 @@ if (BUILD_ARMNN_TFLITE_DELEGATE)
     add_definitions(-DARMNN_TFLITE_DELEGATE)
 endif()
 
-if(BUILD_BARE_METAL)
+if(BUILD_BARE_METAL OR EXECUTE_NETWORK_STATIC)
     add_library_ex(armnn STATIC ${armnn_sources})
 else()
     if (BUILD_SHARED_LIBS)
@@ -484,7 +484,7 @@ target_link_libraries(armnn PUBLIC armnnUtils)
 target_link_libraries(armnn PUBLIC pipeCommon)
 target_link_libraries(armnn PUBLIC pipeClient)
 
-if(NOT BUILD_BARE_METAL)
+if(NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
     target_link_libraries(armnn PUBLIC ${CMAKE_DL_LIBS})
 endif()
 

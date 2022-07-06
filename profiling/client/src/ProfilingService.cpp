@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,7 +10,7 @@
 #include <common/include/ProfilingGuid.hpp>
 #include <common/include/SocketConnectionException.hpp>
 
-#if defined(ARMNN_BUILD_BARE_METAL)
+#if defined(ARMNN_BUILD_BARE_METAL) || defined(ARMNN_EXECUTE_NETWORK_STATIC)
 #include <common/include/IgnoreUnused.hpp>
 #endif
 
@@ -26,7 +26,7 @@ namespace pipe
 void ProfilingService::ResetExternalProfilingOptions(const arm::pipe::ProfilingOptions& options,
                                                      bool resetProfilingService)
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     // Update the profiling options
     m_Options = options;
     m_TimelineReporting = options.m_TimelineEnabled;
@@ -41,23 +41,23 @@ void ProfilingService::ResetExternalProfilingOptions(const arm::pipe::ProfilingO
 #else
     IgnoreUnused(options);
     IgnoreUnused(resetProfilingService);
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL || ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 bool ProfilingService::IsProfilingEnabled() const
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     return m_Options.m_EnableProfiling;
 #else
     return false;
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 ProfilingState ProfilingService::ConfigureProfilingService(
         const ProfilingOptions& options,
         bool resetProfilingService)
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     ResetExternalProfilingOptions(options, resetProfilingService);
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     if (options.m_EnableProfiling)
@@ -106,12 +106,12 @@ ProfilingState ProfilingService::ConfigureProfilingService(
     IgnoreUnused(options);
     IgnoreUnused(resetProfilingService);
     return ProfilingState::Uninitialised;
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::Update()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     if (!m_Options.m_EnableProfiling)
     {
         // Don't run if profiling is disabled
@@ -189,12 +189,12 @@ void ProfilingService::Update()
         throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
                                             static_cast<int>(currentState)));
     }
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::Disconnect()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     ProfilingState currentState = m_StateMachine.GetCurrentState();
     switch (currentState)
     {
@@ -211,7 +211,7 @@ void ProfilingService::Disconnect()
         throw arm::pipe::ProfilingException(fmt::format("Unknown profiling service state: {}",
                                                         static_cast<int>(currentState)));
     }
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 // Store a profiling context returned from a backend that support profiling, and register its counters
@@ -219,7 +219,7 @@ void ProfilingService::AddBackendProfilingContext(
     const std::string& backendId,
     std::shared_ptr<IBackendProfilingContext> profilingContext)
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     ARM_PIPE_ASSERT(profilingContext != nullptr);
     // Register the backend counters
     m_MaxGlobalCounterId = profilingContext->RegisterCounters(m_MaxGlobalCounterId);
@@ -227,7 +227,7 @@ void ProfilingService::AddBackendProfilingContext(
 #else
     IgnoreUnused(backendId);
     IgnoreUnused(profilingContext);
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 const ICounterDirectory& ProfilingService::GetCounterDirectory() const
 {
@@ -343,14 +343,14 @@ std::unique_ptr<ISendTimelinePacket> ProfilingService::GetSendTimelinePacket() c
 
 void ProfilingService::Initialize()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     m_Initialiser.InitialiseProfilingService(*this);
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::InitializeCounterValue(uint16_t counterUid)
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     // Increase the size of the counter index if necessary
     if (counterUid >= m_CounterIndex.size())
     {
@@ -365,12 +365,12 @@ void ProfilingService::InitializeCounterValue(uint16_t counterUid)
     m_CounterIndex.at(counterUid) = counterValuePtr;
 #else
     IgnoreUnused(counterUid);
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::Reset()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     // Stop the profiling service...
     Stop();
 
@@ -384,12 +384,12 @@ void ProfilingService::Reset()
     // ...finally reset the profiling state machine
     m_StateMachine.Reset();
     m_BackendProfilingContexts.clear();
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::Stop()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     {   // only lock when we are updating the inference completed variable
         std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
         m_ServiceActive = false;
@@ -411,24 +411,24 @@ void ProfilingService::Stop()
 
     // ...then move to the "NotConnected" state
     m_StateMachine.TransitionToState(ProfilingState::NotConnected);
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 inline void ProfilingService::CheckCounterUid(uint16_t counterUid) const
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     if (!IsCounterRegistered(counterUid))
     {
         throw arm::pipe::InvalidArgumentException(fmt::format("Counter UID {} is not registered", counterUid));
     }
 #else
     IgnoreUnused(counterUid);
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::NotifyBackendsForTimelineReporting()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     BackendProfilingContext::iterator it = m_BackendProfilingContexts.begin();
     while (it != m_BackendProfilingContexts.end())
     {
@@ -437,23 +437,23 @@ void ProfilingService::NotifyBackendsForTimelineReporting()
         // Increment the Iterator to point to next entry
         it++;
     }
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::NotifyProfilingServiceActive()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     {   // only lock when we are updating the inference completed variable
         std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
         m_ServiceActive = true;
     }
     m_ServiceActiveConditionVariable.notify_one();
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 void ProfilingService::WaitForProfilingServiceActivation(unsigned int timeout)
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     std::unique_lock<std::mutex> lck(m_ServiceActiveMutex);
 
     auto start = std::chrono::high_resolution_clock::now();
@@ -475,14 +475,14 @@ void ProfilingService::WaitForProfilingServiceActivation(unsigned int timeout)
     }
 #else
     IgnoreUnused(timeout);
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 ProfilingService::~ProfilingService()
 {
-#if !defined(ARMNN_BUILD_BARE_METAL)
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     Stop();
-#endif // ARMNN_BUILD_BARE_METAL
+#endif // ARMNN_BUILD_BARE_METAL && ARMNN_EXECUTE_NETWORK_STATIC
 }
 
 } // namespace pipe

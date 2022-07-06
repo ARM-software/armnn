@@ -1,5 +1,5 @@
 #
-# Copyright © 2017, 2019-2020, 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017, 2019-2020, 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 if(BUILD_ARMNN_SERIALIZER)
@@ -36,7 +36,7 @@ if(BUILD_ARMNN_SERIALIZER)
         ../armnnDeserializer/Deserializer.cpp
         )
 
-    if(BUILD_BARE_METAL)
+    if(BUILD_BARE_METAL OR EXECUTE_NETWORK_STATIC)
         add_library_ex(armnnSerializer STATIC ${armnn_serializer_sources})
     else()
         # We're going to export both a STATIC library and a SHARED library here.
@@ -52,9 +52,11 @@ if(BUILD_ARMNN_SERIALIZER)
     target_include_directories(armnnSerializer PRIVATE ../armnn)
     target_include_directories(armnnSerializer PRIVATE ../armnnUtils)
     target_include_directories(armnnSerializer PRIVATE ../../generated)
-    target_include_directories(armnnSerializer-static PRIVATE ../armnn)
-    target_include_directories(armnnSerializer-static PRIVATE ../armnnUtils)
-    target_include_directories(armnnSerializer-static PRIVATE ../../generated)
+    if (NOT BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
+        target_include_directories(armnnSerializer-static PRIVATE ../armnn)
+        target_include_directories(armnnSerializer-static PRIVATE ../armnnUtils)
+        target_include_directories(armnnSerializer-static PRIVATE ../../generated)
+    endif()
 
     list(APPEND armnn_serializer_sources
         ArmnnSchema_generated.h
@@ -64,12 +66,13 @@ if(BUILD_ARMNN_SERIALIZER)
     target_include_directories(armnnSerializer SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
     target_link_libraries(armnnSerializer armnn ${FLATBUFFERS_LIBRARY})
-
-    install(TARGETS armnnSerializer-static
-            EXPORT  armnn-targets
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    )
+    if (NOT BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
+        install(TARGETS armnnSerializer-static
+                EXPORT  armnn-targets
+                LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+                ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+    endif()
 
     install(TARGETS armnnSerializer
             EXPORT  armnn-targets

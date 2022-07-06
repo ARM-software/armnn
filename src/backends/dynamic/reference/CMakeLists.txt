@@ -1,9 +1,9 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
-if(NOT BUILD_BARE_METAL)
+if((NOT BUILD_BARE_METAL) AND (NOT EXECUTE_NETWORK_STATIC))
 
 # File needed to wrap the existing backend into a dynamic one
 list(APPEND armnnRefDynamicBackend_sources
@@ -33,5 +33,5 @@ target_include_directories(Arm_CpuRef_backend PRIVATE ${PROJECT_SOURCE_DIR}/prof
 set_target_properties(Arm_CpuRef_backend PROPERTIES PREFIX "")
 target_link_libraries(Arm_CpuRef_backend armnn)
 
-# BUILD_BARE_METAL
+# BUILD_BARE_METAL && EXECUTE_NETWORK_STATIC
 endif()

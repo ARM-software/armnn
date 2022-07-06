@@ -1,5 +1,5 @@
 #
-# Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -31,7 +31,7 @@ list(APPEND armnnTestUtils_sources
         TestUtils.hpp
         )
 
-if(NOT BUILD_BARE_METAL)
+if(NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
 list(APPEND armnnTestUtils_sources
         UnitTests.cpp
         UnitTests.hpp
@@ -41,6 +41,8 @@ endif()
 
 if(BUILD_BARE_METAL)
     add_library_ex(armnnTestUtils STATIC ${armnnTestUtils_sources})
+elseif(EXECUTE_NETWORK_STATIC)
+    add_library_ex(armnnTestUtils OBJECT ${armnnTestUtils_sources})
 else()
     add_library_ex(armnnTestUtils SHARED ${armnnTestUtils_sources})
 endif()

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,7 +20,10 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/utility/Timer.hpp>
 
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
 #include <backendsCommon/DynamicBackendUtils.hpp>
+#endif
+
 #include <backendsCommon/memoryOptimizerStrategyLibrary/MemoryOptimizerStrategyLibrary.hpp>
 
 #include <client/include/backends/IBackendProfiling.hpp>
@@ -334,11 +337,11 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
         throw RuntimeException(
                 "It is not possible to enable timeline reporting without profiling being enabled");
     }
-
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     // Load any available/compatible dynamic backend before the runtime
     // goes through the backend registry
     LoadDynamicBackends(options.m_DynamicBackendsPath);
-
+#endif
     armnn::BackendIdSet supportedBackends;
     for (const auto& id : BackendRegistryInstance().GetBackendIds())
     {
@@ -354,9 +357,11 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
             if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end() &&
                 customAllocatorMapIterator->second == nullptr)
             {
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
                 // We need to manually clean up  the dynamic backends before throwing an exception.
                 DynamicBackendUtils::DeregisterDynamicBackends(m_DeviceSpec.GetDynamicBackends());
                 m_DeviceSpec.ClearDynamicBackends();
+#endif
                 throw armnn::Exception("Allocator associated with id " + id.Get() + " is null");
             }
 
@@ -579,10 +584,11 @@ RuntimeImpl::~RuntimeImpl()
                       << std::endl;
         }
     }
-
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
     // Clear all dynamic backends.
     DynamicBackendUtils::DeregisterDynamicBackends(m_DeviceSpec.GetDynamicBackends());
     m_DeviceSpec.ClearDynamicBackends();
+#endif
     m_BackendContexts.clear();
 
     BackendRegistryInstance().SetProfilingService(armnn::EmptyOptional());
@@ -763,6 +769,7 @@ void RuntimeImpl::RegisterDebugCallback(NetworkId networkId, const DebugCallback
     loadedNetwork->RegisterDebugCallback(func);
 }
 
+#if !defined(ARMNN_BUILD_BARE_METAL) && !defined(ARMNN_EXECUTE_NETWORK_STATIC)
 void RuntimeImpl::LoadDynamicBackends(const std::string& overrideBackendPath)
 {
     // Get the paths where to load the dynamic backends from
@@ -780,5 +787,5 @@ void RuntimeImpl::LoadDynamicBackends(const std::string& overrideBackendPath)
     // Add the registered dynamic backend ids to the list of supported backends
     m_DeviceSpec.AddSupportedBackends(registeredBackendIds, true);
 }
-
+#endif
 } // namespace armnn

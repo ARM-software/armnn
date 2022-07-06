@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,6 +10,8 @@ namespace armnn
 
 namespace experimental
 {
+
+InferenceId AsyncExecutionCallback::nextID = 0u;
 
 void AsyncExecutionCallback::Notify(armnn::Status status, InferenceTimingPair timeTaken)
 {

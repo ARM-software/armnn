@@ -1,9 +1,9 @@
 #
-# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
-if(NOT BUILD_BARE_METAL)
+if(NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
 list(APPEND armnnBackendsCommon_sources
     DynamicBackend.cpp
     DynamicBackend.hpp

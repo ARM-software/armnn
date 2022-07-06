@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -68,7 +68,6 @@ private:
     armnn::Status       m_Status = Status::Failure;
     InferenceId m_InferenceId;
 };
-InferenceId AsyncExecutionCallback::nextID = 0u;
 
 // Manager to create and monitor AsyncExecutionCallbacks
 // GetNewCallback will create a callback for use in Threadpool::Schedule

@@ -1,8 +1,8 @@
 #
-# Copyright © 2018-2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-if (NOT BUILD_BARE_METAL)
+if (NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
    if(BUILD_SAMPLE_APP AND ARMNNREF)
         add_executable(SimpleSample SimpleSample.cpp)
         target_link_libraries(SimpleSample armnn ${CMAKE_THREAD_LIBS_INIT})

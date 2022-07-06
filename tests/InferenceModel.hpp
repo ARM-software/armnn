@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,7 +7,12 @@
 
 
 #include <armnn/ArmNN.hpp>
+
+#if !defined(ARMNN_DISABLE_THREADS)
 #include <armnn/Threadpool.hpp>
+#include <common/include/IgnoreUnused.hpp>
+#endif
+
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
 #include <armnn/BackendRegistry.hpp>
@@ -511,7 +516,7 @@ public:
 
             ARMNN_LOG(info) << "Network loading time: " << std::setprecision(2)
                             << std::fixed << armnn::GetTimeDuration(loading_start_time).count() << " ms.";
-
+#if !defined(ARMNN_DISABLE_THREADS)
             if (params.m_AsyncEnabled && params.m_ThreadPoolSize > 0)
             {
                 std::vector<std::shared_ptr<armnn::IWorkingMemHandle>> memHandles;
@@ -524,6 +529,7 @@ public:
                                                                    m_Runtime.get(),
                                                                    memHandles);
             }
+#endif
         }
 
         if (ret == armnn::Status::Failure)
@@ -683,6 +689,7 @@ public:
                   std::vector<armnnUtils::TContainer>& outputContainers,
                   std::shared_ptr<armnn::IAsyncExecutionCallback> cb)
     {
+#if !defined(ARMNN_DISABLE_THREADS)
         for (unsigned int i = 0; i < outputContainers.size(); ++i)
         {
             const unsigned int expectedOutputDataSize = GetOutputSize(i);
@@ -714,6 +721,7 @@ public:
         {
             profiler->Print(std::cout);
         }
+#endif
     }
 
     const armnn::BindingPointInfo& GetInputBindingInfo(unsigned int inputIndex = 0u) const
@@ -770,7 +778,9 @@ public:
 private:
     armnn::NetworkId m_NetworkIdentifier;
     std::shared_ptr<armnn::IRuntime> m_Runtime;
+#if !defined(ARMNN_DISABLE_THREADS)
     std::unique_ptr<armnn::Threadpool> m_Threadpool;
+#endif
 
     std::vector<armnn::BindingPointInfo> m_InputBindings;
     std::vector<armnn::BindingPointInfo> m_OutputBindings;

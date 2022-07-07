@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,6 +15,7 @@
 #include <armnn/utility/NumericCast.hpp>
 
 #include <armnnUtils/TContainer.hpp>
+#include "NetworkExecutionUtils/NetworkExecutionUtils.hpp"
 
 #include <common/include/ProfilingGuid.hpp>
 
@@ -45,40 +46,6 @@
 #include <string>
 #include <vector>
 #include <type_traits>
-
-namespace
-{
-
-inline bool CheckRequestedBackendsAreValid(const std::vector<armnn::BackendId>& backendIds,
-                                           armnn::Optional<std::string&> invalidBackendIds = armnn::EmptyOptional())
-{
-    if (backendIds.empty())
-    {
-        return false;
-    }
-
-    armnn::BackendIdSet validBackendIds = armnn::BackendRegistryInstance().GetBackendIds();
-
-    bool allValid = true;
-    for (const auto& backendId : backendIds)
-    {
-        if (std::find(validBackendIds.begin(), validBackendIds.end(), backendId) == validBackendIds.end())
-        {
-            allValid = false;
-            if (invalidBackendIds)
-            {
-                if (!invalidBackendIds.value().empty())
-                {
-                    invalidBackendIds.value() += ", ";
-                }
-                invalidBackendIds.value() += backendId;
-            }
-        }
-    }
-    return allValid;
-}
-
-} // anonymous namespace
 
 namespace InferenceModelInternal
 {

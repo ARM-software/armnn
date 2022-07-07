@@ -144,6 +144,9 @@ if (BUILD_ARMNN_SERIALIZER
         OR BUILD_ONNX_PARSER
         OR BUILD_ARMNN_TFLITE_DELEGATE)
     set(ExecuteNetwork_sources
+        ExecuteNetwork/IExecutor.hpp
+        ExecuteNetwork/ArmNNExecutor.cpp
+        ExecuteNetwork/ArmNNExecutor.hpp
         ExecuteNetwork/ExecuteNetwork.cpp
         ExecuteNetwork/ExecuteNetworkProgramOptions.cpp
         ExecuteNetwork/ExecuteNetworkProgramOptions.hpp
@@ -151,6 +154,13 @@ if (BUILD_ARMNN_SERIALIZER
         ExecuteNetwork/ExecuteNetworkParams.hpp
         NetworkExecutionUtils/NetworkExecutionUtils.cpp
         NetworkExecutionUtils/NetworkExecutionUtils.hpp)
+
+    if(BUILD_ARMNN_TFLITE_DELEGATE)
+        set(ExecuteNetwork_sources
+            ${ExecuteNetwork_sources}
+            ExecuteNetwork/TfliteExecutor.cpp
+            ExecuteNetwork/TfliteExecutor.hpp)
+    endif()
 
     add_executable_ex(ExecuteNetwork ${ExecuteNetwork_sources})
     target_include_directories(ExecuteNetwork PRIVATE ../src/armnn)

@@ -2949,4 +2949,17 @@ OptimizedNetworkImpl::~OptimizedNetworkImpl()
 {
 }
 
+void IOptimizedNetwork::ExecuteStrategy(IStrategy &strategy) const
+{
+    pOptimizedNetworkImpl->ExecuteStrategy(strategy);
+}
+
+void OptimizedNetworkImpl::ExecuteStrategy(IStrategy &strategy) const
+{
+    for (auto layer : GetGraph())
+    {
+        layer->ExecuteStrategy(strategy);
+    };
+}
+
 } // namespace armnn

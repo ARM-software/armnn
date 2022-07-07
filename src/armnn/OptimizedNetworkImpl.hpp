@@ -25,7 +25,10 @@ public:
     virtual size_t GetNumOutputs() const;
 
     Graph& GetGraph() { return *m_Graph; }
+    Graph& GetGraph() const { return *m_Graph; }
     ModelOptions& GetModelOptions() { return m_ModelOptions; }
+
+    void ExecuteStrategy(IStrategy& strategy) const;
 
 private:
     std::unique_ptr<Graph> m_Graph;

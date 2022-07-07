@@ -301,16 +301,30 @@ inline std::ostream& operator<<(std::ostream& os, Status stat)
 }
 
 
-inline std::ostream & operator<<(std::ostream & os, const armnn::TensorShape & shape)
+inline std::ostream& operator<<(std::ostream& os, const armnn::TensorShape& shape)
 {
     os << "[";
-    for (uint32_t i=0; i<shape.GetNumDimensions(); ++i)
+    if (shape.GetDimensionality() != Dimensionality::NotSpecified)
     {
-        if (i!=0)
+        for (uint32_t i = 0; i < shape.GetNumDimensions(); ++i)
         {
-            os << ",";
+            if (i != 0)
+            {
+                os << ",";
+            }
+            if (shape.GetDimensionSpecificity(i))
+            {
+                os << shape[i];
+            }
+            else
+            {
+                os << "?";
+            }
         }
-        os << shape[i];
+    }
+    else
+    {
+        os << "Dimensionality Not Specified";
     }
     os << "]";
     return os;

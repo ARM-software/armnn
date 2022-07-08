@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a3cf241de1f68f90ebfefe0c7e3d6e7c67c36915" #Add G57 to GPUTarget
+DEFAULT_CLFRAMEWORKREVISION="22dd8b9014112fe446cb8cff6d52933d2603a97f" #Add missing flag when building cl graph examples and fix incorrect cl cache behaviour
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

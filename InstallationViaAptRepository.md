@@ -15,7 +15,7 @@
 These are the step by step instructions on how to install the Arm NN core, TensorflowLite Parser
 as well as PyArmNN for x86_64, Arm64 and Armhf for Ubuntu 20.04.
 The packages will also be added to Debian Bullseye, their progress can be tracked here:
-https://tracker.debian.org/pkg/armnn
+https://tracker.debian.org/pkg/armnn.
 
 
 ## Add the Ubuntu Launchpad PPA to your system

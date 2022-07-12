@@ -40,7 +40,7 @@ All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` 
 ## Install Cmake
 Cmake 3.19rc3 is required to build Arm NN.
 
-'''
+```bash
 cd $HOME/armnn-devenv
 sudo apt-get install libssl-dev
 wget https://github.com/Kitware/CMake/releases/download/v3.19.0-rc3/cmake-3.19.0-rc3.tar.gz
@@ -49,7 +49,7 @@ cd cmake-3.19.0-rc3
 ./bootstrap --prefix=$HOME/armnn-devenv/cmake/install
 make all install
 cd..
-'''
+```
 
 ## Build Google's Protobuf library (Optional)
 
@@ -63,13 +63,13 @@ cd protobuf
 git checkout -b v3.12.0 v3.12.0
 ```
 
-* Build a native (x86) version of the protobuf libraries and compiler (protoc): 
+* Build a native (x86) version of the protobuf libraries and compiler (protoc):
   (Requires cUrl, autoconf, llibtool, and other build dependencies if not previously installed: `sudo apt install curl autoconf libtool build-essential g++`)
 ```bash
 ./autogen.sh
-mkdir x86_build
-cd x86_build
-../configure --prefix=$HOME/armnn-devenv/google/x86_pb_install
+mkdir x86_64_build
+cd x86_64_build
+../configure --prefix=$HOME/armnn-devenv/google/x86_64_pb_install
 make install -j16
 cd ..
 ```
@@ -85,7 +85,7 @@ CFLAGS="-fPIE -fPIC" \
    ../configure --host=aarch64-linux-android \
    --prefix=$HOME/armnn-devenv/google/arm64_pb_install \
    --enable-cross-compile \
-   --with-protoc=$HOME/armnn-devenv/google/x86_pb_install/bin/protoc
+   --with-protoc=$HOME/armnn-devenv/google/x86_64_pb_install/bin/protoc
 make install -j16
 cd ..
 ```

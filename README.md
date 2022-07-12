@@ -107,7 +107,7 @@ When the feature is implemented the 'Help wanted' label will be removed.
 ## Contributions
 The Arm NN project welcomes contributions. For more details on contributing to Arm NN please see the
 [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website,
-or see the [Contributor Guide](ContributorGuide.md).
+or see the [Contributor Guide](CONTRIBUTING.md).
 
 Particularly if you'd like to implement your own backend next to our CPU, GPU and NPU backends there are guides for
 backend development: [Backend development guide](src/backends/README.md),

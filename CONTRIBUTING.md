@@ -1,6 +1,24 @@
 # Contribution Guidelines
 
-The Arm NN project is open for external contributors and welcomes contributions. Arm NN is licensed under the [MIT license](https://spdx.org/licenses/MIT.html) and all accepted contributions must have the same license. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website.
+The Arm NN project is open for external contributors and welcomes contributions. Arm NN is licensed under the [MIT license](https://spdx.org/licenses/MIT.html) and all accepted contributions must have the same license. Below is an overview on contributing code to ArmNN. For more details on contributing to Arm NN see the [Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website.
+
+## Contributing code to Arm NN
+
+- All code reviews are performed on [Linaro ML Platform Gerrit](https://review.mlplatform.org)
+- GitHub account credentials are required for creating an account on ML Platform
+- Setup Arm NN git repo
+  - git clone https://review.mlplatform.org/ml/armnn
+  - cd armnn
+  - git checkout master
+  - git pull (not required upon initial clone but good practice before creating a patch)
+  - git config user.name "FIRST_NAME SECOND_NAME"
+  - git config user.email your@email.address
+- Commit using sign-off and push patch for code review
+  - git commit -s
+  - git push origin HEAD:refs/for/master
+- Patch will appear on ML Platform Gerrit [here](https://review.mlplatform.org/q/is:open+project:ml/armnn+branch:master)
+- See below for adding details of copyright notice and developer certificate
+of origin sign off
 
 ## Developer Certificate of Origin (DCO)
 

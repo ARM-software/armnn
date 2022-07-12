@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -63,6 +63,26 @@ TEST_CASE ("Exp_Float32_GpuAcc_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_EXP, backends, inputValues, expectedOutputValues);
 }
 
+TEST_CASE ("Log_Float32_GpuAcc_Test")
+{
+    // Create the ArmNN Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
+    // Set input data
+    std::vector<float> inputValues
+    {
+        1.0f, 1.0f,  2.0f,
+        3.0f,  4.0f, 2.71828f
+    };
+    // Set output data
+    std::vector<float> expectedOutputValues
+    {
+        0.f,  0.f,  0.69314718056f,
+        1.09861228867f, 1.38629436112f, 0.99999932734f
+    };
+
+    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_LOG, backends, inputValues, expectedOutputValues);
+}
+
 TEST_CASE ("Neg_Float32_GpuAcc_Test")
 {
     // Create the ArmNN Delegate
@@ -103,6 +123,25 @@ TEST_CASE ("Rsqrt_Float32_GpuAcc_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_RSQRT, backends, inputValues, expectedOutputValues);
 }
 
+TEST_CASE ("Sin_Float32_GpuAcc_Test")
+{
+    // Create the ArmNN Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
+    // Set input data
+    std::vector<float> inputValues
+    {
+            0.0f, 1.0f, 16.0f,
+            0.5f, 36.0f, -1.f
+    };
+    // Set output data
+    std::vector<float> expectedOutputValues
+    {
+            0.0f, 0.8414709848f, -0.28790331666f,
+            0.4794255386f, -0.99177885344f, -0.8414709848f
+    };
+
+    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_SIN, backends, inputValues, expectedOutputValues);
+}
 } // TEST_SUITE("ElementwiseUnary_GpuAccTests")
 
 
@@ -152,6 +191,26 @@ TEST_CASE ("Exp_Float32_CpuAcc_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_EXP, backends, inputValues, expectedOutputValues);
 }
 
+TEST_CASE ("Log_Float32_CpuAcc_Test")
+{
+    // Create the ArmNN Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    // Set input data
+    std::vector<float> inputValues
+    {
+        1.0f, 1.0f,  2.0f,
+        3.0f,  4.0f, 2.71828f
+    };
+    // Set output data
+    std::vector<float> expectedOutputValues
+    {
+        0.f,  0.f,  0.69314718056f,
+        1.09861228867f, 1.38629436112f, 0.99999932734f
+    };
+
+    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_LOG, backends, inputValues, expectedOutputValues);
+}
+
 TEST_CASE ("Neg_Float32_CpuAcc_Test")
 {
     // Create the ArmNN Delegate
@@ -192,6 +251,25 @@ TEST_CASE ("Rsqrt_Float32_CpuAcc_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_RSQRT, backends, inputValues, expectedOutputValues);
 }
 
+TEST_CASE ("Sin_Float32_CpuAcc_Test")
+{
+    // Create the ArmNN Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    // Set input data
+    std::vector<float> inputValues
+    {
+        0.0f, 1.0f, 16.0f,
+        0.5f, 36.0f, -1.f
+    };
+    // Set output data
+    std::vector<float> expectedOutputValues
+    {
+        0.0f, 0.8414709848f, -0.28790331666f,
+        0.4794255386f, -0.99177885344f, -0.8414709848f
+    };
+
+    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_SIN, backends, inputValues, expectedOutputValues);
+}
 } // TEST_SUITE("ElementwiseUnary_CpuAccTests")
 
 TEST_SUITE("ElementwiseUnary_CpuRefTests")
@@ -237,6 +315,26 @@ TEST_CASE ("Exp_Float32_CpuRef_Test")
     };
 
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_EXP, backends, inputValues, expectedOutputValues);
+}
+
+TEST_CASE ("Log_Float32_CpuRef_Test")
+{
+    // Create the ArmNN Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    // Set input data
+    std::vector<float> inputValues
+    {
+        1.0f, 1.0f,  2.0f,
+        3.0f,  4.0f, 2.71828f
+    };
+    // Set output data
+    std::vector<float> expectedOutputValues
+    {
+        0.f,  0.f,  0.69314718056f,
+        1.09861228867f, 1.38629436112f, 0.99999932734f
+    };
+
+    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_LOG, backends, inputValues, expectedOutputValues);
 }
 
 TEST_CASE ("Neg_Float32_CpuRef_Test")
@@ -298,6 +396,25 @@ TEST_CASE ("Sqrt_Float32_CpuRef_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_SQRT, backends, inputValues, expectedOutputValues);
 }
 
+TEST_CASE ("Sin_Float32_CpuRef_Test")
+{
+    // Create the ArmNN Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    // Set input data
+    std::vector<float> inputValues
+    {
+            0.0f, 1.0f, 16.0f,
+            0.5f, 36.0f, -1.f
+    };
+    // Set output data
+    std::vector<float> expectedOutputValues
+    {
+            0.0f, 0.8414709848f, -0.28790331666f,
+            0.4794255386f, -0.99177885344f, -0.8414709848f
+    };
+
+    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_SIN, backends, inputValues, expectedOutputValues);
+}
 } // TEST_SUITE("ElementwiseUnary_CpuRefTests")
 
 } // namespace armnnDelegate

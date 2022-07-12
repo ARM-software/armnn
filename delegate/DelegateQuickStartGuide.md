@@ -42,8 +42,7 @@ Pre-requisites:
  * numpy (Depends on TfLite version)
  * tflite_runtime (>=2.5, depends on Arm NN Delegate)
 
-If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md). Otherwise, 
-you can download the binaries [here](https://github.com/ARM-software/armnn/releases/)
+If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md). Otherwise, you can download the binaries [here](https://github.com/ARM-software/armnn/releases/).
 
 We recommend creating a virtual environment for this tutorial. For the following code to work python3 is needed. Please
 also check the documentation of the TfLite version you want to use. There might be additional prerequisites for the python

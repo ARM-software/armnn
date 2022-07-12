@@ -20,10 +20,10 @@
 These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 Ubuntu Linux system. This build flow has been tested with Ubuntu 18.04 and 20.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Protobuf, Tflite, Flatbuffer and Compute Libraries.
 Start by creating a directory to contain all components:
 
-'''
+```
 mkdir $HOME/armnn-devenv
 cd $HOME/armnn-devenv
-'''
+```
 
 ## Cross-compiling ToolChain
 * Install the standard cross-compilation libraries for arm64:
@@ -34,7 +34,7 @@ sudo apt install crossbuild-essential-arm64
 ## Install Cmake
 Cmake 3.19rc3 is required to build TF Lite Delegate.
 
-'''
+```
 sudo apt-get install libssl-dev
 wget https://github.com/Kitware/CMake/releases/download/v3.19.0-rc3/cmake-3.19.0-rc3.tar.gz
 tar -zxvf cmake-3.19.0-rc3.tar.gz
@@ -42,14 +42,14 @@ cd cmake-3.19.0-rc3
 ./bootstrap --prefix=$HOME/armnn-devenv/cmake/install
 make all install
 cd..
-'''
+```
 
 
 ## Build and install Google's Protobuf library
 
 We support protobuf version 3.12.0
-* Get protobuf from here: https://github.com/protocolbuffers/protobuf: 
-  (Requires Git if not previously installed: `sudo apt install git`) 
+* Get protobuf from here: https://github.com/protocolbuffers/protobuf:
+  (Requires Git if not previously installed: `sudo apt install git`)
 ```bash
 git clone -b v3.12.0 https://github.com/google/protobuf.git protobuf
 cd protobuf

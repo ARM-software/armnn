@@ -256,6 +256,6 @@ std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDele
 armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get());
 ```
 
-For further information on using TfLite Delegates please visit the [tensorflow website](https://www.tensorflow.org/lite/guide)
+For further information on using TfLite Delegates please visit the [tensorflow website](https://www.tensorflow.org/lite/guide).
 
 For more details of the kind of options you can pass to the Arm NN delegate please check the parameters of function tflite_plugin_create_delegate.

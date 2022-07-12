@@ -722,6 +722,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                            tfLiteNode,
                                                            nodeIndex,
                                                            kTfLiteBuiltinLocalResponseNormalization);
+        case kTfLiteBuiltinLog:
+            return VisitElementwiseUnaryOperator(delegateData,
+                                                 tfLiteContext,
+                                                 tfLiteNode,
+                                                 nodeIndex,
+                                                 armnn::UnaryOperation::Log);
         case kTfLiteBuiltinLogicalAnd:
             return VisitLogicalBinaryOperator(delegateData,
                                               tfLiteContext,
@@ -910,6 +916,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                       tfLiteNode,
                                       nodeIndex,
                                       kTfLiteBuiltinShape);
+        case kTfLiteBuiltinSin:
+            return VisitElementwiseUnaryOperator(delegateData,
+                                                 tfLiteContext,
+                                                 tfLiteNode,
+                                                 nodeIndex,
+                                                 armnn::UnaryOperation::Sin);
         case kTfLiteBuiltinSplit:
             return VisitSplitOperator(delegateData,
                                       tfLiteContext,

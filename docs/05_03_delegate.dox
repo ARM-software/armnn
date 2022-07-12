@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2022 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -89,6 +89,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - LOCAL_RESPONSE_NORMALIZATION
 
+- LOG
+
 - LOGICAL_AND
 
 - LOGICAL_NOT
@@ -150,6 +152,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - RSQRT
 
 - SHAPE
+
+- SIN
 
 - SOFTMAX
 

@@ -144,6 +144,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - LEAKY_RELU
 - LESS
 - LESS_EQUAL
+- LOG
 - LOGICAL_NOT
 - LOGISTIC
 - LOG_SOFTMAX
@@ -171,6 +172,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - RESIZE_NEAREST_NEIGHBOR
 - RSQRT
 - SHAPE
+- SIN
 - SLICE
 - SOFTMAX
 - SPACE_TO_BATCH

@@ -708,6 +708,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_LESS_EQUAL]              = &TfLiteParserImpl::ParseLessOrEqual;
     m_ParserFunctions[tflite::BuiltinOperator_LOCAL_RESPONSE_NORMALIZATION]
             = &TfLiteParserImpl::ParseLocalResponseNormalization;
+    m_ParserFunctions[tflite::BuiltinOperator_LOG]                     = &TfLiteParserImpl::ParseLog;
     m_ParserFunctions[tflite::BuiltinOperator_LOGICAL_NOT]             = &TfLiteParserImpl::ParseLogicalNot;
     m_ParserFunctions[tflite::BuiltinOperator_LOGISTIC]                = &TfLiteParserImpl::ParseLogistic;
     m_ParserFunctions[tflite::BuiltinOperator_LOG_SOFTMAX]             = &TfLiteParserImpl::ParseLogSoftmax;
@@ -736,6 +737,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_RSQRT]                   = &TfLiteParserImpl::ParseRsqrt;
     m_ParserFunctions[tflite::BuiltinOperator_SQRT]                    = &TfLiteParserImpl::ParseSqrt;
     m_ParserFunctions[tflite::BuiltinOperator_SHAPE]                   = &TfLiteParserImpl::ParseShape;
+    m_ParserFunctions[tflite::BuiltinOperator_SIN]                     = &TfLiteParserImpl::ParseSin;
     m_ParserFunctions[tflite::BuiltinOperator_SLICE]                   = &TfLiteParserImpl::ParseSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]                 = &TfLiteParserImpl::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND]       = &TfLiteParserImpl::ParseSpaceToBatchND;
@@ -4160,16 +4162,6 @@ void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, R
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, outputTensorIndexes);
 }
 
-void TfLiteParserImpl::ParseAbs(size_t subgraphIndex, size_t operatorIndex)
-{
-    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Abs);
-}
-
-void TfLiteParserImpl::ParseExp(size_t subgraphIndex, size_t operatorIndex)
-{
-    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Exp);
-}
-
 void TfLiteParserImpl::ParseLocalResponseNormalization(size_t subgraphIndex, size_t operatorIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
@@ -4214,6 +4206,21 @@ void TfLiteParserImpl::ParseLocalResponseNormalization(size_t subgraphIndex, siz
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
+void TfLiteParserImpl::ParseAbs(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Abs);
+}
+
+void TfLiteParserImpl::ParseExp(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Exp);
+}
+
+void TfLiteParserImpl::ParseLog(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Log);
+}
+
 void TfLiteParserImpl::ParseLogicalNot(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::LogicalNot);
@@ -4227,6 +4234,11 @@ void TfLiteParserImpl::ParseNeg(size_t subgraphIndex, size_t operatorIndex)
 void TfLiteParserImpl::ParseRsqrt(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Rsqrt);
+}
+
+void TfLiteParserImpl::ParseSin(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Sin);
 }
 
 void TfLiteParserImpl::ParseSqrt(size_t subgraphIndex, size_t operatorIndex)

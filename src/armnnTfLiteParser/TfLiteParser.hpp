@@ -143,6 +143,7 @@ private:
     void ParseLeakyRelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseLess(size_t subgraphIndex, size_t operatorIndex);
     void ParseLessOrEqual(size_t subgraphIndex, size_t operatorIndex);
+    void ParseLog(size_t subgraphIndex, size_t operatorIndex);
     void ParseLocalResponseNormalization(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogicalNot(size_t subgraphIndex, size_t operatorIndex);
     void ParseLogistic(size_t subgraphIndex, size_t operatorIndex);
@@ -173,6 +174,7 @@ private:
     void ParseResizeNearestNeighbor(size_t subgraphIndex, size_t operatorIndex);
     void ParseRsqrt(size_t subgraphIndex, size_t operatorIndex);
     void ParseShape(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSin(size_t subgraphIndex, size_t operatorIndex);
     void ParseSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSoftmax(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqrt(size_t subgraphIndex, size_t operatorIndex);

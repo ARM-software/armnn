@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -104,6 +104,19 @@ TEST_CASE_FIXTURE(SimpleExpFixture, "ParseExp")
                                                                 20.0855185f, 54.5980834f, 148.4129329f} } });
 }
 
+struct SimpleLogFixture : public ElementWiseUnaryFixture
+{
+    SimpleLogFixture() : ElementWiseUnaryFixture("LOG", "FLOAT32", "[ 1, 2, 3, 1 ]", "[ 1, 2, 3, 1 ]") {}
+};
+
+TEST_CASE_FIXTURE(SimpleLogFixture, "ParseLog")
+{
+    RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor", {  1.0f, 1.0f,  2.0f,
+                                                                3.0f,  4.0f, 2.71828f} }},
+                                         {{ "outputTensor",{ 0.f,  0.f,  0.69314718056f,
+                                                             1.09861228867f, 1.38629436112f, 0.99999932734f} } });
+}
+
 struct SimpleLogicalNotFixture : public ElementWiseUnaryFixture
 {
     SimpleLogicalNotFixture() : ElementWiseUnaryFixture("LOGICAL_NOT", "BOOL", "[ 1, 1, 1, 4 ]", "[ 1, 1, 1, 4 ]") {}
@@ -152,6 +165,19 @@ TEST_CASE_FIXTURE(SimpleSqrtFixture, "ParseSqrt")
                                                                 25.0f, 36.0f, 49.0f } }},
                                          {{ "outputTensor",{ 3.0f, 2.0f, 4.0f,
                                                              5.0f, 6.0f, 7.0f} }});
+}
+
+struct SimpleSinFixture : public ElementWiseUnaryFixture
+{
+    SimpleSinFixture() : ElementWiseUnaryFixture("SIN", "FLOAT32", "[ 1, 2, 3, 1 ]", "[ 1, 2, 3, 1 ]") {}
+};
+
+TEST_CASE_FIXTURE(SimpleSinFixture, "ParseSin")
+{
+    RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor", { 0.0f, 1.0f, 16.0f,
+                                                                0.5f, 36.0f, -1.f } }},
+                                         {{ "outputTensor",{ 0.0f, 0.8414709848f, -0.28790331666f,
+                                                             0.4794255386f, -0.99177885344f, -0.8414709848f} }});
 }
 
 }

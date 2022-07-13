@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2cc50b39613cea5e55c8a4851ee08d284a3d4f66" #Extended direct conv 2d interface for tuning the OpenCl kernel
+DEFAULT_CLFRAMEWORKREVISION="2186aef84fe1206545f6d5bc321752044fdd1b3d" #List licenses used by other projects in README
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

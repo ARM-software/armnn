@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2186aef84fe1206545f6d5bc321752044fdd1b3d" #List licenses used by other projects in README
+DEFAULT_CLFRAMEWORKREVISION="4bfc70e31766587c951204c93a127a486e007d0c" #Add Gemm MMUL Reshaped Only Rhs Support for FP32/FP16
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4bfc70e31766587c951204c93a127a486e007d0c" #Add Gemm MMUL Reshaped Only Rhs Support for FP32/FP16
+DEFAULT_CLFRAMEWORKREVISION="a1f7851e2f776610019db8725c2963c36b0c85eb" #Integrate new winograd APIs from MLTech
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

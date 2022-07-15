@@ -447,7 +447,7 @@ if (BUILD_ARMNN_TFLITE_DELEGATE)
     set(ARMNN_SUB_PROJECT ON)
     set(ARMNN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     add_subdirectory(delegate)
-    add_definitions(-DARMNN_TF_LITE_DELEGATE)
+    add_definitions(-DARMNN_TFLITE_DELEGATE)
 endif()
 
 if(BUILD_BARE_METAL)

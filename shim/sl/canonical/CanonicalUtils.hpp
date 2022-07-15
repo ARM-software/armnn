@@ -55,10 +55,11 @@ bool isQuantizedOperand(const OperandType& operandType);
 
 std::string GetModelSummary(const Model& model);
 
+template <typename TensorType>
 void DumpTensor(const std::string& dumpDir,
                 const std::string& requestName,
                 const std::string& tensorName,
-                const armnn::ConstTensor& tensor);
+                const TensorType& tensor);
 
 void DumpJsonProfilingIfRequired(bool gpuProfilingEnabled,
                                  const std::string& dumpDir,

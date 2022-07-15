@@ -1060,7 +1060,7 @@ int main(int argc, const char* argv[])
                 ProgramOptions.m_ExNetParams.m_TfLiteExecutor ==
                     ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
         {
-        #if defined(ARMNN_TF_LITE_DELEGATE)
+        #if defined(ARMNN_TFLITE_DELEGATE)
             return TfLiteDelegateMainImpl(ProgramOptions.m_ExNetParams, ProgramOptions.m_RuntimeOptions);
         #else
             ARMNN_LOG(fatal) << "Not built with Arm NN Tensorflow-Lite delegate support.";

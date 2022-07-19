@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a1f7851e2f776610019db8725c2963c36b0c85eb" #Integrate new winograd APIs from MLTech
+DEFAULT_CLFRAMEWORKREVISION="99c46475daf277aa53e6747f9e41209f418fed33" #Fix multi_isa build failure after Winograd integration
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

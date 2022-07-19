@@ -932,15 +932,15 @@ bool Converter::ConvertConv2d(const Operation& operation, const Model& model, Co
     }
 
     LayerInputHandle weightsInput = (desc.m_DataLayout == DataLayout::NCHW)
-                                      ? ConvertToLayerInputHandle(operation, 1, model, data, OHWIToOIHW)
-                                      : ConvertToLayerInputHandle(operation, 1, model, data);
+                                      ? ConvertToLayerInputHandle(operation, 1, model, data, OHWIToOIHW, &input)
+                                      : ConvertToLayerInputHandle(operation, 1, model, data, g_DontPermute, &input);
 
     if (!weightsInput.IsValid())
     {
         return Fail("%s: Operation has invalid inputs", __func__);
     }
 
-    LayerInputHandle biasInput = ConvertToLayerInputHandle(operation, 2, model, data); // 1D
+    LayerInputHandle biasInput = ConvertToLayerInputHandle(operation, 2, model, data, g_DontPermute, &input); // 1D
     if (!biasInput.IsValid())
     {
         return Fail("%s: Operation has invalid inputs", __func__);
@@ -1165,7 +1165,7 @@ bool Converter::ConvertDepthwiseConv2d(const Operation& operation, const Model& 
     unsigned int widthIndex  = dataLayoutIndexed.GetWidthIndex();
     unsigned int heightIndex = dataLayoutIndexed.GetHeightIndex();
 
-    LayerInputHandle weightsInput = ConvertToLayerInputHandle(operation, 1, model, data);
+    LayerInputHandle weightsInput = ConvertToLayerInputHandle(operation, 1, model, data, g_DontPermute, &input);
     if (!weightsInput.IsValid())
     {
         return Fail("%s: Operation has invalid inputs", __func__);
@@ -1177,7 +1177,7 @@ bool Converter::ConvertDepthwiseConv2d(const Operation& operation, const Model& 
         return Fail("%s: Could not read bias", __func__);
     }
 
-    LayerInputHandle biasInput = ConvertToLayerInputHandle(operation, 2, model, data); // 1D
+    LayerInputHandle biasInput = ConvertToLayerInputHandle(operation, 2, model, data, g_DontPermute, &input); // 1D
     if (!biasInput.IsValid())
     {
         return Fail("%s: Operation has invalid inputs", __func__);

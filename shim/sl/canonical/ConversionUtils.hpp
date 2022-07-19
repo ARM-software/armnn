@@ -700,7 +700,8 @@ ConstTensorPin ConvertOperandToConstTensorPin(const Operand& operand,
                                               const ConversionData& data,
                                               const armnn::PermutationVector& dimensionMappings = g_DontPermute,
                                               const armnn::TensorShape* overrideTensorShape = nullptr,
-                                              bool optional = false);
+                                              bool optional = false,
+                                              const armnn::DataType* overrideDataType = nullptr);
 
 inline ConstTensorPin ConvertOperationInputToConstTensorPin(
         const Operation& operation,
@@ -924,7 +925,8 @@ LayerInputHandle ConvertToLayerInputHandle(const Operation& operation,
                                            uint32_t inputIndex,
                                            const Model& model,
                                            ConversionData& data,
-                                           const armnn::PermutationVector& dimensionMappings = g_DontPermute);
+                                           const armnn::PermutationVector& dimensionMappings = g_DontPermute,
+                                           const LayerInputHandle* inputHandle = nullptr);
 
 bool SetupAndTrackLayerOutputSlot(const Operation& operation,
                                   uint32_t operationOutputIndex,

@@ -789,7 +789,7 @@ int MainImpl(const ExecuteNetworkParams& params,
         {
             try
             {
-                ARMNN_LOG(info) << "Asynchronous execution with Arm NN thread pool...  \n";
+                ARMNN_LOG(info) << "Asynchronous Execution with Arm NN thread pool...  \n";
                 armnn::AsyncCallbackManager callbackManager;
                 std::unordered_map<armnn::InferenceId, std::vector<armnnUtils::TContainer>&> inferenceOutputMap;
 

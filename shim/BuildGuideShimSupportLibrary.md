@@ -141,10 +141,13 @@ make
 
 ## Build Arm NN Shim
 
-By default the Arm NN shim Android.bp is not enabled.
-Enable it by editing armnn/shim/Android.bp and setting `enabled: true`
+By default the Arm NN shim Android.bp.off is not enabled.
+It is enabled below by renaming it to Android.bp
 
 ```bash
+cd ${WORKING_DIR}/armnn/shim
+mv Android.bp.off Android.bp
+
 cd $AOSP_ROOT
 source build/envsetup.sh
 lunch <device>-eng

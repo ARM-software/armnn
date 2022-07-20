@@ -90,7 +90,7 @@ cc_defaults {
 cc_binary {
     name: "android.hardware.neuralnetworks-shim-service-armnn",
     srcs: ["./shimservice.cpp"],
-    enabled: false,
+    enabled: true,
     defaults: ["NeuralNetworksShimArmnnDriverAidl_server_defaults"],
     init_rc: ["./config/android.hardware.neuralnetworks-shim-service-armnn.rc"],
     vintf_fragments: ["./config/android.hardware.neuralnetworks-shim-service-armnn.xml"],

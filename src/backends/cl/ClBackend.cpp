@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -564,6 +564,31 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                 // Replace existing baselayer with new subgraph.
                 ReplaceLayers<ReduceLayer>(optimizationViews, baseLayer, layers);
                 untouched.erase(baseLayer->GetGuid());
+            }
+        }
+
+        // Special case to fuse padding into average pooling 2d for quantized datatype.
+        // Required to be done as a backend specific optimization as Neon does not support this special case.
+        if (base.GetType() == LayerType::Pooling2d)
+        {
+            Pooling2dLayer* baseLayer = PolymorphicDowncast<Pooling2dLayer*>(&base);
+            Pooling2dDescriptor poolingDescriptor = baseLayer->GetParameters();
+
+            if (baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Pad)
+            {
+                PadLayer* padLayer = PolymorphicDowncast<PadLayer*>(
+                    &baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer());
+                if (padLayer->GetOutputSlot(0).GetNumConnections() == 1 &&
+                    optimizations::pad_fold::TryFoldPadIntoLayer2d(padLayer->GetParameters(),
+                                                                   poolingDescriptor,
+                                                                   padLayer->GetOutputSlot().GetTensorInfo(),
+                                                                   true))
+                {
+                    FoldPadIntoAveragePool2d<Pooling2dLayer>(optimizationViews, baseLayer,
+                                                             poolingDescriptor, padLayer);
+                    untouched.erase(baseLayer->GetGuid());
+                    untouched.erase(padLayer->GetGuid());
+                }
             }
         }
     }

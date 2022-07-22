@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -472,6 +472,68 @@ TEST_CASE("FoldPadLayerIntoPooling2dLayer_MaxPoolingLayerWithLargePadValueShould
                              &IsLayerOfType<PadLayer>,
                              checkSimplePool2d,
                              &IsLayerOfType<OutputLayer>));
+}
+
+TEST_CASE("FoldPadLayerIntoPooling2dLayer_QuantizedAveragePoolingShouldNotBeFolded")
+{
+    Graph              graph;
+    const unsigned int inputShape[]  = {1, 2, 2, 3};
+    const unsigned int paddedShape[] = {1, 4, 4, 3};
+    const unsigned int outputShape[] = {1, 2, 2, 3};
+
+    TensorInfo inputInfo(4, inputShape, DataType::QAsymmU8);
+    TensorInfo paddedInfo(4, paddedShape, DataType::QAsymmU8);
+    TensorInfo outputInfo(4, outputShape, DataType::QAsymmU8);
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    PadDescriptor padDescriptor({{0, 0},
+                                 {1, 1},
+                                 {1, 1},
+                                 {0, 0}});
+
+    PadLayer* padLayer = graph.AddLayer<PadLayer>(padDescriptor, "pad");
+    padLayer->GetOutputSlot().SetTensorInfo(paddedInfo);
+
+    Pooling2dDescriptor pooling2dDescriptor;
+    pooling2dDescriptor.m_PoolType   = PoolingAlgorithm::Average;
+    pooling2dDescriptor.m_PoolWidth  = 3;
+    pooling2dDescriptor.m_PoolHeight = 3;
+    pooling2dDescriptor.m_StrideX    = 1;
+    pooling2dDescriptor.m_StrideY    = 1;
+    pooling2dDescriptor.m_DataLayout = DataLayout::NHWC;
+
+    Pooling2dLayer* pool2dLayer = graph.AddLayer<Pooling2dLayer>(pooling2dDescriptor, "pool2d");
+    pool2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connect up layers - input -> pad -> pool2d -> output
+    input->GetOutputSlot().Connect(padLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot().Connect(pool2dLayer->GetInputSlot(0));
+    pool2dLayer->GetOutputSlot().Connect(output->GetInputSlot(0));
+
+    auto checkSimplePool2d = [&](const Layer* const layer) {
+        const auto pool2dLayer = static_cast<const Pooling2dLayer*>(layer);
+        return IsLayerOfType<Pooling2dLayer>(layer) && (layer->GetNameStr() == "pool2d") &&
+            (pool2dLayer->GetParameters() == pooling2dDescriptor);
+    };
+
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<PadLayer>,
+                        checkSimplePool2d,
+                        &IsLayerOfType<OutputLayer>));
+
+    armnn::Optimizer::Pass(graph, MakeOptimizations(FoldPadIntoPooling2d()));
+
+    // The optimization should not have modified the graph.
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<PadLayer>,
+                        checkSimplePool2d,
+                        &IsLayerOfType<OutputLayer>));
 }
 
 #if defined(ARMNNREF_ENABLED)

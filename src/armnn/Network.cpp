@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -790,13 +790,18 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
         }
         else if (dataTypeIn == DataType::BFloat16 || dataTypeOut == DataType::BFloat16)
         {
+            const auto layerType = layer->GetType();
             if (IWorkloadFactory::IsLayerSupported(*layer, DataType::Float32, reasonIfUnsupported)
-                && layer->GetType() != LayerType::ConvertFp32ToBf16
-                && layer->GetType() != LayerType::ConvertBf16ToFp32)
+                && layerType != LayerType::ConvertFp32ToBf16
+                && layerType != LayerType::ConvertBf16ToFp32)
             {
-                // Insert BF16 -> FP32 conversion layer before current layer
+                bool revertConstantWeightsConversion = RevertConstantWeightsToFP32(layer);
+
+                // Insert BF16 -> FP32 conversion layer before current layer.
+                // Unless we have reverted Constant Weights Type above.
                 std::vector<ConvertBf16ToFp32Layer*> convertBf16ToFp32Layers;
-                if (dataTypeIn == DataType::BFloat16)
+                if (dataTypeIn == DataType::BFloat16 && dataTypeOut != DataType::BFloat16
+                    && !revertConstantWeightsConversion)
                 {
                     convertBf16ToFp32Layers =
                         InsertConvertBf16ToFp32LayersBefore(graph, *layer);
@@ -1759,10 +1764,12 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     // If Fp32 to Bf16 optimization is set convert Fp32 network to Bf16
     // Convert input of Convolution2d and FullyConnected from Fp32 to Bf16
     // Only Constant weight of Convolution2d and FullyConnected are converted from Fp32 to Bf16
+    // Constant and Fp32ToBf16 layers will also be fused so conversion is no longer needed at inference time
     if (options.m_ReduceFp32ToBf16)
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToBf16");
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToBf16Converter()));
+        Optimizer::Pass(optGraph, MakeOptimizations(FuseConversionLayersIntoConstLayers()));
     }
 
     // Initialize backend settings

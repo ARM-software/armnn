@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -9,6 +9,7 @@
 #include <armnn/utility/Assert.hpp>
 
 #include <aclCommon/ArmComputeUtils.hpp>
+#include <backendsCommon/SubgraphUtils.hpp>
 
 namespace armnn
 {
@@ -19,36 +20,6 @@ namespace
 //
 // this helper only works if all layers where the inputs connect to are not selected
 //
-
-SubgraphView::IInputSlots CreateIInputsFrom(const std::vector<armnn::IConnectableLayer*>& layers)
-{
-    SubgraphView::IInputSlots result;
-    for (auto&& layer : layers)
-    {
-        for (unsigned int i = 0 ; i < layer->GetNumInputSlots(); ++i)
-        {
-            result.push_back(&(layer->GetInputSlot(i)));
-        }
-    }
-    return result;
-}
-
-//
-// this helper only works if all layers where the outputs connect to are not selected
-//
-
-SubgraphView::IOutputSlots CreateIOutputsFrom(const std::vector<armnn::IConnectableLayer*>& layers)
-{
-    SubgraphView::IOutputSlots result;
-    for (auto &&layer: layers)
-    {
-        for (unsigned int i = 0; i < layer->GetNumOutputSlots(); ++i)
-        {
-            result.push_back(&(layer->GetOutputSlot(i)));
-        }
-    }
-    return result;
-}
 
 bool checkDataTypeInputandOutput(const Layer& layer)
 {
@@ -78,19 +49,6 @@ bool checkDataTypeInputandOutput(const Layer& layer)
 }
 
 } // namespace
-
-inline void ReportUntouchedLayers(OptimizationViews& optimizationViews, std::map<LayerGuid, Layer*> untouched)
-{
-    std::vector<Layer*> untouchedVector;
-    for (const auto& pair : untouched)
-    {
-        Layer* layer = pair.second;
-        SubgraphView subgraphView({layer},
-                                  CreateIInputsFrom({layer}),
-                                  CreateIOutputsFrom({layer}));
-        optimizationViews.AddUntouchedSubgraph(std::move(subgraphView));
-    }
-}
 
 template<typename LayerType>
 LayerType* FuseLayer(OptimizationViews& optimizationViews,

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -73,6 +73,17 @@ inline bool IsNeutralElement(
         : tensorValue == GetZeroElement(tensorInfo);
 }
 
+inline bool IsPooling2dPadded(const Pooling2dDescriptor& poolDescriptor)
+{
+    const auto poolingPadValues = std::make_tuple(poolDescriptor.m_PadLeft, poolDescriptor.m_PadRight,
+                                                  poolDescriptor.m_PadTop, poolDescriptor.m_PadBottom);
+    if (poolingPadValues != std::make_tuple(0U, 0U, 0U, 0U))
+    {
+        return true;
+    }
+    return false;
+}
+
 template <typename Descriptor>
 bool TryFoldPadIntoLayer2d(
     const PadDescriptor& padDescriptor, Descriptor& layerDescriptor, const TensorInfo& tensorInfo)
@@ -101,25 +112,29 @@ bool TryFoldPadIntoLayer2d(
     return true;
 }
 
-inline bool TryFoldPadIntoLayer2d(
-    const PadDescriptor& padDescriptor, Pooling2dDescriptor& poolDescriptor, const TensorInfo& tensorInfo)
+inline bool TryFoldPadIntoLayer2d(const PadDescriptor& padDescriptor,
+                                  Pooling2dDescriptor& poolDescriptor,
+                                  const TensorInfo& tensorInfo,
+                                  bool isBackendOptimization = false)
 {
-    const auto poolingPadValues = std::make_tuple(poolDescriptor.m_PadLeft, poolDescriptor.m_PadRight,
-                                                  poolDescriptor.m_PadTop, poolDescriptor.m_PadBottom);
-    bool poolHasPadding = false;
-    if (poolingPadValues != std::make_tuple(0U, 0U, 0U, 0U))
+    // Cannot fold Average or L2 pooling if padding exists and the padding method is Exclude.
+    if (poolDescriptor.m_PoolType != PoolingAlgorithm::Max &&
+        IsPooling2dPadded(poolDescriptor) &&
+        poolDescriptor.m_PaddingMethod == PaddingMethod::Exclude)
     {
-        poolHasPadding = true;
+        return false;
     }
 
-    // We cannot fold Average or L2 pooling if there's is already padding and that padding method is Exclude.
-    if (poolDescriptor.m_PoolType != PoolingAlgorithm::Max) // PoolingAlgorithm::Average or PoolingAlgorithm::L2
+    // Cannot fold Average pooling if data type is quantized and layout is NHWC in Neon backend.
+    // Therefore, this specific case will become a backend specific optimization.
+    if  (!isBackendOptimization &&
+         tensorInfo.IsQuantized() &&
+         poolDescriptor.m_PoolType == PoolingAlgorithm::Average &&
+         poolDescriptor.m_DataLayout == DataLayout::NHWC)
     {
-        if ((poolHasPadding) && (poolDescriptor.m_PaddingMethod == PaddingMethod::Exclude))
-        {
-            return false;
-        }
+        return false;
     }
+
     poolDescriptor.m_PaddingMethod = PaddingMethod::IgnoreValue;
 
     return TryFoldPadIntoLayer2d<Pooling2dDescriptor>(padDescriptor, poolDescriptor, tensorInfo);

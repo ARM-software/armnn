@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,5 +28,7 @@ std::vector<ConvertFp16ToFp32Layer*> InsertConvertFp16ToFp32LayersBefore(Graph& 
 std::vector<ConvertFp32ToFp16Layer*> InsertConvertFp32ToFp16LayersAfter(Graph& graph, Layer& layer);
 
 std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer);
+
+bool RevertConstantWeightsToFP32(Layer* layer);
 
 } // namespace armnn

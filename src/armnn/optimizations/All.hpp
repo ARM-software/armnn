@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -9,6 +9,7 @@
 #include "ConvertConstants.hpp"
 #include "ConvertConstDequantisationLayersToConstLayers.hpp"
 #include "ConvertConstPermuteLayersToConstLayers.hpp"
+#include "FuseConvertFp32ToBf16IntoConstLayers.hpp"
 #include "ConvertFp32NetworkToBf16.hpp"
 #include "ConvertFp32NetworkToFp16.hpp"
 #include "FoldPadIntoLayer2d.hpp"

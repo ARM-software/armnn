@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 
 import numpy as np
@@ -66,7 +66,7 @@ def test_external_delegate_options_gpu_cached_network(delegate_dir, test_data_fo
         os.remove(binary_file)
 
     # Create blank binary file to write to.
-    open(binary_file, 'a').close()
+    open(binary_file, "a").close()
     assert (os.path.exists(binary_file))
     assert (os.stat(binary_file).st_size == 0)
 
@@ -102,11 +102,11 @@ def test_external_delegate_options_gpu_cached_network(delegate_dir, test_data_fo
 def test_external_delegate_gpu_fastmath(delegate_dir, test_data_folder):
     # create armnn delegate with enable-fast-math
     # fast-math is only enabled on Conv2d layer, so use conv2d model.
-    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'GpuAcc',
-                                                                   'enable-fast-math': '1',
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "GpuAcc",
+                                                                   "enable-fast-math": "1",
                                                                    "logging-severity": "info"})
 
-    model_file_name = 'conv2d.tflite'
+    model_file_name = "conv2d.tflite"
 
     inputShape = [ 1, 5, 5, 1 ]
     outputShape = [ 1, 3, 3, 1 ]
@@ -131,15 +131,15 @@ def test_external_delegate_gpu_fastmath(delegate_dir, test_data_folder):
     compare_outputs(armnn_outputs, [expected_output])
 
 @pytest.mark.CpuAccTest
-def test_external_delegate_cpu_options(capfd, delegate_dir, test_data_folder):
+def test_external_delegate_cpu_options(delegate_dir, test_data_folder):
     # create armnn delegate with enable-fast-math and number-of-threads options
     # fast-math is only enabled on Conv2d layer, so use conv2d model.
-    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuAcc',
-                                                                   'enable-fast-math': '1',
-                                                                   'number-of-threads': '4',
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "CpuAcc",
+                                                                   "enable-fast-math": "1",
+                                                                   "number-of-threads": "4",
                                                                    "logging-severity": "info"})
 
-    model_file_name = 'conv2d.tflite'
+    model_file_name = "conv2d.tflite"
 
     inputShape = [ 1, 5, 5, 1 ]
     outputShape = [ 1, 3, 3, 1 ]
@@ -162,9 +162,6 @@ def test_external_delegate_cpu_options(capfd, delegate_dir, test_data_folder):
 
     # check results
     compare_outputs(armnn_outputs, [expected_output])
-
-    captured = capfd.readouterr()
-    assert 'Set CPPScheduler to Linear mode, with 4 threads to use' in captured.out
 
 def test_external_delegate_options_wrong_logging_level(delegate_dir):
     with pytest.raises(ValueError):
@@ -174,9 +171,10 @@ def test_external_delegate_options_wrong_logging_level(delegate_dir):
 
 def test_external_delegate_options_debug(capfd, delegate_dir, test_data_folder):
     # create armnn delegate with debug option
-    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuRef', 'debug-data': '1'})
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "CpuRef",
+                                                                   "debug-data": "1"})
 
-    model_file_name = 'fp32_model.tflite'
+    model_file_name = "fp32_model.tflite"
 
     tensor_shape = [1, 2, 2, 1]
 
@@ -192,16 +190,16 @@ def test_external_delegate_options_debug(capfd, delegate_dir, test_data_folder):
     compare_outputs(armnn_outputs, [expected_output])
 
     captured = capfd.readouterr()
-    assert 'layerGuid' in captured.out
+    assert "layerGuid" in captured.out
 
 
 def test_external_delegate_options_fp32_to_fp16(capfd, delegate_dir, test_data_folder):
     # create armnn delegate with reduce-fp32-to-fp16 option
-    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuRef',
-                                                                   'debug-data': '1',
-                                                                   'reduce-fp32-to-fp16': '1'})
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "CpuRef",
+                                                                   "debug-data": "1",
+                                                                   "reduce-fp32-to-fp16": "1"})
 
-    model_file_name = 'fp32_model.tflite'
+    model_file_name = "fp32_model.tflite"
 
     tensor_shape = [1, 2, 2, 1]
 
@@ -217,16 +215,16 @@ def test_external_delegate_options_fp32_to_fp16(capfd, delegate_dir, test_data_f
     compare_outputs(armnn_outputs, [expected_output])
 
     captured = capfd.readouterr()
-    assert 'convert_fp32_to_fp16' in captured.out
-    assert 'convert_fp16_to_fp32' in captured.out
+    assert "convert_fp32_to_fp16" in captured.out
+    assert "convert_fp16_to_fp32" in captured.out
 
 def test_external_delegate_options_fp32_to_bf16(capfd, delegate_dir, test_data_folder):
     # create armnn delegate with reduce-fp32-to-bf16 option
-    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuRef',
-                                                                   'debug-data': '1',
-                                                                   'reduce-fp32-to-bf16': '1'})
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "CpuRef",
+                                                                   "debug-data": "1",
+                                                                   "reduce-fp32-to-bf16": "1"})
 
-    model_file_name = 'conv2d.tflite'
+    model_file_name = "conv2d.tflite"
 
     inputShape = [ 1, 5, 5, 1 ]
     outputShape = [ 1, 3, 3, 1 ]
@@ -251,14 +249,14 @@ def test_external_delegate_options_fp32_to_bf16(capfd, delegate_dir, test_data_f
     compare_outputs(armnn_outputs, [expected_output])
 
     captured = capfd.readouterr()
-    assert 'convert_fp32_to_bf16' in captured.out
+    assert "convert_fp32_to_bf16" in captured.out
 
 def test_external_delegate_options_memory_import(delegate_dir, test_data_folder):
     # create armnn delegate with memory-import option
-    armnn_delegate = tflite.load_delegate(delegate_dir, options = {'backends': 'CpuAcc,CpuRef',
-                                                                   'memory-import': '1'})
+    armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "CpuAcc,CpuRef",
+                                                                   "memory-import": "1"})
 
-    model_file_name = 'fallback_model.tflite'
+    model_file_name = "fallback_model.tflite"
 
     tensor_shape = [1, 2, 2, 1]
 

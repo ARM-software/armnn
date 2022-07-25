@@ -42,7 +42,11 @@ Pre-requisites:
  * numpy (Depends on TfLite version)
  * tflite_runtime (>=2.5, depends on Arm NN Delegate)
 
-If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md). Otherwise, you can download the binaries [here](https://github.com/ARM-software/armnn/releases/).
+If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md). Otherwise, you can download the binaries [here](https://github.com/ARM-software/armnn/releases/). Set the following environment variable to the location of the .so binary files:
+
+```bash
+export LD_LIBRARY_PATH=<path_to_so_binary_files>
+```
 
 We recommend creating a virtual environment for this tutorial. For the following code to work python3 is needed. Please
 also check the documentation of the TfLite version you want to use. There might be additional prerequisites for the python
@@ -73,7 +77,7 @@ you may need to build the pip package from source. You can find more information
 But in our case, with Tensorflow Lite 2.5.0, we can install through:
 
 ```
-pip3 install --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime
+pip3 install --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime==2.5.0
 ```
 
 Your virtual environment is now all setup. Copy the final python script into a python file e.g. 

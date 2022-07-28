@@ -51,8 +51,7 @@ void MemCopyLayer::ValidateTensorShapesFromInputs()
 
 void MemCopyLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    IgnoreUnused(strategy);
-    throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
 
 } // namespace armnn

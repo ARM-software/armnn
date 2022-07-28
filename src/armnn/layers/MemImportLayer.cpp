@@ -52,7 +52,7 @@ void MemImportLayer::ValidateTensorShapesFromInputs()
 void MemImportLayer::ExecuteStrategy(IStrategy& strategy) const
 {
     IgnoreUnused(strategy);
-    throw armnn::Exception("FakeQuantizationLayer should not appear in an input graph");
+    throw armnn::Exception("MemImportLayer should not appear in an input graph");
 }
 
 } // namespace armnn

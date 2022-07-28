@@ -10,6 +10,9 @@
 * [Third-Party](#third-party)
 * [Build Flags](#build-flags)
 
+## Announcement: As part of Arm's commitment to the use of inclusive language we will be moving away from 'master' branch to 'main' soon.
+## From 15 August 2022 our 'master' branch will be frozen and we will be using 'main' branch instead.
+
 **_Arm NN_** is the **most performant** machine learning (ML) inference engine for Android and Linux, accelerating ML
 on **Arm Cortex-A CPUs and Arm Mali GPUs**. This ML inference engine is an open source SDK which bridges the gap
 between existing neural network frameworks and power-efficient Arm IP.

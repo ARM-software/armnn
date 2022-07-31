@@ -90,7 +90,7 @@ public:
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE(
         "Use ABI stable "
         "CreateWorkload(LayerType, const QueueDescriptor&, const WorkloadInfo& info) instead.",
-        "22.11")
+        "23.08")
     std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
                                            const WorkloadInfo& info) const override
     {

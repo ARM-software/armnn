@@ -49,10 +49,7 @@ void ConvertFp32ToFp16Layer::ValidateTensorShapesFromInputs()
 
 void ConvertFp32ToFp16Layer::ExecuteStrategy(IStrategy& strategy) const
 {
-    // These conversion layers are only inserted by the
-    // optimizer and so will never be in an input graph.
-    IgnoreUnused(strategy);
-    throw armnn::Exception("ConvertFp32ToFp16Layer should never appear in an input graph");
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
 
 } // namespace armnn

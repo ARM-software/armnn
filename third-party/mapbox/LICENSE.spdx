@@ -1,0 +1,7 @@
+PackageName: MapBox
+SPDXID: SPDXRef-MapBox
+FilesAnalyzed: true
+PackageLicenseConcluded: BSD-3-Clause
+PackageLicenseInfoFromFiles: BSD-3-Clause
+PackageLicenseDeclared: BSD-3-Clause
+PackageCopyrightText: <text>Copyright (c) MapBox All rights reserved.</text>

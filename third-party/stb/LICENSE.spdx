@@ -1,0 +1,7 @@
+PackageName: stb
+SPDXID: SPDXRef-stb
+FilesAnalyzed: true
+PackageLicenseConcluded: MIT
+PackageLicenseInfoFromFiles: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: <text>Copyright (c) 2017 Sean Barrett</text>

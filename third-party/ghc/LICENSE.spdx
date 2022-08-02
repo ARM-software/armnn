@@ -1,0 +1,7 @@
+PackageName: ghc
+SPDXID: SPDXRef-ghc
+FilesAnalyzed: true
+PackageLicenseConcluded: MIT
+PackageLicenseInfoFromFiles: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: <text>Copyright (c) 2018, Steffen Schümann <s.schuemann@pobox.com></text>

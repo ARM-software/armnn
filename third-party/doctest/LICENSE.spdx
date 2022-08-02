@@ -1,0 +1,7 @@
+PackageName: doctest
+SPDXID: SPDXRef-doctest
+FilesAnalyzed: true
+PackageLicenseConcluded: MIT
+PackageLicenseInfoFromFiles: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: <text>Copyright (c) 2016-2021 Viktor Kirilov</text>

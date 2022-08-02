@@ -1,0 +1,7 @@
+PackageName: cxxopts
+SPDXID: SPDXRef-cxxopts
+FilesAnalyzed: true
+PackageLicenseConcluded: MIT
+PackageLicenseInfoFromFiles: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: <text>Copyright (c) 2014, 2015, 2016, 2017 Jarryd Beck</text>

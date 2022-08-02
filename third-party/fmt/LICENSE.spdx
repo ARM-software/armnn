@@ -1,0 +1,7 @@
+PackageName: fmt
+SPDXID: SPDXRef-fmt
+FilesAnalyzed: true
+PackageLicenseConcluded: MIT
+PackageLicenseInfoFromFiles: MIT
+PackageLicenseDeclared: MIT
+PackageCopyrightText: <text>Copyright (c) 2012 - present, Victor Zverovich</text>

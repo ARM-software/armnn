@@ -474,8 +474,6 @@ list(APPEND armnn_support_library_sources
         canonical/ArmnnDriver.hpp
         canonical/ArmnnDriverImpl.cpp
         canonical/ArmnnDriverImpl.hpp
-        canonical/CacheDataHandler.cpp
-        canonical/CacheDataHandler.hpp
         canonical/CanonicalUtils.cpp
         canonical/CanonicalUtils.hpp
         canonical/ConversionUtils.cpp

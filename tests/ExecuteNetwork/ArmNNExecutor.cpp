@@ -533,6 +533,15 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
         LogAndThrow("Optimize returned nullptr");
     }
 
+    // If v,visualize-optimized-model is enabled then construct a file name for the dot file.
+    if (m_Params.m_EnableLayerDetails)
+    {
+        fs::path filename = m_Params.m_ModelPath;
+        filename.replace_extension("dot");
+        std::fstream file(filename.c_str(), std::ios_base::out);
+        optNet->SerializeToDot(file);
+    }
+
     return optNet;
 }
 
@@ -683,12 +692,12 @@ void ArmNNExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
                     break;
                 }
                 case armnn::DataType::QSymmS8:
+                case armnn::DataType::QAsymmS8:
                 {
                     result = ComputeRMSE<int8_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
                     break;
                 }
                 case armnn::DataType::QAsymmU8:
-                case armnn::DataType::QAsymmS8:
                 {
                     result = ComputeRMSE<uint8_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
                     break;

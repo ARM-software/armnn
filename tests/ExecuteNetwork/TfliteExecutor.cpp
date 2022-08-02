@@ -144,7 +144,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
                 outputSize *=  outputDims->data[dim];
             }
 
-            std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
+            std::cout << m_Params.m_OutputNames[outputIndex] << ": ";
             results.push_back(m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->allocation);
 
             switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
@@ -152,38 +152,38 @@ std::vector<const void *> TfLiteExecutor::Execute()
 
                 case kTfLiteFloat32:
                 {
-                    auto tfLiteDelageOutputData = m_TfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
 
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        fprintf(outputTensorFile, "%f ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%f ", tfLiteDelegateOutputData[i]);
                     }
                     break;
                 }
                 case kTfLiteInt32:
                 {
-                    auto tfLiteDelageOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(tfLiteDelegateOutputId);
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(tfLiteDelegateOutputId);
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        fprintf(outputTensorFile, "%d ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
                     }
                     break;
                 }
                 case kTfLiteUInt8:
                 {
-                    auto tfLiteDelageOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(tfLiteDelegateOutputId);
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(tfLiteDelegateOutputId);
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        fprintf(outputTensorFile, "%u ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
                     }
                     break;
                 }
                 case kTfLiteInt8:
                 {
-                    auto tfLiteDelageOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(tfLiteDelegateOutputId);
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(tfLiteDelegateOutputId);
                     for (int i = 0; i < outputSize; ++i)
                     {
-                        fprintf(outputTensorFile, "%d ", tfLiteDelageOutputData[i]);
+                        fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
                     }
                     break;
                 }

@@ -171,14 +171,6 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
     }
     delegateOptions.SetOptimizerOptions(options);
 
-    // If v,visualize-optimized-model is enabled then construct a file name for the dot file.
-    if (m_EnableLayerDetails)
-    {
-        fs::path filename = m_ModelPath;
-        filename.replace_extension("dot");
-        delegateOptions.SetSerializeToDot(filename);
-    }
-
     return delegateOptions;
 }
 

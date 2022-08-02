@@ -73,7 +73,8 @@ void BatchMatMul::RecurseBMM(std::vector<unsigned int>& curIdx, unsigned int cur
 void BatchMatMul::AdjustAxesToMulForUnequalRanks(
     std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int>>& axesToMul)
 {
-    long rankDiff = static_cast<long>(inputXInfo.GetNumDimensions()) - inputYInfo.GetNumDimensions();
+    int rankDiff = static_cast<int>(inputXInfo.GetNumDimensions()) -
+                   static_cast<int>(inputYInfo.GetNumDimensions());
     if(rankDiff == 0)
     {
         return;

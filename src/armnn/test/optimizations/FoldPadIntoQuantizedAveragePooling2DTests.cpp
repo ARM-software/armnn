@@ -95,6 +95,7 @@ void FoldPadIntoQuantizedAvgPoolTest(Compute backendId)
 }
 
 
+#if defined(ARMNNREF_ENABLED)
 TEST_SUITE("Optimizer_FoldPadIntoQuantizedAvgPoolCpuRef")
 {
 TEST_CASE("FoldPadIntoQuantizedAvgPoolCpuRefTest")
@@ -102,6 +103,7 @@ TEST_CASE("FoldPadIntoQuantizedAvgPoolCpuRefTest")
     FoldPadIntoQuantizedAvgPoolTest(Compute::CpuRef);
 }
 }
+#endif
 
 #if defined(ARMCOMPUTECL_ENABLED)
 TEST_SUITE("Optimizer_FoldPadIntoQuantizedAvgPoolGpuAcc")

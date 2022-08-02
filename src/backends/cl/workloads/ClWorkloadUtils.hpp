@@ -1,9 +1,10 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
+#include <BFloat16.hpp>
 #include <Half.hpp>
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
@@ -139,8 +140,12 @@ inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
         case DataType::Signed32:
             CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<int32_t>());
             break;
+        case DataType::BFloat16:
+            CopyArmComputeClTensorData(clTensor, handle->GetConstTensor<armnn::BFloat16>());
+            break;
         default:
-            ARMNN_ASSERT_MSG(false, "Unexpected tensor type.");
+            // Throw exception; assertion not called in release build.
+            throw Exception("Unexpected tensor type during InitializeArmComputeClTensorData().");
     }
 };
 

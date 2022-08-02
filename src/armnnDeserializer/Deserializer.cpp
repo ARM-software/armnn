@@ -1396,6 +1396,7 @@ void IDeserializer::DeserializerImpl::ParseConstant(GraphPtr graph, unsigned int
                               weightsShape[0],
                               weightsShape[1],
                               weightsShape[2]*weightsShape[3]});
+        weightsInfo.SetConstant(true);
 
         armnn::ConstTensor weightsPermuted(weightsInfo, permuteBuffer.get());
 
@@ -1412,6 +1413,7 @@ void IDeserializer::DeserializerImpl::ParseConstant(GraphPtr graph, unsigned int
         layer = m_Network->AddConstantLayer(input, layerName.c_str());
 
         armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+        outputTensorInfo.SetConstant(true);
         layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
     }
 

@@ -79,6 +79,8 @@ public:
 
     void SanitizeQuantizationScale(LayerInputHandle& weight, LayerInputHandle& input);
 
+    armnn::IOutputSlot* GetOutputSlot() const;
+
 private:
     armnn::IOutputSlot* m_OutputSlot;
     bool                m_Valid;
@@ -1011,5 +1013,7 @@ ConstTensorPin DequantizeAndMakeConstTensorPin(const Operation& operation,
                                                const ConversionData& data,
                                                size_t operandIndex,
                                                bool optional = false);
+
+bool IsConnectedToDequantize(armnn::IOutputSlot* ioutputSlot);
 
 } // namespace armnn_driver

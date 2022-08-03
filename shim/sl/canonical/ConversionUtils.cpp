@@ -67,6 +67,11 @@ void LayerInputHandle::SanitizeQuantizationScale(LayerInputHandle& weight, Layer
     }
 }
 
+armnn::IOutputSlot* LayerInputHandle::GetOutputSlot() const
+{
+    return m_OutputSlot;
+}
+
 ConstTensorPin::ConstTensorPin(bool optional)
     : m_Optional(optional)
 {}
@@ -276,17 +281,6 @@ LayerInputHandle ConvertToLayerInputHandle(const Operation& operation,
             case OperandLifeTime::CONSTANT_REFERENCE:
             {
                 auto constantTensorDataType = operandTensorInfo.GetDataType();
-                if (inputHandle)
-                {
-                    if ((inputHandle->GetTensorInfo().GetDataType() == armnn::DataType::Float32
-                         || inputHandle->GetTensorInfo().GetDataType() == armnn::DataType::Float16)
-                        && (operandTensorInfo.GetDataType() == armnn::DataType::QAsymmU8
-                            || operandTensorInfo.GetDataType() == armnn::DataType::QAsymmS8))
-                    {
-                        constantTensorDataType = inputHandle->GetTensorInfo().GetDataType();
-                    }
-                }
-
                 // The tensor has an already known constant value, and can be converted into an ArmNN Constant layer.
                 ConstTensorPin tensorPin = ConvertOperandToConstTensorPin(*operand,
                                                                           model,
@@ -1027,6 +1021,36 @@ bool SetupAndTrackLayerOutputSlot(const Operation& operation,
     }
 
     return true;
+}
+
+bool IsConnectedToDequantize(armnn::IOutputSlot* ioutputSlot)
+{
+    VLOG(DRIVER) << "ConversionUtils::IsConnectedToDequantize()";
+    if (!ioutputSlot)
+    {
+        return false;
+    }
+    VLOG(DRIVER) << "ConversionUtils::IsConnectedToDequantize() ioutputSlot is valid.";
+    // Find the connections and layers..
+    armnn::IConnectableLayer& owningLayer = ioutputSlot->GetOwningIConnectableLayer();
+    if (owningLayer.GetType() == armnn::LayerType::Dequantize)
+    {
+        VLOG(DRIVER) << "ConversionUtils::IsConnectedToDequantize() connected to Dequantize Layer.";
+        armnn::IInputSlot& inputSlot = owningLayer.GetInputSlot(0);
+        armnn::IOutputSlot* connection = inputSlot.GetConnection();
+        if (connection)
+        {
+            VLOG(DRIVER) << "ConversionUtils::IsConnectedToDequantize() Dequantize Layer has a connection.";
+            armnn::IConnectableLayer& connectedLayer =
+                    connection->GetOwningIConnectableLayer();
+            if (connectedLayer.GetType() == armnn::LayerType::Constant)
+            {
+                VLOG(DRIVER) << "ConversionUtils::IsConnectedToDequantize() Dequantize Layer connected to Constant";
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 } // namespace armnn_driver

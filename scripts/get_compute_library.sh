@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="9b921be1ff7283050eb39d9ce1b10b5c8bfc1300" #Optimize add layer by considering the input tensors as 1D array
+DEFAULT_CLFRAMEWORKREVISION="3c4d085da54c3d9727cb31718c5b407c18ff646a" #Update the GPUTarget list
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

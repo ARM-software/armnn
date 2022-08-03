@@ -998,9 +998,20 @@ bool Converter::ConvertConv2d(const Operation& operation, const Model& model, Co
     desc.m_BiasEnabled = true;
     Optional<TensorInfo> biases(biasInfo);
 
-    bool isSupported = false;
-    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
+    bool requiresValidation = true;
+    const Operand* weightsOperand = GetInputOperand(operation, 1, model);
+    const Operand* biasOperand = GetInputOperand(operation, 2, model);
+    if (IsConnectedToDequantize(weightsInput.GetOutputSlot())
+                || IsConnectedToDequantize(biasInput.GetOutputSlot()))
     {
+        // Do not require validation for now. There will be an optimization step
+        // [ConvertConstDequantisationLayersToConstLayers] will convert layers to Constant layers
+        // then at the end of the optimization there will be layer supported validation.
+        requiresValidation = false;
+        VLOG(DRIVER) << "Converter::ConvertConv2d(): Weights and Biases are as INPUTS.";
+    }
+
+    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported) {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsConvolution2dSupported,
                                    data.m_Backends,
@@ -1012,18 +1023,23 @@ bool Converter::ConvertConv2d(const Operation& operation, const Model& model, Co
                                    biases);
     };
 
-    if(!IsDynamicTensor(outputInfo))
+    if (requiresValidation)
     {
-        validateFunc(outputInfo, isSupported);
-    }
-    else
-    {
-        isSupported = AreDynamicTensorsSupported();
-    }
+        VLOG(DRIVER) << "Converter::ConvertConv2d(): Requires Validation!";
+        bool isSupported = false;
+        if (!IsDynamicTensor(outputInfo))
+        {
+            validateFunc(outputInfo, isSupported);
+        }
+        else
+        {
+            isSupported = AreDynamicTensorsSupported();
+        }
 
-    if (!isSupported)
-    {
-        return false;
+        if (!isSupported)
+        {
+            return false;
+        }
     }
 
     armnn::IConnectableLayer* startLayer = data.m_Network->AddConvolution2dLayer(desc);
@@ -1231,9 +1247,17 @@ bool Converter::ConvertDepthwiseConv2d(const Operation& operation, const Model& 
     desc.m_BiasEnabled = true;
     Optional<TensorInfo> biases(biasInfo);
 
-    bool isSupported = false;
-    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
+    bool requiresValidation = true;
+    if (IsConnectedToDequantize(weightsInput.GetOutputSlot()) || IsConnectedToDequantize(biasInput.GetOutputSlot()))
     {
+        // Do not require validation for now. There will be an optimization step
+        // [ConvertConstDequantisationLayersToConstLayers] will convert layers to Constant layers
+        // then at the end of the optimization there will be layer supported validation.
+        requiresValidation = false;
+        VLOG(DRIVER) << "Converter::ConvertDepthwiseConv2d(): Weights and Biases are as INPUTS.";
+    }
+
+    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported) {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsDepthwiseConvolutionSupported,
                                    data.m_Backends,
@@ -1245,18 +1269,23 @@ bool Converter::ConvertDepthwiseConv2d(const Operation& operation, const Model& 
                                    biases);
     };
 
-    if(!IsDynamicTensor(outputInfo))
+    if (requiresValidation)
     {
-        validateFunc(outputInfo, isSupported);
-    }
-    else
-    {
-        isSupported = AreDynamicTensorsSupported();
-    }
+        VLOG(DRIVER) << "Converter::ConvertDepthwiseConv2d(): Requires Validation!";
+        bool isSupported = false;
+        if (!IsDynamicTensor(outputInfo))
+        {
+            validateFunc(outputInfo, isSupported);
+        }
+        else
+        {
+            isSupported = AreDynamicTensorsSupported();
+        }
 
-    if (!isSupported)
-    {
-        return false;
+        if (!isSupported)
+        {
+            return false;
+        }
     }
 
     armnn::IConnectableLayer* startLayer = data.m_Network->AddDepthwiseConvolution2dLayer(desc);

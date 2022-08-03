@@ -2058,16 +2058,18 @@ IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescrip
     auto layer = m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
     // Add a constant layer for weights
     ConstantLayer* weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
-    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
-    layer->m_Weight = std::make_shared<ScopedTensorHandle>(weights);
+    auto weightsTensorHandle = std::make_shared<ScopedTensorHandle>(weights);
+    weightsLayer->m_LayerOutput = weightsTensorHandle;
+    layer->m_Weight = weightsTensorHandle;
     weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
     weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
     // Add a constant layer for biases
     if (biases.has_value() && convolution2dDescriptor.m_BiasEnabled)
     {
         ConstantLayer* biasLayer = m_Graph->AddLayer<ConstantLayer>("Bias");
-        biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(biases.value());
-        layer->m_Bias = std::make_shared<ScopedTensorHandle>(biases.value());
+        auto biasTensorHandle = std::make_shared<ScopedTensorHandle>(biases.value());
+        biasLayer->m_LayerOutput = biasTensorHandle;
+        layer->m_Bias = biasTensorHandle;
         biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
         biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
     }
@@ -2113,8 +2115,9 @@ IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
 
     // Add a constant layer for weights
     ConstantLayer* weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
-    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
-    layer->m_Weight = std::make_shared<ScopedTensorHandle>(weights);
+    auto weightsTensorHandle = std::make_shared<ScopedTensorHandle>(weights);
+    weightsLayer->m_LayerOutput = weightsTensorHandle;
+    layer->m_Weight = weightsTensorHandle;
 
     weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
     weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -2123,8 +2126,9 @@ IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
     if (biases.has_value() && convolution2dDescriptor.m_BiasEnabled)
     {
         ConstantLayer* biasLayer = m_Graph->AddLayer<ConstantLayer>("Bias");
-        biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(biases.value());
-        layer->m_Bias = std::make_shared<ScopedTensorHandle>(biases.value());
+        auto biasTensorHandle = std::make_shared<ScopedTensorHandle>(biases.value());
+        biasLayer->m_LayerOutput = biasTensorHandle;
+        layer->m_Bias = biasTensorHandle;
 
         biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
         biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));

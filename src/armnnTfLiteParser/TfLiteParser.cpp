@@ -948,16 +948,19 @@ void TfLiteParserImpl::RegisterProducerOfTensor(size_t subgraphIndex,
 
     TensorSlots & tensorSlots = m_SubgraphConnections[subgraphIndex][tensorIndex];
 
-    // assuming there is only one producer for that tensor
-    if (tensorSlots.outputSlot != nullptr)
+    if (slot->GetOwningIConnectableLayer().GetType() != LayerType::Constant)
     {
-        throw ParseException(fmt::format("Another layer has already registered itself as the producer of "
-                                         "subgraph:{} tensor:{} {}",
-                                         subgraphIndex,
-                                         tensorIndex,
-                                         CHECK_LOCATION().AsString()));
-    }
 
+        // assuming there is only one producer for that tensor
+        if (tensorSlots.outputSlot != nullptr)
+        {
+            throw ParseException(fmt::format("Another layer has already registered itself as the producer of "
+                                             "subgraph:{} tensor:{} {}",
+                                             subgraphIndex,
+                                             tensorIndex,
+                                             CHECK_LOCATION().AsString()));
+        }
+    }
     tensorSlots.outputSlot = slot;
 }
 

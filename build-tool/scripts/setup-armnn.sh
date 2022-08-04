@@ -22,7 +22,7 @@ download_and_extract()
 {
   cd "$SOURCE_DIR"
 
-  echo -e "\n***** Downloading $1 *****"
+  echo -e "\n***** Downloading $1 *****\n"
   wget -O "$3" "$2"
 
   echo -e "\n***** Extracting archive *****"
@@ -135,7 +135,7 @@ download_tensorflow()
   git clone https://github.com/tensorflow/tensorflow.git
   cd "$TENSORFLOW_SRC"
 
-  git checkout "$("$ARMNN_SRC"/scripts/get_tensorflow.sh -p)"
+  git checkout "$TENSORFLOW_VERSION"
   echo -e "\n***** TensorFlow downloaded *****"
 }
 
@@ -220,39 +220,6 @@ generate_onnx_sources()
   echo -e "\n***** Generated ONNX sources for $TARGET_ARCH *****"
 }
 
-download_armnn()
-{
-  cd "$SOURCE_DIR"
-
-  echo -e "\n***** Downloading Arm NN *****"
-
-  # Latest release branch of Arm NN is checked out by default
-  git clone https://github.com/ARM-software/armnn.git armnn
-
-  cd "$ARMNN_SRC"
-  armnn_branch="$(git rev-parse --abbrev-ref HEAD)"
-
-  echo -e "\n***** Arm NN Downloaded: $armnn_branch *****"
-}
-
-download_acl()
-{
-  cd "$SOURCE_DIR"
-
-  echo -e "\n***** Downloading ACL *****"
-
-  git clone https://github.com/ARM-software/ComputeLibrary.git acl
-
-  # Get corresponding release tag for ACL by parsing release branch number for Arm NN
-  local acl_tag=""
-  acl_tag="$(echo "$armnn_branch" | tr '\n' ' ' | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | tr -s ' ' | sed 's/ /./g')"
-
-  cd "$ACL_SRC"
-  git checkout v"$acl_tag"
-
-  echo -e "\n***** ACL Downloaded: $acl_tag *****"
-}
-
 usage()
 {
   cat <<EOF
@@ -278,10 +245,6 @@ setup-armnn.sh [OPTION]...
 At least one dependency flag (e.g. --tflite-delegate) must be provided or else provide --all to setup all dependencies.
 Directories called "source" and "build" will be generated in the current directory (ROOT_DIR) from which this script is called.
 It's recommended to call this script in a directory outside of this Arm NN source repo, to avoid nested repositories.
-
-This script will download the latest release branches of Arm NN and ACL, by default.
-Alternatively, manually create a "source" directory in ROOT_DIR and place custom repositories there.
-Custom repositories in "source" must be named "armnn" and "acl".
 
 Examples:
 Setup for aarch64 with all Arm NN dependencies:
@@ -387,7 +350,7 @@ echo "  root directory: $ROOT_DIR"
 echo "source directory: $SOURCE_DIR"
 echo " build directory: $BUILD_DIR"
 
-if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" ]; then
+if check_if_repository .; then
   echo -e "\n***** WARNING: Running script inside a git repository. To avoid nested repos, call this script from outside of this repo. *****"
 fi
 
@@ -397,18 +360,6 @@ sleep 10
 
 mkdir -p "$SOURCE_DIR"
 mkdir -p "$BUILD_DIR"
-
-if [ -d "$ARMNN_SRC" ]; then
-    echo -e "\n***** Arm NN source repository already located at $ARMNN_SRC. Skipping cloning of Arm NN. *****"
-else
-    download_armnn
-fi
-
-if [ -d "$ACL_SRC" ]; then
-    echo -e "\n***** ACL source repository already located at $ACL_SRC. Skipping cloning of ACL. *****"
-else
-    download_acl
-fi
 
 if [ "$flag_tflite_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
   download_flatbuffers

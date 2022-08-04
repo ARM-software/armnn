@@ -74,38 +74,40 @@ ArmnnDevice::ArmnnDevice(DriverOptions options)
     {
         SetMinimumLogSeverity(android::base::INFO);
     }
-
     armnn::IRuntime::CreationOptions runtimeOptions;
 
-#if defined(ARMCOMPUTECL_ENABLED)
-    try
+    if (std::find(m_Options.GetBackends().begin(),
+                  m_Options.GetBackends().end(),
+                  armnn::Compute::GpuAcc) != m_Options.GetBackends().end())
     {
-        if (!m_Options.GetClTunedParametersFile().empty())
+        try
         {
-            m_ClTunedParameters = armnn::IGpuAccTunedParameters::Create(m_Options.GetClTunedParametersMode(),
-                                                                        m_Options.GetClTuningLevel());
-            try
+            if (!m_Options.GetClTunedParametersFile().empty())
             {
-                m_ClTunedParameters->Load(m_Options.GetClTunedParametersFile().c_str());
+                m_ClTunedParameters = armnn::IGpuAccTunedParameters::Create(m_Options.GetClTunedParametersMode(),
+                                                                            m_Options.GetClTuningLevel());
+                try
+                {
+                    m_ClTunedParameters->Load(m_Options.GetClTunedParametersFile().c_str());
+                }
+                catch (std::exception& error)
+                {
+                    // This is only a warning because the file won't exist the first time you are generating it.
+                    VLOG(DRIVER) << "ArmnnDevice: Failed to load CL tuned parameters file "
+                          << m_Options.GetClTunedParametersFile().c_str() << " : " <<  error.what();
+                }
+                runtimeOptions.m_GpuAccTunedParameters = m_ClTunedParameters;
             }
-            catch (std::exception& error)
-            {
-                // This is only a warning because the file won't exist the first time you are generating it.
-                VLOG(DRIVER) << "ArmnnDevice: Failed to load CL tuned parameters file "
-                      << m_Options.GetClTunedParametersFile().c_str() << " : " <<  error.what());
-            }
-            runtimeOptions.m_GpuAccTunedParameters = m_ClTunedParameters;
+        }
+        catch (const armnn::ClRuntimeUnavailableException& error)
+        {
+            VLOG(DRIVER) <<  "ArmnnDevice: Failed to setup CL runtime: %s. Device will be unavailable." << error.what();
+        }
+        catch (std::exception& error)
+        {
+            VLOG(DRIVER) <<  "ArmnnDevice: Unknown exception: %s. Device will be unavailable." << error.what();
         }
     }
-    catch (const armnn::ClRuntimeUnavailableException& error)
-    {
-        VLOG(DRIVER) <<  "ArmnnDevice: Failed to setup CL runtime: %s. Device will be unavailable." << error.what();
-    }
-    catch (std::exception& error)
-    {
-        VLOG(DRIVER) <<  "ArmnnDevice: Unknown exception: %s. Device will be unavailable." << error.what();
-    }
-#endif
     runtimeOptions.m_EnableGpuProfiling = m_Options.IsGpuProfilingEnabled();
     m_Runtime = armnn::IRuntime::Create(runtimeOptions);
 

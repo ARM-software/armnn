@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_05" # Release 22.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="3c4d085da54c3d9727cb31718c5b407c18ff646a" #Update the GPUTarget list
+DEFAULT_CLFRAMEWORKREVISION="f67903b8ab8205b47f0ee2c27aeca8bed405c58e" #Add Dynamic Fusion Tests with BugFixes
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

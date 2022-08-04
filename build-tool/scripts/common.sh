@@ -47,6 +47,7 @@ FLATBUFFERS_BUILD_TARGET="$FLATBUFFERS_BUILD_ROOT"/"$TARGET_ARCH"_build
 FLATBUFFERS_BUILD_HOST="$FLATBUFFERS_BUILD_ROOT"/"$HOST_ARCH"_build # Location of flatc compiler
 
 # Tensorflow
+TENSORFLOW_VERSION="tags/v2.5.0"
 TENSORFLOW_SRC="$SOURCE_DIR"/tensorflow
 TFLITE_SRC="$TENSORFLOW_SRC"/tensorflow/lite
 SCHEMA_SRC="$TFLITE_SRC"/schema/schema.fbs
@@ -73,3 +74,17 @@ ONNX_BUILD_TARGET="$BUILD_DIR"/onnx/"$TARGET_ARCH"_build
 # Arm NN / ACL
 ARMNN_SRC="$SOURCE_DIR"/armnn
 ACL_SRC="$SOURCE_DIR"/acl
+
+# Check if directory at $1 is a repository or not
+check_if_repository()
+{
+  pushd "$1" > /dev/null
+
+  if [ "$(git rev-parse --is-inside-work-tree 2> /dev/null)" ]; then
+    popd > /dev/null
+    return 0
+  else
+    popd > /dev/null
+    return 1
+  fi
+}

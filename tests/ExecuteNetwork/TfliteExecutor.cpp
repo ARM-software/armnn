@@ -30,7 +30,7 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(pa
                                  armnnDelegate::TfLiteArmnnDelegateDelete);
         // Register armnn_delegate to TfLiteInterpreter
         status = m_TfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
-        if (status == kTfLiteError)
+        if (status != kTfLiteOk)
         {
             LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter");
         }
@@ -40,14 +40,14 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(pa
         std::cout << "Running on TfLite without ArmNN delegate\n";
     }
 
-    armnn::Optional<std::string> dataFile = m_Params.m_GenerateTensorData
-                                            ? armnn::EmptyOptional()
-                                            : armnn::MakeOptional<std::string>(m_Params.m_InputTensorDataFilePaths[0]);
-
     const size_t numInputs = m_Params.m_InputNames.size();
 
     for(unsigned int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
     {
+        armnn::Optional<std::string> dataFile = m_Params.m_GenerateTensorData
+            ? armnn::EmptyOptional()
+            : armnn::MakeOptional<std::string>(m_Params.m_InputTensorDataFilePaths[inputIndex]);
+
         int input = m_TfLiteInterpreter->inputs()[inputIndex];
 
         TfLiteIntArray* inputDims = m_TfLiteInterpreter->tensor(input)->dims;
@@ -58,39 +58,39 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(pa
             inputSize *= inputDims->data[dim];
         }
 
-        const auto& inputName = m_TfLiteInterpreter->input_tensor(input)->name;
-        const auto& dataType = m_TfLiteInterpreter->input_tensor(input)->type;
+        const auto& inputName = m_TfLiteInterpreter->tensor(input)->name;
+        const auto& dataType = m_TfLiteInterpreter->tensor(input)->type;
 
         switch (dataType)
         {
             case kTfLiteFloat32:
             {
                 auto inputData = m_TfLiteInterpreter->typed_tensor<float>(input);
-                PopulateTensorWithData(inputData, inputSize, dataFile, inputName);
+                PopulateTensorWithData<float>(inputData, inputSize, dataFile, inputName);
                 break;
             }
             case kTfLiteInt32:
             {
-                auto inputData = m_TfLiteInterpreter->typed_tensor<int>(input);
-                PopulateTensorWithData(inputData, inputSize, dataFile, inputName);
+                auto inputData = m_TfLiteInterpreter->typed_tensor<int32_t>(input);
+                PopulateTensorWithData<int32_t>(inputData, inputSize, dataFile, inputName);
                 break;
             }
             case kTfLiteUInt8:
             {
                 auto inputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(input);
-                PopulateTensorWithData(inputData, inputSize, dataFile, inputName);
+                PopulateTensorWithData<uint8_t>(inputData, inputSize, dataFile, inputName);
                 break;
             }
             case kTfLiteInt16:
             {
                 auto inputData = m_TfLiteInterpreter->typed_tensor<int16_t>(input);
-                PopulateTensorWithData(inputData, inputSize, dataFile, inputName);
+                PopulateTensorWithData<int16_t>(inputData, inputSize, dataFile, inputName);
                 break;
             }
             case kTfLiteInt8:
             {
                 auto inputData = m_TfLiteInterpreter->typed_tensor<int8_t>(input);
-                PopulateTensorWithData(inputData, inputSize, dataFile, inputName);
+                PopulateTensorWithData<int8_t>(inputData, inputSize, dataFile, inputName);
                 break;
             }
             default:

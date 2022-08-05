@@ -7,13 +7,12 @@
 
 TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(params)
 {
-    std::unique_ptr<tflite::FlatBufferModel> model =
-            tflite::FlatBufferModel::BuildFromFile(m_Params.m_ModelPath.c_str());
+    m_Model = tflite::FlatBufferModel::BuildFromFile(m_Params.m_ModelPath.c_str());
 
     m_TfLiteInterpreter =  std::make_unique<Interpreter>();
     tflite::ops::builtin::BuiltinOpResolver resolver;
 
-    tflite::InterpreterBuilder builder(*model, resolver);
+    tflite::InterpreterBuilder builder(*m_Model, resolver);
     builder(&m_TfLiteInterpreter);
     m_TfLiteInterpreter->AllocateTensors();
 
@@ -144,7 +143,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
                 outputSize *=  outputDims->data[dim];
             }
 
-            std::cout << m_Params.m_OutputNames[outputIndex] << ": ";
+            std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
             results.push_back(m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->allocation);
 
             switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)

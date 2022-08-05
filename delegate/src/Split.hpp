@@ -70,7 +70,7 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
         {
             return kTfLiteError;
         }
-        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor));
+        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true));
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 
@@ -224,7 +224,7 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
         {
             return kTfLiteError;
         }
-        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor));
+        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true));
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 

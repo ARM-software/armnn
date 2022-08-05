@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -54,7 +54,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     armnn::TensorInfo weightsTensorInfo       = GetTensorInfoForTfLiteTensor(tfLiteWeightsTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     // Fully Connected Layer accepts two dimensional weights input
     int32_t weightsDimension = static_cast<int32_t>(weightsTensorInfo.GetNumDimensions());

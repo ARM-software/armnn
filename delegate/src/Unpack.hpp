@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -114,7 +114,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
         {
             return kTfLiteError;
         }
-        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor));
+        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true));
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 

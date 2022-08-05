@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,7 +36,7 @@ TfLiteStatus VisitSpaceToDepthOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     armnn::SpaceToDepthDescriptor descriptor;
     auto* params = reinterpret_cast<TfLiteSpaceToDepthParams*>(tfLiteNode->builtin_data);
@@ -95,7 +95,7 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     armnn::DepthToSpaceDescriptor descriptor;
     auto* params = reinterpret_cast<TfLiteDepthToSpaceParams*>(tfLiteNode->builtin_data);

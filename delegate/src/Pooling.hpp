@@ -47,7 +47,7 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     armnn::PoolingAlgorithm poolingAlgorithm;
     switch(tfLitePoolingOperatorCode)
@@ -145,7 +145,7 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
     }
     // Set the input and output info
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     // Custom Operators are defined by the name string associated to the operator. Use this to determine
     // which pooling algorithm to create the armnn operator with. L2 Pooling3D is unsupported in TfLite.

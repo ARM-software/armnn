@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -50,7 +50,7 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo      = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& blockShapeTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteBlockShapeTensor);
     const armnn::TensorInfo& cropsTensorInfo      = GetTensorInfoForTfLiteTensor(tfLiteCropsTensor);
-    const armnn::TensorInfo& outputTensorInfo     = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo     = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     std::vector<unsigned int> blockShape(blockShapeTensorInfo.GetNumElements());
     ::memcpy(blockShape.data(), tfLiteBlockShapeTensor.data.data, blockShapeTensorInfo.GetNumBytes());
@@ -141,7 +141,7 @@ TfLiteStatus VisitSpaceToBatchNdOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo      = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& blockShapeTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteBlockShapeTensor);
     const armnn::TensorInfo& padListTensorInfo    = GetTensorInfoForTfLiteTensor(tfLitePadListTensor);
-    const armnn::TensorInfo& outputTensorInfo     = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo     = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     std::vector<unsigned int> blockShape(blockShapeTensorInfo.GetNumElements());
     std::memcpy(blockShape.data(), tfLiteBlockShapeTensor.data.data, blockShapeTensorInfo.GetNumBytes());

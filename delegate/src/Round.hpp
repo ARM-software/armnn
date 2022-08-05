@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -41,7 +41,7 @@ TfLiteStatus VisitFloorOperator(DelegateData& delegateData,
     // NOTE: looks like the outputTensorInfo is the only thing that is required for the case
     //       where we are adding the floor layer so maybe move the other stuff inside the
     //       if !delegateData block for efficiency.
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     // If the m_Network is a nullptr, this signals that a prerequisite TfLite callback is required to clarify the
     // support for the operator

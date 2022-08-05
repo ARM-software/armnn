@@ -60,7 +60,7 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     armnn::StackDescriptor desc;
     desc.m_NumInputs = static_cast<uint32_t>(numInputs);

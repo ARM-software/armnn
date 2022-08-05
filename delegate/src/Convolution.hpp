@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -98,7 +98,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
@@ -163,14 +163,17 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     // Set up filter and biases
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddConvolution2dLayer(descriptor);
 
-    auto filter =
-        CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[1]],
-                          filterTensorInfo,
-                          armnn::Optional<armnn::PermutationVector&>());
+    if(tflite::IsConstantTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[1]]))
+    {
+        auto filter =
+                CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[1]],
+                                  filterTensorInfo,
+                                  armnn::Optional<armnn::PermutationVector &>());
 
-    armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
-    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
-    weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
+        armnn::IConnectableLayer *weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
+        weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
+    }
 
     if (biasEnabled)
     {
@@ -255,7 +258,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
@@ -449,7 +452,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
@@ -494,9 +497,6 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         biasTensorInfo = armnn::TensorInfo(armnn::TensorShape({1}), GetDataType(tfLiteInputTensor));
     }
 
-    // For depthwise the weights layout is the same as for tflite [1, H, W, I*M]. No permutation required.
-    auto filter = CreateConstTensor(&tfLiteFilterTensor, filterTensorInfo);
-
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -508,16 +508,22 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
-                                   filter.GetInfo(),
+                                   filterTensorInfo,
                                    armnn::Optional<armnn::TensorInfo>(biasTensorInfo));
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthwiseConvolution2dLayer(descriptor);
 
-    armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
-    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
-    weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
+    if(tflite::IsConstantTensor(&tfLiteFilterTensor))
+    {
+        // For depthwise the weights layout is the same as for tflite [1, H, W, I*M]. No permutation required.
+        auto filter = CreateConstTensor(&tfLiteFilterTensor, filterTensorInfo);
+
+        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
+        weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
+    }
 
     if (biasEnabled)
     {
@@ -663,7 +669,7 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
     armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
     // TfLite uses NHWC tensors

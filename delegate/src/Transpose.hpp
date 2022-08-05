@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -58,7 +58,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& inputTensorInfo0 = GetTensorInfoForTfLiteTensor(tfLiteInputTensor0);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     auto* permTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteInputTensor1);
     unsigned int numEl = tfLiteInputTensor1.dims->data[0];

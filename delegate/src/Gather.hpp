@@ -47,7 +47,7 @@ TfLiteStatus VisitGatherOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& indicesTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteIndicesTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
     armnn::GatherDescriptor gatherDescriptor;
     gatherDescriptor.m_Axis = axis;
 

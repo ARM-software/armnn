@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -59,7 +59,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& paddingTensorInfo = GetTensorInfoForTfLiteTensor(tfLitepaddingTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     // Get the padding data from the input tensor
     auto* paddingData = tflite::GetTensorData<int32_t>(&tfLitepaddingTensor);

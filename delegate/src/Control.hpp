@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -115,7 +115,7 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
         SetupConcatViewOrigin(inputTensorInfo, concatDescriptor, concatDimInput, viewIndex, mergeDimOrigin);
     }
 
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     // Check if supported
     bool isSupported = false;
@@ -232,7 +232,7 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo =  GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& axisTensorInfo =   GetTensorInfoForTfLiteTensor(tfLiteAxisTensor);
-    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     auto* axisTensorData = tflite::GetTensorData<int32_t>(&tfLiteAxisTensor);
 

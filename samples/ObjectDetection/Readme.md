@@ -253,8 +253,8 @@ From the build directory, copy the following to the host platform:
 The full list of libs after cross-compilation to copy on your board:
 ```
 libarmnn.so
-libarmnn.so.30
-libarmnn.so.30.0
+libarmnn.so.31
+libarmnn.so.31.0
 For Arm NN public C++ API mode:
 libarmnnTfLiteParser.so
 libarmnnTfLiteParser.so.24.4

@@ -51,9 +51,6 @@ void RefBatchMatMulWorkload::Execute(std::vector<ITensorHandle*> inputs, std::ve
                            *inputXDecoder,
                            *inputYDecoder,
                            *outputEncoder);
-
-    bmm.BatchMatMulImpl();
-
 }
 
 } // namespace armnn

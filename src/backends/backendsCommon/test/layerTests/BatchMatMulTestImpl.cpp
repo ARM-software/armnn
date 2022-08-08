@@ -191,7 +191,7 @@ LayerTestResult<T, 3> BatchMatMul3DSimpleTest(
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         19, 22,
         43, 50
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 3>(workloadFactory,
                                                 memoryManager,
@@ -247,9 +247,7 @@ LayerTestResult<T, 4> BatchMatMulNCHWSimpleTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::BatchMatMulDescriptor(
-        armnn::Optional<armnn::DataLayout>(armnn::DataLayout::NCHW),
-        armnn::Optional<armnn::DataLayout>(armnn::DataLayout::NCHW));
+    auto descriptor = armnn::BatchMatMulDescriptor(); // Default arbitrary layout is treated the same as NCHW
 
     float qScale = 0.0f;
     int32_t qOffset = 0;
@@ -282,7 +280,7 @@ LayerTestResult<T, 4> BatchMatMulNCHWSimpleTest(
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         19, 22,
         43, 50
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 4>(workloadFactory,
                                                 memoryManager,
@@ -338,9 +336,12 @@ LayerTestResult<T, 4> BatchMatMulNHWCSimpleTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::BatchMatMulDescriptor(
-        armnn::Optional<armnn::DataLayout>(armnn::DataLayout::NHWC),
-        armnn::Optional<armnn::DataLayout>(armnn::DataLayout::NHWC));
+    auto descriptor = armnn::BatchMatMulDescriptor(false,
+                                                   false,
+                                                   false,
+                                                   false,
+                                                   armnn::DataLayout::NHWC,
+                                                   armnn::DataLayout::NHWC);
 
     float qScale = 0.0f;
     int32_t qOffset = 0;
@@ -373,7 +374,7 @@ LayerTestResult<T, 4> BatchMatMulNHWCSimpleTest(
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         19, 22,
         43, 50
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 4>(workloadFactory,
                                                 memoryManager,
@@ -471,7 +472,7 @@ LayerTestResult<T, 3> BatchMatMul3DBatchTest(
 
         267, 286,
         323, 346
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 3>(workloadFactory,
                                                 memoryManager,
@@ -566,7 +567,7 @@ LayerTestResult<T, 3> BatchMatMul3DBroadcastTest(
 
         267, 286,
         323, 346
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 3>(workloadFactory,
                                                 memoryManager,
@@ -661,7 +662,7 @@ LayerTestResult<T, 3> BatchMatMul3D2DBroadcastTest(
 
         267, 286,
         323, 346
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 3>(workloadFactory,
                                                 memoryManager,
@@ -717,9 +718,12 @@ LayerTestResult<T, 5> BatchMatMulNDHWCNHWCTest(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::BatchMatMulDescriptor(
-        armnn::Optional<armnn::DataLayout>(armnn::DataLayout::NDHWC),
-        armnn::Optional<armnn::DataLayout>(armnn::DataLayout::NHWC));
+    auto descriptor = armnn::BatchMatMulDescriptor(false,
+                                                   false,
+                                                   false,
+                                                   false,
+                                                   armnn::DataLayout::NDHWC,
+                                                   armnn::DataLayout::NHWC);
 
     float qScale = 0.0f;
     int32_t qOffset = 0;
@@ -761,7 +765,7 @@ LayerTestResult<T, 5> BatchMatMulNDHWCNHWCTest(
 
        34, 1079,
        46, 1167
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 5>(workloadFactory,
                                                 memoryManager,
@@ -959,7 +963,7 @@ LayerTestResult<T, 3> BatchMatMul3DNonSquareTest(
         88, 100, 142, 106,
         39, 61, 78, 56,
         72, 52, 98, 70
-    },qScale, qOffset);
+    }, qScale, qOffset);
 
     return BatchMatMulTestImpl<ArmnnType, T, 3>(workloadFactory,
                                                 memoryManager,
@@ -1005,6 +1009,332 @@ BatchMatMul3DNonSquareTest<armnn::DataType::QAsymmU8>(
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 3>
 BatchMatMul3DNonSquareTest<armnn::DataType::QSymmS16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 2> BatchMatMul2DTranspSimpleTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    auto descriptor = armnn::BatchMatMulDescriptor(true,
+                                                   false,
+                                                   false,
+                                                   false);
+
+    float qScale = 0.0f;
+    int32_t qOffset = 0;
+
+    switch(ArmnnType)
+    {
+        case armnn::DataType::QAsymmS8:
+        case armnn::DataType::QAsymmU8:
+        case armnn::DataType::QSymmS16:
+            qScale = 1.0f;
+            break;
+        default:
+            break;
+    }
+
+    armnn::TensorInfo inputXInfo({2,3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo inputYInfo({2,3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputInfo({3,3}, ArmnnType, qScale, qOffset);
+
+    std::vector<T> inputX = armnnUtils::QuantizedVector<T>({
+        1, 2, 3,
+        4, 5, 6
+    }, qScale, qOffset);
+
+    std::vector<T> inputY = armnnUtils::QuantizedVector<T>({
+        7, 8, 9,
+        10, 11, 12
+    }, qScale, qOffset);
+
+    std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
+        47, 52, 57,
+        64, 71, 78,
+        81, 90, 99
+    }, qScale, qOffset);
+
+    return BatchMatMulTestImpl<ArmnnType, T, 2>(workloadFactory,
+                                                memoryManager,
+                                                tensorHandleFactory,
+                                                descriptor,
+                                                inputX,
+                                                inputY,
+                                                outputExpected,
+                                                inputXInfo,
+                                                inputYInfo,
+                                                outputInfo);
+}
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 2>
+BatchMatMul2DTranspSimpleTest<armnn::DataType::BFloat16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 2>
+BatchMatMul2DTranspSimpleTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 2>
+BatchMatMul2DTranspSimpleTest<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 2>
+BatchMatMul2DTranspSimpleTest<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 2>
+BatchMatMul2DTranspSimpleTest<armnn::DataType::QAsymmU8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 2>
+BatchMatMul2DTranspSimpleTest<armnn::DataType::QSymmS16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 2> BatchMatMul2DAdjointSimpleTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    auto descriptor = armnn::BatchMatMulDescriptor(false,
+                                                   false,
+                                                   true,
+                                                   false);
+
+    float qScale = 0.0f;
+    int32_t qOffset = 0;
+
+    switch(ArmnnType)
+    {
+        case armnn::DataType::QAsymmS8:
+        case armnn::DataType::QAsymmU8:
+        case armnn::DataType::QSymmS16:
+            qScale = 1.0f;
+            break;
+        default:
+            break;
+    }
+
+    armnn::TensorInfo inputXInfo({3,3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo inputYInfo({3,3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputInfo({3,3}, ArmnnType, qScale, qOffset);
+
+    std::vector<T> inputX = armnnUtils::QuantizedVector<T>({
+        3, 1, 1,
+        1, 3, -1,
+        2, 4, 1
+    }, qScale, qOffset);
+
+    std::vector<T> inputY = armnnUtils::QuantizedVector<T>({
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1
+    }, qScale, qOffset);
+
+    std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
+        7, 3, -4,
+        -3, 1, 4,
+        -2, -10, 8
+    }, qScale, qOffset);
+
+    switch (ArmnnType)
+    {
+        case armnn::DataType::QAsymmU8:
+            outputExpected = armnnUtils::QuantizedVector<T>({
+                3, 3, 0,
+                0, 1, 1,
+                0, 0, 8
+            }, qScale, qOffset);
+            break;
+        default:
+            break;
+    }
+
+    return BatchMatMulTestImpl<ArmnnType, T, 2>(workloadFactory,
+                                                memoryManager,
+                                                tensorHandleFactory,
+                                                descriptor,
+                                                inputX,
+                                                inputY,
+                                                outputExpected,
+                                                inputXInfo,
+                                                inputYInfo,
+                                                outputInfo);
+}
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 2>
+BatchMatMul2DAdjointSimpleTest<armnn::DataType::BFloat16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 2>
+BatchMatMul2DAdjointSimpleTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 2>
+BatchMatMul2DAdjointSimpleTest<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 2>
+BatchMatMul2DAdjointSimpleTest<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 2>
+BatchMatMul2DAdjointSimpleTest<armnn::DataType::QAsymmU8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 2>
+BatchMatMul2DAdjointSimpleTest<armnn::DataType::QSymmS16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template<armnn::DataType ArmnnType, typename T>
+LayerTestResult<T, 4> BatchMatMulNHWCParamsTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    auto descriptor = armnn::BatchMatMulDescriptor(false,
+                                                   true,
+                                                   true,
+                                                   false,
+                                                   armnn::DataLayout::NHWC,
+                                                   armnn::DataLayout::NHWC);
+
+    float qScale = 0.0f;
+    int32_t qOffset = 0;
+
+    switch(ArmnnType)
+    {
+        case armnn::DataType::QAsymmS8:
+        case armnn::DataType::QAsymmU8:
+        case armnn::DataType::QSymmS16:
+            qScale = 1.0f;
+            break;
+        default:
+            break;
+    }
+
+    armnn::TensorInfo inputXInfo({1,4,4,2}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo inputYInfo({2,2,4,1}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo outputInfo({2,4,2,2}, ArmnnType, qScale, qOffset);
+
+    std::vector<T> inputX = armnnUtils::QuantizedVector<T>({
+       1, -3, 1, 4, 4, 9, 1, 2,
+       2, 4, 2, 2, 10, 7, 6, -5,
+       3, 8, 9, 9, 21, 1, 17, 7,
+       5, 11, 11, 8, 29, 3, 23, 6
+    }, qScale, qOffset);
+
+    std::vector<T> inputY = armnnUtils::QuantizedVector<T>({
+        1, 2, 3, 4,
+        5, 6, 7, 8,
+
+        9, 10, 11, 12,
+        13, 14, 15, 16
+    }, qScale, qOffset);
+
+    std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
+        28, 625, 140, 585,
+        8, 110, -8, 1662,
+        -24, 401, -120, 921,
+        12, 131, 108, -501,
+
+        252, 545, 364, 505,
+        -24, 3214, -40, 4766,
+        -216, 1441, -312, 1961,
+        204, -1133, 300, -1765
+    }, qScale, qOffset);
+
+    switch (ArmnnType)
+    {
+        case armnn::DataType::QAsymmU8:
+            outputExpected = armnnUtils::QuantizedVector<T>({
+                28, 80, 140, 80,
+                8, 45, 0, 255,
+                0, 18, 0, 18,
+                12, 0, 108, 0,
+
+                252, 80, 255, 80,
+                0, 255, 0, 255,
+                0, 18, 0, 18,
+                204, 0, 255, 0
+            }, qScale, qOffset);
+            break;
+        default:
+            break;
+    }
+
+    return BatchMatMulTestImpl<ArmnnType, T, 4>(workloadFactory,
+                                                memoryManager,
+                                                tensorHandleFactory,
+                                                descriptor,
+                                                inputX,
+                                                inputY,
+                                                outputExpected,
+                                                inputXInfo,
+                                                inputYInfo,
+                                                outputInfo);
+}
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::BFloat16>, 4>
+BatchMatMulNHWCParamsTest<armnn::DataType::BFloat16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
+BatchMatMulNHWCParamsTest<armnn::DataType::Float32>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
+BatchMatMulNHWCParamsTest<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+BatchMatMulNHWCParamsTest<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+BatchMatMulNHWCParamsTest<armnn::DataType::QAsymmU8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QSymmS16>, 4>
+BatchMatMulNHWCParamsTest<armnn::DataType::QSymmS16>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);

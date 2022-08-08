@@ -12,6 +12,7 @@
 
 #include <Profiling.hpp>
 #include <armnn/Optional.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 namespace armnn
 {
@@ -105,6 +106,68 @@ TEST_CASE("RegisterUnregisterProfilerMultipleThreads")
     {
         CHECK(res[i]);
     }
+}
+
+TEST_CASE("LayerWorkloadConstructorWithEmptyWorkloadInfo")
+{
+    // Calling AddDetailsToString with a descriptor that contains no tensors or parameters results
+    // in an invalid piece of JSON as the function assumes there will be something after the input
+    // and output tensors are printed and leaves a hanging ','
+    // This test validates that the fix for that continues to work.
+    armnn::ProfilingDetails classOnTest;
+    armnn::ArgMinMaxDescriptor descriptor;
+    armnn::WorkloadInfo workloadInfo;
+    arm::pipe::ProfilingGuid guid;
+    classOnTest.AddDetailsToString("NeonArgMinMaxWorkload_Construct", descriptor, workloadInfo, guid);
+    std::string result = classOnTest.GetProfilingDetails();
+    // Make sure the string ends with a "GUID": "0"\n}"
+    REQUIRE(result.find("GUID\": \"0\"\n}") != std::string::npos);
+}
+
+TEST_CASE("LayerWorkloadConstructorWithWorkloadInfoOnlyInputTensor")
+{
+    // Calling AddDetailsToString with a descriptor that contains a single inout tensor and no output
+    // tensor or parameters results in an invalid piece of JSON as the function assumes there will be
+    // something after the input and output tensors are printed and leaves a hanging ','
+    // This test validates that the fix for that continues to work.
+
+    armnn::ProfilingDetails classOnTest;
+    armnn::ArgMinMaxDescriptor descriptor;
+    armnn::WorkloadInfo workloadInfo;
+    arm::pipe::ProfilingGuid guid;
+    armnn::TensorInfo inputTensorInfo =
+        armnnUtils::GetTensorInfo(1, 1, 1, 1, armnn::DataLayout::NCHW, armnn::DataType::Float32);
+    workloadInfo.m_InputTensorInfos.push_back(inputTensorInfo);
+
+    classOnTest.AddDetailsToString("NeonArgMinMaxWorkload_Construct", descriptor, workloadInfo, guid);
+    std::string result = classOnTest.GetProfilingDetails();
+    // Make sure the string ends with a "Num Dims\": \"4\"\n\t}\n}"
+    REQUIRE(result.find("Num Dims\": \"4\"\n\t}\n}") != std::string::npos);
+}
+
+TEST_CASE("LayerWorkloadConstructorWithWorkloadInfoInputAndOutputTensorNoParameters")
+{
+    // Calling AddDetailsToString with a descriptor that contains no tensors or parameters results
+    // in an invalid piece of JSON as the function assumes there will be something after the input
+    // and output tensors are printed and leaves a hanging ','
+    // This test validates that the fix for that continues to work.
+    armnn::ProfilingDetails classOnTest;
+    armnn::ArgMinMaxDescriptor descriptor;
+    armnn::WorkloadInfo workloadInfo;
+    arm::pipe::ProfilingGuid guid;
+    armnn::TensorInfo inputTensorInfo =
+        armnnUtils::GetTensorInfo(1, 1, 1, 1, armnn::DataLayout::NCHW, armnn::DataType::Float32);
+    workloadInfo.m_InputTensorInfos.push_back(inputTensorInfo);
+
+    // We'll make the output tensrinfo have 5 dimensions to make errors easier to detect.
+    armnn::TensorInfo outputTensorInfo =
+        armnnUtils::GetTensorInfo(1, 1, 1, 1, 1, armnn::DataLayout::NCDHW, armnn::DataType::Float32);
+    workloadInfo.m_OutputTensorInfos.push_back(outputTensorInfo);
+
+    classOnTest.AddDetailsToString("NeonArgMinMaxWorkload_Construct", descriptor, workloadInfo, guid);
+    std::string result = classOnTest.GetProfilingDetails();
+    // Make sure the string ends with a "Num Dims\": \"4\"\n\t}\n}"
+    REQUIRE(result.find("Num Dims\": \"5\"\n\t}\n}") != std::string::npos);
 }
 
 TEST_CASE("ProfilingMacros")

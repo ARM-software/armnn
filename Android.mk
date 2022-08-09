@@ -297,11 +297,10 @@ LOCAL_CFLAGS := \
         -Wno-unused-parameter \
         -frtti \
         -DFMT_HEADER_ONLY
-        
-ifeq ($(ARMNN_DRIVER_DEBUG),1)
+
 LOCAL_LDFLAGS += \
                 -Wl,-Map=libarmnnMapFile.map
-endif # ARMNN_DRIVER_DEBUG == 1
+
 # The variable to enable/disable the CL backend (ARMNN_COMPUTE_CL_ENABLED) is declared in android-nn-driver/Android.mk
 ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
 LOCAL_CFLAGS += \

@@ -61,7 +61,7 @@ git checkout <branch_name> # e.g. branches/armnn_21_11
 ## Build Tensorflow Lite for C++
 Tensorflow has a few dependencies on it's own. It requires the python packages pip3, numpy,
 and also Bazel or CMake which are used to compile Tensorflow. A description on how to build bazel can be
-found [here](https://docs.bazel.build/versions/master/install-compile-source.html). But for this guide, we will
+found [here](https://bazel.build/install/compile-source). But for this guide, we will
 compile with CMake. Depending on your operating system and architecture there might be an easier way.
 ```bash
 wget -O cmake-3.16.0.tar.gz https://cmake.org/files/v3.16/cmake-3.16.0.tar.gz

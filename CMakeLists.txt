@@ -464,7 +464,7 @@ endif()
 
 target_compile_definitions(armnn PRIVATE "ARMNN_COMPILING_DLL")
 
-# Generate a map file for debug mode only
+# Generate a map file for all build modes
 set_property(TARGET armnn APPEND_STRING PROPERTY
         LINK_FLAGS " -Wl,-Map=libarmnnMapFile.map")
 message(STATUS "Linker will generate mapfile ")

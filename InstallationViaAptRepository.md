@@ -3,11 +3,11 @@
 * [Introduction](#introduction)
 * [Add the Ubuntu Launchpad PPA to your system](#add-the-ubuntu-launchpad-ppa-to-your-system)
 * [Outline of available packages](#outline-of-available-packages)
-  + [x86_64](#x86-64)
+  + [x86_64](#x86_64)
   + [arm64](#arm64)
   + [armhf](#armhf)
-* [Check latest version of packages](#check-latest-version-of-packages)
 * [Install desired combination of packages](#install-desired-combination-of-packages)
+* [Installation of specific ABI versioned packages](#installation-of-specific-abi-versioned-packages)
 * [Uninstall packages](#uninstall-packages)
 
 
@@ -117,7 +117,7 @@ The easiest way to install all of the available packages for your systems archit
  sudo apt-get install -y python3-pyarmnn armnn-latest-all
  # Verify installation via python:
  python3 -c "import pyarmnn as ann;print(ann.GetVersion())"
- # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 27.0.0
+ # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 30.0.0
 ```
 This will install PyArmNN and the three backends for Neon (CpuAcc), OpenCL (GpuAcc) and our Reference Backend.
 It will also install their dependencies including the arm-compute-library package along with the Tensorflow Lite Parser
@@ -156,9 +156,11 @@ In order to check for the latest available Arm NN version use apt-cache search:
  libarmnntfliteparser-dev - Arm NN is an inference engine for CPUs, GPUs and NPUs # Note: removal of dash to suit debian naming conventions
  libarmnn-tfliteparser23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnntfliteparser24 - Arm NN is an inference engine for CPUs, GPUs and NPUs # Note: removal of dash to suit debian naming conventions
+ libarmnntfliteparser24.5 - Arm NN is an inference engine for CPUs, GPUs and NPUs # Note: removal of dash to suit debian naming conventions
  libarmnn23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnn24 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnn25 - Arm NN is an inference engine for CPUs, GPUs and NPUs
+ libarmnn30 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnn-aclcommon23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
  libarmnnaclcommon24 - Arm NN is an inference engine for CPUs, GPUs and NPUs # Note: removal of dash to suit debian naming conventions
  libarmnn-cpuacc-backend23 - Arm NN is an inference engine for CPUs, GPUs and NPUs
@@ -167,13 +169,13 @@ In order to check for the latest available Arm NN version use apt-cache search:
  libarmnn-gpuacc-backend24 - Arm NN is an inference engine for CPUs, GPUs and NPUs
 
 
- # Export the ARMNN_MAJOR_VERSION to the latest visible e.g. libarmnn25 to allow installation using the below examples
- export ARMNN_MAJOR_VERSION=27
+ # Export the ARMNN_MAJOR_VERSION to the latest visible e.g. libarmnn30 to allow installation using the below examples
+ export ARMNN_MAJOR_VERSION=30
 
   # As the Tensorflow Lite Parser is now ABI stable it will have a different version to ARMNN_MAJOR_VERSION please choose latest version:
   apt-cache search libarmnntfliteparser
-  # Returns e.g. libarmnntfliteparser24 so we then export that version, for reference this comes from include/armnnTfLiteParser/Version.hpp:
-  export TFLITE_PARSER_VERSION=24
+  # Returns e.g. libarmnntfliteparser24.5 so we then export that version, for reference this comes from include/armnnTfLiteParser/Version.hpp:
+  export TFLITE_PARSER_VERSION=24.5
 
   sudo apt-get install -y libarmnntfliteparser${TFLITE_PARSER_VERSION} libarmnn-cpuacc-backend${ARMNN_MAJOR_VERSION}
 ```

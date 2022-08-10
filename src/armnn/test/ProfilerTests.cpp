@@ -170,6 +170,35 @@ TEST_CASE("LayerWorkloadConstructorWithWorkloadInfoInputAndOutputTensorNoParamet
     REQUIRE(result.find("Num Dims\": \"5\"\n\t}\n}") != std::string::npos);
 }
 
+TEST_CASE("LayerWorkloadConstructorWithWorkloadInfoMultipleInputAndMultipleOutputTensorNoParameters")
+{
+    // Calling AddDetailsToString with a descriptor that contains multiple input and output tensors. This is
+    // specifically looking at the usage of "addSeparator" parameter in PrintInfos.
+    armnn::ProfilingDetails classOnTest;
+    armnn::ArgMinMaxDescriptor descriptor;
+    armnn::WorkloadInfo workloadInfo;
+    arm::pipe::ProfilingGuid guid;
+    armnn::TensorInfo inputTensorInfo =
+        armnnUtils::GetTensorInfo(1, 1, 1, 1, armnn::DataLayout::NCHW, armnn::DataType::Float32);
+    // Add two inputs.
+    workloadInfo.m_InputTensorInfos.push_back(inputTensorInfo);
+    workloadInfo.m_InputTensorInfos.push_back(inputTensorInfo);
+
+    // We'll make the output tensrinfo have 5 dimensions to make errors easier to detect.
+    armnn::TensorInfo outputTensorInfo =
+        armnnUtils::GetTensorInfo(1, 1, 1, 1, 1, armnn::DataLayout::NCDHW, armnn::DataType::Float32);
+    // and two outputs.
+    workloadInfo.m_OutputTensorInfos.push_back(outputTensorInfo);
+    workloadInfo.m_OutputTensorInfos.push_back(outputTensorInfo);
+
+    classOnTest.AddDetailsToString("NeonArgMinMaxWorkload_Construct", descriptor, workloadInfo, guid);
+    std::string result = classOnTest.GetProfilingDetails();
+    // Look for the piece in the middle between Input 0 and Input 1:
+    REQUIRE(result.find("Dims\": \"4\"\n\t},\n\t\"Input 1\": {\n\t\t\"Shape\": \"[1,1,1,1]\"") != std::string::npos);
+    // Look for the piece in the middle between Output 0and Output 1:
+    REQUIRE(result.find("Dims\": \"5\"\n\t},\n\t\"Output 1\": {\n\t\t\"Shape\": \"[1,1,1,1,1]\"") != std::string::npos);
+}
+
 TEST_CASE("ProfilingMacros")
 {
     // Get a reference to the profiler manager.

@@ -169,7 +169,8 @@ private:
             // Close out the scope
             PrintNewLine();
             PrintFooter();
-            if (addSeparator)
+            // For the last element we will consider the value of addSeparator.
+            if ((i < infos.size() - 1) || (addSeparator))
             {
                 PrintSeparator();
                 PrintNewLine();

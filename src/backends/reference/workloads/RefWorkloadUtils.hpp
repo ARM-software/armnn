@@ -23,11 +23,12 @@ namespace armnn
 /// float32 helpers
 ////////////////////////////////////////////
 
+template <typename TensorHandleType = RefTensorHandle>
 inline const TensorInfo& GetTensorInfo(const ITensorHandle* tensorHandle)
 {
     // We know that reference workloads use RefTensorHandles for inputs and outputs
-    const RefTensorHandle* refTensorHandle =
-        PolymorphicDowncast<const RefTensorHandle*>(tensorHandle);
+    const TensorHandleType* refTensorHandle =
+        PolymorphicDowncast<const TensorHandleType*>(tensorHandle);
     return refTensorHandle->GetTensorInfo();
 }
 

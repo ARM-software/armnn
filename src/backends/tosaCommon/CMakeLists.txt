@@ -8,6 +8,7 @@ include_directories(SYSTEM ${TOSA_SERIALIZATION_LIB_INCLUDE})
 
 list(APPEND armnnTosaBackend_sources
         TosaMappings.hpp
+        TosaLayerSupportRules.hpp
     )
 
 add_subdirectory(operatorMappings)

@@ -2348,4 +2348,11 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateUnidirectionalSequenceLstm(
     return std::unique_ptr<IWorkload>();
 }
 
+std::unique_ptr<IWorkload> IWorkloadFactory::CreateInput(
+        const InputQueueDescriptor& /*descriptor*/,
+        const WorkloadInfo& /*info*/) const
+{
+    return std::unique_ptr<IWorkload>();
+}
+
 } // namepsace armnn

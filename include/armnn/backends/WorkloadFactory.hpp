@@ -56,9 +56,6 @@ public:
                                                                  unsigned int const* subTensorOrigin
                                                                 ) const = 0;
 
-    virtual std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
-                                                   const WorkloadInfo& info) const = 0;
-
     ARMNN_DEPRECATED_MSG("Use ITensorHandleFactory::CreateTensorHandle instead")
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               const bool IsMemoryManaged = true) const = 0;
@@ -71,6 +68,11 @@ public:
     virtual std::unique_ptr<IWorkload> CreateWorkload(LayerType type,
                                                       const QueueDescriptor& descriptor,
                                                       const WorkloadInfo& info) const;
+
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ABI stable "
+    "CreateWorkload(LayerType, const QueueDescriptor&, const WorkloadInfo& info) instead.", "23.08")
+    virtual std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
+                                                   const WorkloadInfo& info) const;
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ABI stable "
     "CreateWorkload(LayerType, const QueueDescriptor&, const WorkloadInfo& info) instead.", "23.08")

@@ -188,7 +188,7 @@ public:
                                                  const TensorInfo& detectionScores,
                                                  const TensorInfo& numDetections,
                                                  const DetectionPostProcessDescriptor& descriptor,
-                                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const =0;
+                                                 Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. "
                                       "Use ABI Stable IsLayerSupported accepting LayerType argument instead.", "23.08")

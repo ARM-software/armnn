@@ -242,6 +242,12 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         {
             this->SetSerializeToDot(options_values[i]);
         }
+
+            // Process disable-tflite-runtime-fallback
+        else if (std::string(options_keys[i]) == std::string("disable-tflite-runtime-fallback"))
+        {
+            this->DisableTfLiteRuntimeFallback(armnn::stringUtils::StringToBool(options_values[i]));
+        }
         else
         {
             throw armnn::Exception("Unknown option for the ArmNN Delegate given: " + std::string(options_keys[i]));

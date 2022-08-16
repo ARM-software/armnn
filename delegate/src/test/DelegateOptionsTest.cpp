@@ -150,6 +150,79 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsImport")
                                 delegateOptions);
 }
 
+TEST_CASE ("ArmnnDelegateStringParsingOptionDisableTfLiteRuntimeFallback")
+{
+    std::stringstream stringStream;
+    std::vector<std::string> keys   {  "backends", "debug-data", "disable-tflite-runtime-fallback"};
+    std::vector<std::string> values {    "CpuRef",          "1",                               "1"};
+
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
+    std::vector<float> inputData = { 0.1f, -2.1f, 3.0f, -4.6f };
+    std::vector<float> expectedResult = { 1.0f, -2.0f, 3.0f, -4.0f };
+
+    // Create options_keys and options_values char array
+    size_t num_options = keys.size();
+    std::unique_ptr<const char*> options_keys =
+            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*> options_values =
+            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    for (size_t i=0; i<num_options; ++i)
+    {
+        options_keys.get()[i]   = keys[i].c_str();
+        options_values.get()[i] = values[i].c_str();
+    }
+
+    StreamRedirector redirect(std::cout, stringStream.rdbuf());
+
+    armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(), num_options, nullptr);
+    DelegateOptionNoFallbackTest<float>(::tflite::TensorType_FLOAT32,
+                                        backends,
+                                        tensorShape,
+                                        inputData,
+                                        expectedResult,
+                                        delegateOptions);
+    CHECK(stringStream.str().find("TfLiteArmnnDelegate: There are unsupported operators in the model")
+                                                                                                 != std::string::npos);
+}
+
+TEST_CASE ("ArmnnDelegateStringParsingOptionEnableTfLiteRuntimeFallback")
+{
+    std::stringstream stringStream;
+    std::vector<std::string> keys   {  "backends", "debug-data", "disable-tflite-runtime-fallback"};
+    std::vector<std::string> values {    "CpuRef",          "1",                               "0"};
+
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
+    std::vector<float> inputData = { 0.1f, -2.1f, 3.0f, -4.6f };
+    std::vector<float> expectedResult = { 1.0f, -2.0f, 3.0f, -4.0f };
+
+    // Create options_keys and options_values char array
+    size_t num_options = keys.size();
+    std::unique_ptr<const char*> options_keys =
+            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*> options_values =
+            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    for (size_t i=0; i<num_options; ++i)
+    {
+        options_keys.get()[i]   = keys[i].c_str();
+        options_values.get()[i] = values[i].c_str();
+    }
+
+    StreamRedirector redirect(std::cout, stringStream.rdbuf());
+
+    armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(), num_options, nullptr);
+    DelegateOptionNoFallbackTest<float>(::tflite::TensorType_FLOAT32,
+                                        backends,
+                                        tensorShape,
+                                        inputData,
+                                        expectedResult,
+                                        delegateOptions);
+
+    CHECK(stringStream.str().find("TfLiteArmnnDelegate: There are unsupported operators in the model")
+                                                                                                 == std::string::npos);
+}
+
 }
 
 TEST_SUITE("DelegateOptions_CpuAccTests")
@@ -306,7 +379,6 @@ TEST_CASE ("ArmnnDelegateStringParsingOptionReduceFp32ToFp16")
         CHECK(ss.str().find("convert_fp16_to_fp32") == std::string::npos);
     }
 }
-
 
 }
 

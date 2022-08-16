@@ -174,6 +174,12 @@ public:
      *                 This is an Experimental parameter that is incompatible with "infer-output-shape". \n
      *                 This parameter may be removed in a later update.
      *
+     *    Option key: "disable-tflite-runtime-fallback" \n
+     *    Possible values: ["true"/"false"] \n
+     *    Description: Disable TfLite Runtime fallback in the Arm NN TfLite delegate.
+     *                 An exception will be thrown if unsupported operators are encountered.
+     *                 This option is only for testing purposes.
+     *
      * @param[in]     option_keys     Delegate option names
      * @param[in]     options_values  Delegate option values
      * @param[in]     num_options     Number of delegate options
@@ -262,6 +268,15 @@ public:
         return m_RuntimeOptions;
     }
 
+    void DisableTfLiteRuntimeFallback(bool fallbackState)
+    {
+        m_DisableTfLiteRuntimeFallback = fallbackState;
+    }
+    bool TfLiteRuntimeFallbackDisabled()
+    {
+        return m_DisableTfLiteRuntimeFallback;
+    }
+
 private:
     /// Which backend to run Delegate on.
     /// Examples of possible values are: CpuRef, CpuAcc, GpuAcc.
@@ -295,6 +310,9 @@ private:
 
     /// If not empty then the optimized model will be serialized to a file with this file name in "dot" format.
     std::string m_SerializeToDot = "";
+
+    /// Option to disable TfLite Runtime fallback for unsupported operators.
+    bool m_DisableTfLiteRuntimeFallback = false;
 };
 
 } // namespace armnnDelegate

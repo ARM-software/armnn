@@ -222,6 +222,15 @@ TfLiteIntArray* Delegate::IdentifyOperatorsToDelegate(TfLiteContext* tfLiteConte
                            *it);
     }
 
+    if (!unsupportedOperators.empty() && m_Options.TfLiteRuntimeFallbackDisabled())
+    {
+        std::stringstream exMessage;
+        exMessage << "TfLiteArmnnDelegate: There are unsupported operators in the model. ";
+        exMessage << "Not falling back to TfLite Runtime as fallback is disabled. ";
+        exMessage << "This should only be disabled under test conditions.";
+        throw armnn::Exception(exMessage.str());
+    }
+
     std::sort(&nodesToDelegate->data[0], &nodesToDelegate->data[nodesToDelegate->size]);
     return nodesToDelegate;
 }

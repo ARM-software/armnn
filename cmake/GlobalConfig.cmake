@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -11,6 +11,7 @@ option(BUILD_FOR_COVERAGE "Use no optimization and output .gcno and .gcda files"
 option(ARMCOMPUTENEON "Build with ARM Compute NEON support" OFF)
 option(ARMCOMPUTECL "Build with ARM Compute OpenCL support" OFF)
 option(ARMNNREF "Build with ArmNN reference support" ON)
+option(ARMNNTOSAREF "Build with Tosa reference support" OFF)
 option(PROFILING_BACKEND_STREAMLINE "Forward the armNN profiling events to DS-5/Streamline as annotations" OFF)
 # options used for heap profiling and leak checking
 option(HEAP_PROFILING "Build with heap profiling enabled" OFF)
@@ -23,6 +24,7 @@ option(BUILD_ACCURACY_TOOL "Build Accuracy Tool" OFF)
 option(FLATC_DIR "Path to Flatbuffers compiler" OFF)
 option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OFF)
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
+option(TOSA_SERIALIZATION_LIB_ROOT "Location where the TOSA serialization library 'include' and 'lib' folders can be found" OFF)
 option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dynamic backends from" "")
 option(SAMPLE_DYNAMIC_BACKEND "Include the sample dynamic backend and its tests in the build" OFF)
 option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling testing." ON)
@@ -183,8 +185,8 @@ endif()
 if(BUILD_ARMNN_TFLITE_DELEGATE)
     add_definitions(-DARMNN_TFLITE_DELEGATE)
 endif()
-# Flatbuffers support for TF Lite and Armnn Serializer
-if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER)
+# Flatbuffers support for TF Lite, Armnn Serializer or the TOSA backend.
+if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER OR ARMNNTOSAREF)
     # verify we have a valid flatbuffers include path
     find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
               HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
@@ -332,6 +334,21 @@ endif()
 # ArmNN reference backend
 if(ARMNNREF)
     add_definitions(-DARMNNREF_ENABLED)
+endif()
+
+# ArmNN TOSA reference backend
+if(ARMNNTOSAREF)
+    # Locate the includes for the TOSA serialization library.
+    message(STATUS "TOSA serialization library root set to ${TOSA_SERIALIZATION_LIB_ROOT}")
+
+    find_path(TOSA_SERIALIZATION_LIB_INCLUDE tosa_serialization_handler.h HINTS
+            ${TOSA_SERIALIZATION_LIB_ROOT}/include)
+    message(STATUS "TOSA serialization library include directory located at: ${TOSA_SERIALIZATION_LIB_INCLUDE}")
+
+    find_library(TOSA_SERIALIZATION_LIB
+            NAMES tosa_serialization_lib.a tosa_serialization_lib
+            HINTS ${TOSA_SERIALIZATION_LIB_ROOT}/lib /usr/local/lib /usr/lib)
+    message(STATUS "TOSA serialization library set to ${TOSA_SERIALIZATION_LIB}")
 endif()
 
 # This is the root for the dynamic backend tests to search for dynamic

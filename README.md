@@ -1,4 +1,7 @@
-# Arm NN
+<br>
+<div align="center">
+  <img src="Arm_NN_horizontal_blue.png" class="center" alt="Arm NN Logo" width="300"/>
+</div>
 
 * [Quick Start Guides](#quick-start-guides)
 * [Pre-Built Binaries](#pre-built-binaries)
@@ -12,6 +15,8 @@
 
 ## Announcement: As part of Arm's commitment to the use of inclusive language we will be moving away from 'master' branch to 'main' soon.
 ## From 15 August 2022 our 'master' branch will be frozen and we will be using 'main' branch instead.
+
+# Arm NN
 
 **_Arm NN_** is the **most performant** machine learning (ML) inference engine for Android and Linux, accelerating ML
 on **Arm Cortex-A CPUs and Arm Mali GPUs**. This ML inference engine is an open source SDK which bridges the gap
@@ -48,6 +53,12 @@ We also provide Debian packages for Arm NN, which are a quick way to start using
 (albeit with less ML operator support than the TF Lite Delegate). There is an installation guide available
 [here](InstallationViaAptRepository.md) which provides instructions on how to install the Arm NN Core and the TF Lite
 Parser for Ubuntu 20.04.
+
+To build Arm NN from scratch, we provide the **[Arm NN Build Tool](build-tool/README.md)**. This tool consists of
+**parameterized bash scripts** accompanied by a **Dockerfile** for building Arm NN and its dependencies, including
+**[Arm Compute Library (ACL)](https://github.com/ARM-software/ComputeLibrary/)**. This tool replaces/supersedes the
+majority of the existing Arm NN build guides as a user-friendly way to build Arm NN. The main benefit of building
+Arm NN from scratch is the ability to **exactly choose which components to build, targeted for your ML project**.<br>
 
 
 ## Pre-Built Binaries
@@ -95,7 +106,7 @@ For FAQs and troubleshooting advice, see the [FAQ](docs/FAQ.md) or take a look a
 
 
 ## Get Involved
-The best way to get involved is by using our software. If you need help or encounter and issue, please raise it as a
+The best way to get involved is by using our software. If you need help or encounter an issue, please raise it as a
 [GitHub Issue](https://github.com/ARM-software/armnn/issues). Feel free to have a look at any of our open issues too.
 We also welcome feedback on our documentation.
 

@@ -15,6 +15,7 @@
 - [Run Unit Tests](#run-unit-tests)
 - [Troubleshooting and Errors:](#troubleshooting-and-errors-)
 
+### NOTE: This build guide is being replaced by the [Arm NN Build Tool](build-tool/README.md) and will be removed soon. Please use the [Arm NN Build Tool](build-tool/README.md) for a user-friendly way to build Arm NN and its dependencies.
 
 ## Introduction
 These are the step by step instructions on Cross-Compiling Arm NN under an x86_64 system to target an Arm64 Ubuntu Linux system. This build flow has been tested with Ubuntu 18.04 and 20.04 and it depends on the same version of Ubuntu or Debian being installed on both the build host and target machines. The instructions assume you are using a bash shell and show how to build the Arm NN core library, Protobuf, Tflite, Flatbuffer and Compute Libraries.

@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['waitcommand',['WaitCommand',['../classarmnn_1_1gatordmock_1_1_gatord_mock_service.xhtml#a18f77daf6b32e5bb456c2bc860140669',1,'armnn::gatordmock::GatordMockService']]],
+  ['waitforpacketssent',['WaitForPacketsSent',['../classarm_1_1pipe_1_1_swap_profiling_connection_factory_helper.xhtml#a19cea020509e009eb4661618eecf3cf3',1,'arm::pipe::SwapProfilingConnectionFactoryHelper']]],
+  ['waitforprofilingserviceactivation',['WaitForProfilingServiceActivation',['../classarm_1_1pipe_1_1_mock_profiling_service_status.xhtml#a80a0e4644a0be7b00bc581cb786d5a4f',1,'arm::pipe::MockProfilingServiceStatus']]],
+  ['waitforreceivingthread',['WaitForReceivingThread',['../classarmnn_1_1gatordmock_1_1_gatord_mock_service.xhtml#a93617d8640d5e93831d06a2ef3c86bef',1,'armnn::gatordmock::GatordMockService']]],
+  ['waitforstreammetadata',['WaitForStreamMetaData',['../classarmnn_1_1gatordmock_1_1_gatord_mock_service.xhtml#ac07351dbc304681b2efd5df4958a6735',1,'armnn::gatordmock::GatordMockService']]],
+  ['waitoninferencecompletion',['WaitOnInferenceCompletion',['../classarm_1_1pipe_1_1_test_timeline_packet_handler.xhtml#a72dbf07f5a1765ef4b046bfa932578d0',1,'arm::pipe::TestTimelinePacketHandler']]],
+  ['wallclocktimer',['WallClockTimer',['../classarmnn_1_1_wall_clock_timer.xhtml#afaae007fd3b7b6935ceb9b052271d461',1,'armnn::WallClockTimer']]],
+  ['what',['what',['../classarmnn_1_1_exception.xhtml#abf843cbb29dec939d0731e491bab6f70',1,'armnn::Exception']]],
+  ['within_5fpercentage_5ftolerance',['within_percentage_tolerance',['../namespacearmnn_utils.xhtml#a56b0e17341e000fa1d4561890294520c',1,'armnnUtils']]],
+  ['workingmemdescriptor',['WorkingMemDescriptor',['../structarmnn_1_1experimental_1_1_working_mem_descriptor.xhtml#a18f0622e8820f40989b382f511b678bd',1,'armnn::experimental::WorkingMemDescriptor']]],
+  ['workingmemhandle',['WorkingMemHandle',['../classarmnn_1_1experimental_1_1_working_mem_handle.xhtml#af67131ba41e1e6df7fe1428bd0475b92',1,'armnn::experimental::WorkingMemHandle::WorkingMemHandle(NetworkId networkId)'],['../classarmnn_1_1experimental_1_1_working_mem_handle.xhtml#a96d8b01c08cef8777555dc89c4afe8e8',1,'armnn::experimental::WorkingMemHandle::WorkingMemHandle(NetworkId networkId, std::vector&lt; InputMemDescriptorCoords &gt; inputLayerInfo, std::vector&lt; OutputMemDescriptorCoords &gt; outputLayerInfo, std::vector&lt; WorkingMemDescriptor &gt; workingMemDescriptors, std::unique_ptr&lt; MemoryManager &gt; memoryManager, std::vector&lt; std::pair&lt; std::shared_ptr&lt; TensorMemory &gt;, MemorySource &gt;&gt; tensorMemory, std::vector&lt; std::unique_ptr&lt; ITensorHandle &gt;&gt; managedTensorHandles, std::vector&lt; std::unique_ptr&lt; ITensorHandle &gt;&gt; unmanagedTensorHandles, std::vector&lt; std::pair&lt; BackendId, ExecutionData &gt;&gt; executionDataVec, BackendPtrMap *backends)']]],
+  ['workloaddatacollector',['WorkloadDataCollector',['../classarmnn_1_1_workload_data_collector.xhtml#a202f67f1d2625e7eb9d46c6e080cf0f2',1,'armnn::WorkloadDataCollector']]],
+  ['wrapclerror',['WrapClError',['../namespacearmnn.xhtml#a2192b5ff59aacdb27f8b0238323915dc',1,'armnn']]],
+  ['write',['Write',['../class_inference_test_image.xhtml#a98be3e32f21051eca5de5728c9cd43bc',1,'InferenceTestImage']]],
+  ['writeimagetensorimpl',['WriteImageTensorImpl',['../_image_tensor_generator_8hpp.xhtml#a292c4c49fc943bfcb7ee1ce1435d4690',1,'ImageTensorGenerator.hpp']]],
+  ['writeimagetensorimpl_3c_20int8_5ft_20_3e',['WriteImageTensorImpl&lt; int8_t &gt;',['../_image_tensor_generator_8hpp.xhtml#a0b38da4834591f31e1ee7511ff9563f3',1,'ImageTensorGenerator.hpp']]],
+  ['writeimagetensorimpl_3c_20uint8_5ft_20_3e',['WriteImageTensorImpl&lt; uint8_t &gt;',['../_image_tensor_generator_8hpp.xhtml#a2120283536d91fbdee0d19fff3156994',1,'ImageTensorGenerator.hpp']]],
+  ['writepacket',['WritePacket',['../classarm_1_1pipe_1_1_mock_profiling_connection.xhtml#a42eb542b5a1d73d00c4ce474140bb78c',1,'arm::pipe::MockProfilingConnection::WritePacket(const unsigned char *buffer, uint32_t length) override'],['../classarm_1_1pipe_1_1_mock_profiling_connection.xhtml#aae7fa615d4a944a10122344cf8bbd1be',1,'arm::pipe::MockProfilingConnection::WritePacket(arm::pipe::Packet &amp;&amp;packet)'],['../classarm_1_1pipe_1_1_test_profiling_connection_base.xhtml#a42eb542b5a1d73d00c4ce474140bb78c',1,'arm::pipe::TestProfilingConnectionBase::WritePacket()']]],
+  ['writetofile',['WriteToFile',['../_network_execution_utils_8hpp.xhtml#a213478ad343eb9bc37ce0e4335af0b46',1,'NetworkExecutionUtils.hpp']]],
+  ['wtfp_5fround_5fmantissa',['wtfp_round_mantissa',['../namespacearmnn.xhtml#a1c8a12a9ede3260e20c65238f20a52a6',1,'armnn']]]
+];

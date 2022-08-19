@@ -182,6 +182,7 @@ enum LayerType : uint {
     Convolution3d = 65,
     Pooling3d = 66,
     GatherNd = 67,
+    BatchMatMul = 68,
 }
 
 // Base layer table to be used as part of other layers
@@ -1009,6 +1010,20 @@ table UnidirectionalSequenceLstmLayer {
     inputParams:LstmInputParams;
 }
 
+table BatchMatMulDescriptor {
+    transposeX:bool = false;
+    transposeY:bool = false;
+    adjointX:bool = false;
+    adjointY:bool = false;
+    dataLayoutX:DataLayout = NCHW;
+    dataLayoutY:DataLayout = NCHW;
+}
+
+table BatchMatMulLayer {
+    base:LayerBase;
+    descriptor:BatchMatMulDescriptor;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -1078,6 +1093,7 @@ union Layer {
     Convolution3dLayer,
     Pooling3dLayer,
     GatherNdLayer,
+    BatchMatMulLayer,
 }
 
 table AnyLayer {

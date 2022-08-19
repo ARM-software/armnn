@@ -214,6 +214,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_ActivationLayer]             = &DeserializerImpl::ParseActivation;
     m_ParserFunctions[Layer_AdditionLayer]               = &DeserializerImpl::ParseAdd;
     m_ParserFunctions[Layer_ArgMinMaxLayer]              = &DeserializerImpl::ParseArgMinMax;
+    m_ParserFunctions[Layer_BatchMatMulLayer]            = &DeserializerImpl::ParseBatchMatMul;
     m_ParserFunctions[Layer_BatchToSpaceNdLayer]         = &DeserializerImpl::ParseBatchToSpaceNd;
     m_ParserFunctions[Layer_BatchNormalizationLayer]     = &DeserializerImpl::ParseBatchNormalization;
     m_ParserFunctions[Layer_CastLayer]                   = &DeserializerImpl::ParseCast;
@@ -292,6 +293,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_AdditionLayer()->base();
         case Layer::Layer_ArgMinMaxLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ArgMinMaxLayer()->base();
+        case Layer::Layer_BatchMatMulLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_BatchMatMulLayer()->base();
         case Layer::Layer_BatchToSpaceNdLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_BatchToSpaceNdLayer()->base();
         case Layer::Layer_BatchNormalizationLayer:
@@ -1250,6 +1253,37 @@ void IDeserializer::DeserializerImpl::ParseArgMinMax(GraphPtr graph, unsigned in
     descriptor.m_Axis = serializerDescriptor->axis();
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddArgMinMaxLayer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseBatchMatMul(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto serializerLayer = graph->layers()->Get(layerIndex)->layer_as_BatchMatMulLayer();
+    auto serializerDescriptor = serializerLayer->descriptor();
+
+    armnn::BatchMatMulDescriptor descriptor(serializerDescriptor->transposeX(),
+                                            serializerDescriptor->transposeY(),
+                                            serializerDescriptor->adjointX(),
+                                            serializerDescriptor->adjointY(),
+                                            ToDataLayout(serializerDescriptor->dataLayoutX()),
+                                            ToDataLayout(serializerDescriptor->dataLayoutY()));
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddBatchMatMulLayer(descriptor, layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

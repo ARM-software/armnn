@@ -88,6 +88,7 @@ private:
     void ParseActivation(GraphPtr graph, unsigned int layerIndex);
     void ParseAdd(GraphPtr graph, unsigned int layerIndex);
     void ParseArgMinMax(GraphPtr graph, unsigned int layerIndex);
+    void ParseBatchMatMul(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchToSpaceNd(GraphPtr graph, unsigned int layerIndex);
     void ParseBatchNormalization(GraphPtr graph, unsigned int layerIndex);
     void ParseCast(GraphPtr graph, unsigned int layerIndex);

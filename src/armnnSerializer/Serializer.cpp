@@ -218,6 +218,33 @@ void SerializerStrategy::SerializeArgMinMaxLayer(const armnn::IConnectableLayer 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ArgMinMaxLayer);
 }
 
+void SerializerStrategy::SerializeBatchMatMulLayer(const armnn::IConnectableLayer* layer,
+                                                   const armnn::BatchMatMulDescriptor& descriptor,
+                                                   const char* name)
+{
+    IgnoreUnused(name);
+
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_BatchMatMul);
+
+    // Create the FlatBuffer BatchMatMulDescriptor
+    auto flatBufferDescriptor = CreateBatchMatMulDescriptor(m_flatBufferBuilder,
+                                                            descriptor.m_TransposeX,
+                                                            descriptor.m_TransposeY,
+                                                            descriptor.m_AdjointX,
+                                                            descriptor.m_AdjointY,
+                                                            GetFlatBufferDataLayout(descriptor.m_DataLayoutX),
+                                                            GetFlatBufferDataLayout(descriptor.m_DataLayoutY));
+
+    // Create the FlatBuffer BatchMatMulLayer
+    auto flatBufferBatchMatMulLayer = CreateBatchMatMulLayer(m_flatBufferBuilder,
+                                                             flatBufferBaseLayer,
+                                                             flatBufferDescriptor);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferBatchMatMulLayer.o, serializer::Layer::Layer_BatchMatMulLayer);
+}
+
 // Build FlatBuffer for BatchToSpaceNd Layer
 void SerializerStrategy::SerializeBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
                                                       const armnn::BatchToSpaceNdDescriptor& descriptor,
@@ -1969,6 +1996,15 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
             const armnn::ArgMinMaxDescriptor& layerDescriptor =
                     static_cast<const armnn::ArgMinMaxDescriptor&>(descriptor);
             SerializeArgMinMaxLayer(layer, layerDescriptor, name);
+            break;
+        }
+        case armnn::LayerType::BatchMatMul:
+        {
+            const armnn::BatchMatMulDescriptor& layerDescriptor =
+                    static_cast<const armnn::BatchMatMulDescriptor&>(descriptor);
+            SerializeBatchMatMulLayer(layer,
+                                      layerDescriptor,
+                                      name);
             break;
         }
         case armnn::LayerType::BatchNormalization :

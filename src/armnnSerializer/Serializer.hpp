@@ -113,6 +113,10 @@ private:
                                  const armnn::ArgMinMaxDescriptor& argMinMaxDescriptor,
                                  const char* name = nullptr);
 
+    void SerializeBatchMatMulLayer(const armnn::IConnectableLayer* layer,
+                                   const armnn::BatchMatMulDescriptor& descriptor,
+                                   const char* name = nullptr);
+
     void SerializeBatchToSpaceNdLayer(const armnn::IConnectableLayer* layer,
                                       const armnn::BatchToSpaceNdDescriptor& descriptor,
                                       const char* name = nullptr);

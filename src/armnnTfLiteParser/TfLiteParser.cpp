@@ -680,6 +680,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_ARG_MAX]                 = &TfLiteParserImpl::ParseArgMax;
     m_ParserFunctions[tflite::BuiltinOperator_AVERAGE_POOL_2D]         = &TfLiteParserImpl::ParseAveragePool2D;
     m_ParserFunctions[tflite::BuiltinOperator_BATCH_TO_SPACE_ND]       = &TfLiteParserImpl::ParseBatchToSpaceND;
+    m_ParserFunctions[tflite::BuiltinOperator_BATCH_MATMUL]            = &TfLiteParserImpl::ParseBatchMatMul;
     m_ParserFunctions[tflite::BuiltinOperator_CAST]                    = &TfLiteParserImpl::ParseCast;
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParserImpl::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParserImpl::ParseConv2D;
@@ -1563,6 +1564,44 @@ void TfLiteParserImpl::ParseTransposeConv(size_t subgraphIndex, size_t operatorI
 void TfLiteParserImpl::ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex)
 {
     ParsePool(subgraphIndex, operatorIndex, PoolingAlgorithm::Average);
+}
+
+void TfLiteParserImpl::ParseBatchMatMul(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = fmt::format("BatchMatMul:{}:{}", subgraphIndex, operatorIndex);
+
+    TensorInfo inputXTensorInfo = ToTensorInfo(inputs[0]);
+    TensorInfo inputYTensorInfo = ToTensorInfo(inputs[1]);
+
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
+
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsBatchMatMulOptions();
+
+    BatchMatMulDescriptor descriptor(false,
+                                     false,
+                                     options->adj_x,
+                                     options->adj_y);
+                                     // Arbitrary DataLayout
+
+    IConnectableLayer* layer = m_Network->AddBatchMatMulLayer(descriptor, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
 void TfLiteParserImpl::ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex)

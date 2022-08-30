@@ -39,7 +39,6 @@ struct Pooling3dDescriptor;
 struct PreCompiledDescriptor;
 struct QLstmDescriptor;
 struct ReshapeDescriptor;
-struct ResizeBilinearDescriptor;
 struct ResizeDescriptor;
 struct ReduceDescriptor;
 struct SliceDescriptor;

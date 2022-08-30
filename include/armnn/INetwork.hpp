@@ -295,29 +295,6 @@ public:
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const char* name = nullptr);
 
-    /// Adds a 2D convolution layer to the network.
-    /// @param convolution2dDescriptor - Description of the 2D convolution layer.
-    /// @param weights - Tensor for the weights data.
-    /// @param biases - Optional tensor for the bias data. If specified, must match the output tensor shape.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
-    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                             const ConstTensor& weights,
-                                             const Optional<ConstTensor>& biases,
-                                             const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
-    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                             const ConstTensor& weights,
-                                             const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.08")
-    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                             const ConstTensor& weights,
-                                             const ConstTensor& biases,
-                                             const char* name = nullptr);
-
     /// Adds a 3D convolution layer to the network.
     /// @param convolution3dDescriptor - Description of the 3D convolution layer.
     /// @param name - Optional name for the layer.
@@ -338,19 +315,6 @@ public:
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddDepthwiseConvolution2dLayer(const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
                                                       const char* name = nullptr);
-
-    /// Adds a 2D depthwise convolution layer to the network.
-    /// @param convolution2dDescriptor - Description of the 2D depthwise convolution layer.
-    /// @param weights - Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].
-    /// @param biases Optional tensor for the bias data. If specified, must match the output tensor shape.
-    /// @param name - Optional name for the layer.
-    /// @return - Interface for configuring the layer.
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const Optional<ConstTensor>& biases,
-        const char* name = nullptr);
 
     /// Adds a Dequantize layer to the network.
     /// @return - Interface for configuring the layer.

@@ -921,43 +921,6 @@ struct GatherDescriptor : BaseDescriptor
     int32_t m_Axis;
 };
 
-/// A ResizeBilinearDescriptor for the ResizeBilinearLayer.
-struct ARMNN_DEPRECATED_MSG_REMOVAL_DATE(
-        "ResizeBilinearDescriptor is not supported anymore. Use ResizeDescriptor instead.",
-        "22.08")
-        ResizeBilinearDescriptor : BaseDescriptor
-{
-    ResizeBilinearDescriptor()
-        : m_TargetWidth(0)
-        , m_TargetHeight(0)
-        , m_DataLayout(DataLayout::NCHW)
-        , m_AlignCorners(false)
-        , m_HalfPixelCenters(false)
-    {}
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    bool operator ==(const ResizeBilinearDescriptor& rhs) const
-    {
-        return m_TargetWidth          == rhs.m_TargetWidth &&
-               m_TargetHeight         == rhs.m_TargetHeight &&
-               m_DataLayout           == rhs.m_DataLayout &&
-               m_AlignCorners         == rhs.m_AlignCorners &&
-               m_HalfPixelCenters     == rhs.m_HalfPixelCenters;
-    }
-    ARMNN_NO_DEPRECATE_WARN_END
-
-    /// Target width value.
-    uint32_t          m_TargetWidth;
-    /// Target height value.
-    uint32_t          m_TargetHeight;
-    /// The data layout to be used (NCHW, NHWC).
-    DataLayout m_DataLayout;
-    /// Aligned corners
-    bool m_AlignCorners;
-    /// Half Pixel Centers
-    bool m_HalfPixelCenters;
-};
-
 /// A ResizeDescriptor for the ResizeLayer.
 struct ResizeDescriptor : BaseDescriptor
 {

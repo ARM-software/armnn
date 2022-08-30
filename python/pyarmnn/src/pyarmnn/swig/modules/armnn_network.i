@@ -1179,25 +1179,15 @@ public:
 
         Args:
             convolution2dDescriptor (Convolution2dDescriptor): Description of the 2D convolution layer.
-            weights (ConstTensor): Tensor for the weights data.
-            biases (ConstTensor): Optional tensor for the bias data. If specified, must match the output tensor shape.
             name (str): Optional name for the layer.
 
         Returns:
             IConnectableLayer: Interface for configuring the layer.
         ") AddConvolution2dLayer;
     armnn::IConnectableLayer* AddConvolution2dLayer(const armnn::Convolution2dDescriptor& convolution2dDescriptor,
-                                                    const armnn::ConstTensor& weights,
-                                                    armnn::ConstTensor* biases = nullptr,
                                                     const char* name = nullptr) {
 
-        if (biases) {
-            return $self->AddConvolution2dLayer(convolution2dDescriptor, weights,
-                                                 armnn::Optional<armnn::ConstTensor>(*biases), name);
-        } else {
-            return $self->AddConvolution2dLayer(convolution2dDescriptor, weights,
-                                                 armnn::Optional<armnn::ConstTensor>(), name);
-        }
+        return $self->AddConvolution2dLayer(convolution2dDescriptor, name);
     }
 
     %feature("docstring",
@@ -1206,8 +1196,6 @@ public:
 
         Args:
             convolution2dDescriptor (DepthwiseConvolution2dDescriptor): Description of the 2D depthwise convolution layer.
-            weights (ConstTensor): Tensor for the weights. Expected format: [channelMultiplier, inputChannels, height, width].
-            biases (ConstTensor): Optional tensor for the bias data. If specified, must match the output tensor shape.
             name (str): Optional name for the layer.
 
         Returns:
@@ -1216,19 +1204,9 @@ public:
 
     armnn::IConnectableLayer* AddDepthwiseConvolution2dLayer(
         const armnn::DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const armnn::ConstTensor& weights,
-        const armnn::ConstTensor* biases = nullptr,
         const char* name = nullptr) {
 
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        if (biases) {
-            return $self->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights,
-                                                 armnn::Optional<armnn::ConstTensor>(*biases), name);
-        } else {
-            return $self->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights,
-                                                 armnn::Optional<armnn::ConstTensor>(), name);
-        }
-        ARMNN_NO_DEPRECATE_WARN_END
+        return $self->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, name);
     }
 
 }

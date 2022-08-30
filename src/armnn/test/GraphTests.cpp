@@ -632,13 +632,13 @@ TEST_CASE("IConnectableLayerConstantTensorsByRef")
     TensorInfo weightsInfo = constInfo;
     ConstTensor weights(weightsInfo, weightData);
     DepthwiseConvolution2dDescriptor desc;
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    // GetConstantTensorsByRef() returns {m_Weights, m_Bias} so we need to use the old AddDepthwiseConvolution2dLayer()
-    const auto depthwiseLayer = net->AddDepthwiseConvolution2dLayer(desc, weights, EmptyOptional(), "Depthwise");
-    ARMNN_NO_DEPRECATE_WARN_END
-    const void* resultData = depthwiseLayer->GetConstantTensorsByRef()[0].get()->GetConstTensor<void>();
-    auto resultValue = reinterpret_cast<const uint8_t*>(resultData);
-    CHECK(resultValue[0] == 3);
+
+    const auto weightsLayer = net->AddConstantLayer(weights);
+
+    const void* resultDataWeights = weightsLayer->GetConstantTensorsByRef()[0].get()->GetConstTensor<void>();
+    auto resultValueWeights = reinterpret_cast<const uint8_t*>(resultDataWeights);
+    CHECK(resultValueWeights[0] == 3);
+
 }
 
 }

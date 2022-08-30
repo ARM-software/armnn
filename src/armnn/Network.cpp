@@ -88,19 +88,6 @@ IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor
     return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor, name);
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-IConnectableLayer* INetwork::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                   const ConstTensor& weights,
-                                                   const Optional<ConstTensor>& biases,
-                                                   const char* name)
-{
-    return pNetworkImpl->AddConvolution2dLayer(convolution2dDescriptor,
-                                               weights,
-                                               armnn::Optional<ConstTensor>(biases),
-                                               name);
-}
-ARMNN_NO_DEPRECATE_WARN_END
-
 IConnectableLayer* INetwork::AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,
                                                    const char* name)
 {
@@ -121,18 +108,6 @@ IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
 {
     return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, name);
 }
-
-
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-IConnectableLayer* INetwork::AddDepthwiseConvolution2dLayer(
-    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-    const ConstTensor& weights,
-    const Optional<ConstTensor>& biases,
-    const char* name)
-{
-    return pNetworkImpl->AddDepthwiseConvolution2dLayer(convolution2dDescriptor, weights, biases, name);
-}
-ARMNN_NO_DEPRECATE_WARN_END
 
 
 IConnectableLayer* INetwork::AddDequantizeLayer(const char* name)

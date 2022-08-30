@@ -9,14 +9,14 @@ The Arm NN project is open for external contributors and welcomes contributions.
 - Setup Arm NN git repo
   - git clone https://review.mlplatform.org/ml/armnn
   - cd armnn
-  - git checkout master
+  - git checkout main
   - git pull (not required upon initial clone but good practice before creating a patch)
   - git config user.name "FIRST_NAME SECOND_NAME"
   - git config user.email your@email.address
 - Commit using sign-off and push patch for code review
   - git commit -s
-  - git push origin HEAD:refs/for/master
-- Patch will appear on ML Platform Gerrit [here](https://review.mlplatform.org/q/is:open+project:ml/armnn+branch:master)
+  - git push origin HEAD:refs/for/main
+- Patch will appear on ML Platform Gerrit [here](https://review.mlplatform.org/q/is:open+project:ml/armnn+branch:main)
 - See below for adding details of copyright notice and developer certificate
 of origin sign off
 
@@ -54,11 +54,11 @@ The Arm NN development repository is hosted on the [mlplatform.org git repositor
 Contributions must go through code review. Code reviews are performed through the [mlplatform.org Gerrit server](https://review.mlplatform.org). Contributors need to signup to this Gerrit server with their GitHub account
 credentials.
 
-Only reviewed contributions can go to the master branch of Arm NN.
+Only reviewed contributions can go to the main branch of Arm NN.
 
 ## Continuous integration
 
-Contributions to Arm NN go through testing at the Arm CI system. All unit, integration and regression tests must pass before a contribution gets merged to the Arm NN master branch.
+Contributions to Arm NN go through testing at the Arm CI system. All unit, integration and regression tests must pass before a contribution gets merged to the Arm NN main branch.
 
 ## Communications
 

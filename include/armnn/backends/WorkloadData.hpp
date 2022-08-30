@@ -353,16 +353,6 @@ struct RankQueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-struct
-ARMNN_DEPRECATED_MSG_REMOVAL_DATE("ResizeBilinearQueueDescriptor is deprecated use ResizeQueueDescriptor instead",
-                                  "22.08")
-ResizeBilinearQueueDescriptor : QueueDescriptorWithParameters<ResizeBilinearDescriptor>
-{
-    void Validate(const WorkloadInfo& workloadInfo) const;
-};
-ARMNN_NO_DEPRECATE_WARN_END
-
 struct ResizeQueueDescriptor : QueueDescriptorWithParameters<ResizeDescriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

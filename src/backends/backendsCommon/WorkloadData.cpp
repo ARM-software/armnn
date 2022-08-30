@@ -1596,54 +1596,6 @@ void Pooling3dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 }
 
-
-void ResizeBilinearQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
-{
-    const std::string descriptorName{"ResizeBilinearQueueDescriptor"};
-
-    ValidateNumInputs(workloadInfo,  descriptorName, 1);
-    ValidateNumOutputs(workloadInfo, descriptorName, 1);
-
-    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
-    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
-
-    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
-    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
-
-    std::vector<DataType> supportedTypes =
-    {
-        DataType::BFloat16,
-        DataType::Float16,
-        DataType::Float32,
-        DataType::QAsymmS8,
-        DataType::QAsymmU8,
-        DataType::QSymmS16
-    };
-
-    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
-    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
-
-    // ResizeBilinear only changes width and height: batch and channel count must match.
-    const unsigned int inputBatchSize  = inputTensorInfo.GetShape()[0];
-    const unsigned int outputBatchSize = outputTensorInfo.GetShape()[0];
-    if (inputBatchSize != outputBatchSize)
-    {
-        throw InvalidArgumentException(
-            fmt::format("{}: Input batch size ({}) does not match output batch size ({})",
-                        descriptorName, inputBatchSize, outputBatchSize));
-    }
-
-    DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
-    const unsigned int inputChannelCount  = inputTensorInfo.GetShape()[dimensionIndices.GetChannelsIndex()];
-    const unsigned int outputChannelCount = outputTensorInfo.GetShape()[dimensionIndices.GetChannelsIndex()];
-    if (inputChannelCount != outputChannelCount)
-    {
-        throw InvalidArgumentException(
-            fmt::format("{}: Input channel count ({}) does not match output channel count ({})",
-                        descriptorName, inputChannelCount, outputChannelCount));
-    }
-}
-
 void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"ResizeQueueDescriptor"};

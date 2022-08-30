@@ -2233,16 +2233,22 @@ bool Converter::ConvertGroupedConv2d(const Operation& operation, const Model& mo
             {
                 return false;
             }
-            ARMNN_NO_DEPRECATE_WARN_BEGIN
-            IConnectableLayer* convLayer =
-                data.m_Network->AddConvolution2dLayer(desc, groupWeights, Optional<ConstTensor>(groupBiases));
-            ARMNN_NO_DEPRECATE_WARN_END
+
+            IConnectableLayer* weightsLayer = data.m_Network->AddConstantLayer(groupWeights);
+            IConnectableLayer* biasLayer = data.m_Network->AddConstantLayer(groupBiases);
+            IConnectableLayer* convLayer = data.m_Network->AddConvolution2dLayer(desc);
+
             if (!convLayer)
             {
                 return Fail("%s: AddConvolution2dLayer failed", __func__);
             }
 
             splitterLayer->GetOutputSlot(group).Connect(convLayer->GetInputSlot(0));
+            weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1));
+            biasLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(2));
+
+            weightsLayer->GetOutputSlot(0).SetTensorInfo(groupWeightsInfo);
+            biasLayer->GetOutputSlot(0).SetTensorInfo(groupBiasesInfo);
             convLayer->GetOutputSlot(0).SetTensorInfo(groupOutputInfo);
 
             if(isDynamic)

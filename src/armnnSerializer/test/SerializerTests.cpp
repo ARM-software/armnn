@@ -436,19 +436,19 @@ TEST_CASE("SerializeConvolution2d")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const convLayer   =
-            network->AddConvolution2dLayer(descriptor,
-                                           weights,
-                                           armnn::Optional<armnn::ConstTensor>(biases),
-                                           layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights, "weights");
+    armnn::IConnectableLayer* const biasLayer = network->AddConstantLayer(biases, "bias");
+    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(descriptor, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1));
+    biasLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(2));
     convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biasesInfo);
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
@@ -458,7 +458,7 @@ TEST_CASE("SerializeConvolution2d")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
-TEST_CASE("SerializeConvolution2dWithPerAxisParamsTestDeprecatedMethod")
+TEST_CASE("SerializeConvolution2dWithPerAxisParams")
 {
     using namespace armnn;
 
@@ -491,19 +491,19 @@ TEST_CASE("SerializeConvolution2dWithPerAxisParamsTestDeprecatedMethod")
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer  = network->AddInputLayer(0);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const convLayer   =
-        network->AddConvolution2dLayer(descriptor,
-                                       weights,
-                                       armnn::Optional<armnn::ConstTensor>(biases),
-                                       layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
+    armnn::IConnectableLayer* const weightsLayer = network->AddConstantLayer(weights, "weights");
+    armnn::IConnectableLayer* const biasLayer = network->AddConstantLayer(weights, "bias");
+    armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(descriptor, layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1));
+    biasLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(2));
     convLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(kernelInfo);
+    biasLayer->GetOutputSlot(0).SetTensorInfo(biasInfo);
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));

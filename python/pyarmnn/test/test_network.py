@@ -253,17 +253,7 @@ def test_network_method_exists(method):
 
 def test_Convolution2d_layer_optional_none():
     net = ann.INetwork()
-    layer = net.AddConvolution2dLayer(convolution2dDescriptor=ann.Convolution2dDescriptor(),
-                                      weights=ann.ConstTensor())
-
-    assert layer
-
-
-def test_Convolution2d_layer_optional_provided():
-    net = ann.INetwork()
-    layer = net.AddConvolution2dLayer(convolution2dDescriptor=ann.Convolution2dDescriptor(),
-                                      weights=ann.ConstTensor(),
-                                      biases=ann.ConstTensor())
+    layer = net.AddConvolution2dLayer(convolution2dDescriptor=ann.Convolution2dDescriptor())
 
     assert layer
 
@@ -271,8 +261,6 @@ def test_Convolution2d_layer_optional_provided():
 def test_Convolution2d_layer_all_args():
     net = ann.INetwork()
     layer = net.AddConvolution2dLayer(convolution2dDescriptor=ann.Convolution2dDescriptor(),
-                                      weights=ann.ConstTensor(),
-                                      biases=ann.ConstTensor(),
                                       name='NAME1')
 
     assert layer

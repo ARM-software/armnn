@@ -110,11 +110,6 @@ int main(int argc, char* argv[])
                     "Path to a excludelist file where each line denotes the index of an image to be "
                     "excluded from evaluation.",
                     cxxopts::value<std::string>(excludelistPath)->default_value(""));
-                ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This b,blacklist-path command is deprecated", "22.08")
-                ("b,blacklist-path",
-                     "Path to a blacklist file where each line denotes the index of an image to be "
-                     "excluded from evaluation. This command will be deprecated in favor of: --excludelist-path ",
-                     cxxopts::value<std::string>(excludelistPath)->default_value(""));
 
             auto result = options.parse(argc, argv);
 

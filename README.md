@@ -13,8 +13,13 @@
 * [Third-Party](#third-party)
 * [Build Flags](#build-flags)
 
-## Announcement: As part of Arm's commitment to the use of inclusive language we will be moving away from 'master' branch to 'main' soon.
-## From 15 August 2022 our 'master' branch will be frozen and we will be using 'main' branch instead.
+# This branch is deprecated
+
+This project's primary branch is now called `main`.
+
+To checkout the `main` branch you first need to clone the Arm NN repository: `https://github.com/ARM-software/armnn.git`.
+
+You should `git checkout main` and `git pull origin main` from now on.
 
 # Arm NN
 

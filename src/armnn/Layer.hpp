@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -275,7 +275,7 @@ public:
     DataType GetDataType() const;
 
     const BackendId& GetBackendId() const { return m_BackendId; }
-    void SetBackendId(const BackendId& id) { m_BackendId = id; }
+    void SetBackendId(const BackendId& id) override { m_BackendId = id; }
 
     // Virtuals
 

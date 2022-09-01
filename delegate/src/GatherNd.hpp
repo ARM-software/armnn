@@ -46,6 +46,7 @@ TfLiteStatus VisitGatherNdOperator(DelegateData& delegateData,
     const armnn::TensorInfo& indicesTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteIndicesTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         // Check if supported
@@ -55,6 +56,7 @@ TfLiteStatus VisitGatherNdOperator(DelegateData& delegateData,
                                    IsGatherNdSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    indicesTensorInfo,
                                    outputTensorInfo);
@@ -62,6 +64,7 @@ TfLiteStatus VisitGatherNdOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddGatherNdLayer();
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 

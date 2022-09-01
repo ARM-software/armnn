@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -116,6 +116,8 @@ public:
     }
 
     virtual const armnn::BaseDescriptor& GetParameters() const override { return m_NullDescriptor; }
+
+    void SetBackendId(const armnn::BackendId& id) override {}
 
 protected:
     /// Retrieve the handles to the constant values stored by the layer.

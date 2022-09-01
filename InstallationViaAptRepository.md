@@ -117,7 +117,7 @@ The easiest way to install all of the available packages for your systems archit
  sudo apt-get install -y python3-pyarmnn armnn-latest-all
  # Verify installation via python:
  python3 -c "import pyarmnn as ann;print(ann.GetVersion())"
- # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 31.0.0
+ # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 32.0.0
 ```
 This will install PyArmNN and the three backends for Neon (CpuAcc), OpenCL (GpuAcc) and our Reference Backend.
 It will also install their dependencies including the arm-compute-library package along with the Tensorflow Lite Parser

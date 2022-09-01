@@ -33,6 +33,7 @@ TfLiteStatus ValidateResizeOperator(DelegateData& delegateData,
                                IsResizeSupported,
                                delegateData.m_Backends,
                                isSupported,
+                               armnn::BackendId(),
                                inputInfo,
                                outputInfo,
                                descriptor);

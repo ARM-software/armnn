@@ -12,6 +12,7 @@
 #include "BackendSettings.hpp"
 #include "optimizations/All.hpp"
 #include "armnnUtils/Filesystem.hpp"
+#include "armnn/utility/Timer.hpp"
 
 #include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
@@ -766,6 +767,15 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
     }
 }
 
+inline std::vector<DataType> GetLayerInOutDatatype(const Layer* layer)
+{
+    DataType dataTypeIn  = layer->GetNumInputSlots() == 0 ? DataType::Float32 :
+                           layer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo().GetDataType();
+    DataType dataTypeOut = layer->GetNumOutputSlots() == 0 ? DataType::Float32 :
+                           layer->GetOutputSlot(0).GetTensorInfo().GetDataType();
+    return {dataTypeIn, dataTypeOut};
+}
+
 // Refactor to allow passing the IConnectableLayer* rather than Layer Iterator
 // on Graph and SubgraphView which are different types.
 void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
@@ -787,10 +797,7 @@ void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
         return;
     }
 
-    DataType dataTypeIn  = layer->GetNumInputSlots() == 0 ? DataType::Float32 :
-                           layer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo().GetDataType();
-    DataType dataTypeOut = layer->GetNumOutputSlots() == 0 ? DataType::Float32 :
-                           layer->GetOutputSlot(0).GetTensorInfo().GetDataType();
+    std::vector<DataType> inOutDataType = GetLayerInOutDatatype(layer);
 
     std::string reasonIfUnsupported;
     bool found = false;
@@ -808,8 +815,8 @@ void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
                                  optNetObjPtr->GetGraph(),
                                  layer,
                                  layer->GetBackendHint().value(),
-                                 dataTypeIn,
-                                 dataTypeOut,
+                                 inOutDataType[0],
+                                 inOutDataType[1],
                                  availablePreferredBackends,
                                  reasonIfUnsupported,
                                  errMessages).IsOk())
@@ -832,8 +839,8 @@ void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
                                                               optNetObjPtr->GetGraph(),
                                                               layer,
                                                               backend,
-                                                              dataTypeIn,
-                                                              dataTypeOut,
+                                                              inOutDataType[0],
+                                                              inOutDataType[1],
                                                               availablePreferredBackends,
                                                               reasonIfUnsupported,
                                                               errMessages);
@@ -903,12 +910,33 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
 
     for (auto it = firstLayer; it != lastLayer; ++it)
     {
-        AssignBackendsIConnectable(optNetObjPtr,
-                                   *it,
-                                   errMessages,
-                                   result,
-                                   backendSettings,
-                                   availablePreferredBackends);
+        auto layer = PolymorphicDowncast<Layer*>(*it);
+        std::vector<DataType> inOutDataType = GetLayerInOutDatatype(layer);
+
+        // In AttemptBackendAssignment() we check:
+        //     - if input/output datatypes of the layer are float16
+        //     - if the layer is supported with these datatypes
+        // If the layer is not supported (failing on ARM_COMPUTE_RETURN_ERROR_ON_CPU_F16_UNSUPPORTED() in clframework),
+        // we attempt to insert convertion layers either side of the new fp32 layer.
+        bool isFloat16 = false;
+        for (auto type : inOutDataType)
+        {
+            if (type == DataType::Float16)
+            {
+                isFloat16 = true;
+                break;
+            }
+        }
+
+        if (layer->GetBackendId() == "Unknown" || isFloat16)
+        {
+            AssignBackendsIConnectable(optNetObjPtr,
+                                       *it,
+                                       errMessages,
+                                       result,
+                                       backendSettings,
+                                       availablePreferredBackends);
+        }
     }
 
     for (auto it = firstLayer; it != lastLayer; ++it)
@@ -1540,6 +1568,8 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                               const OptimizerOptions& options,
                               Optional<std::vector<std::string>&> messages)
 {
+    const auto start_time = armnn::GetTimeNow();
+
     ARMNN_LOG(debug) << options.ToString();
 
     // Enable profiling
@@ -1722,6 +1752,9 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_AddCompatibilityLayers");
         optGraph.AddCompatibilityLayers(backends, tensorHandleFactoryRegistry);
     }
+
+    ARMNN_LOG(info) << "!! New time !! : " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms.";
 
     return optNet;
 }

@@ -91,6 +91,7 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("ARGMINMAX",
@@ -98,6 +99,7 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
                                    IsArgMinMaxSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo,
                                    desc);
@@ -111,6 +113,7 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
 
     // Add an ArgMinMax layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddArgMinMaxLayer(desc);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

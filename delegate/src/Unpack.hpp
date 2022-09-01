@@ -133,6 +133,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     std::vector<std::reference_wrapper<armnn::TensorInfo>> splitterOutputTensorInfos(splitterOutputs.begin(),
                                                                                      splitterOutputs.end());
 
+    armnn::BackendId setBackendSplit;
     if (!delegateData.m_Network)
     {
         // Check if splitter is supported
@@ -142,6 +143,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
                                    IsSplitterSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackendSplit,
                                    inputTensorInfo,
                                    splitterOutputTensorInfos,
                                    splitDesc);
@@ -153,6 +155,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     armnn::ReshapeDescriptor reshapeDescriptor;
     reshapeDescriptor.m_TargetShape = outputTensorInfos[0].get().GetShape();
 
+    armnn::BackendId setBackendReshape;
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -161,6 +164,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
                                    IsReshapeSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackendReshape,
                                    splitterOutputTensorInfos[0],
                                    outputTensorInfos[0],
                                    reshapeDescriptor);
@@ -171,6 +175,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
 
     armnn::IConnectableLayer* splitterLayer = delegateData.m_Network->AddSplitterLayer(splitDesc,
                                                                                        splitterLayerName.c_str());
+    splitterLayer->SetBackendId(setBackendSplit);
     ARMNN_ASSERT(splitterLayer != nullptr);
 
     for (unsigned int k = 0; k < splitterLayer->GetNumOutputSlots(); ++k)
@@ -187,6 +192,7 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
         std::string reshapeLayerName("Unpack Reshape");
         armnn::IConnectableLayer* reshapeLayer = delegateData.m_Network->AddReshapeLayer(reshapeDescriptor,
                                                                                          reshapeLayerName.c_str());
+        reshapeLayer->SetBackendId(setBackendReshape);
         ARMNN_ASSERT(reshapeLayer != nullptr);
 
         splitterLayer->GetOutputSlot(outputIndex).SetTensorInfo(splitterOutputTensorInfos[outputIndex]);

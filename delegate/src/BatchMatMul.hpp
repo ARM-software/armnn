@@ -68,6 +68,7 @@ namespace armnnDelegate
 
         // Check if supported
         bool isSupported = false;
+        armnn::BackendId setBackend;
         auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
         {
             FORWARD_LAYER_SUPPORT_FUNC("BATCH_MATMUL",
@@ -75,6 +76,7 @@ namespace armnnDelegate
                                        IsBatchMatMulSupported,
                                        delegateData.m_Backends,
                                        isSupported,
+                                       setBackend,
                                        armnnLHSInputTensorInfo,
                                        armnnRHSInputTensorInfo,
                                        outputTensorInfo,
@@ -88,6 +90,7 @@ namespace armnnDelegate
         }
 
         armnn::IConnectableLayer* layer = delegateData.m_Network->AddBatchMatMulLayer(descriptor);
+        layer->SetBackendId(setBackend);
         ARMNN_ASSERT(layer != nullptr);
 
         armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

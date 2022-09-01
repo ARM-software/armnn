@@ -256,6 +256,7 @@ LayerInputHandle ConvertToLayerInputHandle(const Operation& operation,
                                            IsInputSupported,
                                            data.m_Backends,
                                            isInputSupported,
+                                           armnn::BackendId(),
                                            operandTensorInfo);
 
                 if (!isInputSupported)
@@ -292,10 +293,12 @@ LayerInputHandle ConvertToLayerInputHandle(const Operation& operation,
                 if (tensorPin.IsValid())
                 {
                     bool isSupported = false;
+                    armnn::BackendId setBackend;
                     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                                IsConstantSupported,
                                                data.m_Backends,
                                                isSupported,
+                                               setBackend,
                                                tensorPin.GetConstTensor().GetInfo());
                     if (!isSupported)
                     {
@@ -304,6 +307,7 @@ LayerInputHandle ConvertToLayerInputHandle(const Operation& operation,
 
                     armnn::IConnectableLayer* constantLayer =
                         data.m_Network->AddConstantLayer(tensorPin.GetConstTensor());
+                    constantLayer->SetBackendId(setBackend);
                     armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
                     armnn::TensorInfo constantTensorInfo = tensorPin.GetConstTensor().GetInfo();
                     outputSlot.SetTensorInfo(constantTensorInfo);
@@ -455,13 +459,14 @@ bool ConvertPooling2d(const Operation& operation,
     }
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsPooling2dSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    desc);
@@ -483,6 +488,7 @@ bool ConvertPooling2d(const Operation& operation,
     }
 
     armnn::IConnectableLayer* pooling2dLayer = data.m_Network->AddPooling2dLayer(desc);
+    pooling2dLayer->SetBackendId(setBackend);
     if (!pooling2dLayer)
     {
         return Fail("%s: AddPooling2dLayer failed", __func__);
@@ -547,12 +553,14 @@ bool ConvertReduce(const Operation& operation,
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsReduceSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -573,6 +581,7 @@ bool ConvertReduce(const Operation& operation,
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddReduceLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -601,13 +610,14 @@ bool ConvertToActivation(const Operation& operation,
     const armnn::TensorInfo& outInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsActivationSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outInfo,
                                    activationDesc);
@@ -628,6 +638,7 @@ bool ConvertToActivation(const Operation& operation,
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddActivationLayer(activationDesc);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -925,10 +936,12 @@ armnn::IConnectableLayer* ProcessActivation(const armnn::TensorInfo& tensorInfo,
         }
 
         bool isSupported = false;
+        armnn::BackendId setBackend;
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsActivationSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    prevLayer->GetOutputSlot(0).GetTensorInfo(),
                                    tensorInfo,
                                    activationDesc);
@@ -938,6 +951,7 @@ armnn::IConnectableLayer* ProcessActivation(const armnn::TensorInfo& tensorInfo,
         }
 
         activationLayer = data.m_Network->AddActivationLayer(activationDesc);
+        activationLayer->SetBackendId(setBackend);
 
         prevLayer->GetOutputSlot(0).Connect(activationLayer->GetInputSlot(0));
         activationLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);

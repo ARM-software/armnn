@@ -43,6 +43,7 @@ TfLiteStatus VisitSpaceToDepthOperator(DelegateData& delegateData,
     descriptor.m_BlockSize = params->block_size;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("SPACE_TO_DEPTH",
@@ -50,6 +51,7 @@ TfLiteStatus VisitSpaceToDepthOperator(DelegateData& delegateData,
                                    IsSpaceToDepthSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo,
                                    descriptor);
@@ -63,6 +65,7 @@ TfLiteStatus VisitSpaceToDepthOperator(DelegateData& delegateData,
 
     // Add a SpaceToDepth layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddSpaceToDepthLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
@@ -102,6 +105,7 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
     descriptor.m_BlockSize = params->block_size;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("DEPTH_TO_SPACE",
@@ -109,6 +113,7 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
                                    IsDepthToSpaceSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo,
                                    descriptor);
@@ -122,6 +127,7 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
 
     // Add a DepthToSpace layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthToSpaceLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

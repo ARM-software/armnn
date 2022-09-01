@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -74,6 +74,7 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
 
     // Check if supported
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("STACK",
@@ -81,6 +82,7 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
                                    IsStackSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputConstTensorInfos,
                                    outputTensorInfo,
                                    desc);
@@ -97,6 +99,7 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
 
     // The TfLite Pack operator is equivalent to the ArmNN Stack operator
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddStackLayer(desc);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     // Connect the Constant Inputs

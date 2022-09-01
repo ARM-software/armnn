@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -69,6 +69,7 @@ TfLiteStatus VisitGatherOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         // Check if supported
@@ -78,6 +79,7 @@ TfLiteStatus VisitGatherOperator(DelegateData& delegateData,
                                    IsGatherSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    indicesTensorInfo,
                                    outputTensorInfo,
@@ -86,6 +88,7 @@ TfLiteStatus VisitGatherOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddGatherLayer(gatherDescriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 

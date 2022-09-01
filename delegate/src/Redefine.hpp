@@ -44,6 +44,7 @@ TfLiteStatus VisitCastOperator(DelegateData& delegateData,
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("CAST",
@@ -51,6 +52,7 @@ TfLiteStatus VisitCastOperator(DelegateData& delegateData,
                                    IsCastSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo);
     };
@@ -66,6 +68,7 @@ TfLiteStatus VisitCastOperator(DelegateData& delegateData,
 
     // Add a Cast layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddCastLayer();
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
@@ -210,6 +213,7 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("RESHAPE",
@@ -217,6 +221,7 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
                                    IsReshapeSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo0,
                                    outInfo,
                                    reshapeDesc);
@@ -229,6 +234,7 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddReshapeLayer(reshapeDesc);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

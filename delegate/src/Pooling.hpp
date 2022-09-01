@@ -84,6 +84,7 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
                 descriptor.m_PadLeft, descriptor.m_PadRight, params->padding);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("POOLING_2D",
@@ -91,6 +92,7 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
                                    IsPooling2dSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor);
@@ -103,6 +105,7 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* poolingLayer = delegateData.m_Network->AddPooling2dLayer(descriptor);
+    poolingLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(poolingLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = poolingLayer->GetOutputSlot(0);
@@ -215,12 +218,14 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
 
     // Validate the output info.
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported) {
         FORWARD_LAYER_SUPPORT_FUNC("POOLING_3D",
                                    tfLiteContext,
                                    IsPooling3dSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor);
@@ -234,6 +239,7 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
 
     // Create the Layer
     armnn::IConnectableLayer* poolingLayer = delegateData.m_Network->AddPooling3dLayer(descriptor);
+    poolingLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(poolingLayer != nullptr);
 
     // Create and set output slots

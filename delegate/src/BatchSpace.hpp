@@ -72,6 +72,7 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
 
     // Check if supported
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("BATCH_TO_SPACE_ND",
@@ -79,6 +80,7 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
                                    IsBatchToSpaceNdSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor);
@@ -95,6 +97,7 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
 
     // Add a BatchToSpace layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddBatchToSpaceNdLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
@@ -163,6 +166,7 @@ TfLiteStatus VisitSpaceToBatchNdOperator(DelegateData& delegateData,
 
     // Check if supported
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("SPACE_TO_BATCH_ND",
@@ -170,6 +174,7 @@ TfLiteStatus VisitSpaceToBatchNdOperator(DelegateData& delegateData,
                                    IsSpaceToBatchNdSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor);
@@ -186,6 +191,7 @@ TfLiteStatus VisitSpaceToBatchNdOperator(DelegateData& delegateData,
 
     // Add a SpaceToBatch layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddSpaceToBatchNdLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

@@ -105,6 +105,7 @@ TfLiteStatus VisitReduceOperator(DelegateData& delegateData,
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("REDUCE",
@@ -112,6 +113,7 @@ TfLiteStatus VisitReduceOperator(DelegateData& delegateData,
                                    IsReduceSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo,
                                    desc);
@@ -125,6 +127,7 @@ TfLiteStatus VisitReduceOperator(DelegateData& delegateData,
 
     // Add an Reduce layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddReduceLayer(desc);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

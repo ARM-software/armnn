@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -98,7 +98,11 @@ public:
     /// Apply a visitor to this layer
     virtual void ExecuteStrategy(IStrategy& strategy) const = 0;
 
-    /// Provide a hint for the optimizer as to which backend to prefer for this layer
+    /// Provide a hint for the optimizer as to which backend to prefer for this layer.
+    /// By providing a BackendSelectionHint there is no guarantee the input backend supports that layer.
+    /// If IsLayerSupported() returns false with the backend hint, we default to calling IsLayerSupported()
+    /// on the BackendPreferences vector. Use SetBackendId() if we can guarantee a backend supports that
+    /// layer (IsLayerSupported returns true for a specific backend).
     virtual void BackendSelectionHint(Optional<BackendId> backend) = 0;
 
     /// Returns the armnn::LayerType of this layer
@@ -110,6 +114,12 @@ public:
     /// Note: NullDescriptors can be detected because they return true when
     /// the BaseDescriptor IsNull function is invoked.
     virtual const BaseDescriptor& GetParameters() const = 0;
+
+    /// Set the backend of the IConnectableLayer.
+    /// By using SetBackendId() we guarantee that the input backend supports that
+    /// layer (IsLayerSupported returns true for a specific backend). If there is
+    /// no guarantee the input backend supports that layer use BackendSelectionHint().
+    virtual void SetBackendId(const BackendId& id) = 0;
 
     using ConstantTensors = std::vector<std::reference_wrapper<std::shared_ptr<ConstTensorHandle>>>;
 

@@ -253,6 +253,7 @@ TfLiteStatus VisitUnidirectionalSequenceLstmOperator(DelegateData& delegateData,
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("UNIDIRECTIONAL_SEQUENCE_LSTM",
@@ -260,6 +261,7 @@ TfLiteStatus VisitUnidirectionalSequenceLstmOperator(DelegateData& delegateData,
                                    IsUnidirectionalSequenceLstmSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputStateInInfo,
                                    cellStateInInfo,
@@ -277,6 +279,7 @@ TfLiteStatus VisitUnidirectionalSequenceLstmOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddUnidirectionalSequenceLstmLayer(desc, params);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     layer->GetOutputSlot(0).SetTensorInfo(outputStateOutTensorInfo);

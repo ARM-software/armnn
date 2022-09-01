@@ -71,7 +71,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
         static_cast<armnn::PermutationVector::SizeType>(numEl)));
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("TRANSPOSE",
@@ -79,6 +79,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
                                    IsTransposeSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo0,
                                    outputTensorInfo,
                                    descriptor);
@@ -91,6 +92,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* transposeLayer = delegateData.m_Network->AddTransposeLayer(descriptor);
+    transposeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(transposeLayer != nullptr);
     ARMNN_ASSERT(transposeLayer->GetNumInputSlots() == 1);     // permutation vector given to descriptor object
 

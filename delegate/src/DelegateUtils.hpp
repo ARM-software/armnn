@@ -25,7 +25,7 @@ namespace
 {
 
 // Macro to call an Is<layer_name>Supported function and log caller name together with reason for lack of support
-#define FORWARD_LAYER_SUPPORT_FUNC(opName, tfLiteContext, func, backends, supported, ...) \
+#define FORWARD_LAYER_SUPPORT_FUNC(opName, tfLiteContext, func, backends, supported, setBackend, ...) \
 try \
 { \
     for (auto&& backendId : backends) \
@@ -38,6 +38,7 @@ try \
                 layerSupportObject.func(__VA_ARGS__, armnn::Optional<std::string&>(reasonIfUnsupported)); \
             if (supported) \
             { \
+                setBackend = backendId; \
                 break; \
             } \
             else \
@@ -224,11 +225,13 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
     armnn::ReshapeDescriptor reshapeDescriptor;
     reshapeDescriptor.m_TargetShape = reshapedInfo.GetShape();
     bool isSupported = false;
+    armnn::BackendId setBackend;
     FORWARD_LAYER_SUPPORT_FUNC("RESHAPE",
                                tfLiteContext,
                                IsReshapeSupported,
                                delegateData.m_Backends,
                                isSupported,
+                               setBackend,
                                smallInfo,
                                reshapedInfo,
                                reshapeDescriptor);
@@ -240,6 +243,7 @@ armnn::IConnectableLayer* BroadcastTensor(const armnn::TensorInfo& inputInfo0,
     ARMNN_ASSERT(delegateData.m_Network != nullptr);
     // Add Reshape layer
     armnn::IConnectableLayer* reshapeLayer = delegateData.m_Network->AddReshapeLayer(reshapeDescriptor);
+    reshapeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(reshapeLayer != nullptr);
     reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedInfo);
 
@@ -331,11 +335,13 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     FORWARD_LAYER_SUPPORT_FUNC("ACTIVATION",
                                tfLiteContext,
                                IsActivationSupported,
                                data.m_Backends,
                                isSupported,
+                               setBackend,
                                prevLayer->GetOutputSlot(0).GetTensorInfo(),
                                activationOutputInfo,
                                activationDesc);
@@ -344,6 +350,7 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
         return kTfLiteError;
     }
     armnn::IConnectableLayer* activationLayer = data.m_Network->AddActivationLayer(activationDesc);
+    activationLayer->SetBackendId(setBackend);
 
     ARMNN_ASSERT(activationLayer != nullptr);
     activationLayer->GetOutputSlot(0).SetTensorInfo(activationOutputInfo);
@@ -566,11 +573,13 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
 {
     IgnoreUnused(layer);
     bool isSupported = false;
+    armnn::BackendId setBackend;
     FORWARD_LAYER_SUPPORT_FUNC("CONSTANT",
                                tfLiteContext,
                                IsConstantSupported,
                                data.m_Backends,
                                isSupported,
+                               setBackend,
                                constTensorInfo);
     if (!isSupported)
     {
@@ -581,6 +590,7 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
                                            constTensorInfo,
                                            armnn::Optional<armnn::PermutationVector&>());
     armnn::IConnectableLayer* constantLayer = data.m_Network->AddConstantLayer(constantInput);
+    constantLayer->SetBackendId(setBackend);
     armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(constTensorInfo);
 
@@ -615,11 +625,13 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
         {
             armnn::TensorInfo inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
             bool isSupported = false;
+            armnn::BackendId setBackend;
             FORWARD_LAYER_SUPPORT_FUNC("CONSTANT",
                                        tfLiteContext,
                                        IsConstantSupported,
                                        delegateData.m_Backends,
                                        isSupported,
+                                       setBackend,
                                        inputTensorInfo);
             if (!isSupported)
             {
@@ -629,6 +641,7 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
                                                    inputTensorInfo,
                                                    armnn::Optional<armnn::PermutationVector&>());
             armnn::IConnectableLayer* constantLayer = delegateData.m_Network->AddConstantLayer(constantInput);
+            constantLayer->SetBackendId(setBackend);
             armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
             outputSlot.SetTensorInfo(inputTensorInfo);
 

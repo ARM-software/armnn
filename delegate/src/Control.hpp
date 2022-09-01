@@ -119,6 +119,7 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
 
     // Check if supported
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("CONCATENATION",
@@ -126,6 +127,7 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
                                    IsConcatSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputConstTensorInfos,
                                    outputTensorInfo,
                                    concatDescriptor);
@@ -139,6 +141,7 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
 
     // Setup layer and connect.
     armnn::IConnectableLayer* concatenationLayer = delegateData.m_Network->AddConcatLayer(concatDescriptor);
+    concatenationLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(concatenationLayer != nullptr);
 
     // Connect the Constant Inputs
@@ -258,6 +261,7 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
 
     // Check if supported
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("MEAN",
@@ -265,6 +269,7 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
                                    IsMeanSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    desc);
@@ -278,6 +283,7 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
 
     // Setup layer and connect.
     armnn::IConnectableLayer* meanLayer = delegateData.m_Network->AddMeanLayer(desc);
+    meanLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(meanLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = meanLayer->GetOutputSlot(0);

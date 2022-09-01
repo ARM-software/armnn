@@ -51,7 +51,7 @@ TfLiteStatus VisitElementwiseUnaryOperator(DelegateData& delegateData,
 
     armnn::ElementwiseUnaryDescriptor descriptor(unaryOperation);
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("ELEMENTWISE_UNARY",
@@ -59,6 +59,7 @@ TfLiteStatus VisitElementwiseUnaryOperator(DelegateData& delegateData,
                                    IsElementwiseUnarySupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor);
@@ -71,6 +72,7 @@ TfLiteStatus VisitElementwiseUnaryOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddElementwiseUnaryLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

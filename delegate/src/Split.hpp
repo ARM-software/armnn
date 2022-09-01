@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -113,6 +113,7 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
         splitDescriptor.SetViewOriginCoord(j, splitDim, splitterDimSizes[splitDim] * j);
     }
 
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         // Check if supported
@@ -122,6 +123,7 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
                                    IsSplitterSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfos,
                                    splitDescriptor);
@@ -129,6 +131,7 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddSplitterLayer(splitDescriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
@@ -305,6 +308,7 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
         accumSplit += splitSize;
     }
 
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         // Check if supported
@@ -314,6 +318,7 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
                                    IsSplitterSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfos,
                                    splitDescriptor);
@@ -321,6 +326,7 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddSplitterLayer(splitDescriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)

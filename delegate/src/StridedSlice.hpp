@@ -114,6 +114,7 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("STRIDED_SLICE",
@@ -121,6 +122,7 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
                                    IsStridedSliceSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo,
                                    descriptor);
@@ -134,6 +136,7 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
 
     // Add a StridedSlice layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddStridedSliceLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
@@ -144,3 +147,4 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
 }
 
 } // namespace armnnDelegate
+

@@ -144,6 +144,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     CalcPadding(inputWidth, filterWidth, descriptor.m_StrideX, descriptor.m_DilationX,
                 descriptor.m_PadLeft, descriptor.m_PadRight, params->padding);
 
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -152,6 +153,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
                                    IsConvolution2dSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
@@ -162,6 +164,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
 
     // Set up filter and biases
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddConvolution2dLayer(descriptor);
+    layer->SetBackendId(setBackend);
 
     if(tflite::IsConstantTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[1]]))
     {
@@ -300,6 +303,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     // If the m_Network is a nullptr, this signals that a prerequisite TfLite callback is required to clarify the
     // support for the operator
     // If supported, VisitConvolutionOperator will be called again to add the layer to the network as seen below.
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -308,6 +312,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
                                    IsConvolution3dSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
@@ -317,6 +322,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer =  delegateData.m_Network->AddConvolution3dLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     // Add a constant layer for weights and biases if inputs are constant,
@@ -497,6 +503,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         biasTensorInfo = armnn::TensorInfo(armnn::TensorShape({1}), GetDataType(tfLiteInputTensor));
     }
 
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -505,6 +512,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
                                    IsDepthwiseConvolutionSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
@@ -514,6 +522,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthwiseConvolution2dLayer(descriptor);
+    layer->SetBackendId(setBackend);
 
     if(tflite::IsConstantTensor(&tfLiteFilterTensor))
     {
@@ -699,6 +708,7 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     auto filterTensor = CreateConstTensor(&tfLiteFilterTensor,
                                           filterTensorInfo,
                                           armnn::Optional<armnn::PermutationVector&>());
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -707,6 +717,7 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
                                    IsTransposeConvolution2dSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
@@ -718,6 +729,7 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddTransposeConvolution2dLayer(descriptor,
                                                                                              filterTensor,
                                                                                              armnn::EmptyOptional());
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

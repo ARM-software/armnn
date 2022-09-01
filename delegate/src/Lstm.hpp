@@ -216,6 +216,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("LSTM",
@@ -223,6 +224,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
                                    IsLstmSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputStateInInfo,
                                    cellStateInInfo,
@@ -241,6 +243,7 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddLstmLayer(desc, params);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     layer->GetOutputSlot(0).SetTensorInfo(scratchBufferTensorInfo);

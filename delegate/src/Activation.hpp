@@ -29,6 +29,7 @@ TfLiteStatus ValidateActivationOperator(DelegateData& delegateData,
                                    IsActivationSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   armnn::BackendId(),
                                    inputInfo,
                                    outputInfo,
                                    activationDesc);

@@ -51,6 +51,7 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     UpdateConstantTensorOutputs(inputTensorInfo, outputTensorInfo);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("DEQUANTIZE",
@@ -58,6 +59,7 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
                                    IsDequantizeSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo);
     };
@@ -69,6 +71,7 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* dequantizeLayer = delegateData.m_Network->AddDequantizeLayer();
+    dequantizeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(dequantizeLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = dequantizeLayer->GetOutputSlot(0);
@@ -130,6 +133,7 @@ TfLiteStatus VisitQuantizeOperator(DelegateData& delegateData,
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("QUANTIZE",
@@ -137,6 +141,7 @@ TfLiteStatus VisitQuantizeOperator(DelegateData& delegateData,
                                    IsQuantizeSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo);
     };
@@ -148,6 +153,7 @@ TfLiteStatus VisitQuantizeOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* quantizeLayer = delegateData.m_Network->AddQuantizeLayer();
+    quantizeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(quantizeLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = quantizeLayer->GetOutputSlot(0);

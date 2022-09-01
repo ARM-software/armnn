@@ -52,6 +52,7 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
 
     // Check if supported
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("LOGICAL_BINARY",
@@ -59,6 +60,7 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
                                    IsLogicalBinarySupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo0,
                                    inputTensorInfo1,
                                    outputTensorInfo,
@@ -72,6 +74,7 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* logicalBinaryLayer = delegateData.m_Network->AddLogicalBinaryLayer(desc);
+    logicalBinaryLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(logicalBinaryLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = logicalBinaryLayer->GetOutputSlot(0);

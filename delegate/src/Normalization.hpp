@@ -42,6 +42,7 @@ TfLiteStatus VisitL2NormalizationOperator(DelegateData& delegateData,
     descriptor.m_DataLayout = armnn::DataLayout::NHWC;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("L2_NORMALIZATION",
@@ -49,6 +50,7 @@ TfLiteStatus VisitL2NormalizationOperator(DelegateData& delegateData,
                                    IsL2NormalizationSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo,
                                    descriptor);
@@ -62,6 +64,7 @@ TfLiteStatus VisitL2NormalizationOperator(DelegateData& delegateData,
 
     // Add a L2Normalization layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddL2NormalizationLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
@@ -112,6 +115,7 @@ TfLiteStatus VisitLocalResponseNormalizationOperator(DelegateData& delegateData,
     descriptor.m_NormSize = 1 + (2 * descriptor.m_NormSize);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("NORMALIZATION",
@@ -119,6 +123,7 @@ TfLiteStatus VisitLocalResponseNormalizationOperator(DelegateData& delegateData,
                                    IsNormalizationSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outInfo,
                                    descriptor);
@@ -132,6 +137,7 @@ TfLiteStatus VisitLocalResponseNormalizationOperator(DelegateData& delegateData,
 
     // Add a Normalization layer
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddNormalizationLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);

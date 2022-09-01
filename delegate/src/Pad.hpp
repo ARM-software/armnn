@@ -149,6 +149,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
         }
     }
 
+    armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
         bool isSupported = false;
@@ -157,6 +158,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
                                    IsPadSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor);
@@ -165,6 +167,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* padLayer = delegateData.m_Network->AddPadLayer(descriptor);
+    padLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(padLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = padLayer->GetOutputSlot(0);

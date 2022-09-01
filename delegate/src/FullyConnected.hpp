@@ -110,6 +110,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     descriptor.m_ConstantWeights       = isConstantWeights;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("FULLY_CONNECTED",
@@ -117,6 +118,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
                                    IsFullyConnectedSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    reshapedTensorInfo,
                                    outputTensorInfo,
                                    weightsTensorInfo,
@@ -131,6 +133,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     // Add a constant layer for weights and biases if inputs are constant.

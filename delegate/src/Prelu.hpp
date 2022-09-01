@@ -29,6 +29,7 @@ TfLiteStatus ValidatePreluOperator(DelegateData& delegateData,
                                    IsPreluSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   armnn::BackendId(),
                                    inputInfo,
                                    alphaInfo,
                                    outputInfo);

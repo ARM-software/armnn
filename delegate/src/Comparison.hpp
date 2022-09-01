@@ -88,7 +88,7 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
 
     armnn::ComparisonDescriptor descriptor(comparisonOperation);
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC("COMPARISON",
@@ -96,6 +96,7 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
                                    IsComparisonSupported,
                                    delegateData.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputTensorInfo0,
                                    inputTensorInfo1,
                                    outputTensorInfo,
@@ -109,6 +110,7 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* comparisonLayer = delegateData.m_Network->AddComparisonLayer(descriptor);
+    comparisonLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(comparisonLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = comparisonLayer->GetOutputSlot(0);

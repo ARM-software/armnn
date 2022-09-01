@@ -206,12 +206,14 @@ bool Converter::ConvertAdd(const Operation& operation, const Model& model, Conve
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsAdditionSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo0,
                                    inputInfo1,
                                    outputInfo);
@@ -232,6 +234,7 @@ bool Converter::ConvertAdd(const Operation& operation, const Model& model, Conve
     }
 
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddAdditionLayer();
+    startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
     if (!isReshapeSupported)
@@ -290,13 +293,14 @@ bool Converter::ConvertArgMinMax(const Operation& operation,
     descriptor.m_Axis     = axis;
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsArgMinMaxSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo0,
                                    outputInfo,
                                    descriptor);
@@ -317,6 +321,7 @@ bool Converter::ConvertArgMinMax(const Operation& operation,
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddArgMinMaxLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
 
     input0.Connect(layer->GetInputSlot(0));
@@ -391,12 +396,14 @@ bool Converter::ConvertBatchMatMul(const Operation& operation, const Model& mode
     batchMatMulDesc.m_TransposeY = GetOptionalBool(operation, 3, model, data);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsBatchMatMulSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo0,
                                    inputInfo1,
                                    outputInfo,
@@ -419,6 +426,7 @@ bool Converter::ConvertBatchMatMul(const Operation& operation, const Model& mode
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddBatchMatMulLayer(batchMatMulDesc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input0.Connect(layer->GetInputSlot(0));
     input1.Connect(layer->GetInputSlot(1));
@@ -482,12 +490,14 @@ bool Converter::ConvertBatchToSpaceNd(const Operation& operation, const Model& m
     batchToSpaceNdDesc.m_Crops = {{0, 0}, {0, 0}};
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsBatchToSpaceNdSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    batchToSpaceNdDesc);
@@ -509,6 +519,7 @@ bool Converter::ConvertBatchToSpaceNd(const Operation& operation, const Model& m
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddBatchToSpaceNdLayer(batchToSpaceNdDesc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -536,13 +547,14 @@ bool Converter::ConvertCast(const Operation& operation, const Model& model, Conv
     const TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsCastSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo);
     };
@@ -562,6 +574,7 @@ bool Converter::ConvertCast(const Operation& operation, const Model& model, Conv
     }
 
     IConnectableLayer* layer = data.m_Network->AddCastLayer();
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -597,12 +610,14 @@ bool Converter::ConvertComparison(const Operation& operation,
     ComparisonDescriptor descriptor(comparisonOperation);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsComparisonSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo0,
                                    inputInfo1,
                                    outputInfo,
@@ -624,6 +639,7 @@ bool Converter::ConvertComparison(const Operation& operation,
     }
 
     IConnectableLayer* layer = data.m_Network->AddComparisonLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
@@ -735,10 +751,12 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
             reshapeDescriptor.m_TargetShape = reshapeInfo.GetShape();
 
             bool isSupported = false;
+            armnn::BackendId setBackendReshape;
             FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                        IsReshapeSupported,
                                        data.m_Backends,
                                        isSupported,
+                                       setBackendReshape,
                                        operandInputHandle.GetTensorInfo(),
                                        reshapeInfo,
                                        reshapeDescriptor);
@@ -748,6 +766,7 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
                 return false;
             }
             armnn::IConnectableLayer& newReshape = AddReshapeLayer(*data.m_Network, operandInputHandle, reshapeInfo);
+            newReshape.SetBackendId(setBackendReshape);
 
             // Point to the reshape operation rather then the input operation
             operandShape       = reshapeInfo.GetShape();
@@ -850,9 +869,16 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
                    [](const LayerInputHandle& h)->const armnn::TensorInfo*{ return &h.GetTensorInfo(); });
 
     bool isSupported  = false;
+    armnn::BackendId setBackendConcat;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported){
-        FORWARD_LAYER_SUPPORT_FUNC(__func__, IsConcatSupported, data.m_Backends, isSupported, inputTensorInfos,
-                                   outputInfo, concatDescriptor);
+        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+                                   IsConcatSupported,
+                                   data.m_Backends,
+                                   isSupported,
+                                   setBackendConcat,
+                                   inputTensorInfos,
+                                   outputInfo,
+                                   concatDescriptor);
     };
 
     if (!isDynamicTensor)
@@ -870,6 +896,7 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddConcatLayer(concatDescriptor);
+    layer->SetBackendId(setBackendConcat);
     assert(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     // Connect inputs to the layer
@@ -889,10 +916,12 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
         armnn::TensorInfo outputTransposeInfo = armnnUtils::TransposeTensorShape(inputTransposeInfo,
                                                                                  permutationPair.second);
         isSupported = false;
+        armnn::BackendId setBackendTranspose;
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsTransposeSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackendTranspose,
                                    inputTransposeInfo,
                                    outputTransposeInfo,
                                    transposeDesc);
@@ -903,6 +932,7 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
         // Add permutation layer and connect the output to it, the permutation becomes the output layer
         armnn::IConnectableLayer& deswizzleLayer = AddTransposeLayer(*data.m_Network, layer->GetOutputSlot(0),
                                                                      permutationPair.second);
+        deswizzleLayer.SetBackendId(setBackendTranspose);
         layer = &deswizzleLayer;
 
         return true;
@@ -945,11 +975,13 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
         armnn::TensorInfo concatInfo = layer->GetOutputSlot(0).GetTensorInfo();
 
         isSupported = false;
+        armnn::BackendId setBackendReshape2;
         auto validateReshapeFunc = [&](const armnn::TensorInfo& afterConcatInfo, bool& isSupported){
             FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                        IsReshapeSupported,
                                        data.m_Backends,
                                        isSupported,
+                                       setBackendReshape2,
                                        concatInfo,
                                        afterConcatInfo,
                                        reshapeDescriptor);
@@ -969,6 +1001,7 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
             return false;
         }
         layer = &AddReshapeLayer(*data.m_Network, layer->GetOutputSlot(0), afterConcatInfo);
+        layer->SetBackendId(setBackendReshape2);
         return SetupAndTrackLayerOutputSlot(operation,
                                             0,
                                             *layer,
@@ -1109,11 +1142,13 @@ bool Converter::ConvertConv2d(const Operation& operation, const Model& model, Co
         VLOG(DRIVER) << "Converter::ConvertConv2d(): Weights and Biases are as INPUTS.";
     }
 
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported) {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsConvolution2dSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    desc,
@@ -1141,6 +1176,7 @@ bool Converter::ConvertConv2d(const Operation& operation, const Model& model, Co
     }
 
     armnn::IConnectableLayer* startLayer = data.m_Network->AddConvolution2dLayer(desc);
+    startLayer->SetBackendId(setBackend);
 
     if (!startLayer)
     {
@@ -1194,12 +1230,14 @@ bool Converter::ConvertDepthToSpace(const Operation& operation, const Model& mod
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsDepthToSpaceSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -1220,6 +1258,7 @@ bool Converter::ConvertDepthToSpace(const Operation& operation, const Model& mod
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddDepthToSpaceLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -1355,11 +1394,13 @@ bool Converter::ConvertDepthwiseConv2d(const Operation& operation, const Model& 
         VLOG(DRIVER) << "Converter::ConvertDepthwiseConv2d(): Weights and Biases are as INPUTS.";
     }
 
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported) {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsDepthwiseConvolutionSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    desc,
@@ -1387,6 +1428,7 @@ bool Converter::ConvertDepthwiseConv2d(const Operation& operation, const Model& 
     }
 
     armnn::IConnectableLayer* startLayer = data.m_Network->AddDepthwiseConvolution2dLayer(desc);
+    startLayer->SetBackendId(setBackend);
 
     if (!startLayer)
     {
@@ -1428,12 +1470,14 @@ bool Converter::ConvertDequantize(const Operation& operation, const Model& model
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsDequantizeSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo);
     };
@@ -1453,6 +1497,7 @@ bool Converter::ConvertDequantize(const Operation& operation, const Model& model
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddDequantizeLayer();
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -1488,12 +1533,14 @@ bool Converter::ConvertDiv(const Operation& operation, const Model& model, Conve
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsDivisionSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
@@ -1514,6 +1561,7 @@ bool Converter::ConvertDiv(const Operation& operation, const Model& model, Conve
     }
 
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddDivisionLayer();
+    startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
     if (!isReshapeSupported)
@@ -1552,13 +1600,14 @@ bool Converter::ConvertElementwiseUnary(const Operation& operation,
     ElementwiseUnaryDescriptor descriptor(unaryOperation);
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsElementwiseUnarySupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -1579,6 +1628,7 @@ bool Converter::ConvertElementwiseUnary(const Operation& operation,
     }
 
     IConnectableLayer* layer = data.m_Network->AddElementwiseUnaryLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -1672,12 +1722,14 @@ bool Converter::ConvertExpandDims(const Operation& operation, const Model& model
     reshapeDescriptor.m_TargetShape = targetShape;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsReshapeSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outputInfo,
                                    reshapeDescriptor);
@@ -1702,6 +1754,7 @@ bool Converter::ConvertExpandDims(const Operation& operation, const Model& model
     }
 
     IConnectableLayer* layer = data.m_Network->AddReshapeLayer(reshapeDescriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -1769,10 +1822,12 @@ bool Converter::ConvertFill(const Operation& operation, const Model& model, Conv
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                IsFillSupported,
                                data.m_Backends,
                                isSupported,
+                               setBackend,
                                inputInfo,
                                outputInfo,
                                descriptor);
@@ -1782,6 +1837,7 @@ bool Converter::ConvertFill(const Operation& operation, const Model& model, Conv
     }
 
     IConnectableLayer* const layer = data.m_Network->AddFillLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -1806,12 +1862,14 @@ bool Converter::ConvertFloor(const Operation& operation, const Model& model, Con
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsFloorSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outputInfo);
     };
@@ -1831,6 +1889,7 @@ bool Converter::ConvertFloor(const Operation& operation, const Model& model, Con
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddFloorLayer();
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -1912,6 +1971,7 @@ bool Converter::ConvertFullyConnected(const Operation& operation, const Model& m
     desc.m_ConstantWeights       = IsOperandConstant(*weightsOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         if (!VerifyFullyConnectedShapes(reshapedInfo.GetShape(),
@@ -1928,6 +1988,7 @@ bool Converter::ConvertFullyConnected(const Operation& operation, const Model& m
                                    IsFullyConnectedSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    reshapedInfo,
                                    outputInfo,
                                    weightsInfo,
@@ -1951,6 +2012,7 @@ bool Converter::ConvertFullyConnected(const Operation& operation, const Model& m
 
     // Add FullyConnected layer. Weights and bias will be connected as constant layers or non const inputs.
     armnn::IConnectableLayer* startLayer = data.m_Network->AddFullyConnectedLayer(desc);
+    startLayer->SetBackendId(setBackend);
 
     if (inputInfo.GetNumDimensions() > 2U)
     {
@@ -2022,12 +2084,14 @@ bool Converter::ConvertGather(const Operation& operation, const Model& model, Co
     desc.m_Axis = axis;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsGatherSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    indices.GetTensorInfo(),
                                    outputInfo,
@@ -2049,6 +2113,7 @@ bool Converter::ConvertGather(const Operation& operation, const Model& model, Co
     }
 
     IConnectableLayer* layer = data.m_Network->AddGatherLayer(desc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
     indices.Connect(layer->GetInputSlot(1));
@@ -2209,10 +2274,12 @@ bool Converter::ConvertGroupedConv2d(const Operation& operation, const Model& mo
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackendSplit;
     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                IsSplitterSupported,
                                data.m_Backends,
                                isSupported,
+                               setBackendSplit,
                                inputInfo,
                                splitterOutputInfos,
                                splitterDesc);
@@ -2222,6 +2289,7 @@ bool Converter::ConvertGroupedConv2d(const Operation& operation, const Model& mo
     }
 
     IConnectableLayer* splitterLayer = data.m_Network->AddSplitterLayer(splitterDesc);
+    splitterLayer->SetBackendId(setBackendSplit);
     if (!splitterLayer)
     {
         return Fail("%s: Failed to add SplitterLayer", __func__);
@@ -2305,12 +2373,14 @@ bool Converter::ConvertGroupedConv2d(const Operation& operation, const Model& mo
                                                               biasesDataOffset));
 
             isSupported = false;
+            armnn::BackendId setBackendConv;
             auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
             {
                 FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                            IsConvolution2dSupported,
                                            data.m_Backends,
                                            isSupported,
+                                           setBackendConv,
                                            groupInputInfo,
                                            outputInfo,
                                            desc,
@@ -2335,6 +2405,8 @@ bool Converter::ConvertGroupedConv2d(const Operation& operation, const Model& mo
             IConnectableLayer* weightsLayer = data.m_Network->AddConstantLayer(groupWeights);
             IConnectableLayer* biasLayer = data.m_Network->AddConstantLayer(groupBiases);
             IConnectableLayer* convLayer = data.m_Network->AddConvolution2dLayer(desc);
+
+            convLayer->SetBackendId(setBackendConv);
 
             if (!convLayer)
             {
@@ -2384,10 +2456,12 @@ bool Converter::ConvertGroupedConv2d(const Operation& operation, const Model& mo
     }
 
     isSupported = false;
+    armnn::BackendId setBackendConcat;
     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                IsConcatSupported,
                                data.m_Backends,
                                isSupported,
+                               setBackendConcat,
                                std::vector<const TensorInfo*>(numGroups * channelMultiplier, &groupOutputInfo),
                                outputInfo,
                                concatDescriptor);
@@ -2398,6 +2472,7 @@ bool Converter::ConvertGroupedConv2d(const Operation& operation, const Model& mo
     }
 
     IConnectableLayer* concatLayer = data.m_Network->AddConcatLayer(concatDescriptor);
+    concatLayer->SetBackendId(setBackendConcat);
     if (!concatLayer)
     {
         return Fail("%s: AddConcatLayer failed", __func__);
@@ -2488,12 +2563,14 @@ bool Converter::ConvertInstanceNormalization(const Operation& operation, const M
     desc.m_DataLayout = OptionalDataLayout(operation, 4, model, data);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsInstanceNormalizationSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outputInfo,
                                    desc);
@@ -2514,6 +2591,7 @@ bool Converter::ConvertInstanceNormalization(const Operation& operation, const M
     }
 
     IConnectableLayer* layer = data.m_Network->AddInstanceNormalizationLayer(desc);
+    layer->SetBackendId(setBackend);
     input.Connect(layer->GetInputSlot(0));
 
     return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
@@ -2552,12 +2630,14 @@ bool Converter::ConvertL2Normalization(const Operation& operation, const Model& 
     desc.m_DataLayout = armnn::DataLayout::NHWC;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsL2NormalizationSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    desc);
@@ -2578,6 +2658,7 @@ bool Converter::ConvertL2Normalization(const Operation& operation, const Model& 
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddL2NormalizationLayer(desc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -2640,12 +2721,14 @@ bool Converter::ConvertLocalResponseNormalization(const Operation& operation,
     descriptor.m_NormSize = 1 + (2 * descriptor.m_NormSize);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsNormalizationSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -2667,6 +2750,7 @@ bool Converter::ConvertLocalResponseNormalization(const Operation& operation,
 
 
     armnn::IConnectableLayer* layer = data.m_Network->AddNormalizationLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -2703,13 +2787,14 @@ bool Converter::ConvertLogicalBinary(const Operation& operation,
     LogicalBinaryDescriptor descriptor(logicalOperation);
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsLogicalBinarySupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo0,
                                    inputInfo1,
                                    outputInfo,
@@ -2731,6 +2816,7 @@ bool Converter::ConvertLogicalBinary(const Operation& operation,
     }
 
     IConnectableLayer* layer = data.m_Network->AddLogicalBinaryLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
@@ -2808,12 +2894,14 @@ bool Converter::ConvertLogSoftmax(const Operation& operation, const Model& model
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsLogSoftmaxSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outputInfo,
                                    descriptor);
@@ -2834,6 +2922,7 @@ bool Converter::ConvertLogSoftmax(const Operation& operation, const Model& model
     }
 
     IConnectableLayer* layer = data.m_Network->AddLogSoftmaxLayer(descriptor);
+    layer->SetBackendId(setBackend);
     if (!layer)
     {
         return Fail("%s: AddLogSoftmaxLayer() returned nullptr", __func__);
@@ -3193,12 +3282,14 @@ bool Converter::ConvertLstm(const Operation& operation, const Model& model, Conv
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsLstmSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputStateInInfo,
                                    cellStateInInfo,
@@ -3231,6 +3322,7 @@ bool Converter::ConvertLstm(const Operation& operation, const Model& model, Conv
 
     // Add the layer
     IConnectableLayer* layer = data.m_Network->AddLstmLayer(desc, params, "Lstm");
+    layer->SetBackendId(setBackend);
 
     input.Connect(layer->GetInputSlot(0));
     outputStateIn.Connect(layer->GetInputSlot(1));
@@ -3283,12 +3375,14 @@ bool Converter::ConvertMaximum(const Operation& operation, const Model& model, C
     const TensorInfo& outInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsMaximumSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outInfo);
@@ -3309,6 +3403,7 @@ bool Converter::ConvertMaximum(const Operation& operation, const Model& model, C
     }
 
     IConnectableLayer* layer = data.m_Network->AddMaximumLayer();
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
     if (!isReshapeSupported)
@@ -3370,12 +3465,14 @@ bool Converter::ConvertMean(const Operation& operation, const Model& model, Conv
     descriptor.m_KeepDims = keepDims > 0;
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsMeanSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -3396,6 +3493,7 @@ bool Converter::ConvertMean(const Operation& operation, const Model& model, Conv
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddMeanLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -3423,12 +3521,14 @@ bool Converter::ConvertMinimum(const Operation& operation, const Model& model, C
     const TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsMinimumSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
@@ -3449,6 +3549,7 @@ bool Converter::ConvertMinimum(const Operation& operation, const Model& model, C
     }
 
     IConnectableLayer* const layer = data.m_Network->AddMinimumLayer();
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
     if (!isReshapeSupported)
@@ -3489,12 +3590,14 @@ bool Converter::ConvertMul(const Operation& operation, const Model& model, Conve
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsMultiplicationSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
@@ -3515,6 +3618,7 @@ bool Converter::ConvertMul(const Operation& operation, const Model& model, Conve
     }
 
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddMultiplicationLayer();
+    startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
     if (!isReshapeSupported)
@@ -3564,12 +3668,14 @@ bool Converter::ConvertPad(const Operation& operation, const Model& model, Conve
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsPadSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -3590,6 +3696,7 @@ bool Converter::ConvertPad(const Operation& operation, const Model& model, Conve
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddPadLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -3666,12 +3773,14 @@ bool Converter::ConvertPadV2(const Operation& operation, const Model& model, Con
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsPadSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -3692,6 +3801,7 @@ bool Converter::ConvertPadV2(const Operation& operation, const Model& model, Con
     }
 
     IConnectableLayer* const layer = data.m_Network->AddPadLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -3722,12 +3832,14 @@ bool Converter::ConvertPrelu(const Operation& operation, const Model& model, Con
     const TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsPreluSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    alphaInfo,
                                    outputInfo);
@@ -3748,6 +3860,7 @@ bool Converter::ConvertPrelu(const Operation& operation, const Model& model, Con
     }
 
     IConnectableLayer* const layer = data.m_Network->AddPreluLayer();
+    layer->SetBackendId(setBackend);
 
     if (!layer)
     {
@@ -3782,12 +3895,14 @@ bool Converter::ConvertQuantize(const Operation& operation, const Model& model, 
     const TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsQuantizeSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outputInfo);
     };
@@ -3807,6 +3922,7 @@ bool Converter::ConvertQuantize(const Operation& operation, const Model& model, 
     }
 
     IConnectableLayer* const layer = data.m_Network->AddQuantizeLayer();
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -4259,12 +4375,14 @@ bool Converter::ConvertQuantizedLstm(const Operation& operation, const Model& mo
 
     // Check if the layer is supported
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& cellStateOutInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsQLstmSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputStatePrevTimeStepInfo,
                                    cellStatePrevTimeStepInfo,
@@ -4295,6 +4413,7 @@ bool Converter::ConvertQuantizedLstm(const Operation& operation, const Model& mo
 
     // Add the layer
     IConnectableLayer* layer = data.m_Network->AddQLstmLayer(desc, params, "QLstm");
+    layer->SetBackendId(setBackend);
 
     input.Connect(layer->GetInputSlot(0));
     outputStatePrevTimeStep.Connect(layer->GetInputSlot(1));
@@ -4502,12 +4621,14 @@ bool Converter::ConvertQuantized16BitLstm(const Operation& operation, const Mode
     paramsInfo.m_OutputGateBias           = &(params.m_OutputGateBias->GetInfo());
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsQuantizedLstmSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    previousCellStateInInfo,
                                    previousOutputInInfo,
@@ -4534,6 +4655,7 @@ bool Converter::ConvertQuantized16BitLstm(const Operation& operation, const Mode
     }
 
     IConnectableLayer* const layer = data.m_Network->AddQuantizedLstmLayer(params, "QuantizedLstm");
+    layer->SetBackendId(setBackend);
     input.Connect(layer->GetInputSlot(0));
     previousCellStateIn.Connect(layer->GetInputSlot(1));
     previousOutputIn.Connect(layer->GetInputSlot(2));
@@ -4580,10 +4702,12 @@ bool Converter::ConvertRank(const Operation& operation, const Model& model, Conv
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                IsRankSupported,
                                data.m_Backends,
                                isSupported,
+                               setBackend,
                                input.GetTensorInfo(),
                                outInfo);
     if (!isSupported)
@@ -4592,6 +4716,7 @@ bool Converter::ConvertRank(const Operation& operation, const Model& model, Conv
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddRankLayer();
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -4620,13 +4745,14 @@ bool Converter::ConvertReLu(const Operation& operation, const Model& model, Conv
     const armnn::TensorInfo& outInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
-
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsActivationSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outInfo,
                                    desc);
@@ -4647,6 +4773,7 @@ bool Converter::ConvertReLu(const Operation& operation, const Model& model, Conv
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddActivationLayer(desc);
+    layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -4724,12 +4851,14 @@ bool Converter::ConvertReshape(const Operation& operation, const Model& model, C
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsReshapeSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outputInfo,
                                    reshapeDescriptor);
@@ -4750,6 +4879,7 @@ bool Converter::ConvertReshape(const Operation& operation, const Model& model, C
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddReshapeLayer(reshapeDescriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -4868,12 +4998,14 @@ bool Converter::ConvertResize(const Operation& operation,
     descriptor.m_HalfPixelCenters = GetOptionalBool(operation, 5, model, data);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsResizeSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -4894,6 +5026,7 @@ bool Converter::ConvertResize(const Operation& operation,
     }
 
     IConnectableLayer* layer = data.m_Network->AddResizeLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -4982,12 +5115,14 @@ bool Converter::ConvertSpaceToBatchNd(const Operation& operation, const Model& m
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo &outputInfo, bool &isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsSpaceToBatchNdSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -5007,6 +5142,7 @@ bool Converter::ConvertSpaceToBatchNd(const Operation& operation, const Model& m
     }
 
     armnn::IConnectableLayer *const layer = data.m_Network->AddSpaceToBatchNdLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -5050,12 +5186,14 @@ bool Converter::ConvertSpaceToDepth(const Operation& operation, const Model& mod
     desc.m_DataLayout = OptionalDataLayout(operation, 2, model, data);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsSpaceToDepthSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    desc);
@@ -5076,6 +5214,7 @@ bool Converter::ConvertSpaceToDepth(const Operation& operation, const Model& mod
     }
 
     IConnectableLayer* const layer = data.m_Network->AddSpaceToDepthLayer(desc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -5134,12 +5273,14 @@ bool Converter::ConvertSoftmax(const Operation& operation, const Model& model, C
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsSoftmaxSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input.GetTensorInfo(),
                                    outputInfo,
                                    desc);
@@ -5160,6 +5301,7 @@ bool Converter::ConvertSoftmax(const Operation& operation, const Model& model, C
     }
 
     IConnectableLayer* layer = data.m_Network->AddSoftmaxLayer(desc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -5195,12 +5337,14 @@ bool Converter::ConvertSub(const Operation& operation, const Model& model, Conve
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsSubtractionSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
@@ -5221,6 +5365,7 @@ bool Converter::ConvertSub(const Operation& operation, const Model& model, Conve
     }
 
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddSubtractionLayer();
+    startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
     if (!isReshapeSupported)
@@ -5413,12 +5558,14 @@ bool Converter::ConvertTransposeConv2d(const Operation& operation, const Model& 
     Optional<TensorInfo> biases(bias.GetInfo());
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsTransposeConvolution2dSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    desc,
@@ -5441,6 +5588,7 @@ bool Converter::ConvertTransposeConv2d(const Operation& operation, const Model& 
 
     IConnectableLayer* startLayer =
         data.m_Network->AddTransposeConvolution2dLayer(desc, weights, Optional<ConstTensor>(bias));
+    startLayer->SetBackendId(setBackend);
     if (!startLayer)
     {
         return Fail("%s: AddTransposeConvolution2dLayer failed", __func__);
@@ -5526,10 +5674,12 @@ bool Converter::ConvertSqueeze(const Operation& operation, const Model& model, C
     reshapeDesc.m_TargetShape = outputInfo.GetShape();
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                IsReshapeSupported,
                                data.m_Backends,
                                isSupported,
+                               setBackend,
                                inputInfo,
                                outputInfo,
                                reshapeDesc);
@@ -5540,6 +5690,7 @@ bool Converter::ConvertSqueeze(const Operation& operation, const Model& model, C
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddReshapeLayer(reshapeDesc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -5623,12 +5774,14 @@ bool Converter::ConvertStridedSlice(const Operation& operation, const Model& mod
     }
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsStridedSliceSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    descriptor);
@@ -5672,6 +5825,7 @@ bool Converter::ConvertStridedSlice(const Operation& operation, const Model& mod
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddStridedSliceLayer(descriptor);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
@@ -5726,12 +5880,14 @@ bool Converter::ConvertTranspose(const Operation& operation, const Model& model,
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     bool isSupported = false;
+    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsTransposeSupported,
                                    data.m_Backends,
                                    isSupported,
+                                   setBackend,
                                    inputInfo,
                                    outputInfo,
                                    transposeDesc);
@@ -5752,6 +5908,7 @@ bool Converter::ConvertTranspose(const Operation& operation, const Model& model,
     }
 
     armnn::IConnectableLayer* const layer = data.m_Network->AddTransposeLayer(transposeDesc);
+    layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 

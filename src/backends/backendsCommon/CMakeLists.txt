@@ -26,7 +26,6 @@ list(APPEND armnnBackendsCommon_sources
     MapWorkload.cpp
     MapWorkload.hpp
     MemCopyWorkload.cpp
-    MemCopyWorkload.hpp
     MemImportWorkload.cpp
     MemImportWorkload.hpp
     MemoryManager.cpp
@@ -36,17 +35,13 @@ list(APPEND armnnBackendsCommon_sources
     OptimizationViews.cpp
     OptimizationViews.hpp
     TensorHandle.cpp
-    TensorHandle.hpp
     TensorHandleFactoryRegistry.cpp
     TensorHandleFactoryRegistry.hpp
     UnmapWorkload.cpp
     UnmapWorkload.hpp
     WorkloadDataCollector.hpp
-    Workload.hpp
     WorkloadData.cpp
-    WorkloadData.hpp
     WorkloadFactory.cpp
-    WorkloadFactory.hpp
     WorkloadFactoryBase.hpp
     WorkloadInfo.hpp
     WorkloadUtils.cpp

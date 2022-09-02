@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -7,7 +7,6 @@ list(APPEND armnnAclCommonUnitTests_sources
     ArmComputeTensorUtilsTests.cpp
     CreateWorkloadClNeon.hpp
     MemCopyTests.cpp
-    MemCopyTestImpl.hpp
 )
 
 add_library(armnnAclCommonUnitTests OBJECT ${armnnAclCommonUnitTests_sources})

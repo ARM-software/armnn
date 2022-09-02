@@ -555,13 +555,11 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/CloneTests.cpp
         src/armnn/test/ConstTensorLayerVisitor.hpp
         src/armnn/test/ConstTensorLayerVisitor.cpp
-        src/armnn/test/CreateWorkload.hpp
         src/armnn/test/EndToEndTest.cpp
         src/armnn/test/ExecutionFrameTest.cpp
         src/armnn/test/FloatingPointConverterTest.cpp
         src/armnn/test/FlowControl.cpp
         src/armnn/test/GraphTests.cpp
-        src/armnn/test/GraphUtils.hpp
         src/armnn/test/InstrumentTests.cpp
         src/armnn/test/InferOutputTests.cpp
         src/armnn/test/InferOutputTests.hpp
@@ -595,13 +593,11 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/SquashEqualSiblingsTests.cpp
         src/armnn/test/optimizations/TransposeAsReshapeTests.cpp
         src/armnn/test/OptionalTest.cpp
-        src/armnn/test/PredicateResult.hpp
         src/armnn/test/ProfilerTests.cpp
         src/armnn/test/ProfilingEventTest.cpp
         src/armnn/test/ShapeInferenceTests.cpp
         src/armnn/test/SubgraphViewTests.cpp
         src/armnn/test/TensorHandleStrategyTest.cpp
-        src/armnn/test/TensorHelpers.hpp
         src/armnn/test/TensorTest.cpp
         src/armnn/test/TestInputOutputLayerVisitor.cpp
         src/armnn/test/TestInputOutputLayerVisitor.hpp
@@ -609,8 +605,6 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/TestLayerVisitor.hpp
         src/armnn/test/TestNameOnlyLayerVisitor.cpp
         src/armnn/test/TestNameOnlyLayerVisitor.hpp
-        src/armnn/test/TestUtils.hpp
-        src/armnn/test/UnitTests.hpp
         src/armnn/test/TestNameAndDescriptorLayerVisitor.hpp
         src/armnn/test/TestNameAndDescriptorLayerVisitor.cpp
         src/armnn/test/UtilityTests.cpp

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_08" # Release 22.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a331e48ad8a4856837cf0afdd44de69af43581af" #Fix add for tensors with non-matching strides
+DEFAULT_CLFRAMEWORKREVISION="552fe4c67d3cd2994cdbd5662cde79da5caf0c4d" #F16 Specialization for MeanStdDevNorm
 
 usage() {
     echo "Usage: $CMD (Use the default clframework SHA)"

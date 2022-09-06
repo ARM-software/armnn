@@ -13,9 +13,6 @@
 * [Third-Party](#third-party)
 * [Build Flags](#build-flags)
 
-## Announcement: As part of Arm's commitment to the use of inclusive language we will be moving away from 'master' branch to 'main' soon.
-## From 15 August 2022 our 'master' branch will be frozen and we will be using 'main' branch instead.
-
 # Arm NN
 
 **_Arm NN_** is the **most performant** machine learning (ML) inference engine for Android and Linux, accelerating ML

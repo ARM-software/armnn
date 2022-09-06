@@ -46,16 +46,15 @@ of the build (generated files and resources, test results etc).
 In our case, PyArmNN depends on Arm NN installation. Thus, binary distr will be linked with
 the local build machine libraries and runtime.
 
-There are 2 ways to build the python packages. Either directly using the python scripts or using CMake.
+The recommended way to build the python packages is by CMake.
 
 ### CMake build
 
 The recommended aproach is to build PyArmNN together with Arm NN by adding the following options to your CMake command:
 ```
 -DBUILD_PYTHON_SRC=1
--DBUILD_PYTHON_WHL=1
 ```
-This will build either the source package or the wheel or both. Current project headers and build libraries will be used, so there is no need to provide them.
+This will build the source package. Current project headers and build libraries will be used, so there is no need to provide them.
 
 SWIG is required to generate the wrappers. If CMake did not find the executable during the configure step or it has found an older version, you may provide it manually:
 ```
@@ -63,43 +62,6 @@ SWIG is required to generate the wrappers. If CMake did not find the executable 
 ```
 
 After the build finishes, you will find the python packages in `<build_folder>/python/pyarmnn/dist`.
-
-### Standalone build
-
-PyArmNN can also be built using the provided python scripts only. The advantage of that is that you may use prebuilt Arm NN libraries and it is generally much faster if you do not want to build all the Arm NN libraries.
-
-##### 1. Set environment:
-
-*ARMNN_INCLUDE* and *ARMNN_LIB* are mandatory and should point to Arm NN includes and libraries against which you will be generating the wrappers. *SWIG_EXECUTABLE* should only be set if you have multiple versions of SWIG installed or you used a custom location for your installation:
-```bash
-$ export SWIG_EXECUTABLE=/full/path/to/swig/executable
-$ export ARMNN_INCLUDE=/full/path/to/armnn/include:/full/path/to/armnn/profiling/common/include
-$ export ARMNN_LIB=/path/to/libs
-```
-
-##### 2. Clean and build SWIG wrappers:
-
-```bash
-$ python setup.py clean --all
-$ python swig_generate.py -v
-$ python setup.py build_ext --inplace
-```
-This step will put all generated files under `./src/pyarmnn/_generated` folder and can be used repeatedly to re-generate the wrappers.
-
-##### 4. Build the source package
-
-```bash
-$ python setup.py sdist
-```
-As the result you will get `./dist/pyarmnn-31.0.0.tar.gz` file. As you can see it is platform independent.
-
-##### 5. Build the binary package
-
-```bash
-$ python setup.py bdist_wheel
-```
-As the result you will get something like `./dist/pyarmnn-31.0.0-cp36-cp36m-linux_x86_64.whl` file. As you can see it
- is platform dependent.
 
 # PyArmNN installation
 
@@ -118,20 +80,9 @@ It is strongly suggested to work within a python virtual environment. The furthe
 
 PyArmNN also depends on the NumPy python library. It will be automatically downloaded and installed alongside PyArmNN. If your machine does not have access to Python pip repositories you might need to install NumPy in advance by following public instructions: https://scipy.org/install.html
 
-## Installing from wheel
-
-Make sure that Arm NN binaries and Arm NN dependencies are installed and can be found in one of the system default library locations. You can check default locations by executing the following command:
-```bash
-$ gcc --print-search-dirs
-```
-Install PyArmNN from binary by pointing to the wheel file:
-```bash
-$ pip install /path/to/pyarmnn-31.0.0-cp36-cp36m-linux_aarch64.whl
-```
-
 ## Installing from source package
 
-Alternatively, you can install from source. This is the more reliable way but requires a little more effort on the users part.
+Installing from source is the most reliable way.
 
 While installing from sources, you have the freedom of choosing Arm NN libraries location. Set environment variables *ARMNN_LIB* and *ARMNN_INCLUDE* to point to Arm NN libraries and headers.
 If you want to use system default locations, just set *ARMNN_INCLUDE* to point to Arm NN headers.
@@ -145,7 +96,7 @@ $ export  ARMNN_INCLUDE=/full/path/to/armnn/include:/full/path/to/armnn/profilin
 
 Install PyArmNN as follows:
 ```bash
-$ pip install /path/to/pyarmnn-31.0.0.tar.gz
+$ pip install /path/to/armnn/python/pyarmnn
 ```
 
 If PyArmNN installation script fails to find Arm NN libraries it will raise an error like this

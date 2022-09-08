@@ -4,7 +4,7 @@ This tool replaces/supersedes the majority of the existing Arm NN build guides a
 The main benefit of building Arm NN from scratch is the ability to **exactly choose which components to build, targeted for your ML project**.<br>
 The Arm NN Build Tool is tested on **x86_64 (Intel) and aarch64 (Arm) build hosts** for the **Ubuntu** platform.
 Other host platforms such as Windows and Mac **should** work (with Docker installed), but have not been officially tested.<br>
-At present, the tool supports **targeting Linux devices (from Ubuntu 18.04 onwards) on x86_64, aarch32 and aarch64** architectures.<br>
+At present, the tool supports **targeting Linux devices (from Ubuntu 18.04 onwards) on x86_64 and aarch64** architectures.<br>
 We recommend using the Arm NN Build Tool through the use of Docker. However, the scripts may be [executed directly on your machine](#build-arm-nn-without-docker) if desired.
 
 **If you already have Docker installed** and want to quickly build the Arm NN Dockerfile with some default build arguments, please follow the [Docker Build Steps](#docker-build-steps).
@@ -134,13 +134,13 @@ For ease of use (but longer initial docker build), use ```--all``` to have all A
 Repeated docker builds with the same ```SETUP_ARGS``` will skip the setup process (using [caching](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#leverage-build-cache) of previous Docker build steps).
 The ```SETUP_ARGS``` string should start and end with **double quotes** ```"```.
 
-| SETUP_ARGS        | Description                                                                        |
-|-------------------|:-----------------------------------------------------------------------------------|
-| --tflite-delegate | **flag:** setup dependencies for the Arm NN TF Lite Delegate                       |
-| --tflite-parser   | **flag:** setup dependencies for the Arm NN TF Lite Parser                         |
-| --onnx-parser     | **flag:** setup dependencies for the Arm NN ONNX parser                            |
-| --all             | **flag:** setup dependencies for all Arm NN components listed above                |
-| --target-arch=    | **mandatory option:** specify a target architecture ```aarch64, aarch32, x86_64``` |
+| SETUP_ARGS        | Description                                                                      |
+|-------------------|:---------------------------------------------------------------------------------|
+| --tflite-delegate | **flag:** setup dependencies for the Arm NN TF Lite Delegate                     |
+| --tflite-parser   | **flag:** setup dependencies for the Arm NN TF Lite Parser                       |
+| --onnx-parser     | **flag:** setup dependencies for the Arm NN ONNX parser                          |
+| --all             | **flag:** setup dependencies for all Arm NN components listed above              |
+| --target-arch=    | **mandatory option:** specify a target architecture ```aarch64, x86_64```        |
 
 **At least one component** (e.g. ```--tflite-delegate```) must be provided **or** else provide ```--all``` to setup dependencies for all components.
 
@@ -163,7 +163,7 @@ The ```BUILD_ARGS``` string should start and end with **double quotes** ```"```.
 | --tflite-parser     | **flag:** build the Arm NN TF Lite Parser component                                                                                                                                                                                                                                                                   |
 | --onnx-parser       | **flag:** build the Arm NN ONNX parser component                                                                                                                                                                                                                                                                      |
 | --all               | **flag:** build all Arm NN components listed above                                                                                                                                                                                                                                                                    |
-| --target-arch=      | **mandatory option:** specify a target architecture ```aarch64, aarch32, x86_64```                                                                                                                                                                                                                                    |
+| --target-arch=      | **mandatory option:** specify a target architecture ```aarch64, x86_64```                                                                                                                                                                                                                                             |
 | --neon-backend      | **flag:** build Arm NN with the NEON backend (CPU acceleration from ACL)                                                                                                                                                                                                                                              |
 | --cl-backend        | **flag:** build Arm NN with the OpenCL backend (GPU acceleration from ACL)                                                                                                                                                                                                                                            |
 | --ref-backend       | **flag:** build Arm NN with the reference backend<br/>**Should be used for verification purposes only.<br/>Does not provide any performance acceleration.**                                                                                                                                                           |
@@ -183,8 +183,8 @@ Build for aarch64 with all Arm NN components, NEON enabled and OpenCL enabled:<b
 Build for aarch64 with TF Lite Delegate, OpenCL enabled and additional ACL scons params:<br>
 ```BUILD_ARGS="--target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params='compress_kernels=1 benchmark_examples=1'"```
 
-Setup for aarch32 with all Arm NN dependencies, OpenCL enabled and additional Arm NN cmake args:<br>
-```BUILD_ARGS="--target-arch=aarch32 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1 -DBUILD_UNIT_TESTS=0'"```
+Setup for aarch64 with all Arm NN dependencies, OpenCL enabled and additional Arm NN cmake args:<br>
+```BUILD_ARGS="--target-arch=aarch64 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1 -DBUILD_UNIT_TESTS=0'"```
 
 **Example _valid_ combination of SETUP_ARGS and BUILD_ARGS:**<br>
 ```

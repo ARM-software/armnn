@@ -37,7 +37,6 @@ if [ "$TARGET_ARCH" == "$HOST_ARCH" ]; then
 fi
 
 AARCH64_COMPILER_FLAGS+="CC=/usr/bin/aarch64-linux-gnu-gcc CXX=/usr/bin/aarch64-linux-gnu-g++ "
-AARCH32_COMPILER_FLAGS+="CC=/usr/bin/arm-linux-gnueabihf-gcc CXX=/usr/bin/arm-linux-gnueabihf-g++ "
 
 # Flatbuffers
 FLATBUFFERS_VERSION=1.12.0

@@ -56,9 +56,6 @@ build_protobuf()
     if [ "$TARGET_ARCH" == "aarch64" ]; then
       cmake_flags+="$AARCH64_COMPILER_FLAGS"
       additional_cmds+="--host=aarch64-linux "
-    elif [ "$TARGET_ARCH" == "aarch32" ]; then
-      cmake_flags+="$AARCH32_COMPILER_FLAGS"
-      additional_cmds+="--host=arm-linux "
     fi
   else
     target_arch="$HOST_ARCH"
@@ -100,8 +97,6 @@ build_flatbuffers()
     mkdir -p "$FLATBUFFERS_BUILD_TARGET"
     if [ "$TARGET_ARCH" == "aarch64" ]; then
       cmake_flags+="$AARCH64_COMPILER_FLAGS"
-    elif [ "$TARGET_ARCH" == "aarch32" ]; then
-      cmake_flags+="$AARCH32_COMPILER_FLAGS"
     fi
   else
     target_arch="$HOST_ARCH"
@@ -154,15 +149,6 @@ build_tflite()
 
       if [ "$NATIVE_BUILD" -eq 0 ]; then
         cmake_flags+="ARMCC_FLAGS='-funsafe-math-optimizations' "
-      fi
-      ;;
-
-    "aarch32")
-      cmake_flags+="$AARCH32_COMPILER_FLAGS"
-      target_arch_cmd="-DCMAKE_SYSTEM_PROCESSOR=armv7 "
-
-      if [ "$NATIVE_BUILD" -eq 0 ]; then
-        cmake_flags+="ARMCC_FLAGS='-march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee' "
       fi
       ;;
   esac
@@ -233,7 +219,7 @@ setup-armnn.sh [OPTION]...
     setup dependencies for the Arm NN ONNX parser
   --all
     setup dependencies for all Arm NN components listed above
-  --target-arch=[aarch64|aarch32|x86_64]
+  --target-arch=[aarch64|x86_64]
     specify a target architecture (mandatory)
   --num-threads=<INTEGER>
     specify number of threads/cores to build dependencies with (optional: defaults to number of online CPU cores on host)
@@ -251,8 +237,6 @@ Setup for aarch64 with all Arm NN dependencies:
     <PATH_TO>/setup-armnn.sh --target-arch=aarch64 --all
 Setup for aarch64 with TF Lite Delegate and TF Lite Parser dependencies only:
     <PATH_TO>/setup-armnn.sh --target-arch=aarch64 --tflite-delegate --tflite-parser
-Setup for aarch32 with all Arm NN dependencies:
-    <PATH_TO>/setup-armnn.sh --target-arch=aarch32 --all
 EOF
 }
 

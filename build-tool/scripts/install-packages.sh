@@ -82,8 +82,7 @@ install_apt_packages()
   # Install cross compile toolchains if host is x86_64
   if [ "$HOST_ARCH" == "x86_64" ]; then
     apt-get update && apt-get install -y --no-install-recommends  \
-        crossbuild-essential-arm64 \
-        crossbuild-essential-armhf
+        crossbuild-essential-arm64
   fi
 
   apt-get clean

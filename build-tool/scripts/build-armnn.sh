@@ -17,7 +17,8 @@ build_acl()
 {
   cd "$ACL_SRC"
 
-  local acl_params="neon=$flag_neon_backend opencl=$flag_cl_backend Werror=0 embed_kernels=1 examples=0 validation_tests=0 benchmark_tests=0 benchmark_examples=0"
+  # $acl_scons_params are additional options provided by the user and will overwrite any previously defined args
+  local acl_params="neon=$flag_neon_backend opencl=$flag_cl_backend Werror=0 embed_kernels=1 examples=0 validation_tests=0 benchmark_tests=0 benchmark_examples=0 $acl_scons_params"
 
   if [ "$flag_debug" -eq 1 ]; then
     acl_params="$acl_params debug=1 asserts=1"
@@ -38,11 +39,6 @@ build_acl()
     "aarch64")
       compile_flags+="$AARCH64_COMPILER_FLAGS"
       acl_arch="arch=arm64-v8a"
-      ;;
-
-    "aarch32")
-      compile_flags+="$AARCH32_COMPILER_FLAGS"
-      acl_arch="arch=armv7a"
       ;;
 
     "x86_64")
@@ -87,10 +83,6 @@ build_armnn()
   case "$TARGET_ARCH" in
     "aarch64")
       compile_flags+="$AARCH64_COMPILER_FLAGS"
-      ;;
-
-    "aarch32")
-      compile_flags+="$AARCH32_COMPILER_FLAGS"
       ;;
   esac
 
@@ -199,7 +191,7 @@ build-armnn.sh [OPTION]...
     build the Arm NN ONNX parser component
   --all
     build all Arm NN components listed above
-  --target-arch=[aarch64|aarch32|x86_64]
+  --target-arch=[aarch64|x86_64]
     specify a target architecture (mandatory)
   --neon-backend
     build Arm NN with the NEON backend (CPU acceleration from ACL)
@@ -212,9 +204,9 @@ build-armnn.sh [OPTION]...
   --debug
     build Arm NN (and ACL) with debug turned on (optional: defaults to off)
   --armnn-cmake-args=<ARG LIST STRING>
-    provide additional space-separated CMake arguments for building Arm NN (optional)
+    provide additional space-separated CMake arguments string for building Arm NN (optional)
   --acl-scons-params=<PARAM LIST STRING>
-    provide additional space-separated scons parameters for building ACL (optional)
+    provide additional space-separated scons parameters string for building ACL (optional)
   --num-threads=<INTEGER>
     specify number of threads/cores to build dependencies with (optional: defaults to number of online CPU cores on host)
   -h, --help
@@ -236,9 +228,9 @@ Examples:
 Build for aarch64 with all Arm NN components, NEON enabled and OpenCL enabled:
   <PATH_TO>/build-armnn.sh --target-arch=aarch64 --all --neon-backend --cl-backend
 Build for aarch64 with TF Lite Delegate, OpenCL enabled and additional ACL scons params:
-  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params="compress_kernels=1 benchmark_examples=1"
-Setup for aarch32 with all Arm NN dependencies, OpenCL enabled and additional Arm NN cmake args:
-  <PATH_TO>/build-armnn.sh --target-arch=aarch32 --all --cl-backend --armnn-cmake-args="-DBUILD_SAMPLE_APP=1 -DBUILD_UNIT_TESTS=0"
+  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params='compress_kernels=1 benchmark_examples=1'
+Setup for aarch64 with all Arm NN dependencies, OpenCL enabled and additional Arm NN cmake args:
+  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1 -DBUILD_UNIT_TESTS=0'
 EOF
 }
 

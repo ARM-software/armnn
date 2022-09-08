@@ -73,7 +73,7 @@ cd ../..
 
 # Default ACL repo directory name is 'clframework'
 # This can be overwritten by command line option '-n'
-ACL_REPO_NAMFE="clframework"
+ACL_REPO_NAME="clframework"
 if [ ! -z "$ACL_REPO_NAME_OPTION" ]; then
   ACL_REPO_NAME="$ACL_REPO_NAME_OPTION"
 fi

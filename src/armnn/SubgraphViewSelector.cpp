@@ -521,6 +521,14 @@ SubgraphViewSelector::SelectSubgraphs(SubgraphView& subgraph, const LayerSelecto
                                                            std::move(outputs)));
     }
 
+    // Sort subgraphs list into deterministic order, not relying on pointer values which may be different on each 
+    // execution. This makes debugging the optimised graph much easier as subsequent stages can also be 
+    // deterministic.
+    std::sort(result.begin(), result.end(), [](const SubgraphViewPtr& a, const SubgraphViewPtr& b)
+    {
+        return a->GetIConnectableLayers().front()->GetGuid() < b->GetIConnectableLayers().front()->GetGuid();
+    });
+
     return result;
 }
 

@@ -847,21 +847,8 @@ TEST_CASE("DisjointGraphs")
     {
         CHECK((subgraphs[0] != nullptr));
         CHECK((subgraphs[1] != nullptr));
-        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
-        {
-            if (std::find(subgraphs[0]->GetIConnectableLayers().begin(),
-                          subgraphs[0]->GetIConnectableLayers().end(), i0) !=
-                          subgraphs[0]->GetIConnectableLayers().end())
-            {
-                CompareSubgraphViews(subgraphs[0], expected1);
-                CompareSubgraphViews(subgraphs[1], expected2);
-            }
-            else
-            {
-                CompareSubgraphViews(subgraphs[0], expected2);
-                CompareSubgraphViews(subgraphs[1], expected1);
-            }
-        }
+        CompareSubgraphViews(subgraphs[0], expected1);
+        CompareSubgraphViews(subgraphs[1], expected2);
     }
 }
 
@@ -936,23 +923,8 @@ TEST_CASE("IslandInTheMiddle")
         // we need to have valid subgraph pointers here
         CHECK((subgraphs[0] != nullptr));
         CHECK((subgraphs[1] != nullptr));
-
-        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
-        {
-            // sort the subgraphs by layer size, so it is simpler to test
-            std::sort(subgraphs.begin(), subgraphs.end(),
-                [](SubgraphViewSelector::SubgraphViewPtr& lhs, SubgraphViewSelector::SubgraphViewPtr& rhs)
-            {
-                return (lhs->GetIConnectableLayers().size() < rhs->GetIConnectableLayers().size());
-            }
-            );
-
-            CHECK(subgraphs[0]->GetIConnectableLayers().size() == 2);
-            CHECK(subgraphs[1]->GetIConnectableLayers().size() == 5);
-
-            CompareSubgraphViews(subgraphs[0], smallerSubgraph);
-            CompareSubgraphViews(subgraphs[1], largerSubgraph);
-        }
+        CompareSubgraphViews(subgraphs[0], largerSubgraph);
+        CompareSubgraphViews(subgraphs[1], smallerSubgraph);
     }
 }
 
@@ -1018,23 +990,8 @@ TEST_CASE("MultipleSimpleSubgraphs")
         // we need to have valid subgraph pointers here
         CHECK((subgraphs[0] != nullptr));
         CHECK((subgraphs[1] != nullptr));
-
-        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
-        {
-            // sort the subgraphs by layer size, so it is simpler to test
-            std::sort(subgraphs.begin(), subgraphs.end(),
-                [](SubgraphViewSelector::SubgraphViewPtr & lhs, SubgraphViewSelector::SubgraphViewPtr & rhs)
-                {
-                    return (lhs->GetIConnectableLayers().size() < rhs->GetIConnectableLayers().size());
-                }
-            );
-
-            CHECK(subgraphs[0]->GetIConnectableLayers().size() == 1);
-            CHECK(subgraphs[1]->GetIConnectableLayers().size() == 2);
-
-            CompareSubgraphViews(subgraphs[0], smallerSubgraph);
-            CompareSubgraphViews(subgraphs[1], largerSubgraph);
-        }
+        CompareSubgraphViews(subgraphs[0], smallerSubgraph);
+        CompareSubgraphViews(subgraphs[1], largerSubgraph);
     }
 }
 
@@ -1298,16 +1255,16 @@ TEST_CASE("ValidMerge")
         });
 
     // expected results to test against
-    auto expectedSubgraph0 =
+    auto expectedSubgraph0 = CreateSubgraphViewFrom(
+        std::vector<InputSlot*>{ &m3->GetInputSlot(0), & m3->GetInputSlot(1) },
+        CreateOutputsFrom({ }),
+        { m0, m3 });
+
+    auto expectedSubgraph1 =
         CreateSubgraphViewFrom(
             CreateInputsFrom({ m1 }),
             std::vector<OutputSlot*>{ &m1->GetOutputSlot(0), &m2->GetOutputSlot(0) },
             { m1, m2 });
-
-    auto expectedSubgraph1 = CreateSubgraphViewFrom(
-        std::vector<InputSlot*>{ &m3->GetInputSlot(0), & m3->GetInputSlot(1) },
-        CreateOutputsFrom({ }),
-        { m0, m3 });
 
     CHECK(subgraphs.size() == 2);
     if (subgraphs.size() == 2)
@@ -1315,20 +1272,8 @@ TEST_CASE("ValidMerge")
         // we need to have valid subgraph pointers here
         CHECK((subgraphs[0] != nullptr));
         CHECK((subgraphs[1] != nullptr));
-
-        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
-        {
-            if (subgraphs[0]->GetIInputSlots().size() == 1)
-            {
-                CompareSubgraphViews(subgraphs[0], expectedSubgraph0);
-                CompareSubgraphViews(subgraphs[1], expectedSubgraph1);
-            }
-            else
-            {
-                CompareSubgraphViews(subgraphs[0], expectedSubgraph1);
-                CompareSubgraphViews(subgraphs[1], expectedSubgraph0);
-            }
-        }
+        CompareSubgraphViews(subgraphs[0], expectedSubgraph0);
+        CompareSubgraphViews(subgraphs[1], expectedSubgraph1);
     }
 }
 
@@ -1410,21 +1355,9 @@ TEST_CASE("PropagatedDependencies")
         CHECK((subgraphs[0] != nullptr));
         CHECK((subgraphs[1] != nullptr));
         CHECK((subgraphs[2] != nullptr));
-
-        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr && subgraphs[2].get() != nullptr)
-        {
-            // sort the subgraphs by layer size, so it is simpler to test
-            std::sort(subgraphs.begin(), subgraphs.end(),
-                [](SubgraphViewSelector::SubgraphViewPtr& lhs, SubgraphViewSelector::SubgraphViewPtr& rhs)
-            {
-                return (lhs->GetIConnectableLayers().size() < rhs->GetIConnectableLayers().size());
-            }
-            );
-
-            CompareSubgraphViews(subgraphs[0], smallerSubgraph);
-            CompareSubgraphViews(subgraphs[1], mediumSubgraph);
-            CompareSubgraphViews(subgraphs[2], largerSubgraph);
-        }
+        CompareSubgraphViews(subgraphs[0], largerSubgraph);
+        CompareSubgraphViews(subgraphs[1], mediumSubgraph);
+        CompareSubgraphViews(subgraphs[2], smallerSubgraph);
     }
 }
 
@@ -1771,14 +1704,6 @@ TEST_CASE("MultipleSubgraphs")
 
         if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
         {
-            //Sort subgraphs by their inputSlot size.
-            std::sort(subgraphs.begin(), subgraphs.end(),
-                      [](SubgraphViewSelector::SubgraphViewPtr & lhs, SubgraphViewSelector::SubgraphViewPtr & rhs)
-                      {
-                          return (lhs->GetIInputSlots().size() < rhs->GetIInputSlots().size());
-                      }
-            );
-
             unsigned int numInputSlots1  = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetIInputSlots().size());
             unsigned int numOutputSlots1 = armnn::numeric_cast<unsigned int>(subgraphs[0]->GetIOutputSlots().size());
 
@@ -1883,24 +1808,8 @@ TEST_CASE("SubgraphCycles")
         // we need to have valid subgraph pointers here
         CHECK((subgraphs[0] != nullptr));
         CHECK((subgraphs[1] != nullptr));
-
-        if (subgraphs[0].get() != nullptr && subgraphs[1].get() != nullptr)
-        {
-            // sort the subgraphs by layer size, so it is simpler to test
-            std::sort(subgraphs.begin(), subgraphs.end(),
-                      [](SubgraphViewSelector::SubgraphViewPtr & lhs, SubgraphViewSelector::SubgraphViewPtr & rhs)
-                          {
-                              return (lhs->GetIConnectableLayers().size() < rhs->GetIConnectableLayers().size());
-                          }
-            );
-
-            // one subgraph needs to be size=1 and the other one is 4
-            CHECK(subgraphs[0]->GetIConnectableLayers().size() == 1);
-            CHECK(subgraphs[1]->GetIConnectableLayers().size() == 2);
-
-            CompareSubgraphViews(subgraphs[0], outputSubgraph);
-            CompareSubgraphViews(subgraphs[1], inputSubgraph);
-        }
+        CompareSubgraphViews(subgraphs[0], inputSubgraph);
+        CompareSubgraphViews(subgraphs[1], outputSubgraph);
     }
 }
 

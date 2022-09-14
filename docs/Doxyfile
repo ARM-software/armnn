@@ -822,6 +822,8 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./docs/05_01_parsers.dox \
                          ./docs/05_02_deserializer_serializer.dox \
                          ./docs/05_03_delegate.dox \
+                         ./docs/05_04_supportlibrary.dox \
+                         ./docs/05_05_runtimeoptions.dox \
                          ./docs/FAQ.md \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \
@@ -832,11 +834,14 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./src/armnnConverter/README.md \
                          ./src/backends/README.md \
                          ./src/dynamic/README.md \
-                         ./tests/ \
                          ./delegate/include \
                          ./delegate/src/armnn_external_delegate.cpp \
                          ./delegate/BuildGuideNative.md \
                          ./delegate/DelegateQuickStartGuide.md \
+                         ./shim/ \
+                         ./shim/BuildGuideShimSupportLibrary.md \
+                         ./shim/sl/ \
+                         ./shim/sl/canonical/ \
                          ./README.md \
                          ./InstallationViaAptRepository.md \
                          ./ContributorGuide.md \
@@ -867,50 +872,14 @@ INPUT_ENCODING         = UTF-8
 # *.m, *.markdown, *.md, *.mm, *.dox, *.py, *.pyw, *.f90, *.f95, *.f03, *.f08,
 # *.f, *.for, *.tcl, *.vhd, *.vhdl, *.ucf and *.qsf.
 
-FILE_PATTERNS          = *.c \
-                         *.cc \
-                         *.cxx \
-                         *.cpp \
-                         *.c++ \
-                         *.java \
-                         *.ii \
-                         *.ixx \
-                         *.ipp \
-                         *.i++ \
+FILE_PATTERNS          = *.cpp \
                          *.inl \
-                         *.idl \
-                         *.ddl \
-                         *.odl \
                          *.h \
-                         *.hh \
-                         *.hxx \
                          *.hpp \
-                         *.h++ \
-                         *.cs \
-                         *.d \
-                         *.php \
-                         *.php4 \
-                         *.php5 \
-                         *.phtml \
-                         *.inc \
-                         *.m \
-                         *.markdown \
                          *.md \
-                         *.mm \
                          *.dox \
-                         *.py \
-                         *.pyw \
-                         *.f90 \
-                         *.f95 \
-                         *.f03 \
-                         *.f08 \
-                         *.f \
-                         *.for \
-                         *.tcl \
-                         *.vhd \
-                         *.vhdl \
-                         *.ucf \
-                         *.qsf
+                         *.py
+
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -925,7 +894,8 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                =
+EXCLUDE                = ./include/armnnTestUtils \
+                         ./tests/
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -942,6 +912,7 @@ EXCLUDE_SYMLINKS       = NO
 # exclude all test directories for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = *.md
+EXCLUDE_PATTERNS       += */test/*
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the

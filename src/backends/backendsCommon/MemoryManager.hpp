@@ -39,16 +39,16 @@ struct BufferStorage
 class MemoryManager
 {
 public:
-    /// Initialization method to store in @m_AllocatorBufferStoragePairVector all information needed.
-    /// @param[in] bufferStorageVector - Vector of @BufferStorage.
-    /// @param[in] customAllocator - Pointer to @ICustomAllocator.
+    /// Initialization method to store in m_AllocatorBufferStoragePairVector all information needed.
+    /// @param[in] bufferStorageVector - Vector of BufferStorage.
+    /// @param[in] customAllocator - Pointer to ICustomAllocator.
     /// @param[in] typeAlignment - Optional parameter. Value of which the size of each value has to be multiple of.
     void StoreMemToAllocate(std::vector<BufferStorage> bufferStorageVector,
                             std::shared_ptr<ICustomAllocator> customAllocator,
                             size_t typeAlignment = 0);
 
-    /// Allocate the amount of memory indicated by @m_BufferSize, and
-    /// point each @m_Data to each correspondent Tensor so that they are @m_Offset bytes separated.
+    /// Allocate the amount of memory indicated by m_BufferSize, and
+    /// point each m_Data to each correspondent Tensor so that they are m_Offset bytes separated.
     void Allocate();
 
     /// Deallocate memory

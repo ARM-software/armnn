@@ -184,5 +184,10 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - UNPACK
 
 More machine learning operators will be supported in future releases.
+
+@section delegateoptions Delegate Options
+
+The general list of runtime options are described in @subpage runtimeoptions
+
 **/
 }

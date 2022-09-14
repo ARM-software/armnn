@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2022 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -12,6 +12,8 @@ On this page you can find all software components contained in the Arm NN reposi
 other helpful information in each section.
 
  - @subpage delegate
+ - @subpage supportlibrary
+ - @subpage runtimeoptions
  - @subpage parsers
  - @subpage md_python_pyarmnn_README
  - @subpage serializer

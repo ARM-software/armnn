@@ -1,0 +1,27 @@
+/// Copyright (c) 2022 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+@page supportlibrary NNAPI Support Library
+@tableofcontents
+
+
+@section supportlibraryintro About the NNAPI Support Library
+
+If you need help building the Arm NN NNAPI Support Library, please take a look at our [build guide](shim/BuildGuideShimSupportLibrary.md).
+
+
+@section slsupport Supported Operators
+This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK currently supports.
+
+
+@section sloptions Support Library Options
+
+The general list of runtime options are described in @subpage runtimeoptions
+
+**/
+}

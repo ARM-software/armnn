@@ -153,12 +153,12 @@ public:
 
     /// (Optional) Register TensorHandleFactories
     /// Either this method or CreateMemoryManager() and
-    /// IWorkloadFactory::CreateTensor()/IWorkloadFactory::CreateSubtensor() methods must be implemented.
+    /// IWorkloadFactory::CreateTensor() IWorkloadFactory::CreateSubtensor() methods must be implemented.
     virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& /*registry*/) {}
 
     /// (Optional) Register TensorHandleFactories
     /// Either this method or CreateMemoryManager() and
-    /// IWorkloadFactory::CreateTensor()/IWorkloadFactory::CreateSubtensor() methods must be implemented.
+    /// IWorkloadFactory::CreateTensor() IWorkloadFactory::CreateSubtensor() methods must be implemented.
     virtual void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry,
                                                MemorySourceFlags inputFlags,
                                                MemorySourceFlags outputFlags);

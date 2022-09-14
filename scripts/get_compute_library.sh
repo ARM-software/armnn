@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_08" # Release 22.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="e4e3b2ead5b6720af8039f3c9ac15ea6b51b915f" #Disable Winograd on fp16 if fast-math = false
+DEFAULT_CLFRAMEWORKREVISION="a4814e8394ffdd7e268614d54cc22e30648f48ff" #Add test case for disable Winograd on fp16 if fast-math = false
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

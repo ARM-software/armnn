@@ -21,6 +21,7 @@
 #include "ArmnnDriverImpl.hpp"
 #include "ModelToINetworkTransformer.hpp"
 
+#include <armnn/Version.hpp>
 #include <log/log.h>
 namespace armnn_driver
 {
@@ -53,7 +54,7 @@ public:
     const std::string& getVersionString() const override
     {
         VLOG(DRIVER) << "ArmnnDriver::getVersionString()";
-        static const std::string versionString = "ArmNN";
+        static const std::string versionString = ARMNN_VERSION;
         return versionString;
     }
 

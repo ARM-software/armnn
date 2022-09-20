@@ -1841,8 +1841,14 @@ void TfLiteParserImpl::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo sizeTensorInfo = ToTensorInfo(inputs[2]);
     BufferRawPtr sizeBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
 
-    std::vector<int> signedSize(sizeTensorInfo.GetNumElements());
-    ::memcpy(signedSize.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
+    std::vector<int> signedSize(sizeTensorInfo.GetNumElements(), 1);
+
+    // if size buffer data is not specified, all contents of size vector remain as values of 1
+    if (sizeBufferPtr->data.data())
+    {
+        ::memcpy(signedSize.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
+    }
+
     std::vector<unsigned int> size(sizeTensorInfo.GetNumElements());
     TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
 

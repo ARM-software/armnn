@@ -20,6 +20,7 @@ list(APPEND armnnDelegate_sources
         src/DelegateOptions.cpp
         src/Activation.hpp
         src/ArgMinMax.hpp
+        src/BatchMatMul.hpp
         src/BatchSpace.hpp
         src/Comparison.hpp
         src/Convolution.hpp
@@ -138,6 +139,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ArgMinMaxTest.cpp
         src/test/ArgMinMaxTestHelper.hpp
         src/test/ArmnnDelegateTest.cpp
+        src/test/BatchMatMulTest.cpp
+        src/test/BatchMatMulTestHelper.hpp
         src/test/BatchSpaceTest.cpp
         src/test/BatchSpaceTestHelper.hpp
         src/test/CastTest.cpp

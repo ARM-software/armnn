@@ -45,6 +45,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - AVERAGE_POOL_3D
 
+- BATCH_MATMUL
+
 - BATCH_TO_SPACE_ND
 
 - CAST

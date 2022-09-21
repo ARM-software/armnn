@@ -40,6 +40,8 @@ private:
 
     static bool ConvertAveragePool2d(const Operation& operation, const Model& model, ConversionData& data);
 
+    static bool ConvertBatchMatMul(const Operation& operation, const Model& model, ConversionData& data);
+
     static bool ConvertBatchToSpaceNd(const Operation& operation, const Model& model, ConversionData& data);
 
     static bool ConvertCast(const Operation& operation, const Model& model, ConversionData& data);

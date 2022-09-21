@@ -61,7 +61,7 @@ public:
     Version getFeatureLevel() const override
     {
         VLOG(DRIVER) << "ArmnnDriver::getFeatureLevel()";
-        return kVersionFeatureLevel5;
+        return kVersionFeatureLevel6;
     }
 
     DeviceType getType() const override

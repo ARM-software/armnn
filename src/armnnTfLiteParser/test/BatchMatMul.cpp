@@ -12,8 +12,8 @@ struct BatchMatMulFixture : public ParserFlatbuffersFixture
     explicit BatchMatMulFixture(const std::string &inputXShape,
                                 const std::string &inputYShape,
                                 const std::string &outputShape,
-                                const std::string &adjX,
-                                const std::string &adjY)
+                                const std::string &tranX,
+                                const std::string &tranY)
     {
         m_JsonString = R"(
             {
@@ -68,8 +68,8 @@ struct BatchMatMulFixture : public ParserFlatbuffersFixture
                                 "outputs": [ 2 ],
                                 "builtin_options_type": "BatchMatMulOptions",
                                 "builtin_options": {
-                                    adj_x: )" + adjX + R"(,
-                                    adj_y: )" + adjY + R"(,
+                                    adj_x: )" + tranX + R"(,
+                                    adj_y: )" + tranY + R"(,
                                     "asymmetric_quantize_inputs": false
                                 },
                                 "custom_options_format": "FLEXBUFFERS"
@@ -105,9 +105,9 @@ TEST_CASE_FIXTURE(BatchMatMulParamsFixture, "ParseBatchMatMulParams")
          {"inputYTensor", {0.0f, 1.0f, 1.0f,
                            1.0f, 0.0f, 1.0f,
                            1.0f, 1.0f, 0.0f}}},
-        {{"outputTensor", {6.0f, 4.0f, 0.0f,
-                           26.0f, 16.0f, 0.0f,
-                           110.0f, 68.0f, 0.0f}}}
+        {{"outputTensor", {8.0f, 7.0f, 5.0f,
+                           34.0f, 29.0f, 21.0f,
+                           144.0f, 123.0f, 89.0f}}}
         );
 }
 

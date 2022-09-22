@@ -1586,10 +1586,11 @@ void TfLiteParserImpl::ParseBatchMatMul(size_t subgraphIndex, size_t operatorInd
     const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
     const auto* options = operatorPtr->builtin_options.AsBatchMatMulOptions();
 
-    BatchMatMulDescriptor descriptor(false,
+    // Adjoint in tensorflow lite performs transpose operation
+    BatchMatMulDescriptor descriptor(options->adj_x,
+                                     options->adj_y,
                                      false,
-                                     options->adj_x,
-                                     options->adj_y);
+                                     false);
                                      // Arbitrary DataLayout
 
     IConnectableLayer* layer = m_Network->AddBatchMatMulLayer(descriptor, layerName.c_str());

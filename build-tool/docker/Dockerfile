@@ -62,7 +62,8 @@ FROM build-production as build-dev
 RUN mkdir -p source/armnn source/acl
 
 # Copy custom armnn/acl source repos from the build-tool directory on the host, if they exist (optional)
-# If repos not provided, the build-armnn.sh script will automatically download the latest release branches of Arm NN and ACL
+# The 'acl' repo must be provided if --neon-backend or --cl-backend is given in the BUILD_ARGS, otherwise only custom "armnn" is required
+# If custom repos not provided, the build-armnn.sh script will automatically download the latest release branches of Arm NN and ACL
 # Copies Dockerfile to ensure COPY works - at least one file must exist for COPY to work
 COPY --chown=arm-user:arm-user ./docker/Dockerfile ./armnn* ./source/armnn/
 COPY --chown=arm-user:arm-user ./docker/Dockerfile ./acl* ./source/acl/

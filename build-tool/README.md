@@ -305,9 +305,10 @@ sudo ./install-packages.sh
 
 ### Use custom Arm NN and ACL repository versions during build
 By default, the docker build process (specifically, during ```build-armnn.sh```) will download the latest release versions of Arm NN and ACL.
-If you'd like to use different versions during the build, check them out in the ```build-tool``` directory on the host (both must be provided).<br>
+If you'd like to use different versions during the build, check them out in the ```build-tool``` directory on the host.<br>
 When providing custom repositories, the following ```docker build``` argument must be provided ```--build-arg BUILD_TYPE=dev```.
-This will trigger Docker to copy the custom repos into the Docker Image during build.
+This will trigger Docker to copy the custom repos into the Docker Image during build. The ACL repo is only required if
+supplying the ```--neon-backend``` or ```--cl-backend``` BUILD_ARGS options.
 
 **Note:** the Arm NN version used for build-tool (Dockerfile and scripts) is not the same version of Arm NN that is used during the build.
 This means that separate versions of Arm NN can be used for the build-tool and for building Arm NN itself.<br>
@@ -321,13 +322,14 @@ git checkout <branch or SHA>
 
 cd ..
 
+# custom ACL repo only required when supplying --neon-backend or --cl-backend BUILD_ARGS options
 git clone https://github.com/ARM-software/ComputeLibrary.git acl
 cd acl
 git checkout <tag or SHA>
 
 cd ..
 
-# Example docker build with BUILD_TYPE=dev
+# Example docker build with BUILD_TYPE=dev, ran inside the build-tool directory
 docker build \
 --build-arg BUILD_TYPE=dev \
 --build-arg SETUP_ARGS="--target-arch=aarch64 --all" \

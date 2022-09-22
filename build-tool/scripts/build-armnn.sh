@@ -153,16 +153,20 @@ download_armnn()
   git clone https://github.com/ARM-software/armnn.git armnn
 
   cd "$ARMNN_SRC"
-  armnn_branch="$(git rev-parse --abbrev-ref HEAD)"
+  local armnn_branch="$(git rev-parse --abbrev-ref HEAD)"
 
   echo -e "\n***** Arm NN Downloaded: $armnn_branch *****"
 }
 
 download_acl()
 {
-  cd "$SOURCE_DIR"
+  # First get Arm NN branch so that we can download corresponding ACL tag
+  cd "$ARMNN_SRC"
+  local armnn_branch="$(git rev-parse --abbrev-ref HEAD)"
 
-  echo -e "\n***** Downloading ACL *****"
+  echo -e "\n***** Downloading corresponding ACL version using Arm NN branch: $armnn_branch *****"
+
+  cd "$SOURCE_DIR"
 
   rm -rf "$ACL_SRC"
 
@@ -219,8 +223,8 @@ At least one backend (i.e. --neon-backend, --cl-backend, --ref-backend) must be 
 This script must be executed from the same root directory in which setup-armnn.sh was executed from.
 
 The first execution of this script will download the latest release branches of Arm NN and ACL, by default.
-Alternatively, place custom/modified repositories named "armnn" and "acl" in <ROOT_DIR>/source.
-If providing custom repos, both Arm NN and ACL must be provided. The ACL repo will not be used if flags --neon-backend or --cl-backend are not selected.
+Alternatively, place custom/modified repositories named "armnn" and (optionally) "acl" in <ROOT_DIR>/source.
+Providing custom "acl" repo is optional since it is only required if backend flags --neon-backend or --cl-backend are chosen.
 
 By default, a tarball tar.gz archive of the Arm NN build will be created in the directory from which this script is called from.
 
@@ -386,22 +390,27 @@ if [ ! -d "$BUILD_DIR" ]; then
     exit 1
 fi
 
-# Download Arm NN and ACL if not done already in a previous execution of this script
+# Download Arm NN if not done already in a previous execution of this script
 # Check if Arm NN source directory exists AND that it is a repository (not empty)
 if [ -d "$ARMNN_SRC" ] && check_if_repository "$ARMNN_SRC"; then
   echo -e "\n***** Arm NN source repository already located at $ARMNN_SRC. Skipping cloning of Arm NN. *****"
+else
+  # Download latest release branch of Arm NN
+  download_armnn
+fi
 
-  # ACL repo must also be present if Arm NN repo is present
+# Download ACL if not done already in a previous execution of this script
+# Only download ACL if backend options --neon-backend and --cl-backend are chosen
+if [ "$flag_neon_backend" -eq 1 ] || [ "$flag_cl_backend" -eq 1 ]; then
+  # Check if Arm NN source directory exists AND that it is a repository (not empty)
   if [ -d "$ACL_SRC" ] && check_if_repository "$ACL_SRC"; then
     echo -e "\n***** ACL source repository already located at $ACL_SRC. Skipping cloning of ACL. *****"
   else
-    echo -e "\nERROR: ACL source repository must be provided at $ACL_SRC if Arm NN source is provided. *****"
-    exit 1
+    # Download latest release branch of ACL
+    download_acl
   fi
 else
-  # Download latest release branches of Arm NN and ACL
-  download_armnn
-  download_acl
+  echo -e "\n***** Backend options --neon-backend and --cl-backend not selected - skipping cloning of ACL *****"
 fi
 
 # Adjust output build directory names for Arm NN and ACL if debug is enabled

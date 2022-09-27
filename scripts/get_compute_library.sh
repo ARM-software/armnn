@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_08" # Release 22.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a77c6d774053672b7bf0261e1a7a229bb6be5f21" #Add test for ClGemmLowpMatrixMultiplyCore to test a batched matrix multiplication with variable input tensors
+DEFAULT_CLFRAMEWORKREVISION="d6b8a71714361881a249a6f6ed67125f290f4a83" #Add FP32 Neon™ swish activation
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

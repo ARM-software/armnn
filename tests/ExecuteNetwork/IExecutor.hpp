@@ -19,4 +19,5 @@ public:
     /// Compare the output with the result of another IExecutor
     virtual void CompareAndPrintResult(std::vector<const void*> otherOutput) = 0;
     virtual ~IExecutor(){};
+    bool m_constructionFailed = false;
 };

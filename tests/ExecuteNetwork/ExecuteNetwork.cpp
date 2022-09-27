@@ -55,12 +55,21 @@ int main(int argc, const char* argv[])
     }
 
     std::vector<const void*> outputResults;
-
-    auto executor = BuildExecutor(programOptions);
-    if (!executor)
+    std::unique_ptr<IExecutor> executor;
+    try
     {
+        executor = BuildExecutor(programOptions);
+        if (executor->m_constructionFailed)
+        {
+            return EXIT_FAILURE;
+        }
+    }
+    catch (const std::exception& e)
+    {
+        ARMNN_LOG(fatal) << e.what();
         return EXIT_FAILURE;
     }
+
 
     executor->PrintNetworkInfo();
     outputResults = executor->Execute();

@@ -28,8 +28,6 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
     m_IOInfo = GetIOInfo(optNet.get());
     SetupInputsAndOutputs();
 
-    std::string errorMsg;
-
     armnn::ProfilingDetailsMethod profilingDetailsMethod = ProfilingDetailsMethod::Undefined;
     if (params.m_OutputDetailsOnlyToStdOut)
     {
@@ -46,7 +44,18 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
                                          params.m_EnableProfiling,
                                          profilingDetailsMethod};
 
-    m_Runtime->LoadNetwork(m_NetworkId, std::move(optNet), errorMsg, networkProperties);
+    std::string errorMsg;
+    Status status = m_Runtime->LoadNetwork(m_NetworkId, std::move(optNet), errorMsg, networkProperties);
+    if (status != Status::Success)
+    {
+        std::string message("Failed to create Arm NN Executor: ");
+        message.append(errorMsg);
+        // Throwing an exception at this point in the constructor causes lots of problems. We'll instead mark this
+        // executor as not constructed.
+        ARMNN_LOG(fatal) << message;
+        m_constructionFailed = true;
+        return;
+    }
 
     if (m_Params.m_Iterations > 1)
     {

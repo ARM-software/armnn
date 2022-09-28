@@ -740,13 +740,6 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
 
     ARMNN_ASSERT_MSG(workloadFactory, "No workload factory");
 
-    std::string reasonIfUnsupported;
-    ARMNN_ASSERT_MSG(IWorkloadFactory::IsLayerSupported(layer,
-                                                        {},
-                                                        reasonIfUnsupported,
-                                                        m_OptimizedNetwork->pOptimizedNetworkImpl->GetModelOptions()),
-        "Factory does not support layer");
-    IgnoreUnused(reasonIfUnsupported);
     return *workloadFactory;
 }
 

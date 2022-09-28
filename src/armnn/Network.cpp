@@ -1797,6 +1797,17 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         throw InvalidArgumentException("Failed to apply the backend-specific optimizations");
     }
 
+    // Convert constants
+    {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ConvertConstants");
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
+
+        // Once the constants are converted we can now safely call RedirectMembersToConstantInputs
+        Optimizer::Pass(optGraph, MakeOptimizations(RedirectMembersToConstantInputs()));
+    }
+
+    // This must occur after all topological changes to the graph and any redirection of variables
     // If the debug flag is set, then insert a DebugLayer after each layer
     // Doing this after applying the backend optimizations as they might have changed some layers
     if (options.m_Debug)
@@ -1824,15 +1835,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         optGraph.AddCompatibilityLayers(backends, tensorHandleFactoryRegistry);
     }
 
-    // Convert constants
-    {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ConvertConstants");
-        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
-        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
-
-        // Once the constants are converted we can now safely call RedirectMembersToConstantInputs
-        Optimizer::Pass(optGraph, MakeOptimizations(RedirectMembersToConstantInputs()));
-    }
     return optNet;
 }
 

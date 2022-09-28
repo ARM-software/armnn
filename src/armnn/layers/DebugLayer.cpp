@@ -8,7 +8,6 @@
 
 #include <armnn/backends/WorkloadData.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -54,9 +53,7 @@ void DebugLayer::ValidateTensorShapesFromInputs()
 
 void DebugLayer::ExecuteStrategy(IStrategy& strategy) const
 {
-    // by design debug layers are never in input graphs
-    IgnoreUnused(strategy);
-    throw armnn::Exception("DebugLayer should never appear in an input graph");
+    strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
 }
 
 } // namespace armnn

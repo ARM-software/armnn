@@ -63,6 +63,8 @@ private:
         for (unsigned int inputSlotIndex = 1; inputSlotIndex != layerPtr->GetNumInputSlots(); ++inputSlotIndex)
         {
             OutputSlot* outputSlot = layerPtr->GetInputSlot(inputSlotIndex).GetConnectedOutputSlot();
+            // Debug layers should not be inserted in optimize process yet
+            ARMNN_ASSERT(outputSlot->GetOwningLayer().GetType() != LayerType::Debug);
             if (outputSlot->GetOwningLayer().GetType() == LayerType::Constant)
             {
                 // Get constant layer and redirect base layer member variables.

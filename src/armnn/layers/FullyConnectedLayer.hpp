@@ -16,10 +16,10 @@ class FullyConnectedLayer : public LayerWithParameters<FullyConnectedDescriptor>
 {
 public:
     /// A unique pointer to store Weight values.
-    /// @Note: Deprecated. Weights are stored in ConstantLayers now.
+    /// @Note: Deprecated. Removal date is 23.02. Weights are stored in ConstantLayers now.
     std::shared_ptr<ConstTensorHandle> m_Weight;
     /// A unique pointer to store Bias values.
-    /// @Note: Deprecated. Bias are stored in ConstantLayers now.
+    /// @Note: Deprecated. Removal date is 23.02. Bias are stored in ConstantLayers now.
     std::shared_ptr<ConstTensorHandle> m_Bias;
 
     /// Makes a workload for the FullyConnected type.

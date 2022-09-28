@@ -200,7 +200,7 @@ public:
             ARMNN_ASSERT_MSG(newConv2dLayer->GetInputSlot(1).GetConnection() != nullptr,
                              "FoldPadIntoConvolution2d: New convolution layer is missing connection to weights layer");
 
-            // Deprecated 22.11
+            // Deprecated. Removal date is 23.02.
             newConv2dLayer->m_Weight = std::move(conv2dLayer->m_Weight);
 
             if (conv2dLayer->GetParameters().m_BiasEnabled)
@@ -209,7 +209,7 @@ public:
                                  "FoldPadIntoConvolution2d: New convolution layer is missing "
                                  "connection to bias layer.");
 
-                // Deprecated 22.11
+                // Deprecated. Removal date is 23.02.
                 newConv2dLayer->m_Bias = std::move(conv2dLayer->m_Bias);
             }
         }
@@ -234,7 +234,7 @@ public:
             ARMNN_ASSERT_MSG(newConv2dLayer->GetInputSlot(1).GetConnection() != nullptr,
             "FoldPadIntoDepthwiseConvolution2d: New convolution layer is missing connection to weights layer");
 
-            // Deprecated 22.11
+            // Deprecated. Removal date is 23.02.
             newConv2dLayer->m_Weight = std::move(conv2dLayer->m_Weight);
 
             if (conv2dLayer->GetParameters().m_BiasEnabled)
@@ -242,7 +242,7 @@ public:
                 ARMNN_ASSERT_MSG(newConv2dLayer->GetInputSlot(2).GetConnection() != nullptr,
                                  "FoldPadIntoConvolution2d: New convolution layer is missing "
                                  "connection to bias layer.");
-                // Deprecated 22.11
+                // Deprecated. Removal date is 23.02.
                 newConv2dLayer->m_Bias = std::move(conv2dLayer->m_Bias);
             }
         }

@@ -17,10 +17,10 @@ class Convolution2dLayer : public LayerWithParameters<Convolution2dDescriptor>
 public:
 
     /// A unique pointer to store Weight values.
-    /// @Note: Deprecated. Removal date is 22.11. Weights are stored in ConstantLayers now.
+    /// @Note: Deprecated. Removal date is 23.02. Weights are stored in ConstantLayers now.
     std::shared_ptr<ConstTensorHandle> m_Weight;
     /// A unique pointer to store Bias values.
-    /// @Note: Deprecated. Removal date is 22.11. Bias are stored in ConstantLayers now.
+    /// @Note: Deprecated. Removal date is 23.02. Bias are stored in ConstantLayers now.
     std::shared_ptr<ConstTensorHandle> m_Bias;
 
     /// Makes a workload for the Convolution2d type.

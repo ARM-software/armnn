@@ -76,18 +76,18 @@ public:
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.11")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "23.02")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const Optional<ConstTensor>& biases,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.11")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "23.02")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "22.11")
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "23.02")
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const ConstTensor& weights,
                                              const ConstTensor& biases,

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_08" # Release 22.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="d6b8a71714361881a249a6f6ed67125f290f4a83" #Add FP32 Neon™ swish activation
+DEFAULT_CLFRAMEWORKREVISION="ff81de5a9a0f6b9331c3b112cc2aed552f0482a9" #Fix overflow in NEActivationLayer for FP16 type
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

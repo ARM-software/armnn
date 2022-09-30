@@ -16,10 +16,18 @@
 #include <armnn/backends/ICustomAllocator.hpp>
 #include <armnn/backends/IMemoryOptimizerStrategy.hpp>
 
-#include <client/include/ILocalPacketHandler.hpp>
-
 #include <memory>
 #include <map>
+
+namespace arm
+{
+
+namespace pipe
+{
+class ILocalPacketHandler;
+using ILocalPacketHandlerSharedPtr = std::shared_ptr<ILocalPacketHandler>;
+} // pipe
+} // arm
 
 namespace armnn
 {

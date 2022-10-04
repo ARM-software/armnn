@@ -695,6 +695,11 @@ void ArmNNExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
                     result = ComputeRMSE<float>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
                     break;
                 }
+                case armnn::DataType::Signed32:
+                {
+                    result = ComputeRMSE<int32_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
+                    break;
+                }
                 case armnn::DataType::QSymmS16:
                 {
                     result = ComputeRMSE<int16_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);

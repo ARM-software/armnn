@@ -85,6 +85,11 @@ void OpenClTimer::Stop()
     CLSymbols::get().clEnqueueNDRangeKernel_ptr = m_OriginalEnqueueFunction;
 }
 
+bool OpenClTimer::HasKernelMeasurements() const
+{
+    return m_Kernels.size() > 0;
+}
+
 std::vector<Measurement> OpenClTimer::GetMeasurements() const
 {
     std::vector<Measurement> measurements;

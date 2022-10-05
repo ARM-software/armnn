@@ -61,6 +61,8 @@ public:
 
     virtual const char* GetName() const = 0;
 
+    virtual bool HasKernelMeasurements() const { return false;}
+
 };
 
 } //namespace armnn

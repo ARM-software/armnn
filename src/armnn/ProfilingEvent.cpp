@@ -66,6 +66,11 @@ const std::vector<Measurement> Event::GetMeasurements() const
     return measurements;
 }
 
+const std::vector<Event::InstrumentPtr>& Event::GetInstruments() const
+{
+    return m_Instruments;
+}
+
 const std::string& Event::GetName() const
 {
     return m_EventName;

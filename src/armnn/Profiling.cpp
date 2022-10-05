@@ -316,6 +316,20 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
     }
     std::vector<Measurement> instrumentMeasurements = parentEvent->GetMeasurements();
     unsigned int childIdx = 0;
+    unsigned int numSkippedKernels = 0;
+    if (inferenceIndex > 0)
+    {
+        for (auto &i: parentEvent->GetInstruments())
+        {
+            if (i->HasKernelMeasurements())
+            {
+                numSkippedKernels = static_cast<unsigned int>(parentObject.m_Children.size() -
+                                                               instrumentMeasurements.size());
+                childIdx = numSkippedKernels;
+            }
+        }
+    }
+
     for (size_t measurementIndex = 0; measurementIndex < instrumentMeasurements.size(); ++measurementIndex, ++childIdx)
     {
         if (inferenceIndex == 0)
@@ -327,6 +341,13 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
 
             ARMNN_ASSERT(parentObject.NumChildren() == childIdx);
             parentObject.AddChild(measurementObject);
+        }
+        else
+        {
+            if (numSkippedKernels > 0)
+            {
+                parentObject.GetChild(--numSkippedKernels).AddMeasurement(0.0);
+            }
         }
 
         parentObject.GetChild(childIdx).AddMeasurement(instrumentMeasurements[measurementIndex].m_Value);

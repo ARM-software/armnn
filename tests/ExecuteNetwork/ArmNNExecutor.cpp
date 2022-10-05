@@ -184,7 +184,7 @@ void ArmNNExecutor::ExecuteSync()
         const auto inferenceDuration = armnn::GetTimeDuration(start_time);
 
         // If profiling is enabled print out the results
-        if(profiler && profiler->IsProfilingEnabled())
+        if(profiler && profiler->IsProfilingEnabled() && x == (m_Params.m_Iterations - 1))
         {
             profiler->Print(std::cout);
         }

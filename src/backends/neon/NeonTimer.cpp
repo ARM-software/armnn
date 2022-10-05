@@ -42,6 +42,11 @@ void NeonTimer::Stop()
     m_RealScheduler = nullptr;
 }
 
+bool NeonTimer::HasKernelMeasurements() const
+{
+    return m_Kernels.size() > 0;
+}
+
 std::vector<Measurement> NeonTimer::GetMeasurements() const
 {
     std::vector<Measurement> measurements = m_Kernels;

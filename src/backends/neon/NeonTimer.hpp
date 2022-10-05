@@ -30,6 +30,8 @@ public:
 
     void Stop() override;
 
+    bool HasKernelMeasurements() const override;
+
     std::vector<Measurement> GetMeasurements() const override;
 
     const char* GetName() const override;

@@ -55,6 +55,10 @@ public:
     /// \return Recorded measurements of the event
     const std::vector<Measurement> GetMeasurements() const;
 
+    /// Get the Instruments used by this Event
+    /// \return Return a reference to the collection of Instruments
+    const std::vector<InstrumentPtr>& GetInstruments() const;
+
     /// Get the name of the event
     /// \return Name of the event
     const std::string& GetName() const;

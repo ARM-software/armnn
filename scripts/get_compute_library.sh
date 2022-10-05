@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_08" # Release 22.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="ff81de5a9a0f6b9331c3b112cc2aed552f0482a9" #Fix overflow in NEActivationLayer for FP16 type
+DEFAULT_CLFRAMEWORKREVISION="db14af697b934d684d8b3d63a00ad5bea5c07bfb" #8364: Update GEMM reshaped rhs only heuristic | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8364
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

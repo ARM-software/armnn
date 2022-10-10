@@ -541,6 +541,17 @@ if (ARMNNTOSAREF)
 
         target_link_libraries(armnn PUBLIC -Wl,--whole-archive ${TOSA_SERIALIZATION_LIB} -Wl,--no-whole-archive)
     endif()
+
+    if (TOSA_REFERENCE_MODEL_LIB)
+        target_link_libraries(armnn PUBLIC -Wl,--whole-archive ${TOSA_REFERENCE_MODEL_LIB} -Wl,--no-whole-archive)
+    else()
+        find_library(TOSA_REFERENCE_MODEL_LIB
+            NAMES libtosa_reference_model_lib.a tosa_reference_model_lib
+            HINTS ${TOSA_REFERENCE_MODEL_ROOT}/lib /usr/local/lib /usr/lib)
+        message(STATUS "TOSA Reference Model set to ${TOSA_REFERENCE_MODEL_LIB}")
+
+        target_link_libraries(armnn PUBLIC -Wl,--whole-archive ${TOSA_REFERENCE_MODEL_LIB} -Wl,--no-whole-archive)
+    endif()
 endif()
 
 if(PROFILING_BACKEND_STREAMLINE AND (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Android)))

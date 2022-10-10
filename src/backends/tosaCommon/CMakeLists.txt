@@ -4,6 +4,7 @@
 #
 
 include_directories(SYSTEM ${FLATBUFFERS_INCLUDE_PATH})
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/third-party/half)
 include_directories(SYSTEM ${TOSA_SERIALIZATION_LIB_INCLUDE})
 
 list(APPEND armnnTosaBackend_sources

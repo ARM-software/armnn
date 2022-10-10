@@ -18,7 +18,7 @@ void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* basicBlock
                                          uint32_t numOutputs,
                                          Op tosaOp,
                                          std::string operatorString,
-                                         DType dataType = DType_FLOAT)
+                                         DType dataType = DType_FP32)
 {
     std::string blockStr = operatorString + "_block_";
     CHECK(basicBlock->GetName().find(blockStr)  != std::string::npos);

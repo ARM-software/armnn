@@ -19,9 +19,10 @@ DType ArmNNToDType(const DataType& type)
     switch (type)
     {
         case DataType::Float16:
-        case DataType::Float32:
         case DataType::BFloat16:
-            return DType_FLOAT;
+            return DType_FP16;
+        case DataType::Float32:
+            return DType_FP32;
         case DataType::QAsymmU8:
             return DType_UINT8;
         case DataType::QSymmS8:

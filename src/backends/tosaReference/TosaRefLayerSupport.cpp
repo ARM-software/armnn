@@ -29,25 +29,26 @@ static bool IsTosaLayerSupported(TosaSerializationOperator* op,
             bool supported = true;
 
             std::array<Attribute, 1> supportedAttributes =
-                    {
-                            Attribute_NONE
-                    };
+            {
+                Attribute_NONE
+            };
 
             // Check Attribute from operator (GetAttribute)
             supported &= CheckSupportRule(TosaOperatorAttributeOfAny(op, supportedAttributes), reasonIfUnsupported,
                 std::string("TOSA Reference addition: operator has an unsupported attribute.").c_str());
 
-            std::array<DType, 8> supportedTypes =
-                    {
-                            DType_BOOL,
-                            DType_UINT8,
-                            DType_INT4,
-                            DType_INT8,
-                            DType_INT16,
-                            DType_INT32,
-                            DType_FLOAT,
-                            DType_UINT16
-                    };
+            std::array<DType, 9> supportedTypes =
+            {
+                DType_BOOL,
+                DType_UINT8,
+                DType_UINT16,
+                DType_INT4,
+                DType_INT8,
+                DType_INT16,
+                DType_INT32,
+                DType_FP16,
+                DType_FP32
+            };
 
             for (auto tensor : inputs)
             {

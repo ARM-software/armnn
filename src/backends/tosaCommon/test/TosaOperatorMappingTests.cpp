@@ -21,15 +21,15 @@ void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* basicBlock
                                          DType dataType = DType_FLOAT)
 {
     std::string blockStr = operatorString + "_block_";
-    ARMNN_ASSERT(basicBlock->GetName().find(blockStr)  != std::string::npos);
-    ARMNN_ASSERT(basicBlock->GetInputs().size() == numInputs);
-    ARMNN_ASSERT(basicBlock->GetOutputs().size() == numOutputs);
-    ARMNN_ASSERT(basicBlock->GetOperators().size() == 1);
-    ARMNN_ASSERT(basicBlock->GetTensors().size() == (numInputs + numOutputs));
+    CHECK(basicBlock->GetName().find(blockStr)  != std::string::npos);
+    CHECK(basicBlock->GetInputs().size() == numInputs);
+    CHECK(basicBlock->GetOutputs().size() == numOutputs);
+    CHECK(basicBlock->GetOperators().size() == 1);
+    CHECK(basicBlock->GetTensors().size() == (numInputs + numOutputs));
 
     TosaSerializationOperator* op = basicBlock->GetOperators().at(0);
-    ARMNN_ASSERT(op->GetInputTensorNames().size() == numInputs);
-    ARMNN_ASSERT(op->GetOutputTensorNames().size() == numOutputs);
+    CHECK(op->GetInputTensorNames().size() == numInputs);
+    CHECK(op->GetOutputTensorNames().size() == numOutputs);
 
     for (uint32_t i = 0; i < numInputs; i++)
     {
@@ -39,9 +39,9 @@ void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* basicBlock
 
         std::string opStr = operatorString + "_input" + std::to_string(i) + "_";
 
-        ARMNN_ASSERT(blockInputName == operatorInputName);
-        ARMNN_ASSERT(tensorName == operatorInputName);
-        ARMNN_ASSERT(blockInputName.find(opStr)  != std::string::npos);
+        CHECK(blockInputName == operatorInputName);
+        CHECK(tensorName == operatorInputName);
+        CHECK(blockInputName.find(opStr)  != std::string::npos);
     }
 
     for (uint32_t i = 0; i < numOutputs; i++)
@@ -52,18 +52,18 @@ void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* basicBlock
 
         std::string opStr = operatorString + "_output" + std::to_string(i) + "_";
 
-        ARMNN_ASSERT(blockOutputName == operatorOutputName);
-        ARMNN_ASSERT(tensorName == operatorOutputName);
-        ARMNN_ASSERT(blockOutputName.find(opStr)  != std::string::npos);
+        CHECK(blockOutputName == operatorOutputName);
+        CHECK(tensorName == operatorOutputName);
+        CHECK(blockOutputName.find(opStr)  != std::string::npos);
     }
 
-    ARMNN_ASSERT(op->GetAttributeType() == Attribute_NONE);
-    ARMNN_ASSERT(op->GetOp() == tosaOp);
+    CHECK(op->GetAttributeType() == Attribute_NONE);
+    CHECK(op->GetOp() == tosaOp);
 
     TosaSerializationTensor* tensor0 = basicBlock->GetTensors()[0];
-    ARMNN_ASSERT(tensor0->GetDtype() == dataType);
-    ARMNN_ASSERT(tensor0->GetData().size() == 0);
-    ARMNN_ASSERT(tensor0->GetShape() == shape);
+    CHECK(tensor0->GetDtype() == dataType);
+    CHECK(tensor0->GetData().size() == 0);
+    CHECK(tensor0->GetShape() == shape);
 }
 
 TEST_SUITE("TosaOperatorMappingOneToOneTests")
@@ -109,16 +109,16 @@ TEST_CASE("GetTosaMapping_Unimplemented")
     TosaSerializationBasicBlock* basicBlock =
         GetTosaMapping(LayerType::UnidirectionalSequenceLstm, {}, {}, BaseDescriptor());
 
-    ARMNN_ASSERT(basicBlock->GetName() == "");
-    ARMNN_ASSERT(basicBlock->GetTensors().size() == 0);
-    ARMNN_ASSERT(basicBlock->GetOperators().size() == 1);
-    ARMNN_ASSERT(basicBlock->GetInputs().size() == 0);
-    ARMNN_ASSERT(basicBlock->GetOutputs().size() == 0);
+    CHECK(basicBlock->GetName() == "");
+    CHECK(basicBlock->GetTensors().size() == 0);
+    CHECK(basicBlock->GetOperators().size() == 1);
+    CHECK(basicBlock->GetInputs().size() == 0);
+    CHECK(basicBlock->GetOutputs().size() == 0);
 
     TosaSerializationOperator* op = basicBlock->GetOperators()[0];
-    ARMNN_ASSERT(op->GetAttributeType() == Attribute_NONE);
-    ARMNN_ASSERT(op->GetOp() == tosa::Op_UNKNOWN);
-    ARMNN_ASSERT(op->GetInputTensorNames().size() == 0);
-    ARMNN_ASSERT(op->GetOutputTensorNames().size() == 0);
+    CHECK(op->GetAttributeType() == Attribute_NONE);
+    CHECK(op->GetOp() == tosa::Op_UNKNOWN);
+    CHECK(op->GetInputTensorNames().size() == 0);
+    CHECK(op->GetOutputTensorNames().size() == 0);
 }
 }

@@ -3,11 +3,17 @@
 # SPDX-License-Identifier: MIT
 #
 if(BUILD_ARMNN_DESERIALIZER)
+    # We're using NO_SYSTEM_ENVIRONMENT_PATH to prevent a system installed
+    # flatc being found and used.
     find_program(FLATC flatc
                  HINTS ${FLATC_DIR}
+                 NO_SYSTEM_ENVIRONMENT_PATH
                  DOC "Path to 'flatc', the flatbuffers compiler")
+
     if (NOT FLATC)
         message(SEND_ERROR "flatc not found. Specify the full path of the flatc executable with -DFLATC=<flatc path>")
+    else()
+        message("Using flatc was from: ${FLATC}")
     endif()
 
     add_custom_command(

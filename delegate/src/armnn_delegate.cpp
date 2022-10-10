@@ -119,6 +119,7 @@ TfLiteStatus DoPrepare(TfLiteContext* tfLiteContext, TfLiteDelegate* tfLiteDeleg
         .builtin_code = kTfLiteBuiltinDelegate,
         .custom_name = "TfLiteArmNnDelegate",
         .version = 1,
+        .registration_external = nullptr,
     };
 
     const TfLiteStatus status =

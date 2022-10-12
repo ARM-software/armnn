@@ -556,13 +556,13 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
 
 std::unique_ptr<ArmNNExecutor::IParser> ArmNNExecutor::CreateParser()
 {
-    // If no model format is given check the file name
-    const std::string& modelFormat = m_Params.m_ModelPath;
+    const fs::path modelFilename = m_Params.m_ModelPath;
+    const std::string modelExtension = modelFilename.extension();
 
-    m_Params.m_IsModelBinary = modelFormat.find("json") == std::string::npos ? true : false;
+    m_Params.m_IsModelBinary = modelExtension != ".json";
     std::unique_ptr<IParser> parser = nullptr;
     // Forward to implementation based on the parser type
-    if (modelFormat.find("armnn") != std::string::npos)
+    if (modelExtension == ".armnn")
     {
 #if defined(ARMNN_SERIALIZER)
         parser = std::make_unique<ArmNNDeserializer>();
@@ -570,7 +570,7 @@ std::unique_ptr<ArmNNExecutor::IParser> ArmNNExecutor::CreateParser()
         LogAndThrow("Not built with serialization support.");
 #endif
     }
-    else if(modelFormat.find("tflite") != std::string::npos)
+    else if (modelExtension == ".tflite")
     {
 #if defined(ARMNN_TF_LITE_PARSER)
         parser = std::make_unique<TfliteParser>(m_Params);
@@ -578,7 +578,7 @@ std::unique_ptr<ArmNNExecutor::IParser> ArmNNExecutor::CreateParser()
         LogAndThrow("Not built with Tensorflow-Lite parser support.");
 #endif
     }
-    else if (modelFormat.find("onnx") != std::string::npos)
+    else if (modelExtension == ".onnx")
     {
 #if defined(ARMNN_ONNX_PARSER)
         parser = std::make_unique<OnnxParser>();

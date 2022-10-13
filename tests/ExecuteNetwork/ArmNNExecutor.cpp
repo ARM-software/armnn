@@ -674,6 +674,7 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
             }
         }
         std::cout << "\n";
+        ++outputIndex;
     }
 }
 

@@ -341,4 +341,24 @@ std::map<std::string, unsigned int> CalculateGatherNdKeyIndices(TensorInfo input
     return keyIndices;
 }
 
+armnn::PermutationVector GeneratePermutationVectorOnLastTwoDimensions(unsigned int rank)
+{
+    armnn::PermutationVector permutationVector{};
+    switch (rank)
+    {
+        case 2:
+            permutationVector = {1U, 0U};
+            break;
+        case 3:
+            permutationVector = {0U, 2U, 1U};
+            break;
+        case 4:
+            permutationVector = {0U, 1U, 3U, 2U};
+            break;
+        default:
+            throw Exception("Invalid number of dimensions.");
+    }
+    return permutationVector;
+}
+
 } // namespace armnn

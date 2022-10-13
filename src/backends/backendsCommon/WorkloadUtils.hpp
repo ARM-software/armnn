@@ -258,4 +258,10 @@ std::tuple<ConstTensor, unsigned int> Convert1HWOtoMIHW(const ConstTensorHandle*
 /// \return - A map with names and values for  N, ND, K, W, C
 std::map<std::string, unsigned int> CalculateGatherNdKeyIndices(TensorInfo inputInfo0, TensorInfo inputInfo1);
 
+/// Generates a permutation vector of size rank that permutes the 2 most right dimensions
+///
+/// \param rank - Tensor rank, i.e. number of dimensions in the tensors
+/// \return - A permutation vector that permutes the 2 last dimensions
+armnn::PermutationVector GeneratePermutationVectorOnLastTwoDimensions(unsigned int rank);
+
 }  //namespace armnn

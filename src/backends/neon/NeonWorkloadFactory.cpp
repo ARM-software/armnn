@@ -152,6 +152,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
             auto argMinMaxQueueDescriptor = PolymorphicDowncast<const ArgMinMaxQueueDescriptor*>(&descriptor);
             return std::make_unique<NeonArgMinMaxWorkload>(*argMinMaxQueueDescriptor, info);
         }
+        case LayerType::BatchMatMul :
+        {
+            auto batchMatMulQueueDescriptor = PolymorphicDowncast<const BatchMatMulQueueDescriptor*>(&descriptor);
+            return std::make_unique<NeonBatchMatMulWorkload>(*batchMatMulQueueDescriptor, info);
+        }
         case LayerType::BatchNormalization :
         {
             auto batchNormalizationQueueDescriptor

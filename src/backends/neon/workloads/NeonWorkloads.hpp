@@ -8,6 +8,7 @@
 #include "NeonActivationWorkload.hpp"
 #include "NeonAdditionWorkload.hpp"
 #include "NeonArgMinMaxWorkload.hpp"
+#include "NeonBatchMatMulWorkload.hpp"
 #include "NeonBatchNormalizationWorkload.hpp"
 #include "NeonBatchToSpaceNdWorkload.hpp"
 #include "NeonCastWorkload.hpp"

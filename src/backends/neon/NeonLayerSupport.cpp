@@ -24,6 +24,7 @@
 #include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"
 #include "workloads/NeonArgMinMaxWorkload.hpp"
+#include "workloads/NeonBatchMatMulWorkload.hpp"
 #include "workloads/NeonBatchNormalizationWorkload.hpp"
 #include "workloads/NeonBatchToSpaceNdWorkload.hpp"
 #include "workloads/NeonCastWorkload.hpp"
@@ -171,6 +172,12 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
                                         infos[1],
                                         *(PolymorphicDowncast<const ArgMinMaxDescriptor*>(&descriptor)),
                                         reasonIfUnsupported);
+        case LayerType::BatchMatMul:
+            return IsBatchMatMulSupported(infos[0],
+                                          infos[1],
+                                          infos[2],
+                                          *(PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor)),
+                                          reasonIfUnsupported);
         case LayerType::BatchNormalization:
             return IsBatchNormalizationSupported(infos[0],
                                                  infos[1],
@@ -623,6 +630,20 @@ bool NeonLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonArgMinMaxWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
+                                   output,
+                                   descriptor);
+}
+
+bool NeonLayerSupport::IsBatchMatMulSupported(const TensorInfo& inputX,
+                                              const TensorInfo& inputY,
+                                              const TensorInfo& output,
+                                              const BatchMatMulDescriptor& descriptor,
+                                              Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonBatchMatMulValidate,
+                                   reasonIfUnsupported,
+                                   inputX,
+                                   inputY,
                                    output,
                                    descriptor);
 }

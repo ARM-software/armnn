@@ -71,19 +71,8 @@ LayerTestResult<T, 2> BatchMatMul2DSimpleTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Arbitrary layout with no transpose/adjointing
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({2,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({2,2}, ArmnnType, qScale, qOffset);
@@ -160,19 +149,8 @@ LayerTestResult<T, 3> BatchMatMul3DSimpleTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Arbitrary layout with no transpose/adjointing
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({1,2,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({1,2,2}, ArmnnType, qScale, qOffset);
@@ -249,19 +227,8 @@ LayerTestResult<T, 4> BatchMatMulNCHWSimpleTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Default arbitrary layout is treated the same as NCHW
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({1,1,2,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({1,1,2,2}, ArmnnType, qScale, qOffset);
@@ -343,19 +310,8 @@ LayerTestResult<T, 4> BatchMatMulNHWCSimpleTest(
                                                    armnn::DataLayout::NHWC,
                                                    armnn::DataLayout::NHWC);
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({1,2,2,1}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({1,2,2,1}, ArmnnType, qScale, qOffset);
@@ -432,19 +388,8 @@ LayerTestResult<T, 3> BatchMatMul3DBatchTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Arbitrary layout with no transpose/adjointing
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({2,2,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({2,2,2}, ArmnnType, qScale, qOffset);
@@ -530,19 +475,8 @@ LayerTestResult<T, 3> BatchMatMul3DBroadcastTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Arbitrary layout with no transpose/adjointing
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({2,2,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({1,2,2}, ArmnnType, qScale, qOffset);
@@ -625,19 +559,8 @@ LayerTestResult<T, 3> BatchMatMul3D2DBroadcastTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Arbitrary layout with no transpose/adjointing
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({2,2,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({2,2}, ArmnnType, qScale, qOffset);
@@ -725,19 +648,8 @@ LayerTestResult<T, 5> BatchMatMulNDHWCNHWCTest(
                                                    armnn::DataLayout::NDHWC,
                                                    armnn::DataLayout::NHWC);
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({1,1,2,2,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({1,2,2,2}, ArmnnType, qScale, qOffset);
@@ -823,19 +735,8 @@ LayerTestResult<T, 2> BatchMatMul2DTinyTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Arbitrary layout with no transpose/adjointing
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({1,1}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({1,1}, ArmnnType, qScale, qOffset);
@@ -909,19 +810,8 @@ LayerTestResult<T, 3> BatchMatMul3DNonSquareTest(
 {
     auto descriptor = armnn::BatchMatMulDescriptor(); // Arbitrary layout with no transpose/adjointing
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({2,5,3}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({2,3,4}, ArmnnType, qScale, qOffset);
@@ -1024,19 +914,8 @@ LayerTestResult<T, 2> BatchMatMul2DTranspSimpleTest(
                                                    false,
                                                    false);
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({2,3}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({2,3}, ArmnnType, qScale, qOffset);
@@ -1117,19 +996,8 @@ LayerTestResult<T, 2> BatchMatMul2DAdjointSimpleTest(
                                                    true,
                                                    false);
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({3,3}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({3,3}, ArmnnType, qScale, qOffset);
@@ -1227,19 +1095,8 @@ LayerTestResult<T, 4> BatchMatMulNHWCParamsTest(
                                                    armnn::DataLayout::NHWC,
                                                    armnn::DataLayout::NHWC);
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
-
-    switch(ArmnnType)
-    {
-        case armnn::DataType::QAsymmS8:
-        case armnn::DataType::QAsymmU8:
-        case armnn::DataType::QSymmS16:
-            qScale = 1.0f;
-            break;
-        default:
-            break;
-    }
 
     armnn::TensorInfo inputXInfo({1,4,4,2}, ArmnnType, qScale, qOffset);
     armnn::TensorInfo inputYInfo({2,2,4,1}, ArmnnType, qScale, qOffset);

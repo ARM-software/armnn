@@ -26,6 +26,7 @@ BACKEND_SOURCES := \
         workloads/NeonActivationWorkload.cpp \
         workloads/NeonAdditionWorkload.cpp \
         workloads/NeonArgMinMaxWorkload.cpp \
+        workloads/NeonBatchMatMulWorkload.cpp \
         workloads/NeonBatchNormalizationWorkload.cpp \
         workloads/NeonBatchToSpaceNdWorkload.cpp \
         workloads/NeonCastWorkload.cpp \

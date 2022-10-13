@@ -654,4 +654,20 @@ namespace armnnDelegate
         }
     }
 
+    TEST_SUITE("BATCH_MATMUL_CpuAccTests")
+    {
+        TEST_CASE("BATCH_MATMUL_Fp32_CpuAccTests")
+        {
+            std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+            BatchMatMul2DFp32SimpleTest       (backends);
+            BatchMatMul3DFp32SimpleTest       (backends);
+            BatchMatMul4DFp32SimpleTest       (backends);
+            BatchMatMul3DFp32BatchTest        (backends);
+            BatchMatMul3DFp32BroadcastTest    (backends);
+            BatchMatMul3D2DFp32BroadcastTest  (backends);
+            BatchMatMul2DFp32TinyTest         (backends);
+            BatchMatMulNonSquareFp32Test      (backends);
+            BatchMatMul2DFp32SimpleAdjointTest(backends);
+        }
+    }
 }

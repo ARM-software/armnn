@@ -13,7 +13,13 @@ namespace armnn
 {
 
 DebugLayer::DebugLayer(const char* name)
-    : Layer(1, 1, LayerType::Debug, name)
+    : Layer(1, 1, LayerType::Debug, name),
+      m_ToFile(false)
+{}
+
+DebugLayer::DebugLayer(const char* name, bool toFile)
+    : Layer(1, 1, LayerType::Debug, name),
+      m_ToFile(toFile)
 {}
 
 std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const IWorkloadFactory& factory) const
@@ -24,6 +30,7 @@ std::unique_ptr<IWorkload> DebugLayer::CreateWorkload(const IWorkloadFactory& fa
     descriptor.m_Guid = prevLayer.GetGuid();
     descriptor.m_LayerName = prevLayer.GetNameStr();
     descriptor.m_SlotIndex = GetInputSlot(0).GetConnectedOutputSlot()->CalculateIndexOnOwner();
+    descriptor.m_LayerOutputToFile = m_ToFile;
 
     SetAdditionalInfo(descriptor);
 

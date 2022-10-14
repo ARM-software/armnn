@@ -126,6 +126,7 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
     options.m_ReduceFp32ToFp16 = m_EnableFp16TurboMode;
     options.m_ReduceFp32ToBf16 = m_EnableBf16TurboMode;
     options.m_Debug = m_PrintIntermediate;
+    options.m_DebugToFile = m_PrintIntermediateOutputsToFile;
     options.m_ProfilingEnabled = m_EnableProfiling;
     delegateOptions.SetInternalProfilingParams(m_EnableProfiling, armnn::ProfilingDetailsMethod::DetailsWithEvents);
     options.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly;

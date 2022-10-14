@@ -34,9 +34,13 @@ protected:
     /// Constructor to create a DebugLayer.
     /// @param [in] name Optional name for the layer.
     DebugLayer(const char* name);
+    DebugLayer(const char* name, bool toFile);
 
     /// Default destructor
     ~DebugLayer() = default;
+
+private:
+    bool m_ToFile;
 };
 
 } // namespace armnn

@@ -1810,9 +1810,13 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     // This must occur after all topological changes to the graph and any redirection of variables
     // If the debug flag is set, then insert a DebugLayer after each layer
     // Doing this after applying the backend optimizations as they might have changed some layers
-    if (options.m_Debug)
+    if (options.m_Debug && !options.m_DebugToFile)
     {
         Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugLayer()));
+    }
+    else if (options.m_DebugToFile)
+    {
+        Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugToFileLayer()));
     }
 
     // Calculate the compatibility strategies for tensor handles

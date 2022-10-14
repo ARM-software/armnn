@@ -2250,25 +2250,46 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice2dInt16, StridedSlice2dInt16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice2dReverseInt16, StridedSlice2dReverseInt16Test)
 
 // Debug
-ARMNN_AUTO_TEST_CASE(Debug4dFloat32, Debug4dFloat32Test)
-ARMNN_AUTO_TEST_CASE(Debug3dFloat32, Debug3dFloat32Test)
-ARMNN_AUTO_TEST_CASE(Debug2dFloat32, Debug2dFloat32Test)
-ARMNN_AUTO_TEST_CASE(Debug1dFloat32, Debug1dFloat32Test)
+ARMNN_AUTO_TEST_CASE(Debug4dFloat32, Debug4dFloat32Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug3dFloat32, Debug3dFloat32Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug2dFloat32, Debug2dFloat32Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug1dFloat32, Debug1dFloat32Test, /*toFile*/ false)
 
-ARMNN_AUTO_TEST_CASE(Debug4dBFloat16, Debug4dBFloat16Test)
-ARMNN_AUTO_TEST_CASE(Debug3dBFloat16, Debug3dBFloat16Test)
-ARMNN_AUTO_TEST_CASE(Debug2dBFloat16, Debug2dBFloat16Test)
-ARMNN_AUTO_TEST_CASE(Debug1dBFloat16, Debug1dBFloat16Test)
+ARMNN_AUTO_TEST_CASE(Debug4dBFloat16, Debug4dBFloat16Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug3dBFloat16, Debug3dBFloat16Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug2dBFloat16, Debug2dBFloat16Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug1dBFloat16, Debug1dBFloat16Test, /*toFile*/ false)
 
-ARMNN_AUTO_TEST_CASE(Debug4dUint8, Debug4dUint8Test)
-ARMNN_AUTO_TEST_CASE(Debug3dUint8, Debug3dUint8Test)
-ARMNN_AUTO_TEST_CASE(Debug2dUint8, Debug2dUint8Test)
-ARMNN_AUTO_TEST_CASE(Debug1dUint8, Debug1dUint8Test)
+ARMNN_AUTO_TEST_CASE(Debug4dUint8, Debug4dUint8Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug3dUint8, Debug3dUint8Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug2dUint8, Debug2dUint8Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug1dUint8, Debug1dUint8Test, /*toFile*/ false)
 
-ARMNN_AUTO_TEST_CASE(Debug4dQSymm16, Debug4dInt16Test)
-ARMNN_AUTO_TEST_CASE(Debug3dQSymm16, Debug3dInt16Test)
-ARMNN_AUTO_TEST_CASE(Debug2dQSymm16, Debug2dInt16Test)
-ARMNN_AUTO_TEST_CASE(Debug1dQSymm16, Debug1dInt16Test)
+ARMNN_AUTO_TEST_CASE(Debug4dQSymm16, Debug4dInt16Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug3dQSymm16, Debug3dInt16Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug2dQSymm16, Debug2dInt16Test, /*toFile*/ false)
+ARMNN_AUTO_TEST_CASE(Debug1dQSymm16, Debug1dInt16Test, /*toFile*/ false)
+
+// Debug To File
+ARMNN_AUTO_TEST_CASE(DebugToFile4dFloat32, Debug4dFloat32Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile3dFloat32, Debug3dFloat32Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile2dFloat32, Debug2dFloat32Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile1dFloat32, Debug1dFloat32Test, /*toFile*/ true)
+
+ARMNN_AUTO_TEST_CASE(DebugToFile4dBFloat16, Debug4dBFloat16Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile3dBFloat16, Debug3dBFloat16Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile2dBFloat16, Debug2dBFloat16Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile1dBFloat16, Debug1dBFloat16Test, /*toFile*/ true)
+
+ARMNN_AUTO_TEST_CASE(DebugToFile4dUint8, Debug4dUint8Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile3dUint8, Debug3dUint8Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile2dUint8, Debug2dUint8Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile1dUint8, Debug1dUint8Test, /*toFile*/ true)
+
+ARMNN_AUTO_TEST_CASE(DebugToFile4dQSymm16, Debug4dInt16Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile3dQSymm16, Debug3dInt16Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile2dQSymm16, Debug2dInt16Test, /*toFile*/ true)
+ARMNN_AUTO_TEST_CASE(DebugToFile1dQSymm16, Debug1dInt16Test, /*toFile*/ true)
 
 // Gather
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsFloat32, Gather1dParamsFloat32Test)

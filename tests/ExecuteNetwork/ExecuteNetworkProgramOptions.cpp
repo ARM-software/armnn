@@ -289,6 +289,11 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<bool>(m_ExNetParams.m_PrintIntermediate)->default_value("false")
                          ->implicit_value("true"))
 
+                ("F,print-intermediate-layers-to-file",
+                 "If this option is enabled, the output of every graph layer will be printed within separate files.",
+                 cxxopts::value<bool>(m_ExNetParams.m_PrintIntermediateOutputsToFile)->default_value("false")
+                         ->implicit_value("true"))
+
                 ("parse-unsupported",
                  "Add unsupported operators as stand-in layers (where supported by parser)",
                  cxxopts::value<bool>(m_ExNetParams.m_ParseUnsupported)->default_value("false")->implicit_value("true"))

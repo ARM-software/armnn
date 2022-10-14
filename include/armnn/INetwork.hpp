@@ -129,6 +129,7 @@ struct OptimizerOptions
     OptimizerOptions()
         : m_ReduceFp32ToFp16(false)
         , m_Debug(false)
+        , m_DebugToFile(false)
         , m_ReduceFp32ToBf16(false)
         , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
         , m_ImportEnabled(false)
@@ -139,9 +140,10 @@ struct OptimizerOptions
     {}
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16, bool importEnabled,
-                     ModelOptions modelOptions = {}, bool exportEnabled = false)
+                     ModelOptions modelOptions = {}, bool exportEnabled = false, bool debugToFile = false)
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
+        , m_DebugToFile(debugToFile)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
         , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
         , m_ImportEnabled(importEnabled)
@@ -159,9 +161,10 @@ struct OptimizerOptions
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false,
                      ShapeInferenceMethod shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly,
                      bool importEnabled = false, ModelOptions modelOptions = {}, bool exportEnabled = false,
-                     bool allowExpandedDims = false)
+                     bool debugToFile = false, bool allowExpandedDims = false)
         : m_ReduceFp32ToFp16(reduceFp32ToFp16)
         , m_Debug(debug)
+        , m_DebugToFile(debugToFile)
         , m_ReduceFp32ToBf16(reduceFp32ToBf16)
         , m_shapeInferenceMethod(shapeInferenceMethod)
         , m_ImportEnabled(importEnabled)
@@ -183,6 +186,7 @@ struct OptimizerOptions
         stream << "\tReduceFp32ToFp16: " << m_ReduceFp32ToFp16 << "\n";
         stream << "\tReduceFp32ToBf16: " << m_ReduceFp32ToBf16 << "\n";
         stream << "\tDebug: " << m_Debug << "\n";
+        stream << "\tDebug to file: " << m_DebugToFile << "\n";
         stream << "\tShapeInferenceMethod: " <<
         (m_shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly ? "ValidateOnly" : "InferAndValidate") << "\n";
         stream << "\tImportEnabled: " << m_ImportEnabled << "\n";
@@ -214,6 +218,9 @@ struct OptimizerOptions
 
     // Add debug data for easier troubleshooting
     bool m_Debug;
+
+    // Pass debug data to separate output files for easier troubleshooting
+    bool m_DebugToFile;
 
     /// Reduces all Fp32 operators in the model to Bf16 for faster processing.
     /// @Note This feature works best if all operators of the model are in Fp32. ArmNN will add conversion layers

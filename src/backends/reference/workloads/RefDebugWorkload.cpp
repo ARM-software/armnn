@@ -45,7 +45,7 @@ void RefDebugWorkload<DataType>::Execute(std::vector<ITensorHandle*> inputs) con
     }
     else
     {
-        Debug(inputInfo, inputData, m_Data.m_Guid, m_Data.m_LayerName, m_Data.m_SlotIndex);
+        Debug(inputInfo, inputData, m_Data.m_Guid, m_Data.m_LayerName, m_Data.m_SlotIndex, m_Data.m_LayerOutputToFile);
     }
 
     std::memcpy(outputData, inputData, inputInfo.GetNumElements()*sizeof(T));

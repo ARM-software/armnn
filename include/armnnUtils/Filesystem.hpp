@@ -19,8 +19,15 @@ namespace armnnUtils
 namespace Filesystem
 {
 
+using FileContents = std::string;
+
 /// Returns a path to a file in the system temporary folder. If the file existed it will be deleted.
 fs::path NamedTempFile(const char* fileName);
+
+/// Returns full path to temporary folder
+std::string CreateDirectory(std::string sPath);
+
+FileContents ReadFileContentsIntoString(const std::string path);
 
 } // namespace armnnUtils
 } // namespace Filesystem

@@ -50,6 +50,7 @@ struct ExecuteNetworkParams
     std::vector<std::string>          m_OutputTensorFiles;
     bool                              m_ParseUnsupported = false;
     bool                              m_PrintIntermediate;
+    bool                              m_PrintIntermediateOutputsToFile;
     bool                              m_DontPrintOutputs;
     bool                              m_QuantizeInput;
     bool                              m_SaveCachedNetwork;

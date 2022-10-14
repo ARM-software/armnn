@@ -242,7 +242,7 @@ std::vector<ConvertFp32ToFp16Layer*> InsertConvertFp32ToFp16LayersAfter(Graph& g
     return convertLayers;
 }
 
-std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
+std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer, bool toFile)
 {
     std::vector<DebugLayer*> debugLayers;
     debugLayers.reserve(layer.GetNumOutputSlots());
@@ -255,7 +255,7 @@ std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer)
             std::to_string(outputSlotIdx);
 
         DebugLayer* debugLayer =
-            graph.InsertNewLayer<DebugLayer>(*outputSlot, debugName.c_str());
+            graph.InsertNewLayer<DebugLayer>(*outputSlot, debugName.c_str(), toFile);
 
         // Sets output tensor info for the debug layer.
         ARMNN_ASSERT(debugLayer->GetInputSlot(0).GetConnectedOutputSlot() == &(*outputSlot));

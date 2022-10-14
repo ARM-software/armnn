@@ -522,6 +522,8 @@ struct DebugQueueDescriptor : QueueDescriptor
     LayerGuid m_Guid;
     std::string m_LayerName;
     unsigned int m_SlotIndex;
+
+    bool m_LayerOutputToFile = false;
 };
 
 struct RsqrtQueueDescriptor : QueueDescriptor

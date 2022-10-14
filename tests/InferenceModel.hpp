@@ -68,6 +68,7 @@ struct Params
     bool                            m_EnableFp16TurboMode;
     bool                            m_EnableBf16TurboMode;
     bool                            m_PrintIntermediateLayers;
+    bool                            m_PrintIntermediateLayersToFile;
     bool                            m_ParseUnsupported;
     bool                            m_InferOutputShape;
     bool                            m_EnableFastMath;
@@ -91,6 +92,7 @@ struct Params
         , m_EnableFp16TurboMode(false)
         , m_EnableBf16TurboMode(false)
         , m_PrintIntermediateLayers(false)
+        , m_PrintIntermediateLayersToFile(false)
         , m_ParseUnsupported(false)
         , m_InferOutputShape(false)
         , m_EnableFastMath(false)
@@ -452,6 +454,7 @@ public:
             options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
             options.m_ReduceFp32ToBf16 = params.m_EnableBf16TurboMode;
             options.m_Debug = params.m_PrintIntermediateLayers;
+            options.m_DebugToFile = params.m_PrintIntermediateLayersToFile;
             options.m_shapeInferenceMethod = params.m_InferOutputShape ?
                     armnn::ShapeInferenceMethod::InferAndValidate : armnn::ShapeInferenceMethod::ValidateOnly;
             options.m_ProfilingEnabled = m_EnableProfiling;

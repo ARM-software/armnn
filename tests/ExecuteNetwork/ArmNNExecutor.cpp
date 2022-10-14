@@ -510,6 +510,7 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
     options.m_ReduceFp32ToFp16 = m_Params.m_EnableFp16TurboMode;
     options.m_ReduceFp32ToBf16 = m_Params.m_EnableBf16TurboMode;
     options.m_Debug = m_Params.m_PrintIntermediate;
+    options.m_DebugToFile = m_Params.m_PrintIntermediateOutputsToFile;
     options.m_shapeInferenceMethod = m_Params.m_InferOutputShape ?
                                      armnn::ShapeInferenceMethod::InferAndValidate :
                                      armnn::ShapeInferenceMethod::ValidateOnly;

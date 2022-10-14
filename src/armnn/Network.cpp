@@ -442,12 +442,12 @@ void INetwork::ExecuteStrategy(IStrategy& strategy) const
     return pNetworkImpl->ExecuteStrategy(strategy);
 }
 
-armnn::INetwork* INetwork::CreateRaw(NetworkOptions networkOptions)
+armnn::INetwork* INetwork::CreateRaw(const NetworkOptions& networkOptions)
 {
     return new INetwork(networkOptions);
 }
 
-armnn::INetworkPtr INetwork::Create(NetworkOptions networkOptions)
+armnn::INetworkPtr INetwork::Create(const NetworkOptions& networkOptions)
 {
     return INetworkPtr(CreateRaw(networkOptions), &INetwork::Destroy);
 }
@@ -1879,7 +1879,7 @@ bool NetworkImpl::GetAllowExpandedDims()
     return allowExpandedDims;
 }
 
-NetworkImpl::NetworkImpl(NetworkOptions networkOptions)
+NetworkImpl::NetworkImpl(const NetworkOptions& networkOptions)
 : m_NetworkOptions(networkOptions),
   m_Graph(std::make_unique<Graph>(GetShapeInferenceMethod(), GetAllowExpandedDims()))
 {}

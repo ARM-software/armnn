@@ -31,7 +31,7 @@ using NetworkImplPtr = std::unique_ptr<NetworkImpl, void (*)(NetworkImpl* networ
 class NetworkImpl
 {
 public:
-    NetworkImpl(NetworkOptions networkOptions = {});
+    NetworkImpl(const NetworkOptions& networkOptions = {});
     ~NetworkImpl();
 
     const Graph& GetGraph() const

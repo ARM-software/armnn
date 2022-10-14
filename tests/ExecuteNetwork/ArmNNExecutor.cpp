@@ -514,6 +514,7 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
                                      armnn::ShapeInferenceMethod::InferAndValidate :
                                      armnn::ShapeInferenceMethod::ValidateOnly;
     options.m_ProfilingEnabled = m_Params.m_EnableProfiling;
+    options.m_AllowExpandedDims = m_Params.m_AllowExpandedDims;
 
     armnn::BackendOptions gpuAcc("GpuAcc",
                                  {
@@ -530,6 +531,19 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
                                  });
     options.m_ModelOptions.push_back(gpuAcc);
     options.m_ModelOptions.push_back(cpuAcc);
+    // The shapeInferenceMethod and allowExpandedDims values have to be added to the model options
+    // because these are what are passed to the OptimizeSubgraphViews method and are used to create
+    // the new optimized INetwork that method uses
+    armnn::BackendOptions allowExDimOpt("AllowExpandedDims",
+                                        {
+                                                { "AllowExpandedDims", m_Params.m_AllowExpandedDims }
+                                        });
+    options.m_ModelOptions.push_back(allowExDimOpt);
+    armnn::BackendOptions shapeInferOpt("ShapeInferenceMethod",
+                                        {
+                                                { "InferAndValidate", m_Params.m_InferOutputShape }
+                                        });
+    options.m_ModelOptions.push_back(shapeInferOpt);
 
     const auto optimization_start_time = armnn::GetTimeNow();
     optNet = armnn::Optimize(*network, m_Params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);
@@ -758,6 +772,7 @@ ArmNNExecutor::TfliteParser::TfliteParser(const ExecuteNetworkParams& params)
     armnnTfLiteParser::ITfLiteParser::TfLiteParserOptions options;
     options.m_StandInLayerForUnsupported = params.m_ParseUnsupported;
     options.m_InferAndValidate = params.m_InferOutputShape;
+    options.m_AllowExpandedDims = params.m_AllowExpandedDims;
 
     m_Parser = armnnTfLiteParser::ITfLiteParser::Create(options);
 }

@@ -119,12 +119,12 @@ public:
         m_LayersInOrder = std::move(other.m_LayersInOrder);
         m_Views         = std::move(other.m_Views);
         m_Profiler      = std::move(other.m_Profiler);
+        m_AllowExpandedDims    = other.m_AllowExpandedDims;
+        m_ShapeInferenceMethod = other.m_ShapeInferenceMethod;
         other.ForEachLayer([this](Layer* otherLayer)
         {
             otherLayer->Reparent(*this, m_Layers.end());
         });
-        m_AllowExpandedDims    = other.m_AllowExpandedDims;
-        m_ShapeInferenceMethod = other.m_ShapeInferenceMethod;
 
         ARMNN_ASSERT(other.m_PosInGraphMap.empty());
         ARMNN_ASSERT(other.m_Layers.empty());

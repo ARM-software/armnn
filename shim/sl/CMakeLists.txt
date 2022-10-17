@@ -57,6 +57,7 @@ list(APPEND base_sources
 add_library(base STATIC ${base_sources})
 target_include_directories (base PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories (base PUBLIC ${libnnapi_support_include_directories})
+target_compile_options(base PUBLIC -Wno-c99-designator)
 
 file(GLOB TYPES_CL_SOURCE_FILES
     ${AOSP_MODULES_ROOT}/packages/modules/NeuralNetworks/common/operations/*Validation.cpp
@@ -141,6 +142,7 @@ list(APPEND neuralnetworks_common_cl_sources
 add_library(neuralnetworks_common_cl STATIC ${neuralnetworks_common_cl_sources})
 target_include_directories (neuralnetworks_common_cl PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories (neuralnetworks_common_cl PUBLIC ${libnnapi_support_include_directories})
+target_compile_options(neuralnetworks_common_cl PUBLIC -Wno-unused-but-set-variable)
 
 set(neuralnetworks_cl_sources)
 list(APPEND neuralnetworks_cl_sources

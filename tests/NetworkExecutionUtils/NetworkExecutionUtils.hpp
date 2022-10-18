@@ -175,7 +175,10 @@ void WriteToFile(const std::string& outputTensorFileName,
     if (outputTensorFile.is_open())
     {
         outputTensorFile << outputName << ": ";
-        std::copy(array, array + numElements, std::ostream_iterator<T>(outputTensorFile, " "));
+        for (std::size_t i = 0; i < numElements; ++i)
+        {
+            outputTensorFile << +array[i] << " ";
+        }
     }
     else
     {

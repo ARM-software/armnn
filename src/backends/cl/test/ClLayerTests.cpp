@@ -73,6 +73,29 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tanh, ClContextControlFixture, TanhTest)
 // Elu Activation
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Elu, ClContextControlFixture, EluTest)
 
+// Batch Mat Mul
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DSimpleFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMul2DSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DSimpleFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMul3DSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DBatchFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMul3DBatchTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DBroadcastFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMul3DBroadcastTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3D2DBroadcastFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMul3D2DBroadcastTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DTinyFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMul2DTinyTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DTranspSimpleFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMul2DTranspSimpleTest<DataType::Float32>);
+
 // Batch To Space
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcFloat321,
                                  ClContextControlFixture,

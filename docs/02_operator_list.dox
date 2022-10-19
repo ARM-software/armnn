@@ -304,12 +304,13 @@ where N = batches, C = channels, H = height, W = width
   <td>GpuAcc
   <td>
       <ul>
-       <li>N/A
+       <li>All
       </ul>
   <td>
-      <ul>
-       <li>N/A
-      </ul>
+      <table>
+       <tr><th>
+       <tr><td>FLOAT32
+      </table>
 <tr>
   <td rowspan="3">BatchNormalizationLayer
   <td rowspan="3" style="width:200px;"> Layer to perform batch normalization.

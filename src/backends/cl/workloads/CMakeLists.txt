@@ -12,6 +12,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClAdditionWorkload.hpp
     ClArgMinMaxWorkload.cpp
     ClArgMinMaxWorkload.hpp
+    ClBatchMatMulWorkload.cpp
+    ClBatchMatMulWorkload.hpp
     ClBatchNormalizationFloatWorkload.cpp
     ClBatchNormalizationFloatWorkload.hpp
     ClBatchToSpaceNdWorkload.cpp

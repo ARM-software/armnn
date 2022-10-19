@@ -22,6 +22,7 @@
 #include "workloads/ClAdditionWorkload.hpp"
 #include "workloads/ClActivationWorkload.hpp"
 #include "workloads/ClArgMinMaxWorkload.hpp"
+#include "workloads/ClBatchMatMulWorkload.hpp"
 #include "workloads/ClBatchNormalizationFloatWorkload.hpp"
 #include "workloads/ClBatchToSpaceNdWorkload.hpp"
 #include "workloads/ClCastWorkload.hpp"
@@ -201,6 +202,12 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
                                         infos[1],
                                         *(PolymorphicDowncast<const ArgMinMaxDescriptor*>(&descriptor)),
                                         reasonIfUnsupported);
+        case LayerType::BatchMatMul:
+            return IsBatchMatMulSupported(infos[0],
+                                          infos[1],
+                                          infos[2],
+                                          *(PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor)),
+                                          reasonIfUnsupported);
         case LayerType::BatchNormalization:
             return IsBatchNormalizationSupported(infos[0],
                                                  infos[1],
@@ -636,6 +643,20 @@ bool ClLayerSupport::IsArgMinMaxSupported(const TensorInfo& input,
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClArgMinMaxWorkloadValidate,
                                    reasonIfUnsupported,
                                    input,
+                                   output,
+                                   descriptor);
+}
+
+bool ClLayerSupport::IsBatchMatMulSupported(const TensorInfo& inputX,
+                                            const TensorInfo& inputY,
+                                            const TensorInfo& output,
+                                            const BatchMatMulDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClBatchMatMulValidate,
+                                   reasonIfUnsupported,
+                                   inputX,
+                                   inputY,
                                    output,
                                    descriptor);
 }

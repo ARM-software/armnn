@@ -10,6 +10,7 @@
 #include "ClArgMinMaxWorkload.hpp"
 #include "ClComparisonWorkload.hpp"
 #include "ClConstantWorkload.hpp"
+#include "ClBatchMatMulWorkload.hpp"
 #include "ClBatchNormalizationFloatWorkload.hpp"
 #include "ClBatchToSpaceNdWorkload.hpp"
 #include "ClCastWorkload.hpp"

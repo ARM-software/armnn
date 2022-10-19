@@ -40,6 +40,12 @@ public:
                               const ArgMinMaxDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsBatchMatMulSupported(const TensorInfo& inputX,
+                                const TensorInfo& inputY,
+                                const TensorInfo& output,
+                                const BatchMatMulDescriptor& descriptor,
+                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     bool IsBatchNormalizationSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        const TensorInfo& mean,

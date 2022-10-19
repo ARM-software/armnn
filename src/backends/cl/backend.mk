@@ -30,6 +30,7 @@ BACKEND_SOURCES := \
         workloads/ClActivationWorkload.cpp \
         workloads/ClAdditionWorkload.cpp \
         workloads/ClArgMinMaxWorkload.cpp \
+        workloads/ClBatchMatMulWorkload.cpp \
         workloads/ClBatchNormalizationFloatWorkload.cpp \
         workloads/ClBatchToSpaceNdWorkload.cpp \
         workloads/ClCastWorkload.cpp \

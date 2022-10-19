@@ -11,6 +11,7 @@
 #include "SubgraphViewSelector.hpp"
 #include "BackendSettings.hpp"
 #include "optimizations/All.hpp"
+#include "armnnUtils/Filesystem.hpp"
 
 #include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
@@ -1816,6 +1817,8 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     }
     else if (options.m_DebugToFile)
     {
+        // Setup the output file path
+        armnnUtils::Filesystem::CreateDirectory("/ArmNNIntermediateLayerOutputs");
         Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugToFileLayer()));
     }
 

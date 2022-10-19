@@ -70,7 +70,10 @@ LayerTestResult<T, Dim> DebugTestImpl(
 
     if (toFile)
     {
+        // Given that this is dependent on an ExNet switch, we need to explicitly set the directory that the
+        //  files are stored in as this happens within the ExNet flow
         fs::path tmpDir = fs::temp_directory_path();
+        armnnUtils::Filesystem::CreateDirectory("/ArmNNIntermediateLayerOutputs");
         std::string full_path = tmpDir.generic_string() + "/ArmNNIntermediateLayerOutputs/" + layerName + ".numpy";
 
         ExecuteWorkload(*workload, memoryManager);

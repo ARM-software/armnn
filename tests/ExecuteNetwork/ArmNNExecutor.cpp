@@ -304,6 +304,17 @@ void ArmNNExecutor::SetupInputsAndOutputs()
                         " not compatible with number of inputs: " + std::to_string(noOfInputs));
         }
         noInputSets = inputFilePaths / noOfInputs;
+        // use the same inputSet per iteration or
+        // there should be a 1:1 mapping between inputSets and iterations
+        if (noInputSets != 1 ||
+            noInputSets != m_Params.m_Iterations)
+        {
+            LogAndThrow("The input model accepts " + std::to_string(noOfInputs) + " inputs. "
+                + std::to_string(inputFilePaths) + " input-tensor-data file paths have been provided. "
+                "ExecuteNetwork expects to perform " + std::to_string(noInputSets) + " inference(s) but "
+                "the iterations number provided is " + std::to_string(m_Params.m_Iterations) + "."
+                "Please amend the iterations or input-tensor-data parameter.");
+        }
         if (noInputSets != 1 && m_Params.m_ReuseBuffers)
         {
             LogAndThrow("Specifying multiple sets of inputs not compatible with ReuseBuffers");

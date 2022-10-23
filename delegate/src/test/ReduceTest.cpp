@@ -354,7 +354,8 @@ TEST_CASE ("Sum_Fp32_GpuAcc_Test")
 TEST_SUITE("Prod_CpuRefTests")
 {
 
-TEST_CASE ("Prod_Uint8_KeepDims_CpuRef_Test")
+TEST_CASE ("Prod_Uint8_KeepDims_CpuRef_Test"
+           * doctest::skip(true) )
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     std::vector<uint8_t> expectedOutputValues { 4, 6, 3 };
@@ -363,7 +364,8 @@ TEST_CASE ("Prod_Uint8_KeepDims_CpuRef_Test")
                             expectedOutputValues);
 }
 
-TEST_CASE ("Prod_Fp32_CpuRef_Test")
+TEST_CASE ("Prod_Fp32_CpuRef_Test"
+           * doctest::skip(true) )
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     std::vector<float>   expectedOutputValues { 10010.0f, 11022.0f, 12036.0f };
@@ -377,7 +379,8 @@ TEST_CASE ("Prod_Fp32_CpuRef_Test")
 TEST_SUITE("Prod_CpuAccTests")
 {
 
-TEST_CASE ("Prod_Uint8_KeepDims_CpuAcc_Test")
+TEST_CASE ("Prod_Uint8_KeepDims_CpuAcc_Test"
+           * doctest::skip(true) )
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
     std::vector<uint8_t> expectedOutputValues { 4, 6, 3 };
@@ -386,7 +389,8 @@ TEST_CASE ("Prod_Uint8_KeepDims_CpuAcc_Test")
                             expectedOutputValues);
 }
 
-TEST_CASE ("Prod_Fp32_CpuAcc_Test")
+TEST_CASE ("Prod_Fp32_CpuAcc_Test"
+           * doctest::skip(true) )
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
     std::vector<float>   expectedOutputValues { 10010.0f, 11022.0f, 12036.0f };
@@ -400,7 +404,8 @@ TEST_CASE ("Prod_Fp32_CpuAcc_Test")
 TEST_SUITE("Prod_GpuAccTests")
 {
 
-TEST_CASE ("Prod_Uint8_KeepDims_GpuAcc_Test")
+TEST_CASE ("Prod_Uint8_KeepDims_GpuAcc_Test"
+           * doctest::skip(true) )
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     std::vector<uint8_t> expectedOutputValues { 4, 6, 3 };
@@ -409,7 +414,8 @@ TEST_CASE ("Prod_Uint8_KeepDims_GpuAcc_Test")
                             expectedOutputValues);
 }
 
-TEST_CASE ("Prod_Fp32_GpuAcc_Test")
+TEST_CASE ("Prod_Fp32_GpuAcc_Test"
+           * doctest::skip(true) )
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     std::vector<float>   expectedOutputValues { 10010.0f, 11022.0f, 12036.0f };

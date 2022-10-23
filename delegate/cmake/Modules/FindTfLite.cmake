@@ -116,17 +116,17 @@ if (TfLite_LIB MATCHES .a$)
     if (TFLITE_FOUND)
         # WARNING! The order of these libraries is critical. Moving them
         # around will result in linker errors in DelegateUnitTests.
-        set(TfLite_LIB ${TfLite_LIB} ${TfLite_abseilstrings_LIB} ${TfLite_farmhash_LIB} ${TfLite_fftsg_LIB} ${TfLite_fftsg2d_LIB} ${TfLite_ruy_threadpool_LIB}
-                                      ${TfLite_flatbuffers_LIB} ${TfLite_ruy_allocator_LIB} ${TfLite_ruy_apply_multiplier_LIB} ${TfLite_ruy_blocking_counter_LIB}
-                                      ${TfLite_ruy_frontend_LIB} ${TfLite_ruy_trmul_LIB} ${TfLite_ruy_block_map_LIB} ${TfLite_ruy_context_LIB}
-                                      ${TfLite_ruy_context_get_ctx_LIB} ${TfLite_ruy_cpuinfo_LIB} ${TfLite_ruy_ctx_LIB} ${TfLite_ruy_denormal_LIB}
-                                      ${TfLite_ruy_have_built_path_for_avx2_fma_LIB} ${TfLite_ruy_have_built_path_for_avx512_LIB}
-                                      ${TfLite_ruy_have_built_path_for_avx_LIB} ${TfLite_ruy_kernel_arm_LIB} ${TfLite_ruy_kernel_avx2_fma_LIB}
-                                      ${TfLite_ruy_kernel_avx512_LIB} ${TfLite_ruy_kernel_avx_LIB} ${TfLite_ruy_pack_arm_LIB}
-                                      ${TfLite_ruy_pack_avx2_fma_LIB} ${TfLite_ruy_pack_avx512_LIB} ${TfLite_ruy_pack_avx_LIB} ${TfLite_ruy_prepacked_cache_LIB}
-                                      ${TfLite_ruy_prepare_packed_matrices_LIB} ${TfLite_ruy_system_aligned_alloc_LIB}
-                                      ${TfLite_ruy_tune_LIB} ${TfLite_ruy_wait_LIB} ${TfLite_ruy_profiler_LIB}
-                                      ${TfLite_cpuinfo_LIB} ${TfLite_clog_LIB} ${TfLite_abseil_synchronization_LIB})
+        set(TfLite_LIB ${TfLite_LIB} ${TfLite_abseilstrings_LIB} ${TfLite_farmhash_LIB} ${TfLite_fftsg_LIB} ${TfLite_fftsg2d_LIB} ${TfLite_flatbuffers_LIB}
+                                     ${TfLite_ruy_allocator_LIB} ${TfLite_ruy_apply_multiplier_LIB} ${TfLite_ruy_frontend_LIB} ${TfLite_ruy_trmul_LIB}
+                                     ${TfLite_ruy_threadpool_LIB} ${TfLite_ruy_blocking_counter_LIB} ${TfLite_ruy_block_map_LIB} ${TfLite_ruy_context_LIB}
+                                     ${TfLite_ruy_context_get_ctx_LIB} ${TfLite_ruy_cpuinfo_LIB} ${TfLite_ruy_ctx_LIB} ${TfLite_ruy_denormal_LIB}
+                                     ${TfLite_ruy_have_built_path_for_avx2_fma_LIB} ${TfLite_ruy_have_built_path_for_avx512_LIB}
+                                     ${TfLite_ruy_have_built_path_for_avx_LIB} ${TfLite_ruy_kernel_arm_LIB} ${TfLite_ruy_kernel_avx2_fma_LIB}
+                                     ${TfLite_ruy_kernel_avx512_LIB} ${TfLite_ruy_kernel_avx_LIB} ${TfLite_ruy_pack_arm_LIB}
+                                     ${TfLite_ruy_pack_avx2_fma_LIB} ${TfLite_ruy_pack_avx512_LIB} ${TfLite_ruy_pack_avx_LIB} ${TfLite_ruy_prepacked_cache_LIB}
+                                     ${TfLite_ruy_prepare_packed_matrices_LIB} ${TfLite_ruy_system_aligned_alloc_LIB}
+                                     ${TfLite_ruy_tune_LIB} ${TfLite_ruy_wait_LIB} ${TfLite_ruy_profiler_LIB}
+                                     ${TfLite_cpuinfo_LIB} ${TfLite_clog_LIB} ${TfLite_abseil_synchronization_LIB})
     endif ()
 elseif (TfLite_LIB MATCHES .so$)
     message("-- Dynamic tensorflow lite library found, using for ArmNN build")

@@ -156,6 +156,7 @@ if (BUILD_ARMNN_SERIALIZER
         NetworkExecutionUtils/NetworkExecutionUtils.hpp)
 
     if(BUILD_ARMNN_TFLITE_DELEGATE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-comment")
         set(ExecuteNetwork_sources
             ${ExecuteNetwork_sources}
             ExecuteNetwork/TfliteExecutor.cpp

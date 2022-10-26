@@ -443,24 +443,29 @@ void ArmNNExecutor::SetupInputsAndOutputs()
         }
     }
 
-    // Fill the remaining iterations with copies
-    const unsigned int remainingInputSets = m_Params.m_Iterations - noInputSets;
-    for (unsigned int i = 1; i <= remainingInputSets; i++)
+    // If iterations > noSets fill the remaining iterations repeating the given files
+    // If iterations < noSets just ignore the extra files
+    const unsigned int remainingInputSets = (m_Params.m_Iterations > noInputSets)
+                                          ? m_Params.m_Iterations - noInputSets
+                                          : 0;
+    for (unsigned int i = 0; i < remainingInputSets; ++i)
     {
-        m_InputTensorsVec.push_back(m_InputTensorsVec[noInputSets % i]);
+        m_InputTensorsVec.push_back(m_InputTensorsVec[i % noInputSets]);
         if (m_Params.m_ImportInputsIfAligned)
         {
-            m_ImportedInputIds.push_back(m_ImportedInputIds[noInputSets % i]);
+            m_ImportedInputIds.push_back(m_ImportedInputIds[i % noInputSets]);
         }
     }
 
-    const unsigned int remainingOutputSets = m_Params.m_Iterations - noOutputSets;
-    for (unsigned int i = 1; i <= remainingOutputSets; i++)
+    const unsigned int remainingOutputSets = (m_Params.m_Iterations > noOutputSets)
+                                           ? m_Params.m_Iterations - noOutputSets
+                                           : 0;
+    for (unsigned int i = 0; i < remainingOutputSets; ++i)
     {
-        m_OutputTensorsVec.push_back(m_OutputTensorsVec[noOutputSets % i]);
+        m_OutputTensorsVec.push_back(m_OutputTensorsVec[i % noOutputSets]);
         if (m_Params.m_ImportInputsIfAligned)
         {
-            m_ImportedOutputIds.push_back(m_ImportedOutputIds[noOutputSets % i]);
+            m_ImportedOutputIds.push_back(m_ImportedOutputIds[i % noOutputSets]);
         }
     }
 }

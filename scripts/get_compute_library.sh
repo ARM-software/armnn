@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_08" # Release 22.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="0a36f58e711a19040b1b65ef0afa83cce0c9dc4c" #8470: Fix FFTConvolutionLayer test | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8470
+DEFAULT_CLFRAMEWORKREVISION="dc73246af4fec0b36ca3ae3d8e47f51561308309" #8513: Fix compiler warning | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8513
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

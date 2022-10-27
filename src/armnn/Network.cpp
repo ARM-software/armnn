@@ -574,8 +574,10 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
     for (unsigned int i = 0; i < numOutputs; i++) {
         OutputSlot& outputSlot = layer->GetOutputSlot(i);
         TensorInfo info = outputSlot.GetTensorInfo();
-        if (DataType::QAsymmU8 == info.GetDataType()) {
-            if (0.f == info.GetQuantizationScale()) {
+        if (DataType::QAsymmU8 == info.GetDataType())
+        {
+            if (0.f == info.GetQuantizationScale())
+            {
                 noErrors = false;
                 std::stringstream ss;
                 ss << "output " << i << " of layer " << GetLayerTypeAsCString(layer->GetType())

@@ -24,14 +24,15 @@ namespace
 {
 
 std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperatorCode,
-                                        tflite::TensorType tensorType,
-                                        std::vector<int32_t>& input0TensorShape,
-                                        std::vector<int32_t>& input1TensorShape,
-                                        const std::vector <int32_t>& outputTensorShape,
-                                        std::vector<int32_t>& axisData,
-                                        const bool keepDims,
-                                        float quantScale = 1.0f,
-                                        int quantOffset  = 0)
+                                          tflite::TensorType tensorType,
+                                          std::vector<int32_t>& input0TensorShape,
+                                          std::vector<int32_t>& input1TensorShape,
+                                          const std::vector <int32_t>& outputTensorShape,
+                                          std::vector<int32_t>& axisData,
+                                          const bool keepDims,
+                                          float quantScale = 1.0f,
+                                          int quantOffset  = 0,
+                                          bool kTfLiteNoQuantizationForQuantized = false)
 {
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
@@ -42,12 +43,38 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(axisData.data()),
                                                              sizeof(int32_t) * axisData.size()));
 
-    auto quantizationParameters =
-            CreateQuantizationParameters(flatBufferBuilder,
-                                         0,
-                                         0,
-                                         flatBufferBuilder.CreateVector<float>({ quantScale }),
-                                         flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
+    flatbuffers::Offset<tflite::QuantizationParameters> quantizationParametersAxis
+    = CreateQuantizationParameters(flatBufferBuilder);
+
+    flatbuffers::Offset<tflite::QuantizationParameters> quantizationParameters;
+
+    if (kTfLiteNoQuantizationForQuantized)
+    {
+        if ((quantScale == 1 || quantScale == 0) && quantOffset == 0)
+        {
+            // Creates quantization parameter with quantization.type = kTfLiteNoQuantization
+            quantizationParameters = CreateQuantizationParameters(flatBufferBuilder);
+        }
+        else
+        {
+            // Creates quantization parameter with quantization.type != kTfLiteNoQuantization
+            quantizationParameters = CreateQuantizationParameters(
+                    flatBufferBuilder,
+                    0,
+                    0,
+                    flatBufferBuilder.CreateVector<float>({quantScale}),
+                    flatBufferBuilder.CreateVector<int64_t>({quantOffset}));
+        }
+    }
+    else
+    {
+        quantizationParameters = CreateQuantizationParameters(
+                flatBufferBuilder,
+                0,
+                0,
+                flatBufferBuilder.CreateVector<float>({quantScale}),
+                flatBufferBuilder.CreateVector<int64_t>({quantOffset}));
+    }
 
     std::array<flatbuffers::Offset<Tensor>, 3> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
@@ -64,7 +91,7 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
                               ::tflite::TensorType_INT32,
                               1,
                               flatBufferBuilder.CreateString("axis"),
-                              quantizationParameters);
+                              quantizationParametersAxis);
 
     // Create output tensor
     tensors[2] = CreateTensor(flatBufferBuilder,
@@ -75,7 +102,7 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 
-    // Create operator. Reduce operations MIN, MAX, SUM, MEAN uses ReducerOptions.
+    // Create operator. Reduce operations MIN, MAX, SUM, MEAN, PROD uses ReducerOptions.
     tflite::BuiltinOptions operatorBuiltinOptionsType = tflite::BuiltinOptions_ReducerOptions;
     flatbuffers::Offset<void> operatorBuiltinOptions = CreateReducerOptions(flatBufferBuilder, keepDims).Union();
 
@@ -131,27 +158,39 @@ void ReduceTest(tflite::BuiltinOperator reduceOperatorCode,
                 int quantOffset  = 0)
 {
     using namespace tflite;
-    std::vector<char> modelBuffer = CreateReduceTfLiteModel(reduceOperatorCode,
-                                                            tensorType,
-                                                            input0Shape,
-                                                            input1Shape,
-                                                            expectedOutputShape,
-                                                            input1Values,
-                                                            keepDims,
-                                                            quantScale,
-                                                            quantOffset);
+    std::vector<char> modelBufferArmNN = CreateReduceTfLiteModel(reduceOperatorCode,
+                                                                 tensorType,
+                                                                 input0Shape,
+                                                                 input1Shape,
+                                                                 expectedOutputShape,
+                                                                 input1Values,
+                                                                 keepDims,
+                                                                 quantScale,
+                                                                 quantOffset,
+                                                                 false);
+    std::vector<char> modelBufferTFLite = CreateReduceTfLiteModel(reduceOperatorCode,
+                                                                  tensorType,
+                                                                  input0Shape,
+                                                                  input1Shape,
+                                                                  expectedOutputShape,
+                                                                  input1Values,
+                                                                  keepDims,
+                                                                  quantScale,
+                                                                  quantOffset,
+                                                                  true);
 
-    const Model* tfLiteModel = GetModel(modelBuffer.data());
+    const Model* tfLiteModelArmNN = GetModel(modelBufferArmNN.data());
+    const Model* tfLiteModelTFLite = GetModel(modelBufferTFLite.data());
 
     // Create TfLite Interpreters
     std::unique_ptr<Interpreter> armnnDelegateInterpreter;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
+    CHECK(InterpreterBuilder(tfLiteModelArmNN, ::tflite::ops::builtin::BuiltinOpResolver())
                   (&armnnDelegateInterpreter) == kTfLiteOk);
     CHECK(armnnDelegateInterpreter != nullptr);
     CHECK(armnnDelegateInterpreter->AllocateTensors() == kTfLiteOk);
 
     std::unique_ptr<Interpreter> tfLiteInterpreter;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
+    CHECK(InterpreterBuilder(tfLiteModelTFLite, ::tflite::ops::builtin::BuiltinOpResolver())
                   (&tfLiteInterpreter) == kTfLiteOk);
     CHECK(tfLiteInterpreter != nullptr);
     CHECK(tfLiteInterpreter->AllocateTensors() == kTfLiteOk);

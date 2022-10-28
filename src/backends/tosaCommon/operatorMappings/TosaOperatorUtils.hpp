@@ -14,7 +14,7 @@ using namespace armnn;
 using namespace tosa;
 
 // Function to return Tosa datatype from input ArmNN datatype.
-DType ArmNNToDType(const DataType& type)
+inline DType ArmNNToDType(const DataType& type)
 {
     switch (type)
     {
@@ -43,7 +43,7 @@ DType ArmNNToDType(const DataType& type)
 }
 
 // Function to return Tosa tensor shape from input ArmNN tensor shape.
-std::vector<int32_t> GetTosaTensorShape(const TensorShape& shape)
+inline std::vector<int32_t> GetTosaTensorShape(const TensorShape& shape)
 {
     std::vector<int32_t> returnShape;
     for (u_int32_t i = 0; i < shape.GetNumDimensions(); i++)
@@ -55,7 +55,7 @@ std::vector<int32_t> GetTosaTensorShape(const TensorShape& shape)
 
 // Function to return unique int as a string to ensure uniqueness between all input, output and block names.
 static int uniqueTosaMappingID = 0;
-std::string GetUniqueTosaMappingID()
+inline std::string GetUniqueTosaMappingID()
 {
     return std::to_string(++uniqueTosaMappingID);
 }

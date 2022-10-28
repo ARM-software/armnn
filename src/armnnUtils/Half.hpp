@@ -8,8 +8,12 @@
 #include <type_traits>
 
 // Set style to round to nearest
-#define HALF_ROUND_STYLE 1
-#define HALF_ROUND_TIES_TO_EVEN 1
+#ifndef HALF_ROUND_STYLE
+    #define HALF_ROUND_STYLE 1
+#endif
+#ifndef HALF_ROUND_TIES_TO_EVEN
+    #define HALF_ROUND_TIES_TO_EVEN 1
+#endif
 
 #include "half/half.hpp"
 

@@ -5,6 +5,7 @@
 
 list(APPEND armnnTosaBackendOperators_sources
         AdditionOperator.hpp
+        AdditionOperator.cpp
         TosaOperatorUtils.hpp
     )
 

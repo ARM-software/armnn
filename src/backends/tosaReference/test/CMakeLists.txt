@@ -6,6 +6,7 @@
 list(APPEND armnnTosaRefBackendUnitTests_sources
         TosaRefLayerTests.cpp
         TosaRefLayerSupportTests.cpp
+        TosaRefOptimizedNetworkTests.cpp
 )
 
 add_library(armnnTosaRefBackendUnitTests OBJECT ${armnnTosaRefBackendUnitTests_sources})

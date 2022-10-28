@@ -9,6 +9,7 @@
 #include "TosaRefLayerSupport.hpp"
 #include "TosaRefTensorHandleFactory.hpp"
 
+#include <tosaCommon/TosaMappings.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
@@ -20,6 +21,13 @@
 
 namespace armnn
 {
+
+// Utility function to construct a valid Deleter for TosaSerializationHandler ptrs passed back to ArmNN
+template <typename T>
+void DeleteAsType(const void* const blob)
+{
+    delete static_cast<const T*>(blob);
+}
 
 const BackendId& TosaRefBackend::GetIdStatic()
 {
@@ -75,10 +83,43 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
                                                        const ModelOptions& modelOptions) const
 {
     OptimizationViews optimizationViews(modelOptions);
-    optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
+    auto handler = std::make_unique<TosaSerializationHandler>();
 
+    auto it = subgraph.endIConnectable();
+    while (it != subgraph.beginIConnectable())
+    {
+        --it;
+        Layer &base = *(PolymorphicDowncast<Layer*>(*it));
+
+        if(base.GetType() == armnn::LayerType::Input ||
+           base.GetType() == armnn::LayerType::Output)
+        {
+            continue;
+        }
+
+        tosa::TosaSerializationBasicBlock* mappings = GetTosaMappingFromLayer(&base);
+        handler.get()->GetBlocks().push_back(mappings);
+    }
+
+    auto compiledBlob =
+            std::make_unique<PreCompiledObjectPtr>(handler.release(), DeleteAsType<TosaSerializationHandler>);
+
+    IConnectableLayer* preCompiledLayer = optimizationViews.GetINetwork()->AddPrecompiledLayer(
+            PreCompiledDescriptor(subgraph.GetNumInputSlots(), subgraph.GetNumOutputSlots()),
+            std::move(*compiledBlob),
+            armnn::Optional<BackendId>(GetId()),
+            "TOSA_Pre_Compiled_Layer");
+
+    // Copy the output tensor infos from sub-graph
+    for (unsigned int i = 0; i < subgraph.GetNumOutputSlots(); i++)
+    {
+        preCompiledLayer->GetOutputSlot(i).SetTensorInfo(subgraph.GetIOutputSlot(i)->GetTensorInfo());
+    }
+
+    optimizationViews.AddSubstitution({ std::move(subgraph), SubgraphView(preCompiledLayer) });
     return optimizationViews;
 }
+
 
 std::vector<ITensorHandleFactory::FactoryId> TosaRefBackend::GetHandleFactoryPreferences() const
 {

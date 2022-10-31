@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 
 #include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
+#include <backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
@@ -126,6 +127,11 @@ TEST_CASE("NeonGreaterBroadcastEndToEndUint8Test")
     ComparisonBroadcastEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends,
                                                                   ComparisonOperation::Greater,
                                                                   expectedOutput);
+}
+
+TEST_CASE("NeonBatchMatMulEndToEndFloat32Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
 TEST_CASE("NeonConcatEndToEndDim0Test")

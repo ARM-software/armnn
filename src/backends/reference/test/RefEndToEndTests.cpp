@@ -8,6 +8,7 @@
 #include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
+#include <backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ChannelShuffleEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
@@ -464,6 +465,11 @@ TEST_CASE("RefGreaterBroadcastEndToEndUint8Test")
     ComparisonBroadcastEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
                                                                   ComparisonOperation::Greater,
                                                                   expectedOutput);
+}
+
+TEST_CASE("RefBatchMatMulEndToEndFloat32Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 TEST_CASE("RefBatchToSpaceNdEndToEndFloat32NHWCTest")

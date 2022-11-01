@@ -113,7 +113,7 @@ build_flatbuffers()
   find . -mindepth 1 -name "*_build" -prune -o -exec rm -rf {} +
 
   eval "$cmake_flags" \
-  cmake -DFLATBUFFERS_BUILD_FLATC=1 \
+  cmake -DFLATBUFFERS_BUILD_FLATC="$native_build" \
         -DCMAKE_INSTALL_PREFIX:PATH="$build_dir" \
         -DFLATBUFFERS_BUILD_TESTS=0 \
 	      "$FLATBUFFERS_SRC"
@@ -145,7 +145,8 @@ build_tflite()
   case "$TARGET_ARCH" in
     "aarch64")
       cmake_flags+="$AARCH64_COMPILER_FLAGS"
-      target_arch_cmd="-DCMAKE_SYSTEM_PROCESSOR=aarch64 "
+      target_arch_cmd="-DCMAKE_SYSTEM_PROCESSOR=aarch64 \
+                       -DCMAKE_SYSTEM_NAME=Linux "
 
       if [ "$NATIVE_BUILD" -eq 0 ]; then
         cmake_flags+="ARMCC_FLAGS='-funsafe-math-optimizations' "

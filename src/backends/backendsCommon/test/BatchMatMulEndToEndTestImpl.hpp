@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -55,30 +55,38 @@ void BatchMatMulEndToEnd(const std::vector<armnn::BackendId>& backends)
     const TensorShape& inputYShape = { 2, 2, 2 };
     const TensorShape& outputShape = { 2, 2, 2 };
 
-    INetworkPtr network = CreateBatchMatMulNetwork<ArmnnType>(inputXShape, inputYShape, outputShape);
+    constexpr float qScale    = 1.0f;
+    constexpr int32_t qOffset = 0;
+
+    INetworkPtr network = CreateBatchMatMulNetwork<ArmnnType>(inputXShape, inputYShape, outputShape, qScale, qOffset);
 
     CHECK(network);
 
-    std::vector<T> inputXData{ 1, 2,
-                               3, 4,
+    std::vector<float> floatInputXData{ 1., 2.,
+                                        3., 4.,
 
-                               9, 10,
-                               11, 12 };
-    std::vector<T> inputYData{ 5, 7,
-                               6, 8,
+                                        9., 10.,
+                                        11., 12. };
+    std::vector<T> inputXData = armnnUtils::QuantizedVector<T>(floatInputXData, qScale, qOffset);
 
-                               13, 15,
-                               14, 16 };
-    std::vector<T> expectedOutput{ 19, 22,
-                                   43, 50,
+    std::vector<float> floatInputYData{ 5., 7.,
+                                        6., 8.,
 
-                                   267, 286,
-                                   323, 346 };
+                                        13., 15.,
+                                        14., 16. };
+    std::vector<T> inputYData = armnnUtils::QuantizedVector<T>(floatInputYData, qScale, qOffset);
 
-    std::map<int, std::vector<T>> inputTensorData = {{ 0, inputXData }, {1, inputYData}};
-    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput } };
+    std::vector<float> floatExpectedOutputData{ 19., 22.,
+                                                43., 50.,
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
+                                                267., 286.,
+                                                323., 346. };
+    std::vector<T> expectedOutputData = armnnUtils::QuantizedVector<T>(floatExpectedOutputData, qScale, qOffset);
+
+    std::map<int, std::vector<T>> inputTensor = {{ 0, inputXData }, {1, inputYData}};
+    std::map<int, std::vector<T>> expectedOutput = { { 0, expectedOutputData } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensor, expectedOutput, backends);
 }
 
 } // anonymous namespace

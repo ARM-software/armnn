@@ -148,6 +148,11 @@ TEST_CASE("NeonBatchMatMulEndToEndFloat32Test")
     BatchMatMulEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
+TEST_CASE("NeonBatchMatMulEndToEndInt8Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::QAsymmS8>(neonDefaultBackends);
+}
+
 TEST_CASE("NeonConcatEndToEndDim0Test")
 {
     ConcatDim0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);

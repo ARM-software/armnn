@@ -155,7 +155,19 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
         case LayerType::BatchMatMul :
         {
             auto batchMatMulQueueDescriptor = PolymorphicDowncast<const BatchMatMulQueueDescriptor*>(&descriptor);
-            return std::make_unique<NeonBatchMatMulWorkload>(*batchMatMulQueueDescriptor, info);
+            bool isFastMathEnabled = false;
+            if (m_ModelContextPtr)
+            {
+                if (m_ModelContextPtr.get() != nullptr)
+                {
+                    auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
+                    if (modelOptions)
+                    {
+                        isFastMathEnabled = modelOptions->IsFastMathEnabled();
+                    }
+                }
+            }
+            return std::make_unique<NeonBatchMatMulWorkload>(*batchMatMulQueueDescriptor, info, isFastMathEnabled);
         }
         case LayerType::BatchNormalization :
         {

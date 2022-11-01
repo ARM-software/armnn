@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -14,6 +14,7 @@
 #include <armnnUtils/QuantizeHelper.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnn/Optional.hpp>
+#include <armnn/BackendHelper.hpp>
 
 
 template<armnn::DataType ArmnnType, typename T, std::size_t NumDims>
@@ -29,6 +30,7 @@ LayerTestResult<T, NumDims> BatchMatMulTestImpl(
     const armnn::TensorInfo& inputYInfo,
     const armnn::TensorInfo& outputInfo)
 {
+    LayerTestResult<T, NumDims> result(outputInfo);
     std::vector<T> outputActual(outputInfo.GetNumElements());
 
     std::unique_ptr<armnn::ITensorHandle> inputXHandle = tensorHandleFactory.CreateTensorHandle(inputXInfo);
@@ -36,12 +38,26 @@ LayerTestResult<T, NumDims> BatchMatMulTestImpl(
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
 
     armnn::BatchMatMulQueueDescriptor queueDescriptor;
-    queueDescriptor.m_Parameters = descriptor;
+    queueDescriptor.m_Parameters = std::move(descriptor);
     armnn::WorkloadInfo workloadInfo;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, inputXInfo, inputXHandle.get());
     AddInputToWorkload(queueDescriptor, workloadInfo, inputYInfo, inputYHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
+
+    // Don't execute if BatchMatMul is not supported, as an exception will be raised.
+    const armnn::BackendId& backend = workloadFactory.GetBackendId();
+    std::string reasonIfUnsupported;
+    armnn::LayerSupportHandle handle = armnn::GetILayerSupportByBackendId(backend);
+    result.m_Supported = handle.IsBatchMatMulSupported(inputXInfo,
+                                                       inputYInfo,
+                                                       outputInfo,
+                                                       queueDescriptor.m_Parameters,
+                                                       reasonIfUnsupported);
+    if (!result.m_Supported)
+    {
+        return result;
+    }
 
     auto workload = workloadFactory.CreateWorkload(armnn::LayerType::BatchMatMul, queueDescriptor, workloadInfo);
 

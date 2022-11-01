@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2021, 2023 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -299,6 +299,7 @@ where N = batches, C = channels, H = height, W = width
       <table>
        <tr><th>
        <tr><td>FLOAT32
+       <tr><td>QASYMMS8
       </table>
 <tr>
   <td>GpuAcc

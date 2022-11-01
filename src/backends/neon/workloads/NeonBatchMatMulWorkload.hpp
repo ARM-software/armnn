@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,35 +7,27 @@
 
 #include "NeonBaseWorkload.hpp"
 
-#include <arm_compute/runtime/IFunction.h>
-#include <arm_compute/runtime/Tensor.h>
-
-#include <memory>
+#include <arm_compute/runtime/NEON/functions/NEMatMul.h>
 
 namespace armnn
 {
-    arm_compute::Status NeonBatchMatMulValidate(const TensorInfo& inputX,
-                                                const TensorInfo& inputY,
-                                                const TensorInfo& output,
-                                                const BatchMatMulDescriptor& descriptor);
+    arm_compute::Status NeonBatchMatMulValidate(const TensorInfo& inputInfoX,
+                                                const TensorInfo& inputInfoY,
+                                                const TensorInfo& outputInfo,
+                                                const BatchMatMulDescriptor& descriptor,
+                                                const bool isFastMathEnabled,
+                                                const ActivationDescriptor* activationDescriptor);
+
 
     class NeonBatchMatMulWorkload : public NeonBaseWorkload<BatchMatMulQueueDescriptor>
     {
     public:
         NeonBatchMatMulWorkload(const BatchMatMulQueueDescriptor& descriptor,
-                                const WorkloadInfo& info);
+                                const WorkloadInfo& info,
+                                const bool isFastMathEnabled);
         virtual void Execute() const override;
 
     private:
-        // ACL layers required to fully form a Batch Mat Mul layer.
-        std::unique_ptr<arm_compute::IFunction> m_GEMMLayer;
-        std::unique_ptr<arm_compute::IFunction> m_PermuteLayerX;
-        std::unique_ptr<arm_compute::IFunction> m_PermuteLayerY;
-
-        // Additional ACL arm_compute::Tensors.
-        // Required to perform permutations.
-        arm_compute::Tensor m_PermutedTensorX;
-        arm_compute::Tensor m_PermutedTensorY;
-
+        mutable arm_compute::NEMatMul m_MatMulLayer;
     };
 } //namespace armnn

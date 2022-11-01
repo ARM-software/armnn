@@ -76,20 +76,32 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint7, BatchToSpaceNdNchwTest7<D
 
 // Batch Mat Mul
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DSimpleFloat32, BatchMatMul2DSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DSimpleInt8, BatchMatMul2DSimpleTest<DataType::QAsymmS8>);
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul3DSimpleFloat32, BatchMatMul3DSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul3DSimpleInt8, BatchMatMul3DSimpleTest<DataType::QAsymmS8>);
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMulNCHWSimpleFloat32, BatchMatMulNCHWSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMulNCHWSimpleInt8, BatchMatMulNCHWSimpleTest<DataType::QAsymmS8>);
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul3DBatchFloat32, BatchMatMul3DBatchTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul3DBatchInt8, BatchMatMul3DBatchTest<DataType::QAsymmS8>);
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul3DBroadcastFloat32, BatchMatMul3DBroadcastTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_BatchMatMul3DBroadcastFloat32,
+                              BatchMatMul3DBroadcastTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_BatchMatMul3DBroadcastInt8,
+                              BatchMatMul3DBroadcastTest<DataType::QAsymmS8>);
 
-ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul3D2DBroadcastFloat32, BatchMatMul3D2DBroadcastTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_BatchMatMul3D2DBroadcastFloat32,
+                              BatchMatMul3D2DBroadcastTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_BatchMatMul3D2DBroadcastInt8,
+                              BatchMatMul3D2DBroadcastTest<DataType::QAsymmS8>);
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DTinyFloat32, BatchMatMul2DTinyTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DTinyInt8, BatchMatMul2DTinyTest<DataType::QAsymmS8>);
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DTranspSimpleFloat32, BatchMatMul2DTranspSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DTranspSimpleInt8, BatchMatMul2DTranspSimpleTest<DataType::QAsymmS8>);
 
 // Convolution
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvolution1d, Convolution1dTest, true)

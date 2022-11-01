@@ -486,6 +486,11 @@ TEST_CASE("RefBatchMatMulEndToEndFloat32Test")
     BatchMatMulEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
+TEST_CASE("RefBatchMatMulEndToEndInt8Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
 TEST_CASE("RefBatchToSpaceNdEndToEndFloat32NHWCTest")
 {
     BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC);

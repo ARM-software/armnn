@@ -760,12 +760,28 @@ bool NeonLayerSupport::IsBatchMatMulSupported(const TensorInfo& inputX,
                                               const BatchMatMulDescriptor& descriptor,
                                               Optional<std::string&> reasonIfUnsupported) const
 {
+    bool isFastMathEnabled = false;
+#if defined(ARMCOMPUTENEON_ENABLED)
+    if (m_ModelContextPtr)
+    {
+        if (m_ModelContextPtr.get() != nullptr)
+        {
+            auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
+            if (modelOptions)
+            {
+                isFastMathEnabled = modelOptions->IsFastMathEnabled();
+            }
+        }
+    }
+#endif
     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonBatchMatMulValidate,
                                    reasonIfUnsupported,
                                    inputX,
                                    inputY,
                                    output,
-                                   descriptor);
+                                   descriptor,
+                                   isFastMathEnabled,
+                                   nullptr);
 }
 
 bool NeonLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,

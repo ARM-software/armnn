@@ -26,16 +26,16 @@ All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` 
  mkdir -p $HOME/armnn-devenv/
  cd $HOME/armnn-devenv/
  # For Mac OS, change the NDK download link accordingly.
- wget https://dl.google.com/android/repository/android-ndk-r20b-linux-x86_64.zip
- unzip android-ndk-r20b-linux-x86_64.zip
- export NDK=$HOME/armnn-devenv/android-ndk-r20b
+ wget https://dl.google.com/android/repository/android-ndk-r25-linux.zip
+ unzip android-ndk-r25.zip
+ export NDK=$HOME/armnn-devenv/android-ndk-r25
  export NDK_TOOLCHAIN_ROOT=$NDK/toolchains/llvm/prebuilt/linux-x86_64
  export PATH=$NDK_TOOLCHAIN_ROOT/bin/:$PATH
 
  # You may want to append the above export variables commands to your `~/.bashrc` (or `~/.bash_profile` in Mac OS).
  ```
 
-* With the android ndk-20b, you don't need to use the make_standalone_toolchain script to create a toolchain for a specific version of android. Android's current preference is for you to just specify the architecture and operating system while setting the compiler and just use the ndk directory.
+* With the android ndk-25, you don't need to use the make_standalone_toolchain script to create a toolchain for a specific version of android. Android's current preference is for you to just specify the architecture and operating system while setting the compiler and just use the ndk directory.
 
 ## Install Cmake
 Cmake 3.19rc3 is required to build Arm NN.
@@ -97,13 +97,13 @@ Note: The ANDROID_API variable should be set to the Android API version number y
 * Download Flatbuffers
 ```bash
 cd $HOME/armnn-devenv
-wget -O flatbuffers-1.12.0.tar.gz https://github.com/google/flatbuffers/archive/v1.12.0.tar.gz
-tar xf flatbuffers-1.12.0.tar.gz
+wget https://github.com/google/flatbuffers/archive/v2.0.6.tar.gz
+tar xf v2.0.6.tar.gz
 ```
 
 * Build Flatbuffers
 ```bash
-cd flatbuffers-1.12.0
+cd flatbuffers-2.0.6
 rm -f CMakeCache.txt
 rm -rf build
 mkdir build
@@ -189,7 +189,7 @@ cmake .. \
     -DARMCOMPUTENEON=1 -DARMCOMPUTECL=1 -DARMNNREF=1 \
     -DPROTOBUF_ROOT=$HOME/armnn-devenv/google/arm64_pb_install/
     -DFLATBUFFERS_ROOT=$HOME/armnn-devenv/flatbuffers \
-    -DFLATC_DIR=$HOME/armnn-devenv/flatbuffers-1.12.0/build \
+    -DFLATC_DIR=$HOME/armnn-devenv/flatbuffers-2.0.6/build \
 ```
 
 To include standalone sample dynamic backend tests, add the argument to enable the tests and the dynamic backend path to the CMake command:
@@ -225,7 +225,7 @@ cmake \
 -DCMAKE_SYSTEM_NAME=Android \
 -DCMAKE_SYSTEM_VERSION=$ANDROID_API \
 -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
--DCMAKE_SYSROOT=$HOME/armnn-devenv/android-ndk-r20b/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
+-DCMAKE_SYSROOT=$HOME/armnn-devenv/android-ndk-r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
 -DCMAKE_CXX_FLAGS=--std=c++14 \
 -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
 -DCMAKE_MODULE_LINKER_FLAGS="-llog" \

@@ -16,9 +16,9 @@ This work is currently in an experimental phase.
 ## Prerequisites
 
 The following are required to build the Arm NN support library
-* Android NDK r20b
+* Android NDK r25
   * Detailed setup can be found in [BuildGuideAndroidNDK.md](../BuildGuideAndroidNDK.md)
-* Flatbuffer version 1.12.0
+* Flatbuffer version 2.0.6
   * Detailed setup can be found in [BuildGuideCrossCompilation.md](../BuildGuideCrossCompilation.md)
 
 The following is required to build the Arm NN shim
@@ -33,7 +33,7 @@ export WORKING_DIR=<path to where the Arm NN source code, clframework and aosp r
 export AOSP_ROOT=<path to the root of Android tree where the shim will be built>
 export AOSP_MODULES_ROOT=<path to where AOSP modules will be cloned i.e. $WORKING_DIR/aosp>
 export ARMNN_BUILD_DIR=<path to the Arm NN build directory i.e. $WORKING_DIR/build>
-export NDK=<path to>android-ndk-r20b
+export NDK=<path to>android-ndk-r25
 export NDK_TOOLCHAIN_ROOT=$NDK/toolchains/llvm/prebuilt/linux-x86_64
 export PATH=$NDK_TOOLCHAIN_ROOT/bin/:$PATH
 export FLATBUFFERS_ANDROID_BUILD=<path to flatbuffers target android build>

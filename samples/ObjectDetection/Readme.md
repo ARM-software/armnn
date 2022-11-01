@@ -20,8 +20,8 @@ with detections shown in bounding boxes, class labels and confidence.
 This example utilizes OpenCV functions to capture and output video data.
 1. Public Arm NN C++ API is provided by Arm NN library.
 2. For Delegate file mode following dependencies exist:
-2.1 Tensorflow version 2.5.0
-2.2 Flatbuffers version 1.12.0
+2.1 Tensorflow version 2.10
+2.2 Flatbuffers version 2.0.6
 2.3 Arm NN delegate library
 
 ## System
@@ -97,7 +97,7 @@ Please see [find_opencv.cmake](./cmake/find_opencv.cmake) for implementation det
 
 ### Tensorflow Lite (Needed only in delegate file mode)
 
-This application uses [Tensorflow Lite)](https://www.tensorflow.org/) version 2.5.0 for demonstrating use of 'armnnDelegate'.
+This application uses [Tensorflow Lite)](https://www.tensorflow.org/) version 2.10 for demonstrating use of 'armnnDelegate'.
 armnnDelegate is a library for accelerating certain TensorFlow Lite operators on Arm hardware by providing
 the TensorFlow Lite interpreter with an alternative implementation of the operators via its delegation mechanism.
 You may clone and build Tensorflow lite and provide the path to its root and output library directories through the cmake
@@ -106,13 +106,13 @@ For implementation details see the scripts FindTfLite.cmake and FindTfLiteSrc.cm
 
 The application links with the Tensorflow lite library libtensorflow-lite.a
 
-#### Download and build Tensorflow Lite version 2.5.0
+#### Download and build Tensorflow Lite version 2.10
 Example for Tensorflow Lite native compilation
 ```commandline
 sudo apt install build-essential
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/tensorflow
-git checkout tags/v2.5.0
+git checkout 359c3cdfc5fabac82b3c70b3b6de2b0a8c16874f #Tensorflow 2.10
 mkdir build && cd build
 cmake ../lite -DTFLITE_ENABLE_XNNPACK=OFF
 make
@@ -127,12 +127,12 @@ Please see [FindFlatbuffers.cmake] for implementation details.
 
 The application links with the Flatbuffers library libflatbuffers.a
 
-#### Download and build flatbuffers version 1.12.0
+#### Download and build flatbuffers version 2.0.6
 Example for flatbuffer native compilation
 ```commandline
-wget -O flatbuffers-1.12.0.zip https://github.com/google/flatbuffers/archive/v1.12.0.zip
-unzip -d . flatbuffers-1.12.0.zip
-cd flatbuffers-1.12.0
+wget https://github.com/google/flatbuffers/archive/v2.0.6.tar.gz
+tar xf v2.0.6.tar.gz
+cd flatbuffers-2.0.6
 mkdir install && cd install
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=`pwd`
 make install

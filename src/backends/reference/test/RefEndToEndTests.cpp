@@ -1,11 +1,12 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
 #include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
+#include <backendsCommon/test/AdditionEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp>
@@ -78,6 +79,17 @@ TEST_CASE("RefAbsEndToEndTestInt16")
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::QSymmS16>(defaultBackends,
                                                                      UnaryOperation::Abs,
                                                                      expectedOutput);
+}
+
+// Addition
+TEST_CASE("RefAdditionEndtoEndFloat32")
+{
+    AdditionEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefAdditionEndtoEndUint8")
+{
+    AdditionEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
 }
 
 // Constant

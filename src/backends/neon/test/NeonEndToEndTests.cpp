@@ -6,6 +6,7 @@
 #include <backendsCommon/test/EndToEndTestImpl.hpp>
 
 #include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
+#include <backendsCommon/test/AdditionEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
@@ -127,6 +128,16 @@ TEST_CASE("NeonGreaterBroadcastEndToEndUint8Test")
     ComparisonBroadcastEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends,
                                                                   ComparisonOperation::Greater,
                                                                   expectedOutput);
+}
+
+TEST_CASE("NeonAdditionEndToEndFloat32Test")
+{
+    AdditionEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonAdditionEndToEndUint8Test")
+{
+    AdditionEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
 TEST_CASE("NeonBatchMatMulEndToEndFloat32Test")

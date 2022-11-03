@@ -4,6 +4,7 @@
 #
 
 list(APPEND armnnTosaRefBackendUnitTests_sources
+        TosaRefEndToEndTests.cpp
         TosaRefLayerTests.cpp
         TosaRefLayerSupportTests.cpp
         TosaRefOptimizedNetworkTests.cpp

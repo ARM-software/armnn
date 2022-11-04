@@ -37,13 +37,13 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - ADD
 
-- ARGMAX
+- ARG_MAX
 
-- ARGMIN
+- ARG_MIN
 
-- AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- AVERAGE_POOL_2D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
-- AVERAGE_POOL_3D
+- AVERAGE_POOL_3D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, SIGN_BIT, TANH, NONE
 
 - BATCH_MATMUL
 
@@ -51,15 +51,15 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - CAST
 
-- CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- CONCATENATION, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
-- CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- CONV_2D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
-- CONV_3D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- CONV_3D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
 - DEPTH_TO_SPACE
 
-- DEPTHWISE_CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- DEPTHWISE_CONV_2D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
 - DEQUANTIZE
 
@@ -71,9 +71,15 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - EXP
 
-- FULLY_CONNECTED, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- EXPAND_DIMS
+
+- FILL
 
 - FLOOR
+
+- FLOOR_DIV
+
+- FULLY_CONNECTED, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
 - GATHER
 
@@ -81,13 +87,17 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - GREATER
 
-- GREATER_OR_EQUAL
+- GREATER_EQUAL
 
 - HARD_SWISH
 
+- L2_NORMALIZATION
+
+- L2_POOL_2D
+
 - LESS
 
-- LESS_OR_EQUAL
+- LESS_EQUAL
 
 - LOCAL_RESPONSE_NORMALIZATION
 
@@ -105,15 +115,11 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - LSTM
 
-- L2_NORMALIZATION
-
-- L2_POOL_2D
-
 - MAXIMUM
 
-- MAX_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
+- MAX_POOL_2D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
-- MAX_POOL_3D
+- MAX_POOL_3D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, SIGN_BIT, TANH, NONE
 
 - MEAN
 
@@ -131,6 +137,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - PAD
 
+- PADV2
+
 - PRELU
 
 - QUANTIZE
@@ -141,15 +149,19 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - REDUCE_MIN
 
+- REDUCE_PROD
+
+- RELU
+
+- RELU6
+
+- RELU_N1_TO_1
+
 - RESHAPE
 
 - RESIZE_BILINEAR
 
 - RESIZE_NEAREST_NEIGHBOR
-
-- RELU
-
-- RELU6
 
 - RSQRT
 
@@ -168,6 +180,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - SPLIT_V
 
 - SQRT
+
+- SQUEEZE
 
 - STRIDED_SLICE
 

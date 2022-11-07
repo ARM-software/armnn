@@ -207,12 +207,8 @@ list(APPEND armnn_sources
     src/armnn/layers/Convolution2dLayer.cpp
     src/armnn/layers/Convolution3dLayer.hpp
     src/armnn/layers/Convolution3dLayer.cpp
-    src/armnn/layers/ConvertBf16ToFp32Layer.cpp
-    src/armnn/layers/ConvertBf16ToFp32Layer.hpp
     src/armnn/layers/ConvertFp16ToFp32Layer.hpp
     src/armnn/layers/ConvertFp16ToFp32Layer.cpp
-    src/armnn/layers/ConvertFp32ToBf16Layer.hpp
-    src/armnn/layers/ConvertFp32ToBf16Layer.cpp
     src/armnn/layers/ConvertFp32ToFp16Layer.hpp
     src/armnn/layers/ConvertFp32ToFp16Layer.cpp
     src/armnn/layers/DebugLayer.hpp
@@ -401,7 +397,6 @@ list(APPEND armnn_sources
     src/armnn/optimizations/AddDebug.hpp
     src/armnn/optimizations/All.hpp
     src/armnn/optimizations/ConvertConstants.hpp
-    src/armnn/optimizations/ConvertFp32NetworkToBf16.hpp
     src/armnn/optimizations/ConvertFp32NetworkToFp16.hpp
     src/armnn/optimizations/FoldPadIntoLayer2d.hpp
     src/armnn/optimizations/MovePermuteUp.hpp
@@ -581,16 +576,13 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/AddBroadcastReshapeLayerTests.cpp
         src/armnn/test/optimizations/ConvertConstDequantisationLayersToConstLayersTest.cpp
         src/armnn/test/optimizations/ConvertConstPermuteLayersToConstLayersTest.cpp
-        src/armnn/test/optimizations/ConvertConstantsBFloatTests.cpp
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp
         src/armnn/test/optimizations/FoldPadIntoQuantizedAveragePooling2DTests.cpp
         src/armnn/test/optimizations/FoldPadTests.cpp
-        src/armnn/test/optimizations/Fp32NetworkToBf16ConverterTests.cpp
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp
         src/armnn/test/optimizations/FuseActivationTests.cpp
         src/armnn/test/optimizations/FuseBatchNormTests.cpp
-        src/armnn/test/optimizations/FuseConvertF32BF16IntoConstLayerTests.cpp
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp
         src/armnn/test/optimizations/MovePermuteUpTests.cpp
         src/armnn/test/optimizations/MoveTransposeUpTests.cpp

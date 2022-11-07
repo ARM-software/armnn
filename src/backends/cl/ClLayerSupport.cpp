@@ -247,14 +247,6 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
             return IsConvertFp16ToFp32Supported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::ConvertFp32ToFp16:
             return IsConvertFp32ToFp16Supported(infos[0], infos[1], reasonIfUnsupported);
-        case LayerType::ConvertBf16ToFp32:
-            return LayerSupportBase::IsConvertBf16ToFp32Supported(infos[0],
-                                                                  infos[1],
-                                                                  reasonIfUnsupported);
-        case LayerType::ConvertFp32ToBf16:
-            return LayerSupportBase::IsConvertFp32ToBf16Supported(infos[0],
-                                                                  infos[1],
-                                                                  reasonIfUnsupported);
         case LayerType::Convolution2d:
         {
             if (infos.size() != 4)

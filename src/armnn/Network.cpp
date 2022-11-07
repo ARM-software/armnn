@@ -604,30 +604,6 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
     return noErrors;
 }
 
-template <typename LayerT>
-LayerT* ConvertBf16ToFp32Weight(Layer* l)
-{
-    LayerT* layer = PolymorphicDowncast<LayerT*>(l);
-    if ((layer->GetType() == LayerType::Convolution2d || layer->GetType() == LayerType::FullyConnected)
-         && layer->m_Weight)
-    {
-        const TensorInfo& info = layer->m_Weight->GetTensorInfo();
-
-        if (info.GetDataType() == DataType::BFloat16)
-        {
-            std::vector<float> newValues(info.GetNumElements());
-
-            armnnUtils::FloatingPointConverter::ConvertBFloat16ToFloat32(
-                layer->m_Weight->template GetConstTensor<armnn::BFloat16>(), info.GetNumElements(), newValues.data());
-
-            TensorInfo newInfo(info.GetShape(), DataType::Float32);
-            ConstTensor newInput(newInfo, newValues);
-            layer->m_Weight.reset(new ScopedTensorHandle(newInput));
-        }
-    }
-    return layer;
-}
-
 OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
                                             Graph& graph,
                                             Layer* layer,
@@ -762,98 +738,6 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
                 }
 
                 for (ConvertFp32ToFp16Layer* convertLayer : convertFp32ToFp16Layers)
-                {
-                    if (!AssignFirstSupportedBackend(convertLayer, backend))
-                    {
-                        return ReturnError(convertLayer);
-                    }
-                }
-
-                return result;
-            }
-        }
-        else if (dataTypeIn == DataType::BFloat16 || dataTypeOut == DataType::BFloat16)
-        {
-            const auto layerType = layer->GetType();
-            if (IWorkloadFactory::IsLayerSupported(*layer, DataType::Float32, reasonIfUnsupported)
-                && layerType != LayerType::ConvertFp32ToBf16
-                && layerType != LayerType::ConvertBf16ToFp32)
-            {
-                bool revertConstantWeightsConversion = RevertConstantWeightsToFP32(layer);
-
-                // Insert BF16 -> FP32 conversion layer before current layer.
-                // Unless we have reverted Constant Weights Type above.
-                std::vector<ConvertBf16ToFp32Layer*> convertBf16ToFp32Layers;
-                if (dataTypeIn == DataType::BFloat16 && dataTypeOut != DataType::BFloat16
-                    && !revertConstantWeightsConversion)
-                {
-                    convertBf16ToFp32Layers =
-                        InsertConvertBf16ToFp32LayersBefore(graph, *layer);
-                    if (layer->GetType() == LayerType::Convolution2d)
-                    {
-                        ConvertBf16ToFp32Weight<Convolution2dLayer>(layer);
-                    }
-                    else if (layer->GetType() == LayerType::FullyConnected)
-                    {
-                        ConvertBf16ToFp32Weight<FullyConnectedLayer>(layer);
-                    }
-                }
-
-                // Insert FP32 -> BF16 conversion layer after current layer
-                std::vector<ConvertFp32ToBf16Layer*> convertFp32ToBf16Layers;
-                if (dataTypeOut == DataType::BFloat16)
-                {
-                    convertFp32ToBf16Layers =
-                        InsertConvertFp32ToBf16LayersAfter(graph, *layer);
-                }
-
-                // Assign a supported backend to the newly introduced conversion layers
-                auto AssignFirstSupportedBackend = [&](Layer* layer, BackendId preferredBackend)
-                    {
-                        bool supportedBackendFound = false;
-                        std::string reasonIfUnsupported;
-
-                        // Try preferred backend first
-                        layer->SetBackendId(preferredBackend);
-                        if (IWorkloadFactory::IsLayerSupported(*layer,
-                                                               EmptyOptional(),
-                                                               reasonIfUnsupported))
-                        {
-                            supportedBackendFound = true;
-                        }
-                        else
-                        {
-                            for (const auto& backend : availablePreferredBackends)
-                            {
-                                // Skip preferred backend (we already determined that it is not supported)
-                                if (backend == preferredBackend)
-                                {
-                                    continue;
-                                }
-
-                                layer->SetBackendId(backend);
-                                if (IWorkloadFactory::IsLayerSupported(*layer,
-                                                                       EmptyOptional(),
-                                                                       reasonIfUnsupported))
-                                {
-                                    supportedBackendFound = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        return supportedBackendFound;
-                    };
-
-                for (ConvertBf16ToFp32Layer* convertLayer : convertBf16ToFp32Layers)
-                {
-                    if (!AssignFirstSupportedBackend(convertLayer, backend))
-                    {
-                        return ReturnError(convertLayer);
-                    }
-                }
-
-                for (ConvertFp32ToBf16Layer* convertLayer : convertFp32ToBf16Layers)
                 {
                     if (!AssignFirstSupportedBackend(convertLayer, backend))
                     {
@@ -1669,6 +1553,12 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         throw InvalidArgumentException("Invoked Optimize with no backends specified");
     }
 
+    if (options.m_ReduceFp32ToBf16)
+    {
+        throw InvalidArgumentException("BFloat16 optimization is currently ignored. In order to use Bf16 optimization "
+                                       "Please use the FastMathEnabled backend option for CpuAcc or GpuAcc.");
+    }
+
     if (options.m_ReduceFp32ToFp16 && options.m_ReduceFp32ToBf16)
     {
         throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
@@ -1743,17 +1633,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToFp16");
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
         Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
-    }
-
-    // If Fp32 to Bf16 optimization is set convert Fp32 network to Bf16
-    // Convert input of Convolution2d and FullyConnected from Fp32 to Bf16
-    // Only Constant weight of Convolution2d and FullyConnected are converted from Fp32 to Bf16
-    // Constant and Fp32ToBf16 layers will also be fused so conversion is no longer needed at inference time
-    if (options.m_ReduceFp32ToBf16)
-    {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToBf16");
-        Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToBf16Converter()));
-        Optimizer::Pass(optGraph, MakeOptimizations(FuseConversionLayersIntoConstLayers()));
     }
 
     // Initialize backend settings

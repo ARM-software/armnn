@@ -655,48 +655,6 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>All
     </table>
 <tr>
-  <td rowspan="3">ConvertBf16ToFp32Layer
-  <td rowspan="3" style="width:200px;"> Layer to convert BFloat16 tensor to Float32 tensor.
-  <td rowspan="3">
-      <ul>
-       <li>N/A
-      </ul>
-   <td>CpuRef
-     <td>
-         <ul>
-          <li>All
-         </ul>
-     <td>
-      <table>
-         <tr><th>
-         <tr><td>BFLOAT16
-         <tr><td>FLOAT32
-      </table>
-<tr>
-  <td>CpuAcc
-  <td>
-      <ul>
-       <li>All
-      </ul>
-  <td>
-    <table>
-         <tr><th>
-         <tr><td>BFLOAT16
-         <tr><td>FLOAT32
-    </table>
-<tr>
-  <td>GpuAcc
-  <td>
-      <ul>
-       <li>All
-      </ul>
-  <td>
-    <table>
-         <tr><th>
-         <tr><td>BFLOAT16
-         <tr><td>FLOAT32
-    </table>
-<tr>
   <td rowspan="3">ConvertFp16ToFp32Layer
   <td rowspan="3" style="width:200px;"> Layer to convert Float16 tensor to Float32 tensor.
   <td rowspan="3">
@@ -736,48 +694,6 @@ where N = batches, C = channels, H = height, W = width
     <table>
          <tr><th>
          <tr><td>FLOAT16
-         <tr><td>FLOAT32
-    </table>
-<tr>
-  <td rowspan="3">ConvertFp32ToBf16Layer
-  <td rowspan="3" style="width:200px;"> Layer to convert Float32 tensor to BFloat16 tensor.
-  <td rowspan="3">
-      <ul>
-       <li>N/A
-      </ul>
-   <td>CpuRef
-     <td>
-         <ul>
-          <li>All
-         </ul>
-     <td>
-      <table>
-         <tr><th>
-         <tr><td>BFLOAT16
-         <tr><td>FLOAT32
-      </table>
-<tr>
-  <td>CpuAcc
-  <td>
-      <ul>
-       <li>All
-      </ul>
-  <td>
-    <table>
-         <tr><th>
-         <tr><td>BFLOAT16
-         <tr><td>FLOAT32
-    </table>
-<tr>
-  <td>GpuAcc
-  <td>
-      <ul>
-       <li>All
-      </ul>
-  <td>
-    <table>
-         <tr><th>
-         <tr><td>BFLOAT16
          <tr><td>FLOAT32
     </table>
 <tr>

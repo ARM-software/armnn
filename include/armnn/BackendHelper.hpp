@@ -86,14 +86,6 @@ public:
     bool IsConstantSupported(const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-    bool IsConvertBf16ToFp32Supported(const TensorInfo& input,
-                                      const TensorInfo& output,
-                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional());
-
-    bool IsConvertFp32ToBf16Supported(const TensorInfo& input,
-                                      const TensorInfo& output,
-                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional());
-
     bool IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional());

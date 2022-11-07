@@ -113,7 +113,7 @@ public:
      *
      *    Option key: "reduce-fp32-to-bf16" \n
      *    Possible values: ["true"/"false"] \n
-     *    Description: Reduce Fp32 data to Bf16 for faster processing
+     *    Description: This option is currently ignored. Please enable Fast Math in the CpuAcc or GpuAcc backends.
      *
      *    Option key: "debug-data" \n
      *    Possible values: ["true"/"false"] \n

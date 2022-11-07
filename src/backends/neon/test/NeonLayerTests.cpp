@@ -743,12 +743,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatUint8, ConcatUint8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ConcatUint8DifferentInputOutputQParam,
                      ConcatDifferentInputOutputQParamTest<DataType::QAsymmU8>, false)
 
-// Convert from BFloat16 to Float32
-ARMNN_AUTO_TEST_CASE_WITH_THF(ConvertBf16ToFp32, ConvertBf16ToFp32Test)
-
-// Convert from Float32 to BFloat16
-ARMNN_AUTO_TEST_CASE_WITH_THF(ConvertFp32ToBf16, ConvertFp32ToBf16Test)
-
 // Fully Connected
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFullyConnectedWithBias, FullyConnectedFloat32Test, true, false)
@@ -798,7 +792,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize1QAsymmU8, RankDimSize1Test<DataType::Q
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize1Signed32, RankDimSize1Test<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize1QSymmS16, RankDimSize1Test<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize1QAsymmS8, RankDimSize1Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize1BFloat16, RankDimSize1Test<DataType::BFloat16>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize2Float16,  RankDimSize2Test<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize2Float32,  RankDimSize2Test<DataType::Float32>)
@@ -806,7 +799,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize2QAsymmU8, RankDimSize2Test<DataType::Q
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize2Signed32, RankDimSize2Test<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize2QSymmS16, RankDimSize2Test<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize2QAsymmS8, RankDimSize2Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize2BFloat16, RankDimSize2Test<DataType::BFloat16>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize3Float16,  RankDimSize3Test<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize3Float32,  RankDimSize3Test<DataType::Float32>)
@@ -814,7 +806,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize3QAsymmU8, RankDimSize3Test<DataType::Q
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize3Signed32, RankDimSize3Test<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize3QSymmS16, RankDimSize3Test<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize3QAsymmS8, RankDimSize3Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize3BFloat16, RankDimSize3Test<DataType::BFloat16>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize4Float16,  RankDimSize4Test<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize4Float32,  RankDimSize4Test<DataType::Float32>)
@@ -822,7 +813,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize4QAsymmU8, RankDimSize4Test<DataType::Q
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize4Signed32, RankDimSize4Test<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize4QSymmS16, RankDimSize4Test<DataType::QSymmS16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize4QAsymmS8, RankDimSize4Test<DataType::QAsymmS8>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(RankDimSize4BFloat16, RankDimSize4Test<DataType::BFloat16>)
 
 // InstanceNormalization
 ARMNN_AUTO_TEST_CASE_WITH_THF(InstanceNormFloat32Nchw, InstanceNormFloat32Test, DataLayout::NCHW);

@@ -83,16 +83,8 @@ public:
     bool IsConstantSupported(const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsConvertBf16ToFp32Supported(const TensorInfo& input,
-                                      const TensorInfo& output,
-                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use IsLayerSupported instead.", "23.08")
     bool IsConvertFp16ToFp32Supported(const TensorInfo& input,
-                                      const TensorInfo& output,
-                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
-
-    bool IsConvertFp32ToBf16Supported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 

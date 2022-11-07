@@ -146,11 +146,6 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         {
             optimizerOptions.m_ReduceFp32ToFp16 = armnn::stringUtils::StringToBool(options_values[i]);
         }
-            // Process reduce-fp32-to-bf16 option
-        else if (std::string(options_keys[i]) == std::string("reduce-fp32-to-bf16"))
-        {
-            optimizerOptions.m_ReduceFp32ToBf16 = armnn::stringUtils::StringToBool(options_values[i]);
-        }
             // Process debug-data
         else if (std::string(options_keys[i]) == std::string("debug-data"))
         {

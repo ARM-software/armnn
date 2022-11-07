@@ -452,7 +452,6 @@ public:
 
             armnn::OptimizerOptions options;
             options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
-            options.m_ReduceFp32ToBf16 = params.m_EnableBf16TurboMode;
             options.m_Debug = params.m_PrintIntermediateLayers;
             options.m_DebugToFile = params.m_PrintIntermediateLayersToFile;
             options.m_shapeInferenceMethod = params.m_InferOutputShape ?

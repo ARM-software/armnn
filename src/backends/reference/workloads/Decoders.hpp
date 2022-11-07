@@ -88,10 +88,6 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
                 info.GetQuantizationScale(),
                 info.GetQuantizationOffset());
         }
-        case DataType::BFloat16:
-        {
-            return std::make_unique<BFloat16Decoder>(static_cast<const BFloat16*>(data));
-        }
         case DataType::Float16:
         {
             return std::make_unique<Float16Decoder>(static_cast<const Half*>(data));

@@ -60,10 +60,9 @@ void ExecuteNetworkParams::ValidateParams()
     }
     CheckClTuningParameter(m_TuningLevel, m_TuningPath, m_ComputeDevices);
 
-    if (m_EnableBf16TurboMode && m_EnableFp16TurboMode)
+    if (m_EnableBf16TurboMode && !m_EnableFastMath)
     {
-        throw armnn::InvalidArgumentException("BFloat16 and Float16 turbo mode cannot be "
-                                              "enabled at the same time.");
+        throw armnn::InvalidArgumentException("To use BF16 please use --enable-fast-math. ");
     }
 
     // Check input tensor shapes
@@ -124,7 +123,6 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
 
     armnn::OptimizerOptions options;
     options.m_ReduceFp32ToFp16 = m_EnableFp16TurboMode;
-    options.m_ReduceFp32ToBf16 = m_EnableBf16TurboMode;
     options.m_Debug = m_PrintIntermediate;
     options.m_DebugToFile = m_PrintIntermediateOutputsToFile;
     options.m_ProfilingEnabled = m_EnableProfiling;

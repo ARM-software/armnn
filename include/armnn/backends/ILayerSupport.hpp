@@ -109,18 +109,6 @@ public:
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. "
                                       "Use ABI Stable IsLayerSupported accepting LayerType argument instead.", "23.08")
-    virtual bool IsConvertBf16ToFp32Supported(const TensorInfo& input,
-                                              const TensorInfo& output,
-                                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. "
-                                      "Use ABI Stable IsLayerSupported accepting LayerType argument instead.", "23.08")
-    virtual bool IsConvertFp32ToBf16Supported(const TensorInfo& input,
-                                              const TensorInfo& output,
-                                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. "
-                                      "Use ABI Stable IsLayerSupported accepting LayerType argument instead.", "23.08")
     virtual bool IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                               const TensorInfo& output,
                                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;

@@ -227,25 +227,11 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             result = layerSupportObject.IsConstantSupported(OverrideDataType(output, dataType), reason);
             break;
         }
-        case LayerType::ConvertBf16ToFp32:
-        {
-            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject.IsConvertBf16ToFp32Supported(input, output, reason);
-            break;
-        }
         case LayerType::ConvertFp16ToFp32:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject.IsConvertFp16ToFp32Supported(input, output, reason);
-            break;
-        }
-        case LayerType::ConvertFp32ToBf16:
-        {
-            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
-            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
-            result = layerSupportObject.IsConvertFp32ToBf16Supported(input, output, reason);
             break;
         }
         case LayerType::ConvertFp32ToFp16:
@@ -1630,23 +1616,11 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateWorkload(LayerType type,
             auto constantQueueDescriptor = PolymorphicDowncast<const ConstantQueueDescriptor*>(&descriptor);
             return CreateConstant(*constantQueueDescriptor, info);
         }
-        case LayerType::ConvertBf16ToFp32 :
-        {
-            auto convertBf16ToFp32QueueDescriptor
-                    = PolymorphicDowncast<const ConvertBf16ToFp32QueueDescriptor*>(&descriptor);
-            return CreateConvertBf16ToFp32(*convertBf16ToFp32QueueDescriptor, info);
-        }
         case LayerType::ConvertFp16ToFp32:
         {
             auto convertFp16ToFp32QueueDescriptor
                     = PolymorphicDowncast<const ConvertFp16ToFp32QueueDescriptor*>(&descriptor);
             return CreateConvertFp16ToFp32(*convertFp16ToFp32QueueDescriptor, info);
-        }
-        case LayerType::ConvertFp32ToBf16:
-        {
-            auto convertFp32ToBf16QueueDescriptor
-                    = PolymorphicDowncast<const ConvertFp32ToBf16QueueDescriptor*>(&descriptor);
-            return CreateConvertFp32ToBf16(*convertFp32ToBf16QueueDescriptor, info);
         }
         case LayerType::ConvertFp32ToFp16:
         {
@@ -1992,19 +1966,7 @@ std::unique_ptr<IWorkload> IWorkloadFactory::CreateConstant(const ConstantQueueD
     return std::unique_ptr<IWorkload>();
 }
 
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertBf16ToFp32(const ConvertBf16ToFp32QueueDescriptor& /*desc*/,
-                                                                     const WorkloadInfo& /*info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
 std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& /*desc*/,
-                                                                     const WorkloadInfo& /*info*/) const
-{
-    return std::unique_ptr<IWorkload>();
-}
-
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateConvertFp32ToBf16(const ConvertFp32ToBf16QueueDescriptor& /*desc*/,
                                                                      const WorkloadInfo& /*info*/) const
 {
     return std::unique_ptr<IWorkload>();

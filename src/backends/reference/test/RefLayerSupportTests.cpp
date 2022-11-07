@@ -49,12 +49,6 @@ TEST_CASE("IsLayerSupportedReferenceAddition")
     CHECK(supportChecker.IsAdditionSupported(in0, in1, out, reasonNotSupported));
 }
 
-TEST_CASE("IsLayerSupportedBFloat16Reference")
-{
-    armnn::RefWorkloadFactory factory;
-    IsLayerSupportedTests<armnn::RefWorkloadFactory, armnn::DataType::BFloat16>(&factory);
-}
-
 TEST_CASE("IsLayerSupportedFloat16Reference")
 {
     armnn::RefWorkloadFactory factory;
@@ -115,70 +109,6 @@ TEST_CASE("IsConvertFp16ToFp32SupportedFp16OutputReference")
 
     CHECK(!result);
     CHECK_EQ(reasonIfUnsupported, "Layer is not supported with float16 data type output");
-}
-
-TEST_CASE("IsConvertBf16ToFp32SupportedReference")
-{
-    std::string reasonIfUnsupported;
-
-    bool result = IsConvertLayerSupportedTests<armnn::RefWorkloadFactory, armnn::ConvertBf16ToFp32Layer,
-      armnn::DataType::BFloat16, armnn::DataType::Float32>(reasonIfUnsupported);
-
-    CHECK(result);
-}
-
-TEST_CASE("IsConvertBf16ToFp32SupportedFp32InputReference")
-{
-    std::string reasonIfUnsupported;
-
-    bool result = IsConvertLayerSupportedTests<armnn::RefWorkloadFactory, armnn::ConvertBf16ToFp32Layer,
-      armnn::DataType::Float32, armnn::DataType::Float32>(reasonIfUnsupported);
-
-    CHECK(!result);
-    CHECK_EQ(reasonIfUnsupported, "Reference for ConvertBf16ToFp32 layer: input type not supported\n");
-}
-
-TEST_CASE("IsConvertBf16ToFp32SupportedBf16OutputReference")
-{
-    std::string reasonIfUnsupported;
-
-    bool result = IsConvertLayerSupportedTests<armnn::RefWorkloadFactory, armnn::ConvertBf16ToFp32Layer,
-      armnn::DataType::BFloat16, armnn::DataType::BFloat16>(reasonIfUnsupported);
-
-    CHECK(!result);
-    CHECK_EQ(reasonIfUnsupported, "Reference for ConvertBf16ToFp32 layer: output type not supported\n");
-}
-
-TEST_CASE("IsConvertFp32ToBf16SupportedReference")
-{
-    std::string reasonIfUnsupported;
-
-    bool result = IsConvertLayerSupportedTests<armnn::RefWorkloadFactory, armnn::ConvertFp32ToBf16Layer,
-      armnn::DataType::Float32, armnn::DataType::BFloat16>(reasonIfUnsupported);
-
-    CHECK(result);
-}
-
-TEST_CASE("IsConvertFp32ToBf16SupportedBf16InputReference")
-{
-    std::string reasonIfUnsupported;
-
-    bool result = IsConvertLayerSupportedTests<armnn::RefWorkloadFactory, armnn::ConvertFp32ToBf16Layer,
-      armnn::DataType::BFloat16, armnn::DataType::BFloat16>(reasonIfUnsupported);
-
-    CHECK(!result);
-    CHECK_EQ(reasonIfUnsupported, "Reference for ConvertFp32ToBf16 layer: input type not supported\n");
-}
-
-TEST_CASE("IsConvertFp32ToBf16SupportedFp32OutputReference")
-{
-    std::string reasonIfUnsupported;
-
-    bool result = IsConvertLayerSupportedTests<armnn::RefWorkloadFactory, armnn::ConvertFp32ToBf16Layer,
-      armnn::DataType::Float32, armnn::DataType::Float32>(reasonIfUnsupported);
-
-    CHECK(!result);
-    CHECK_EQ(reasonIfUnsupported, "Reference for ConvertFp32ToBf16 layer: output type not supported\n");
 }
 
 TEST_CASE("IsConvertFp32ToFp16SupportedReference")
@@ -271,7 +201,9 @@ TEST_CASE("IsConstantSupportedRef")
 
     result = IsConstantLayerSupportedTests<armnn::RefWorkloadFactory,
             armnn::DataType::BFloat16>(reasonIfUnsupported);
-    CHECK(result);
+    CHECK(!result);
+    CHECK(reasonIfUnsupported.find("Reference constant: output is not a supported type.") != std::string::npos);
+
 }
 
 }

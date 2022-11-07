@@ -123,54 +123,6 @@ TEST_CASE("BFloatType")
     CHECK((GetDataTypeName(armnn::DataType::BFloat16) == std::string("BFloat16")));
 }
 
-TEST_CASE("Float32ToBFloat16Test")
-{
-    // LSB = 0, R = 0 -> round down
-    armnn::BFloat16 roundDown0 = armnn::BFloat16::Float32ToBFloat16(1.704735E38f); // 0x7F004000
-    CHECK_EQ(roundDown0.Val(), 0x7F00);
-    // LSB = 1, R = 0 -> round down
-    armnn::BFloat16 roundDown1 = armnn::BFloat16::Float32ToBFloat16(9.18355E-41f); // 0x00010000
-    CHECK_EQ(roundDown1.Val(), 0x0001);
-    // LSB = 0, R = 1 all 0 -> round down
-    armnn::BFloat16 roundDown2 = armnn::BFloat16::Float32ToBFloat16(1.14794E-40f); // 0x00014000
-    CHECK_EQ(roundDown2.Val(), 0x0001);
-    // LSB = 1, R = 1 -> round up
-    armnn::BFloat16 roundUp = armnn::BFloat16::Float32ToBFloat16(-2.0234377f); // 0xC0018001
-    CHECK_EQ(roundUp.Val(), 0xC002);
-    // LSB = 0, R = 1 -> round up
-    armnn::BFloat16 roundUp1 = armnn::BFloat16::Float32ToBFloat16(4.843037E-35f); // 0x0680C000
-    CHECK_EQ(roundUp1.Val(), 0x0681);
-    // Max positive value -> infinity
-    armnn::BFloat16 maxPositive = armnn::BFloat16::Float32ToBFloat16(std::numeric_limits<float>::max()); // 0x7F7FFFFF
-    CHECK_EQ(maxPositive, armnn::BFloat16::Inf());
-    // Max negative value -> -infinity
-    armnn::BFloat16 maxNeg = armnn::BFloat16::Float32ToBFloat16(std::numeric_limits<float>::lowest()); // 0xFF7FFFFF
-    CHECK_EQ(maxNeg.Val(), 0xFF80);
-    // Min positive value
-    armnn::BFloat16 minPositive = armnn::BFloat16::Float32ToBFloat16(1.1754942E-38f); // 0x007FFFFF
-    CHECK_EQ(minPositive.Val(), 0x0080);
-    // Min negative value
-    armnn::BFloat16 minNeg = armnn::BFloat16::Float32ToBFloat16(-1.1754942E-38f); // 0x807FFFFF
-    CHECK_EQ(minNeg.Val(), 0x8080);
-}
-
-TEST_CASE("BFloat16ToFloat32Test")
-{
-    armnn::BFloat16 bf0(1.5f);
-    CHECK_EQ(bf0.ToFloat32(), 1.5f);
-    armnn::BFloat16 bf1(-5.525308E-25f);
-    CHECK_EQ(bf1.ToFloat32(), -5.525308E-25f);
-    armnn::BFloat16 bf2(-2.0625f);
-    CHECK_EQ(bf2.ToFloat32(), -2.0625f);
-    uint16_t v = 32639;
-    armnn::BFloat16 bf3(v);
-    CHECK_EQ(bf3.ToFloat32(), 3.3895314E38f);
-    // Infinity
-    CHECK_EQ(armnn::BFloat16::Inf().ToFloat32(), std::numeric_limits<float>::infinity());
-    // NaN
-    CHECK(std::isnan(armnn::BFloat16::Nan().ToFloat32()));
-}
-
 TEST_CASE("GraphTopologicalSortSimpleTest")
 {
     std::map<int, std::vector<int>> graph;

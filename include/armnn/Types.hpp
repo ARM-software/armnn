@@ -394,9 +394,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Comparison) \
     X(Concat) \
     X(Constant) \
-    X(ConvertBf16ToFp32) \
     X(ConvertFp16ToFp32) \
-    X(ConvertFp32ToBf16) \
     X(ConvertFp32ToFp16) \
     X(Convolution2d) \
     X(Debug) \

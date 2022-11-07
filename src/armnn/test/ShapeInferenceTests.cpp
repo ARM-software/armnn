@@ -250,17 +250,6 @@ TEST_CASE("ConstantTest")
     CHECK(layer->GetOutputSlot(0).GetTensorInfo().GetShape() == outputShape);
 }
 
-TEST_CASE("ConvertBf16ToFp32Test")
-{
-    CreateGraphAndRunTest<ConvertBf16ToFp32Layer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");
-}
-
-TEST_CASE("ConvertFp16ToBf16Test")
-{
-    const TensorShape tensorShape{5, 7, 6, 2};
-    CreateGraphAndRunTest<ConvertFp32ToBf16Layer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");
-}
-
 TEST_CASE("ConvertFp16ToFp32Test")
 {
     CreateGraphAndRunTest<ConvertFp16ToFp32Layer>({{ 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "floor");

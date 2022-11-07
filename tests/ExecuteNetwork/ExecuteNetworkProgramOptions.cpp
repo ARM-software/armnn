@@ -375,14 +375,14 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
         m_CxxOptions.add_options("c) Optimization")
                 ("bf16-turbo-mode",
-                 "If this option is enabled, FP32 layers, "
-                 "weights and biases will be converted to BFloat16 where the backend supports it",
+                 "This option is no longer being used. In order to use bf16 please set enable-fast-math "
+                 "to true",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableBf16TurboMode)
                          ->default_value("false")->implicit_value("true"))
 
                 ("enable-fast-math",
                  "Enables fast_math options in backends that support it. Using the fast_math flag can lead to "
-                 "performance improvements but may result in reduced or different precision.",
+                 "performance improvements but may result in reduced or different precision. ",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableFastMath)->default_value("false")->implicit_value("true"))
 
                 ("number-of-threads",

@@ -34,8 +34,6 @@ BACKEND_SOURCES := \
         workloads/NeonComparisonWorkload.cpp \
         workloads/NeonConcatWorkload.cpp \
         workloads/NeonConstantWorkload.cpp \
-        workloads/NeonConvertBf16ToFp32Workload.cpp \
-        workloads/NeonConvertFp32ToBf16Workload.cpp \
         workloads/NeonConvertFp16ToFp32Workload.cpp \
         workloads/NeonConvertFp32ToFp16Workload.cpp \
         workloads/NeonConvolution2dWorkload.cpp \

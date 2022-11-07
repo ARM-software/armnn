@@ -152,10 +152,6 @@ struct OptimizerOptions
         , m_ExportEnabled(exportEnabled)
         , m_AllowExpandedDims(false)
     {
-        if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
-        {
-            throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
-        }
     }
 
     OptimizerOptions(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16 = false,
@@ -173,10 +169,6 @@ struct OptimizerOptions
         , m_ExportEnabled(exportEnabled)
         , m_AllowExpandedDims(allowExpandedDims)
     {
-        if (m_ReduceFp32ToFp16 && m_ReduceFp32ToBf16)
-        {
-            throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
-        }
     }
 
     const std::string ToString() const
@@ -216,35 +208,32 @@ struct OptimizerOptions
     ///       required.
     bool m_ReduceFp32ToFp16;
 
-    // Add debug data for easier troubleshooting
+    /// Add debug data for easier troubleshooting
     bool m_Debug;
 
-    // Pass debug data to separate output files for easier troubleshooting
+    /// Pass debug data to separate output files for easier troubleshooting
     bool m_DebugToFile;
 
-    /// Reduces all Fp32 operators in the model to Bf16 for faster processing.
-    /// @Note This feature works best if all operators of the model are in Fp32. ArmNN will add conversion layers
-    ///       between layers that weren't in Fp32 in the first place or if the operator is not supported in Bf16.
-    ///       The overhead of these conversions can lead to a slower overall performance if too many conversions are
-    ///       required.
+    /// @Note This feature has been replaced by enabling Fast Math in compute library backend options.
+    /// This is currently a placeholder option
     bool m_ReduceFp32ToBf16;
 
-    // Infer output size when not available
+    /// Infer output size when not available
     ShapeInferenceMethod m_shapeInferenceMethod;
 
-    // Enable Import
+    /// Enable Import
     bool m_ImportEnabled;
 
-    // Enable Model Options
+    /// Enable Model Options
     ModelOptions m_ModelOptions;
 
-    // Enable profiling dump of the optimizer phase
+    /// Enable profiling dump of the optimizer phase
     bool m_ProfilingEnabled;
 
-    // Enable Export
+    /// Enable Export
     bool m_ExportEnabled;
 
-    // When calculating tensor sizes dimensions of size == 1 will be ignored
+    /// When calculating tensor sizes, dimensions of size == 1 will be ignored
     bool m_AllowExpandedDims;
 };
 
@@ -782,8 +771,8 @@ public:
 
     void ExecuteStrategy(IStrategy& strategy) const;
 
-    // Creates a copy of the IOptimizedNetwork. The IOptimizedNetwork will not be reoptimized,
-    // the provided ModelOptions will only be used when creating a LoadedNetwork.
+    /// Creates a copy of the IOptimizedNetwork. The IOptimizedNetwork will not be reoptimized,
+    /// the provided ModelOptions will only be used when creating a LoadedNetwork.
     IOptimizedNetwork(const IOptimizedNetwork& other, const ModelOptions& modelOptions);
     IOptimizedNetwork(std::unique_ptr<Graph> graph);
     IOptimizedNetwork(std::unique_ptr<OptimizedNetworkImpl> impl);

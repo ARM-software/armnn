@@ -25,8 +25,8 @@ Struct for holding options relating to the Arm NN optimizer. See `Optimize`.
 
 Contains:
     m_debug (bool): Add debug data for easier troubleshooting.
-    m_ReduceFp32ToBf16 (bool): Reduces Fp32 network to BFloat16 (Bf16) for faster processing. Layers
-                               that can not be reduced will be left in Fp32.
+    m_ReduceFp32ToBf16 (bool): This feature has been replaced by enabling Fast Math in compute library backend options.
+                               This is currently a placeholder option.
     m_ReduceFp32ToFp16 (bool): Reduces Fp32 network to Fp16 for faster processing. Layers
                                that can not be reduced will be left in Fp32.
     m_ImportEnabled (bool):    Enable memory import of inport tensors.

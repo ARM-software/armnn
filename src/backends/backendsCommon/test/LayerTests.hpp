@@ -16,9 +16,7 @@
 #include <backendsCommon/test/layerTests/ChannelShuffleTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ComparisonTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConcatTestImpl.hpp>
-#include <backendsCommon/test/layerTests/ConvertBf16ToFp32TestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConvertFp16ToFp32TestImpl.hpp>
-#include <backendsCommon/test/layerTests/ConvertFp32ToBf16TestImpl.hpp>
 #include <backendsCommon/test/layerTests/ConvertFp32ToFp16TestImpl.hpp>
 #include <backendsCommon/test/layerTests/Conv2dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/Conv3dTestImpl.hpp>

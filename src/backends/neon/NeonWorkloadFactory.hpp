@@ -108,17 +108,7 @@ public:
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ABI stable "
     "CreateWorkload(LayerType, const QueueDescriptor&, const WorkloadInfo& info) instead.", "23.08")
-    std::unique_ptr<IWorkload> CreateConvertBf16ToFp32(const ConvertBf16ToFp32QueueDescriptor& descriptor,
-                                                       const WorkloadInfo& info) const override;
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ABI stable "
-    "CreateWorkload(LayerType, const QueueDescriptor&, const WorkloadInfo& info) instead.", "23.08")
     std::unique_ptr<IWorkload> CreateConvertFp16ToFp32(const ConvertFp16ToFp32QueueDescriptor& descriptor,
-                                                       const WorkloadInfo& info) const override;
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ABI stable "
-    "CreateWorkload(LayerType, const QueueDescriptor&, const WorkloadInfo& info) instead.", "23.08")
-    std::unique_ptr<IWorkload> CreateConvertFp32ToBf16(const ConvertFp32ToBf16QueueDescriptor& descriptor,
                                                        const WorkloadInfo& info) const override;
 
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ABI stable "

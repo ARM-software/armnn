@@ -9,8 +9,6 @@
 #include "ConvertConstants.hpp"
 #include "ConvertConstDequantisationLayersToConstLayers.hpp"
 #include "ConvertConstPermuteLayersToConstLayers.hpp"
-#include "FuseConvertFp32ToBf16IntoConstLayers.hpp"
-#include "ConvertFp32NetworkToBf16.hpp"
 #include "ConvertFp32NetworkToFp16.hpp"
 #include "FoldPadIntoLayer2d.hpp"
 #include "FuseBatchNorm.hpp"

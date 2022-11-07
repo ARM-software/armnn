@@ -307,34 +307,6 @@ bool LayerSupportHandle::IsConstantSupported(const TensorInfo& output,
                                             reasonIfUnsupported);
 }
 
-bool LayerSupportHandle::IsConvertBf16ToFp32Supported(const TensorInfo& input,
-                                                      const TensorInfo& output,
-                                                      Optional<std::string&> reasonIfUnsupported)
-{
-    TensorInfos infos{input, output};
-
-    return m_LayerSupport->IsLayerSupported(LayerType::ConvertBf16ToFp32,
-                                            infos,
-                                            BaseDescriptor(),
-                                            EmptyOptional(),
-                                            EmptyOptional(),
-                                            reasonIfUnsupported);
-}
-
-bool LayerSupportHandle::IsConvertFp32ToBf16Supported(const TensorInfo& input,
-                                                      const TensorInfo& output,
-                                                      Optional<std::string&> reasonIfUnsupported)
-{
-    TensorInfos infos{input, output};
-
-    return m_LayerSupport->IsLayerSupported(LayerType::ConvertFp32ToBf16,
-                                            infos,
-                                            BaseDescriptor(),
-                                            EmptyOptional(),
-                                            EmptyOptional(),
-                                            reasonIfUnsupported);
-}
-
 bool LayerSupportHandle::IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                                       const TensorInfo& output,
                                                       Optional<std::string&> reasonIfUnsupported)

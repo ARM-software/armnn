@@ -58,9 +58,7 @@ BACKEND_SOURCES := \
         workloads/RefComparisonWorkload.cpp \
         workloads/RefConcatWorkload.cpp \
         workloads/RefConstantWorkload.cpp \
-        workloads/RefConvertBf16ToFp32Workload.cpp \
         workloads/RefConvertFp16ToFp32Workload.cpp \
-        workloads/RefConvertFp32ToBf16Workload.cpp \
         workloads/RefConvertFp32ToFp16Workload.cpp \
         workloads/RefConvolution2dWorkload.cpp \
         workloads/RefConvolution3dWorkload.cpp \

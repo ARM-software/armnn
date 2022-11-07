@@ -194,23 +194,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
             auto constantQueueDescriptor = PolymorphicDowncast<const ConstantQueueDescriptor*>(&descriptor);
             return std::make_unique<NeonConstantWorkload>(*constantQueueDescriptor, info);
         }
-        case LayerType::ConvertBf16ToFp32 :
-        {
-            auto convertBf16ToFp32QueueDescriptor
-                    = PolymorphicDowncast<const ConvertBf16ToFp32QueueDescriptor*>(&descriptor);
-            return std::make_unique<NeonConvertBf16ToFp32Workload>(*convertBf16ToFp32QueueDescriptor, info);
-        }
         case LayerType::ConvertFp16ToFp32 :
         {
             auto convertFp16ToFp32QueueDescriptor
                     = PolymorphicDowncast<const ConvertFp16ToFp32QueueDescriptor*>(&descriptor);
             return std::make_unique<NeonConvertFp16ToFp32Workload>(*convertFp16ToFp32QueueDescriptor, info);
-        }
-        case LayerType::ConvertFp32ToBf16 :
-        {
-            auto convertFp32ToBf16QueueDescriptor
-                    = PolymorphicDowncast<const ConvertFp32ToBf16QueueDescriptor*>(&descriptor);
-            return std::make_unique<NeonConvertFp32ToBf16Workload>(*convertFp32ToBf16QueueDescriptor, info);
         }
         case LayerType::ConvertFp32ToFp16 :
         {
@@ -655,25 +643,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConstant(const ConstantQue
     return std::make_unique<NeonConstantWorkload>(descriptor, info);
 }
 
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertBf16ToFp32(
-    const ConvertBf16ToFp32QueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<NeonConvertBf16ToFp32Workload>(descriptor, info);
-}
-
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp16ToFp32(
     const ConvertFp16ToFp32QueueDescriptor& descriptor,
     const WorkloadInfo& info) const
 {
     return std::make_unique<NeonConvertFp16ToFp32Workload>(descriptor, info);
-}
-
-std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToBf16(
-    const ConvertFp32ToBf16QueueDescriptor& descriptor,
-    const WorkloadInfo& info) const
-{
-    return std::make_unique<NeonConvertFp32ToBf16Workload>(descriptor, info);
 }
 
 std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateConvertFp32ToFp16(

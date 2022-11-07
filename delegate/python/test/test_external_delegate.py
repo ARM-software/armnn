@@ -218,39 +218,6 @@ def test_external_delegate_options_fp32_to_fp16(capfd, delegate_dir, test_data_f
     assert "convert_fp32_to_fp16" in captured.out
     assert "convert_fp16_to_fp32" in captured.out
 
-def test_external_delegate_options_fp32_to_bf16(capfd, delegate_dir, test_data_folder):
-    # create armnn delegate with reduce-fp32-to-bf16 option
-    armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "CpuRef",
-                                                                   "debug-data": "1",
-                                                                   "reduce-fp32-to-bf16": "1"})
-
-    model_file_name = "conv2d.tflite"
-
-    inputShape = [ 1, 5, 5, 1 ]
-    outputShape = [ 1, 3, 3, 1 ]
-
-    inputValues = [ 1, 5, 2, 3, 5,
-                    8, 7, 3, 6, 3,
-                    3, 3, 9, 1, 9,
-                    4, 1, 8, 1, 3,
-                    6, 8, 1, 9, 2 ]
-
-    expectedResult = [ 28, 38, 29,
-                       96, 104, 53,
-                       31, 55, 24 ]
-
-    input = np.array(inputValues, dtype=np.float32).reshape(inputShape)
-    expected_output = np.array(expectedResult, dtype=np.float32).reshape(outputShape)
-
-    # run the inference
-    armnn_outputs = run_inference(test_data_folder, model_file_name, [input], [armnn_delegate])
-
-    # check results
-    compare_outputs(armnn_outputs, [expected_output])
-
-    captured = capfd.readouterr()
-    assert "convert_fp32_to_bf16" in captured.out
-
 def test_external_delegate_options_memory_import(delegate_dir, test_data_folder):
     # create armnn delegate with memory-import option
     armnn_delegate = tflite.load_delegate(delegate_dir, options = {"backends": "CpuAcc,CpuRef",

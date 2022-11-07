@@ -218,9 +218,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ConstantLayer.cpp \
         src/armnn/layers/Convolution2dLayer.cpp \
         src/armnn/layers/Convolution3dLayer.cpp \
-        src/armnn/layers/ConvertBf16ToFp32Layer.cpp \
         src/armnn/layers/ConvertFp16ToFp32Layer.cpp \
-        src/armnn/layers/ConvertFp32ToBf16Layer.cpp \
         src/armnn/layers/ConvertFp32ToFp16Layer.cpp \
         src/armnn/layers/DebugLayer.cpp \
         src/armnn/layers/DepthToSpaceLayer.cpp \
@@ -441,10 +439,8 @@ LOCAL_SRC_FILES := \
         src/armnn/test/ModelAccuracyCheckerTest.cpp \
         src/armnn/test/NetworkTests.cpp \
         src/armnn/test/ObservableTest.cpp \
-        src/armnn/test/optimizations/ConvertConstantsBFloatTests.cpp \
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp \
         src/armnn/test/optimizations/ConvertConstantsHalfToFloatTests.cpp \
-        src/armnn/test/optimizations/Fp32NetworkToBf16ConverterTests.cpp \
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp \
         src/armnn/test/optimizations/FuseActivationTests.cpp \
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp \

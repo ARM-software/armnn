@@ -634,11 +634,6 @@ TEST_CASE("RefEluEndToEndTestFloat16")
     EluEndToEndTest<armnn::DataType::Float16>(defaultBackends);
 }
 
-TEST_CASE("RefEluEndToEndTestBFloat16")
-{
-    EluEndToEndTest<armnn::DataType::BFloat16>(defaultBackends);
-}
-
 TEST_CASE("RefEluEndToEndTestQAsymmS8")
 {
     EluEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
@@ -1004,11 +999,6 @@ TEST_CASE("RefHardSwishEndToEndTestFloat32")
 TEST_CASE("RefHardSwishEndToEndTestFloat16")
 {
     HardSwishEndToEndTest<armnn::DataType::Float16>(defaultBackends);
-}
-
-TEST_CASE("RefHardSwishEndToEndTestBFloat16")
-{
-    HardSwishEndToEndTest<armnn::DataType::BFloat16>(defaultBackends);
 }
 
 TEST_CASE("RefHardSwishEndToEndTestQAsymmS8")

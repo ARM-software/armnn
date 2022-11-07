@@ -220,12 +220,8 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
         }
         case LayerType::Constant:
             return IsConstantSupported(infos[0], reasonIfUnsupported);
-        case LayerType::ConvertBf16ToFp32:
-            return IsConvertBf16ToFp32Supported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::ConvertFp16ToFp32:
             return IsConvertFp16ToFp32Supported(infos[0], infos[1], reasonIfUnsupported);
-        case LayerType::ConvertFp32ToBf16:
-            return IsConvertFp32ToBf16Supported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::ConvertFp32ToFp16:
             return IsConvertFp32ToFp16Supported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::Convolution2d:
@@ -765,27 +761,7 @@ bool NeonLayerSupport::IsConstantSupported(const TensorInfo& output,
                                    output);
 }
 
-bool NeonLayerSupport::IsConvertBf16ToFp32Supported(const TensorInfo& input,
-                                                    const TensorInfo& output,
-                                                    Optional<std::string&> reasonIfUnsupported) const
-{
-    armnn::IgnoreUnused(input);
-    armnn::IgnoreUnused(output);
-    armnn::IgnoreUnused(reasonIfUnsupported);
-    return true;
-}
-
 bool NeonLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
-                                                    const TensorInfo& output,
-                                                    Optional<std::string&> reasonIfUnsupported) const
-{
-    armnn::IgnoreUnused(input);
-    armnn::IgnoreUnused(output);
-    armnn::IgnoreUnused(reasonIfUnsupported);
-    return true;
-}
-
-bool NeonLayerSupport::IsConvertFp32ToBf16Supported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {

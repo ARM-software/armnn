@@ -26,8 +26,9 @@ void SetBasicBlockConstantTensorData(Layer* layer, TosaSerializationBasicBlock* 
 TosaSerializationBasicBlock* GetTosaMapping(const LayerType type,
                                             const std::vector<const TensorInfo*>& inputs,
                                             const std::vector<const TensorInfo*>& outputs,
-                                            const BaseDescriptor& /*descriptor*/);
+                                            const BaseDescriptor& /*descriptor*/,
+                                            bool isMain);
 
 // Function called in armnn::OptimizeSubgraphView() when access to armnn::Layer is available
 // and there is an option to set tosa basic block data from constant layer tenors available from the input layer.
-TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer);
+TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer, bool isMain);

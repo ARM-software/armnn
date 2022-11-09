@@ -7,6 +7,9 @@
 
 #include "armnn/backends/Workload.hpp"
 
+#include <graph_status.h>
+#include <model_runner.h>
+
 #include <memory>
 #include <string>
 #include <vector>
@@ -38,6 +41,14 @@ private:
     {
         this->m_Data.m_Outputs[slot] = tensorHandle;
     }
+
+    template <typename T>
+    void SetInput(TosaReference::IModelRunner& runner, std::string inputName, uint32_t inputIndex) const;
+
+    template <typename T>
+    void GetOutput(TosaReference::IModelRunner& runner, std::string outputName, uint32_t outputIndex) const;
+
+    WorkloadInfo m_workloadInfo;
 };
 
 }    //namespace armnn

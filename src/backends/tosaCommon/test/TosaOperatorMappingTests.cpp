@@ -72,7 +72,7 @@ TEST_CASE("GetTosaMapping_AdditionLayer")
 {
     TensorInfo info = TensorInfo({ 1, 2, 4, 2 }, DataType::Float32, 0.0f, 0, true);
     TosaSerializationBasicBlock* basicBlock =
-        GetTosaMapping(LayerType::Addition, {&info, &info}, {&info}, BaseDescriptor());
+        GetTosaMapping(LayerType::Addition, {&info, &info}, {&info}, BaseDescriptor(), false);
     AssertTosaOneToOneMappingBasicBlock(basicBlock, { 1, 2, 4, 2 }, 2, 1, Op::Op_ADD, "Op_ADD");
 }
 
@@ -100,14 +100,14 @@ TEST_CASE("GetTosaMappingFromLayer_AdditionLayer")
     add->GetOutputSlot(0).SetTensorInfo(info);
 
     TosaSerializationBasicBlock* basicBlock =
-        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(add));
+        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(add), false);
     AssertTosaOneToOneMappingBasicBlock(basicBlock, { 1, 2, 4, 2 }, 2, 1, Op::Op_ADD, "Op_ADD");
 }
 
 TEST_CASE("GetTosaMapping_Unimplemented")
 {
     TosaSerializationBasicBlock* basicBlock =
-        GetTosaMapping(LayerType::UnidirectionalSequenceLstm, {}, {}, BaseDescriptor());
+        GetTosaMapping(LayerType::UnidirectionalSequenceLstm, {}, {}, BaseDescriptor(), false);
 
     CHECK(basicBlock->GetName() == "");
     CHECK(basicBlock->GetTensors().size() == 0);

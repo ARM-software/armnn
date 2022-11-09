@@ -6,7 +6,8 @@
 #include "AdditionOperator.hpp"
 
 TosaSerializationBasicBlock* ConvertAdditionToTosaOperator(const std::vector<const TensorInfo*>& inputs,
-                                                           const std::vector<const TensorInfo*>& outputs)
+                                                           const std::vector<const TensorInfo*>& outputs,
+                                                           bool isMain)
 {
     // A helper function with static global variables ensures uniqueness
     // for dynamically generating input, output and block names
@@ -14,6 +15,12 @@ TosaSerializationBasicBlock* ConvertAdditionToTosaOperator(const std::vector<con
     std::string input1Name = std::string("Op_ADD_input1_")  + GetUniqueTosaMappingID();
     std::string outputName = std::string("Op_ADD_output0_") + GetUniqueTosaMappingID();
     std::string blockName  = std::string("Op_ADD_block_")   + GetUniqueTosaMappingID();
+
+    // If it's the first block, overwrite block name with main.
+    if (isMain)
+    {
+        blockName = std::string("main");
+    }
 
     TosaSerializationOperator* op = new TosaSerializationOperator(Op_ADD,
                                                                   Attribute_NONE,

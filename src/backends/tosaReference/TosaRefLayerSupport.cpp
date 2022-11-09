@@ -113,7 +113,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             break;
     }
 
-    auto mappings = GetTosaMapping(type, inputInfos, outputInfos, descriptor);
+    auto mappings = GetTosaMapping(type, inputInfos, outputInfos, descriptor, false);
     if (mappings->GetName() == "")
     {
         // There currently isn't a TOSA mapping for this layer, as the default was returned.

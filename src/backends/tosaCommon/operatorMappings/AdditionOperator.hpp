@@ -14,5 +14,6 @@ using namespace armnn;
 using namespace tosa;
 
 TosaSerializationBasicBlock* ConvertAdditionToTosaOperator(const std::vector<const TensorInfo*>& inputs,
-                                                           const std::vector<const TensorInfo*>& outputs);
+                                                           const std::vector<const TensorInfo*>& outputs,
+                                                           bool isMain);
 

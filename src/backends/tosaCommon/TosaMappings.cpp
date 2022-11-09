@@ -26,13 +26,14 @@ void SetBasicBlockConstantTensorData(Layer* layer, TosaSerializationBasicBlock* 
 TosaSerializationBasicBlock* GetTosaMapping(const LayerType type,
                                             const std::vector<const TensorInfo*>& inputs,
                                             const std::vector<const TensorInfo*>& outputs,
-                                            const BaseDescriptor& /*descriptor*/)
+                                            const BaseDescriptor& /*descriptor*/,
+                                            bool isMain = false)
 {
     switch (type)
     {
         case LayerType::Addition:
         {
-            return ConvertAdditionToTosaOperator(inputs, outputs);
+            return ConvertAdditionToTosaOperator(inputs, outputs, isMain);
         }
         default:
         {
@@ -43,7 +44,7 @@ TosaSerializationBasicBlock* GetTosaMapping(const LayerType type,
     }
 }
 
-TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer)
+TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer, bool isMain = false)
 {
     std::vector<const TensorInfo*> inputs;
     for (auto inputSlot : layer->GetInputSlots())
@@ -60,7 +61,8 @@ TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer)
     TosaSerializationBasicBlock* basicBlock = GetTosaMapping(layer->GetType(),
                                                              inputs,
                                                              outputs,
-                                                             layer->GetParameters());
+                                                             layer->GetParameters(),
+                                                             isMain);
     SetBasicBlockConstantTensorData(layer, basicBlock);
     return basicBlock;
 }

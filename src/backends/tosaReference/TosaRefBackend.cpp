@@ -85,6 +85,9 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
     OptimizationViews optimizationViews(modelOptions);
     auto handler = std::make_unique<TosaSerializationHandler>();
 
+    // A main block should only be added once.
+    bool isMain = true;
+
     auto it = subgraph.endIConnectable();
     while (it != subgraph.beginIConnectable())
     {
@@ -97,8 +100,13 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
             continue;
         }
 
-        tosa::TosaSerializationBasicBlock* mappings = GetTosaMappingFromLayer(&base);
+        tosa::TosaSerializationBasicBlock* mappings = GetTosaMappingFromLayer(&base, isMain);
         handler.get()->GetBlocks().push_back(mappings);
+
+        if(isMain)
+        {
+            isMain = false;
+        }
     }
 
     auto compiledBlob =

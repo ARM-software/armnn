@@ -39,7 +39,7 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(pa
         std::cout << "Running on TfLite without ArmNN delegate\n";
     }
 
-    const size_t numInputs = m_Params.m_InputNames.size();
+    const size_t numInputs = m_TfLiteInterpreter->inputs().size();
 
     for(unsigned int inputIndex = 0; inputIndex < numInputs; ++inputIndex)
     {

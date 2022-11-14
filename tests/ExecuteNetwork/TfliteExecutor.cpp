@@ -112,87 +112,90 @@ std::vector<const void *> TfLiteExecutor::Execute()
         status = m_TfLiteInterpreter->Invoke();
         const auto duration = armnn::GetTimeDuration(start_time);
 
-        if (m_Params.m_DontPrintOutputs || m_Params.m_ReuseBuffers)
+        if (!m_Params.m_DontPrintOutputs)
         {
-            break;
-        }
-        // Print out the output
-        for (unsigned int outputIndex = 0; outputIndex < m_TfLiteInterpreter->outputs().size(); ++outputIndex)
-        {
-            auto tfLiteDelegateOutputId = m_TfLiteInterpreter->outputs()[outputIndex];
-            TfLiteIntArray* outputDims = m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
-            // If we've been asked to write to a file then set a file output stream. Otherwise use stdout.
-            FILE* outputTensorFile = stdout;
-            if (!m_Params.m_OutputTensorFiles.empty())
+            // Print out the output
+            for (unsigned int outputIndex = 0; outputIndex < m_TfLiteInterpreter->outputs().size(); ++outputIndex)
             {
-                outputTensorFile = fopen(m_Params.m_OutputTensorFiles[outputIndex].c_str(), "w");
-                if (outputTensorFile == NULL)
+                auto tfLiteDelegateOutputId = m_TfLiteInterpreter->outputs()[outputIndex];
+                TfLiteIntArray* outputDims = m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
+                // If we've been asked to write to a file then set a file output stream. Otherwise use stdout.
+                FILE* outputTensorFile = stdout;
+                if (!m_Params.m_OutputTensorFiles.empty())
                 {
-                    LogAndThrow("Specified output tensor file, \"" + m_Params.m_OutputTensorFiles[outputIndex] +
-                                "\", cannot be created. Defaulting to stdout. Error was: " + std::strerror(errno));
+                    outputTensorFile = fopen(m_Params.m_OutputTensorFiles[outputIndex].c_str(), "w");
+                    if (outputTensorFile == NULL)
+                    {
+                        LogAndThrow("Specified output tensor file, \"" + m_Params.m_OutputTensorFiles[outputIndex] +
+                                    "\", cannot be created. Defaulting to stdout. Error was: " + std::strerror(errno));
+                    }
+                    else
+                    {
+                        ARMNN_LOG(info) << "Writing output " << outputIndex << "' of iteration: " << x + 1
+                                        << " to file: '" << m_Params.m_OutputTensorFiles[outputIndex] << "'";
+                    }
                 }
-                else
+                long outputSize = 1;
+                for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
                 {
-                    ARMNN_LOG(info) << "Writing output " << outputIndex << "' of iteration: " << x+1 << " to file: '"
-                                    << m_Params.m_OutputTensorFiles[outputIndex] << "'";
+                    outputSize *= outputDims->data[dim];
                 }
+
+                std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
+                results.push_back(m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->allocation);
+
+                switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
+                {
+
+                    case kTfLiteFloat32:
+                    {
+                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(
+                                tfLiteDelegateOutputId);
+
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%f ", tfLiteDelegateOutputData[i]);
+                        }
+                        break;
+                    }
+                    case kTfLiteInt32:
+                    {
+                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(
+                                tfLiteDelegateOutputId);
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                        }
+                        break;
+                    }
+                    case kTfLiteUInt8:
+                    {
+                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(
+                                tfLiteDelegateOutputId);
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+                        }
+                        break;
+                    }
+                    case kTfLiteInt8:
+                    {
+                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(
+                                tfLiteDelegateOutputId);
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                        }
+                        break;
+                    }
+                    default:
+                    {
+                        LogAndThrow("Unsupported output type");
+                    }
+                }
+
+                std::cout << std::endl;
             }
-            long outputSize = 1;
-            for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
-            {
-                outputSize *=  outputDims->data[dim];
-            }
-
-            std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
-            results.push_back(m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->allocation);
-
-            switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
-            {
-
-                case kTfLiteFloat32:
-                {
-                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
-
-                    for (int i = 0; i < outputSize; ++i)
-                    {
-                        fprintf(outputTensorFile, "%f ", tfLiteDelegateOutputData[i]);
-                    }
-                    break;
-                }
-                case kTfLiteInt32:
-                {
-                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(tfLiteDelegateOutputId);
-                    for (int i = 0; i < outputSize; ++i)
-                    {
-                        fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
-                    }
-                    break;
-                }
-                case kTfLiteUInt8:
-                {
-                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(tfLiteDelegateOutputId);
-                    for (int i = 0; i < outputSize; ++i)
-                    {
-                        fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
-                    }
-                    break;
-                }
-                case kTfLiteInt8:
-                {
-                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(tfLiteDelegateOutputId);
-                    for (int i = 0; i < outputSize; ++i)
-                    {
-                        fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
-                    }
-                    break;
-                }
-                default:
-                {
-                    LogAndThrow("Unsupported output type");
-                }
-            }
-
-            std::cout << std::endl;
         }
         CheckInferenceTimeThreshold(duration, m_Params.m_ThresholdTime);
     }

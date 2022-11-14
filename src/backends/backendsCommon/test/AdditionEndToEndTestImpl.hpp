@@ -4,12 +4,12 @@
 //
 #pragma once
 
-#include <ResolveType.hpp>
-
 #include <armnn/INetwork.hpp>
 
-#include <doctest/doctest.h>
 #include <CommonTestUtils.hpp>
+#include <ResolveType.hpp>
+
+#include <doctest/doctest.h>
 
 namespace
 {
@@ -74,6 +74,33 @@ void AdditionEndToEnd(const std::vector<armnn::BackendId>& backends)
 
     std::map<int, std::vector<T>> inputTensorData = {{ 0, inputXData }, {1, inputYData}};
     std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void AdditionEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
+{
+    using namespace armnn;
+    using namespace half_float::literal;
+    using Half = half_float::half;
+
+    const TensorShape& inputXShape = { 2, 2 };
+    const TensorShape& inputYShape = { 2, 2 };
+    const TensorShape& outputShape = { 2, 2 };
+
+    INetworkPtr network = CreateAdditionNetwork<ArmnnType>(inputXShape, inputYShape, outputShape);
+    CHECK(network);
+
+    std::vector<Half> inputXData{ 1._h, 2._h,
+                                  3._h, 4._h };
+    std::vector<Half> inputYData{ 5._h, 7._h,
+                                  6._h, 8._h };
+    std::vector<Half> expectedOutput{ 6._h, 9._h,
+                                      9._h, 12._h };
+
+    std::map<int, std::vector<Half>> inputTensorData = {{ 0, inputXData }, { 1, inputYData }};
+    std::map<int, std::vector<Half>> expectedOutputData = { { 0, expectedOutput } };
 
     EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
 }

@@ -19,4 +19,14 @@ TEST_CASE("TosaRefEndtoEndTestFloat32")
     AdditionEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
 }
 
+TEST_CASE("TosaRefEndtoEndTestInt32")
+{
+    AdditionEndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefEndtoEndTestFloat16")
+{
+    AdditionEndToEndFloat16<armnn::DataType::Float16>(tosaDefaultBackends);
+}
+
 }

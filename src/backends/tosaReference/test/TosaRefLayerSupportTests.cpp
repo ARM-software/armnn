@@ -57,9 +57,9 @@ TEST_CASE("IsLayerSupportedTosaReferenceAdditionUnsupported")
                                                      reasonIfNotSupported);
 
     CHECK(!supported);
-    REQUIRE(reasonIfNotSupported.find("TOSA Reference addition: Op_ADD_input0_") != std::string::npos);
-    REQUIRE(reasonIfNotSupported.find("TOSA Reference addition: Op_ADD_input1_") != std::string::npos);
-    REQUIRE(reasonIfNotSupported.find("TOSA Reference addition: Op_ADD_output0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find("TOSA Reference Operator: 14 for input: Op_ADD_input0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find("TOSA Reference Operator: 14 for input: Op_ADD_input1_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find("TOSA Reference Operator: 14 for output: Op_ADD_output0_") != std::string::npos);
 }
 
 }

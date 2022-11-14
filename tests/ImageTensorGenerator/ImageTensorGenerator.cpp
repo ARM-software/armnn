@@ -264,7 +264,7 @@ public:
         }
         else
         {
-            throw armnn::Exception("Unsupported input type" + m_OutputType);
+            throw armnn::Exception("Unsupported input type " + m_OutputType);
         }
     }
 

@@ -231,7 +231,7 @@ private:
 
         if (error != CL_SUCCESS)
         {
-            throw MemoryImportException("ClImportTensorHandle::Invalid imported memory" + std::to_string(error));
+            throw MemoryImportException("ClImportTensorHandle::Invalid imported memory: " + std::to_string(error));
         }
 
         cl::Buffer wrappedBuffer(buffer);

@@ -428,7 +428,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
         if (loadingStatus != armnn::Status::Success)
         {
             // Network load failed.
-            throw armnn::Exception("TfLiteArmnnDelegate: Network could not be loaded:" + errorMessage);
+            throw armnn::Exception("TfLiteArmnnDelegate: Network could not be loaded: " + errorMessage);
         }
 
         ARMNN_LOG(info) << "Load ArmnnSubgraph time: " << std::setprecision(2)

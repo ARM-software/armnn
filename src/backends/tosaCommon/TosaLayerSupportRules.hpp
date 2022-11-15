@@ -38,3 +38,29 @@ struct TosaTensorNumDimensionsWithinBounds : public Rule
         m_Res = (tensor->GetShape().size() <= MaxNumOfTensorDimensions) || (!tensor->GetShape().empty());
     }
 };
+
+struct TosaAssertSize : public Rule
+{
+    template<typename Container>
+    explicit TosaAssertSize(const Container& c1, const Container& c2)
+    {
+        m_Res = (c1.size() == c2.size());
+    }
+};
+
+struct TosaContainerContains : public Rule
+{
+    explicit TosaContainerContains(std::tuple<DType, DType>& check, const std::vector<std::tuple<DType, DType>>& c)
+    {
+        for (auto item: c)
+        {
+            if (std::get<0>(check) == std::get<0>(item)
+                && std::get<1>(check) == std::get<1>(item))
+            {
+                m_Res = true;
+                return;
+            }
+        }
+        m_Res = false;
+    }
+};

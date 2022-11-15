@@ -6,27 +6,60 @@
 #include "backendsCommon/test/EndToEndTestImpl.hpp"
 
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
+#include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
 TEST_SUITE("TosaRefEndToEnd")
 {
-std::vector<armnn::BackendId> tosaDefaultBackends = { "TosaRef" };
+std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
 
 // Addition
-TEST_CASE("TosaRefEndtoEndTestFloat32")
+TEST_CASE("TosaRefAdditionEndtoEndTestFloat32")
 {
-    AdditionEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+    AdditionEndToEnd<DataType::Float32>(tosaDefaultBackends);
 }
 
-TEST_CASE("TosaRefEndtoEndTestInt32")
+TEST_CASE("TosaRefAdditionEndtoEndTestInt32")
 {
-    AdditionEndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends);
+    AdditionEndToEnd<DataType::Signed32>(tosaDefaultBackends);
 }
 
-TEST_CASE("TosaRefEndtoEndTestFloat16")
+TEST_CASE("TosaRefAdditionEndtoEndTestFloat16")
 {
-    AdditionEndToEndFloat16<armnn::DataType::Float16>(tosaDefaultBackends);
+    AdditionEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+// Max Pool 2D
+TEST_CASE("TosaRefMaxPool2DEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefMaxPool2DEndtoEndTestFloat16")
+{
+    MaxPool2dEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefMaxPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+// Average Pool 2D
+TEST_CASE("TosaRefAvgPool2DEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefAvgPool2DEndtoEndTestFloat16")
+{
+    AvgPool2dEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefAvgPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends, PaddingMethod::IgnoreValue);
 }
 
 }

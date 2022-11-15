@@ -8,7 +8,7 @@
 #include <Layer.hpp>
 
 #include <tosa_serialization_handler.h>
-#include "operatorMappings/AdditionOperator.hpp"
+#include "operatorMappings/TosaCommonOperators.hpp"
 
 using namespace armnn;
 using namespace tosa;

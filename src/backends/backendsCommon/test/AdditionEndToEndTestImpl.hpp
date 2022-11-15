@@ -105,4 +105,4 @@ void AdditionEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
     EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
 }
 
-} // anonymous namespaceS
+} // anonymous namespace

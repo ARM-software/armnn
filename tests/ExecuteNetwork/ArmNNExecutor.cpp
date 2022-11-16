@@ -26,7 +26,6 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
     auto optNet = OptimizeNetwork(network.get());
 
     m_IOInfo = GetIOInfo(optNet.get());
-    SetupInputsAndOutputs();
 
     armnn::ProfilingDetailsMethod profilingDetailsMethod = ProfilingDetailsMethod::Undefined;
     if (params.m_OutputDetailsOnlyToStdOut)
@@ -56,6 +55,8 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
         m_constructionFailed = true;
         return;
     }
+
+    SetupInputsAndOutputs();
 
     if (m_Params.m_Iterations > 1)
     {
@@ -415,11 +416,12 @@ void ArmNNExecutor::SetupInputsAndOutputs()
                 }
             }
 
-            if (m_Params.m_ImportInputsIfAligned)
-            {
-                m_ImportedInputIds.push_back(
-                    m_Runtime->ImportInputs(m_NetworkId, m_InputTensorsVec.back(), armnn::MemorySource::Malloc));
-            }
+        }
+
+        if (m_Params.m_ImportInputsIfAligned)
+        {
+            m_ImportedInputIds.push_back(
+                m_Runtime->ImportInputs(m_NetworkId, inputTensors, armnn::MemorySource::Malloc));
         }
         m_InputTensorsVec.emplace_back(inputTensors);
     }

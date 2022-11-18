@@ -34,6 +34,7 @@
 #include "Round.hpp"
 #include "Shape.hpp"
 #include "Slice.hpp"
+#include "StridedSlice.hpp"
 #include "Softmax.hpp"
 #include "SpaceDepth.hpp"
 #include "Split.hpp"
@@ -963,12 +964,18 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                         tfLiteNode,
                                         nodeIndex,
                                         kTfLiteBuiltinSqueeze);
-        case kTfLiteBuiltinStridedSlice:
+        case kTfLiteBuiltinSlice:
             return VisitSliceOperator(delegateData,
                                       tfLiteContext,
                                       tfLiteNode,
                                       nodeIndex,
-                                      kTfLiteBuiltinStridedSlice);
+                                      kTfLiteBuiltinSlice);
+        case kTfLiteBuiltinStridedSlice:
+            return VisitStridedSliceOperator(delegateData,
+                                             tfLiteContext,
+                                             tfLiteNode,
+                                             nodeIndex,
+                                             kTfLiteBuiltinStridedSlice);
         case kTfLiteBuiltinSum:
             return VisitReduceOperator(delegateData,
                                        tfLiteContext,

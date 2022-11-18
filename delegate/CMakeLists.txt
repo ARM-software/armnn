@@ -202,6 +202,8 @@ if(BUILD_UNIT_TESTS)
         src/test/ShapeTestHelper.hpp
         src/test/SliceTest.cpp
         src/test/SliceTestHelper.hpp
+        src/test/StridedSliceTest.cpp
+        src/test/StridedSliceTestHelper.hpp
         src/test/SplitTest.cpp
         src/test/SplitTestHelper.hpp
         src/test/TestUtils.hpp

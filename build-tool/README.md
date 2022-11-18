@@ -168,8 +168,8 @@ The ```BUILD_ARGS``` string should start and end with **double quotes** ```"```.
 | --cl-backend        | **flag:** build Arm NN with the OpenCL backend (GPU acceleration from ACL)                                                                                                                                                                                                                                            |
 | --ref-backend       | **flag:** build Arm NN with the reference backend<br/>**Should be used for verification purposes only.<br/>Does not provide any performance acceleration.**                                                                                                                                                           |
 | --debug             | **flag:** build Arm NN (and ACL) with debug turned on (optional: defaults to off)                                                                                                                                                                                                                                     |
-| --armnn-cmake-args= | **option:** provide additional space-separated CMake arguments string for building Arm NN (optional)<br/>String should start and end with **single quotes** ```'```<br/>Please refer to **armnn/cmake/GlobalConfig.cmake**                                                                                            |
-| --acl-scons-params= | **option**: provide additional space-separated scons parameters string for building ACL (optional)<br/>String should start and end with **single quotes** ```'```<br/>ACL provide [documentation](https://arm-software.github.io/ComputeLibrary/latest/how_to_build.xhtml#S1_1_build_options) for their build options |
+| --armnn-cmake-args= | **option:** provide additional comma-separated CMake arguments string for building Arm NN (optional)<br/>String should start and end with **single quotes** ```'```<br/>Please refer to **armnn/cmake/GlobalConfig.cmake**                                                                                            |
+| --acl-scons-params= | **option**: provide additional comma-separated scons parameters string for building ACL (optional)<br/>String should start and end with **single quotes** ```'```<br/>ACL provide [documentation](https://arm-software.github.io/ComputeLibrary/latest/how_to_build.xhtml#S1_1_build_options) for their build options |
 
 
 **At least one component** (i.e. ```--tflite-delegate```, ```--tflite-parser```, ```--onnx-parser```) must be provided or else provide ```--all``` to build all Arm NN components.<br>
@@ -181,10 +181,10 @@ Build for aarch64 with all Arm NN components, NEON enabled and OpenCL enabled:<b
 ```BUILD_ARGS="--target-arch=aarch64 --all --neon-backend --cl-backend"```
 
 Build for aarch64 with TF Lite Delegate, OpenCL enabled and additional ACL scons params:<br>
-```BUILD_ARGS="--target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params='compress_kernels=1 benchmark_examples=1'"```
+```BUILD_ARGS="--target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params='compress_kernels=1,benchmark_examples=1'"```
 
 Setup for aarch64 with all Arm NN dependencies, OpenCL enabled and additional Arm NN cmake args:<br>
-```BUILD_ARGS="--target-arch=aarch64 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1 -DBUILD_UNIT_TESTS=0'"```
+```BUILD_ARGS="--target-arch=aarch64 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1,-DBUILD_UNIT_TESTS=0'"```
 
 **Example _valid_ combination of SETUP_ARGS and BUILD_ARGS:**<br>
 ```

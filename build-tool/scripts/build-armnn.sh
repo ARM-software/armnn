@@ -208,9 +208,9 @@ build-armnn.sh [OPTION]...
   --debug
     build Arm NN (and ACL) with debug turned on (optional: defaults to off)
   --armnn-cmake-args=<ARG LIST STRING>
-    provide additional space-separated CMake arguments string for building Arm NN (optional)
+    provide additional comma-separated CMake arguments string for building Arm NN (optional)
   --acl-scons-params=<PARAM LIST STRING>
-    provide additional space-separated scons parameters string for building ACL (optional)
+    provide additional comma-separated scons parameters string for building ACL (optional)
   --num-threads=<INTEGER>
     specify number of threads/cores to build dependencies with (optional: defaults to number of online CPU cores on host)
   -h, --help
@@ -232,9 +232,9 @@ Examples:
 Build for aarch64 with all Arm NN components, NEON enabled and OpenCL enabled:
   <PATH_TO>/build-armnn.sh --target-arch=aarch64 --all --neon-backend --cl-backend
 Build for aarch64 with TF Lite Delegate, OpenCL enabled and additional ACL scons params:
-  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params='compress_kernels=1 benchmark_examples=1'
+  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params='compress_kernels=1,benchmark_examples=1'
 Setup for aarch64 with all Arm NN dependencies, OpenCL enabled and additional Arm NN cmake args:
-  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1 -DBUILD_UNIT_TESTS=0'
+  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1,-DBUILD_UNIT_TESTS=0'
 EOF
 }
 
@@ -418,6 +418,13 @@ DEBUG_POSTFIX=""
 if [ "$flag_debug" -eq 1 ]; then
   DEBUG_POSTFIX="_debug"
 fi
+
+# Replace commas with spaces in additional Arm NN / ACL build args
+# shellcheck disable=SC2001
+armnn_cmake_args="$(echo "$armnn_cmake_args" | sed 's/,/ /g')"
+
+# shellcheck disable=SC2001
+acl_scons_params="$(echo "$acl_scons_params" | sed 's/,/ /g')"
 
 # Directories for Arm NN and ACL build outputs
 ARMNN_BUILD_ROOT="$BUILD_DIR"/armnn

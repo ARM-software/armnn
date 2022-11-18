@@ -117,35 +117,35 @@ public:
     unsigned int GetNumOutputSlots() const;
 
     ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "IConnectableLayerIterator, until that occurs in 23.02; please use "
-                                     "beginIConnectable() returning public IConnectableLayerIterator", "23.02")
+                                     "IConnectableLayerIterator, until that occurs in 23.08; please use "
+                                     "beginIConnectable() returning public IConnectableLayerIterator", "23.08")
     Iterator begin();
     IConnectableLayerIterator beginIConnectable();
     ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "IConnectableLayerIterator, until that occurs in 23.02; please use "
-                                     "endIConnectable() returning public IConnectableLayerIterator", "23.02")
+                                     "IConnectableLayerIterator, until that occurs in 23.08; please use "
+                                     "endIConnectable() returning public IConnectableLayerIterator", "23.08")
     Iterator end();
     IConnectableLayerIterator endIConnectable();
 
     ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.02; please use "
-                                     "beginIConnectable() returning public ConstIConnectableIterator", "23.02")
+                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
+                                     "beginIConnectable() returning public ConstIConnectableIterator", "23.08")
     ConstIterator begin() const;
     ConstIConnectableIterator beginIConnectable() const;
     ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.02; please use "
-                                     "endIConnectable() returning public ConstIConnectableIterator", "23.02")
+                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
+                                     "endIConnectable() returning public ConstIConnectableIterator", "23.08")
     ConstIterator end() const;
     ConstIConnectableIterator endIConnectable() const;
 
     ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.02; please use "
-                                     "cbeginIConnectable() returning public ConstIConnectableIterator", "23.02")
+                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
+                                     "cbeginIConnectable() returning public ConstIConnectableIterator", "23.08")
     ConstIterator cbegin() const;
     ConstIConnectableIterator cbeginIConnectable() const;
     ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.02; please use "
-                                     "cendIConnectable() returning public ConstIConnectableIterator", "23.02")
+                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
+                                     "cendIConnectable() returning public ConstIConnectableIterator", "23.08")
     ConstIterator cend() const;
     ConstIConnectableIterator cendIConnectable() const;
 

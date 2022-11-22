@@ -28,8 +28,5 @@ options from different build guides.
 ## Android NDK and Arm NN
  - @subpage md_BuildGuideAndroidNDK
 
-## Crosscompile Guide for Arm NN
- - @subpage md_BuildGuideCrossCompilation
-
 **/
 }

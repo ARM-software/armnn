@@ -31,8 +31,11 @@ public:
 
 private:
     std::mutex m_Mutex;
+
     struct ClContextControlWrapper;
-    std::unique_ptr<ClContextControlWrapper> m_ClContextControlWrapper;
+    static std::shared_ptr<ClBackendContext::ClContextControlWrapper> Get();
+
+    std::shared_ptr<ClBackendContext::ClContextControlWrapper> m_ClContextControlWrapper;
 
     std::unordered_set<NetworkId> m_NetworkIds;
 

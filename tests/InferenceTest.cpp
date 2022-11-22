@@ -23,7 +23,7 @@ namespace armnn
 {
 namespace test
 {
-/// Parse the command line of an ArmNN (or referencetests) inference test program.
+/// Parse the command line of an ArmNN inference test program.
 /// \return false if any error occurred during options processing, otherwise true
 bool ParseCommandLine(int argc, char** argv, IInferenceTestCaseProvider& testCaseProvider,
     InferenceTestOptions& outParams)

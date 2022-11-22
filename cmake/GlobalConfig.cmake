@@ -385,26 +385,21 @@ endif()
 
 if(NOT BUILD_BARE_METAL)
 if(HEAP_PROFILING OR LEAK_CHECKING)
-    # enable heap profiling for everything except for referencetests
-    if(NOT ${PROJECT_NAME} STREQUAL "referencetests")
-        find_path(HEAP_PROFILER_INCLUDE gperftools/heap-profiler.h
-                PATHS ${GPERFTOOLS_ROOT}/include
-                NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-        include_directories(SYSTEM "${HEAP_PROFILER_INCLUDE}")
-        find_library(GPERF_TOOLS_LIBRARY
-                    NAMES tcmalloc_debug
-                    HINTS ${GPERFTOOLS_ROOT}/lib)
-        link_directories(${GPERFTOOLS_ROOT}/lib)
+    find_path(HEAP_PROFILER_INCLUDE gperftools/heap-profiler.h
+            PATHS ${GPERFTOOLS_ROOT}/include
+            NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    include_directories(SYSTEM "${HEAP_PROFILER_INCLUDE}")
+    find_library(GPERF_TOOLS_LIBRARY
+                NAMES tcmalloc_debug
+                HINTS ${GPERFTOOLS_ROOT}/lib)
+    link_directories(${GPERFTOOLS_ROOT}/lib)
 
-        link_libraries(${GPERF_TOOLS_LIBRARY})
-        if (HEAP_PROFILING)
-            add_definitions("-DARMNN_HEAP_PROFILING_ENABLED=1")
-        endif()
-        if (LEAK_CHECKING)
-            add_definitions("-DARMNN_LEAK_CHECKING_ENABLED=1")
-        endif()
-    else()
-        message(STATUS "Heap profiling and leak checking are disabled for referencetests")
+    link_libraries(${GPERF_TOOLS_LIBRARY})
+    if (HEAP_PROFILING)
+        add_definitions("-DARMNN_HEAP_PROFILING_ENABLED=1")
+    endif()
+    if (LEAK_CHECKING)
+        add_definitions("-DARMNN_LEAK_CHECKING_ENABLED=1")
     endif()
 else()
     # Valgrind only works with gperftools version number <= 2.4

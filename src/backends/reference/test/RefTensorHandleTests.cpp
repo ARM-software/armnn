@@ -99,8 +99,14 @@ TEST_CASE("RefTensorHandleFactoryMemoryManaged")
     memoryManager->Release();
 
     float testPtr[2] = { 2.5f, 5.5f };
-    // Cannot import as import is disabled
-    CHECK(!handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    // Check import overlays contents
+    CHECK(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
+    {
+        float* buffer = reinterpret_cast<float*>(handle->Map());
+        CHECK(buffer != nullptr); // Yields a valid pointer
+        CHECK(buffer[0] == 2.5f); // Memory is writable and readable
+        CHECK(buffer[1] == 5.5f); // Memory is writable and readable
+    }
 }
 
 TEST_CASE("RefTensorHandleFactoryImport")
@@ -115,11 +121,12 @@ TEST_CASE("RefTensorHandleFactoryImport")
     handle->Allocate();
     memoryManager->Acquire();
 
-    // No buffer allocated when import is enabled
-    CHECK_THROWS_AS(handle->Map(), armnn::NullPointerException);
+    // Check storage has been allocated
+    void* unmanagedStorage = handle->Map();
+    CHECK(unmanagedStorage != nullptr);
 
+    // Check importing overlays the storage
     float testPtr[2] = { 2.5f, 5.5f };
-    // Correctly import
     CHECK(handle->Import(static_cast<void*>(testPtr), MemorySource::Malloc));
     float* buffer = reinterpret_cast<float*>(handle->Map());
     CHECK(buffer != nullptr); // Yields a valid pointer after import
@@ -142,11 +149,11 @@ TEST_CASE("RefTensorHandleImport")
     handle.Manage();
     handle.Allocate();
 
-    // No buffer allocated when import is enabled
-    CHECK_THROWS_AS(handle.Map(), armnn::NullPointerException);
+    // Check unmanaged memory allocated 
+    CHECK(handle.Map());
 
     float testPtr[2] = { 2.5f, 5.5f };
-    // Correctly import
+    // Check imoport overlays the unamaged memory
     CHECK(handle.Import(static_cast<void*>(testPtr), MemorySource::Malloc));
     float* buffer = reinterpret_cast<float*>(handle.Map());
     CHECK(buffer != nullptr); // Yields a valid pointer after import

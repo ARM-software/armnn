@@ -71,8 +71,7 @@ private:
     std::shared_ptr<RefMemoryManager> m_MemoryManager;
     RefMemoryManager::Pool* m_Pool;
     mutable void* m_UnmanagedMemory;
-    bool m_Imported;
-    bool m_IsImportEnabled;
+    void* m_ImportedMemory;
 };
 
 }

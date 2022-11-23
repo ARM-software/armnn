@@ -1,0 +1,24 @@
+var searchData=
+[
+  ['factoryfunction',['FactoryFunction',['../classarmnn_1_1_backend_registry.xhtml#aa33ac375677ee8436456a585dd6f68d9',1,'armnn::BackendRegistry']]],
+  ['factoryid',['FactoryId',['../classarmnn_1_1_i_tensor_handle_factory.xhtml#a32f4aa6a7089d877af08928139c2c277',1,'armnn::ITensorHandleFactory::FactoryId()'],['../namespacearmnn.xhtml#a947e07902b1b5d98b57eeae34053146b',1,'armnn::FactoryId()'],['../namespacesdb.xhtml#a3efde8001f5743a54642c896b1595318',1,'sdb::FactoryId()']]],
+  ['factorystorage',['FactoryStorage',['../classarmnn_1_1_backend_registry.xhtml#a20fb10b59fccc99291e7fe993cd814bb',1,'armnn::BackendRegistry']]],
+  ['filecontents',['FileContents',['../namespacearmnn_utils_1_1_filesystem.xhtml#ac43ab637ed192811c3b20c71990fd871',1,'armnnUtils::Filesystem']]],
+  ['first_5fargument_5ftype',['first_argument_type',['../structarmnn_1_1maximum.xhtml#a9e9bfdf07be793850c9f72f5907c5ab9',1,'armnn::maximum::first_argument_type()'],['../structarmnn_1_1minimum.xhtml#a9e9bfdf07be793850c9f72f5907c5ab9',1,'armnn::minimum::first_argument_type()']]],
+  ['float16tofloat32workload',['Float16ToFloat32Workload',['../namespacearmnn.xhtml#a827d59b5a779a8089017802172817f3c',1,'armnn']]],
+  ['float32tobfloat16workload',['Float32ToBFloat16Workload',['../namespacearmnn.xhtml#a6ef601b454db749320636d9425b1f4c2',1,'armnn']]],
+  ['float32tofloat16workload',['Float32ToFloat16Workload',['../namespacearmnn.xhtml#a6486138451112140f98516c0bee18615',1,'armnn']]],
+  ['float32workload',['Float32Workload',['../namespacearmnn.xhtml#a0493144f15b35804a133c9aa0b63fcc9',1,'armnn']]],
+  ['floatworkload',['FloatWorkload',['../namespacearmnn.xhtml#abaedcfd0ae08790c03bfe8ba7586dd84',1,'armnn']]],
+  ['foldpadintoconvolution2d',['FoldPadIntoConvolution2d',['../namespacearmnn_1_1optimizations.xhtml#a8b394ff60ed829a91f07deac476f3db2',1,'armnn::optimizations']]],
+  ['foldpadintodepthwiseconvolution2d',['FoldPadIntoDepthwiseConvolution2d',['../namespacearmnn_1_1optimizations.xhtml#a227e9ab5e488aa90ba462790ba0e5aec',1,'armnn::optimizations']]],
+  ['foldpadintopooling2d',['FoldPadIntoPooling2d',['../namespacearmnn_1_1optimizations.xhtml#a279d0a7c56966cea334303d48a874964',1,'armnn::optimizations']]],
+  ['fp32networktobf16converter',['Fp32NetworkToBf16Converter',['../namespacearmnn_1_1optimizations.xhtml#aeb70f8fcf5180bdd5c94be7bb2f9d176',1,'armnn::optimizations']]],
+  ['fp32networktofp16converter',['Fp32NetworkToFp16Converter',['../namespacearmnn_1_1optimizations.xhtml#a86d19da62b6cfed3928f6fe7026f22fa',1,'armnn::optimizations']]],
+  ['fusebatchnormintoconvolution2dfloat16',['FuseBatchNormIntoConvolution2DFloat16',['../namespacearmnn_1_1optimizations.xhtml#a8a81178ddcebb93ec0c35b6e6284273c',1,'armnn::optimizations']]],
+  ['fusebatchnormintoconvolution2dfloat32',['FuseBatchNormIntoConvolution2DFloat32',['../namespacearmnn_1_1optimizations.xhtml#aa52c06792e18dc13030e82476f706f9e',1,'armnn::optimizations']]],
+  ['fusebatchnormintodepthwiseconvolution2dfloat16',['FuseBatchNormIntoDepthwiseConvolution2DFloat16',['../namespacearmnn_1_1optimizations.xhtml#ab40bb51feca46649eb9d00522bfe51f6',1,'armnn::optimizations']]],
+  ['fusebatchnormintodepthwiseconvolution2dfloat32',['FuseBatchNormIntoDepthwiseConvolution2DFloat32',['../namespacearmnn_1_1optimizations.xhtml#a56e54a818166a2f4b2c1a7f76a3629ff',1,'armnn::optimizations']]],
+  ['fuseconversionlayersintoconstlayers',['FuseConversionLayersIntoConstLayers',['../namespacearmnn_1_1optimizations.xhtml#a8fc3cdb7b4956182c23e8d217f961550',1,'armnn::optimizations']]],
+  ['fusepermuteintoconstlayer',['FusePermuteIntoConstLayer',['../namespacearmnn_1_1optimizations.xhtml#ad668074369437a111649f51296ff8959',1,'armnn::optimizations']]]
+];

@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['scalar',['Scalar',['../namespacearmnn.xhtml#a8e1f31031ad31cd8cc22d7c9daa32681af60357a8d17e45793298323f1b372a74',1,'armnn']]],
+  ['shape',['Shape',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a880c1273b27d27cfc82004c3a4b205c9',1,'armnn']]],
+  ['sigmoid',['Sigmoid',['../namespacearmnn.xhtml#a56297e0f7b215eea46c818cb7528d9eaa21eebb164e4b8b9bcf64fdb4d8d5dff4',1,'armnn']]],
+  ['signed32',['Signed32',['../namespacearmnn.xhtml#ad8ed01ff3ff33333d8e19db4d2818bb6accedffbc6e5308e33d3843e8bdc0dad7',1,'armnn']]],
+  ['signed64',['Signed64',['../namespacearmnn.xhtml#ad8ed01ff3ff33333d8e19db4d2818bb6ae1b3c9c6087a93b07c83e0b04f377a8d',1,'armnn']]],
+  ['sin',['Sin',['../namespacearmnn.xhtml#a1cfaa710db2a54673b21d2ea2da757c8a0986d137604183312e6d3599578bc6cd',1,'armnn']]],
+  ['singleaxispacking',['SingleAxisPacking',['../namespacearmnn.xhtml#a7100de49939c3e393101f78d425a98c6a568437eb3752bdf14546b5c221ba5be7',1,'armnn']]],
+  ['slice',['Slice',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4ad140d37ad98c12ccd8e1c432f548bcdb',1,'armnn']]],
+  ['softmax',['Softmax',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a31d953b9d49a6b4378f45097047976d0',1,'armnn']]],
+  ['softrelu',['SoftReLu',['../namespacearmnn.xhtml#a56297e0f7b215eea46c818cb7528d9eaa6bba7052636d1740303b1b2ef3b53fef',1,'armnn']]],
+  ['spacetobatchnd',['SpaceToBatchNd',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a337c392144dca0d18290c6b4711a2279',1,'armnn']]],
+  ['spacetodepth',['SpaceToDepth',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a5e7ff12da912dc79e7e547281823fa4a',1,'armnn']]],
+  ['specified',['Specified',['../namespacearmnn.xhtml#a8e1f31031ad31cd8cc22d7c9daa32681ab4b379bf7ded74c07595ccb85bc6fdc3',1,'armnn']]],
+  ['splitter',['Splitter',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a41cb9b797ebc6f6f6314e3ded935f4cf',1,'armnn']]],
+  ['sqrt',['Sqrt',['../namespacearmnn.xhtml#a56297e0f7b215eea46c818cb7528d9eaaae77f3ad25595e35b327334d89410054',1,'armnn::Sqrt()'],['../namespacearmnn.xhtml#a1cfaa710db2a54673b21d2ea2da757c8aae77f3ad25595e35b327334d89410054',1,'armnn::Sqrt()']]],
+  ['square',['Square',['../namespacearmnn.xhtml#a56297e0f7b215eea46c818cb7528d9eaaceb46ca115d05c51aa5a16a8867c3304',1,'armnn']]],
+  ['stack',['Stack',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a2187e1021a911b3807cc1bea2eb1a9ca',1,'armnn']]],
+  ['standin',['StandIn',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a93bca63ecbb003649425dd0e4ba79a99',1,'armnn']]],
+  ['stridedslice',['StridedSlice',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4aa31904f2b3479b5a00137fd985974b4d',1,'armnn']]],
+  ['subtraction',['Subtraction',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4a6eb8b8b560161603402c0238b3a7d8b0',1,'armnn']]],
+  ['success',['SUCCESS',['../namespacearmnn__driver.xhtml#a10c64daf22426af432d0a9ada03eee5cad0749aaba8b833466dfcbb0428e4f89c',1,'armnn_driver::SUCCESS()'],['../namespacearmnn.xhtml#a67a0db04d321a74b7e7fcfd3f1a3f70ba505a83f220c02df2f85c3810cd9ceb38',1,'armnn::Success()'],['../namespacearmnn__driver.xhtml#afa2a6d5a1431289c92cea9cceeb174c9a505a83f220c02df2f85c3810cd9ceb38',1,'armnn_driver::Success()']]],
+  ['sum',['Sum',['../namespacearmnn.xhtml#abc05539fc6e7907f32ef0fb242e3b3b0aa0ec87054b5e5b7847d0d8780a01a3d5',1,'armnn']]],
+  ['switch',['Switch',['../namespacearmnn.xhtml#a56943a0946e5f15e5e58054b8e7a04a4abbc155fb2b111bf61c4f5ff892915e6b',1,'armnn']]],
+  ['symmetric',['Symmetric',['../namespacearmnn.xhtml#a14d24d90ab4ba2956e92e27890ba4c91af334649ef5e5d0ffe200751d07012626',1,'armnn']]]
+];

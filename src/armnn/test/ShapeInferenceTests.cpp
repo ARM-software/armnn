@@ -239,8 +239,8 @@ TEST_CASE("ConstantTest")
     TensorShape outputShape{ 1, 1, 3, 3 };
     auto layer = BuildGraph<ConstantLayer>(&graph, {}, "constant");
 
-    const float Datum = 0.0f;
-    ConstTensor output0({outputShape, DataType::Float32, 0.0f, 0, true}, &Datum);
+    std::vector<float> data(9, 0.0f);
+    ConstTensor output0({outputShape, DataType::Float32, 0.0f, 0, true}, data);
     layer->m_LayerOutput = std::make_unique<ScopedTensorHandle>(output0);
 
     layer->GetOutputSlot(0).SetTensorInfo({{1, 1, 3, 3}, DataType::Float32});
@@ -343,8 +343,8 @@ TEST_CASE("DetectionPostProcessTest")
     descriptor.m_ScaleH = 5.0;
     descriptor.m_ScaleW = 5.0;
 
-    const float Datum = 0.0f;
-    ConstTensor anchorsTensor({{1, 1, 3, 3}, DataType::Float32, 0.0f, 0, true}, &Datum);
+    std::vector<float> data(9, 0.0f);
+    ConstTensor anchorsTensor({{1, 1, 3, 3}, DataType::Float32, 0.0f, 0, true}, data);
 
     Graph graph;
 
@@ -432,8 +432,8 @@ TEST_CASE("LstmTest")
     Graph graph;
     auto layer = BuildGraph<LstmLayer>(&graph, {inputShape, inputCellState, inputCellState}, descriptor, "lstm");
 
-    float Datum = 0.0f;
-    ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32, 0.0f, 0, true}, &Datum);
+    std::vector<float> data(60, 0.0f);
+    ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32, 0.0f, 0, true}, data);
 
     layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
     layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
@@ -520,8 +520,8 @@ TEST_CASE("QLstmTest")
     Graph graph;
     auto layer = BuildGraph<QLstmLayer>(&graph, {inputShape, inputCellState, inputCellState}, descriptor, "qlstm");
 
-    float Datum = 0.0f;
-    ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32, 0.0f, 0, true}, &Datum);
+    std::vector<float> data(60, 0.0f);
+    ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32, 0.0f, 0, true}, data);
 
     layer->m_BasicParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
     layer->m_BasicParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);
@@ -548,8 +548,8 @@ TEST_CASE("QuantizedLstmTest")
     Graph graph;
     auto layer = BuildGraph<QuantizedLstmLayer>(&graph, {inputShape, inputCellState, inputCellState},  "quatizedlstm");
 
-    float Datum = 0.0f;
-    ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32, 0.0f, 0, true}, &Datum);
+    std::vector<float> data(60, 0.0f);
+    ConstTensor constTensor({{ 2, 5, 3, 2 }, DataType::Float32, 0.0f, 0, true}, data);
 
     layer->m_QuantizedLstmParameters.m_InputToCellWeights = std::make_unique<ScopedTensorHandle>(constTensor);
     layer->m_QuantizedLstmParameters.m_InputToForgetWeights = std::make_unique<ScopedTensorHandle>(constTensor);

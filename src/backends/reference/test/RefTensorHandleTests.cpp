@@ -137,7 +137,7 @@ TEST_CASE("RefTensorHandleFactoryImport")
 TEST_CASE("RefTensorHandleImport")
 {
     TensorInfo info({ 1, 1, 2, 1 }, DataType::Float32);
-    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+    RefTensorHandle handle(info);
 
     handle.Manage();
     handle.Allocate();
@@ -224,7 +224,7 @@ TEST_CASE("TestManagedConstTensorHandle")
 TEST_CASE("CheckSourceType")
 {
     TensorInfo info({1}, DataType::Float32);
-    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+    RefTensorHandle handle(info);
 
     int* testPtr = new int(4);
 
@@ -243,7 +243,7 @@ TEST_CASE("CheckSourceType")
 TEST_CASE("ReusePointer")
 {
     TensorInfo info({1}, DataType::Float32);
-    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+    RefTensorHandle handle(info);
 
     int* testPtr = new int(4);
 
@@ -258,7 +258,7 @@ TEST_CASE("ReusePointer")
 TEST_CASE("MisalignedPointer")
 {
     TensorInfo info({2}, DataType::Float32);
-    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+    RefTensorHandle handle(info);
 
     // Allocate a 2 int array
     int* testPtr = new int[2];
@@ -274,7 +274,7 @@ TEST_CASE("MisalignedPointer")
 TEST_CASE("CheckCanBeImported")
 {
     TensorInfo info({1}, DataType::Float32);
-    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+    RefTensorHandle handle(info);
 
     int* testPtr = new int(4);
 
@@ -291,7 +291,7 @@ TEST_CASE("CheckCanBeImported")
 TEST_CASE("MisalignedCanBeImported")
 {
     TensorInfo info({2}, DataType::Float32);
-    RefTensorHandle handle(info, static_cast<unsigned int>(MemorySource::Malloc));
+    RefTensorHandle handle(info);
 
     // Allocate a 2 int array
     int* testPtr = new int[2];

@@ -119,7 +119,7 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
     }
     else
     {
-        return std::make_unique<RefTensorHandle>(tensorInfo, static_cast<unsigned int>(MemorySource::Malloc));
+        return std::make_unique<RefTensorHandle>(tensorInfo);
     }
 }
 
@@ -137,7 +137,7 @@ std::unique_ptr<ITensorHandle> RefWorkloadFactory::CreateTensorHandle(const Tens
     }
     else
     {
-        return std::make_unique<RefTensorHandle>(tensorInfo, static_cast<unsigned int>(MemorySource::Malloc));
+        return std::make_unique<RefTensorHandle>(tensorInfo);
     }
 }
 

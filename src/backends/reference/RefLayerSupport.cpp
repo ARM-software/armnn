@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1573,11 +1573,7 @@ bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
         DataType::Signed32
     };
 
-    if (descriptor.m_Axis != 0)
-    {
-        reasonIfUnsupported.value() += std::string("Reference Gather: axis not supported\n");
-        supported &= false;
-    }
+    IgnoreUnused(descriptor);
     supported &= CheckSupportRule(TypeAnyOf(input0, supportedTypes), reasonIfUnsupported,
                                   "Reference Gather: input type not supported");
 

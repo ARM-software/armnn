@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -38,6 +38,13 @@ public:
     armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile,
                                                    const std::map<std::string, armnn::TensorShape>& inputShapes);
 
+    /// Create the network from a protobuf binary
+    armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent);
+
+    /// Create the network from a protobuf binary, with inputShapes specified
+    armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent,
+                                               const std::map<std::string, armnn::TensorShape>& inputShapes);
+
     /// Create the network from a protobuf text file on disk
     armnn::INetworkPtr CreateNetworkFromTextFile(const char* graphFile);
 
@@ -64,6 +71,7 @@ public:
     OnnxParserImpl();
     ~OnnxParserImpl() = default;
 
+    static ModelPtr LoadModelFromBinary(const std::vector<uint8_t>& binaryContent);
     static ModelPtr LoadModelFromBinaryFile(const char * fileName);
     static ModelPtr LoadModelFromTextFile(const char * fileName);
     static ModelPtr LoadModelFromString(const std::string& inputString);

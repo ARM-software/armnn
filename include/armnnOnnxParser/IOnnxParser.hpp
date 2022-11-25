@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -26,6 +26,13 @@ public:
     static IOnnxParser* CreateRaw();
     static IOnnxParserPtr Create();
     static void Destroy(IOnnxParser* parser);
+
+    /// Create the network from a protobuf binary vector
+    armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent);
+
+    /// Create the network from a protobuf binary vector, with inputShapes specified
+    armnn::INetworkPtr CreateNetworkFromBinary(const std::vector<uint8_t>& binaryContent,
+                                               const std::map<std::string, armnn::TensorShape>& inputShapes);
 
     /// Create the network from a protobuf binary file on disk
     armnn::INetworkPtr CreateNetworkFromBinaryFile(const char* graphFile);

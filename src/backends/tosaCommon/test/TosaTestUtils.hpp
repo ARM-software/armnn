@@ -21,6 +21,24 @@ inline void VerifyTosaAttributeFromDescriptor(const BaseDescriptor& descriptor,
 {
     switch (type)
     {
+        case LayerType::Convolution2d:
+        {
+            auto conv2dDesc = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor);
+            std::vector<int> pad = {static_cast<int>(conv2dDesc->m_PadTop),
+                                    static_cast<int>(conv2dDesc->m_PadBottom),
+                                    static_cast<int>(conv2dDesc->m_PadLeft),
+                                    static_cast<int>(conv2dDesc->m_PadRight)};
+
+            std::vector<int> dilation = {static_cast<int>(conv2dDesc->m_DilationY),
+                                         static_cast<int>(conv2dDesc->m_DilationX)};
+            std::vector<int> stride = {static_cast<int>(conv2dDesc->m_StrideY),
+                                       static_cast<int>(conv2dDesc->m_StrideX)};
+            TosaConvAttribute convAttribute(attribute);
+            CHECK(pad == convAttribute.pad());
+            CHECK(dilation == convAttribute.dilation());
+            CHECK(stride == convAttribute.stride());
+            break;
+        }
         case LayerType::Pooling2d:
         {
             auto poolDesc = PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor);
@@ -80,6 +98,7 @@ inline void VerifyTosaAttributeFromDescriptor(const BaseDescriptor& descriptor,
             CHECK(pad == poolAttribute.pad());
             CHECK(kernel == poolAttribute.kernel());
             CHECK(stride == poolAttribute.stride());
+            break;
         }
         default:
             break;
@@ -97,18 +116,30 @@ inline void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* bas
                                                 DType dataType = DType_FP32)
 {
     uint32_t numInputs = static_cast<uint32_t>(inputShape.size());
+    uint32_t numInputTensors = static_cast<uint32_t>(inputShape.size());
     uint32_t numOutputs = static_cast<uint32_t>(outputShape.size());
     std::string operatorString = TosaOpToString(tosaOp);
 
+    // The number of tensors in the block can be different if there are constant layers, as they are created separately.
+    if(type == LayerType::Convolution2d)
+    {
+        numInputTensors = 2;
+        auto conv2dDesc = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor);
+        if(conv2dDesc->m_BiasEnabled)
+        {
+            numInputTensors = 3;
+        }
+    }
+
     std::string blockStr = operatorString + "_block_";
     CHECK(basicBlock->GetName().find(blockStr)  != std::string::npos);
-    CHECK(basicBlock->GetInputs().size() == numInputs);
+    CHECK(basicBlock->GetInputs().size() == numInputTensors);
     CHECK(basicBlock->GetOutputs().size() == numOutputs);
     CHECK(basicBlock->GetOperators().size() == 1);
     CHECK(basicBlock->GetTensors().size() == (numInputs + numOutputs));
 
     TosaSerializationOperator* op = basicBlock->GetOperators().at(0);
-    CHECK(op->GetInputTensorNames().size() == numInputs);
+    CHECK(op->GetInputTensorNames().size() == numInputTensors);
     CHECK(op->GetOutputTensorNames().size() == numOutputs);
 
     for (uint32_t i = 0; i < numInputs; i++)
@@ -117,11 +148,11 @@ inline void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* bas
         std::basic_string<char> operatorInputName  = op->GetInputTensorNames()[i];
         std::basic_string<char> tensorName = basicBlock->GetTensors()[i]->GetName();
 
-        std::string opStr = operatorString + "_input" + std::to_string(i) + "_";
+        std::string opStr = "input" + std::to_string(i) + "_";
 
         CHECK(blockInputName == operatorInputName);
         CHECK(tensorName == operatorInputName);
-        CHECK(blockInputName.find(opStr)  != std::string::npos);
+        CHECK(blockInputName.find(opStr) != std::string::npos);
     }
 
     for (uint32_t i = 0; i < numOutputs; i++)
@@ -130,7 +161,11 @@ inline void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* bas
         std::basic_string<char> operatorOutputName  = op->GetOutputTensorNames()[i];
         std::basic_string<char> tensorName = basicBlock->GetTensors()[numInputs + i]->GetName();
 
-        std::string opStr = operatorString + "_output" + std::to_string(i) + "_";
+        std::string opStr = "output" + std::to_string(i) + "_";
+        if (tosaOp == Op_CONST)
+        {
+            opStr = "constant_";
+        }
 
         CHECK(blockOutputName == operatorOutputName);
         CHECK(tensorName == operatorOutputName);
@@ -152,8 +187,12 @@ inline void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* bas
     {
         TosaSerializationTensor* tensor = basicBlock->GetTensors()[i + inputShape.size()];
         CHECK(tensor->GetDtype() == dataType);
-        CHECK(tensor->GetData().size() == 0);
         CHECK(tensor->GetShape() == outputShape[static_cast<unsigned long int>(i)]);
+        if (tosaOp != Op_CONST)
+        {
+            // Const tensors contain data.
+            CHECK(tensor->GetData().size() == 0);
+        }
     }
 
     VerifyTosaAttributeFromDescriptor(descriptor,

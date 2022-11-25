@@ -5,15 +5,16 @@
 
 #pragma once
 
+#include "TosaOperatorUtils.hpp"
+
 #include <Layer.hpp>
 
 #include <tosa_serialization_handler.h>
-#include "TosaOperatorUtils.hpp"
 
 using namespace armnn;
 using namespace tosa;
 
-TosaSerializationBasicBlock* ConvertPooling2DToTosaOperator(const std::vector<const TensorInfo*>& inputs,
+TosaSerializationBasicBlock* ConvertPooling2DToTosaOperator(const Layer* layer,
+                                                            const std::vector<const TensorInfo*>& inputs,
                                                             const std::vector<const TensorInfo*>& outputs,
-                                                            bool isMain,
                                                             const Pooling2dDescriptor* poolDescriptor);

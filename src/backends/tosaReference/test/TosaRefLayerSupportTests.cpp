@@ -58,11 +58,98 @@ TEST_CASE("IsLayerSupportedTosaReferenceAdditionUnsupported")
 
     CHECK(!supported);
     REQUIRE(reasonIfNotSupported.find(
-        "TOSA Reference Operator: Op_ADD for input: Op_ADD_input0_") != std::string::npos);
+        "TOSA Reference Operator: Op_ADD for input: input0_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
-        "TOSA Reference Operator: Op_ADD for input: Op_ADD_input1_") != std::string::npos);
+        "TOSA Reference Operator: Op_ADD for input: input1_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
-        "TOSA Reference Operator: Op_ADD for output: Op_ADD_output0_") != std::string::npos);
+        "TOSA Reference Operator: Op_ADD for output: output0_") != std::string::npos);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceConstant")
+{
+    armnn::TensorInfo outputInfo({1,1,3,4}, armnn::DataType::Float32);
+
+    armnn::TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Constant,
+                                                     {outputInfo},
+                                                     armnn::BaseDescriptor(),
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceConstantUnsupported")
+{
+    armnn::TensorInfo outputInfo({1,1,3,4}, armnn::DataType::Signed64);
+
+    armnn::TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Constant,
+                                                     {outputInfo},
+                                                     armnn::BaseDescriptor(),
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+    REQUIRE(reasonIfNotSupported.find(
+            "TOSA Reference Operator: Op_CONST for output: constant_") != std::string::npos);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceConv2d")
+{
+    armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+
+    armnn::Convolution2dDescriptor desc;
+    desc.m_BiasEnabled = true;
+
+    armnn::TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Convolution2d,
+                                                     {inputInfo, outputInfo, weightsInfo, biasesInfo},
+                                                     desc,
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceConv2dUnsupported")
+{
+    // If inputs and weights are Fp32, output must match.
+    armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
+    armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Signed64);
+    armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+
+    armnn::Convolution2dDescriptor desc;
+    desc.m_BiasEnabled = true;
+
+    armnn::TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Convolution2d,
+                                                     {inputInfo, outputInfo, weightsInfo, biasesInfo},
+                                                     desc,
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+    REQUIRE(reasonIfNotSupported.find(
+            "TOSA Reference Operator: Op_CONV2D for input 0: input0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+            "input 1: input1_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+            "and output: output0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+            "has an unsupported input data type combination.") != std::string::npos);
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2d")
@@ -150,9 +237,9 @@ TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2dUnsupported")
 
     CHECK(!supported);
     REQUIRE(reasonIfNotSupported.find(
-        "TOSA Reference Operator: Op_MAX_POOL2D for input: Op_MAX_POOL2D_input0_") != std::string::npos);
+        "TOSA Reference Operator: Op_MAX_POOL2D for input: input0_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
-        "TOSA Reference Operator: Op_MAX_POOL2D for output: Op_MAX_POOL2D_output0_") != std::string::npos);
+        "TOSA Reference Operator: Op_MAX_POOL2D for output: output0_") != std::string::npos);
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2dUnsupported_InputOutputDatatypeDifferent")
@@ -177,9 +264,9 @@ TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2dUnsupported_InputOutputDatat
 
     CHECK(!supported);
     REQUIRE(reasonIfNotSupported.find(
-        "TOSA Reference Operator: Op_AVG_POOL2D for input: Op_PAD_intermediate0_") != std::string::npos);
+        "TOSA Reference Operator: Op_AVG_POOL2D for input: intermediate0_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
-        " and output: Op_AVG_POOL2D_output0_") != std::string::npos);
+        " and output: output0_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
         " has an unsupported input data type: 8 to output data type: 10") != std::string::npos);
 }

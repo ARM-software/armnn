@@ -30,7 +30,7 @@ TEST_CASE("GetTosaMapping_AvgPool2DIgnoreValueLayer")
     std::vector<std::vector<int32_t>> outputShape        = {{ 1, 1, 3, 3 }};
 
     TosaSerializationBasicBlock* basicBlock =
-        GetTosaMapping(LayerType::Pooling2d, {&inputTensorInfo}, {&outputTensorInfo}, descriptor, false);
+        GetTosaMapping(nullptr, LayerType::Pooling2d, {&inputTensorInfo}, {&outputTensorInfo}, descriptor);
     VerifyAvgPool2DIgnoreValue(basicBlock,
                                inputShape,
                                outputShape,
@@ -74,7 +74,7 @@ TEST_CASE("GetTosaMappingFromLayer_AvgPool2DIgnoreValueLayer")
     pool->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     TosaSerializationBasicBlock* basicBlock =
-        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(pool), false);
+        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(pool));
     VerifyAvgPool2DIgnoreValue(basicBlock,
                               inputShape,
                               outputShape,

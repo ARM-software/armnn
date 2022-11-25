@@ -17,10 +17,8 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
 {
     uint32_t numInputs = static_cast<uint32_t>(inputShape.size());
     uint32_t numOutputs = static_cast<uint32_t>(outputShape.size());
-    std::string operatorString0 = TosaOpToString(Op_PAD);
-    std::string operatorString1 = TosaOpToString(Op_AVG_POOL2D);
 
-    std::string blockStr = operatorString1 + "_block_";
+    std::string blockStr = TosaOpToString(Op_AVG_POOL2D) + "_block_";
     CHECK(basicBlock->GetName().find(blockStr)  != std::string::npos);
     CHECK(basicBlock->GetInputs().size() == numInputs);
     CHECK(basicBlock->GetOutputs().size() == numOutputs);
@@ -41,7 +39,7 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
         std::basic_string<char> blockInputName = basicBlock->GetInputs()[i];
         std::basic_string<char> operatorInputName  = padOp->GetInputTensorNames()[i];
 
-        std::string opStr = operatorString0 + "_input" + std::to_string(i) + "_";
+        std::string opStr = "input" + std::to_string(i) + "_";
 
         CHECK(blockInputName == operatorInputName);
         CHECK(basicBlock->GetTensorByName(blockInputName));
@@ -56,7 +54,7 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
     for (uint32_t i = 0; i < padOpOutputs; i++)
     {
         std::basic_string<char> operatorOutputName  = padOp->GetOutputTensorNames()[i];
-        std::string opStr = operatorString0 + "_intermediate" + std::to_string(i) + "_";
+        std::string opStr = "intermediate" + std::to_string(i) + "_";
 
         CHECK(basicBlock->GetTensorByName(operatorOutputName));
         CHECK(operatorOutputName.find(opStr)  != std::string::npos);
@@ -86,7 +84,7 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
     for (uint32_t i = 0; i < poolOpInputs; i++)
     {
         std::basic_string<char> operatorInputName  = poolOp->GetInputTensorNames()[i];
-        std::string opStr = operatorString0 + "_intermediate" + std::to_string(i) + "_";
+        std::string opStr = "intermediate" + std::to_string(i) + "_";
 
         CHECK(basicBlock->GetTensorByName(operatorInputName));
         CHECK(operatorInputName.find(opStr)  != std::string::npos);
@@ -102,7 +100,7 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
         std::basic_string<char> blockOutputName = basicBlock->GetOutputs()[i];
         std::basic_string<char> operatorOutputName  = poolOp->GetOutputTensorNames()[i];
 
-        std::string opStr = operatorString1 + "_output" + std::to_string(i) + "_";
+        std::string opStr = "output" + std::to_string(i) + "_";
 
         CHECK(blockOutputName == operatorOutputName);
         CHECK(basicBlock->GetTensorByName(blockOutputName));

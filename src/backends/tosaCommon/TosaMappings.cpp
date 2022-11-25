@@ -8,40 +8,33 @@
 using namespace armnn;
 using namespace tosa;
 
-void SetBasicBlockConstantTensorData(Layer* layer, TosaSerializationBasicBlock* /*basicBlock*/)
-{
-    switch (layer->GetType())
-    {
-        case LayerType::Convolution2d:
-        {
-            // ToDo: using Convolution2d as an example as it has constant tensors for weights and bias.
-            // ToDo: manually set TosaOperator data of basicBlock where constant tensors exist.
-        }
-        default:
-            // If no switch statement for layer, no constant tensors exist in that layer, return
-            return;
-    }
-}
-
 TosaSerializationBasicBlock* CreateEmptyTosaSerializationBasicBlock()
 {
-    // empty basic block when no tosa mapping implemented/exists
-    TosaSerializationOperator* op =
-        new TosaSerializationOperator(Op_UNKNOWN, Attribute_NONE, nullptr, {}, {});
+    // Empty basic block when no TOSA mapping implemented/exists
+    auto* op = new TosaSerializationOperator(Op_UNKNOWN, Attribute_NONE, nullptr, {}, {});
     return new TosaSerializationBasicBlock("", {op}, {}, {}, {});
 }
 
-TosaSerializationBasicBlock* GetTosaMapping(const LayerType type,
+TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
+                                            const LayerType type,
                                             const std::vector<const TensorInfo*>& inputs,
                                             const std::vector<const TensorInfo*>& outputs,
-                                            const BaseDescriptor& descriptor,
-                                            bool isMain = false)
+                                            const BaseDescriptor& descriptor)
 {
     switch (type)
     {
         case LayerType::Addition:
         {
-            return ConvertAdditionToTosaOperator(inputs, outputs, isMain);
+            return ConvertAdditionToTosaOperator(layer, inputs, outputs);
+        }
+        case LayerType::Constant:
+        {
+            return ConvertConstantToTosaOperator(layer, outputs);
+        }
+        case LayerType::Convolution2d:
+        {
+            auto conv2dDesc = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor);
+            return ConvertConv2dToTosaOperator(layer, inputs, outputs, conv2dDesc);
         }
         case LayerType::Pooling2d:
         {
@@ -57,11 +50,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const LayerType type,
             }
             else if (avgPoolIgnoreValue)
             {
-                return ConvertAvgPool2DIgnoreValueToTosaOperator(inputs, outputs, isMain, poolDesc);
+                return ConvertAvgPool2DIgnoreValueToTosaOperator(layer, inputs, outputs, poolDesc);
             }
             else
             {
-                return ConvertPooling2DToTosaOperator(inputs, outputs, isMain, poolDesc);
+                return ConvertPooling2DToTosaOperator(layer, inputs, outputs, poolDesc);
             }
         }
         default:
@@ -71,7 +64,7 @@ TosaSerializationBasicBlock* GetTosaMapping(const LayerType type,
     }
 }
 
-TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer, bool isMain = false)
+TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer)
 {
     std::vector<const TensorInfo*> inputs;
     for (auto inputSlot : layer->GetInputSlots())
@@ -85,11 +78,10 @@ TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer, bool isMain =
         outputs.push_back(&outputSlot.GetTensorInfo());
     }
 
-    TosaSerializationBasicBlock* basicBlock = GetTosaMapping(layer->GetType(),
+    TosaSerializationBasicBlock* basicBlock = GetTosaMapping(layer,
+                                                             layer->GetType(),
                                                              inputs,
                                                              outputs,
-                                                             layer->GetParameters(),
-                                                             isMain);
-    SetBasicBlockConstantTensorData(layer, basicBlock);
+                                                             layer->GetParameters());
     return basicBlock;
 }

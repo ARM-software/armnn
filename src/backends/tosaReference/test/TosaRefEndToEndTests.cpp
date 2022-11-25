@@ -6,6 +6,7 @@
 #include "backendsCommon/test/EndToEndTestImpl.hpp"
 
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
+#include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
@@ -28,6 +29,17 @@ TEST_CASE("TosaRefAdditionEndtoEndTestInt32")
 TEST_CASE("TosaRefAdditionEndtoEndTestFloat16")
 {
     AdditionEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+// Conv2d
+TEST_CASE("TosaRefConv2dEndtoEndTestFloat32")
+{
+    Convolution2dEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefConv2dWithoutBiasEndtoEndTestFloat32")
+{
+    Convolution2dEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
 }
 
 // Max Pool 2D

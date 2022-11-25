@@ -8,6 +8,10 @@ list(APPEND armnnTosaBackendOperators_sources
         AdditionOperator.cpp
         AvgPool2DIgnoreValueOperator.hpp
         AvgPool2DIgnoreValueOperator.cpp
+        ConstantOperator.hpp
+        ConstantOperator.cpp
+        Conv2dOperator.hpp
+        Conv2dOperator.cpp
         Pooling2DOperator.hpp
         Pooling2DOperator.cpp
         TosaOperatorUtils.hpp

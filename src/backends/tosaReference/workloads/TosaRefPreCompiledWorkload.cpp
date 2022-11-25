@@ -23,13 +23,10 @@ TosaRefPreCompiledWorkload::TosaRefPreCompiledWorkload(const PreCompiledQueueDes
 
 void TosaRefPreCompiledWorkload::Execute() const
 {
-    uint32_t numInputBuffers  = static_cast<uint32_t>(m_Data.m_Inputs.size());
-    uint32_t numOutputBuffers = static_cast<uint32_t>(m_Data.m_Outputs.size());
-
     tosa::TosaSerializationHandler* handler = static_cast<tosa::TosaSerializationHandler*>(m_Data.m_PreCompiledObject);
 
-    std::vector<std::string> input_names = handler->GetInputs();
-    std::vector<std::string> output_names = handler->GetOutputs();
+    std::vector<std::string> inputNames = handler->GetInputs();
+    std::vector<std::string> outputNames = handler->GetOutputs();
 
     TosaReference::IModelRunner runner;
     GraphStatus status;
@@ -42,29 +39,29 @@ void TosaRefPreCompiledWorkload::Execute() const
     }
 
     // Set the inputs
-    for (uint32_t inputSlotIdx = 0; inputSlotIdx < numInputBuffers; ++inputSlotIdx)
+    for (uint32_t inputSlotIdx = 0; inputSlotIdx < inputNames.size(); ++inputSlotIdx)
     {
         DataType dataType = m_workloadInfo.m_InputTensorInfos[inputSlotIdx].GetDataType();
         switch (dataType)
         {
             case DataType::Float16:
-                SetInput<half_float::half>(runner, input_names[inputSlotIdx], inputSlotIdx);
+                SetInput<half_float::half>(runner, inputNames[inputSlotIdx], inputSlotIdx);
                 break;
             case DataType::Float32:
-                SetInput<float>(runner, input_names[inputSlotIdx], inputSlotIdx);
+                SetInput<float>(runner, inputNames[inputSlotIdx], inputSlotIdx);
                 break;
             case DataType::QAsymmU8:
             case DataType::QAsymmS8:
             case DataType::QSymmS8:
             case DataType::QSymmS16:
             case DataType::Signed32:
-                SetInput<int32_t>(runner, input_names[inputSlotIdx], inputSlotIdx);
+                SetInput<int32_t>(runner, inputNames[inputSlotIdx], inputSlotIdx);
                 break;
             case DataType::Signed64:
-                SetInput<int64_t>(runner, input_names[inputSlotIdx], inputSlotIdx);
+                SetInput<int64_t>(runner, inputNames[inputSlotIdx], inputSlotIdx);
                 break;
             case DataType::Boolean:
-                SetInput<unsigned char>(runner, input_names[inputSlotIdx], inputSlotIdx);
+                SetInput<unsigned char>(runner, inputNames[inputSlotIdx], inputSlotIdx);
                 break;
             default:
                 throw armnn::Exception("Input data type is unsupported in TOSA Reference Backend.");
@@ -79,29 +76,29 @@ void TosaRefPreCompiledWorkload::Execute() const
     }
 
     // Gets the outputs
-    for (uint32_t outputSlotIdx = 0; outputSlotIdx < numOutputBuffers; ++outputSlotIdx)
+    for (uint32_t outputSlotIdx = 0; outputSlotIdx < outputNames.size(); ++outputSlotIdx)
     {
         DataType dataType = m_workloadInfo.m_OutputTensorInfos[outputSlotIdx].GetDataType();
         switch (dataType)
         {
             case DataType::Float16:
-                GetOutput<half_float::half>(runner, output_names[outputSlotIdx], outputSlotIdx);
+                GetOutput<half_float::half>(runner, outputNames[outputSlotIdx], outputSlotIdx);
                 break;
             case DataType::Float32:
-                GetOutput<float>(runner, output_names[outputSlotIdx], outputSlotIdx);
+                GetOutput<float>(runner, outputNames[outputSlotIdx], outputSlotIdx);
                 break;
             case DataType::QAsymmU8:
             case DataType::QAsymmS8:
             case DataType::QSymmS8:
             case DataType::QSymmS16:
             case DataType::Signed32:
-                GetOutput<int32_t>(runner, output_names[outputSlotIdx], outputSlotIdx);
+                GetOutput<int32_t>(runner, outputNames[outputSlotIdx], outputSlotIdx);
                 break;
             case DataType::Signed64:
-                GetOutput<int64_t>(runner, output_names[outputSlotIdx], outputSlotIdx);
+                GetOutput<int64_t>(runner, outputNames[outputSlotIdx], outputSlotIdx);
                 break;
             case DataType::Boolean:
-                GetOutput<unsigned char>(runner, output_names[outputSlotIdx], outputSlotIdx);
+                GetOutput<unsigned char>(runner, outputNames[outputSlotIdx], outputSlotIdx);
                 break;
             default:
                 throw armnn::Exception("Output data type is unsupported in TOSA Reference Backend.");

@@ -48,14 +48,34 @@ struct TosaAssertSize : public Rule
     }
 };
 
-struct TosaContainerContains : public Rule
+struct TosaContainerContainsTwoTypes : public Rule
 {
-    explicit TosaContainerContains(std::tuple<DType, DType>& check, const std::vector<std::tuple<DType, DType>>& c)
+    explicit TosaContainerContainsTwoTypes(std::tuple<DType, DType>& check,
+                                           const std::vector<std::tuple<DType, DType>>& c)
     {
         for (auto item: c)
         {
-            if (std::get<0>(check) == std::get<0>(item)
-                && std::get<1>(check) == std::get<1>(item))
+            if (std::get<0>(check) == std::get<0>(item) &&
+                std::get<1>(check) == std::get<1>(item))
+            {
+                m_Res = true;
+                return;
+            }
+        }
+        m_Res = false;
+    }
+};
+
+struct TosaContainerContainsThreeTypes : public Rule
+{
+    explicit TosaContainerContainsThreeTypes(std::tuple<DType, DType, DType>& check,
+                                             const std::vector<std::tuple<DType, DType, DType>>& c)
+    {
+        for (auto item: c)
+        {
+            if (std::get<0>(check) == std::get<0>(item) &&
+                std::get<1>(check) == std::get<1>(item) &&
+                std::get<2>(check) == std::get<2>(item))
             {
                 m_Res = true;
                 return;

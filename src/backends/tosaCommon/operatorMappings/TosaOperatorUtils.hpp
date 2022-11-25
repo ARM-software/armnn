@@ -5,10 +5,13 @@
 
 #pragma once
 
+#include <Layer.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 
-#include <tosa_generated.h>
+#include "common/include/ProfilingGuid.hpp"
+
+#include <tosa_serialization_handler.h>
 
 using namespace armnn;
 using namespace tosa;
@@ -51,6 +54,33 @@ inline std::vector<int32_t> GetTosaTensorShape(const TensorShape& shape)
         returnShape.push_back(static_cast<int32_t>(shape[i]));
     }
     return returnShape;
+}
+
+// Function that generates unique name using the layer type, input slot and layer guid.
+inline std::string GenerateUniqueName(const Layer& layer, uint32_t layerSlot)
+{
+    std::string name;
+    std::string guid        = std::to_string(layer.GetGuid());
+    std::string slotAndGuid = std::to_string(layerSlot) + "_" + guid;
+    LayerType layerType = layer.GetType();
+
+    if (layerType == LayerType::Input)
+    {
+        name = "input" + slotAndGuid;
+    }
+    else if (layerType == LayerType::Output)
+    {
+        name = "output" + slotAndGuid;
+    }
+    else if (layerType == LayerType::Constant)
+    {
+        name = "constant_" + guid;
+    }
+    else
+    {
+        name = "intermediate" + slotAndGuid;
+    }
+    return name;
 }
 
 // Function to return unique int as a string to ensure uniqueness between all input, output and block names.
@@ -205,4 +235,73 @@ inline std::string TosaOpToString(Op tosaOp)
             return "Op_WHILE_LOOP";
     }
     return "";
+}
+
+inline std::vector<uint8_t> ConvertConstantTensorDataToBuffer(const std::shared_ptr<ConstTensorHandle>& tensorHandle)
+{
+    tosa_err_t error;
+    std::vector<uint8_t> uint8Data;
+    auto tensorInfo = tensorHandle->GetTensorInfo();
+
+    switch (tensorInfo.GetDataType())
+    {
+        case DataType::Float32:
+        {
+            std::vector<float> data(tensorInfo.GetNumElements());
+            memcpy(data.data(), tensorHandle->Map(true), tensorInfo.GetNumBytes());
+
+            error = TosaSerializationHandler::ConvertF32toU8(data, uint8Data);
+            break;
+        }
+        case DataType::Float16:
+        {
+            std::vector<float> data(tensorInfo.GetNumElements());
+            memcpy(data.data(), tensorHandle->Map(true), tensorInfo.GetNumBytes());
+
+            error = TosaSerializationHandler::ConvertF16toU8(data, uint8Data);
+            break;
+        }
+        case DataType::QSymmS8:
+        case DataType::QAsymmS8:
+        {
+            std::vector<int8_t> data(tensorInfo.GetNumElements());
+            memcpy(data.data(), tensorHandle->Map(true), tensorInfo.GetNumBytes());
+
+            error = TosaSerializationHandler::ConvertI8toU8(data, uint8Data);
+            break;
+        }
+        case DataType::QAsymmU8:
+        {
+            memcpy(uint8Data.data(), tensorHandle->Map(true), tensorInfo.GetNumBytes());
+            break;
+        }
+        case DataType::QSymmS16:
+        {
+            std::vector<int16_t> data(tensorInfo.GetNumElements());
+            memcpy(data.data(), tensorHandle->Map(true), tensorInfo.GetNumBytes());
+
+            error = TosaSerializationHandler::ConvertI16toU8(data, uint8Data);
+            break;
+        }
+        case DataType::Signed32:
+        {
+            std::vector<int32_t> data(tensorInfo.GetNumElements());
+            memcpy(data.data(), tensorHandle->Map(true), tensorInfo.GetNumBytes());
+
+            error = TosaSerializationHandler::ConvertI32toU8(data, uint8Data);
+            break;
+        }
+        default:
+        {
+            throw armnn::Exception("SetConstantTensorData: An unsupported data type was encountered.");
+        }
+    }
+
+    if(error != tosa_err_t::TOSA_OK)
+    {
+        throw armnn::Exception("SetConstantTensorData: An error occurred when converting constant data");
+    }
+
+    tensorHandle->Unmap();
+    return uint8Data;
 }

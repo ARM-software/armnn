@@ -14,6 +14,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ComparisonEndToEndTestImpl.hpp
     CompatibilityTests.cpp
     ConcatEndToEndTestImpl.hpp
+    Convolution2dEndToEndTestImpl.hpp
     Convolution3dEndToEndTestImpl.hpp
     CustomMemoryOptimizerStrategyTests.cpp
     DefaultAsyncExecuteTest.cpp

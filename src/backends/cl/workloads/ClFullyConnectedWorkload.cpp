@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -65,10 +65,10 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
 
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
     detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
-    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[1]);
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
-        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[2]);
     }
 
     // Report Profiling Details

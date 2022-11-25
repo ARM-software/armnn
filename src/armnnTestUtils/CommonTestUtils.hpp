@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -70,15 +70,6 @@ inline bool Compare(T a, T b, float tolerance = 0.000001f)
     return std::fabs(static_cast<float>(a) - static_cast<float>(b)) <= tolerance;
 }
 
-template <typename ConvolutionLayer>
-void SetWeightAndBias(ConvolutionLayer* layer, const armnn::TensorInfo& weightInfo, const armnn::TensorInfo& biasInfo)
-{
-    layer->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(weightInfo);
-    layer->m_Bias   = std::make_unique<armnn::ScopedTensorHandle>(biasInfo);
-
-    layer->m_Weight->Allocate();
-    layer->m_Bias->Allocate();
-}
 armnn::SubgraphView::InputSlots CreateInputsFrom(armnn::Layer* layer,
                                                  std::vector<unsigned int> ignoreSlots = {});
 

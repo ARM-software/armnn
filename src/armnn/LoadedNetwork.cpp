@@ -421,7 +421,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                             ConstWorkloads.push_back(m_WorkloadQueue.back().get());
                         }
                     }
-                    // release the constant data in the layer..
+                    // release the constant data in the layer.
                     layer->ReleaseConstantData();
                     break;
                 }

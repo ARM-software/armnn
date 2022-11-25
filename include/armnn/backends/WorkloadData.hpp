@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -179,15 +179,6 @@ struct FillQueueDescriptor : QueueDescriptorWithParameters<FillDescriptor>
 // Fully connected layer workload data.
 struct FullyConnectedQueueDescriptor : QueueDescriptorWithParameters<FullyConnectedDescriptor>
 {
-    FullyConnectedQueueDescriptor()
-        : m_Weight(nullptr)
-        , m_Bias(nullptr)
-    {
-    }
-
-    const ConstTensorHandle* m_Weight;
-    const ConstTensorHandle* m_Bias;
-
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
@@ -213,15 +204,6 @@ struct Pooling3dQueueDescriptor : QueueDescriptorWithParameters<Pooling3dDescrip
 // Convolution 2D layer workload data.
 struct Convolution2dQueueDescriptor : QueueDescriptorWithParameters<Convolution2dDescriptor>
 {
-    Convolution2dQueueDescriptor()
-        : m_Weight(nullptr)
-        , m_Bias(nullptr)
-    {
-    }
-
-    const ConstTensorHandle* m_Weight;
-    const ConstTensorHandle* m_Bias;
-
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
@@ -246,15 +228,6 @@ struct Convolution3dQueueDescriptor : QueueDescriptorWithParameters<Convolution3
 ///
 struct DepthwiseConvolution2dQueueDescriptor : QueueDescriptorWithParameters<DepthwiseConvolution2dDescriptor>
 {
-    DepthwiseConvolution2dQueueDescriptor()
-        : m_Weight(nullptr)
-        , m_Bias(nullptr)
-    {
-    }
-
-    const ConstTensorHandle* m_Weight;
-    const ConstTensorHandle* m_Bias;
-
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 

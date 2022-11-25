@@ -88,16 +88,16 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     arm_compute::ICLTensor& weights = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ICLTensor* bias  = nullptr;
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        bias = &static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+        arm_compute::ICLTensor& bias = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+        m_BiasProxy = std::make_unique<ICLTensorProxy>(&bias);
     }
 
     // Create Proxy tensor and set the initial tensor handle to it
     m_InputProxy = std::make_unique<ICLTensorProxy>(&input);
     m_OutputProxy = std::make_unique<ICLTensorProxy>(&output);
-
+    m_WeightsProxy = std::make_unique<ICLTensorProxy>(&weights);
 
     arm_compute::DataLayout aclDataLayout = ConvertDataLayout(m_Data.m_Parameters.m_DataLayout);
     input.info()->set_data_layout(aclDataLayout);
@@ -112,8 +112,8 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution2dWorkload_configure");
         m_ConvolutionLayer.configure(clCompileContext,
                                      m_InputProxy.get(),
-                                     &weights,
-                                     bias,
+                                     m_WeightsProxy.get(),
+                                     m_BiasProxy.get(),
                                      m_OutputProxy.get(),
                                      padStrideInfo,
                                      arm_compute::WeightsInfo(),
@@ -138,11 +138,11 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
 
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
     detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
-    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[1]);
     detailsInfo.m_ConvolutionMethod = armnn::Optional<std::string>(GetConvolutionMethodString(m_ConvolutionMethod));
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
-        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[2]);
     }
 
     // Report Profiling Details

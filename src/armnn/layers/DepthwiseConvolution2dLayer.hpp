@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -15,12 +15,6 @@ class ScopedTensorHandle;
 class DepthwiseConvolution2dLayer : public LayerWithParameters<DepthwiseConvolution2dDescriptor>
 {
 public:
-    /// A unique pointer to store Weight values.
-    /// @Note Deprecated. Removal date is 23.02. Weights are stored in ConstantLayers now.
-    std::shared_ptr<ConstTensorHandle> m_Weight;
-    /// A unique pointer to store Bias values.
-    /// @Note Deprecated. Removal date is 23.02. Bias are stored in ConstantLayers now.
-    std::shared_ptr<ConstTensorHandle> m_Bias;
 
     /// Makes a workload for the DepthwiseConvolution2d type.
     /// @param [in] graph The graph where this layer can be found.
@@ -47,6 +41,10 @@ public:
 
     void SerializeLayerParameters(ParameterStringifyFunction& fn) const override;
 
+    /// This layer does not have any data stored, weights and bias are now stored in constant layers.
+    /// We do not want to release the data in the constant layer, that is why we override with an empty function.
+    void ReleaseConstantData() override {}
+
 protected:
     /// Constructor to create a DepthwiseConvolution2dLayer.
     /// @param [in] param DepthwiseConvolution2dDescriptor to configure the depthwise convolution2d.
@@ -56,10 +54,8 @@ protected:
     /// Default destructor
     ~DepthwiseConvolution2dLayer() = default;
 
-    /// Retrieve the handles to the constant values stored by the layer.
-    /// @return A vector of the constant tensors stored by this layer.
-    /// @Note Deprecated. GetConstantTensorsByRef is deprecated. m_Weights and m_Bias
-    ///                   should be connected to layer as Constant Layers instead."
+    /// Retrieve the handles to the constant values connected to the layer.
+    /// @return A vector of the constant tensors connected to the layer.
     ConstantTensors GetConstantTensorsByRef() override;
 };
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -63,6 +63,8 @@ private:
     arm_compute::ConvolutionMethod m_ConvolutionMethod;
 
     std::unique_ptr<ICLTensorProxy> m_InputProxy;
+    std::unique_ptr<ICLTensorProxy> m_WeightsProxy;
+    std::unique_ptr<ICLTensorProxy> m_BiasProxy;
     std::unique_ptr<ICLTensorProxy> m_OutputProxy;
 };
 

@@ -20,6 +20,5 @@
 #include "PermuteAsReshape.hpp"
 #include "PermuteAndBatchToSpaceAsDepthToSpace.hpp"
 #include "PermuteDepthwiseConv2dWeights.hpp"
-#include "RedirectMembersToConstantInputs.hpp"
 #include "SquashEqualSiblings.hpp"
 #include "TransposeAsReshape.hpp"

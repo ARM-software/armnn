@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -76,23 +76,6 @@ public:
     IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
                                              const char* name = nullptr);
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "23.02")
-    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                             const ConstTensor& weights,
-                                             const Optional<ConstTensor>& biases,
-                                             const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "23.02")
-    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                             const ConstTensor& weights,
-                                             const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This AddConvolution2dLayer overload is deprecated", "23.02")
-    IConnectableLayer* AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                             const ConstTensor& weights,
-                                             const ConstTensor& biases,
-                                             const char* name = nullptr);
-
     IConnectableLayer* AddConvolution3dLayer(const Convolution3dDescriptor& convolution3dDescriptor,
                                              const char* name = nullptr);
 
@@ -101,23 +84,14 @@ public:
     IConnectableLayer* AddDepthToSpaceLayer(const DepthToSpaceDescriptor& depthToSpaceDescriptor,
                                             const char* name = nullptr);
 
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const char* name = nullptr);
-
-    ARMNN_DEPRECATED_MSG("This AddDepthwiseConvolution2dLayer overload is deprecated")
-    IConnectableLayer* AddDepthwiseConvolution2dLayer(
-        const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-        const ConstTensor& weights,
-        const Optional<ConstTensor>& biases,
-        const char* name = nullptr);
+    IConnectableLayer* AddDepthwiseConvolution2dLayer(const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
+                                                      const char* name = nullptr);
 
     IConnectableLayer* AddDequantizeLayer(const char* name = nullptr);
 
-    IConnectableLayer* AddDetectionPostProcessLayer(
-        const DetectionPostProcessDescriptor& descriptor,
-        const ConstTensor& anchors,
-        const char* name = nullptr);
+    IConnectableLayer* AddDetectionPostProcessLayer(const DetectionPostProcessDescriptor& descriptor,
+                                                    const ConstTensor& anchors,
+                                                    const char* name = nullptr);
 
     IConnectableLayer* AddDivisionLayer(const char* name = nullptr);
 
@@ -132,11 +106,6 @@ public:
     IConnectableLayer* AddFloorLayer(const char* name = nullptr);
 
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                              const char* name = nullptr);
-
-    IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                              const Optional<ConstTensor>& weights,
-                                              const Optional<ConstTensor>& biases,
                                               const char* name = nullptr);
 
     IConnectableLayer* AddGatherLayer(const GatherDescriptor& gatherDescriptor,

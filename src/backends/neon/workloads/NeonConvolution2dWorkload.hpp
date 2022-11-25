@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -41,10 +41,12 @@ public:
 private:
     std::unique_ptr<arm_compute::IFunction> m_ConvolutionLayer;
 
-    std::unique_ptr<arm_compute::Tensor> m_KernelTensor;
-    std::unique_ptr<arm_compute::Tensor> m_BiasTensor;
-
+    mutable std::unique_ptr<arm_compute::Tensor> m_KernelTensor;
+    mutable std::unique_ptr<arm_compute::Tensor> m_BiasTensor;
+    TensorInfo m_KernelTensorInfo;
+    TensorInfo m_BiasTensorInfo;
     arm_compute::ConvolutionMethod m_ConvolutionMethod;
+    mutable bool prepared = false;
 };
 
 } //namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -188,8 +188,6 @@ LayerType* FuseConvolution2dLayer(OptimizationViews& optimizationViews,
 
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
-    replacementLayer->m_Weight = std::move(baseLayer->m_Weight);
-    replacementLayer->m_Bias = std::move(baseLayer->m_Bias);
 
     FuseLayer(optimizationViews,
               baseLayer,
@@ -212,8 +210,6 @@ LayerType* FuseDepthwiseConvolution2dLayer(OptimizationViews& optimizationViews,
 
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
-    replacementLayer->m_Weight = std::move(baseLayer->m_Weight);
-    replacementLayer->m_Bias = std::move(baseLayer->m_Bias);
 
     FuseLayer(optimizationViews,
               baseLayer,
@@ -242,8 +238,6 @@ LayerType* FuseFullyConnectedLayer(OptimizationViews& optimizationViews,
               activationLayer,
               activationDesc);
 
-    replacementLayer->m_Weight = std::move(baseLayer->m_Weight);
-    replacementLayer->m_Bias   = std::move(baseLayer->m_Bias);
 
     return replacementLayer;
 }

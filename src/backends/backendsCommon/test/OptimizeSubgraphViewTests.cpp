@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -94,13 +94,10 @@ Convolution2dLayer* AddConvolutionLayer(Graph& graph,
                                         LayerNameToLayerMap& layersInGraph,
                                         const Convolution2dDescriptor& convolutionDescriptor,
                                         const std::string& layerName,
-                                        const TensorInfo& weightInfo,
-                                        const TensorInfo& biasInfo,
                                         const TensorInfo& outputInfo)
 {
     Convolution2dLayer* const convLayer = graph.AddLayer<Convolution2dLayer>(convolutionDescriptor, layerName.c_str());
     CHECK(convLayer);
-    SetWeightAndBias(convLayer, weightInfo, biasInfo);
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
     layersInGraph.insert(std::make_pair(convLayer->GetName(), convLayer));
     return convLayer;
@@ -335,11 +332,11 @@ SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph1(Graph& graph, Layer
     // Construct the graph
     Layer* const inputLayer = AddInputLayer(graph, "input layer", inputInfo);
     Convolution2dLayer* const convLayer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                              "conv layer", weightInfo, biasInfo, outputInfo);
+                                                              "conv layer", outputInfo);
 
   ConstantLayer* const weightsLayer =
-      AddConstantLayer(graph, layersInGraph, "Weights Layer", constWeightsTensor, outputInfo);
-  ConstantLayer* const biasLayer = AddConstantLayer(graph, layersInGraph, "Bias Layer", constBiasTensor, outputInfo);
+      AddConstantLayer(graph, layersInGraph, "Weights Layer", constWeightsTensor, weightInfo);
+  ConstantLayer* const biasLayer = AddConstantLayer(graph, layersInGraph, "Bias Layer", constBiasTensor, biasInfo);
 
     Layer* const outputLayer = AddOutputLayer(graph, "output layer");
 
@@ -373,7 +370,6 @@ SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph2(Graph& graph, Layer
     std::vector<float> biasVector(16);
     ConstTensor constBiasTensor(biasInfo, biasVector);
 
-
     Convolution2dDescriptor convolutionDescriptor;
     convolutionDescriptor.m_StrideX     = 1;
     convolutionDescriptor.m_StrideY     = 1;
@@ -383,40 +379,40 @@ SubgraphView::SubgraphViewPtr BuildFullyOptimizableSubgraph2(Graph& graph, Layer
     // Construct the graph
     Layer* const inputLayer = AddInputLayer(graph, "input layer", inputInfo);
     Convolution2dLayer* const conv1Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv1 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv1 layer", outputInfo);
     ConstantLayer* const weightsLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, biasInfo);
 
     Convolution2dLayer* const conv2Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv2 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv2 layer", outputInfo);
     ConstantLayer* const weightsLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 2", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 2", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 2", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 2", constBiasTensor, biasInfo);
 
 
     Convolution2dLayer* const conv3Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv3 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv3 layer", outputInfo);
     ConstantLayer* const weightsLayer3 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 3", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 3", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer3 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 3", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 3", constBiasTensor, biasInfo);
 
     Convolution2dLayer* const conv4Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv4 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv4 layer", outputInfo);
     ConstantLayer* const weightsLayer4 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 4", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 4", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer4 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 4", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 4", constBiasTensor, biasInfo);
 
     Convolution2dLayer* const conv5Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv5 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv5 layer", outputInfo);
     ConstantLayer* const weightsLayer5 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 5", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 5", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer5 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 5", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 5", constBiasTensor, biasInfo);
 
 
     Layer* const outputLayer = AddOutputLayer(graph, "output layer");
@@ -504,26 +500,26 @@ SubgraphView::SubgraphViewPtr BuildPartiallySupportedSubgraph(Graph& graph, Laye
     // Construct the graph
     Layer* const inputLayer = AddInputLayer(graph, "input layer", inputInfo);
     ConstantLayer* const weightsLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, weightInfo);
 
     ConstantLayer* const biasLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, biasInfo);
 
     Convolution2dLayer* const conv1Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv1 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv1 layer", outputInfo);
     Pooling2dLayer* const pooling1Layer = AddPoolingLayer(graph, layersInGraph, poolingDescriptor,
                                                           "pooling1 layer", outputInfo);
     Pooling2dLayer* const pooling2Layer = AddPoolingLayer(graph, layersInGraph, poolingDescriptor,
                                                           "pooling2 layer", outputInfo);
 
     ConstantLayer* const weightsLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 2", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 2", constWeightsTensor, weightInfo);
 
     ConstantLayer* const biasLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 2", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 2", constBiasTensor, biasInfo);
 
     Convolution2dLayer* const conv2Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv2 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv2 layer", outputInfo);
     Pooling2dLayer* const pooling3Layer = AddPoolingLayer(graph, layersInGraph, poolingDescriptor,
                                                           "pooling3 layer", outputInfo);
     Layer* const outputLayer = AddOutputLayer(graph, "output layer");
@@ -581,14 +577,13 @@ SubgraphView::SubgraphViewPtr BuildFullyUnoptimizableSubgraph1(Graph& graph, Lay
     Layer* const inputLayer = AddInputLayer(graph, "input layer", inputInfo);
 
     ConstantLayer* const weightsLayer =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer unoptimizable", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer unoptimizable", constWeightsTensor, weightInfo);
 
     ConstantLayer* const biasLayer =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer unoptimizable", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer unoptimizable", constBiasTensor, biasInfo);
 
     Convolution2dLayer* const convLayer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv layer unoptimizable", weightInfo, biasInfo,
-                                                               outputInfo);
+                                                               "conv layer unoptimizable", outputInfo);
     Layer* const outputLayer = AddOutputLayer(graph, "output layer");
 
     // Connect the network
@@ -631,46 +626,36 @@ SubgraphView::SubgraphViewPtr BuildPartiallyOptimizableSubgraph1(Graph& graph, L
     Layer* const inputLayer = AddInputLayer(graph, "input layer", inputInfo);
 
     ConstantLayer* const weightsLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, biasInfo);
     ConstantLayer* const weightsLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 2 unoptimizable", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 2 unoptimizable", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 2 unoptimizable", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 2 unoptimizable", constBiasTensor, biasInfo);
     ConstantLayer* const weightsLayer3 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 3", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 3", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer3 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 3", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 3", constBiasTensor, biasInfo);
     ConstantLayer* const weightsLayer4 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 4 unoptimizable", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 4 unoptimizable", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer4 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 4 unoptimizable", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 4 unoptimizable", constBiasTensor, biasInfo);
     ConstantLayer* const weightsLayer5 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 5", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 5", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer5 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 5", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 5", constBiasTensor, biasInfo);
 
   Convolution2dLayer* const conv1Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                             "conv1 layer", weightInfo, biasInfo, outputInfo);
-  Convolution2dLayer* const conv2Layer = AddConvolutionLayer(graph,
-                                                             layersInGraph,
-                                                             convolutionDescriptor,
-                                                             "conv2 layer unoptimizable",
-                                                             weightInfo,
-                                                             biasInfo,
-                                                             outputInfo);
+                                                             "conv1 layer", outputInfo);
+  Convolution2dLayer* const conv2Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
+                                                             "conv2 layer unoptimizable", outputInfo);
   Convolution2dLayer* const conv3Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                             "conv3 layer", weightInfo, biasInfo, outputInfo);
-  Convolution2dLayer* const conv4Layer = AddConvolutionLayer(graph,
-                                                             layersInGraph,
-                                                             convolutionDescriptor,
-                                                             "conv4 layer unoptimizable",
-                                                             weightInfo,
-                                                             biasInfo,
-                                                             outputInfo);
+                                                             "conv3 layer", outputInfo);
+  Convolution2dLayer* const conv4Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
+                                                             "conv4 layer unoptimizable", outputInfo);
   Convolution2dLayer* const conv5Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                             "conv5 layer", weightInfo, biasInfo, outputInfo);
+                                                             "conv5 layer", outputInfo);
 
   Layer* const outputLayer = AddOutputLayer(graph, "output layer");
 
@@ -747,25 +732,24 @@ SubgraphView::SubgraphViewPtr BuildPartiallyOptimizableSubgraph2(Graph& graph, L
     Layer* const input2Layer = AddInputLayer(graph, "input2 layer", inputInfo, 1);
 
     ConstantLayer* const weightsLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 1", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer1 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 1", constBiasTensor, biasInfo);
     ConstantLayer* const weightsLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 2 unoptimizable", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 2 unoptimizable", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer2 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 2 unoptimizable", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 2 unoptimizable", constBiasTensor, biasInfo);
     ConstantLayer* const weightsLayer3 =
-        AddConstantLayer(graph, layersInGraph, "Weights Layer 3", constWeightsTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Weights Layer 3", constWeightsTensor, weightInfo);
     ConstantLayer* const biasLayer3 =
-        AddConstantLayer(graph, layersInGraph, "Bias Layer 3", constBiasTensor, outputInfo);
+        AddConstantLayer(graph, layersInGraph, "Bias Layer 3", constBiasTensor, biasInfo);
 
     Convolution2dLayer* const conv1Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv1 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv1 layer", outputInfo);
     Convolution2dLayer* const conv2Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv2 layer unoptimizable", weightInfo, biasInfo,
-                                                               outputInfo);
+                                                               "conv2 layer unoptimizable", outputInfo);
     Convolution2dLayer* const conv3Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
-                                                               "conv3 layer", weightInfo, biasInfo, outputInfo);
+                                                               "conv3 layer", outputInfo);
     AdditionLayer* const addLayer = AddAdditionaLayer(graph, layersInGraph, "add layer", outputInfo);
     Layer* const outputLayer = AddOutputLayer(graph, "output layer");
 

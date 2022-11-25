@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1714,9 +1714,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ConvertConstants");
         Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
         Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsHalfToFloat()));
-
-        // Once the constants are converted we can now safely call RedirectMembersToConstantInputs
-        Optimizer::Pass(optGraph, MakeOptimizations(RedirectMembersToConstantInputs()));
     }
 
     // This must occur after all topological changes to the graph and any redirection of variables
@@ -1860,82 +1857,6 @@ IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescr
     return m_Graph->AddLayer<FullyConnectedLayer>(fullyConnectedDescriptor, name);
 }
 
-IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
-                                                       const Optional<ConstTensor>& weights,
-                                                       const Optional<ConstTensor>& biases,
-                                                       const char* name)
-{
-    ConstantLayer* weightsLayer = nullptr;
-    ConstantLayer* biasLayer    = nullptr;
-    unsigned int   numInputs    = fullyConnectedDescriptor.GetNumInputs();
-
-    // Add a constant layer for weights
-    if (weights.has_value())
-    {
-        weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
-        weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights.value());
-
-        TensorInfo weightsInfo = weightsLayer->m_LayerOutput->GetTensorInfo();
-        weightsInfo.SetConstant();
-
-        weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
-    }
-    else if (fullyConnectedDescriptor.m_ConstantWeights)
-    {
-        throw InvalidArgumentException("AddFullyConnectedLayer: Constant weights tensor is empty.");
-    }
-
-    // Add a constant layer for biases
-    if (biases.has_value() && fullyConnectedDescriptor.m_BiasEnabled)
-    {
-        biasLayer = m_Graph->AddLayer<ConstantLayer>("Biases");
-        biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(biases.value());
-
-        TensorInfo biasInfo = biasLayer->m_LayerOutput->GetTensorInfo();
-        biasInfo.SetConstant();
-
-        biasLayer->GetOutputSlot(0).SetTensorInfo(biasInfo);
-    }
-
-    if (numInputs < 2)
-    {
-        throw InvalidArgumentException("AddFullyConnectedLayer: Requires at least 2 input tensors: Input, Weights");
-    }
-
-    auto layer = m_Graph->AddLayer<FullyConnectedLayer>(fullyConnectedDescriptor, name);
-
-    if (weightsLayer)
-    {
-        // Connect weights layer
-        weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
-    }
-
-    if ( fullyConnectedDescriptor.m_BiasEnabled && numInputs == 3 )
-    {
-        if (biasLayer)
-        {
-            // Connect bias layer
-            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
-        }
-    }
-    else if ( !fullyConnectedDescriptor.m_BiasEnabled && numInputs == 2 )
-    {
-        // Bias is disabled
-        layer->m_Bias = nullptr;
-    }
-    else
-    {
-        throw InvalidArgumentException(fmt::format(
-                "AddFullyConnectedLayer: Value mismatch. When bias is enabled in the "
-                "descriptor the number of inputs is expected to be 3 otherwise 2. "
-                "BiasEnabled={}, numInputs={}",
-                fullyConnectedDescriptor.m_BiasEnabled,
-                numInputs));
-    }
-
-    return layer;
-}
-
 IConnectableLayer* NetworkImpl::AddConcatLayer(const ConcatDescriptor& concatDescriptor,
                                            const char* name)
 {
@@ -1946,32 +1867,6 @@ IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescrip
                                                       const char* name)
 {
     return m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
-}
-
-IConnectableLayer* NetworkImpl::AddConvolution2dLayer(const Convolution2dDescriptor& convolution2dDescriptor,
-                                                      const ConstTensor& weights,
-                                                      const Optional<ConstTensor>& biases,
-                                                      const char* name)
-{
-    auto layer = m_Graph->AddLayer<Convolution2dLayer>(convolution2dDescriptor, name);
-    // Add a constant layer for weights
-    ConstantLayer* weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
-    auto weightsTensorHandle = std::make_shared<ScopedTensorHandle>(weights);
-    weightsLayer->m_LayerOutput = weightsTensorHandle;
-    layer->m_Weight = weightsTensorHandle;
-    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
-    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
-    // Add a constant layer for biases
-    if (biases.has_value() && convolution2dDescriptor.m_BiasEnabled)
-    {
-        ConstantLayer* biasLayer = m_Graph->AddLayer<ConstantLayer>("Bias");
-        auto biasTensorHandle = std::make_shared<ScopedTensorHandle>(biases.value());
-        biasLayer->m_LayerOutput = biasTensorHandle;
-        layer->m_Bias = biasTensorHandle;
-        biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
-        biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
-    }
-    return layer;
 }
 
 IConnectableLayer* NetworkImpl::AddConvertFp16ToFp32Layer(const char* name)
@@ -2001,38 +1896,6 @@ IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
     const char* name)
 {
     return m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
-}
-
-IConnectableLayer* NetworkImpl::AddDepthwiseConvolution2dLayer(
-    const DepthwiseConvolution2dDescriptor& convolution2dDescriptor,
-    const ConstTensor& weights,
-    const Optional<ConstTensor>& biases,
-    const char* name)
-{
-    auto layer = m_Graph->AddLayer<DepthwiseConvolution2dLayer>(convolution2dDescriptor, name);
-
-    // Add a constant layer for weights
-    ConstantLayer* weightsLayer = m_Graph->AddLayer<ConstantLayer>("Weights");
-    auto weightsTensorHandle = std::make_shared<ScopedTensorHandle>(weights);
-    weightsLayer->m_LayerOutput = weightsTensorHandle;
-    layer->m_Weight = weightsTensorHandle;
-
-    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
-    weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
-
-    // Add a constant layer for biases
-    if (biases.has_value() && convolution2dDescriptor.m_BiasEnabled)
-    {
-        ConstantLayer* biasLayer = m_Graph->AddLayer<ConstantLayer>("Bias");
-        auto biasTensorHandle = std::make_shared<ScopedTensorHandle>(biases.value());
-        biasLayer->m_LayerOutput = biasTensorHandle;
-        layer->m_Bias = biasTensorHandle;
-
-        biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
-        biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2));
-    }
-
-    return layer;
 }
 
 IConnectableLayer* NetworkImpl::AddDetectionPostProcessLayer(const armnn::DetectionPostProcessDescriptor& descriptor,

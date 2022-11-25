@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,19 +44,10 @@ LayerTestResult<T, 2> SimpleFullyConnectedTestImpl(
 
     armnn::FullyConnectedQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedTensorHandle weightsTensor(weightsTensorInfo);
-    armnn::ScopedTensorHandle biasTensor(biasesTensorInfo);
-
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, weights.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
 
     AddInputToWorkload(data, info, inputTensorInfo, input0Handle.get());
     AddInputToWorkload(data, info, weightsTensorInfo, input1Handle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
-
-    // Need to set as layer members will be null when creating the workload because the optimization hasn't been run.
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor;
 
     data.m_Parameters.m_BiasEnabled = biasEnabled;
     data.m_Parameters.m_TransposeWeightMatrix = transposeWeights;

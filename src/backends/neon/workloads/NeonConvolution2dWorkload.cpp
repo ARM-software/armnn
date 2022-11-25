@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -90,11 +90,11 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     output.info()->set_data_layout(aclDataLayout);
 
     m_KernelTensor = std::make_unique<arm_compute::Tensor>();
-    BuildArmComputeTensor(*m_KernelTensor, m_Data.m_Weight->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
+    BuildArmComputeTensor(*m_KernelTensor, info.m_InputTensorInfos[1], m_Data.m_Parameters.m_DataLayout);
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
-        BuildArmComputeTensor(*m_BiasTensor, m_Data.m_Bias->GetTensorInfo(), m_Data.m_Parameters.m_DataLayout);
+        BuildArmComputeTensor(*m_BiasTensor, info.m_InputTensorInfos[2], m_Data.m_Parameters.m_DataLayout);
     }
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
@@ -130,11 +130,12 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
 
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
     detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
-    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Weight->GetTensorInfo());
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[1]);
     detailsInfo.m_ConvolutionMethod = armnn::Optional<std::string>(GetConvolutionMethodString(m_ConvolutionMethod));
+
     if (descriptor.m_Parameters.m_BiasEnabled)
     {
-        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(descriptor.m_Bias->GetTensorInfo());
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[2]);
     }
 
     // Report Profiling Details
@@ -146,22 +147,31 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
     m_ConvolutionLayer.reset(convolutionLayer.release());
 
     ARMNN_ASSERT(m_ConvolutionLayer);
-
-    InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
+    m_KernelTensorInfo = info.m_InputTensorInfos[1];
 
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
-        InitializeArmComputeTensorData(*m_BiasTensor, m_Data.m_Bias);
+        m_BiasTensorInfo = info.m_InputTensorInfos[2];
     }
-
-    m_ConvolutionLayer->prepare();
-    FreeTensorIfUnused(m_KernelTensor);
-    FreeTensorIfUnused(m_BiasTensor);
 }
 
 void NeonConvolution2dWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConvolution2dWorkload_Execute", this->GetGuid());
+    // The constant tensors may not be fully in place until the workload is Executed
+    if (!prepared)
+    {
+        InitializeArmComputeTensorData(*m_KernelTensor, m_KernelTensorInfo, m_Data.m_Inputs[1]);
+
+        if (m_Data.m_Parameters.m_BiasEnabled)
+        {
+            InitializeArmComputeTensorData(*m_BiasTensor, m_BiasTensorInfo, m_Data.m_Inputs[2]);
+        }
+        m_ConvolutionLayer->prepare();
+        FreeTensorIfUnused(m_KernelTensor);
+        FreeTensorIfUnused(m_BiasTensor);
+        prepared = true;
+    }
     m_ConvolutionLayer->run();
 }
 

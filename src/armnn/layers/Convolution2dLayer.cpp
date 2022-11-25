@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -48,18 +48,8 @@ void Convolution2dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn
 
 std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    // on this level constant data should not be released..
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Convolution2dLayer_CreateWorkload");
     Convolution2dQueueDescriptor descriptor;
-    if (m_Weight)
-    {
-        descriptor.m_Weight = m_Weight.get();
-    }
-    if (m_Param.m_BiasEnabled && m_Bias)
-    {
-        descriptor.m_Bias = m_Bias.get();
-    }
-
     SetAdditionalInfo(descriptor);
 
     return factory.CreateWorkload(LayerType::Convolution2d, descriptor, PrepInfoAndDesc(descriptor));
@@ -68,14 +58,6 @@ std::unique_ptr<IWorkload> Convolution2dLayer::CreateWorkload(const IWorkloadFac
 Convolution2dLayer* Convolution2dLayer::Clone(Graph& graph) const
 {
     auto layer = CloneBase<Convolution2dLayer>(graph, m_Param, GetName());
-
-    layer->m_Weight = m_Weight ? m_Weight : nullptr;
-
-    if (layer->m_Param.m_BiasEnabled)
-    {
-        layer->m_Bias = m_Bias ? m_Bias : nullptr;
-    }
-
     return std::move(layer);
 }
 
@@ -140,14 +122,7 @@ void Convolution2dLayer::ValidateTensorShapesFromInputs()
 Layer::ConstantTensors Convolution2dLayer::GetConstantTensorsByRef()
 {
     Layer::ConstantTensors tensors = GetConnectedConstantAsInputTensors();
-
-    if (!tensors.empty())
-    {
-        return tensors;
-    }
-
-    // For API stability DO NOT ALTER order and add new members to the end of vector
-    return {m_Weight, m_Bias};
+    return tensors;
 }
 
 void Convolution2dLayer::ExecuteStrategy(IStrategy& strategy) const

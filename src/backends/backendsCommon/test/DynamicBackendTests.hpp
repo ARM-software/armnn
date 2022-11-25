@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1469,8 +1469,6 @@ void CreateReferenceDynamicBackendTestImpl()
         { outputInfo }
     };
     convolution2dQueueDescriptor.m_Inputs.push_back(nullptr);
-    auto weights = std::make_unique<ScopedTensorHandle>(weightInfo);
-    convolution2dQueueDescriptor.m_Weight = weights.get();
 
     // Create a convolution workload with the dummy settings
     auto workload = referenceWorkloadFactory->CreateWorkload(LayerType::Convolution2d,

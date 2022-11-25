@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -313,20 +313,12 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     // Permute the kernel if necessary
     std::vector<T> kernel = originalKernel;
     if (layout == armnn::DataLayout::NHWC)
     {
         armnnUtils::Permute(kernelDesc.GetShape(), NCHWToNHWC, originalKernel.data(), kernel.data(), sizeof(T));
-    }
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
-
-    if(biasEnabled)
-    {
-        AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
     }
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -339,8 +331,6 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
         biasHandle = tensorHandleFactory.CreateTensorHandle(biasDesc);
         AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     }
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padLeft;
@@ -442,15 +432,13 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
     std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelDesc);
     std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
 
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
+//    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
+//    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
 
-    armnn::ScopedTensorHandle biasTensor(biasDesc);
+//    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     armnn::Convolution2dQueueDescriptor data;
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padLeft;
@@ -590,18 +578,16 @@ LayerTestResult<T,4> Convolution1dTestImpl(
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-    armnn::ScopedTensorHandle weightsTensor(kernelInfo);
-    armnn::ScopedTensorHandle biasTensor(biasInfo);
-
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
+//    armnn::ScopedTensorHandle weightsTensor(kernelInfo);
+//    armnn::ScopedTensorHandle biasTensor(biasInfo);
+//
+//    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data());
+//    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
 
     AddInputToWorkload(data, info, inputInfo, inputHandle.get());
     AddInputToWorkload(data, info, kernelInfo, weightsHandle.get());
     AddOutputToWorkload(data, info, outputInfo, outputHandle.get());
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor;
     data.m_Parameters.m_StrideX = 1;
     data.m_Parameters.m_StrideY = stride;
     data.m_Parameters.m_PadLeft = 0;
@@ -1421,25 +1407,14 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
 
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-    armnn::ScopedTensorHandle biasTensor(biasDesc);
-
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddInputToWorkload(data, info, kernelDesc, weightsHandle.get());
     AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
-    // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
-    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
-    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
     AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernel.data());
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
     AllocateAndCopyDataToITensorHandle(biasHandle.get(), bias.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor;
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padX;
@@ -1827,15 +1802,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
 
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-
-    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
-    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
-    //    Needed in Neon and Cl Workload when permuting. Backend TensorHandle in (2) below will not work.
-    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
-    //    Cannot PolymorphicDowncast from ScopedTensorHandle->RefTensorHandle.
-    //    Need to PolymorphicDowncast from ITensorHandle->RefTensorHandle.
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernelData.data()); // required for ConstantTensor
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -1852,8 +1818,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
         AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     }
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - it can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padLeft;
@@ -2009,12 +1973,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
 
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
-    // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
-    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
-    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data()); // required for QueueDescriptor
     AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernelData.data()); // required for ConstantTensor
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -2031,8 +1989,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
         AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     }
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled.
     data.m_Parameters.m_StrideX = 1;
     data.m_Parameters.m_StrideY = 1;
     data.m_Parameters.m_PadLeft = 0;
@@ -2234,12 +2190,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
 
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
-    // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
-    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
-    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data()); // required for QueueDescriptor
     AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernelData.data()); // required for ConstantTensor
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -2256,8 +2206,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
         AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     }
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled.
     data.m_Parameters.m_StrideX = 2;
     data.m_Parameters.m_StrideY = 1;
     data.m_Parameters.m_PadLeft = 0;
@@ -2426,12 +2374,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
 
-    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
-    // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
-    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
-    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data()); // required for QueueDescriptor
     AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernelData.data()); // required for ConstantTensor
 
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
@@ -2448,8 +2390,6 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
         AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     }
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor; // Still set this whether or not bias is enabled - can be a source of bugs.
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padLeft;
@@ -3177,25 +3117,14 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
     armnn::DepthwiseConvolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
 
-    armnn::ScopedTensorHandle weightsTensor(aclKernelDescriptor);
-    armnn::ScopedTensorHandle biasTensor(biasDesc);
-
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddInputToWorkload(data, info, aclKernelDescriptor, weightsHandle.get());
     AddInputToWorkload(data, info, biasDesc, biasHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
 
-    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
-    // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
-    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
-    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
     AllocateAndCopyDataToITensorHandle(weightsHandle.get(), aclKernelData.data());
-    AllocateAndCopyDataToITensorHandle(&weightsTensor, aclKernelData.data());
     AllocateAndCopyDataToITensorHandle(biasHandle.get(), bias.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, bias.data());
 
-    data.m_Weight = &weightsTensor;
-    data.m_Bias = &biasTensor;
     data.m_Parameters.m_StrideX = strideX;
     data.m_Parameters.m_StrideY = strideY;
     data.m_Parameters.m_PadLeft = padX;
@@ -3696,16 +3625,14 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
 
     WorkloadInfo workloadInfo;
-    ScopedTensorHandle weightTensor(kernelInfo);
-    ScopedTensorHandle biasTensor(biasInfo);
-
-    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
+//    ScopedTensorHandle weightTensor(kernelInfo);
+//    ScopedTensorHandle biasTensor(biasInfo);
+//
+//    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
+//    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
 
     Convolution2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = descriptor;
-    queueDescriptor.m_Weight     = &weightTensor;
-    queueDescriptor.m_Bias       = &biasTensor;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
     AddInputToWorkload(queueDescriptor, workloadInfo, kernelInfo, weightsHandle.get());
@@ -3995,26 +3922,16 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
 
     DepthwiseConvolution2dQueueDescriptor queueDescriptor;
     WorkloadInfo workloadInfo;
-    ScopedTensorHandle weightTensor(kernelInfo);
-    ScopedTensorHandle biasTensor(biasInfo);
 
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
     AddInputToWorkload(queueDescriptor, workloadInfo, kernelInfo, weightsHandle.get());
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
     AddInputToWorkload(queueDescriptor, workloadInfo, biasInfo, biasHandle.get());
 
-    // AllocateAndCopyDataToITensorHandle() is required twice for the weights AND biases:
-    // See comment in DepthwiseConvolution2dAsymmetricTestImpl() for reasons.
-    // 1) ScopedTensorHandle (weightsTensor) required for QueueDescriptor (data.m_Weight).
-    // 2) ITensorHandle (converts to Backend TensorHandle) required in RefWorkload for GetTensorInfo() method.
     AllocateAndCopyDataToITensorHandle(weightsHandle.get(), kernelData.data());
-    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
     AllocateAndCopyDataToITensorHandle(biasHandle.get(), biasData.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
 
     queueDescriptor.m_Parameters = descriptor;
-    queueDescriptor.m_Weight     = &weightTensor;
-    queueDescriptor.m_Bias       = &biasTensor;
 
     std::unique_ptr<IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::DepthwiseConvolution2d,
                                                                          queueDescriptor,

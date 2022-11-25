@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -50,16 +50,6 @@ void DepthwiseConvolution2dLayer::SerializeLayerParameters(ParameterStringifyFun
 std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     DepthwiseConvolution2dQueueDescriptor descriptor;
-
-    if (m_Weight)
-    {
-        descriptor.m_Weight = m_Weight.get();
-    }
-    if (m_Param.m_BiasEnabled && m_Bias)
-    {
-        descriptor.m_Bias = m_Bias.get();
-    }
-
     SetAdditionalInfo(descriptor);
 
     return factory.CreateWorkload(LayerType::DepthwiseConvolution2d, descriptor, PrepInfoAndDesc(descriptor));
@@ -68,13 +58,6 @@ std::unique_ptr<IWorkload> DepthwiseConvolution2dLayer::CreateWorkload(const IWo
 DepthwiseConvolution2dLayer* DepthwiseConvolution2dLayer::Clone(Graph& graph) const
 {
     auto layer      = CloneBase<DepthwiseConvolution2dLayer>(graph, m_Param, GetName());
-    layer->m_Weight = m_Weight ? m_Weight : nullptr;
-
-    if (layer->m_Param.m_BiasEnabled)
-    {
-        layer->m_Bias = m_Bias ? m_Bias : nullptr;
-    }
-
     return std::move(layer);
 }
 
@@ -143,14 +126,7 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
 Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()
 {
     Layer::ConstantTensors tensors = GetConnectedConstantAsInputTensors();
-
-    if (!tensors.empty())
-    {
-        return tensors;
-    }
-
-    // For API stability DO NOT ALTER order and add new members to the end of vector
-    return {m_Weight, m_Bias};
+    return tensors;
 }
 
 void DepthwiseConvolution2dLayer::ExecuteStrategy(IStrategy& strategy) const

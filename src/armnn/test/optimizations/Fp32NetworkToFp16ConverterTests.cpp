@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,14 +33,21 @@ TEST_CASE("Fp32NetworkToFp16OptimizationTest")
     floor->GetOutputSlot().Connect(output->GetInputSlot(0));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::FloorLayer>, &IsLayerOfType<armnn::OutputLayer>));
+                                                      &IsLayerOfType<armnn::FloorLayer>,
+                                                      &IsLayerOfType<armnn::OutputLayer>));
 
     // Run the optimizer
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(Fp32NetworkToFp16Converter()));
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::ConvertFp32ToFp16Layer>, &IsLayerOfType<armnn::FloorLayer>,
-                             &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>, &IsLayerOfType<armnn::OutputLayer>));
+                                                      &IsLayerOfType<armnn::ConvertFp32ToFp16Layer>,
+                                                      &IsLayerOfType<armnn::FloorLayer>,
+                                                      &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>,
+                                                      &IsLayerOfType<armnn::OutputLayer>));
+
+    CHECK(floor->GetDataType() == armnn::DataType::Float16);
+    CHECK(floor->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo().GetDataType() == armnn::DataType::Float16);
+    CHECK(floor->GetOutputSlot(0).GetTensorInfo().GetDataType() == armnn::DataType::Float16);
 }
 
 }

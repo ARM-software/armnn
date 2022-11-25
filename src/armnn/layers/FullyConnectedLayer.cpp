@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "FullyConnectedLayer.hpp"
@@ -22,27 +22,13 @@ FullyConnectedLayer::FullyConnectedLayer(const FullyConnectedDescriptor& param, 
 std::unique_ptr<IWorkload> FullyConnectedLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
     FullyConnectedQueueDescriptor descriptor;
-    if (m_Weight)
-    {
-        descriptor.m_Weight = m_Weight.get();
-    }
-    if (m_Param.m_BiasEnabled && m_Bias)
-    {
-        descriptor.m_Bias = m_Bias.get();
-    }
     SetAdditionalInfo(descriptor);
-
     return factory.CreateWorkload(LayerType::FullyConnected, descriptor, PrepInfoAndDesc(descriptor));
 }
 
 FullyConnectedLayer* FullyConnectedLayer::Clone(Graph& graph) const
 {
     auto layer = CloneBase<FullyConnectedLayer>(graph, m_Param, GetName());
-    layer->m_Weight = m_Weight ? m_Weight : nullptr;
-    if (layer->m_Param.m_BiasEnabled)
-    {
-        layer->m_Bias = m_Bias ? m_Bias : nullptr;
-    }
     return std::move(layer);
 }
 
@@ -78,14 +64,7 @@ void FullyConnectedLayer::ValidateTensorShapesFromInputs()
 Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()
 {
     Layer::ConstantTensors tensors = GetConnectedConstantAsInputTensors();
-
-    if (!tensors.empty())
-    {
-        return tensors;
-    }
-
-    // For API stability DO NOT ALTER order and add new members to the end of vector
-    return {m_Weight, m_Bias};
+    return tensors;
 }
 
 void FullyConnectedLayer::ExecuteStrategy(IStrategy& strategy) const

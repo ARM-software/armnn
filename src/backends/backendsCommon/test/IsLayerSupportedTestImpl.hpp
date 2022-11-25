@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -242,10 +242,6 @@ struct DummyConvolutionLayer
         desc.m_StrideX = 1;
         desc.m_StrideY = 1;
         m_Layer = dummyGraph.AddLayer<ConvolutionLayerType>(desc, "");
-        m_Layer->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(
-            armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
-        m_Layer->m_Bias = std::make_unique<armnn::ScopedTensorHandle>(
-            armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
     }
 
     ~DummyConvolutionLayer()
@@ -268,10 +264,28 @@ struct DummyLayer<armnn::DepthwiseConvolution2dLayer>
 {
 };
 
-template<>
+// Note: When m_Weight and m_Bias are removed from TransposeConvolution, Transpose can use DummyConvolutionLayer
+template <>
 struct DummyLayer<armnn::TransposeConvolution2dLayer>
-    : public DummyConvolutionLayer<armnn::TransposeConvolution2dLayer>
 {
+    DummyLayer()
+    {
+        typename armnn::TransposeConvolution2dLayer::DescriptorType desc;
+        desc.m_StrideX = 1;
+        desc.m_StrideY = 1;
+        m_Layer = dummyGraph.AddLayer<armnn::TransposeConvolution2dLayer>(desc, "");
+        m_Layer->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(
+            armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+        m_Layer->m_Bias = std::make_unique<armnn::ScopedTensorHandle>(
+            armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
+    }
+
+    ~DummyLayer()
+    {
+        dummyGraph.EraseLayer(m_Layer);
+    }
+
+    armnn::TransposeConvolution2dLayer* m_Layer;
 };
 
 template<>
@@ -518,8 +532,6 @@ struct DummyLayer<armnn::FullyConnectedLayer>
     {
         armnn::FullyConnectedLayer::DescriptorType desc;
         m_Layer = dummyGraph.AddLayer<armnn::FullyConnectedLayer>(desc, "");
-        m_Layer->m_Weight = std::make_unique<armnn::ScopedTensorHandle>(
-            armnn::TensorInfo(armnn::TensorShape({1,1,1,1}), armnn::DataType::Float32));
     }
 
     ~DummyLayer()
@@ -767,12 +779,6 @@ unsigned int GetNumOutputs(const armnn::Layer& layer)
     return layer.GetNumOutputSlots();
 }
 
-template<>
-unsigned int GetNumInputs<armnn::LayerType::Concat>(const armnn::Layer& layer)
-{
-    IgnoreUnused(layer);
-    return 2;
-}
 
 // Tests that the IsLayerSupported() function returns the correct value.
 // We determined the correct value by *trying* to create the relevant workload and seeing if it matches what we expect.

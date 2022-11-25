@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -167,8 +167,6 @@ public:
             auto& newConv2dLayer = *graph.InsertNewLayer<ConvLayer>(base.GetInputSlot(0),
                                                                     convDescriptor,
                                                                     name.c_str());
-            newConv2dLayer.m_Weight = std::make_unique<ScopedTensorHandle>(fusedWeightsTensor);
-            newConv2dLayer.m_Bias = std::make_unique<ScopedTensorHandle>(ConstTensor(fusedBiasTensor));
 
             // Connect weights and bias from old to new Conv2d layer
             // This optimization will always have 3 input slots on the Conv2d base layer
@@ -177,7 +175,7 @@ public:
                 // Remove old connection and connect to new layer2d
                 weightLayer->GetOutputSlot(0).Disconnect(base.GetInputSlot(1));
                 weightLayer->GetOutputSlot(0).Connect(newConv2dLayer.GetInputSlot(1));
-                weightLayer->m_LayerOutput = newConv2dLayer.m_Weight;
+                weightLayer->m_LayerOutput = std::make_unique<ScopedTensorHandle>(fusedWeightsTensor);
 
                 // Move bias const layers as normal if it was enabled before the optimisation
                 ConstantLayer* biasLayer;
@@ -198,7 +196,7 @@ public:
                     biasLayer->GetOutputSlot(0).SetTensorInfo(fusedBiasTensor.GetInfo());
                     biasLayer->GetOutputSlot(0).Connect(newConv2dLayer.GetInputSlot(2));
                 }
-                biasLayer->m_LayerOutput = newConv2dLayer.m_Bias;
+                biasLayer->m_LayerOutput = std::make_unique<ScopedTensorHandle>(ConstTensor(fusedBiasTensor));
             }
 
 

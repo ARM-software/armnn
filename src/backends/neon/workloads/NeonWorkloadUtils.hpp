@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -56,6 +56,42 @@ void CopyArmComputeTensorData(arm_compute::Tensor& dstTensor, const T* srcData)
     InitialiseArmComputeTensorEmpty(dstTensor);
     CopyArmComputeITensorData(srcData, dstTensor);
 }
+
+inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
+                                           TensorInfo tensorInfo,
+                                           const ITensorHandle* handle)
+{
+    ARMNN_ASSERT(handle);
+
+    switch(tensorInfo.GetDataType())
+    {
+        case DataType::Float16:
+            CopyArmComputeTensorData(tensor, reinterpret_cast<const armnn::Half*>(handle->Map()));
+            break;
+        case DataType::Float32:
+            CopyArmComputeTensorData(tensor, reinterpret_cast<const float*>(handle->Map()));
+            break;
+        case DataType::QAsymmU8:
+            CopyArmComputeTensorData(tensor, reinterpret_cast<const uint8_t*>(handle->Map()));
+            break;
+        case DataType::QSymmS8:
+        case DataType::QAsymmS8:
+            CopyArmComputeTensorData(tensor, reinterpret_cast<const int8_t*>(handle->Map()));
+            break;
+        case DataType::Signed32:
+            CopyArmComputeTensorData(tensor, reinterpret_cast<const int32_t*>(handle->Map()));
+            break;
+        case DataType::QSymmS16:
+            CopyArmComputeTensorData(tensor, reinterpret_cast<const int16_t*>(handle->Map()));
+            break;
+        case DataType::BFloat16:
+            CopyArmComputeTensorData(tensor, reinterpret_cast<const armnn::BFloat16*>(handle->Map()));
+            break;
+        default:
+            // Throw exception; assertion not called in release build.
+            throw Exception("Unexpected tensor type during InitializeArmComputeTensorData().");
+    }
+};
 
 inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
                                            const ConstTensorHandle* handle)

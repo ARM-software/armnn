@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,13 +29,16 @@ class NeonFullyConnectedWorkload : public NeonBaseWorkload<FullyConnectedQueueDe
 public:
     NeonFullyConnectedWorkload(const FullyConnectedQueueDescriptor& descriptor, const WorkloadInfo& info,
                                std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager);
+
     virtual void Execute() const override;
 
 private:
     std::unique_ptr<arm_compute::IFunction> m_FullyConnectedLayer;
-    std::unique_ptr<arm_compute::Tensor> m_WeightsTensor;
-    std::unique_ptr<arm_compute::Tensor> m_BiasesTensor;
-
+    mutable std::unique_ptr<arm_compute::Tensor> m_WeightsTensor;
+    mutable std::unique_ptr<arm_compute::Tensor> m_BiasesTensor;
+    TensorInfo m_WeightsTensorInfo;
+    TensorInfo m_BiasesTensorInfo;
+    mutable bool prepared = false;
 };
 
 } //namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,13 +27,8 @@ public:
 
     static IConnectableLayer *AddConvolution(INetwork *network,
                                              const Convolution2dDescriptor &descriptor,
-                                             const ConstTensor &weights,
-                                             const Optional<ConstTensor> &biases,
                                              const char *name)
     {
-        IgnoreUnused(weights);
-        IgnoreUnused(biases);
-
         return network->AddConvolution2dLayer(descriptor, name);
     }
 
@@ -65,12 +60,8 @@ public:
 
     static IConnectableLayer* AddConvolution(INetwork* network,
                                              const DepthwiseConvolution2dDescriptor& descriptor,
-                                             const ConstTensor& weights,
-                                             const Optional<ConstTensor>& biases,
                                              const char* name)
     {
-        IgnoreUnused(weights);
-        IgnoreUnused(biases);
 
         return network->AddDepthwiseConvolution2dLayer(descriptor, name);
     }
@@ -171,8 +162,6 @@ INetworkPtr CreateNetwork(bool depthwise, bool preventFusing)
 
     IConnectableLayer* convLayer      = Conv2dTest::AddConvolution(network.get(),
                                                                    convolution2dDescriptor,
-                                                                   weights,
-                                                                   Optional<ConstTensor>(),
                                                                    "convolution");
 
     IConnectableLayer* batchNormLayer = network->AddBatchNormalizationLayer(batchNormDescriptor,
@@ -243,13 +232,21 @@ void FuseBatchNormIntoConvTest(bool depthwise, float tolerance, armnn::Compute b
         return IsLayerOfType<ConvLayerType>(layer) &&
                (layer->GetNameStr() == "fused-batchNorm-into-convolution");
     };
-
+    auto checkConstant = [ ](const armnn::Layer* const layer) -> bool
+    {
+        const ConstantLayer* constLayer = PolymorphicDowncast<const ConstantLayer*>(layer);
+        auto tensor = ConstTensor(constLayer->m_LayerOutput->GetTensorInfo(),
+                                  constLayer->m_LayerOutput->Map(true));
+        const auto* buffer = static_cast<const T*>(tensor.GetMemoryArea());
+        std::vector<T> vector(buffer, buffer + tensor.GetNumElements());
+        return IsLayerOfType<ConstantLayer>(layer);
+    };
     CHECK(5 == graphFused.GetNumLayers());
     CHECK(CheckSequence(graphFused.cbegin(),
                         graphFused.cend(),
                         &IsLayerOfType<InputLayer>,
-                        &IsLayerOfType<ConstantLayer>,
-                        &IsLayerOfType<ConstantLayer>,
+                        checkConstant,
+                        checkConstant,
                         checkFusedConv2d,
                         &IsLayerOfType<OutputLayer>));
 

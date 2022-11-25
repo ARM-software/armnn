@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -477,16 +477,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dClCompiledContext
 
 
     WorkloadInfo workloadInfo;
-    ScopedTensorHandle weightTensor(kernelInfo);
-    ScopedTensorHandle biasTensor(biasInfo);
-
-    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
-    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
 
     Convolution2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = descriptor;
-    queueDescriptor.m_Weight     = &weightTensor;
-    queueDescriptor.m_Bias       = &biasTensor;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
     AddInputToWorkload(queueDescriptor, workloadInfo, kernelInfo, weightsHandle.get());

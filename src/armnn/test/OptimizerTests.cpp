@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -441,16 +441,15 @@ void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,
     Layer* input = graph.AddLayer<InputLayer>(0, "input");
     input->GetOutputSlot().SetTensorInfo(inputInfo);
 
-    ConstantLayer* weightsLayer = nullptr;
-    weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
+    ConstantLayer* weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
     weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
     weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsLayer->m_LayerOutput->GetTensorInfo());
 
     Convolution2dLayer* layer = graph.AddLayer<Convolution2dLayer>(desc, "conv2d");
-    layer->m_Weight           = std::make_unique<armnn::ScopedTensorHandle>(weights);
     layer->GetOutputSlot().SetTensorInfo(outputInfo);
 
     Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+
     input->GetOutputSlot().Connect(layer->GetInputSlot(0));
     layer->GetOutputSlot().Connect(output->GetInputSlot(0));
     weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -908,11 +907,10 @@ TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
     {
         std::vector<float> biasVector = { 11 };
         ConstTensor bias(TensorInfo(1, outputChannelSize, DataType::Float32, 0.0f, 0, true), biasVector);
-        biasLayer =graph.AddLayer<ConstantLayer>("Bias");
+        biasLayer = graph.AddLayer<ConstantLayer>("Bias");
         biasLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(bias);
         biasLayer->GetOutputSlot(0).SetTensorInfo(biasLayer->m_LayerOutput->GetTensorInfo());
         biasLayer->GetOutputSlot(0).Connect(conv->GetInputSlot(2));
-        conv->m_Bias = biasLayer->m_LayerOutput;
     }
 
     // Connect layers
@@ -920,9 +918,6 @@ TEST_CASE("OptimizeForExclusiveConnectionsFuseTest")
     weightsLayer->GetOutputSlot(0).Connect(conv->GetInputSlot(1));
     conv->GetOutputSlot(0).Connect(batchNorm->GetInputSlot(0));
     batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
-
-    // Temporary workaround to ensure the descriptor weights are populated
-    conv->m_Weight = weightsLayer->m_LayerOutput;
 
     if (convolution2dDescriptor.m_BiasEnabled)
     {
@@ -983,22 +978,22 @@ TEST_CASE("OptimizeForExclusiveConnectionsWithoutFuseTest")
     batchNorm->GetOutputSlot(0).Connect(output->GetInputSlot(0));
     conv->GetOutputSlot(0).Connect(output2->GetInputSlot(0));
 
-    CHECK(5 == graph.GetNumLayers());
+    CHECK((5 == graph.GetNumLayers()));
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
-                             &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::Convolution2dLayer>,
-                             &IsLayerOfType<armnn::BatchNormalizationLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>));
+                        &IsLayerOfType<armnn::InputLayer>,
+                        &IsLayerOfType<armnn::Convolution2dLayer>,
+                        &IsLayerOfType<armnn::BatchNormalizationLayer>,
+                        &IsLayerOfType<armnn::OutputLayer>,
+                        &IsLayerOfType<armnn::OutputLayer>));
     // Optimize graph
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FuseBatchNormIntoConvolution2DFloat32()));
 
     CHECK(5 == graph.GetNumLayers());
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
-                             &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::Convolution2dLayer>,
-                             &IsLayerOfType<armnn::BatchNormalizationLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>,
-                             &IsLayerOfType<armnn::OutputLayer>));
+                        &IsLayerOfType<armnn::InputLayer>,
+                        &IsLayerOfType<armnn::Convolution2dLayer>,
+                        &IsLayerOfType<armnn::BatchNormalizationLayer>,
+                        &IsLayerOfType<armnn::OutputLayer>,
+                        &IsLayerOfType<armnn::OutputLayer>));
 }
 } // Optimizer TestSuite

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -15,12 +15,6 @@ class ScopedTensorHandle;
 class FullyConnectedLayer : public LayerWithParameters<FullyConnectedDescriptor>
 {
 public:
-    /// A unique pointer to store Weight values.
-    /// @Note: Deprecated. Removal date is 23.02. Weights are stored in ConstantLayers now.
-    std::shared_ptr<ConstTensorHandle> m_Weight;
-    /// A unique pointer to store Bias values.
-    /// @Note: Deprecated. Removal date is 23.02. Bias are stored in ConstantLayers now.
-    std::shared_ptr<ConstTensorHandle> m_Bias;
 
     /// Makes a workload for the FullyConnected type.
     /// @param [in] graph The graph where this layer can be found.
@@ -44,6 +38,10 @@ public:
     std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
     void ExecuteStrategy(IStrategy& strategy) const override;
+
+    /// This layer does not have any data stored, weights and bias are now stored in constant layers.
+    /// We do not want to release the data in the constant layer, that is why we override with an empty function.
+    void ReleaseConstantData() override {}
 
 protected:
     /// Constructor to create a FullyConnectedLayer.

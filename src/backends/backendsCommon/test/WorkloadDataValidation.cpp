@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -158,13 +158,8 @@ TEST_CASE("FullyConnectedQueueDescriptor_Validate_RequiredDataMissing")
     FullyConnectedQueueDescriptor invalidData;
     WorkloadInfo                  invalidInfo;
 
-    ScopedTensorHandle weightTensor(weightsDesc);
-    ScopedTensorHandle biasTensor(biasesDesc);
-
     AddInputToWorkload(invalidData, invalidInfo, inputTensorInfo, nullptr);
     AddOutputToWorkload(invalidData, invalidInfo, outputTensorInfo, nullptr);
-    invalidData.m_Weight = &weightTensor;
-    invalidData.m_Bias = &biasTensor;
     invalidData.m_Parameters.m_BiasEnabled = true;
     invalidData.m_Parameters.m_TransposeWeightMatrix = false;
 
@@ -678,15 +673,9 @@ TEST_CASE("BiasPerAxisQuantization_ValidateCorrectValues")
     AddInputToWorkload(queueDescriptor, workloadInfo, weightInfo, nullptr);
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, nullptr);
 
-    ScopedTensorHandle weightTensor(weightInfo);
-    queueDescriptor.m_Weight = &weightTensor;
-
     // Test 1: correct per-axis quantization values
     const std::vector<float> biasPerAxisScales1  = { 3.75f, 5.25f };
     const TensorInfo biasInfo1(biasShape, biasType, biasPerAxisScales1, 0);
-
-    ScopedTensorHandle biasHandle1(biasInfo1);
-    queueDescriptor.m_Bias = &biasHandle1;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, biasInfo1, nullptr);
 
@@ -729,15 +718,9 @@ TEST_CASE("BiasPerAxisQuantization_ValidateIncorrectValues")
     AddInputToWorkload(queueDescriptor, workloadInfo, weightInfo, nullptr);
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, nullptr);
 
-    ScopedTensorHandle weightTensor(weightInfo);
-    queueDescriptor.m_Weight = &weightTensor;
-
-   // Test 2: wrong per-axis quantization values
+    // Test 2: wrong per-axis quantization values
     const std::vector<float> biasPerAxisScales2 = { 4.00f, 5.00f };
     const TensorInfo biasInfo2(biasShape, biasType, biasPerAxisScales2, 0);
-
-    ScopedTensorHandle biasHandle2(biasInfo2);
-    queueDescriptor.m_Bias = &biasHandle2;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, biasInfo2, nullptr);
 
@@ -781,15 +764,9 @@ TEST_CASE("BiasPerAxisQuantization_ValidateInvalidArgumentException")
     AddInputToWorkload(queueDescriptor, workloadInfo, weightInfo, nullptr);
     AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, nullptr);
 
-    ScopedTensorHandle weightTensor(weightInfo);
-    queueDescriptor.m_Weight = &weightTensor;
-
     // Test 3: mismatched number of quantization scales
     const std::vector<float> biasPerAxisScales3 = { 3.75f, 5.25f, 5.25f };
     const TensorInfo biasInfo3(biasShape, biasType, biasPerAxisScales3, 0);
-
-    ScopedTensorHandle biasHandle3(biasInfo3);
-    queueDescriptor.m_Bias = &biasHandle3;
 
     AddInputToWorkload(queueDescriptor, workloadInfo, biasInfo3, nullptr);
 

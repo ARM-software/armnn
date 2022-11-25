@@ -1328,6 +1328,7 @@ void LoadedNetwork::EnqueueInput(const ConstTensor& inputTensor, ITensorHandle* 
     }
     else
     {
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "CopyInput");
         std::unique_ptr<ITensorHandle> tensorHandle =
                 std::make_unique<ConstPassthroughTensorHandle>(inputTensor.GetInfo(), inputTensor.GetMemoryArea());
 
@@ -1374,6 +1375,7 @@ void LoadedNetwork::ImportOutputTensor(const Tensor& outputTensor, ITensorHandle
 
 void CopyToOutputTensor(const Tensor& outputTensor, ITensorHandle* outputTensorHandle)
 {
+    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "CopyOutput");
     auto copyFunc = [](void* dst, const void* src, size_t size)
     {
         memcpy(dst, src, size);

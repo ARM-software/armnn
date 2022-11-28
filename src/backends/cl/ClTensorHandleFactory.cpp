@@ -108,12 +108,12 @@ bool ClTensorHandleFactory::SupportsSubTensors() const
 
 MemorySourceFlags ClTensorHandleFactory::GetExportFlags() const
 {
-    return m_ExportFlags;
+    return MemorySourceFlags(MemorySource::Undefined);
 }
 
 MemorySourceFlags ClTensorHandleFactory::GetImportFlags() const
 {
-    return m_ImportFlags;
+    return MemorySourceFlags(MemorySource::Undefined);
 }
 
 }    // namespace armnn

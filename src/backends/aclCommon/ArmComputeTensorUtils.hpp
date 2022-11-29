@@ -75,7 +75,7 @@ arm_compute::PermutationVector BuildArmComputeTransposeVector(const armnn::Permu
 arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsigned int height);
 
 /// Gets the appropriate PixelValue for the TensorInfo DataType
-arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo, float pixelValue);
+arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo, float value);
 
 /// Computes the depth multiplier parameter for the Depthwise Conv2d ACL workload.
 unsigned int ComputeDepthwiseConv2dDepthMultiplier(armnn::DataLayout layout,

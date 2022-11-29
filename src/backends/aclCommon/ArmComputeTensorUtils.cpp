@@ -324,24 +324,31 @@ arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsign
     return arm_compute::Size2D(width, height);
 }
 
-arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo, float pixelValue)
+arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo, float value)
 {
     switch (tensorInfo->data_type())
     {
         case arm_compute::DataType::F16:
-            return arm_compute::PixelValue(static_cast<Half>(pixelValue));
+        {
+            arm_compute::PixelValue pixelValue = arm_compute::PixelValue(static_cast<Half>(value));
+            if (isinf(pixelValue.get<Half>())) {
+                throw InvalidArgumentException("Under/Overflow converting float value [" + std::to_string(value) +
+                    "] to fp16: [" + std::to_string(pixelValue.get<Half>()) + "]");
+            }
+            return pixelValue;
+        }
         case arm_compute::DataType::F32:
-            return arm_compute::PixelValue(pixelValue);
+            return arm_compute::PixelValue(value);
         case arm_compute::DataType::QASYMM8:
-            return arm_compute::PixelValue(static_cast<uint8_t>(pixelValue));
+            return arm_compute::PixelValue(static_cast<uint8_t>(value));
         case arm_compute::DataType::QSYMM16:
-            return arm_compute::PixelValue(static_cast<int16_t>(pixelValue));
+            return arm_compute::PixelValue(static_cast<int16_t>(value));
         case arm_compute::DataType::QSYMM8:
         case arm_compute::DataType::QASYMM8_SIGNED:
         case arm_compute::DataType::QSYMM8_PER_CHANNEL:
-            return arm_compute::PixelValue(static_cast<int8_t>(pixelValue));
+            return arm_compute::PixelValue(static_cast<int8_t>(value));
         case arm_compute::DataType::S32:
-            return arm_compute::PixelValue(static_cast<int32_t>(pixelValue));
+            return arm_compute::PixelValue(static_cast<int32_t>(value));
         default:
             throw InvalidArgumentException("Unsupported DataType: [" +
                                            std::to_string(static_cast<int>(tensorInfo->data_type())) + "]");

@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_11" # Release 22.11
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_11" # Release 22.11
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="73f19af80aaee8929553739894b8dd8fedb163c3" #8546: Add Dynamic Fusion GpuConv2d FP32/FP16 testcase | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8546
+DEFAULT_CLFRAMEWORKREVISION="03b2971ac69a86f10a1566938d1a25afee15746c" #8692: Integrate SME2 kernels | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8692
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

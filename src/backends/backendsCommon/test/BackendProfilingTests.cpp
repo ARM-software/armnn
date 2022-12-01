@@ -169,7 +169,7 @@ TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
 
     unsigned int shiftedId = 0;
 
-    if (armnn::BackendRegistry().IsBackendRegistered("EthosNAcc"))
+    if (armnn::BackendRegistryInstance().IsBackendRegistered("EthosNAcc"))
     {
         shiftedId = 4;
     }

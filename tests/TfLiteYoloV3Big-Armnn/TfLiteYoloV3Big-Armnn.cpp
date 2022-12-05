@@ -20,6 +20,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <cmath>
 
 using namespace armnnTfLiteParser;

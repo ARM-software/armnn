@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "AdditionOperator.hpp"
+#include "AvgPool2DIgnoreValueOperator.hpp"
 #include "ConcatOperator.hpp"
 #include "ConstantOperator.hpp"
 #include "Conv2dOperator.hpp"
-#include "AvgPool2DIgnoreValueOperator.hpp"
+#include "ElementwiseBinaryOperator.hpp"
 #include "Pooling2DOperator.hpp"
 #include "ReshapeOperator.hpp"
 #include "SliceOperator.hpp"

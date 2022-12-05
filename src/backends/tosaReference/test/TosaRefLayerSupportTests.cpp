@@ -190,6 +190,50 @@ TEST_CASE("IsLayerSupportedTosaReferenceConv2dUnsupported")
     CHECK(!supported);
 }
 
+TEST_CASE("IsLayerSupportedTosaReferenceMultiplication")
+{
+    TensorShape shape0 = {1,1,3,4};
+    TensorShape shape1 = {1,1,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in0(shape0, armnn::DataType::Float32);
+    TensorInfo in1(shape1, armnn::DataType::Float32);
+    TensorInfo out(outShape, armnn::DataType::Float32);
+
+    BaseDescriptor desc;
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Multiplication,
+                                                     {in0, in1, out},
+                                                     desc,
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceMultiplicationUnsupported")
+{
+    TensorShape shape0 = {1,1,3,4};
+    TensorShape shape1 = {1,2,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in0(shape0, armnn::DataType::Signed64);
+    TensorInfo in1(shape1, armnn::DataType::Signed64);
+    TensorInfo out(outShape, armnn::DataType::Signed64);
+
+    BaseDescriptor desc;
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Multiplication,
+                                                     {in0, in1, out},
+                                                     desc,
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+}
+
 TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2d")
 {
     TensorShape inShape = {1,1,3,4};
@@ -371,6 +415,50 @@ TEST_CASE("IsLayerSupportedTosaReferenceSliceUnsupported")
                                                      descriptor,
                                                      EmptyOptional(),
                                                      EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceSubtraction")
+{
+    TensorShape shape0 = {1,1,3,4};
+    TensorShape shape1 = {1,1,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in0(shape0, armnn::DataType::Float32);
+    TensorInfo in1(shape1, armnn::DataType::Float32);
+    TensorInfo out(outShape, armnn::DataType::Float32);
+
+    BaseDescriptor desc;
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Subtraction,
+                                                     {in0, in1, out},
+                                                     desc,
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceSubtractionUnsupported")
+{
+    TensorShape shape0 = {1,1,3,4};
+    TensorShape shape1 = {4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in0(shape0, armnn::DataType::Signed64);
+    TensorInfo in1(shape1, armnn::DataType::Signed64);
+    TensorInfo out(outShape, armnn::DataType::Signed64);
+
+    BaseDescriptor desc;
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Subtraction,
+                                                     {in0, in1, out},
+                                                     desc,
+                                                     armnn::EmptyOptional(),
+                                                     armnn::EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(!supported);

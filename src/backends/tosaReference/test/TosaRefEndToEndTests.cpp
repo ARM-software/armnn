@@ -8,9 +8,11 @@
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
+#include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
+#include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
@@ -149,6 +151,35 @@ TEST_CASE("TosaRefSliceEndtoEndTestInt32")
 TEST_CASE("TosaRefSliceEndtoEndTestFloat16")
 {
     SliceEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+TEST_CASE("TosaRefSubtractionEndtoEndTestFloat32")
+{
+    SubtractionEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSubtractionEndtoEndTestInt32")
+{
+    SubtractionEndToEnd<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSubtractionEndtoEndTestFloat16")
+{
+    SubtractionEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefMultiplicationEndtoEndTestFloat32")
+{
+    MultiplicationEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefMultiplicationEndtoEndTestInt32")
+{
+    MultiplicationEndToEnd<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefMultiplicationEndtoEndTestFloat16")
+{
+    MultiplicationEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
 }
 
 // TransposeConvolution2d

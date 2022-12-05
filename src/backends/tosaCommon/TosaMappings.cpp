@@ -24,8 +24,10 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
     switch (type)
     {
         case LayerType::Addition:
+        case LayerType::Multiplication:
+        case LayerType::Subtraction:
         {
-            return ConvertAdditionToTosaOperator(layer, inputs, outputs);
+            return ConvertElementwiseBinaryToTosaOperator(layer, type, inputs, outputs);
         }
         case LayerType::Concat:
         {

@@ -253,6 +253,54 @@ TEST_CASE("GetTosaMappingFromLayer_Conv2dLayer")
         basicBlock, inputShape, outputShape, Op_CONV2D, Attribute_ConvAttribute, descriptor, LayerType::Convolution2d);
 }
 
+TEST_CASE("GetTosaMapping_MultiplicationLayer")
+{
+
+    const TensorInfo input0Info ({ 1, 2, 4, 2 }, DataType::Float32);
+    const TensorInfo input1Info ({ 1, 2, 4, 2 }, DataType::Float32);
+    const TensorInfo outputInfo ({ 1, 2, 4, 2 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 2, 4, 2 }, { 1, 2, 4, 2 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 2, 4, 2 }};
+
+    TosaSerializationBasicBlock* basicBlock =
+        GetTosaMapping(nullptr, LayerType::Multiplication, {&input0Info, &input1Info}, {&outputInfo}, BaseDescriptor());
+    AssertTosaOneToOneMappingBasicBlock( basicBlock, inputShape, outputShape,
+        tosa::Op_MUL, tosa::Attribute_MulAttribute, BaseDescriptor(), LayerType::Multiplication);
+}
+
+TEST_CASE("GetTosaMappingFromLayer_MultiplicationLayer")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
+    IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
+    IConnectableLayer* add    = net->AddMultiplicationLayer("multiplication");
+    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+
+    input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(add->GetInputSlot(1));
+    add->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    TensorInfo info = TensorInfo({ 2, 2 }, DataType::Float32, 0.0f, 0, true);
+
+    input0->GetOutputSlot(0).SetTensorInfo(info);
+    input1->GetOutputSlot(0).SetTensorInfo(info);
+    add->GetOutputSlot(0).SetTensorInfo(info);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 2, 2 }, { 2, 2 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 2, 2 }};
+
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(add));
+    AssertTosaOneToOneMappingBasicBlock( basicBlock, inputShape, outputShape,
+            tosa::Op_MUL, Attribute_MulAttribute, BaseDescriptor(), LayerType::Multiplication);
+}
+
 TEST_CASE("GetTosaMapping_AvgPool2DLayer")
 {
     Pooling2dDescriptor descriptor;

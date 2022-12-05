@@ -1,5 +1,5 @@
 #
-# Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2022 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -41,6 +41,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     LogSoftmaxEndToEndTestImpl.hpp
     MemoryManagerTests.cpp
     MockBackendId.hpp
+    MultiplicationEndToEndTestImpl.hpp
     OptimizeSubgraphViewTests.cpp
     OptimizationViewsTests.cpp
     PreluEndToEndTestImpl.hpp
@@ -57,6 +58,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
     StridedSliceAsyncEndToEndTest.hpp
+    SubtractionEndToEndTestImpl.hpp
     TransposeEndToEndTestImpl.hpp
     TensorCopyUtils.hpp
     WorkloadFactoryHelper.hpp

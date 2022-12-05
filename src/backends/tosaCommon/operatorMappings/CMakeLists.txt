@@ -4,8 +4,6 @@
 #
 
 list(APPEND armnnTosaBackendOperators_sources
-        AdditionOperator.hpp
-        AdditionOperator.cpp
         AvgPool2DIgnoreValueOperator.hpp
         AvgPool2DIgnoreValueOperator.cpp
         ConcatOperator.hpp
@@ -14,6 +12,8 @@ list(APPEND armnnTosaBackendOperators_sources
         ConstantOperator.cpp
         Conv2dOperator.hpp
         Conv2dOperator.cpp
+        ElementwiseBinaryOperator.hpp
+        ElementwiseBinaryOperator.cpp
         Pooling2DOperator.hpp
         Pooling2DOperator.cpp
         ReshapeOperator.hpp

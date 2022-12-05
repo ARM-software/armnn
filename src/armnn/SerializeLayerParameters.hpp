@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -33,6 +33,11 @@ template <> struct StringifyLayerParameters<ActivationDescriptor>
 template <> struct StringifyLayerParameters<BatchNormalizationDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const BatchNormalizationDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<BatchMatMulDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const BatchMatMulDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<BatchToSpaceNdDescriptor>
@@ -83,6 +88,11 @@ template <> struct StringifyLayerParameters<FakeQuantizationDescriptor>
 template <> struct StringifyLayerParameters<FullyConnectedDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const FullyConnectedDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<GatherDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const GatherDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<L2NormalizationDescriptor>

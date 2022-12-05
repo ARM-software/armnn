@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SerializeLayerParameters.hpp"
@@ -24,6 +24,15 @@ void StringifyLayerParameters<BatchNormalizationDescriptor>::Serialize(Parameter
 {
     fn("Eps", std::to_string(desc.m_Eps));
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
+}
+
+void StringifyLayerParameters<BatchMatMulDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                                const BatchMatMulDescriptor& desc)
+{
+    fn("TransposeX", (desc.m_TransposeX ? "true" : "false"));
+    fn("TransposeX", (desc.m_TransposeY ? "true" : "false"));
+    fn("AdjointX", (desc.m_AdjointX ? "true" : "false"));
+    fn("AdjointY", (desc.m_AdjointY ? "true" : "false"));
 }
 
 void StringifyLayerParameters<BatchToSpaceNdDescriptor>::Serialize(ParameterStringifyFunction& fn,
@@ -196,6 +205,12 @@ void StringifyLayerParameters<FullyConnectedDescriptor>::Serialize(ParameterStri
 {
     fn("BiasEnabled", (desc.m_BiasEnabled ? "true" : "false"));
     fn("TransposeWeightMatrix", (desc.m_TransposeWeightMatrix ? "true" : "false"));
+}
+
+void StringifyLayerParameters<GatherDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                           const GatherDescriptor& desc)
+{
+    fn("Axis", std::to_string(desc.m_Axis));
 }
 
 void StringifyLayerParameters<L2NormalizationDescriptor>::Serialize(ParameterStringifyFunction& fn,

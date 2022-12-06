@@ -1,18 +1,18 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
-
-#include "TensorFwd.hpp"
 
 #include "Exceptions.hpp"
 #include "Optional.hpp"
 #include "Types.hpp"
 
+#include <stdint.h>
 #include <array>
 #include <initializer_list>
 #include <vector>
+#include <utility>
 
 namespace armnn
 {

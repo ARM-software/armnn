@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,11 +7,20 @@
 
 #include <armnn/BackendId.hpp>
 #include <armnn/BackendOptions.hpp>
-#include <armnn/backends/ILayerSupport.hpp>
-#include <armnn/Types.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/Optional.hpp>
+#include <functional>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace armnn
 {
+class ILayerSupport;
+class TensorInfo;
+struct LstmInputParamsInfo;
+struct QuantizedLstmInputParamsInfo;
 
 // This handle calls its own IsXXXLayerSupported() functions which then call the polymorphic
 // ILayerSupport::IsXXXLayerSupported() at the framework level so there is no risk of VTable misalignment.

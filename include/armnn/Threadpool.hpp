@@ -1,27 +1,32 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #if !defined(ARMNN_DISABLE_THREADS)
 
 #pragma once
 
+#include "IRuntime.hpp"
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
-
-#include "INetwork.hpp"
-#include "IRuntime.hpp"
-
+#include <stdint.h>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <unordered_map>
 #include <queue>
+#include <iosfwd>
+#include <memory>
+#include <tuple>
+#include <vector>
 
 namespace armnn
 {
 namespace experimental
 {
+class IAsyncExecutionCallback;
+class IWorkingMemHandle;
+
 class Threadpool
 {
 public:

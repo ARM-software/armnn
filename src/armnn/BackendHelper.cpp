@@ -1,13 +1,20 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include <armnn/BackendHelper.hpp>
+#include <armnn/BackendId.hpp>
+#include <armnn/BackendOptions.hpp>
 #include <armnn/BackendRegistry.hpp>
-#include <armnn/Logging.hpp>
-
+#include <armnn/LstmParams.hpp>
+#include <armnn/QuantizedLstmParams.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+#include <armnn/backends/ILayerSupport.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
+
+#include <stddef.h>
 
 namespace armnn
 {

@@ -1,15 +1,20 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include <Graph.hpp>
-#include <Network.hpp>
-
-#include <reference/RefWorkloadFactory.hpp>
-#include <GraphUtils.hpp>
-
 #include <doctest/doctest.h>
+#include <Graph.hpp>
+#include <armnn/BackendId.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/INetwork.hpp>
+#include <armnn/IRuntime.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+#include <GraphUtils.hpp>
+#include <reference/RefWorkloadFactory.hpp>
+#include <memory>
+#include <vector>
 
 TEST_SUITE("RefOptimizedNetwork")
 {

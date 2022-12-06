@@ -1,19 +1,16 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
-#include <armnn/Types.hpp>
 #include <armnn/BackendId.hpp>
 #include <armnn/Optional.hpp>
-#include <armnn/backends/ICustomAllocator.hpp>
-#include <armnn/backends/IMemoryOptimizerStrategy.hpp>
-
-#include <algorithm>
 #include <memory>
 #include <unordered_map>
 #include <functional>
+#include <stddef.h>
+#include <string>
 
 namespace arm
 {
@@ -29,6 +26,9 @@ namespace armnn
 {
 
 class IBackendInternal;
+class ICustomAllocator;
+class IMemoryOptimizerStrategy;
+
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;
 using MemoryOptimizerStrategiesMapRef = std::unordered_map<BackendId, std::shared_ptr<IMemoryOptimizerStrategy>>;
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,6 +12,8 @@
 #include <common/include/WindowsWrapper.hpp>
 #endif
 #include <ghc/filesystem.hpp>
+#include <string>
+
 namespace fs = ghc::filesystem;
 
 namespace armnnUtils

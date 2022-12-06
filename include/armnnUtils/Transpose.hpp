@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 
 #include <armnn/TensorFwd.hpp>
 #include <armnn/Types.hpp>
+#include <stddef.h>
 
 namespace armnnUtils
 {

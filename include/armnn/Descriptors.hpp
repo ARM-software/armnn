@@ -5,15 +5,15 @@
 #pragma once
 
 #include "Deprecated.hpp"
-#include "DescriptorsFwd.hpp"
-
-#include <cstdint>
-#include <initializer_list>
-#include <iostream>
-#include <sstream>
-
+#include "DescriptorsFwd.hpp" // Required for class equivalence declarations.
 #include "Tensor.hpp"
 #include "Types.hpp"
+#include <armnn/Exceptions.hpp>
+
+#include <cstdint>
+#include <iterator>
+#include <utility>
+#include <vector>
 
 namespace armnn
 {

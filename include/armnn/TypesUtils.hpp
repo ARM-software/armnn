@@ -1,15 +1,19 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
+#include <armnn/BackendId.hpp>
+#include <armnn/Exceptions.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 
+#include <stdint.h>
 #include <cmath>
 #include <ostream>
 #include <set>
+#include <type_traits>
 
 namespace armnn
 {

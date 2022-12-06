@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,6 +12,11 @@ namespace arm
 
 namespace pipe
 {
+
+class Category;
+class Device;
+class CounterSet;
+class Counter;
 
 class ICounterRegistry
 {

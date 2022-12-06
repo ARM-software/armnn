@@ -1,13 +1,20 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/Utils.hpp>
+#include <ctype.h>
 #include <iostream>
 #include <algorithm>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <armnn/Exceptions.hpp>
 
 namespace armnn
 {

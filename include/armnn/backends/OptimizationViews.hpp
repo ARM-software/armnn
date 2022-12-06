@@ -5,7 +5,12 @@
 
 #pragma once
 
+#include <armnn/BackendOptions.hpp>
+#include <armnn/Deprecated.hpp>
+#include <armnn/INetwork.hpp>
 #include <armnn/backends/SubgraphView.hpp>
+#include <vector>
+#include "Graph.hpp"
 
 namespace armnn
 {

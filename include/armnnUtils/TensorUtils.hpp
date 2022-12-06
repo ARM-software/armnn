@@ -1,11 +1,20 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/TypesUtils.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+#include <utility>
+#include <vector>
+
+namespace armnn
+{
+class ITensorHandle;
+}  // namespace armnn
 
 namespace armnnUtils
 {

@@ -1,18 +1,26 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <Layer.hpp>
-#include <Graph.hpp>
+#include <armnn/Deprecated.hpp>
 
 #include <vector>
 #include <list>
+#include <iterator>
+#include <memory>
 
 namespace armnn
 {
+class Graph;
+class IConnectableLayer;
+class IInputSlot;
+class IOutputSlot;
+class InputSlot;
+class Layer;
+class OutputSlot;
 
 ///
 /// The SubgraphView class represents a subgraph of a Graph.

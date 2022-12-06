@@ -1,11 +1,29 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-#include <reference/RefTensorHandle.hpp>
-#include <reference/RefTensorHandleFactory.hpp>
+
 
 #include <doctest/doctest.h>
+#include <armnn/BackendId.hpp>
+#include <armnn/INetwork.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
+#include <armnn/backends/ITensorHandleFactory.hpp>
+#include <armnn/backends/TensorHandle.hpp>
+#include <armnn/utility/Assert.hpp>
+#include <reference/RefTensorHandle.hpp>
+#include <reference/RefTensorHandleFactory.hpp>
+#include <reference/RefMemoryManager.hpp>
+#include <memory>
+#include <vector>
+
+namespace armnn 
+{
+class Exception;
+class NullPointerException;
+}
 
 TEST_SUITE("RefTensorHandleTests")
 {

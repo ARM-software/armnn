@@ -5,7 +5,13 @@
 #pragma once
 
 #include "MockMemoryManager.hpp"
+
 #include <armnn/backends/TensorHandle.hpp>
+#include <armnn/MemorySources.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
+#include <memory>
 
 namespace armnn
 {

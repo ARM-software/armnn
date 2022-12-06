@@ -4,15 +4,48 @@
 //
 #pragma once
 
-#include <atomic>
-
+#include <armnn/Deprecated.hpp>
+#include <armnn/Descriptors.hpp>
+#include <armnn/Exceptions.hpp>
+#include <armnn/IRuntime.hpp>
+#include <armnn/Optional.hpp>
+#include <armnn/Tensor.hpp>
+#include <armnn/Types.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
 #include <armnn/backends/MemCopyWorkload.hpp>
+#include <armnn/backends/ITensorHandle.hpp>
+#include <armnn/backends/IWorkload.hpp>
+#include <armnn/backends/OptimizationViews.hpp>
+#include <armnn/backends/SubgraphView.hpp>
+#include <armnn/backends/WorkloadData.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
+#include <armnn/backends/WorkloadInfo.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnnTestUtils/MockTensorHandle.hpp>
 #include <backendsCommon/LayerSupportBase.hpp>
 
+#include <client/include/CounterValue.hpp>
+#include <client/include/ISendTimelinePacket.hpp>
+#include <client/include/Timestamp.hpp>
+#include <client/include/backends/IBackendProfiling.hpp>
+#include <client/include/backends/IBackendProfilingContext.hpp>
+#include <common/include/Optional.hpp>
+
+#include <atomic>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
 namespace armnn
 {
+class BackendId;
+class ICustomAllocator;
+class MockMemoryManager;
+struct LstmInputParamsInfo;
+struct QuantizedLstmInputParamsInfo;
 
 // A bare bones Mock backend to enable unit testing of simple tensor manipulation features.
 class MockBackend : public IBackendInternal

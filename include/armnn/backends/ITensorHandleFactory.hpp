@@ -1,19 +1,23 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include "ITensorHandle.hpp"
-
-#include <armnn/IRuntime.hpp>
 #include <armnn/MemorySources.hpp>
+#include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace armnn
 {
+class IConnectableLayer;
 
 /// Capability class to calculate in the GetCapabilities function
 /// so that only the capability in the scope can be choose to calculate

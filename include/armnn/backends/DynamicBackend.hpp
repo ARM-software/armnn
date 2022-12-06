@@ -1,16 +1,18 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include "IBackendInternal.hpp"
-
 #include <armnn/BackendRegistry.hpp>
+#include <armnn/BackendId.hpp>
 
+#include <stdint.h>
 #include <functional>
 #include <memory>
+#include <string>
 
 namespace armnn
 {

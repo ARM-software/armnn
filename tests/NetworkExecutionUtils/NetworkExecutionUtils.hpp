@@ -5,15 +5,29 @@
 
 #pragma once
 
-#include <armnn/Logging.hpp>
-#include <armnn/utility/StringUtils.hpp>
-#include <armnn/utility/NumericCast.hpp>
-#include <armnn/BackendRegistry.hpp>
-
-#include <iostream>
+#include <armnn/BackendRegistry.hpp>      // for BackendRegistryInstance
+#include <armnn/Logging.hpp>              // for ScopedRecord, ARMNN_LOG
+#include <armnn/utility/NumericCast.hpp>  // for numeric_cast
+#include <armnn/utility/StringUtils.hpp>  // for StringTokenizer
+#include <armnn/BackendId.hpp>            // for BackendId, BackendIdSet
+#include <armnn/Optional.hpp>             // for Optional, EmptyOptional
+#include <armnn/Tensor.hpp>               // for Tensor, TensorInfo
+#include <armnn/TypesUtils.hpp>           // for Dequantize
+#include <chrono>                         // for duration
+#include <functional>                     // for function
 #include <fstream>
 #include <iomanip>
-#include <iterator>
+#include <iostream>                       // for ofstream, basic_istream
+#include <ratio>                          // for milli
+#include <string>                         // for string, getline, basic_string
+#include <type_traits>                    // for enable_if_t, is_floating_point
+#include <unordered_set>                  // for operator!=, operator==, _No...
+#include <vector>                         // for vector
+#include <math.h>                         // for pow, sqrt
+#include <stdint.h>                       // for int32_t
+#include <stdio.h>                        // for printf, size_t
+#include <stdlib.h>                       // for abs
+#include <algorithm>                      // for find, for_each
 
 /**
  * Given a measured duration and a threshold time tell the user whether we succeeded or not.

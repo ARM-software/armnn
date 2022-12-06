@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -142,7 +142,14 @@ struct PermuteDescriptor : BaseDescriptor
     }
 
     /// @brief Indicates how to translate tensor elements from a given source into the target destination, when
-    /// source and target potentially have different memory layouts e.g. {0U, 3U, 1U, 2U}.
+    /// source and target potentially have different memory layouts e.g.
+    /// Input Shape        {1, 1, 4, 4}
+    /// Permutation Vector {0, 2, 3, 1}
+    /// Output Shape       {1, 4, 1, 4}
+    /// dim "0" goes into index 0 ([ 1, X, X, X ])
+    /// dim "1" goes into index 2 ([ 1, X, 1, X ])
+    /// dim "2" goes into index 3 ([ 1, X, 1, 4 ])
+    /// dim "3" goes into index 1 ([ 1, 4, 1, 4 ])
     PermutationVector m_DimMappings;
 };
 
@@ -1443,7 +1450,14 @@ struct TransposeDescriptor : BaseDescriptor
     }
 
     /// @brief Indicates how to translate tensor elements from a given source into the target destination, when
-    /// source and target potentially have different memory layouts e.g. {0U, 3U, 1U, 2U}.
+    /// source and target potentially have different memory layouts e.g.
+    /// Input Shape        {1, 1, 4, 4}
+    /// Permutation Vector {0, 2, 3, 1}
+    /// Output Shape       {1, 4, 4, 1}
+    /// dim "0" of input goes into index 0 ([ 1, X, X, X])
+    /// dim "2" of input goes into index 1 ([ 1, 4, X, X ])
+    /// dim "3" of input goes into index 2 ([ 1, 4, 4, X ])
+    /// dim "1" of input goes into index 3 ([ 1, 4, 4, 1 ])
     PermutationVector m_DimMappings;
 };
 

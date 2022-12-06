@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,6 +32,7 @@
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
+#include <backendsCommon/test/TransposeEndToEndTestImpl.hpp>
 
 #include <doctest/doctest.h>
 
@@ -1192,6 +1193,12 @@ TEST_CASE("RefTransposeConvolution2dEndToEndInt16NhwcTest")
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::QSymmS16, armnn::DataType::Signed32>(
         defaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Transpose
+TEST_CASE("RefTransposeEndToEndTest")
+{
+    TransposeEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 // Resize Bilinear

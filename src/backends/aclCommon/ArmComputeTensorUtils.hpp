@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -66,10 +66,14 @@ arm_compute::Pooling3dLayerInfo BuildArmComputePooling3dLayerInfo(const Pooling3
 arm_compute::NormalizationLayerInfo BuildArmComputeNormalizationLayerInfo(const NormalizationDescriptor& desc);
 
 /// Utility function used to setup an arm_compute::PermutationVector object from an armnn::PermutationVector.
-arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::PermutationVector& vector);
+/// \param perm PermutationVector used in Arm NN Permute layer
+/// \return PermutationVector used in ACL Transpose layer
+arm_compute::PermutationVector BuildArmComputePermutationVector(const armnn::PermutationVector& perm);
 
 /// Utility function used to setup an arm_compute::PermutationVector object from an armnn::PermutationVector.
-arm_compute::PermutationVector BuildArmComputeTransposeVector(const armnn::PermutationVector& vector);
+/// \param perm PermutationVector used in Arm NN Transpose layer
+/// \return PermutationVector used in ACL Transpose layer
+arm_compute::PermutationVector BuildArmComputeTransposeVector(const armnn::PermutationVector& perm);
 
 /// Utility function used to setup an arm_compute::Size2D object from width and height values.
 arm_compute::Size2D BuildArmComputeSize2D(const unsigned int width, const unsigned int height);

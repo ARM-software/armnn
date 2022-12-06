@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -26,7 +26,6 @@ public:
 
     /// Check if the input tensor shape(s)
     /// will lead to a valid configuration of @ref TransposeLayer.
-    /// @param [in] shapeInferenceMethod Indicates if output shape shall be overwritten or just validated.
     void ValidateTensorShapesFromInputs() override;
 
     /// Infers the output shapes from given input shapes and the permutation vector.

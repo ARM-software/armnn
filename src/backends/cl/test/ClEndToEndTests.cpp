@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,6 +21,7 @@
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
+#include <backendsCommon/test/TransposeEndToEndTestImpl.hpp>
 
 #include <doctest/doctest.h>
 
@@ -413,6 +414,12 @@ TEST_CASE("ClTransposeConvolution2dEndToEndUint8NhwcTest")
 {
     TransposeConvolution2dEndToEnd<armnn::DataType::QAsymmU8, armnn::DataType::Signed32>(
         clDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Transpose
+TEST_CASE("ClTransposeEndToEndTest")
+{
+TransposeEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
 }
 
 TEST_CASE("ClQuantizedLstmEndToEndTest")

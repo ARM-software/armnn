@@ -26,6 +26,7 @@ option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OF
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
 option(TOSA_SERIALIZATION_LIB_ROOT "Location where the TOSA Serialization Library 'include' and 'lib' folders can be found" OFF)
 option(TOSA_REFERENCE_MODEL_ROOT "Location where the TOSA Reference Model 'include' and 'lib' folders can be found" OFF)
+option(TOSA_REFERENCE_MODEL_OUTPUT "TOSA Reference Model output is printed during layer support checks" ON)
 option(DYNAMIC_BACKEND_PATHS "Colon seperated list of paths where to load the dynamic backends from" "")
 option(SAMPLE_DYNAMIC_BACKEND "Include the sample dynamic backend and its tests in the build" OFF)
 option(BUILD_GATORD_MOCK "Build the Gatord simulator for external profiling testing." ON)
@@ -362,6 +363,10 @@ if(ARMNNTOSAREF)
                  NAMES tosa_reference_model_lib.a tosa_reference_model_lib
                  HINTS ${TOSA_REFERENCE_MODEL_ROOT}/lib /usr/local/lib /usr/lib)
     message(STATUS "TOSA Reference Model set to ${TOSA_REFERENCE_MODEL_LIB}")
+
+    if(TOSA_REFERENCE_MODEL_OUTPUT)
+        add_definitions("-DTOSA_REFERENCE_MODEL_OUTPUT=1")
+    endif()
 endif()
 
 # This is the root for the dynamic backend tests to search for dynamic

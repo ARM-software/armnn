@@ -384,8 +384,8 @@ TEST_CASE("GetTosaMapping_SliceLayer")
     std::vector<std::vector<int32_t>> outputShape = {{ 2, 1, 3 }};
 
     SliceDescriptor descriptor;
-    descriptor.m_Begin = { 3 };
-    descriptor.m_Size  = { 3 };
+    descriptor.m_Begin = { 1, 0, 0 };
+    descriptor.m_Size  = { 2, 1, 3 };
 
     TosaSerializationBasicBlock* basicBlock =
         GetTosaMapping(nullptr, LayerType::Slice, {&inputInfo}, {&outputInfo}, descriptor);

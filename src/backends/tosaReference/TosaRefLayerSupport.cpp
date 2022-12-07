@@ -4,328 +4,19 @@
 //
 
 #include "TosaRefLayerSupport.hpp"
+
 #include <tosaCommon/TosaMappings.hpp>
 
 #include <armnn/Types.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
-#include <tosaCommon/TosaLayerSupportRules.hpp>
-#include <LayerSupportCommon.hpp>
+
+#include <graph_status.h>
+#include <model_runner.h>
 
 #include <vector>
-#include <array>
-#include <tuple>
 
 namespace armnn
 {
-
-static bool RunTosaLayerChecksSingleDataType(TosaSerializationOperator* op,
-                                             const std::vector<TosaSerializationTensor*>& inputs,
-                                             const std::vector<TosaSerializationTensor*>& outputs,
-                                             const std::vector<Attribute>& supportedAttributes,
-                                             const std::vector<DType>& supportedTypes,
-                                             Optional<string&> reasonIfUnsupported)
-{
-    bool supported = true;
-
-    std::string opString = TosaOpToString(op->GetOp());
-
-    // Check Attribute from operator (GetAttribute)
-    supported &= CheckSupportRule(TosaOperatorAttributeOfAny(op, supportedAttributes), reasonIfUnsupported,
-                                  std::string("TOSA Reference Operator: " + opString +
-                                              " has an unsupported attribute.").c_str());
-
-    for (auto input : inputs)
-    {
-        std::string dataTypeCode = TosaDTypeToString(input->GetDtype());
-
-        // Check Dtype from tensor (GetDtype)
-        supported &= CheckSupportRule(TosaTypeAnyOf(input, supportedTypes),
-                                      reasonIfUnsupported,
-                                      std::string("TOSA Reference Operator: " + opString + " for input: " +
-                                                  input->GetName() + " has an unsupported data type: " +
-                                                  dataTypeCode).c_str());
-
-        // Check Shape from tensor (GetShape)
-        supported &= CheckSupportRule(TosaTensorNumDimensionsWithinBounds(input),
-                                      reasonIfUnsupported,
-                                      std::string("Tosa Reference Operator: " + opString + " for input: " +
-                                                  input->GetName() + " exceeds MaxNumOfTensorDimensions.").c_str());
-    }
-
-    for (auto output : outputs)
-    {
-        std::string dataTypeCode = TosaDTypeToString(output->GetDtype());
-
-        // Check Dtype from tensor (GetDtype)
-        supported &= CheckSupportRule(TosaTypeAnyOf(output, supportedTypes),
-                                      reasonIfUnsupported,
-                                      std::string("TOSA Reference Operator: " + opString + " for output: " +
-                                                  output->GetName() + " has an unsupported data type: " +
-                                                  dataTypeCode).c_str());
-
-        // Check Shape from tensor (GetShape)
-        supported &= CheckSupportRule(TosaTensorNumDimensionsWithinBounds(output),
-                                      reasonIfUnsupported,
-                                      std::string("Tosa Reference Operator: " + opString + " for output: " +
-                                                  output->GetName() + " exceeds MaxNumOfTensorDimensions.").c_str());
-    }
-
-    return supported;
-}
-
-static bool RunTosaLayerChecksInputOutputDataType(TosaSerializationOperator* op,
-                                                  const std::vector<TosaSerializationTensor*>& inputs,
-                                                  const std::vector<TosaSerializationTensor*>& outputs,
-                                                  const std::vector<Attribute>& supportedAttributes,
-                                                  const std::vector<std::tuple<DType,DType>>& supportedMappingTypes,
-                                                  Optional<string&> reasonIfUnsupported)
-{
-    bool supported = true;
-
-    std::string opString = TosaOpToString(op->GetOp());
-
-    // Check Attribute from operator (GetAttribute)
-    supported &= CheckSupportRule(TosaOperatorAttributeOfAny(op, supportedAttributes), reasonIfUnsupported,
-                                  std::string("TOSA Reference Operator: " + opString +
-                                      " has an unsupported attribute.").c_str());
-
-    supported &= CheckSupportRule(TosaAssertSize(inputs, outputs), reasonIfUnsupported,
-                                  std::string("TOSA Reference Operator: " + opString +
-                                      " must have 1-to-1 mapping of inputs-to-outputs.").c_str());
-
-    for (uint32_t i = 0; i < inputs.size(); i++)
-    {
-        auto input = inputs[i];
-        auto output = outputs[i];
-        std::string inputDataTypeCode = TosaDTypeToString(input->GetDtype());
-        std::string outputDataTypeCode = TosaDTypeToString(output->GetDtype());
-        std::tuple<DType, DType> mappingType(input->GetDtype(), output->GetDtype());
-
-        // Check Dtype from tensor (GetDtype)
-        supported &= CheckSupportRule(TosaContainerContainsTwoTypes(mappingType, supportedMappingTypes),
-                                      reasonIfUnsupported,
-                                      std::string("TOSA Reference Operator: " + opString + " for input: " +
-                                          input->GetName() + " and output: " + output->GetName() +
-                                          " has an unsupported input data type: " + inputDataTypeCode +
-                                          " to output data type: " + outputDataTypeCode).c_str());
-
-        // Check Shape from tensor (GetShape)
-        supported &= CheckSupportRule(TosaTensorNumDimensionsWithinBounds(input),
-                                      reasonIfUnsupported,
-                                      std::string("Tosa Reference Operator: " + opString + " for input: " +
-                                          input->GetName() + " exceeds MaxNumOfTensorDimensions.").c_str());
-
-        // Check Shape from tensor (GetShape)
-        supported &= CheckSupportRule(TosaTensorNumDimensionsWithinBounds(output),
-                                      reasonIfUnsupported,
-                                      std::string("Tosa Reference Operator: " + opString + " for output: " +
-                                          output->GetName() + " exceeds MaxNumOfTensorDimensions.").c_str());
-    }
-
-    return supported;
-}
-
-static bool RunTosaLayerChecksInputWeightsOutputDataType(
-        TosaSerializationOperator* op,
-        const std::vector<TosaSerializationTensor*>& inputs,
-        const std::vector<TosaSerializationTensor*>& outputs,
-        const std::vector<Attribute>& supportedAttributes,
-        const std::vector<std::tuple<DType, DType, DType>>& supportedMappingTypes,
-        Optional<string&> reasonIfUnsupported)
-{
-    bool supported = true;
-
-    std::string opString = TosaOpToString(op->GetOp());
-
-    // Check Attribute from operator (GetAttribute)
-    supported &= CheckSupportRule(TosaOperatorAttributeOfAny(op, supportedAttributes), reasonIfUnsupported,
-                                  std::string("TOSA Reference Operator: " + opString +
-                                              " has an unsupported attribute.").c_str());
-
-    // Check combination of input, weights and output types.
-    // Bias is the same as output type, so it is covered.
-    std::tuple<DType, DType, DType> mappingTypes(inputs[0]->GetDtype(), inputs[1]->GetDtype(), outputs[0]->GetDtype());
-
-    // Check Dtype from tensor (GetDtype)
-    supported &= CheckSupportRule(TosaContainerContainsThreeTypes(mappingTypes, supportedMappingTypes),
-                                  reasonIfUnsupported,
-                                  std::string("TOSA Reference Operator: " + opString + " for input 0: " +
-                                              inputs[0]->GetName() + ", input 1: " + inputs[1]->GetName() +
-                                              " and output: " + outputs[0]->GetName() +
-                                              " has an unsupported input data type combination.").c_str());
-
-    for (auto input : inputs)
-    {
-        // Check Shape from tensor (GetShape)
-        supported &= CheckSupportRule(TosaTensorNumDimensionsWithinBounds(input),
-                                      reasonIfUnsupported,
-                                      std::string("Tosa Reference Operator: " + opString + " for input: " +
-                                                  input->GetName() + " exceeds MaxNumOfTensorDimensions.").c_str());
-    }
-
-    for (auto output : outputs)
-    {
-        // Check Shape from tensor (GetShape)
-        supported &= CheckSupportRule(TosaTensorNumDimensionsWithinBounds(output),
-                                      reasonIfUnsupported,
-                                      std::string("Tosa Reference Operator: " + opString + " for output: " +
-                                                  output->GetName() + " exceeds MaxNumOfTensorDimensions.").c_str());
-    }
-
-    return supported;
-}
-
-
-
-static bool IsTosaLayerSupported(TosaSerializationOperator* op,
-                                 const std::vector<TosaSerializationTensor*>& inputs,
-                                 const std::vector<TosaSerializationTensor*>& outputs,
-                                 Optional<string&> reasonIfUnsupported)
-{
-    switch(op->GetOp())
-    {
-        case tosa::Op_ADD:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_NONE };
-
-            // Only Int32, Fp32 and Fp16 are currently supported by the TOSA Reference Model.
-            std::vector<DType> supportedTypes =
-            {
-                DType_INT32,
-                DType_FP16,
-                DType_FP32
-            };
-
-            // Check the attribute, data types and bounds for inputs and outputs.
-            return RunTosaLayerChecksSingleDataType(
-                    op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
-        }
-        case tosa::Op_CONST:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_NONE };
-
-            std::vector<DType> supportedTypes =
-            {
-                DType_FP16,
-                DType_FP32,
-                DType_UINT8,
-                DType_INT8,
-                DType_INT16,
-                DType_INT32,
-                DType_BOOL
-            };
-
-            // Check the attribute, data types and bounds for inputs and outputs.
-            return RunTosaLayerChecksSingleDataType(
-                    op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
-        }
-        case tosa::Op_CONV2D:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_ConvAttribute };
-
-            std::vector<std::tuple<DType, DType, DType>> supportedTypesMapping =
-            {
-                std::tuple<DType, DType, DType>(DType_FP16, DType_FP16, DType_FP16),
-                std::tuple<DType, DType, DType>(DType_FP16, DType_FP16, DType_FP32),
-                std::tuple<DType, DType, DType>(DType_FP32, DType_FP32, DType_FP32),
-                std::tuple<DType, DType, DType>(DType_INT8, DType_INT8, DType_INT32)
-            };
-
-            return RunTosaLayerChecksInputWeightsOutputDataType(
-                    op, inputs, outputs, supportedAttributes, supportedTypesMapping, reasonIfUnsupported);
-        }
-        case tosa::Op_AVG_POOL2D:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_PoolAttribute };
-
-            std::vector<std::tuple<DType, DType>> supportedTypesMapping =
-            {
-                std::tuple<DType, DType>(DType_FP16, DType_FP16),
-                std::tuple<DType, DType>(DType_FP16, DType_FP32),
-                std::tuple<DType, DType>(DType_FP32, DType_FP32),
-                std::tuple<DType, DType>(DType_INT8, DType_INT32),
-                std::tuple<DType, DType>(DType_INT16, DType_INT32)
-            };
-
-            // Check the attribute, data types and bounds for inputs and outputs.
-            return RunTosaLayerChecksInputOutputDataType(
-                    op, inputs, outputs, supportedAttributes, supportedTypesMapping, reasonIfUnsupported);
-        }
-        case tosa::Op_MAX_POOL2D:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_PoolAttribute };
-
-            std::vector<DType> supportedTypes =
-            {
-                DType_FP16,
-                DType_FP32,
-                DType_INT8,
-                DType_INT16
-            };
-
-            // Check the attribute, data types and bounds for inputs and outputs.
-            return RunTosaLayerChecksSingleDataType(
-                    op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
-        }
-        case tosa::Op_PAD:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_PadAttribute };
-
-            std::vector<DType> supportedTypes =
-            {
-                DType_FP16,
-                DType_FP32,
-                DType_INT8,
-                DType_INT16,
-                DType_INT32,
-                DType_BOOL
-            };
-
-            // Check the attribute, data types and bounds for inputs and outputs.
-            return RunTosaLayerChecksSingleDataType(
-                    op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
-        }
-        case tosa::Op_RESHAPE:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_ReshapeAttribute };
-
-            std::vector<DType> supportedTypes =
-            {
-                DType_FP16,
-                DType_FP32,
-                DType_INT8,
-                DType_INT16,
-                DType_INT32,
-                DType_BOOL
-            };
-
-            // Check the attribute, data types and bounds for inputs and outputs.
-            return RunTosaLayerChecksSingleDataType(
-                op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
-        }
-        case tosa::Op_SLICE:
-        {
-            std::vector<Attribute> supportedAttributes = { Attribute_SliceAttribute };
-
-            std::vector<DType> supportedTypes =
-            {
-                DType_FP16,
-                DType_FP32,
-                DType_INT8,
-                DType_INT16,
-                DType_INT32,
-                DType_BOOL
-            };
-
-            // Check the attribute, data types and bounds for inputs and outputs.
-            return RunTosaLayerChecksSingleDataType(
-                op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
-        }
-        default:
-            SetValueChecked(reasonIfUnsupported, "Operation is currently unsupported by the TOSA Reference Backend.");
-            return false;
-    }
-}
 
 bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
                                            const std::vector<TensorInfo>& infos,
@@ -336,6 +27,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
 {
     IgnoreUnused(lstmParamsInfo);
     IgnoreUnused(quantizedLstmInputParamsInfo);
+    IgnoreUnused(reasonIfUnsupported);
 
     std::vector<const TensorInfo*> inputInfos;
     std::vector<const TensorInfo*> outputInfos;
@@ -385,35 +77,47 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         return false;
     }
 
-    // Loop through block and get each tensor and operator
-    for (long unsigned int i = 0; i < mappings->GetOperators().size(); ++i)
+    TosaSerializationHandler handler;
+
+    // Add mappings to main block as the TOSA Reference Model requires the graph to be in one block called main.
+    auto* block = new TosaSerializationBasicBlock("main",
+                                                  mappings->GetOperators(),
+                                                  mappings->GetTensors(),
+                                                  mappings->GetInputs(),
+                                                  mappings->GetOutputs());
+    handler.GetBlocks().emplace_back(block);
+
+    GraphStatus status;
+    TosaReference::IModelRunner runner;
+
+#if !defined(TOSA_REFERENCE_MODEL_OUTPUT)
+    // There currently isn't a way to disable the output from the TOSA Reference Model, but it does have a file pointer
+    // to write debug output to, so set this to /dev/null (if it exists on the system) to hide the output.
+    func_debug_t funcDebug;
+
+    FILE* file = fopen("/dev/null", "w");
+    funcDebug.func_debug_file = (file == nullptr) ? stderr : file;
+
+    runner.setFuncDebug(funcDebug);
+#endif
+
+    // Initialise the model runner with the TosaSerializationHandler, which runs validation on the mapping.
+    status = runner.initialize(handler);
+
+#if !defined(TOSA_REFERENCE_MODEL_OUTPUT)
+    // Reset FuncDebug as they can persist across multiple IModelRunner instances.
+    funcDebug.func_debug_file = stderr;
+    runner.setFuncDebug(funcDebug);
+#endif
+
+    if(status == GraphStatus::TOSA_ERROR || status == GraphStatus::TOSA_UNPREDICTABLE)
     {
-        // While looping over operators check for op_UNKNOWN which is unsupported
-        if (mappings->GetOperators()[i]->GetOp() == tosa::Op_UNKNOWN) { return false; }
-
-        // Loop over operators and get GetInput/OutputTensorNames, loop over resulting names and
-        // use GetTensorByName to pass pointers to tensors on to the IsTosaLayerSupported()
-        std::vector<TosaSerializationTensor*> inputTensorsVect;
-        for (const auto& name : mappings->GetOperators()[i]->GetInputTensorNames())
-        {
-            inputTensorsVect.push_back(mappings->GetTensorByName(name));
-        }
-
-        std::vector<TosaSerializationTensor*> outputTensorsVect;
-        for (const auto& name : mappings->GetOperators()[i]->GetOutputTensorNames())
-        {
-            outputTensorsVect.push_back(mappings->GetTensorByName(name));
-        }
-
-        if (!IsTosaLayerSupported(mappings->GetOperators()[i],
-                                  inputTensorsVect,
-                                  outputTensorsVect,
-                                  reasonIfUnsupported))
-        {
-            return false;
-        }
+        return false;
     }
-    return true;
+    else
+    {
+        return true;
+    }
 }
 
 } // namespace armnn

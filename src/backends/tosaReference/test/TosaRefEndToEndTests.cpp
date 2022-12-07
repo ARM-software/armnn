@@ -8,6 +8,7 @@
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
@@ -72,6 +73,22 @@ TEST_CASE("TosaRefAvgPool2DEndtoEndTestFloat16")
 TEST_CASE("TosaRefAvgPool2DIgnoreValueEndtoEndTestFloat32")
 {
     AvgPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+// Reshape
+TEST_CASE("TosaRefReshapeEndtoEndTestFloat32")
+{
+    ReshapeEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefReshapeEndtoEndTestInt32")
+{
+    ReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefReshapeEndtoEndTestFloat16")
+{
+    ReshapeEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
 }
 
 }

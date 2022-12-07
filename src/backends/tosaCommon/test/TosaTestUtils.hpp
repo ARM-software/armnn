@@ -8,16 +8,20 @@
 #include <Layer.hpp>
 
 #include <tosaCommon/TosaMappings.hpp>
+#include <tosaCommon/operatorMappings/TosaOperatorUtils.hpp>
 
 #include <doctest/doctest.h>
+#include <numeric>
 
 using namespace armnn;
 using namespace tosa;
 
-inline void VerifyTosaAttributeFromDescriptor(const BaseDescriptor& descriptor,
-                                              const TosaAttributeBase* attribute,
-                                              LayerType type,
-                                              uint32_t mappingOpNumber = 0)
+inline void VerifyTosaAttribute(const BaseDescriptor& descriptor,
+                                const TosaAttributeBase* attribute,
+                                std::vector<int32_t> inputShape,
+                                std::vector<int32_t> outputShape,
+                                LayerType type,
+                                uint32_t mappingOpNumber = 0)
 {
     switch (type)
     {
@@ -99,6 +103,25 @@ inline void VerifyTosaAttributeFromDescriptor(const BaseDescriptor& descriptor,
             CHECK(kernel == poolAttribute.kernel());
             CHECK(stride == poolAttribute.stride());
             break;
+        }
+        case LayerType::Reshape:
+        {
+            auto reshapeDesc = PolymorphicDowncast<const ReshapeDescriptor*>(&descriptor);
+            TosaReshapeAttribute reshapeAttribute(attribute);
+            std::vector<int32_t> shapeAttrib = reshapeAttribute.new_shape();
+
+            CHECK(GetTosaTensorShape(reshapeDesc->m_TargetShape) == shapeAttrib);
+            CHECK(outputShape == shapeAttrib);
+
+            auto numInputElements = std::accumulate(std::begin(inputShape),
+                                                    std::end(inputShape),
+                                                    1,
+                                                    std::multiplies<int32_t>());
+            auto numAttributeShapeElements = std::accumulate(std::begin(shapeAttrib),
+                                                             std::end(shapeAttrib),
+                                                             1,
+                                                             std::multiplies<int32_t>());
+            CHECK(numInputElements == numAttributeShapeElements);
         }
         default:
             break;
@@ -195,7 +218,22 @@ inline void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* bas
         }
     }
 
-    VerifyTosaAttributeFromDescriptor(descriptor,
-                                      op->GetAttribute(),
-                                      type);
+    std::vector<int32_t> input = {};
+    std::vector<int32_t> output = {};
+
+    if (!inputShape.empty())
+    {
+        input = inputShape[0];
+    }
+
+    if (!outputShape.empty())
+    {
+        output = outputShape[0];
+    }
+
+    VerifyTosaAttribute(descriptor,
+                        op->GetAttribute(),
+                        input,
+                        output,
+                        type);
 }

@@ -59,28 +59,20 @@ inline std::vector<int32_t> GetTosaTensorShape(const TensorShape& shape)
 // Function that generates unique name using the layer type, input slot and layer guid.
 inline std::string GenerateUniqueName(const Layer& layer, uint32_t layerSlot)
 {
-    std::string name;
     std::string guid        = std::to_string(layer.GetGuid());
     std::string slotAndGuid = std::to_string(layerSlot) + "_" + guid;
-    LayerType layerType = layer.GetType();
 
-    if (layerType == LayerType::Input)
+    switch (layer.GetType())
     {
-        name = "input" + slotAndGuid;
+        case LayerType::Input:
+            return "input" + slotAndGuid;
+        case LayerType::Output:
+            return "output" + slotAndGuid;
+        case LayerType::Constant:
+            return "constant_" + guid;
+        default:
+            return "intermediate" + slotAndGuid;
     }
-    else if (layerType == LayerType::Output)
-    {
-        name = "output" + slotAndGuid;
-    }
-    else if (layerType == LayerType::Constant)
-    {
-        name = "constant_" + guid;
-    }
-    else
-    {
-        name = "intermediate" + slotAndGuid;
-    }
-    return name;
 }
 
 // Function to return unique int as a string to ensure uniqueness between all input, output and block names.
@@ -88,6 +80,37 @@ static int uniqueTosaMappingID = 0;
 inline std::string GetUniqueTosaMappingID()
 {
     return std::to_string(++uniqueTosaMappingID);
+}
+
+// Function to return Tosa DType as string.
+inline std::string TosaDTypeToString(DType tosaDType)
+{
+    switch (tosaDType)
+    {
+        case DType_UNKNOWN:
+            return "DType_UNKNOWN";
+        case DType_BOOL:
+            return "DType_BOOL";
+        case DType_UINT8:
+            return "DType_UINT8";
+        case DType_INT4:
+            return "DType_INT4";
+        case DType_INT8:
+            return "DType_INT8";
+        case DType_INT16:
+            return "DType_INT16";
+        case DType_INT32:
+            return "DType_INT32";
+        case DType_INT48:
+            return "DType_INT48";
+        case DType_FP32:
+            return "DType_FP32";
+        case DType_UINT16:
+            return "DType_UINT16";
+        case DType_FP16:
+            return "DType_FP16";
+    }
+    return "";
 }
 
 // Function to return Tosa Op as string.

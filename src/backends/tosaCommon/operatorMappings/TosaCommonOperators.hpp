@@ -10,3 +10,4 @@
 #include "Conv2dOperator.hpp"
 #include "AvgPool2DIgnoreValueOperator.hpp"
 #include "Pooling2DOperator.hpp"
+#include "ReshapeOperator.hpp"

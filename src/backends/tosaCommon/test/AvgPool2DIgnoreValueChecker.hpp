@@ -68,9 +68,11 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
     CHECK(padOp->GetAttributeType() == Attribute_PadAttribute);
     CHECK(padOp->GetOp() == Op_PAD);
 
-    VerifyTosaAttributeFromDescriptor(descriptor,
-                                      padOp->GetAttribute(),
-                                      LayerType::Pooling2d);
+    VerifyTosaAttribute(descriptor,
+                        padOp->GetAttribute(),
+                        inputShape[0],
+                        outputShape[0],
+                        LayerType::Pooling2d);
 
     //
     // Verify average pool operator second.
@@ -115,9 +117,11 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
     CHECK(poolOp->GetAttributeType() == Attribute_PoolAttribute);
     CHECK(poolOp->GetOp() == Op_AVG_POOL2D);
 
-    VerifyTosaAttributeFromDescriptor(descriptor,
-                                      poolOp->GetAttribute(),
-                                      LayerType::Pooling2d,
-                                      1);
+    VerifyTosaAttribute(descriptor,
+                        poolOp->GetAttribute(),
+                        inputShape[0],
+                        outputShape[0],
+                        LayerType::Pooling2d,
+                        1);
 
 }

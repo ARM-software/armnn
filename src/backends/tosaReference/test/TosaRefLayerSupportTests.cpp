@@ -12,26 +12,28 @@
 
 #include <string>
 
+using namespace armnn;
+
 TEST_SUITE("TosaRefLayerSupported")
 {
 
 TEST_CASE("IsLayerSupportedTosaReferenceAddition")
 {
-    armnn::TensorShape shape0 = {1,1,3,4};
-    armnn::TensorShape shape1 = {4};
-    armnn::TensorShape outShape = {1,1,3,4};
-    armnn::TensorInfo in0(shape0, armnn::DataType::Float32);
-    armnn::TensorInfo in1(shape1, armnn::DataType::Float32);
-    armnn::TensorInfo out(outShape, armnn::DataType::Float32);
+    TensorShape shape0 = {1,1,3,4};
+    TensorShape shape1 = {4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in0(shape0, DataType::Float32);
+    TensorInfo in1(shape1, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
 
-    armnn::BaseDescriptor desc;
-    armnn::TosaRefLayerSupport supportChecker;
+    BaseDescriptor desc;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Addition,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Addition,
                                                      {in0, in1, out},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(supported);
@@ -39,21 +41,21 @@ TEST_CASE("IsLayerSupportedTosaReferenceAddition")
 
 TEST_CASE("IsLayerSupportedTosaReferenceAdditionUnsupported")
 {
-    armnn::TensorShape shape0 = {1,1,3,4};
-    armnn::TensorShape shape1 = {4};
-    armnn::TensorShape outShape = {1,1,3,4};
-    armnn::TensorInfo in0(shape0, armnn::DataType::Signed64);
-    armnn::TensorInfo in1(shape1, armnn::DataType::Signed64);
-    armnn::TensorInfo out(outShape, armnn::DataType::Signed64);
+    TensorShape shape0 = {1,1,3,4};
+    TensorShape shape1 = {4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in0(shape0, DataType::Signed64);
+    TensorInfo in1(shape1, DataType::Signed64);
+    TensorInfo out(outShape, DataType::Signed64);
 
-    armnn::BaseDescriptor desc;
-    armnn::TosaRefLayerSupport supportChecker;
+    BaseDescriptor desc;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Addition,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Addition,
                                                      {in0, in1, out},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(!supported);
@@ -63,19 +65,21 @@ TEST_CASE("IsLayerSupportedTosaReferenceAdditionUnsupported")
         "TOSA Reference Operator: Op_ADD for input: input1_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
         "TOSA Reference Operator: Op_ADD for output: output0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+        "has an unsupported data type: DType_UNKNOWN") != std::string::npos);
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceConstant")
 {
-    armnn::TensorInfo outputInfo({1,1,3,4}, armnn::DataType::Float32);
+    TensorInfo outputInfo({1,1,3,4}, DataType::Float32);
 
-    armnn::TosaRefLayerSupport supportChecker;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Constant,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Constant,
                                                      {outputInfo},
-                                                     armnn::BaseDescriptor(),
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     BaseDescriptor(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(supported);
@@ -83,39 +87,41 @@ TEST_CASE("IsLayerSupportedTosaReferenceConstant")
 
 TEST_CASE("IsLayerSupportedTosaReferenceConstantUnsupported")
 {
-    armnn::TensorInfo outputInfo({1,1,3,4}, armnn::DataType::Signed64);
+    TensorInfo outputInfo({1,1,3,4}, DataType::Signed64);
 
-    armnn::TosaRefLayerSupport supportChecker;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Constant,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Constant,
                                                      {outputInfo},
-                                                     armnn::BaseDescriptor(),
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     BaseDescriptor(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(!supported);
     REQUIRE(reasonIfNotSupported.find(
             "TOSA Reference Operator: Op_CONST for output: constant_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+        "has an unsupported data type: DType_UNKNOWN") != std::string::npos);
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceConv2d")
 {
-    armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32);
+    TensorInfo inputInfo ({ 1, 5, 5, 1 }, DataType::Float32);
+    TensorInfo outputInfo({ 1, 3, 3, 1 }, DataType::Float32);
+    TensorInfo weightsInfo({ 1, 3, 3, 1 }, DataType::Float32);
+    TensorInfo biasesInfo ({ 1 }, DataType::Float32);
 
-    armnn::Convolution2dDescriptor desc;
+    Convolution2dDescriptor desc;
     desc.m_BiasEnabled = true;
 
-    armnn::TosaRefLayerSupport supportChecker;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
     auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Convolution2d,
                                                      {inputInfo, outputInfo, weightsInfo, biasesInfo},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(supported);
@@ -124,21 +130,21 @@ TEST_CASE("IsLayerSupportedTosaReferenceConv2d")
 TEST_CASE("IsLayerSupportedTosaReferenceConv2dUnsupported")
 {
     // If inputs and weights are Fp32, output must match.
-    armnn::TensorInfo inputInfo ({ 1, 5, 5, 1 }, armnn::DataType::Float32);
-    armnn::TensorInfo outputInfo({ 1, 3, 3, 1 }, armnn::DataType::Signed64);
-    armnn::TensorInfo weightsInfo({ 1, 3, 3, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
-    armnn::TensorInfo biasesInfo ({ 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    TensorInfo inputInfo ({ 1, 5, 5, 1 }, DataType::Float32);
+    TensorInfo outputInfo({ 1, 3, 3, 1 }, DataType::Signed64);
+    TensorInfo weightsInfo({ 1, 3, 3, 1 }, DataType::Float32, 0.0f, 0, true);
+    TensorInfo biasesInfo ({ 1 }, DataType::Float32, 0.0f, 0, true);
 
-    armnn::Convolution2dDescriptor desc;
+    Convolution2dDescriptor desc;
     desc.m_BiasEnabled = true;
 
-    armnn::TosaRefLayerSupport supportChecker;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
     auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Convolution2d,
                                                      {inputInfo, outputInfo, weightsInfo, biasesInfo},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(!supported);
@@ -154,19 +160,19 @@ TEST_CASE("IsLayerSupportedTosaReferenceConv2dUnsupported")
 
 TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2d")
 {
-    armnn::TensorShape inShape = {1,1,3,4};
-    armnn::TensorShape outShape = {1,1,3,4};
-    armnn::TensorInfo in(inShape, armnn::DataType::Float32);
-    armnn::TensorInfo out(outShape, armnn::DataType::Float32);
+    TensorShape inShape = {1,1,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
 
-    armnn::Pooling2dDescriptor desc;
-    armnn::TosaRefLayerSupport supportChecker;
+    Pooling2dDescriptor desc;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Pooling2d,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Pooling2d,
                                                      {in, out},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(supported);
@@ -174,22 +180,22 @@ TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2d")
 
 TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2d_IgnoreValue")
 {
-    armnn::TensorShape inShape = {1,1,3,4};
-    armnn::TensorShape outShape = {1,1,3,4};
-    armnn::TensorInfo in(inShape, armnn::DataType::Float32);
-    armnn::TensorInfo out(outShape, armnn::DataType::Float32);
+    TensorShape inShape = {1,1,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
 
-    armnn::Pooling2dDescriptor desc;
-    desc.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
-    desc.m_PoolType = armnn::PoolingAlgorithm::Average;
+    Pooling2dDescriptor desc;
+    desc.m_PaddingMethod = PaddingMethod::IgnoreValue;
+    desc.m_PoolType = PoolingAlgorithm::Average;
 
-    armnn::TosaRefLayerSupport supportChecker;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Pooling2d,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Pooling2d,
                                                      {in, out},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(supported);
@@ -197,22 +203,22 @@ TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2d_IgnoreValue")
 
 TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2d_InputOutputDatatypeDifferent")
 {
-    armnn::TensorShape inShape = {1,1,3,4};
-    armnn::TensorShape outShape = {1,1,3,4};
-    armnn::TensorInfo in(inShape, armnn::DataType::QAsymmS8);
-    armnn::TensorInfo out(outShape, armnn::DataType::Signed32);
+    TensorShape inShape = {1,1,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in(inShape, DataType::QAsymmS8);
+    TensorInfo out(outShape, DataType::Signed32);
 
-    armnn::Pooling2dDescriptor desc;
-    desc.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
-    desc.m_PoolType = armnn::PoolingAlgorithm::Average;
+    Pooling2dDescriptor desc;
+    desc.m_PaddingMethod = PaddingMethod::IgnoreValue;
+    desc.m_PoolType = PoolingAlgorithm::Average;
 
-    armnn::TosaRefLayerSupport supportChecker;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Pooling2d,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Pooling2d,
                                                      {in, out},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(supported);
@@ -220,19 +226,19 @@ TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2d_InputOutputDatatypeDifferen
 
 TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2dUnsupported")
 {
-    armnn::TensorShape inShape = {1,1,3,4};
-    armnn::TensorShape outShape = {1,1,3,4};
-    armnn::TensorInfo in(inShape, armnn::DataType::Signed64);
-    armnn::TensorInfo out(outShape, armnn::DataType::Signed64);
+    TensorShape inShape = {1,1,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in(inShape, DataType::Signed64);
+    TensorInfo out(outShape, DataType::Signed64);
 
-    armnn::Pooling2dDescriptor desc;
-    armnn::TosaRefLayerSupport supportChecker;
+    Pooling2dDescriptor desc;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Pooling2d,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Pooling2d,
                                                      {in, out},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(!supported);
@@ -240,26 +246,28 @@ TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2dUnsupported")
         "TOSA Reference Operator: Op_MAX_POOL2D for input: input0_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
         "TOSA Reference Operator: Op_MAX_POOL2D for output: output0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+        "has an unsupported data type: DType_UNKNOWN") != std::string::npos);
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2dUnsupported_InputOutputDatatypeDifferent")
 {
-    armnn::TensorShape inShape = {1,1,3,4};
-    armnn::TensorShape outShape = {1,1,3,4};
-    armnn::TensorInfo in(inShape, armnn::DataType::Float32);
-    armnn::TensorInfo out(outShape, armnn::DataType::Float16);
+    TensorShape inShape = {1,1,3,4};
+    TensorShape outShape = {1,1,3,4};
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float16);
 
-    armnn::Pooling2dDescriptor desc;
-    desc.m_PaddingMethod = armnn::PaddingMethod::IgnoreValue;
-    desc.m_PoolType = armnn::PoolingAlgorithm::Average;
+    Pooling2dDescriptor desc;
+    desc.m_PaddingMethod = PaddingMethod::IgnoreValue;
+    desc.m_PoolType = PoolingAlgorithm::Average;
 
-    armnn::TosaRefLayerSupport supportChecker;
+    TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Pooling2d,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Pooling2d,
                                                      {in, out},
                                                      desc,
-                                                     armnn::EmptyOptional(),
-                                                     armnn::EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
                                                      reasonIfNotSupported);
 
     CHECK(!supported);
@@ -268,7 +276,57 @@ TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2dUnsupported_InputOutputDatat
     REQUIRE(reasonIfNotSupported.find(
         " and output: output0_") != std::string::npos);
     REQUIRE(reasonIfNotSupported.find(
-        " has an unsupported input data type: 8 to output data type: 10") != std::string::npos);
+        " has an unsupported input data type: DType_FP32 to output data type: DType_FP16") != std::string::npos);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceReshape")
+{
+    TensorShape inShape = {3,4};
+    TensorShape outShape = {12};
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
+
+    ReshapeDescriptor desc;
+    desc.m_TargetShape = {12};
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Reshape,
+                                                     {in, out},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceReshapeUnsupported")
+{
+    TensorShape inShape = {3,4};
+    TensorShape outShape = {12};
+    TensorInfo in(inShape, DataType::Signed64);
+    TensorInfo out(outShape, DataType::Signed64);
+
+    ReshapeDescriptor desc;
+    desc.m_TargetShape = {12};
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Reshape,
+                                                     {in, out},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+    REQUIRE(reasonIfNotSupported.find(
+        "TOSA Reference Operator: Op_RESHAPE for input: input0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+        "TOSA Reference Operator: Op_RESHAPE for output: output0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+        "has an unsupported data type: DType_UNKNOWN") != std::string::npos);
 }
 
 }

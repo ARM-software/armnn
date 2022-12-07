@@ -14,6 +14,8 @@ list(APPEND armnnTosaBackendOperators_sources
         Conv2dOperator.cpp
         Pooling2DOperator.hpp
         Pooling2DOperator.cpp
+        ReshapeOperator.hpp
+        ReshapeOperator.cpp
         TosaOperatorUtils.hpp
     )
 

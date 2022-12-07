@@ -50,7 +50,7 @@ TosaSerializationBasicBlock* ConvertAdditionToTosaOperator(const Layer* layer,
     auto* outputTensor0 = new TosaSerializationTensor(outputName, outputShape0, outputDType0, {});
 
     // operatorInputNames/operatorOutputNames ends up being the same as
-    // blockInputNames/blockOutputNames for one-to-one ArmNN to Tosa mappings
+    // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName, // name
                                            {op}, // operators
                                            {inputTensor0, inputTensor1, outputTensor0}, // tensors

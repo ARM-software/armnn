@@ -126,6 +126,11 @@ build_armnn()
     ln -s libprotobuf.so.23.0.0 ./libprotobuf.so
   fi
 
+  # Copy Arm NN include directory into build output
+  cd "$ARMNN_BUILD_TARGET"
+  rm -rf include
+  cp -r "$SOURCE_DIR"/armnn/include .
+
   echo -e "\n***** Built Arm NN for $TARGET_ARCH *****"
 
   local tarball_path="$ROOT_DIR/armnn_$ARMNN_BUILD_DIR_NAME.tar.gz"

@@ -75,6 +75,23 @@ inline std::string GenerateUniqueName(const Layer& layer, uint32_t layerSlot)
     }
 }
 
+// Function that generates unique output name using the layer type, input slot and layer guid.
+inline std::string GenerateUniqueOutputName(const Layer& layer, uint32_t layerSlot)
+{
+    Layer& connectedLayer = layer.GetOutputSlot().GetConnection(0)->GetOwningLayer();
+
+    // Get the layer connected to the output slot, if output use that layer and id,
+    // otherwise use current layer and id.
+    if(connectedLayer.GetType() == LayerType::Output)
+    {
+        return GenerateUniqueName(connectedLayer, layerSlot);
+    }
+    else
+    {
+        return GenerateUniqueName(layer, layerSlot);
+    }
+}
+
 // Function to return unique int as a string to ensure uniqueness between all input, output and block names.
 static int uniqueTosaMappingID = 0;
 inline std::string GetUniqueTosaMappingID()

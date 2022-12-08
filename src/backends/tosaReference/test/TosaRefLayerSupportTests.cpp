@@ -105,7 +105,7 @@ TEST_CASE("IsLayerSupportedTosaReferenceConv2d")
 
     TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Convolution2d,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Convolution2d,
                                                      {inputInfo, outputInfo, weightsInfo, biasesInfo},
                                                      desc,
                                                      EmptyOptional(),
@@ -128,7 +128,7 @@ TEST_CASE("IsLayerSupportedTosaReferenceConv2dUnsupported")
 
     TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(armnn::LayerType::Convolution2d,
+    auto supported = supportChecker.IsLayerSupported(LayerType::Convolution2d,
                                                      {inputInfo, outputInfo, weightsInfo, biasesInfo},
                                                      desc,
                                                      EmptyOptional(),
@@ -150,7 +150,7 @@ TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2d")
     desc.m_PoolWidth = 1;
     desc.m_StrideX = 1;
     desc.m_StrideY = 1;
-    desc.m_PoolType = armnn::PoolingAlgorithm::Max;
+    desc.m_PoolType = PoolingAlgorithm::Max;
 
     TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
@@ -321,6 +321,51 @@ TEST_CASE("IsLayerSupportedTosaReferenceSliceUnsupported")
                                                      EmptyOptional(),
                                                      reasonIfNotSupported);
 
+    CHECK(!supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceTransposeConv2d")
+{
+    TensorInfo inputInfo ({ 1, 3, 3, 1 }, DataType::Float32);
+    TensorInfo outputInfo({ 1, 5, 5, 1 }, DataType::Float32);
+    TensorInfo weightsInfo({ 1, 3, 3, 1 }, DataType::Float32);
+    TensorInfo biasesInfo ({ 1 }, DataType::Float32);
+
+    TransposeConvolution2dDescriptor desc;
+    desc.m_StrideX = 1;
+    desc.m_StrideY = 1;
+    desc.m_BiasEnabled = true;
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::TransposeConvolution2d,
+                                                     {inputInfo, outputInfo, weightsInfo, biasesInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceTransposeConv2dUnsupported")
+{
+    // If inputs and weights are Fp32, output must match.
+    TensorInfo inputInfo ({ 1, 3, 3, 1 }, DataType::Float32);
+    TensorInfo outputInfo({ 1, 5, 5, 1 }, DataType::Float32);
+    TensorInfo weightsInfo({ 1, 3, 3, 1 }, DataType::Float32, 0.0f, 0, true);
+    TensorInfo biasesInfo ({ 1 }, DataType::Float32, 0.0f, 0, true);
+
+    TransposeConvolution2dDescriptor desc;
+    desc.m_BiasEnabled = true;
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::TransposeConvolution2d,
+                                                     {inputInfo, outputInfo, weightsInfo, biasesInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
     CHECK(!supported);
 }
 

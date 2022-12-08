@@ -10,6 +10,7 @@
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
+#include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
@@ -106,6 +107,19 @@ TEST_CASE("TosaRefSliceEndtoEndTestInt32")
 TEST_CASE("TosaRefSliceEndtoEndTestFloat16")
 {
     SliceEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+// TransposeConvolution2d
+TEST_CASE("TosaRefTransposeConvolution2dEndToEndFloatNhwcTest")
+{
+    TransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
+        tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefSimpleTransposeConvolution2dEndToEndFloatNhwcTest")
+{
+    SimpleTransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
+        tosaDefaultBackends, armnn::DataLayout::NHWC);
 }
 
 }

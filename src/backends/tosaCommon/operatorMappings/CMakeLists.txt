@@ -19,6 +19,8 @@ list(APPEND armnnTosaBackendOperators_sources
         SliceOperator.hpp
         SliceOperator.cpp
         TosaOperatorUtils.hpp
+        TransposeConv2dOperator.hpp
+        TransposeConv2dOperator.cpp
     )
 
 add_library(armnnTosaBackendOperators OBJECT ${armnnTosaBackendOperators_sources})

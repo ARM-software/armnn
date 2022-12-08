@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -141,6 +141,74 @@ void TransposeConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
                                                               weights,
                                                               Optional<ConstTensor>(biases));
 
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
+                                                { { 0, qInputData } },
+                                                { { 0, qExpectedOutputData } },
+                                                backends);
+}
+
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType>
+void SimpleTransposeConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
+                                          armnn::DataLayout dataLayout)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    const float   qScale  = IsQuantizedType<T>() ? 0.25f : 1.0f;
+    const int32_t qOffset = IsQuantizedType<T>() ? 50    : 0;
+
+    TensorInfo inputInfo({1, 2, 2, 1}, ArmnnType, qScale, qOffset, true);
+    TensorInfo outputInfo({1, 3, 3, 1}, ArmnnType, qScale, qOffset);
+    TensorInfo weightsInfo({1, 2, 2, 1}, ArmnnType, qScale, qOffset, true);
+    TensorInfo biasesInfo({ 1 }, ArmnnBType, qScale * qScale, 0, true);
+
+    std::vector<float> inputData =
+    {
+        1, 2, 3, 4
+    };
+
+    std::vector<float> weightsData =
+    {
+        0, 1, 2, 4
+    };
+    std::vector<float> biasesData = { 0.f };
+
+    std::vector<float> expectedOutputData =
+    {
+        0, 1,  2,
+        2, 11, 12,
+        6, 20, 16
+    };
+
+    TransposeConvolution2dDescriptor descriptor;
+    descriptor.m_PadLeft     = 0;
+    descriptor.m_PadRight    = 0;
+    descriptor.m_PadTop      = 0;
+    descriptor.m_PadBottom   = 0;
+    descriptor.m_StrideX     = 1;
+    descriptor.m_StrideY     = 1;
+    descriptor.m_BiasEnabled = true;
+    descriptor.m_DataLayout  = dataLayout;
+    descriptor.m_OutputShapeEnabled = true;
+    descriptor.m_OutputShape = { 1, 3, 3, 1 };
+
+    // quantize data
+    std::vector<T> qInputData          = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
+    std::vector<T> qWeightsData        = armnnUtils::QuantizedVector<T>(weightsData, qScale, qOffset);
+    std::vector<T> qExpectedOutputData = armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset);
+
+    using BT = ResolveType<ArmnnBType>;
+    std::vector<BT> qBiasesData = armnnUtils::QuantizedVector<BT>(biasesData, qScale * qScale, 0);
+
+    ConstTensor weights(weightsInfo, qWeightsData);
+    ConstTensor biases(biasesInfo, qBiasesData);
+
+    INetworkPtr network = CreateTransposeConvolution2dNetwork(descriptor,
+                                                              inputInfo,
+                                                              outputInfo,
+                                                              weights,
+                                                              Optional<ConstTensor>(biases));
 
     EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
                                                 { { 0, qInputData } },

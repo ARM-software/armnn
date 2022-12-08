@@ -144,6 +144,20 @@ inline void VerifyTosaAttribute(const BaseDescriptor& descriptor,
 
             break;
         }
+        case LayerType::TransposeConvolution2d:
+        {
+            auto transposeConv2dDesc = PolymorphicDowncast<const TransposeConvolution2dDescriptor*>(&descriptor);
+            std::vector<int> outPad = {-static_cast<int>(transposeConv2dDesc->m_PadTop),
+                                       -static_cast<int>(transposeConv2dDesc->m_PadBottom),
+                                       -static_cast<int>(transposeConv2dDesc->m_PadLeft),
+                                       -static_cast<int>(transposeConv2dDesc->m_PadRight)};
+            std::vector<int> stride = {static_cast<int>(transposeConv2dDesc->m_StrideY),
+                                       static_cast<int>(transposeConv2dDesc->m_StrideX)};
+            TosaTransposeConvAttribute transposeConvAttribute(attribute);
+            CHECK(outPad == transposeConvAttribute.out_pad());
+            CHECK(stride == transposeConvAttribute.stride());
+            break;
+        }
         default:
             break;
     }
@@ -167,12 +181,7 @@ inline void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* bas
     // The number of tensors in the block can be different if there are constant layers, as they are created separately.
     if(type == LayerType::Convolution2d)
     {
-        numInputTensors = 2;
-        auto conv2dDesc = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor);
-        if(conv2dDesc->m_BiasEnabled)
-        {
-            numInputTensors = 3;
-        }
+        numInputTensors = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor)->m_BiasEnabled ? 3 : 2;
     }
 
     std::string blockStr = operatorString + "_block_";

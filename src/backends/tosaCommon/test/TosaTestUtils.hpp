@@ -122,6 +122,27 @@ inline void VerifyTosaAttribute(const BaseDescriptor& descriptor,
                                                              1,
                                                              std::multiplies<int32_t>());
             CHECK(numInputElements == numAttributeShapeElements);
+
+            break;
+        }
+        case LayerType::Slice:
+        {
+            auto sliceDesc = PolymorphicDowncast<const SliceDescriptor*>(&descriptor);
+            TosaSliceAttribute reshapeAttribute(attribute);
+
+            std::vector<int32_t> begin(sliceDesc->m_Begin.begin(), sliceDesc->m_Begin.end());
+            std::vector<int32_t> size(sliceDesc->m_Size.begin(), sliceDesc->m_Size.end());
+
+            CHECK(begin == reshapeAttribute.start());
+            CHECK(size == reshapeAttribute.size());
+
+            CHECK(begin.size() == inputShape.size());
+            CHECK(size.size() == inputShape.size());
+
+            CHECK(begin.size() == outputShape.size());
+            CHECK(size.size() == outputShape.size());
+
+            break;
         }
         default:
             break;

@@ -375,6 +375,69 @@ TEST_CASE("GetTosaMappingFromLayer_ReshapeLayer")
                                         LayerType::Reshape);
 }
 
+TEST_CASE("GetTosaMapping_SliceLayer")
+{
+    TensorInfo inputInfo = TensorInfo({ 3, 2, 3 }, DataType::Float32);
+    TensorInfo outputInfo = TensorInfo({ 2, 1, 3 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 3, 2, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 2, 1, 3 }};
+
+    SliceDescriptor descriptor;
+    descriptor.m_Begin = { 3 };
+    descriptor.m_Size  = { 3 };
+
+    TosaSerializationBasicBlock* basicBlock =
+        GetTosaMapping(nullptr, LayerType::Slice, {&inputInfo}, {&outputInfo}, descriptor);
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_SLICE,
+                                        Attribute_SliceAttribute,
+                                        descriptor,
+                                        LayerType::Slice);
+}
+
+TEST_CASE("GetTosaMappingFromLayer_SliceLayer")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    TensorInfo inputInfo = TensorInfo({ 3, 2, 3 }, DataType::Float32);
+    TensorInfo outputInfo = TensorInfo({ 2, 1, 3 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 3, 2, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 2, 1, 3 }};
+
+    SliceDescriptor descriptor;
+    descriptor.m_Begin = { 1, 0, 0 };
+    descriptor.m_Size  = { 2, 1, 3 };
+
+    IConnectableLayer* input  = net->AddInputLayer(0, "input");
+    IConnectableLayer* slice  = net->AddSliceLayer(descriptor, "slice");
+    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+
+    input->GetOutputSlot(0).Connect(slice->GetInputSlot(0));
+    slice->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    slice->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    TosaSerializationBasicBlock* basicBlock =
+        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(slice));
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_SLICE,
+                                        Attribute_SliceAttribute,
+                                        descriptor,
+                                        LayerType::Slice);
+}
+
+
 TEST_CASE("GetTosaMapping_Unimplemented")
 {
     TosaSerializationBasicBlock* basicBlock =

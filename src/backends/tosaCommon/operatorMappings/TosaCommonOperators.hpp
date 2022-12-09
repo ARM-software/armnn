@@ -11,3 +11,4 @@
 #include "AvgPool2DIgnoreValueOperator.hpp"
 #include "Pooling2DOperator.hpp"
 #include "ReshapeOperator.hpp"
+#include "SliceOperator.hpp"

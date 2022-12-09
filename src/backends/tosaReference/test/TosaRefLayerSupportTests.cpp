@@ -329,4 +329,56 @@ TEST_CASE("IsLayerSupportedTosaReferenceReshapeUnsupported")
         "has an unsupported data type: DType_UNKNOWN") != std::string::npos);
 }
 
+TEST_CASE("IsLayerSupportedTosaReferenceSlice")
+{
+    TensorShape inShape = {3,2,3};
+    TensorShape outShape = {2,1,3};
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
+
+    SliceDescriptor descriptor;
+    descriptor.m_Begin = {1,0,0 };
+    descriptor.m_Size  = {2,1,3 };
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Slice,
+                                                     {in, out},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceSliceUnsupported")
+{
+    TensorShape inShape = {3,2,3};
+    TensorShape outShape = {2,1,3};
+    TensorInfo in(inShape, DataType::Signed64);
+    TensorInfo out(outShape, DataType::Signed64);
+
+    SliceDescriptor descriptor;
+    descriptor.m_Begin = {1,0,0};
+    descriptor.m_Size  = {2,1,3};
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Slice,
+                                                     {in, out},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+    REQUIRE(reasonIfNotSupported.find(
+        "TOSA Reference Operator: Op_SLICE for input: input0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+        "TOSA Reference Operator: Op_SLICE for output: output0_") != std::string::npos);
+    REQUIRE(reasonIfNotSupported.find(
+        "has an unsupported data type: DType_UNKNOWN") != std::string::npos);
+}
+
 }

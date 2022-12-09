@@ -62,6 +62,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto reshapeDesc = PolymorphicDowncast<const ReshapeDescriptor*>(&descriptor);
             return ConvertReshapeToTosaOperator(layer, inputs, outputs, reshapeDesc);
         }
+        case LayerType::Slice:
+        {
+            auto sliceDesc = PolymorphicDowncast<const SliceDescriptor*>(&descriptor);
+            return ConvertSliceToTosaOperator(layer, inputs, outputs, sliceDesc);
+        }
         default:
         {
             return CreateEmptyTosaSerializationBasicBlock();

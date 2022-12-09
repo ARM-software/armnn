@@ -52,6 +52,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ReshapeEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp
+    SliceEndToEndTestImpl.hpp
     SpaceToDepthEndToEndTestImpl.cpp
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp

@@ -9,6 +9,7 @@
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
+#include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
@@ -89,6 +90,22 @@ TEST_CASE("TosaRefReshapeEndtoEndTestInt32")
 TEST_CASE("TosaRefReshapeEndtoEndTestFloat16")
 {
     ReshapeEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+// Slice
+TEST_CASE("TosaRefSliceEndtoEndTestFloat32")
+{
+    SliceEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSliceEndtoEndTestInt32")
+{
+    SliceEndToEnd<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSliceEndtoEndTestFloat16")
+{
+    SliceEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
 }
 
 }

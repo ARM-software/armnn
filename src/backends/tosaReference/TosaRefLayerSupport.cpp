@@ -303,6 +303,24 @@ static bool IsTosaLayerSupported(TosaSerializationOperator* op,
             return RunTosaLayerChecksSingleDataType(
                 op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
         }
+        case tosa::Op_SLICE:
+        {
+            std::vector<Attribute> supportedAttributes = { Attribute_SliceAttribute };
+
+            std::vector<DType> supportedTypes =
+            {
+                DType_FP16,
+                DType_FP32,
+                DType_INT8,
+                DType_INT16,
+                DType_INT32,
+                DType_BOOL
+            };
+
+            // Check the attribute, data types and bounds for inputs and outputs.
+            return RunTosaLayerChecksSingleDataType(
+                op, inputs, outputs, supportedAttributes, supportedTypes, reasonIfUnsupported);
+        }
         default:
             SetValueChecked(reasonIfUnsupported, "Operation is currently unsupported by the TOSA Reference Backend.");
             return false;
@@ -351,6 +369,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         }
         case LayerType::Pooling2d:
         case LayerType::Reshape:
+        case LayerType::Slice:
             // Setup inputs and outputs
             inputInfos.push_back(&infos[0]);
             outputInfos.push_back(&infos[1]);

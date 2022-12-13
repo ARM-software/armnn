@@ -4,6 +4,7 @@
 //
 
 #include "AvgPool2DIgnoreValueChecker.hpp"
+#include <armnn/IRuntime.hpp>
 
 using namespace armnn;
 using namespace tosa;

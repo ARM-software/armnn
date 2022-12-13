@@ -39,6 +39,7 @@ else()
 endif()
 
 add_library(armnnTosaRefBackend OBJECT ${armnnTosaRefBackend_sources})
+set_target_properties(armnnTosaRefBackend PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(armnnTosaRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnn)
 target_include_directories(armnnTosaRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/armnnUtils)
 target_include_directories(armnnTosaRefBackend PRIVATE ${PROJECT_SOURCE_DIR}/src/backends)

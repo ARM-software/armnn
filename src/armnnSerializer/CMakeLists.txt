@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017, 2019-2020, 2022 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 if(BUILD_ARMNN_SERIALIZER)
@@ -39,34 +39,33 @@ if(BUILD_ARMNN_SERIALIZER)
     if(BUILD_BARE_METAL)
         add_library_ex(armnnSerializer STATIC ${armnn_serializer_sources})
     else()
-        # We're going to export both an OBJECT library and a SHARED library here.
+        # We're going to export both a STATIC library and a SHARED library here.
         # In some instances it's easier to include the serializer directly into
         # the target executable or library rather than have yet another .so.
-        add_library(armnnSerializerObj OBJECT ${armnn_serializer_sources})
+        add_library(armnnSerializer-static STATIC ${armnn_serializer_sources})
         add_library_ex(armnnSerializer SHARED ${armnn_serializer_sources})
     endif()
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
 
     set_target_properties(armnnSerializer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-    target_include_directories(armnnSerializerObj PRIVATE ../armnn)
-    target_include_directories(armnnSerializerObj PRIVATE ../armnnUtils)
     target_include_directories(armnnSerializer PRIVATE ../armnn)
     target_include_directories(armnnSerializer PRIVATE ../armnnUtils)
     target_include_directories(armnnSerializer PRIVATE ../../generated)
-    target_include_directories(armnnSerializerObj PRIVATE ../../generated)
+    target_include_directories(armnnSerializer-static PRIVATE ../armnn)
+    target_include_directories(armnnSerializer-static PRIVATE ../armnnUtils)
+    target_include_directories(armnnSerializer-static PRIVATE ../../generated)
 
     list(APPEND armnn_serializer_sources
         ArmnnSchema_generated.h
         )
 
     # System include to suppress warnings for flatbuffers generated files
-    target_include_directories(armnnSerializerObj SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
     target_include_directories(armnnSerializer SYSTEM PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
     target_link_libraries(armnnSerializer armnn ${FLATBUFFERS_LIBRARY})
 
-    install(TARGETS armnnSerializerObj
+    install(TARGETS armnnSerializer-static
             EXPORT  armnn-targets
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}

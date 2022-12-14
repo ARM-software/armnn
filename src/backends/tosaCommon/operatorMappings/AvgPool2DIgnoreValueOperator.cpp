@@ -24,8 +24,7 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
         padInputName = GenerateUniqueName(connectedInputLayer, 0);
 
         // Get the layer connected to the output slot and determine unique layer name.
-        Layer& connectedOutputLayer = layer->GetOutputSlot().GetConnection(0)->GetOwningLayer();
-        poolOutputName = GenerateUniqueName(connectedOutputLayer, 0);
+        poolOutputName = GenerateUniqueOutputName(*layer, 0);
     }
 
     std::vector<int> paddings;
@@ -74,8 +73,18 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
                                                  {padOutputName},
                                                  {poolOutputName});
 
+    std::vector<TosaSerializationTensor*> tensors;
+
     std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
     DType inputDType = ArmNNToDType(inputs[0]->GetDataType());
+
+    // Only add input tensors if connected layer is an input layer.
+    // As intermediate or constant tensors will be created separately.
+    // There also can't be duplicate tensor.
+    if(padInputName.find("input0_") != std::string::npos)
+    {
+        tensors.push_back(new TosaSerializationTensor(padInputName, inputShape, inputDType, {}));
+    }
 
     std::vector<int32_t> outputShape = GetTosaTensorShape(outputs[0]->GetShape());
     DType outputDType = ArmNNToDType(outputs[0]->GetDataType());
@@ -96,15 +105,14 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
                              inputShape[3] + paddings[6] + paddings[7]};
     }
 
-    auto* inputTensor        = new TosaSerializationTensor(padInputName, inputShape, inputDType, {});
-    auto* intermediateTensor = new TosaSerializationTensor(padOutputName, intermediateShape, inputDType, {});
-    auto* outputTensor       = new TosaSerializationTensor(poolOutputName, outputShape, outputDType, {});
+    tensors.push_back(new TosaSerializationTensor(padOutputName, intermediateShape, inputDType, {}));
+    tensors.push_back(new TosaSerializationTensor(poolOutputName, outputShape, outputDType, {}));
 
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName, // name
                                            {opPad, opPool}, // operators
-                                           {inputTensor, intermediateTensor, outputTensor}, // tensors
+                                           tensors, // tensors
                                            {padInputName}, // inputs
                                            {poolOutputName}); // outputs
 }

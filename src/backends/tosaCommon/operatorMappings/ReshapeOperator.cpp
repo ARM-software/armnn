@@ -23,8 +23,7 @@ TosaSerializationBasicBlock* ConvertReshapeToTosaOperator(const Layer* layer,
         inputName = GenerateUniqueName(connectedLayer, 0);
 
         // Get the layer connected to the output slot and determine unique layer name.
-        Layer& connectedOutputLayer = layer->GetOutputSlot().GetConnection(0)->GetOwningLayer();
-        outputName = GenerateUniqueName(connectedOutputLayer, 0);
+        outputName = GenerateUniqueOutputName(*layer, 0);
     }
 
     TosaReshapeAttribute attribute(GetTosaTensorShape(reshapeDescriptor->m_TargetShape));
@@ -35,20 +34,29 @@ TosaSerializationBasicBlock* ConvertReshapeToTosaOperator(const Layer* layer,
                                              {inputName},
                                              {outputName});
 
-    std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
-    DType inputDType = ArmNNToDType(inputs[0]->GetDataType());
+    std::vector<TosaSerializationTensor*> tensors;
+
+    // Only add input tensors if connected layer is an input layer.
+    // As intermediate or constant tensors will be created separately.
+    // There also can't be duplicate tensor.
+    if(inputName.find("input0_") != std::string::npos)
+    {
+        std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
+        DType inputDType = ArmNNToDType(inputs[0]->GetDataType());
+
+        tensors.push_back(new TosaSerializationTensor(inputName, inputShape, inputDType, {}));
+    }
 
     std::vector<int32_t> outputShape = GetTosaTensorShape(outputs[0]->GetShape());
     DType outputDType = ArmNNToDType(outputs[0]->GetDataType());
 
-    auto* inputTensor  = new TosaSerializationTensor(inputName, inputShape, inputDType, {});
-    auto* outputTensor = new TosaSerializationTensor(outputName, outputShape, outputDType, {});
+    tensors.push_back(new TosaSerializationTensor(outputName, outputShape, outputDType, {}));
 
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName, // name
                                            {op}, // operators
-                                           {inputTensor, outputTensor}, // tensors
+                                           tensors, // tensors
                                            {inputName}, // inputs
                                            {outputName}); // outputs
 }

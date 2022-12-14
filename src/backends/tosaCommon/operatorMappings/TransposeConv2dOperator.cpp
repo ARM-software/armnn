@@ -94,8 +94,7 @@ TosaSerializationBasicBlock* ConvertTransposeConv2dToTosaOperator(const Layer* l
     {
         // If bias is disabled, create a constant bias tensor of 0's as three inputs are required.
         // The size of the bias must match the channels dimension, so get the correct index.
-        unsigned int index = (descriptor->m_DataLayout == DataLayout::NHWC) ?
-                outputs[0]->GetShape()[3] : outputs[0]->GetShape()[1];
+        unsigned int index = (descriptor->m_DataLayout == DataLayout::NHWC) ? 3 : 1;
 
         std::vector<uint8_t> uint8Data;
         std::vector<float> data(outputs[0]->GetShape()[index], 0.0f);

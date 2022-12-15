@@ -21,11 +21,11 @@ TosaSerializationBasicBlock* ConvertPooling2DToTosaOperator(const Layer* layer,
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique layer names.
+        // Get the layers connected to the input slots and determine unique tensor names.
         Layer& connectedInputLayer = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
         input0Name = GenerateUniqueName(connectedInputLayer, 0);
 
-        // Get the layer connected to the output slot and determine unique layer name.
+        // Determine unique output tensor name.
         outputName = GenerateUniqueOutputName(*layer, 0);
     }
 

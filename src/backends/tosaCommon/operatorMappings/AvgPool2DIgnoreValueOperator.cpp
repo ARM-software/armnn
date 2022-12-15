@@ -19,11 +19,11 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique layer names.
+        // Get the layers connected to the input slots and determine unique tensors names.
         Layer& connectedInputLayer = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
         padInputName = GenerateUniqueName(connectedInputLayer, 0);
 
-        // Get the layer connected to the output slot and determine unique layer name.
+        // Determine unique output tensor name.
         poolOutputName = GenerateUniqueOutputName(*layer, 0);
     }
 

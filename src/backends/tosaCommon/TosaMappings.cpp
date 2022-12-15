@@ -27,6 +27,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         {
             return ConvertAdditionToTosaOperator(layer, inputs, outputs);
         }
+        case LayerType::Concat:
+        {
+            auto concatDesc = PolymorphicDowncast<const OriginsDescriptor*>(&descriptor);
+            return ConvertConcatToTosaOperator(layer, inputs, outputs, concatDesc);
+        }
         case LayerType::Constant:
         {
             return ConvertConstantToTosaOperator(layer, outputs);

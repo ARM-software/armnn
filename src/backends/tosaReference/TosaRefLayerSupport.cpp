@@ -43,6 +43,13 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             inputInfos.push_back(&infos[1]);
             outputInfos.push_back(&infos[2]);
             break;
+        case LayerType::Concat:
+            for (unsigned int i = 0; i < infos.size() - 1; ++i)
+            {
+                inputInfos.push_back(&infos[i]);
+            }
+            outputInfos.push_back(&infos.back());
+            break;
         case LayerType::Constant:
             outputInfos.push_back(&infos[0]);
             break;

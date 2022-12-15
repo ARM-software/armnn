@@ -56,6 +56,82 @@ TEST_CASE("GetTosaMappingFromLayer_AdditionLayer")
         basicBlock, inputShape, outputShape, Op_ADD, Attribute_NONE, BaseDescriptor(), LayerType::Addition);
 }
 
+TEST_CASE("GetTosaMapping_ConcatLayer")
+{
+    std::vector<armnn::TensorShape> inputTensorShapes = { { 2, 3, 2, 2 }, { 2, 3, 2, 2 } };
+    armnn::TensorInfo input0Info(inputTensorShapes[0], DataType::Float32);
+    armnn::TensorInfo input1Info(inputTensorShapes[1], DataType::Float32);
+    armnn::TensorInfo outputInfo({ 2, 6, 2, 2 }, DataType::Float32);
+
+    armnn::OriginsDescriptor descriptor;
+    unsigned int concatAxis = 1;
+    descriptor.SetConcatAxis(concatAxis);
+    descriptor = armnn::CreateDescriptorForConcatenation(inputTensorShapes.begin(),
+                                                         inputTensorShapes.end(),
+                                                         concatAxis);
+
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMapping(nullptr, LayerType::Concat, {&input0Info,&input1Info}, {&outputInfo}, descriptor);
+
+    std::vector<std::vector<int32_t>> inputShapes = { { 2, 3, 2, 2 }, { 2, 3, 2, 2 }};
+    std::vector<std::vector<int32_t>> outputShape = { { 2, 6, 2, 2 } };
+
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShapes,
+                                        outputShape,
+                                        Op_CONCAT,
+                                        Attribute_AxisAttribute,
+                                        descriptor,
+                                        LayerType::Concat);
+}
+
+TEST_CASE("GetTosaMappingFromLayer_ConcatLayer")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    armnn::OriginsDescriptor descriptor;
+    unsigned int concatAxis = 1;
+    descriptor.SetConcatAxis(concatAxis);
+    std::vector<armnn::TensorShape> inputTensorShapes = { { 2, 3, 2, 2 }, { 2, 3, 2, 2 } };
+    descriptor = armnn::CreateDescriptorForConcatenation(inputTensorShapes.begin(),
+                                                         inputTensorShapes.end(),
+                                                         concatAxis);
+
+    IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
+    IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
+    IConnectableLayer* concat = net->AddConcatLayer(descriptor, "concat");
+    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+
+    input0->GetOutputSlot(0).Connect(concat->GetInputSlot(0));
+    input1->GetOutputSlot(0).Connect(concat->GetInputSlot(1));
+    concat->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+
+    TensorInfo inputInfo0 = TensorInfo(inputTensorShapes[0], DataType::Float32, 0.0f, 0, true);
+    TensorInfo inputInfo1 = TensorInfo(inputTensorShapes[1], DataType::Float32, 0.0f, 0, true);
+    armnn::TensorInfo outputInfo({ 2, 6, 2, 2 }, DataType::Float32);
+
+    input0->GetOutputSlot(0).SetTensorInfo(inputInfo0);
+    input1->GetOutputSlot(0).SetTensorInfo(inputInfo1);
+    concat->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    std::vector<std::vector<int32_t>> inputShapes = { { 2, 3, 2, 2 }, { 2, 3, 2, 2 }};
+    std::vector<std::vector<int32_t>> outputShape = { { 2, 6, 2, 2 } };
+
+    TosaSerializationBasicBlock* basicBlock = GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(concat));
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShapes,
+                                        outputShape,
+                                        Op_CONCAT,
+                                        Attribute_AxisAttribute,
+                                        descriptor,
+                                        LayerType::Concat);
+}
+
 TEST_CASE("GetTosaMapping_ConstantLayer")
 {
     TensorInfo outputInfo = TensorInfo({ 1, 2, 4, 2 }, DataType::Float32, 0.0f, 0, true);

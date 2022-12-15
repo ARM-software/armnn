@@ -24,21 +24,21 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
             inputNames.emplace_back("input2_");
         }
     }
+    // If a layer is present then the block will be used for execution, so input and output names need to be
+    // determined using the previous and following layers so the graph is connected correctly.
+    // For validation this doesn't matter.
     else
     {
-        // If a layer is present then the block will be used for execution, so input and output names need to be
-        // determined using the previous and following layers so the graph is connected correctly.
-        // For validation this doesn't matter.
+        // Get the layer connected to the input slot and determine unique tensor names.
         for (uint32_t i = 0; i < inputs.size(); ++i)
         {
-            // Get the layer connected to the input slot and determine unique layer name.
             Layer& connectedLayer = layer->GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
 
             std::string inputName = GenerateUniqueName(connectedLayer, i);
             inputNames.push_back(inputName);
         }
 
-        // Get the layer connected to the output slot and determine unique layer name.
+        // Determine unique output tensor name.
         outputName = GenerateUniqueOutputName(*layer, 0);
     }
 

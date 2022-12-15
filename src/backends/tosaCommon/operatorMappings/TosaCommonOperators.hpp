@@ -6,6 +6,7 @@
 #pragma once
 
 #include "AdditionOperator.hpp"
+#include "ConcatOperator.hpp"
 #include "ConstantOperator.hpp"
 #include "Conv2dOperator.hpp"
 #include "AvgPool2DIgnoreValueOperator.hpp"

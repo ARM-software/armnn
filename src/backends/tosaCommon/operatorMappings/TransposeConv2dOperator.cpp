@@ -22,9 +22,11 @@ TosaSerializationBasicBlock* ConvertTransposeConv2dToTosaOperator(const Layer* l
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
+        // Get the layers connected to the input slots and determine unique tensor names.
         Layer& connectedInputLayer = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
         input0Name = GenerateUniqueName(connectedInputLayer, 0);
 
+        // Determine unique output tensor name.
         outputName = GenerateUniqueOutputName(*layer, 0);
     }
 

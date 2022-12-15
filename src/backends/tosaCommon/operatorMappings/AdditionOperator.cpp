@@ -18,14 +18,14 @@ TosaSerializationBasicBlock* ConvertAdditionToTosaOperator(const Layer* layer,
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique layer names.
+        // Get the layers connected to the input slots and determine unique tensors names.
         Layer& connectedLayer0 = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
         input0Name = GenerateUniqueName(connectedLayer0, 0);
 
         Layer& connectedLayer1 = layer->GetInputSlot(1).GetConnectedOutputSlot()->GetOwningLayer();
         input1Name = GenerateUniqueName(connectedLayer1, 1);
 
-        // Get the layer connected to the output slot and determine unique layer name.
+        // Determine unique output tensor name.
         outputName = GenerateUniqueOutputName(*layer, 0);
     }
 

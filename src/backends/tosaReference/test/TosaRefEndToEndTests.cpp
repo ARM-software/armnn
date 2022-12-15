@@ -7,6 +7,7 @@
 
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
@@ -32,6 +33,47 @@ TEST_CASE("TosaRefAdditionEndtoEndTestInt32")
 TEST_CASE("TosaRefAdditionEndtoEndTestFloat16")
 {
     AdditionEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+// Concat
+TEST_CASE("TosaRefConcatEndToEndDim0TestFloat32")
+{
+    ConcatDim0EndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefConcatEndToEndDim0TestInt32")
+{
+    ConcatDim0EndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefConcatEndToEndDim1TestFloat32")
+{
+    ConcatDim1EndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefConcatEndToEndDim1TestInt32")
+{
+    ConcatDim1EndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefConcatEndToEndDim2TestFloat32")
+{
+    ConcatDim2EndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefConcatEndToEndDim2TestInt32")
+{
+    ConcatDim2EndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefConcatEndToEndDim3TestFloat32")
+{
+    ConcatDim3EndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefConcatEndToEndDim3TestInt32")
+{
+    ConcatDim3EndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends);
 }
 
 // Conv2d

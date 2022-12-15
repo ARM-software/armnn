@@ -117,15 +117,15 @@ void AvgPool2dEndToEnd(const std::vector<armnn::BackendId>& backends,
     std::vector<T> expectedOutput;
     if (padMethod == PaddingMethod::Exclude)
     {
-        expectedOutput  = { 3  , 3.5 , 4 ,
-                            4.5, 5  , 5.5,
-                            6  , 6.5, 7  };
+        expectedOutput  = { 3.f , 3.5f, 4.f ,
+                            4.5f, 5.f , 5.5f,
+                            6.f , 6.5f, 7.f  };
     }
     else
     {
-        expectedOutput  = { 1.33333, 2.33333, 1.77778,
-                            3      , 5      , 3.66667,
-                            2.66667, 4.33333, 3.11111 };
+        expectedOutput  = { 1.33333f, 2.33333f, 1.77778f,
+                            3.f     , 5.f     , 3.66667f,
+                            2.66667f, 4.33333f, 3.11111f };
     }
 
     std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };

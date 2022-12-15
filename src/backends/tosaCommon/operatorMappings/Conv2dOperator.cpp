@@ -114,7 +114,7 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                static_cast<int>(conv2dDescriptor->m_StrideX)};
     std::vector<int> dilation = {static_cast<int>(conv2dDescriptor->m_DilationY),
                                  static_cast<int>(conv2dDescriptor->m_DilationX)};
-    TosaConvAttribute attribute(pad, dilation, stride, 0, 0, ArmNNToDType(inputs[0]->GetDataType()));
+    TosaConvAttribute attribute(pad, stride, dilation, 0, 0, ArmNNToDType(inputs[0]->GetDataType()));
 
     auto* op = new TosaSerializationOperator(Op_CONV2D,
                                              Attribute_ConvAttribute,

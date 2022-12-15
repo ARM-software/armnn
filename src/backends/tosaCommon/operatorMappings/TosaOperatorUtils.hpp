@@ -279,7 +279,7 @@ inline std::string TosaOpToString(Op tosaOp)
 
 inline std::vector<uint8_t> ConvertConstantTensorDataToBuffer(const std::shared_ptr<ConstTensorHandle>& tensorHandle)
 {
-    tosa_err_t error;
+    tosa_err_t error = tosa_err_t::TOSA_OK;
     std::vector<uint8_t> uint8Data;
     auto tensorInfo = tensorHandle->GetTensorInfo();
 

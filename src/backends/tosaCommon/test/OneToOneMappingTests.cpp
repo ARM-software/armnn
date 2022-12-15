@@ -177,6 +177,80 @@ TEST_CASE("GetTosaMappingFromLayer_Conv2dLayer")
         basicBlock, inputShape, outputShape, Op_CONV2D, Attribute_ConvAttribute, descriptor, LayerType::Convolution2d);
 }
 
+TEST_CASE("GetTosaMapping_AvgPool2DLayer")
+{
+    Pooling2dDescriptor descriptor;
+    descriptor.m_PoolType = PoolingAlgorithm::Average;
+    descriptor.m_PoolWidth = descriptor.m_PoolHeight = 2;
+    descriptor.m_StrideX = descriptor.m_StrideY = 2;
+    descriptor.m_PadLeft = 1;
+    descriptor.m_PadRight = 1;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 1;
+    descriptor.m_PaddingMethod = PaddingMethod::Exclude;
+
+    TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, DataType::Float32);
+    TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 1, 4, 4 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 1, 3, 3 }};
+
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMapping(nullptr, LayerType::Pooling2d, {&inputTensorInfo}, {&outputTensorInfo}, descriptor);
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_AVG_POOL2D,
+                                        Attribute_PoolAttribute,
+                                        descriptor,
+                                        LayerType::Pooling2d);
+}
+
+TEST_CASE("GetTosaMappingFromLayer_AvgPool2DLayer")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    Pooling2dDescriptor descriptor;
+    descriptor.m_PoolType = PoolingAlgorithm::Average;
+    descriptor.m_PoolWidth = descriptor.m_PoolHeight = 2;
+    descriptor.m_StrideX = descriptor.m_StrideY = 2;
+    descriptor.m_PadLeft = 1;
+    descriptor.m_PadRight = 1;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 1;
+    descriptor.m_PaddingMethod = PaddingMethod::Exclude;
+
+    IConnectableLayer* input0  = net->AddInputLayer(0, "input0");
+    IConnectableLayer* pool    = net->AddPooling2dLayer(descriptor, "pool");
+    IConnectableLayer* output  = net->AddOutputLayer(0, "output");
+
+    input0->GetOutputSlot(0).Connect(pool->GetInputSlot(0));
+    pool->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, DataType::Float32);
+    TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 1, 4, 4 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 1, 3, 3 }};
+
+    input0->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    pool->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(pool));
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_AVG_POOL2D,
+                                        Attribute_PoolAttribute,
+                                        descriptor,
+                                        LayerType::Pooling2d);
+}
+
 TEST_CASE("GetTosaMapping_MaxPool2DLayer")
 {
     Pooling2dDescriptor descriptor;
@@ -239,80 +313,6 @@ TEST_CASE("GetTosaMappingFromLayer_MaxPool2DLayer")
         GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(pool));
     AssertTosaOneToOneMappingBasicBlock(
         basicBlock, inputShape, outputShape, Op_MAX_POOL2D, Attribute_PoolAttribute, descriptor, LayerType::Pooling2d);
-}
-
-TEST_CASE("GetTosaMapping_AvgPool2DLayer")
-{
-    Pooling2dDescriptor descriptor;
-    descriptor.m_PoolType = PoolingAlgorithm::Average;
-    descriptor.m_PoolWidth = descriptor.m_PoolHeight = 2;
-    descriptor.m_StrideX = descriptor.m_StrideY = 2;
-    descriptor.m_PadLeft = 1;
-    descriptor.m_PadRight = 1;
-    descriptor.m_PadTop = 1;
-    descriptor.m_PadBottom = 1;
-    descriptor.m_PaddingMethod = PaddingMethod::Exclude;
-
-    TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, DataType::Float32);
-    TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, DataType::Float32);
-
-    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 1, 4, 4 }};
-    std::vector<std::vector<int32_t>> outputShape = {{ 1, 1, 3, 3 }};
-
-    TosaSerializationBasicBlock* basicBlock =
-        GetTosaMapping(nullptr, LayerType::Pooling2d, {&inputTensorInfo}, {&outputTensorInfo}, descriptor);
-    AssertTosaOneToOneMappingBasicBlock(basicBlock,
-                                        inputShape,
-                                        outputShape,
-                                        Op_AVG_POOL2D,
-                                        Attribute_PoolAttribute,
-                                        descriptor,
-                                        LayerType::Pooling2d);
-}
-
-TEST_CASE("GetTosaMappingFromLayer_AvgPool2DLayer")
-{
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
-    // Builds up the structure of the network.
-    INetworkPtr net(INetwork::Create());
-
-    Pooling2dDescriptor descriptor;
-    descriptor.m_PoolType = PoolingAlgorithm::Average;
-    descriptor.m_PoolWidth = descriptor.m_PoolHeight = 2;
-    descriptor.m_StrideX = descriptor.m_StrideY = 2;
-    descriptor.m_PadLeft = 1;
-    descriptor.m_PadRight = 1;
-    descriptor.m_PadTop = 1;
-    descriptor.m_PadBottom = 1;
-    descriptor.m_PaddingMethod = PaddingMethod::Exclude;
-
-    IConnectableLayer* input0  = net->AddInputLayer(0, "input0");
-    IConnectableLayer* pool    = net->AddPooling2dLayer(descriptor, "pool");
-    IConnectableLayer* output  = net->AddOutputLayer(0, "output");
-
-    input0->GetOutputSlot(0).Connect(pool->GetInputSlot(0));
-    pool->GetOutputSlot(0).Connect(output->GetInputSlot(0));
-
-    TensorInfo inputTensorInfo({ 1, 1, 4, 4 }, DataType::Float32);
-    TensorInfo outputTensorInfo({ 1, 1, 3, 3 }, DataType::Float32);
-
-    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 1, 4, 4 }};
-    std::vector<std::vector<int32_t>> outputShape = {{ 1, 1, 3, 3 }};
-
-    input0->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
-    pool->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
-
-    TosaSerializationBasicBlock* basicBlock =
-        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(pool));
-    AssertTosaOneToOneMappingBasicBlock(basicBlock,
-                                        inputShape,
-                                        outputShape,
-                                        Op_AVG_POOL2D,
-                                        Attribute_PoolAttribute,
-                                        descriptor,
-                                        LayerType::Pooling2d);
 }
 
 TEST_CASE("GetTosaMapping_ReshapeLayer")

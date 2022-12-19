@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2019-2022  Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -287,5 +287,16 @@ TEST_CASE("OptimizeViewsValidateDeviceMockBackend")
     armnn::Graph& graph = GetGraphForTesting(optNet.get());
     CheckLayers(graph);
 }
+
+TEST_CASE("OptimizedViewsReturnsINetworkReference")
+{
+    OptimizationViews view;
+
+    auto layer = view.GetINetworkRef().AddInputLayer(0, "input");
+
+    // Check layer has been added to the referenced INetwork
+    CHECK(layer);
+}
+
 
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2019, 2021-2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -64,7 +64,8 @@ public:
     ARMNN_DEPRECATED_MSG_REMOVAL_DATE("GetGraph is deprecated. Use GetINetwork instead.", "23.08")
     Graph& GetGraph() { return m_Graph; }
 
-    INetworkPtr& GetINetwork() { return m_INetwork; }
+    INetwork* GetINetwork() { return m_INetwork.get(); }
+    INetwork& GetINetworkRef() { return *m_INetwork; }
 
 private:
     Substitutions m_SuccesfulOptimizations;     ///< Proposed substitutions from successful optimizations

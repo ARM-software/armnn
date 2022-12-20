@@ -90,6 +90,19 @@ namespace armnn
 namespace
 {
 
+const TensorInfo OverrideDataType(const TensorInfo& info, Optional<DataType> type)
+{
+    if (!type)
+    {
+        return info;
+    }
+    return TensorInfo(info.GetShape(),
+                      type.value(),
+                      info.GetQuantizationScale(),
+                      info.GetQuantizationOffset(),
+                      info.IsConstant());
+}
+
 template< typename ... Args>
 bool IsNeonBackendSupported(Optional<std::string&> reasonIfUnsupported, Args... args)
 {
@@ -151,61 +164,64 @@ NeonLayerSupport::NeonLayerSupport()
 {
 }
 
-bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
-                                        const std::vector<TensorInfo>& infos,
-                                        const BaseDescriptor& descriptor,
-                                        const Optional<LstmInputParamsInfo>& lstmParamsInfo,
-                                        const Optional<QuantizedLstmInputParamsInfo>& quantizedLstmParamsInfo,
-                                        Optional<std::string&> reasonIfUnsupported) const
+bool IsLayerTypeSupported(const LayerType& type,
+                          const std::vector<TensorInfo>& infos,
+                          const BaseDescriptor& descriptor,
+                          const Optional<LstmInputParamsInfo>& lstmParamsInfo,
+                          const Optional<QuantizedLstmInputParamsInfo>& quantizedLstmParamsInfo,
+                          Optional<std::string&> reasonIfUnsupported,
+                          const NeonLayerSupport& support)
 {
     switch (type)
     {
         case LayerType::Activation:
-            return IsActivationSupported(infos[0],
-                                         infos[1],
-                                         *(PolymorphicDowncast<const ActivationDescriptor*>(&descriptor)),
-                                         reasonIfUnsupported);
+            return support.IsActivationSupported(infos[0],
+                                                 infos[1],
+                                                 *(PolymorphicDowncast<const ActivationDescriptor*>(&descriptor)),
+                                                 reasonIfUnsupported);
         case LayerType::Addition:
-            return IsAdditionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            return support.IsAdditionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::ArgMinMax:
-            return IsArgMinMaxSupported(infos[0],
-                                        infos[1],
-                                        *(PolymorphicDowncast<const ArgMinMaxDescriptor*>(&descriptor)),
-                                        reasonIfUnsupported);
+            return support.IsArgMinMaxSupported(infos[0],
+                                                infos[1],
+                                                *(PolymorphicDowncast<const ArgMinMaxDescriptor*>(&descriptor)),
+                                                reasonIfUnsupported);
         case LayerType::BatchMatMul:
-            return IsBatchMatMulSupported(infos[0],
-                                          infos[1],
-                                          infos[2],
-                                          *(PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor)),
-                                          reasonIfUnsupported);
+            return support.IsBatchMatMulSupported(infos[0],
+                                                  infos[1],
+                                                  infos[2],
+                                                  *(PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor)),
+                                                  reasonIfUnsupported);
         case LayerType::BatchNormalization:
-            return IsBatchNormalizationSupported(infos[0],
+            return support.IsBatchNormalizationSupported(infos[0],
+                                                         infos[1],
+                                                         infos[2],
+                                                         infos[3],
+                                                         infos[4],
+                                                         infos[5],
+                                                         *(PolymorphicDowncast<const
+                                                             BatchNormalizationDescriptor*>(&descriptor)),
+                                                         reasonIfUnsupported);
+        case LayerType::BatchToSpaceNd:
+            return support.IsBatchToSpaceNdSupported(infos[0],
+                                                     infos[1],
+                                                     *(PolymorphicDowncast<const
+                                                        BatchToSpaceNdDescriptor*>(&descriptor)),
+                                                     reasonIfUnsupported);
+        case LayerType::Cast:
+            return support.IsCastSupported(infos[0], infos[1], reasonIfUnsupported);
+        case LayerType::ChannelShuffle:
+            return support.IsChannelShuffleSupported(infos[0],
+                                                     infos[1],
+                                                     *(PolymorphicDowncast<const
+                                                         ChannelShuffleDescriptor*>(&descriptor)),
+                                                     reasonIfUnsupported);
+        case LayerType::Comparison:
+            return support.IsComparisonSupported(infos[0],
                                                  infos[1],
                                                  infos[2],
-                                                 infos[3],
-                                                 infos[4],
-                                                 infos[5],
-                                                 *(PolymorphicDowncast<const BatchNormalizationDescriptor*>
-                                                     (&descriptor)),
+                                                 *(PolymorphicDowncast<const ComparisonDescriptor*>(&descriptor)),
                                                  reasonIfUnsupported);
-        case LayerType::BatchToSpaceNd:
-            return IsBatchToSpaceNdSupported(infos[0],
-                                             infos[1],
-                                             *(PolymorphicDowncast<const BatchToSpaceNdDescriptor*>(&descriptor)),
-                                             reasonIfUnsupported);
-        case LayerType::Cast:
-            return IsCastSupported(infos[0], infos[1], reasonIfUnsupported);
-        case LayerType::ChannelShuffle:
-            return IsChannelShuffleSupported(infos[0],
-                                             infos[1],
-                                             *(PolymorphicDowncast<const ChannelShuffleDescriptor*>(&descriptor)),
-                                             reasonIfUnsupported);
-        case LayerType::Comparison:
-            return IsComparisonSupported(infos[0],
-                                         infos[1],
-                                         infos[2],
-                                         *(PolymorphicDowncast<const ComparisonDescriptor*>(&descriptor)),
-                                         reasonIfUnsupported);
         case LayerType::Concat:
         {
             std::vector<const TensorInfo*> inputInfos;
@@ -213,17 +229,17 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             {
                 inputInfos.push_back(&infos[i]);
             }
-            return IsConcatSupported(inputInfos,
-                                     infos[infos.size() - 1],
-                                     *(PolymorphicDowncast<const OriginsDescriptor*>(&descriptor)),
-                                     reasonIfUnsupported);
+            return support.IsConcatSupported(inputInfos,
+                                             infos[infos.size() - 1],
+                                             *(PolymorphicDowncast<const OriginsDescriptor*>(&descriptor)),
+                                             reasonIfUnsupported);
         }
         case LayerType::Constant:
-            return IsConstantSupported(infos[0], reasonIfUnsupported);
+            return support.IsConstantSupported(infos[0], reasonIfUnsupported);
         case LayerType::ConvertFp16ToFp32:
-            return IsConvertFp16ToFp32Supported(infos[0], infos[1], reasonIfUnsupported);
+            return support.IsConvertFp16ToFp32Supported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::ConvertFp32ToFp16:
-            return IsConvertFp32ToFp16Supported(infos[0], infos[1], reasonIfUnsupported);
+            return support.IsConvertFp32ToFp16Supported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::Convolution2d:
         {
             if (infos.size() != 4)
@@ -235,21 +251,21 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             auto desc = *(PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor));
             if (infos[3] == TensorInfo())
             {
-                return IsConvolution2dSupported(infos[0],
-                                                infos[1],
-                                                desc,
-                                                infos[2],
-                                                EmptyOptional(),
-                                                reasonIfUnsupported);
+                return support.IsConvolution2dSupported(infos[0],
+                                                        infos[1],
+                                                        desc,
+                                                        infos[2],
+                                                        EmptyOptional(),
+                                                        reasonIfUnsupported);
             }
             else
             {
-                return IsConvolution2dSupported(infos[0],
-                                                infos[1],
-                                                desc,
-                                                infos[2],
-                                                infos[3],
-                                                reasonIfUnsupported);
+                return support.IsConvolution2dSupported(infos[0],
+                                                        infos[1],
+                                                        desc,
+                                                        infos[2],
+                                                        infos[3],
+                                                        reasonIfUnsupported);
             }
         }
         case LayerType::Convolution3d:
@@ -263,28 +279,28 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             auto desc = *(PolymorphicDowncast<const Convolution3dDescriptor*>(&descriptor));
             if (infos[3] == TensorInfo())
             {
-                return IsConvolution3dSupported(infos[0],
-                                                infos[1],
-                                                desc,
-                                                infos[2],
-                                                EmptyOptional(),
-                                                reasonIfUnsupported);
+                return support.IsConvolution3dSupported(infos[0],
+                                                        infos[1],
+                                                        desc,
+                                                        infos[2],
+                                                        EmptyOptional(),
+                                                        reasonIfUnsupported);
             }
             else
             {
-                return IsConvolution3dSupported(infos[0],
-                                                infos[1],
-                                                desc,
-                                                infos[2],
-                                                infos[3],
-                                                reasonIfUnsupported);
+                return support.IsConvolution3dSupported(infos[0],
+                                                        infos[1],
+                                                        desc,
+                                                        infos[2],
+                                                        infos[3],
+                                                        reasonIfUnsupported);
             }
         }
         case LayerType::DepthToSpace:
-            return IsDepthToSpaceSupported(infos[0],
-                                           infos[1],
-                                           *(PolymorphicDowncast<const DepthToSpaceDescriptor*>(&descriptor)),
-                                           reasonIfUnsupported);
+            return support.IsDepthToSpaceSupported(infos[0],
+                                                   infos[1],
+                                                   *(PolymorphicDowncast<const DepthToSpaceDescriptor*>(&descriptor)),
+                                                   reasonIfUnsupported);
         case LayerType::DepthwiseConvolution2d:
         {
             if (infos.size() != 4)
@@ -296,217 +312,223 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             auto desc = *(PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&descriptor));
             if (infos[3] == TensorInfo())
             {
-                return IsDepthwiseConvolutionSupported(infos[0],
-                                                       infos[1],
-                                                       desc,
-                                                       infos[2],
-                                                       EmptyOptional(),
-                                                       reasonIfUnsupported);
+                return support.IsDepthwiseConvolutionSupported(infos[0],
+                                                               infos[1],
+                                                               desc,
+                                                               infos[2],
+                                                               EmptyOptional(),
+                                                               reasonIfUnsupported);
             }
             else
             {
-                return IsDepthwiseConvolutionSupported(infos[0],
-                                                       infos[1],
-                                                       desc,
-                                                       infos[2],
-                                                       infos[3],
-                                                       reasonIfUnsupported);
+                return support.IsDepthwiseConvolutionSupported(infos[0],
+                                                               infos[1],
+                                                               desc,
+                                                               infos[2],
+                                                               infos[3],
+                                                               reasonIfUnsupported);
             }
         }
         case LayerType::Dequantize:
-            return IsDequantizeSupported(infos[0], infos[1], reasonIfUnsupported);
+            return support.IsDequantizeSupported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::DetectionPostProcess:
         {
             auto desc = *(PolymorphicDowncast<const DetectionPostProcessDescriptor*>(&descriptor));
-            return LayerSupportBase::IsDetectionPostProcessSupported(infos[0],
-                                                                     infos[1],
-                                                                     infos[2],
-                                                                     infos[3],
-                                                                     infos[4],
-                                                                     infos[5],
-                                                                     infos[6],
-                                                                     desc,
-                                                                     reasonIfUnsupported);
+            return support.IsDetectionPostProcessSupported(infos[0],
+                                                           infos[1],
+                                                           infos[2],
+                                                           infos[3],
+                                                           infos[4],
+                                                           infos[5],
+                                                           infos[6],
+                                                           desc,
+                                                           reasonIfUnsupported);
         }
         case LayerType::Division:
-            return IsDivisionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            return support.IsDivisionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::ElementwiseUnary:
-            return IsElementwiseUnarySupported(infos[0],
-                                               infos[1],
-                                               *(PolymorphicDowncast<const ElementwiseUnaryDescriptor*>(&descriptor)),
-                                               reasonIfUnsupported);
+            return support.IsElementwiseUnarySupported(infos[0],
+                                                       infos[1],
+                                                       *(PolymorphicDowncast<const
+                                                           ElementwiseUnaryDescriptor*>(&descriptor)),
+                                                       reasonIfUnsupported);
         case LayerType::Fill:
-            return IsFillSupported(infos[0],
-                                   infos[1],
-                                   *(PolymorphicDowncast<const FillDescriptor*>(&descriptor)),
-                                   reasonIfUnsupported);
+            return support.IsFillSupported(infos[0],
+                                           infos[1],
+                                           *(PolymorphicDowncast<const FillDescriptor*>(&descriptor)),
+                                           reasonIfUnsupported);
         case LayerType::Floor:
-            return IsFloorSupported(infos[0], infos[1], reasonIfUnsupported);
+            return support.IsFloorSupported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::FullyConnected:
-            return IsFullyConnectedSupported(infos[0],
+            return support.IsFullyConnectedSupported(infos[0],
+                                                     infos[1],
+                                                     infos[2],
+                                                     infos[3],
+                                                     *(PolymorphicDowncast<const
+                                                         FullyConnectedDescriptor*>(&descriptor)),
+                                                     reasonIfUnsupported);
+        case LayerType::Gather:
+            return support.IsGatherSupported(infos[0],
                                              infos[1],
                                              infos[2],
-                                             infos[3],
-                                             *(PolymorphicDowncast<const FullyConnectedDescriptor*>(&descriptor)),
+                                             *(PolymorphicDowncast<const GatherDescriptor*>(&descriptor)),
                                              reasonIfUnsupported);
-        case LayerType::Gather:
-            return IsGatherSupported(infos[0],
-                                     infos[1],
-                                     infos[2],
-                                     *(PolymorphicDowncast<const GatherDescriptor*>(&descriptor)),
-                                     reasonIfUnsupported);
         case LayerType::GatherNd:
-            return IsGatherNdSupported(infos[0],
-                                       infos[1],
-                                       infos[2],
-                                       reasonIfUnsupported);
+            return support.IsGatherNdSupported(infos[0],
+                                               infos[1],
+                                               infos[2],
+                                               reasonIfUnsupported);
         case LayerType::Input:
-            return IsInputSupported(infos[0], reasonIfUnsupported);
+            return support.IsInputSupported(infos[0], reasonIfUnsupported);
         case LayerType::InstanceNormalization:
-            return IsInstanceNormalizationSupported(infos[0],
-                                                    infos[1],
-                                                    *(PolymorphicDowncast<const InstanceNormalizationDescriptor*>
-                                                        (&descriptor)),
-                                                    reasonIfUnsupported);
+            return support.IsInstanceNormalizationSupported(infos[0],
+                                                            infos[1],
+                                                            *(PolymorphicDowncast<const
+                                                                InstanceNormalizationDescriptor*>(&descriptor)),
+                                                            reasonIfUnsupported);
         case LayerType::L2Normalization:
-            return IsL2NormalizationSupported(infos[0],
-                                              infos[1],
-                                              *(PolymorphicDowncast<const L2NormalizationDescriptor*>(&descriptor)),
-                                              reasonIfUnsupported);
+            return support.IsL2NormalizationSupported(infos[0],
+                                                      infos[1],
+                                                      *(PolymorphicDowncast<const
+                                                          L2NormalizationDescriptor*>(&descriptor)),
+                                                      reasonIfUnsupported);
         case LayerType::LogicalBinary:
-            return IsLogicalBinarySupported(infos[0],
-                                            infos[1],
-                                            infos[2],
-                                            *(PolymorphicDowncast<const LogicalBinaryDescriptor*>(&descriptor)),
-                                            reasonIfUnsupported);
+            return support.IsLogicalBinarySupported(infos[0],
+                                                    infos[1],
+                                                    infos[2],
+                                                    *(PolymorphicDowncast<const
+                                                        LogicalBinaryDescriptor*>(&descriptor)),
+                                                    reasonIfUnsupported);
         case LayerType::LogSoftmax:
-            return IsLogSoftmaxSupported(infos[0],
-                                         infos[1],
-                                         *(PolymorphicDowncast<const LogSoftmaxDescriptor*>(&descriptor)),
-                                         reasonIfUnsupported);
+            return support.IsLogSoftmaxSupported(infos[0],
+                                                 infos[1],
+                                                 *(PolymorphicDowncast<const LogSoftmaxDescriptor*>(&descriptor)),
+                                                 reasonIfUnsupported);
         case LayerType::Lstm:
-            return IsLstmSupported(infos[0],
-                                   infos[1],
-                                   infos[2],
-                                   infos[3],
-                                   infos[4],
-                                   infos[5],
-                                   infos[6],
-                                   *(PolymorphicDowncast<const LstmDescriptor*>(&descriptor)),
-                                   lstmParamsInfo.value(),
-                                   reasonIfUnsupported);
+            return support.IsLstmSupported(infos[0],
+                                           infos[1],
+                                           infos[2],
+                                           infos[3],
+                                           infos[4],
+                                           infos[5],
+                                           infos[6],
+                                           *(PolymorphicDowncast<const LstmDescriptor*>(&descriptor)),
+                                           lstmParamsInfo.value(),
+                                           reasonIfUnsupported);
         case LayerType::Map:
             return true;
         case LayerType::Maximum:
-            return IsMaximumSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            return support.IsMaximumSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::Mean:
-            return IsMeanSupported(infos[0],
-                                   infos[1],
-                                   *(PolymorphicDowncast<const MeanDescriptor*>(&descriptor)),
-                                   reasonIfUnsupported);
+            return support.IsMeanSupported(infos[0],
+                                           infos[1],
+                                           *(PolymorphicDowncast<const MeanDescriptor*>(&descriptor)),
+                                           reasonIfUnsupported);
         case LayerType::MemCopy:
-            return LayerSupportBase::IsMemCopySupported(infos[0], infos[1], reasonIfUnsupported);
+            return support.IsMemCopySupported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::MemImport:
-            return LayerSupportBase::IsMemImportSupported(infos[0], infos[1], reasonIfUnsupported);
+            return support.IsMemImportSupported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::Merge:
-            return LayerSupportBase::IsMergeSupported(infos[0],
+            return support.IsMergeSupported(infos[0],
                                                       infos[1],
                                                       infos[2],
                                                       reasonIfUnsupported);
         case LayerType::Minimum:
-            return IsMinimumSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            return support.IsMinimumSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::Multiplication:
-            return IsMultiplicationSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            return support.IsMultiplicationSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::Normalization:
-            return IsNormalizationSupported(infos[0],
-                                            infos[1],
-                                            *(PolymorphicDowncast<const NormalizationDescriptor*>(&descriptor)),
-                                            reasonIfUnsupported);
+            return support.IsNormalizationSupported(infos[0],
+                                                    infos[1],
+                                                    *(PolymorphicDowncast<const
+                                                        NormalizationDescriptor*>(&descriptor)),
+                                                    reasonIfUnsupported);
         case LayerType::Output:
-            return IsOutputSupported(infos[0], reasonIfUnsupported);
+            return support.IsOutputSupported(infos[0], reasonIfUnsupported);
         case LayerType::Pad:
-            return IsPadSupported(infos[0],
-                                  infos[1],
-                                  *(PolymorphicDowncast<const PadDescriptor*>(&descriptor)),
-                                  reasonIfUnsupported);
+            return support.IsPadSupported(infos[0],
+                                          infos[1],
+                                          *(PolymorphicDowncast<const PadDescriptor*>(&descriptor)),
+                                          reasonIfUnsupported);
         case LayerType::Permute:
-            return IsPermuteSupported(infos[0],
-                                      infos[1],
-                                      *(PolymorphicDowncast<const PermuteDescriptor*>(&descriptor)),
-                                      reasonIfUnsupported);
+            return support.IsPermuteSupported(infos[0],
+                                              infos[1],
+                                              *(PolymorphicDowncast<const PermuteDescriptor*>(&descriptor)),
+                                              reasonIfUnsupported);
         case LayerType::Pooling2d:
-            return IsPooling2dSupported(infos[0],
-                                        infos[1],
-                                        *(PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor)),
-                                        reasonIfUnsupported);
+            return support.IsPooling2dSupported(infos[0],
+                                                infos[1],
+                                                *(PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor)),
+                                                reasonIfUnsupported);
         case LayerType::Pooling3d:
-            return IsPooling3dSupported(infos[0],
-                                        infos[1],
-                                        *(PolymorphicDowncast<const Pooling3dDescriptor*>(&descriptor)),
-                                        reasonIfUnsupported);
+            return support.IsPooling3dSupported(infos[0],
+                                                infos[1],
+                                                *(PolymorphicDowncast<const Pooling3dDescriptor*>(&descriptor)),
+                                                reasonIfUnsupported);
         case LayerType::Prelu:
-            return IsPreluSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            return support.IsPreluSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::QLstm:
-            return IsQLstmSupported(infos[0],
-                                    infos[1],
-                                    infos[2],
-                                    infos[3],
-                                    infos[4],
-                                    infos[5],
-                                    *(PolymorphicDowncast<const QLstmDescriptor*>(&descriptor)),
-                                    lstmParamsInfo.value(),
-                                    reasonIfUnsupported);
-        case LayerType::Quantize:
-            return IsQuantizeSupported(infos[0], infos[1], reasonIfUnsupported);
-        case LayerType::QuantizedLstm:
-            return IsQuantizedLstmSupported(infos[0],
+            return support.IsQLstmSupported(infos[0],
                                             infos[1],
                                             infos[2],
                                             infos[3],
                                             infos[4],
-                                            quantizedLstmParamsInfo.value(),
+                                            infos[5],
+                                            *(PolymorphicDowncast<const QLstmDescriptor*>(&descriptor)),
+                                            lstmParamsInfo.value(),
                                             reasonIfUnsupported);
+        case LayerType::Quantize:
+            return support.IsQuantizeSupported(infos[0], infos[1], reasonIfUnsupported);
+        case LayerType::QuantizedLstm:
+            return support.IsQuantizedLstmSupported(infos[0],
+                                                    infos[1],
+                                                    infos[2],
+                                                    infos[3],
+                                                    infos[4],
+                                                    quantizedLstmParamsInfo.value(),
+                                                    reasonIfUnsupported);
         case LayerType::Rank:
             return true;
         case LayerType::Reshape:
-            return IsReshapeSupported(infos[0],
-                                      infos[1],
-                                      *(PolymorphicDowncast<const ReshapeDescriptor*>(&descriptor)),
-                                      reasonIfUnsupported);
+            return support.IsReshapeSupported(infos[0],
+                                              infos[1],
+                                              *(PolymorphicDowncast<const ReshapeDescriptor*>(&descriptor)),
+                                              reasonIfUnsupported);
         case LayerType::Resize:
-            return IsResizeSupported(infos[0],
-                                     infos[1],
-                                     *(PolymorphicDowncast<const ResizeDescriptor*>(&descriptor)),
-                                     reasonIfUnsupported);
-        case LayerType::Reduce:
-            return IsReduceSupported(infos[0],
-                                     infos[1],
-                                     *(PolymorphicDowncast<const ReduceDescriptor*>(&descriptor)),
-                                     reasonIfUnsupported);
-        case LayerType::Shape:
-            return LayerSupportBase::IsShapeSupported(infos[0],
-                                                      infos[1],
-                                                      reasonIfUnsupported);
-        case LayerType::Slice:
-            return IsSliceSupported(infos[0],
-                                    infos[1],
-                                    *(PolymorphicDowncast<const SliceDescriptor*>(&descriptor)),
-                                    reasonIfUnsupported);
-        case LayerType::Softmax:
-            return IsSoftmaxSupported(infos[0],
-                                      infos[1],
-                                      *(PolymorphicDowncast<const SoftmaxDescriptor*>(&descriptor)),
-                                      reasonIfUnsupported);
-        case LayerType::SpaceToBatchNd:
-            return IsSpaceToBatchNdSupported(infos[0],
+            return support.IsResizeSupported(infos[0],
                                              infos[1],
-                                             *(PolymorphicDowncast<const SpaceToBatchNdDescriptor*>(&descriptor)),
+                                             *(PolymorphicDowncast<const ResizeDescriptor*>(&descriptor)),
                                              reasonIfUnsupported);
+        case LayerType::Reduce:
+            return support.IsReduceSupported(infos[0],
+                                             infos[1],
+                                             *(PolymorphicDowncast<const ReduceDescriptor*>(&descriptor)),
+                                             reasonIfUnsupported);
+        case LayerType::Shape:
+            return support.IsShapeSupported(infos[0],
+                                            infos[1],
+                                            reasonIfUnsupported);
+        case LayerType::Slice:
+            return support.IsSliceSupported(infos[0],
+                                            infos[1],
+                                            *(PolymorphicDowncast<const SliceDescriptor*>(&descriptor)),
+                                            reasonIfUnsupported);
+        case LayerType::Softmax:
+            return support.IsSoftmaxSupported(infos[0],
+                                              infos[1],
+                                              *(PolymorphicDowncast<const SoftmaxDescriptor*>(&descriptor)),
+                                              reasonIfUnsupported);
+        case LayerType::SpaceToBatchNd:
+            return support.IsSpaceToBatchNdSupported(infos[0],
+                                                     infos[1],
+                                                     *(PolymorphicDowncast<const
+                                                        SpaceToBatchNdDescriptor*>(&descriptor)),
+                                                     reasonIfUnsupported);
         case LayerType::SpaceToDepth:
-            return IsSpaceToDepthSupported(infos[0],
-                                           infos[1],
-                                           *(PolymorphicDowncast<const SpaceToDepthDescriptor*>(&descriptor)),
-                                           reasonIfUnsupported);
+            return support.IsSpaceToDepthSupported(infos[0],
+                                                   infos[1],
+                                                   *(PolymorphicDowncast<const SpaceToDepthDescriptor*>(&descriptor)),
+                                                   reasonIfUnsupported);
         case LayerType::Splitter:
         {
             std::vector<TensorInfo> outputInfos;
@@ -514,10 +536,10 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             {
                 outputInfos.push_back(infos[i]);
             }
-            return IsSplitterSupported(infos[0],
-                                       {outputInfos.begin(), outputInfos.end()},
-                                       *(PolymorphicDowncast<const ViewsDescriptor*>(&descriptor)),
-                                       reasonIfUnsupported);
+            return support.IsSplitterSupported(infos[0],
+                                               {outputInfos.begin(), outputInfos.end()},
+                                               *(PolymorphicDowncast<const ViewsDescriptor*>(&descriptor)),
+                                               reasonIfUnsupported);
         }
         case LayerType::Stack:
         {
@@ -526,23 +548,23 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             {
                 inputInfos.push_back(&infos[i]);
             }
-            return IsStackSupported(inputInfos,
-                                    infos[infos.size() - 1],
-                                    *(PolymorphicDowncast<const StackDescriptor*>(&descriptor)),
-                                    reasonIfUnsupported);
+            return support.IsStackSupported(inputInfos,
+                                            infos[infos.size() - 1],
+                                            *(PolymorphicDowncast<const StackDescriptor*>(&descriptor)),
+                                            reasonIfUnsupported);
         }
         case LayerType::StridedSlice:
-            return IsStridedSliceSupported(infos[0],
-                                           infos[1],
-                                           *(PolymorphicDowncast<const StridedSliceDescriptor*>(&descriptor)),
-                                           reasonIfUnsupported);
+            return support.IsStridedSliceSupported(infos[0],
+                                                   infos[1],
+                                                   *(PolymorphicDowncast<const StridedSliceDescriptor*>(&descriptor)),
+                                                   reasonIfUnsupported);
         case LayerType::Subtraction:
-            return IsSubtractionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            return support.IsSubtractionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
         case LayerType::Transpose:
-            return IsTransposeSupported(infos[0],
-                                        infos[1],
-                                        *(PolymorphicDowncast<const TransposeDescriptor*>(&descriptor)),
-                                        reasonIfUnsupported);
+            return support.IsTransposeSupported(infos[0],
+                                                infos[1],
+                                                *(PolymorphicDowncast<const TransposeDescriptor*>(&descriptor)),
+                                                reasonIfUnsupported);
         case LayerType::TransposeConvolution2d:
         {
             if (infos.size() != 4)
@@ -554,34 +576,36 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             auto desc = *(PolymorphicDowncast<const TransposeConvolution2dDescriptor*>(&descriptor));
             if (infos[3] == TensorInfo())
             {
-                return IsTransposeConvolution2dSupported(infos[0],
-                                                         infos[1],
-                                                         desc,
-                                                         infos[2],
-                                                         EmptyOptional(),
-                                                         reasonIfUnsupported);
+                return support.IsTransposeConvolution2dSupported(infos[0],
+                                                                 infos[1],
+                                                                 desc,
+                                                                 infos[2],
+                                                                 EmptyOptional(),
+                                                                 reasonIfUnsupported);
             }
             else
             {
-                return IsTransposeConvolution2dSupported(infos[0],
-                                                         infos[1],
-                                                         desc,
-                                                         infos[2],
-                                                         infos[3],
-                                                         reasonIfUnsupported);
+                return support.IsTransposeConvolution2dSupported(infos[0],
+                                                                 infos[1],
+                                                                 desc,
+                                                                 infos[2],
+                                                                 infos[3],
+                                                                 reasonIfUnsupported);
             }
         }
         case LayerType::UnidirectionalSequenceLstm:
-            return IsUnidirectionalSequenceLstmSupported(infos[0],
-                                                         infos[1],
-                                                         infos[2],
-                                                         infos[3],
-                                                         infos[4],
-                                                         infos[5],
-                                                         *(PolymorphicDowncast<const
-                                                            UnidirectionalSequenceLstmDescriptor*>(&descriptor)),
-                                                         lstmParamsInfo.value(),
-                                                         reasonIfUnsupported);
+        {
+            auto desc = *(PolymorphicDowncast<const UnidirectionalSequenceLstmDescriptor*>(&descriptor));
+            return support.IsUnidirectionalSequenceLstmSupported(infos[0],
+                                                                 infos[1],
+                                                                 infos[2],
+                                                                 infos[3],
+                                                                 infos[4],
+                                                                 infos[5],
+                                                                 desc,
+                                                                 lstmParamsInfo.value(),
+                                                                 reasonIfUnsupported);
+        }
         case LayerType::Unmap:
             return true;
         default:
@@ -590,6 +614,54 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
             // standin, switch
             return false;
     }
+}
+
+bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
+                                        const std::vector<TensorInfo>& infos,
+                                        const BaseDescriptor& descriptor,
+                                        const Optional<LstmInputParamsInfo>& lstmParamsInfo,
+                                        const Optional<QuantizedLstmInputParamsInfo>& quantizedLstmParamsInfo,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    bool isSupported = IsLayerTypeSupported(type,
+                                            infos,
+                                            descriptor,
+                                            lstmParamsInfo,
+                                            quantizedLstmParamsInfo,
+                                            reasonIfUnsupported,
+                                            *this);
+
+    // For android-nn-driver and support library, to run FP16 operations on CpuAcc we need at least v8.2
+    // architecture. If the available architecture is older than v8.2, we can check if the operator is
+    // supported by changing operator inputs & outputs to be FP32.
+    // This does not change the operator datatype in the above parsers to be FP32. We are simply reporting
+    // to the parsers if the operator can supported in ArmNN. We will then re-enter ArmNN (Network.cpp)
+    // where we will recheck IsLayerSupported() on the FP16 datatype, update the operator to be FP32,
+    // and, insert convert layers around the FP32 operator.
+    if (reasonIfUnsupported.has_value())
+    {
+        std::string checkStr = "This CPU architecture does not support F16 data type, you need v8.2 or above";
+        if (!isSupported
+            && reasonIfUnsupported.value().find(checkStr) != std::string::npos)
+        {
+            std::vector<TensorInfo> newInfos;
+            for (auto               info: infos)
+            {
+                newInfos.emplace_back(OverrideDataType(info, DataType::Float32));
+            }
+
+            std::string tmpString;
+            return IsLayerTypeSupported(type,
+                                        newInfos,
+                                        descriptor,
+                                        lstmParamsInfo,
+                                        quantizedLstmParamsInfo,
+                                        tmpString,
+                                        *this);
+        }
+    }
+
+    return isSupported;
 }
 
 bool NeonLayerSupport::IsActivationSupported(const TensorInfo& input,

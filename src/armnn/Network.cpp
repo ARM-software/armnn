@@ -626,7 +626,14 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
     // need to set the compute device on the layer
     // before we can check if it is supported
     layer->SetBackendId(backend);
-    if (!IWorkloadFactory::IsLayerSupported(*layer, EmptyOptional(), reasonIfUnsupported))
+
+    // To run FP16 operations on CpuAcc we need at least v8.2 architecture. If the available architecture 
+    // is older than v8.2, we can check if the operator is supported by changing operator inputs & outputs
+    // to be FP32 and inserting convert layers around the FP32 operator.
+    bool isLayerSupported = IWorkloadFactory::IsLayerSupported(*layer, EmptyOptional(), reasonIfUnsupported);
+    std::string checkStr = "This CPU architecture does not support F16 data type, you need v8.2 or above";
+    if (!isLayerSupported ||
+        reasonIfUnsupported.find(checkStr) != std::string::npos)
     {
         if (dataTypeIn == DataType::Float16 || dataTypeOut == DataType::Float16)
         {

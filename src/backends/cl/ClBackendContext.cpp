@@ -20,20 +20,11 @@ namespace armnn
 
 struct ClBackendContext::ClContextControlWrapper
 {
-    ClContextControlWrapper() {}
-
-    bool IsInitialised()
-    {
-        return m_Initialised;
-    }
-
-    void Init(arm_compute::CLTuner* tuner,
-              arm_compute::CLGEMMHeuristicsHandle* heuristicsHandle,
-              bool profilingEnabled)
-    {
-        m_ClContextControl = ClContextControl(tuner, heuristicsHandle, profilingEnabled);
-        m_Initialised = true;
-    }
+    ClContextControlWrapper(arm_compute::CLTuner* tuner,
+                            arm_compute::CLGEMMHeuristicsHandle* heuristicsHandle,
+                            bool profilingEnabled)
+        : m_ClContextControl(tuner, heuristicsHandle, profilingEnabled)
+    {}
 
     bool Sync()
     {
@@ -62,27 +53,11 @@ struct ClBackendContext::ClContextControlWrapper
         {
             // There are no loaded networks left, so clear the CL cache to free up memory
             m_ClContextControl.ClearClCache();
-            m_Initialised = false;
         }
     }
 
-private:
-    bool m_Initialised;
     ClContextControl m_ClContextControl;
-
 };
-
-/**
- * Returns a shared_ptr to the CLContextControlWrapper. This wraps the CLContextControl and ensures that we only create
- * and use one at a time.
- */
-std::shared_ptr<ClBackendContext::ClContextControlWrapper> ClBackendContext::Get()
-{
-    static std::shared_ptr<ClBackendContext::ClContextControlWrapper> instance
-            = std::make_shared<ClBackendContext::ClContextControlWrapper>();
-    // Instantiated on first use.
-    return instance;
-}
 
 std::string LowerString(std::string value)
 {
@@ -171,7 +146,6 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
     arm_compute::CLTuner* tuner = nullptr;
     arm_compute::CLGEMMHeuristicsHandle* mlgoTuner = nullptr;
     bool useLegacyTunerAPI = options.m_GpuAccTunedParameters.get() != nullptr;
-
     if (useLegacyTunerAPI)
     {
         auto clTunerParams = PolymorphicDowncast<ClTunedParameters*>(
@@ -272,12 +246,11 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
         tuner = m_Tuner.get();
     }
 
-    m_ClContextControlWrapper = Get();
-
-    if (!m_ClContextControlWrapper->IsInitialised())
-    {
-        m_ClContextControlWrapper->Init(tuner, mlgoTuner, kernelProfiling);
-    }
+    m_ClContextControlWrapper = std::make_unique<ClContextControlWrapper>(
+            tuner,
+            mlgoTuner,
+            kernelProfiling
+    );
 }
 
 bool ClBackendContext::BeforeLoadNetwork(NetworkId)

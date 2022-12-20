@@ -137,13 +137,12 @@ Delegate::Delegate(armnnDelegate::DelegateOptions options)
     m_Options(std::move(options))
 {
     // Configures logging for ARMNN
-    if (options.IsLoggingEnabled())
+    if (m_Options.IsLoggingEnabled())
     {
-        armnn::ConfigureLogging(true, true, options.GetLoggingSeverity());
+        armnn::ConfigureLogging(true, true, m_Options.GetLoggingSeverity());
     }
-
     // Create ArmNN Runtime
-    m_Runtime = armnn::IRuntime::Create(options.GetRuntimeOptions());
+    m_Runtime = armnn::IRuntime::Create(m_Options.GetRuntimeOptions());
 
     std::vector<armnn::BackendId> backends;
     if (m_Runtime)

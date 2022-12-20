@@ -120,56 +120,67 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
     armnnDelegate::DelegateOptions delegateOptions(m_ComputeDevices);
     delegateOptions.SetDynamicBackendsPath(m_DynamicBackendsPath);
     delegateOptions.SetGpuProfilingState(m_EnableProfiling);
-
-    armnn::OptimizerOptions options;
-    options.m_ReduceFp32ToFp16 = m_EnableFp16TurboMode;
-    options.m_Debug = m_PrintIntermediate;
-    options.m_DebugToFile = m_PrintIntermediateOutputsToFile;
-    options.m_ProfilingEnabled = m_EnableProfiling;
     delegateOptions.SetInternalProfilingParams(m_EnableProfiling, armnn::ProfilingDetailsMethod::DetailsWithEvents);
-    options.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly;
-    if (m_InferOutputShape)
+
+    // GPU Backend options first.
     {
-        options.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::InferAndValidate;
+        armnn::BackendOptions gpuOption("GpuAcc", {{"TuningLevel", m_TuningLevel}});
+        delegateOptions.AddBackendOption(gpuOption);
+    }
+    {
+        armnn::BackendOptions gpuOption("GpuAcc", {{"TuningFile", m_TuningPath.c_str()}});
+        delegateOptions.AddBackendOption(gpuOption);
+    }
+    {
+        armnn::BackendOptions gpuOption("GpuAcc", {{"KernelProfilingEnabled", m_EnableProfiling}});
+        delegateOptions.AddBackendOption(gpuOption);
     }
 
-    armnn::BackendOptions gpuAcc("GpuAcc",
-                                 {
-        { "FastMathEnabled", m_EnableFastMath },
-        { "SaveCachedNetwork", m_SaveCachedNetwork },
-        { "CachedNetworkFilePath", m_CachedNetworkFilePath },
-        { "TuningLevel", m_TuningLevel},
-        { "TuningFile", m_TuningPath.c_str()},
-        { "KernelProfilingEnabled", m_EnableProfiling},
-        { "MLGOTuningFilePath", m_MLGOTuningFilePath}
-                                 });
+    // Optimizer options next.
+    armnn::OptimizerOptions optimizerOptions;
+    optimizerOptions.m_ReduceFp32ToFp16 = m_EnableFp16TurboMode;
+    optimizerOptions.m_Debug = m_PrintIntermediate;
+    optimizerOptions.m_DebugToFile = m_PrintIntermediateOutputsToFile;
+    optimizerOptions.m_ProfilingEnabled = m_EnableProfiling;
+    optimizerOptions.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly;
+    if (m_InferOutputShape)
+    {
+        optimizerOptions.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::InferAndValidate;
+        armnn::BackendOptions networkOption("ShapeInferenceMethod",
+                                            {
+                                                {"InferAndValidate", true}
+                                            });
+        optimizerOptions.m_ModelOptions.push_back(networkOption);
+    }
+
+    {
+        armnn::BackendOptions option("GpuAcc", {{"FastMathEnabled", m_EnableFastMath}});
+        optimizerOptions.m_ModelOptions.push_back(option);
+    }
+    {
+        armnn::BackendOptions option("GpuAcc", {{"CachedNetworkFilePath", m_CachedNetworkFilePath}});
+        optimizerOptions.m_ModelOptions.push_back(option);
+    }
+    {
+        armnn::BackendOptions option("GpuAcc", {{"MLGOTuningFilePath", m_MLGOTuningFilePath}});
+        optimizerOptions.m_ModelOptions.push_back(option);
+    }
 
     armnn::BackendOptions cpuAcc("CpuAcc",
                                  {
         { "FastMathEnabled", m_EnableFastMath },
         { "NumberOfThreads", m_NumberOfThreads }
                                  });
-    options.m_ModelOptions.push_back(gpuAcc);
-    options.m_ModelOptions.push_back(cpuAcc);
-
-    if (m_InferOutputShape)
-    {
-        armnn::BackendOptions networkOption("ShapeInferenceMethod",
-                                            {
-                                                    {"InferAndValidate", true}
-                                            });
-        options.m_ModelOptions.push_back(networkOption);
-    }
+    optimizerOptions.m_ModelOptions.push_back(cpuAcc);
     if (m_AllowExpandedDims)
     {
         armnn::BackendOptions networkOption("AllowExpandedDims",
                                             {
                                                     {"AllowExpandedDims", true}
                                             });
-        options.m_ModelOptions.push_back(networkOption);
+        optimizerOptions.m_ModelOptions.push_back(networkOption);
     }
-    delegateOptions.SetOptimizerOptions(options);
-
+    delegateOptions.SetOptimizerOptions(optimizerOptions);
     return delegateOptions;
 }
 

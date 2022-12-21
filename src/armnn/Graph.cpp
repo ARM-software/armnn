@@ -497,13 +497,19 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
         IInputSlot* subgraphInputSlot = subgraphInputSlots.at(inputSlotIdx);
         ARMNN_ASSERT(subgraphInputSlot);
 
-        IOutputSlot* connectedOutputSlot = subgraphInputSlot->GetConnection();
-        ARMNN_ASSERT(connectedOutputSlot);
-        connectedOutputSlot->Disconnect(*subgraphInputSlot);
+        // Only disconnect if the InputSlot has a connection, this might not be the case when
+        // dealing with working copies of SubgraphViews
+        // Note: we don't need this check for OutputSlot as it iterates over a vector of valid connections
+        if (subgraphInputSlot->GetConnection())
+        {
+            IOutputSlot* connectedOutputSlot = subgraphInputSlot->GetConnection();
+            ARMNN_ASSERT(connectedOutputSlot);
+            connectedOutputSlot->Disconnect(*subgraphInputSlot);
 
-        IInputSlot* substituteInputSlot = substituteSubgraphInputSlots.at(inputSlotIdx);
-        ARMNN_ASSERT(substituteInputSlot);
-        connectedOutputSlot->Connect(*substituteInputSlot);
+            IInputSlot* substituteInputSlot = substituteSubgraphInputSlots.at(inputSlotIdx);
+            ARMNN_ASSERT(substituteInputSlot);
+            connectedOutputSlot->Connect(*substituteInputSlot);
+        }
     }
 
     // Step 2: process output slots

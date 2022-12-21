@@ -2063,6 +2063,35 @@ TEST_CASE("SubgraphViewWorkingCopySubstituteSubgraph")
     CHECK_THROWS_AS(workingCopy.GetWorkingCopy(), Exception);
 }
 
+TEST_CASE("SubgraphViewPartialWorkingCopySubstituteSubgraph")
+{
+    Graph graph;
+
+    auto input = graph.AddLayer<InputLayer>(0, "Input");
+    auto activation = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "Activation");
+    auto output = graph.AddLayer<OutputLayer>(1, "Output");
+
+    input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Add in out of order
+    auto view = CreateSubgraphViewFrom({activation},
+                                       {&activation->GetInputSlot(0)},
+                                       {&activation->GetOutputSlot(0)});
+
+    auto workingCopy = view->GetWorkingCopy();
+
+    // First (and only) layer in the subgraph is the Activation
+    CHECK(std::string((*workingCopy.beginIConnectable())->GetName()) == "Activation");
+
+    // Substitute the "Activation" layer for an equivalent layer
+    auto activation2 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "Activation2");
+    SubgraphView pattern(*workingCopy.beginIConnectable());
+    workingCopy.SubstituteSubgraph(pattern, activation2);
+
+    CHECK(std::string((*workingCopy.beginIConnectable())->GetName()) == "Activation2");
+}
+
 TEST_CASE("SubgraphViewWorkingCopyOptimizationViews")
 {
     Graph graph;

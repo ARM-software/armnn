@@ -5,6 +5,7 @@
 #pragma once
 
 #include "BackendId.hpp"
+#include "BackendHelper.hpp"
 #include "Descriptors.hpp"
 #include "Exceptions.hpp"
 #include "INetwork.hpp"

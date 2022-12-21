@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -935,7 +935,7 @@ void FullyOptimizableSubgraphTestImpl1()
     LayerNameToLayerMap layersInGraph;
 
     // Create a fully optimizable subgraph
-    SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph1(graph, layersInGraph);
+    SubgraphView::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph1(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
@@ -1002,7 +1002,7 @@ void FullyOptimizableSubgraphTestImpl2()
     LayerNameToLayerMap layersInGraph;
 
     // Create a fully optimizable subgraph
-    SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph2(graph, layersInGraph);
+    SubgraphView::SubgraphViewPtr subgraphPtr = BuildFullyOptimizableSubgraph2(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
@@ -1110,7 +1110,7 @@ void PartiallySupportedSubgraphTestImpl()
     LayerNameToLayerMap layersInGraph;
 
     // Create a fully optimizable subgraph
-    SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallySupportedSubgraph(graph, layersInGraph);
+    SubgraphView::SubgraphViewPtr subgraphPtr = BuildPartiallySupportedSubgraph(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
@@ -1254,7 +1254,7 @@ void FullyUnoptimizableSubgraphTestImpl1()
     LayerNameToLayerMap layersInGraph;
 
     // Create a fully optimizable subgraph
-    SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildFullyUnoptimizableSubgraph1(graph, layersInGraph);
+    SubgraphView::SubgraphViewPtr subgraphPtr = BuildFullyUnoptimizableSubgraph1(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
@@ -1318,7 +1318,7 @@ void PartiallyOptimizableSubgraphTestImpl1()
     LayerNameToLayerMap layersInGraph;
 
     // Create a fully optimizable subgraph
-    SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph1(graph, layersInGraph);
+    SubgraphView::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph1(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();
@@ -1470,7 +1470,7 @@ void PartiallyOptimizableSubgraphTestImpl2()
     LayerNameToLayerMap layersInGraph;
 
     // Create a partially optimizable subgraph
-    SubgraphViewSelector::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph2(graph, layersInGraph);
+    SubgraphView::SubgraphViewPtr subgraphPtr = BuildPartiallyOptimizableSubgraph2(graph, layersInGraph);
     CHECK((subgraphPtr != nullptr));
 
     const SubgraphView::IInputSlots& subgraphInputSlots = subgraphPtr->GetIInputSlots();

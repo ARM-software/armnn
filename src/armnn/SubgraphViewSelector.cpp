@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -524,7 +524,8 @@ SubgraphViewSelector::SelectSubgraphs(SubgraphView& subgraph, const LayerSelecto
     // Sort subgraphs list into deterministic order, not relying on pointer values which may be different on each 
     // execution. This makes debugging the optimised graph much easier as subsequent stages can also be 
     // deterministic.
-    std::sort(result.begin(), result.end(), [](const SubgraphViewPtr& a, const SubgraphViewPtr& b)
+    std::sort(result.begin(), result.end(), [](const SubgraphView::SubgraphViewPtr& a,
+                                               const SubgraphView::SubgraphViewPtr& b)
     {
         return a->GetIConnectableLayers().front()->GetGuid() < b->GetIConnectableLayers().front()->GetGuid();
     });

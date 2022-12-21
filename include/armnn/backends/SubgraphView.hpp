@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,7 +28,7 @@ class OutputSlot;
 /// the contents of the SubgraphView become invalid when the Layers are destroyed
 /// or changed.
 ///
-class SubgraphView final
+class SubgraphView final : public std::enable_shared_from_this<SubgraphView>
 {
 public:
     template <typename Func>
@@ -53,7 +53,7 @@ public:
         }
     }
 
-    using SubgraphViewPtr = std::unique_ptr<SubgraphView>;
+    using SubgraphViewPtr = std::shared_ptr<SubgraphView>;
     using InputSlots = std::vector<InputSlot*>;
     using IInputSlots = std::vector<IInputSlot*>;
     using OutputSlots = std::vector<OutputSlot*>;
@@ -170,6 +170,13 @@ public:
     /// They take a SubgraphView pattern to replace and the substitute layer or subgraphView to substitute in.
     void SubstituteSubgraph(SubgraphView&, IConnectableLayer*);
     void SubstituteSubgraph(SubgraphView&, const SubgraphView&);
+
+    /// These methods should be called on a working copy subgraph created from GetWorkingCopy.
+    /// They return pointers to the input and output Slots belonging to the original SubgraphView
+    /// that the working copy was created from.
+    /// This may be used to find the original TensorInfo of connected boundary OutputSlots.
+    const IInputSlots& GetOriginalInputSlots() const;
+    const IOutputSlots& GetOriginalOutputSlots() const;
 
 private:
     struct SubgraphViewWorkingCopy;

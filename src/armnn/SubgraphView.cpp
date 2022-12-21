@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,7 +42,8 @@ void AssertIfNullsOrDuplicates(const C& container, const std::string& errorMessa
 } // anonymous namespace
 
 SubgraphView::SubgraphView(Graph& graph)
-    : m_InputSlots{}
+    : enable_shared_from_this()
+    , m_InputSlots{}
     , m_OutputSlots{}
     , m_Layers(graph.begin(), graph.end())
     , m_IConnectableLayers(graph.begin(), graph.end())
@@ -53,7 +54,8 @@ SubgraphView::SubgraphView(Graph& graph)
 
 /// IConnectable Duplication to maintain backwards compatibility
 SubgraphView::SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& layers)
-    : m_InputSlots{InputSlots{inputs.begin(), inputs.end()}}
+    : enable_shared_from_this()
+    , m_InputSlots{InputSlots{inputs.begin(), inputs.end()}}
     , m_IInputSlots{IInputSlots{inputs.begin(), inputs.end()}}
     , m_OutputSlots{OutputSlots{outputs.begin(), outputs.end()}}
     , m_IOutputSlots{IOutputSlots{outputs.begin(), outputs.end()}}
@@ -68,7 +70,8 @@ SubgraphView::SubgraphView(InputSlots&& inputs, OutputSlots&& outputs, Layers&& 
 SubgraphView::SubgraphView(SubgraphView::IConnectableLayers&& layers,
                            SubgraphView::IInputSlots&& inputs,
                            SubgraphView::IOutputSlots&& outputs)
-        : m_IInputSlots{inputs}
+        : enable_shared_from_this()
+        , m_IInputSlots{inputs}
         , m_IOutputSlots{outputs}
         , m_IConnectableLayers(IConnectableLayers{layers.begin(), layers.end()})
 {
@@ -104,7 +107,8 @@ SubgraphView::SubgraphView(SubgraphView::IConnectableLayers&& layers,
                            SubgraphView::IInputSlots&& inputs,
                            SubgraphView::IOutputSlots&& outputs,
                            std::shared_ptr<SubgraphViewWorkingCopy> ptr)
-        : m_IInputSlots{inputs}
+        : enable_shared_from_this()
+        , m_IInputSlots{inputs}
         , m_IOutputSlots{outputs}
         , m_IConnectableLayers(IConnectableLayers{layers.begin(), layers.end()})
         , p_WorkingCopyImpl(std::move(ptr))
@@ -137,7 +141,8 @@ SubgraphView::SubgraphView(SubgraphView::IConnectableLayers&& layers,
 }
 
 SubgraphView::SubgraphView(const SubgraphView& subgraph)
-    : m_InputSlots(subgraph.m_InputSlots.begin(), subgraph.m_InputSlots.end())
+    : enable_shared_from_this()
+    , m_InputSlots(subgraph.m_InputSlots.begin(), subgraph.m_InputSlots.end())
     , m_IInputSlots(subgraph.m_IInputSlots.begin(), subgraph.m_IInputSlots.end())
     , m_OutputSlots(subgraph.m_OutputSlots.begin(), subgraph.m_OutputSlots.end())
     , m_IOutputSlots(subgraph.m_IOutputSlots.begin(), subgraph.m_IOutputSlots.end())
@@ -150,7 +155,8 @@ SubgraphView::SubgraphView(const SubgraphView& subgraph)
 }
 
 SubgraphView::SubgraphView(SubgraphView&& subgraph)
-    : m_InputSlots(std::move(subgraph.m_InputSlots))
+    : enable_shared_from_this()
+    , m_InputSlots(std::move(subgraph.m_InputSlots))
     , m_IInputSlots(std::move(subgraph.m_IInputSlots))
     , m_OutputSlots(std::move(subgraph.m_OutputSlots))
     , m_IOutputSlots(std::move(subgraph.m_IOutputSlots))
@@ -162,7 +168,8 @@ SubgraphView::SubgraphView(SubgraphView&& subgraph)
 }
 
 SubgraphView::SubgraphView(IConnectableLayer* layer)
-    : m_Layers{PolymorphicDowncast<Layer*>(layer)}
+    : enable_shared_from_this()
+    , m_Layers{PolymorphicDowncast<Layer*>(layer)}
     , m_IConnectableLayers{layer}
 {
     unsigned int numInputSlots = layer->GetNumInputSlots();
@@ -408,11 +415,13 @@ struct SubgraphView::SubgraphViewWorkingCopy
 public:
 
     SubgraphViewWorkingCopy() = default;
-    SubgraphViewWorkingCopy(Graph graph)
+    SubgraphViewWorkingCopy(Graph graph, std::shared_ptr<const SubgraphView> originalSubgraphView)
                             : m_Graph(graph)
+                            , m_OriginalSubgraphView(originalSubgraphView)
     {};
 
     Graph m_Graph;
+    std::shared_ptr<const SubgraphView> m_OriginalSubgraphView;
 
 };
 
@@ -426,7 +435,7 @@ SubgraphView SubgraphView::GetWorkingCopy() const
 
     // Create a cut down SubgraphView with underlying graph containing only the relevant layers.
     // It needs its own underlying layers so that they can be replaced safely.
-    auto ptr = std::make_shared<SubgraphViewWorkingCopy>(Graph());
+    auto ptr = std::make_shared<SubgraphViewWorkingCopy>(Graph(), shared_from_this());
 
     std::unordered_map<const IConnectableLayer*, IConnectableLayer*> originalToClonedLayerMap;
     std::list<armnn::IConnectableLayer*> originalSubgraphLayers = GetIConnectableLayers();
@@ -605,6 +614,33 @@ void SubgraphView::SubstituteSubgraph(SubgraphView& patternSubgraph, const Subgr
     // Update SubgraphView layer pointers to match those of the internal WorkingCopy layer pointers
     m_IConnectableLayers = IConnectableLayers{ workingCopyGraph->m_Layers.begin(),
                                                workingCopyGraph->m_Layers.end() };
+}
+
+const SubgraphView::IInputSlots& SubgraphView::GetOriginalInputSlots() const
+{
+    if (!p_WorkingCopyImpl)
+    {
+        throw NullPointerException("The SubgraphView calling GetOriginalInputSlots is not a working copy. "
+                                   "Call this function on SubgraphView returned from SubgraphView::GetWorkingCopy()");
+    }
+    if (!p_WorkingCopyImpl->m_OriginalSubgraphView)
+    {
+        throw NullPointerException("The working copy SubgraphView pointer to its original SubgraphView is null.");
+    }
+    return p_WorkingCopyImpl->m_OriginalSubgraphView->GetIInputSlots();
+}
+const SubgraphView::IOutputSlots& SubgraphView::GetOriginalOutputSlots() const
+{
+    if (!p_WorkingCopyImpl)
+    {
+        throw NullPointerException("The SubgraphView calling GetOriginalOutputSlots is not a working copy. "
+                                   "Call this function on SubgraphView returned from SubgraphView::GetWorkingCopy()");
+    }
+    if (!p_WorkingCopyImpl->m_OriginalSubgraphView)
+    {
+        throw NullPointerException("The working copy SubgraphView pointer to its original SubgraphView is null.");
+    }
+    return p_WorkingCopyImpl->m_OriginalSubgraphView->GetIOutputSlots();
 }
 
 

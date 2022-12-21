@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -21,8 +21,7 @@ class Graph;
 class SubgraphViewSelector final
 {
 public:
-    using SubgraphViewPtr = std::unique_ptr<SubgraphView>;
-    using Subgraphs = std::vector<SubgraphViewPtr>;
+    using Subgraphs = std::vector<SubgraphView::SubgraphViewPtr>;
     using LayerSelectorFunction = std::function<bool(const Layer&)>;
 
     /// Selects subgraphs from a graph based on the selector function and the algorithm.

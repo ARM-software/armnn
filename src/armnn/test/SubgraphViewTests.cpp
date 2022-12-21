@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -119,14 +119,14 @@ SubgraphView::IOutputSlots CreateIOutputsFrom(const std::vector<armnn::IConnecta
 // this takes the inputs, outputs and layers as a copy and the move these copies into the
 // resulting subgraph, so the pass by value is intentional
 //
-SubgraphViewSelector::SubgraphViewPtr CreateSubgraphViewFrom(SubgraphView::InputSlots&& inputs,
+SubgraphView::SubgraphViewPtr CreateSubgraphViewFrom(SubgraphView::InputSlots&& inputs,
                                                              SubgraphView::OutputSlots&& outputs,
                                                              SubgraphView::Layers&& layers)
 {
     return std::make_unique<SubgraphView>(std::move(inputs), std::move(outputs), std::move(layers));
 }
 
-SubgraphViewSelector::SubgraphViewPtr CreateSubgraphViewFrom(SubgraphView::IConnectableLayers&& layers,
+SubgraphView::SubgraphViewPtr CreateSubgraphViewFrom(SubgraphView::IConnectableLayers&& layers,
                                                              SubgraphView::IInputSlots&& inputs,
                                                              SubgraphView::IOutputSlots&& outputs)
 {
@@ -147,8 +147,8 @@ void CompareVectors(const std::vector<T>& result, const std::vector<T>& expected
     CHECK(std::equal(result.begin(), result.end(), expected.begin(), expected.end()));
 }
 
-void CompareSubgraphViews(SubgraphViewSelector::SubgraphViewPtr& result,
-                          SubgraphViewSelector::SubgraphViewPtr& expected)
+void CompareSubgraphViews(SubgraphView::SubgraphViewPtr& result,
+                          SubgraphView::SubgraphViewPtr& expected)
 {
     // expect both to be valid subgraphs
     CHECK((result.get() != nullptr));
@@ -256,7 +256,7 @@ TEST_CASE("SubgraphViewSlots")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({},
+    SubgraphView::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({},
                                                                             CreateIInputsFrom({convLayer1}, {1, 2}),
                                                                             CreateIOutputsFrom({convLayer2}));
 
@@ -293,7 +293,7 @@ TEST_CASE("SubgraphViewConstructors")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph =
+    SubgraphView::SubgraphViewPtr subgraph =
             CreateSubgraphViewFrom({inputLayer, convLayer1, convLayer2, outputLayer},
                                    CreateIInputsFrom({convLayer1}),
                                    CreateIOutputsFrom({convLayer2}));
@@ -354,7 +354,7 @@ TEST_CASE("SingleInputSingleOutput")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph =
+    SubgraphView::SubgraphViewPtr subgraph =
             CreateSubgraphViewFrom({},
                                    CreateIInputsFrom({convLayer1}, {1}),
                                    CreateIOutputsFrom({convLayer2}));
@@ -396,7 +396,7 @@ TEST_CASE("SingleInputSingleOutputAddPrecompiledLayerSubstituteSubgraph1")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
+    SubgraphView::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
                                                                             CreateOutputsFrom({convLayer2}),
                                                                             {});
 
@@ -440,7 +440,7 @@ TEST_CASE("SingleInputSingleOutputAddPrecompiledLayerSubstituteSubgraph2")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
+    SubgraphView::SubgraphViewPtr subgraph = CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
                                                                             CreateOutputsFrom({convLayer2}),
                                                                             {});
 
@@ -485,7 +485,7 @@ TEST_CASE("SingleInputSingleOutputSubstituteGraph")
     convLayer2->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph =
+    SubgraphView::SubgraphViewPtr subgraph =
             CreateSubgraphViewFrom(CreateInputsFrom({convLayer1}, {1}),
                                    CreateOutputsFrom({convLayer2}),
                                    {});
@@ -499,7 +499,7 @@ TEST_CASE("SingleInputSingleOutputSubstituteGraph")
     PreCompiledDescriptor preCompiledDescriptor(1, 1);
     Layer* const preCompiledLayer = substituteGraph.AddLayer<PreCompiledLayer>(preCompiledDescriptor, "pre-compiled");
 
-    SubgraphViewSelector::SubgraphViewPtr substituteSubgraph =
+    SubgraphView::SubgraphViewPtr substituteSubgraph =
                                           CreateSubgraphViewFrom(CreateInputsFrom({preCompiledLayer}),
                                                                  CreateOutputsFrom({preCompiledLayer}),
                                                                  {preCompiledLayer});
@@ -587,7 +587,7 @@ TEST_CASE("SingleInputMultiOutput")
     concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph =
+    SubgraphView::SubgraphViewPtr subgraph =
             CreateSubgraphViewFrom(CreateInputsFrom({splitterLayer}),
                                    CreateOutputsFrom({convLayer1, convLayer2}),
                                    {});
@@ -639,7 +639,7 @@ TEST_CASE("MultiInputMultiOutput")
     concatLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph =
+    SubgraphView::SubgraphViewPtr subgraph =
             CreateSubgraphViewFrom(CreateInputsFrom({convLayer1, convLayer2}, {1}),
                                    CreateOutputsFrom({convLayer1, convLayer2}),
                                    {});
@@ -686,7 +686,7 @@ TEST_CASE("EraseReplacedIConnectableLayers")
     graph.AddLayer<OutputLayer>(0, "output");
 
     // Construct sub-graph
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({splitterLayer,
+    SubgraphView::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({splitterLayer,
                                                                              convLayer1,
                                                                              convLayer2,
                                                                              concatLayer},
@@ -1514,7 +1514,7 @@ TEST_CASE("Random")
         for (Layer* layer : graph)
         {
             size_t i = 0;
-            for (std::unique_ptr<SubgraphView>& subgraph : subgraphs)
+            for (auto& subgraph : subgraphs)
             {
                 std::string name = std::to_string(i++);
                 if (std::find(subgraph->cbeginIConnectable(), subgraph->cendIConnectable(), layer)
@@ -1551,7 +1551,7 @@ TEST_CASE("Random")
         // Check the dependencies between subgraphs to make sure that the algorithm has produced a valid result.
         // Starting from each of the input slots of each subgraph, recurse up the graph and ensure that we never
         // encounter a layer that belongs to the subgraph that we started from.
-        for (std::unique_ptr<SubgraphView>& subgraph : subgraphs)
+        for (auto& subgraph : subgraphs)
         {
             for (IInputSlot* inSlot : subgraph->GetIInputSlots())
             {
@@ -2092,6 +2092,106 @@ TEST_CASE("SubgraphViewPartialWorkingCopySubstituteSubgraph")
     CHECK(std::string((*workingCopy.beginIConnectable())->GetName()) == "Activation2");
 }
 
+// Workaround function used to get the original OutputSlot connected to the InputSlot of a SubgraphView
+// As working copy SubgraphViews do not have connections on boundary it finds the corresponding InputSlot
+// on the Original SubgraphView and then returns the OutputSlot connected to it.
+// Using this function to test against the simpler API: SubgraphView::GetOriginalInputSlots().
+const IOutputSlot* GetConnection(IInputSlot* inputSlot,
+                                 const SubgraphView& workingCopy,
+                                 const SubgraphView& original)
+{
+    const IOutputSlot* res = inputSlot->GetConnection();
+    if (res)
+    {
+        return res;
+    }
+
+    const SubgraphView::IInputSlots& workingCopyInputSlots = workingCopy.GetIInputSlots();
+    const SubgraphView::IInputSlots& originalInputSlots = original.GetIInputSlots();
+    for (SubgraphView::InputSlots::size_type i = 0; i < workingCopyInputSlots.size(); i++)
+    {
+        if (workingCopyInputSlots[i] == inputSlot)
+        {
+            return originalInputSlots[i]->GetConnection();
+        }
+    }
+    return nullptr;
+}
+
+// Workaround function used to get the original InputSlot connected to the OutputSlot of a SubgraphView
+// As working copy SubgraphViews do not have connections on boundary it finds the corresponding OutputSlot
+// on the Original SubgraphView and then returns the InputSlot connected to it using index parameter.
+// Using this function to test against the simpler API: SubgraphView::GetOriginalOutputSlots().
+const IInputSlot* GetConnection(IOutputSlot* outputSlot,
+                                unsigned int index,
+                                const SubgraphView& workingCopy,
+                                const SubgraphView& original)
+{
+    const IInputSlot* res;
+    // Check within range
+    if (index < outputSlot->GetNumConnections() && outputSlot->GetNumConnections() > 0)
+    {
+        res = outputSlot->GetConnection(index);
+        return res;
+    }
+
+    const SubgraphView::IOutputSlots& workingCopyOutputSlots = workingCopy.GetIOutputSlots();
+    const SubgraphView::IOutputSlots& originalOutputSlots = original.GetIOutputSlots();
+    for (SubgraphView::OutputSlots::size_type i = 0; i < workingCopyOutputSlots.size(); i++)
+    {
+        if (workingCopyOutputSlots[i] == outputSlot)
+        {
+            // Check within range
+            if (index < originalOutputSlots[i]->GetNumConnections() && originalOutputSlots[i]->GetNumConnections() > 0)
+            {
+                return originalOutputSlots[i]->GetConnection(index);
+            }
+        }
+    }
+    return nullptr;
+}
+
+SubgraphView CheckOutOfScopeWorkingCopy()
+{
+    Graph graph;
+
+    auto input = graph.AddLayer<InputLayer>(0, "Input");
+    auto activation = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "Activation");
+    auto output = graph.AddLayer<OutputLayer>(1, "Output");
+
+    input->GetOutputSlot(0).Connect(activation->GetInputSlot(0));
+    activation->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    //Add in out of order
+    auto shared = CreateSubgraphViewFrom({activation},
+                                       {&activation->GetInputSlot(0)},
+                                       {&activation->GetOutputSlot(0)});
+
+    auto workingCopy = shared->GetWorkingCopy();
+
+    // Check InputSlots are same as original
+    auto boundaryOutputSlot = GetConnection(workingCopy.GetIInputSlots()[0], workingCopy, *shared);
+    CHECK(boundaryOutputSlot);
+
+    auto inputSlots = workingCopy.GetOriginalInputSlots();
+    CHECK(inputSlots[0]->GetConnection() == boundaryOutputSlot);
+
+    // Check OutputSlots are same as original
+    auto boundaryInputSlot = GetConnection(workingCopy.GetIOutputSlots()[0], 0U, workingCopy, *shared);
+    CHECK(boundaryInputSlot);
+
+    auto outputSlots = workingCopy.GetOriginalOutputSlots();
+    CHECK(outputSlots[0]->GetConnection(0) == boundaryInputSlot);
+
+    return workingCopy;
+}
+
+TEST_CASE("SubgraphViewWorkingCopyOriginalSlots")
+{
+    auto result = CheckOutOfScopeWorkingCopy();
+    auto outputSlots = result.GetOriginalOutputSlots();
+}
+
 TEST_CASE("SubgraphViewWorkingCopyOptimizationViews")
 {
     Graph graph;
@@ -2394,7 +2494,7 @@ TEST_CASE("MultipleOutputSlotsSubstituteGraph")
     }
 
     // pattern subgraph creation
-    SubgraphViewSelector::SubgraphViewPtr subgraph =
+    SubgraphView::SubgraphViewPtr subgraph =
         CreateSubgraphViewFrom({convCopyLayer},
                                {&convCopyLayer->GetInputSlot(0)},
                                {&convCopyLayer->GetOutputSlot(0)});
@@ -2491,7 +2591,7 @@ TEST_CASE("MultipleInputMultipleOutputSlots_SubstituteGraph")
 
     // pattern subgraph creation
     IConnectableLayer* constCopyLayer = &addCopyLayer->GetInputSlot(0).GetConnection()->GetOwningIConnectableLayer();
-    SubgraphViewSelector::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({addCopyLayer, constCopyLayer},
+    SubgraphView::SubgraphViewPtr subgraph = CreateSubgraphViewFrom({addCopyLayer, constCopyLayer},
                                                                             {&addCopyLayer->GetInputSlot(0)},
                                                                             {&addCopyLayer->GetOutputSlot(0)});
 

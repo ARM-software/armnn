@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -157,6 +157,10 @@ private:
 
     /// Profiling Service Instance
     std::unique_ptr<arm::pipe::IProfilingService> m_ProfilingService;
+
+    /// Keep track of backend ids of the custom allocators that this instance of the runtime added. The
+    /// destructor can then clean up for this runtime.
+    std::set<BackendId> m_AllocatorsAddedByThisRuntime;
 };
 
 } // namespace armnn

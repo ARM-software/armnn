@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -393,6 +393,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                         }
                         // No errors so register the Custom Allocator with the BackendRegistry
                         BackendRegistryInstance().RegisterAllocator(id, customAllocatorMapIterator->second);
+                        m_AllocatorsAddedByThisRuntime.emplace(id);
                     }
                     else
                     {
@@ -428,6 +429,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                     }
                     // No errors so register the Custom Allocator with the BackendRegistry
                     BackendRegistryInstance().RegisterAllocator(id, customAllocatorMapIterator->second);
+                    m_AllocatorsAddedByThisRuntime.emplace(id);
                 }
             }
 
@@ -584,6 +586,12 @@ RuntimeImpl::~RuntimeImpl()
     m_BackendContexts.clear();
 
     BackendRegistryInstance().SetProfilingService(armnn::EmptyOptional());
+    // Remove custom allocators that this runtime has added.
+    // Note: that as backends can be per process and there can be many instances of a runtime in a process an allocator
+    // may have been overwritten by another runtime.
+    for_each(m_AllocatorsAddedByThisRuntime.begin(), m_AllocatorsAddedByThisRuntime.end(),
+             [](BackendId id) {BackendRegistryInstance().DeregisterAllocator(id);});
+
     ARMNN_LOG(info) << "Shutdown time: " << std::setprecision(2)
                     << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
 }

@@ -1568,8 +1568,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                               const OptimizerOptions& options,
                               Optional<std::vector<std::string>&> messages)
 {
-    const auto start_time = armnn::GetTimeNow();
-
     ARMNN_LOG(debug) << options.ToString();
 
     // Enable profiling
@@ -1749,9 +1747,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_AddCompatibilityLayers");
         optGraph.AddCompatibilityLayers(backends, tensorHandleFactoryRegistry);
     }
-
-    ARMNN_LOG(info) << "!! New time !! : " << std::setprecision(2)
-                    << std::fixed << armnn::GetTimeDuration(start_time).count() << " ms.";
 
     return optNet;
 }

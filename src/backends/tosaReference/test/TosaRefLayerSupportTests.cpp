@@ -509,4 +509,46 @@ TEST_CASE("IsLayerSupportedTosaReferenceTransposeConv2dUnsupported")
     CHECK(!supported);
 }
 
+TEST_CASE("IsLayerSupportedTosaReferenceTranspose")
+{
+    TensorShape inShape = { 1, 1, 5, 3 };
+    TensorShape outShape = { 1, 5, 1, 3 };
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
+
+    TransposeDescriptor transposeDescriptor = TransposeDescriptor({ 0, 2, 1 ,3 });
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Transpose,
+                                                     {in, out},
+                                                     transposeDescriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceTransposeUnsupported")
+{
+    TensorShape inShape = { 1, 1, 5, 3 };
+    TensorShape outShape = { 1, 5, 1, 3 };
+    TensorInfo in(inShape, DataType::Signed64);
+    TensorInfo out(outShape, DataType::Signed64);
+
+    TransposeDescriptor transposeDescriptor = TransposeDescriptor({ 0, 2, 1 ,3 });
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Transpose,
+                                                     {in, out},
+                                                     transposeDescriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+}
+
 }

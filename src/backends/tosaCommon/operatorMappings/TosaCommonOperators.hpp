@@ -14,3 +14,4 @@
 #include "ReshapeOperator.hpp"
 #include "SliceOperator.hpp"
 #include "TransposeConv2dOperator.hpp"
+#include "TransposeOperator.hpp"

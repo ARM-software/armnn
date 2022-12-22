@@ -158,6 +158,14 @@ inline void VerifyTosaAttribute(const BaseDescriptor& descriptor,
             CHECK(stride == transposeConvAttribute.stride());
             break;
         }
+        case LayerType::Transpose:
+        {
+            auto transposeDesc = PolymorphicDowncast<const TransposeDescriptor*>(&descriptor);
+            std::vector<int> outPerm(transposeDesc->m_DimMappings.begin(), transposeDesc->m_DimMappings.end());
+            TosaTransposeAttribute transposeAttribute(attribute);
+            CHECK(outPerm == transposeAttribute.perms());
+            break;
+        }
         default:
             break;
     }

@@ -664,6 +664,64 @@ TEST_CASE("GetTosaMappingFromLayer_TransposeConv2dLayer")
                         LayerType::TransposeConvolution2d);
 }
 
+TEST_CASE("GetTosaMapping_TransposeLayer")
+{
+    TensorInfo inputInfo  = TensorInfo({ 1, 1, 5, 3 }, DataType::Float32, 0.0f, 0, true);
+    TensorInfo outputInfo = TensorInfo({ 1, 5, 1, 3 }, DataType::Float32, 0.0f, 0, true);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 1, 5, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 5, 1, 3 }};
+
+    TransposeDescriptor transposeDescriptor = TransposeDescriptor({ 0, 2, 1 ,3 });
+
+    TosaSerializationBasicBlock* basicBlock =
+        GetTosaMapping(nullptr, LayerType::Transpose, {&inputInfo,}, {&outputInfo}, transposeDescriptor);
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_TRANSPOSE,
+                                        Attribute_TransposeAttribute,
+                                        transposeDescriptor,
+                                        LayerType::Transpose);
+}
+
+TEST_CASE("GetTosaMappingFromLayer_TransposeLayer")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    TransposeDescriptor transposeDescriptor = TransposeDescriptor({ 0, 2, 1 ,3 });
+
+    IConnectableLayer* input     = net->AddInputLayer(0, "input0");
+    IConnectableLayer* transpose = net->AddTransposeLayer(transposeDescriptor, "transpose");
+    IConnectableLayer* output    = net->AddOutputLayer(0, "output");
+
+    input->GetOutputSlot(0).Connect(transpose->GetInputSlot(0));
+    transpose->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    TensorInfo inputInfo  = TensorInfo({ 1, 1, 5, 3 }, DataType::Float32, 0.0f, 0, true);
+    TensorInfo outputInfo = TensorInfo({ 1, 5, 1, 3 }, DataType::Float32, 0.0f, 0, true);
+
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    transpose->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 1, 5, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 5, 1, 3 }};
+
+    TosaSerializationBasicBlock* basicBlock =
+        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(transpose));
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_TRANSPOSE,
+                                        Attribute_TransposeAttribute,
+                                        transposeDescriptor,
+                                        LayerType::Transpose);
+}
+
 TEST_CASE("GetTosaMapping_Unimplemented")
 {
     TosaSerializationBasicBlock* basicBlock =

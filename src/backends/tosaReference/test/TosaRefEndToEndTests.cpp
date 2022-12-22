@@ -14,6 +14,7 @@
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/TransposeEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
@@ -193,6 +194,12 @@ TEST_CASE("TosaRefSimpleTransposeConvolution2dEndToEndFloatNhwcTest")
 {
     SimpleTransposeConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(
         tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Transpose
+TEST_CASE("TosaRefTransposeEndtoEndTestFloat32")
+{
+    TransposeEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
 }
 
 }

@@ -79,6 +79,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto transposeConv2dDesc = PolymorphicDowncast<const TransposeConvolution2dDescriptor*>(&descriptor);
             return ConvertTransposeConv2dToTosaOperator(layer, inputs, outputs, transposeConv2dDesc);
         }
+        case LayerType::Transpose:
+        {
+            auto transposeDesc = PolymorphicDowncast<const TransposeDescriptor*>(&descriptor);
+            return ConvertTransposeToTosaOperator(layer, inputs, outputs, transposeDesc);
+        }
         default:
         {
             return CreateEmptyTosaSerializationBasicBlock();

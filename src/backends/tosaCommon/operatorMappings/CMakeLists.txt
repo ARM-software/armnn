@@ -23,6 +23,8 @@ list(APPEND armnnTosaBackendOperators_sources
         TosaOperatorUtils.hpp
         TransposeConv2dOperator.hpp
         TransposeConv2dOperator.cpp
+        TransposeOperator.hpp
+        TransposeOperator.cpp
     )
 
 add_library(armnnTosaBackendOperators OBJECT ${armnnTosaBackendOperators_sources})

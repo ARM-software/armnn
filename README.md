@@ -15,7 +15,7 @@
 
 # Arm NN
 
-**_Arm NN_** is the **most performant** machine learning (ML) inference engine for Android and Linux, accelerating ML
+**Arm NN** is the **most performant** machine learning (ML) inference engine for Android and Linux, accelerating ML
 on **Arm Cortex-A CPUs and Arm Mali GPUs**. This ML inference engine is an open source SDK which bridges the gap
 between existing neural network frameworks and power-efficient Arm IP.
 

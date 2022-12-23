@@ -118,17 +118,6 @@ def test_optimizer_options_fail():
 
     assert "Wrong number or type of arguments" in str(err.value)
 
-    with pytest.raises(RuntimeError) as err:
-        OptimizerOptions(True,
-                         False,
-                         True,
-                         ShapeInferenceMethod_InferAndValidate,
-                         True,
-                         [a],
-                         True)
-
-    assert "BFloat16 and Float16 optimization cannot be enabled at the same time" in str(err.value)
-
     with pytest.raises(TypeError) as err:
         oo = OptimizerOptions(True,
                               False,

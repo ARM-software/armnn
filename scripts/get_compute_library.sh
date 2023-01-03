@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2018-2022 Arm Ltd. All rights reserved.
+# Copyright © 2018-2023 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_11" # Release 22.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="e317baf74dd6206932877e254350b9ab913426f1" #8804: Optimize MeanReduce by integer acc. and removing upfront dequant. | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8804
+DEFAULT_CLFRAMEWORKREVISION="3558c5840e7c973e2b1a86ae3a9335b44cad59d4" #8877: Add temporary tile support for dynamic fusion | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8877
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

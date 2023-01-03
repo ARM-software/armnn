@@ -55,4 +55,9 @@ unsigned int GetNumElementsAfter(const armnn::TensorShape& shape, unsigned int a
 
 std::pair<unsigned int, std::vector<float>> GetPerAxisParams(const armnn::TensorInfo& info);
 
+template<typename PrimitiveType>
+std::unique_ptr<float[]> ToFloatArray(const std::vector<PrimitiveType>& data, const armnn::TensorInfo& tensorInfo);
+
+std::unique_ptr<float[]> ToFloatArray(const std::vector<uint8_t>& data, const armnn::TensorInfo& tensorInfo);
+
 } // namespace armnnUtils

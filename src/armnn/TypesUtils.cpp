@@ -82,3 +82,7 @@ float armnn::Dequantize<int16_t>(int16_t value, float scale, int32_t offset);
 /// Explicit specialization of Dequantize for int32_t
 template
 float armnn::Dequantize<int32_t>(int32_t value, float scale, int32_t offset);
+
+/// Explicit specialization of Dequantize for int64_t
+template
+float armnn::Dequantize<int64_t>(int64_t value, float scale, int32_t offset);

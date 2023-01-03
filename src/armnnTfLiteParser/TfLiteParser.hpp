@@ -242,7 +242,13 @@ private:
     };
 
     bool ShouldConstantTensorBeCreated(unsigned int tensorIndex);
+
     bool IsConstTensor(TensorRawPtr tensorPtr);
+
+    bool ShouldConstantTensorBeConverted(TfLiteParserImpl::TensorRawPtr tensorPtr,
+                                         armnn::DataType inputDataType,
+                                         armnn::DataType filterDataType);
+
     armnn::ConstTensor CreateConstTensorNonPermuted(TensorRawPtr tensorPtr,
                                                     armnn::TensorInfo& tensorInfo);
 
@@ -250,6 +256,7 @@ private:
     CreateConstTensorPermuted(TensorRawPtr tensorPtr,
                               armnn::TensorInfo& tensorInfo,
                               armnn::Optional<armnn::PermutationVector&> permutationVector);
+
     std::pair<armnn::ConstTensor, std::unique_ptr<float[]>>
     CreateConstTensorNonPermuted(TensorRawPtr tensorPtr,
                                  armnn::TensorInfo& tensorInfo,
@@ -261,6 +268,7 @@ private:
                                   TfLiteParserImpl::TensorRawPtr tensorPtr,
                                   armnn::TensorInfo& tensorInfo,
                                   armnn::Optional<armnn::PermutationVector&> permutationVector);
+
     std::pair<armnn::ConstTensor*, std::unique_ptr<float[]>>
     CreateConstTensorPtr(TensorRawPtr tensorPtr,
                          armnn::TensorInfo& inputTensorInfo);

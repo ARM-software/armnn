@@ -673,7 +673,7 @@ struct Conv2FloatWithInt8WeightsAndBiasesFixture : Conv2DWithBiasesFixture
                                       "[ 1, 2, 2, 1 ]",    // filterShape
                                       "[ 2,1, 0,6 ]",      // filterData
                                       "[ 1 ]",             // biasShape
-                                      "[ 10, 0, 0, 0 ]",   // biasData
+                                      "[ 10 ]",            // biasData
                                       "1",                 // stride w and h
                                       "NONE",              // activation
                                       "1.0",               // filterScale

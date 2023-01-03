@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -168,11 +168,6 @@ TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
     armnn::RuntimeImpl runtime(options);
 
     unsigned int shiftedId = 0;
-
-    if (armnn::BackendRegistryInstance().IsBackendRegistered("EthosNAcc"))
-    {
-        shiftedId = 4;
-    }
 
     // Check if the MockBackends 3 dummy counters {0, 1, 2-5 (four cores)} are registered
     armnn::BackendId mockId = armnn::MockBackendId();

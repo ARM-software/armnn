@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -438,13 +438,13 @@ void TransposeConvFp32Test(std::vector<armnn::BackendId>& backends)
 TEST_SUITE("TransposeConv_CpuRef_Test")
 {
 
-TEST_CASE ("TransposeConv_Fp32_Test")
+TEST_CASE ("TransposeConv_CpuRef_Fp32_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     TransposeConvFp32Test(backends);
 }
 
-TEST_CASE ("TransposeConv_Int8_Test")
+TEST_CASE ("TransposeConv_CpuRef_Int8_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     TransposeConvInt8Test(backends);
@@ -455,13 +455,13 @@ TEST_CASE ("TransposeConv_Int8_Test")
 TEST_SUITE("TransposeConv_CpuAcc_Test")
 {
 
-TEST_CASE ("TransposeConv_Fp32_Test")
+TEST_CASE ("TransposeConv_CpuAcc_Fp32_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
     TransposeConvFp32Test(backends);
 }
 
-TEST_CASE ("TransposeConv_Int8_Test")
+TEST_CASE ("TransposeConv_CpuAcc_Int8_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
     TransposeConvInt8Test(backends);
@@ -472,13 +472,13 @@ TEST_CASE ("TransposeConv_Int8_Test")
 TEST_SUITE("TransposeConv_GpuAcc_Test")
 {
 
-TEST_CASE ("TransposeConv_Fp32_Test")
+TEST_CASE ("TransposeConv_GpuAcc_Fp32_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     TransposeConvFp32Test(backends);
 }
 
-TEST_CASE ("TransposeConv_Int8_Test")
+TEST_CASE ("TransposeConv_GpuAcc_Int8_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     TransposeConvInt8Test(backends);

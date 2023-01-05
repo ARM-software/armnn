@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -286,7 +286,7 @@ TEST_CASE ("Concatenation_Three_Inputs_GpuAcc_Test")
     ConcatThreeInputsTest(backends);
 }
 
-TEST_CASE ("Concatenation_Axis_CpuRef_Test")
+TEST_CASE ("Concatenation_Axis_GpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     ConcatAxisTest(backends);

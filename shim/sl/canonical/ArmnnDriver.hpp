@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,18 +28,26 @@ namespace armnn_driver
 
 //using namespace android::nn;
 
-class ArmnnDriver : public ArmnnDevice, public IDevice
+class ArmnnDriver : public IDevice
 {
+private:
+    std::unique_ptr<ArmnnDevice> m_Device;
 public:
-
     ArmnnDriver(DriverOptions options)
-        : ArmnnDevice(std::move(options))
     {
-        VLOG(DRIVER) << "ArmnnDriver::ArmnnDriver()";
-    }
-    ~ArmnnDriver()
-    {
-        VLOG(DRIVER) << "ArmnnDriver::~ArmnnDriver()";
+        try
+        {
+            VLOG(DRIVER) << "ArmnnDriver::ArmnnDriver()";
+            m_Device = std::unique_ptr<ArmnnDevice>(new ArmnnDevice(std::move(options)));
+        }
+        catch (armnn::InvalidArgumentException& ex)
+        {
+            VLOG(DRIVER) << "ArmnnDevice failed to initialise: " << ex.what();
+        }
+        catch (...)
+        {
+            VLOG(DRIVER) << "ArmnnDevice failed to initialise with an unknown error";
+        }
     }
 
 public:
@@ -80,17 +88,18 @@ public:
     const Capabilities& getCapabilities() const override
     {
         VLOG(DRIVER) << "ArmnnDriver::GetCapabilities()";
-        return ArmnnDriverImpl::GetCapabilities(m_Runtime);
+        return ArmnnDriverImpl::GetCapabilities(m_Device->m_Runtime);
     }
 
     std::pair<uint32_t, uint32_t> getNumberOfCacheFilesNeeded() const override
     {
         VLOG(DRIVER) << "ArmnnDriver::getNumberOfCacheFilesNeeded()";
         unsigned int numberOfCachedModelFiles = 0;
-        for (auto& backend : m_Options.GetBackends())
+        for (auto& backend : m_Device->m_Options.GetBackends())
         {
             numberOfCachedModelFiles += GetNumberOfCacheFiles(backend);
-            VLOG(DRIVER) << "ArmnnDriver::getNumberOfCacheFilesNeeded() = " << std::to_string(numberOfCachedModelFiles);
+            VLOG(DRIVER) << "ArmnnDriver::getNumberOfCacheFilesNeeded() = "
+                         << std::to_string(numberOfCachedModelFiles);
         }
         return std::make_pair(numberOfCachedModelFiles, 1ul);
     }
@@ -104,22 +113,26 @@ public:
     GeneralResult<std::vector<bool>> getSupportedOperations(const Model& model) const override
     {
         VLOG(DRIVER) << "ArmnnDriver::getSupportedOperations()";
+        if (m_Device.get() == nullptr)
+        {
+            return NN_ERROR(ErrorStatus::DEVICE_UNAVAILABLE) << "Device Unavailable!";
+        }
 
         std::stringstream ss;
         ss << "ArmnnDriverImpl::getSupportedOperations()";
         std::string fileName;
         std::string timestamp;
-        if (!m_Options.GetRequestInputsAndOutputsDumpDir().empty())
+        if (!m_Device->m_Options.GetRequestInputsAndOutputsDumpDir().empty())
         {
             ss << " : "
-               << m_Options.GetRequestInputsAndOutputsDumpDir()
+               << m_Device->m_Options.GetRequestInputsAndOutputsDumpDir()
                << "/"
                // << GetFileTimestamp()
                << "_getSupportedOperations.txt";
         }
         VLOG(DRIVER) << ss.str().c_str();
 
-        if (!m_Options.GetRequestInputsAndOutputsDumpDir().empty())
+        if (!m_Device->m_Options.GetRequestInputsAndOutputsDumpDir().empty())
         {
             //dump the marker file
             std::ofstream fileStream;
@@ -133,7 +146,7 @@ public:
         }
 
         std::vector<bool> result;
-        if (!m_Runtime)
+        if (!m_Device->m_Runtime)
         {
             return NN_ERROR(ErrorStatus::DEVICE_UNAVAILABLE) << "Device Unavailable!";
         }
@@ -145,9 +158,9 @@ public:
         }
 
         // Attempt to convert the model to an ArmNN input network (INetwork).
-        ModelToINetworkTransformer modelConverter(m_Options.GetBackends(),
+        ModelToINetworkTransformer modelConverter(m_Device->m_Options.GetBackends(),
                                                   model,
-                                                  m_Options.GetForcedUnsupportedOperations());
+                                                  m_Device->m_Options.GetForcedUnsupportedOperations());
 
         if (modelConverter.GetConversionResult() != ConversionResult::Success
             && modelConverter.GetConversionResult() != ConversionResult::UnsupportedFeature)
@@ -179,6 +192,10 @@ public:
     {
         VLOG(DRIVER) << "ArmnnDriver::prepareModel()";
 
+        if (m_Device.get() == nullptr)
+        {
+            return NN_ERROR(ErrorStatus::DEVICE_UNAVAILABLE) << "Device Unavailable!";
+        }
         // Validate arguments.
         if (const auto result = validate(model); !result.ok()) {
             return NN_ERROR(ErrorStatus::INVALID_ARGUMENT) << "Invalid Model: " << result.error();
@@ -196,15 +213,15 @@ public:
             return NN_ERROR(ErrorStatus::MISSED_DEADLINE_PERSISTENT);
         }
 
-        return ArmnnDriverImpl::PrepareArmnnModel(m_Runtime,
-                                                  m_ClTunedParameters,
-                                                  m_Options,
-                                                  model,
-                                                  modelCache,
-                                                  dataCache,
-                                                  token,
-                                                  model.relaxComputationFloat32toFloat16 && m_Options.GetFp16Enabled(),
-                                                  priority);
+        return ArmnnDriverImpl::PrepareArmnnModel(m_Device->m_Runtime,
+            m_Device->m_ClTunedParameters,
+            m_Device->m_Options,
+            model,
+            modelCache,
+            dataCache,
+            token,
+            model.relaxComputationFloat32toFloat16 && m_Device->m_Options.GetFp16Enabled(),
+            priority);
     }
 
     GeneralResult<SharedPreparedModel> prepareModelFromCache(OptionalTimePoint deadline,
@@ -213,20 +230,23 @@ public:
                                                              const CacheToken& token) const override
     {
         VLOG(DRIVER) << "ArmnnDriver::prepareModelFromCache()";
-
+        if (m_Device.get() == nullptr)
+        {
+            return NN_ERROR(ErrorStatus::DEVICE_UNAVAILABLE) << "Device Unavailable!";
+        }
         // Check if deadline has passed.
         if (hasDeadlinePassed(deadline)) {
             return NN_ERROR(ErrorStatus::MISSED_DEADLINE_PERSISTENT);
         }
 
         return ArmnnDriverImpl::PrepareArmnnModelFromCache(
-                     m_Runtime,
-                     m_ClTunedParameters,
-                     m_Options,
+                     m_Device->m_Runtime,
+                     m_Device->m_ClTunedParameters,
+                     m_Device->m_Options,
                      modelCache,
                      dataCache,
                      token,
-                     m_Options.GetFp16Enabled());
+                     m_Device->m_Options.GetFp16Enabled());
     }
 
     GeneralResult<SharedBuffer> allocate(const BufferDesc&,

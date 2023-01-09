@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -4907,7 +4907,7 @@ TfLiteParserImpl::CreateConstTensorNonPermuted(TensorRawPtr tensorPtr,
             std::unique_ptr<float[]> data = armnnUtils::ToFloatArray(bufferPtr->data, tensorInfo);
             return std::make_pair(ConstTensor(constTensorInfo, data.get()), std::move(data));
         }
-        catch (armnn::InvalidArgumentException)
+        catch (InvalidArgumentException&)
         {
             throw ParseException(
                     fmt::format("Unsupported input/weights combination:  Input {} not supported with Weights {}",
@@ -4941,7 +4941,7 @@ TfLiteParserImpl::CreateConstTensorPtr(TensorRawPtr tensorPtr, armnn::TensorInfo
             std::unique_ptr<float[]> data = armnnUtils::ToFloatArray(bufferPtr->data, tensorInfo);
             return std::make_pair(new ConstTensor(constTensorInfo, data.get()), std::move(data));
         }
-        catch (armnn::InvalidArgumentException)
+        catch (InvalidArgumentException&)
         {
             throw ParseException(
                     fmt::format("Unsupported input/weights combination:  Input {} not supported with Weights {}",

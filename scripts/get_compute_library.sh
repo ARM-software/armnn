@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_11" # Release 22.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="3558c5840e7c973e2b1a86ae3a9335b44cad59d4" #8877: Add temporary tile support for dynamic fusion | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8877
+DEFAULT_CLFRAMEWORKREVISION="f800adf185e966b16385f65b9c7250766949dbe4" #8881: Implement dynamic fusion reshape operator | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8881
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

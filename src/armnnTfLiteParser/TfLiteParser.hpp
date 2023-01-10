@@ -1,9 +1,10 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
+#include <armnn/Descriptors.hpp>
 #include "armnn/INetwork.hpp"
 #include "armnnTfLiteParser/ITfLiteParser.hpp"
 #include "armnn/Types.hpp"
@@ -204,6 +205,9 @@ private:
                              armnn::IConnectableLayer* layer,
                              const std::vector<unsigned int>& tensorIndexes);
 
+    void SetupInputLayerTensorInfos(size_t subgraphIndex);
+    void SetupConstantLayerTensorInfos(size_t subgraphIndex);
+
     void SetupInputLayers(size_t subgraphIndex);
     void SetupOutputLayers(size_t subgraphIndex);
     void SetupConstantLayers(size_t subgraphIndex);
@@ -273,7 +277,23 @@ private:
     CreateConstTensorPtr(TensorRawPtr tensorPtr,
                          armnn::TensorInfo& inputTensorInfo);
 
-    // Settings for configuring the TfLiteParser
+    armnn::TensorInfo InputTensorInfo(size_t subgraphIndex,
+                                      size_t operatorIndex,
+                                      int input);
+
+    armnn::TensorInfo OutputTensorInfoFromInputs(size_t subgraphIndex,
+                                       size_t operatorIndex,
+                                       armnn::IConnectableLayer* layer,
+                                       int output,
+                                       std::vector<int> inputs);
+
+    armnn::TensorInfo OutputTensorInfoFromShapes(size_t subgraphIndex,
+                                       size_t operatorIndex,
+                                       armnn::IConnectableLayer* layer,
+                                       int output = 0,
+                                       std::vector<armnn::TensorShape> inputShapes = {});
+
+    /// Settings for configuring the TfLiteParser
     armnn::Optional<ITfLiteParser::TfLiteParserOptions> m_Options;
 
     /// The network we're building. Gets cleared after it is passed to the user
@@ -300,10 +320,11 @@ private:
 
     /// This is used in case that the model does not specify the output.
     /// The shape can be calculated from the options.
-    std::vector<std::vector<unsigned int>> m_OverridenOutputShapes;
+    std::vector<std::vector<unsigned int>> m_OverriddenOutputShapes;
 
     std::vector<unsigned int> m_ConstantsToDequantize;
     std::vector<unsigned int> m_ConstantsToBeCreated;
+    std::map<size_t, armnn::TensorInfo> m_TensorInfos;
 };
 
 }

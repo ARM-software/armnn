@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -49,28 +49,44 @@ void DetectionPostProcessLayer::ValidateTensorShapesFromInputs()
 
     ARMNN_ASSERT_MSG(GetNumOutputSlots() == 4, "DetectionPostProcessLayer: The layer should return 4 outputs.");
 
-    unsigned int detectedBoxes = m_Param.m_MaxDetections * m_Param.m_MaxClassesPerDetection;
+    std::vector<TensorShape> inferredShapes = InferOutputShapes(
+            { GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
+              GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
 
-    const TensorShape& inferredDetectionBoxes = TensorShape({ 1, detectedBoxes, 4 });
-    const TensorShape& inferredDetectionScores = TensorShape({ 1, detectedBoxes });
-    const TensorShape& inferredNumberDetections = TensorShape({ 1 });
+    ARMNN_ASSERT(inferredShapes.size() == 4);
+    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
+    ARMNN_ASSERT(inferredShapes[1].GetDimensionality() == Dimensionality::Specified);
+    ARMNN_ASSERT(inferredShapes[2].GetDimensionality() == Dimensionality::Specified);
+    ARMNN_ASSERT(inferredShapes[3].GetDimensionality() == Dimensionality::Specified);
 
-    ValidateAndCopyShape(outputShape, inferredDetectionBoxes, m_ShapeInferenceMethod, "DetectionPostProcessLayer");
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DetectionPostProcessLayer");
 
     ValidateAndCopyShape(GetOutputSlot(1).GetTensorInfo().GetShape(),
-                         inferredDetectionScores,
+                         inferredShapes[1],
                          m_ShapeInferenceMethod,
                          "DetectionPostProcessLayer", 1);
 
     ValidateAndCopyShape(GetOutputSlot(2).GetTensorInfo().GetShape(),
-                         inferredDetectionScores,
+                         inferredShapes[2],
                          m_ShapeInferenceMethod,
                          "DetectionPostProcessLayer", 2);
 
     ValidateAndCopyShape(GetOutputSlot(3).GetTensorInfo().GetShape(),
-                         inferredNumberDetections,
+                         inferredShapes[3],
                          m_ShapeInferenceMethod,
                          "DetectionPostProcessLayer", 3);
+}
+
+std::vector<TensorShape> DetectionPostProcessLayer::InferOutputShapes(const std::vector<TensorShape>&) const
+{
+    unsigned int detectedBoxes = m_Param.m_MaxDetections * m_Param.m_MaxClassesPerDetection;
+
+    std::vector<TensorShape> results;
+    results.push_back({ 1, detectedBoxes, 4 });
+    results.push_back({ 1, detectedBoxes });
+    results.push_back({ 1, detectedBoxes });
+    results.push_back({ 1 });
+    return results;
 }
 
 Layer::ConstantTensors DetectionPostProcessLayer::GetConstantTensorsByRef()

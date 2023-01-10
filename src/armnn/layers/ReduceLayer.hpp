@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Samsung Electronics Co Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Samsung Electronics Co Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -23,12 +23,17 @@ public:
     /// @param [in] graph The graph into which this layer is being cloned.
     ReduceLayer* Clone(Graph& graph) const override;
 
+    /// By default returns inputShapes if the number of inputs are equal to number of outputs,
+    /// otherwise infers the output shapes from given input shapes and layer properties.
+    /// @param [in] inputShapes The input shapes layer has.
+    /// @return A vector to the inferred output shape.
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
+
     /// Check if the input tensor shape(s)
     /// will lead to a valid configuration of @ref ReduceLayer.
     void ValidateTensorShapesFromInputs() override;
 
     void ExecuteStrategy(IStrategy& strategy) const override;
-
 
 protected:
     /// Constructor to create a ReduceLayer.

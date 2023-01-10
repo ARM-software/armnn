@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,6 +33,12 @@ public:
     /// will lead to a valid configuration of @ref DetectionPostProcessLayer.
     /// @param [in] shapeInferenceMethod Indicates if output shape shall be overwritten or just validated.
     void ValidateTensorShapesFromInputs() override;
+
+    /// The model does not specify the output shapes. The output shapes are calculated from the max_detection and
+    /// max_classes_per_detection parameters in the DetectionPostProcessDescriptor.
+    /// @param [in] inputShapes The input shapes layer has. These are ignored for DetectionPostProcessLayer.
+    /// @return A vector to the inferred output shape.
+    std::vector<TensorShape> InferOutputShapes(const std::vector<TensorShape>& inputShapes) const override;
 
     void ExecuteStrategy(IStrategy& strategy) const override;
 

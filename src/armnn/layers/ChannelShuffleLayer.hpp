@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -26,7 +26,6 @@ public:
     /// @param [in] shapeInferenceMethod Indicates if output shape shall be overwritten or just validated.
     void ValidateTensorShapesFromInputs() override;
 
-    // TODO Do you need to create an InferOutputShapes function for ChannelShuffle?
 protected:
     ChannelShuffleLayer(const ChannelShuffleDescriptor& param, const char* name);
 

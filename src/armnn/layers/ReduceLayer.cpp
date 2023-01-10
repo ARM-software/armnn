@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Samsung Electronics Co Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Samsung Electronics Co Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -53,6 +53,19 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
     ARMNN_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
                      "ReduceLayer: Reduce supports up to 4D input.");
 
+    std::vector<TensorShape> inferredShapes = InferOutputShapes( {input.GetShape() });
+
+    ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ReduceLayer");
+}
+
+std::vector<TensorShape> ReduceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+{
+    ARMNN_ASSERT(inputShapes.size() == 1);
+    const TensorShape& input = inputShapes[0];
+
+    ARMNN_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
+                     "ReduceLayer: Reduce supports up to 4D input.");
+
     unsigned int rank = input.GetNumDimensions();
     unsigned int outputRank = 0;
 
@@ -87,7 +100,7 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
         {
             if (std::find(m_Param.m_vAxis.begin(), m_Param.m_vAxis.end(), i) == m_Param.m_vAxis.end())
             {
-                dimSizes[outputIndex] = armnn::numeric_cast<unsigned int>(input.GetShape()[i]);
+                dimSizes[outputIndex] = armnn::numeric_cast<unsigned int>(input[i]);
                 ++outputIndex;
             }
             else if (m_Param.m_KeepDims)
@@ -97,9 +110,7 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
             }
         }
     }
-    const TensorShape& inferredShape = TensorShape(outputRank, dimSizes.data());
-
-    ValidateAndCopyShape(outputShape, inferredShape, m_ShapeInferenceMethod, "ReduceLayer");
+    return std::vector<TensorShape>({ TensorShape(outputRank, dimSizes.data()) });
 }
 
 void ReduceLayer::ExecuteStrategy(IStrategy& strategy) const

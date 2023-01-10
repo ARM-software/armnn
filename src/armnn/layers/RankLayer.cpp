@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,6 +29,11 @@ Layer* RankLayer::Clone(Graph& graph) const
 {
     RankLayer* clone = CloneBase<RankLayer>(graph, GetName());
     return clone;
+}
+
+std::vector<TensorShape> RankLayer::InferOutputShapes(const std::vector<TensorShape>&) const
+{
+    return std::vector<TensorShape>({ TensorShape(Dimensionality::Scalar) });
 }
 
 void RankLayer::ValidateTensorShapesFromInputs()

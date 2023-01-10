@@ -77,27 +77,51 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Elu, ClContextControlFixture, EluTest)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DSimpleFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul2DSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DSimpleInt8,
+                                 ClContextControlFixture,
+                                 BatchMatMul2DSimpleTest<DataType::QAsymmS8>);
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DSimpleFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul3DSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DSimpleInt8,
+                                 ClContextControlFixture,
+                                 BatchMatMul3DSimpleTest<DataType::QAsymmS8>);
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMulNCHWSimpleFloat32,
                                  ClContextControlFixture,
                                  BatchMatMulNCHWSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMulNCHWSimpleFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMulNCHWSimpleTest<DataType::QAsymmS8>);
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DBatchFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul3DBatchTest<DataType::Float32>);
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DBroadcastFloat32,
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DBatchInt8,
+                                 ClContextControlFixture,
+                                 BatchMatMul3DBatchTest<DataType::QAsymmS8>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_BatchMatMul3DBroadcastFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul3DBroadcastTest<DataType::Float32>);
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3D2DBroadcastFloat32,
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_BatchMatMul3DBroadcastInt8,
+                                 ClContextControlFixture,
+                                 BatchMatMul3DBroadcastTest<DataType::QAsymmS8>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_BatchMatMul3D2DBroadcastFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul3D2DBroadcastTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(UNSUPPORTED_BatchMatMul3D2DBroadcastInt8,
+                                 ClContextControlFixture,
+                                 BatchMatMul3D2DBroadcastTest<DataType::QAsymmS8>);
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DTinyFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul2DTinyTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DTinyInt8,
+                                 ClContextControlFixture,
+                                 BatchMatMul2DTinyTest<DataType::QAsymmS8>);
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DTranspSimpleFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul2DTranspSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DTranspSimpleInt8,
+                                 ClContextControlFixture,
+                                 BatchMatMul2DTranspSimpleTest<DataType::QAsymmS8>);
 
 // Batch To Space
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcFloat321,

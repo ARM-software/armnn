@@ -311,6 +311,7 @@ where N = batches, C = channels, H = height, W = width
       <table>
        <tr><th>
        <tr><td>FLOAT32
+       <tr><td>QASYMMS8
       </table>
 <tr>
   <td rowspan="3">BatchNormalizationLayer

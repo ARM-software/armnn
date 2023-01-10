@@ -720,7 +720,8 @@ bool ClLayerSupport::IsBatchMatMulSupported(const TensorInfo& inputX,
                                    inputX,
                                    inputY,
                                    output,
-                                   descriptor);
+                                   descriptor,
+                                   nullptr);
 }
 
 bool ClLayerSupport::IsBatchNormalizationSupported(const TensorInfo& input,

@@ -303,7 +303,7 @@ namespace armnnDelegate
     {
         // Set input data
         std::vector<int32_t> LHSInputShape { 2,2,2 };
-        std::vector<int32_t> RHSInputShape { 1,2,2 };
+        std::vector<int32_t> RHSInputShape { 2,2 };
         std::vector<int32_t> outputShape   { 2,2,2 };
 
         std::vector<int8_t> LHSInputValues = { 1, 2,
@@ -680,6 +680,7 @@ namespace armnnDelegate
             BatchMatMul2DInt8SimpleAdjointTest(backends);
         }
     }
+
     TEST_SUITE("BATCH_MATMUL_GpuAccTests")
     {
         TEST_CASE("BATCH_MATMUL_Fp32_GpuAccTests")
@@ -689,11 +690,20 @@ namespace armnnDelegate
             BatchMatMul3DFp32SimpleTest       (backends);
             BatchMatMul4DFp32SimpleTest       (backends);
             BatchMatMul3DFp32BatchTest        (backends);
-            BatchMatMul3DFp32BroadcastTest    (backends);
-            BatchMatMul3D2DFp32BroadcastTest  (backends);
             BatchMatMul2DFp32TinyTest         (backends);
             BatchMatMulNonSquareFp32Test      (backends);
             BatchMatMul2DFp32SimpleAdjointTest(backends);
+        }
+
+        TEST_CASE("BATCH_MATMUL_Int8_GpuAccTests")
+        {
+            std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+            BatchMatMul2DInt8SimpleTest       (backends);
+            BatchMatMul3DInt8SimpleTest       (backends);
+            BatchMatMul3DInt8BatchTest        (backends);
+            BatchMatMul2DInt8TinyTest         (backends);
+            BatchMatMulNonSquareInt8Test      (backends);
+            BatchMatMul2DInt8SimpleAdjointTest(backends);
         }
     }
 }

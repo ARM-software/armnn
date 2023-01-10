@@ -8,6 +8,7 @@
 #include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/AdditionEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
+#include <backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
@@ -54,6 +55,17 @@ TEST_CASE("ClAdditionEndToEndFloat32Test")
 TEST_CASE("ClAdditionEndToEndUint8Test")
 {
     AdditionEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends);
+}
+
+// Batch Mat Mul
+TEST_CASE("ClBatchMatMulEndToEndFloat32Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClBatchMatMulEndToEndInt8Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::QAsymmS8>(clDefaultBackends);
 }
 
 // Constant

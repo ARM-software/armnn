@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -359,9 +359,9 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::string>()->default_value("parser"))
 
                 ("C, compare-output",
-                 "Number of Arm NN threads to use when running the network asynchronously via the Arm NN thread pool. "
-                 "The default is set to 0 which equals disabled. If 'thread-pool-size' is greater than 0 the "
-                 "'concurrent' option is automatically set to true.",
+                 "Compare the output of the network with an output file that has been previously "
+                 "produced by running a network through ExecuteNetwork. See --write-outputs-to-file "
+                 "to produce an output file for an execution.",
                  cxxopts::value<std::string>(m_ExNetParams.m_ComparisonFile))
 
                 ("B, compare-output-with-backend",

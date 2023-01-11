@@ -205,8 +205,20 @@ TfLiteIntArray* Delegate::IdentifyOperatorsToDelegate(TfLiteContext* tfLiteConte
             continue;
         }
 
-        if (ArmnnSubgraph::VisitNode(
-                   delegateData, tfLiteContext, tfLiteRegistration, tfLiteNode, nodeIndex) != kTfLiteOk)
+        TfLiteStatus visitStatus;
+
+        try
+        {
+            visitStatus = ArmnnSubgraph::VisitNode(
+                    delegateData, tfLiteContext, tfLiteRegistration, tfLiteNode, nodeIndex);
+        }
+        catch(std::exception& ex)
+        {
+            ARMNN_LOG(error) << "ArmNN Failed to visit node with error: " << ex.what();
+            visitStatus = kTfLiteError;
+        }
+
+        if ( visitStatus != kTfLiteOk)
         {
             // node is not supported by ArmNN
             unsupportedOperators.insert(tfLiteRegistration->builtin_code);
@@ -376,7 +388,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
         ARMNN_LOG(info) << "Optimize ArmnnSubgraph time: " << std::setprecision(2)
                         << std::fixed << armnn::GetTimeDuration(optimizeStartTime).count() << " ms";
     }
-    catch (std::exception &ex)
+    catch (std::exception& ex)
     {
         std::stringstream exMessage;
         exMessage << "TfLiteArmnnDelegate: Exception (" << ex.what() << ") caught from optimize.";

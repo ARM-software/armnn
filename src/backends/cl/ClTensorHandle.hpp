@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -18,7 +18,7 @@
 #include <arm_compute/core/TensorShape.h>
 #include <arm_compute/core/Coordinates.h>
 
-#include <cl/IClTensorHandle.hpp>
+#include <aclCommon/IClTensorHandle.hpp>
 
 namespace armnn
 {

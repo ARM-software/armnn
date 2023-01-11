@@ -1,13 +1,10 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
-#include "armnn/IRuntime.hpp"
-
-#include <arm_compute/runtime/CL/CLTuner.h>
-#include <arm_compute/runtime/CL/CLGEMMHeuristicsHandle.h>
+#include <aclCommon/ArmComputeTuningUtils.hpp>
 
 namespace armnn
 {
@@ -40,21 +37,6 @@ private:
     arm_compute::CLGEMMHeuristicsHandle* m_HeuristicsHandle;
 
     bool m_ProfilingEnabled;
-};
-
-class ClTunedParameters : public IGpuAccTunedParameters
-{
-public:
-    ClTunedParameters(armnn::IGpuAccTunedParameters::Mode mode, armnn::IGpuAccTunedParameters::TuningLevel tuningLevel);
-
-    virtual void Load(const char* filename);
-    virtual void Save(const char* filename) const;
-
-    Mode m_Mode;
-    TuningLevel m_TuningLevel;
-
-    arm_compute::CLTuner m_Tuner;
-    arm_compute::CLGEMMHeuristicsHandle m_HeuristicsHandle;
 };
 
 } // namespace armnn

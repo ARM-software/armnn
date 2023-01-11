@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -59,84 +59,6 @@ struct ClBackendContext::ClContextControlWrapper
     ClContextControl m_ClContextControl;
 };
 
-std::string LowerString(std::string value)
-{
-    std::transform(value.begin(), value.end(), value.begin(),
-                   [](unsigned char c){ return std::tolower(c); });
-
-    return value;
-}
-
-enum class TuningLevel
-{
-    None,
-    Rapid,
-    Normal,
-    Exhaustive
-};
-
-
-TuningLevel ParseTuningLevel(const BackendOptions::Var& value, TuningLevel defaultValue)
-{
-    if (value.IsInt())
-    {
-        int v = value.AsInt();
-        if (v > static_cast<int>(TuningLevel::Exhaustive) ||
-            v < static_cast<int>(TuningLevel::None))
-        {
-            ARMNN_LOG(warning) << "Invalid GpuAcc tuning level ("<< v << ") selected. "
-                                  "Using default(" << static_cast<int>(defaultValue) << ")";
-        } else
-        {
-            return static_cast<TuningLevel>(v);
-        }
-    }
-    return defaultValue;
-}
-
-bool ParseBoolean(const BackendOptions::Var& value, bool defaultValue)
-{
-    if (value.IsBool())
-    {
-        return value.AsBool();
-    }
-    return defaultValue;
-}
-
-std::string ParseFile(const BackendOptions::Var& value, std::string defaultValue)
-{
-    if (value.IsString())
-    {
-        return value.AsString();
-    }
-    return defaultValue;
-}
-
-void ConfigureTuner(arm_compute::CLTuner &tuner, TuningLevel level)
-{
-    tuner.set_tune_new_kernels(true); // Turn on tuning initially.
-
-    switch (level)
-    {
-        case TuningLevel::Rapid:
-            ARMNN_LOG(info) << "Gpu tuning is activated. TuningLevel: Rapid (1)";
-            tuner.set_tuner_mode(arm_compute::CLTunerMode::RAPID);
-            break;
-        case TuningLevel::Normal:
-            ARMNN_LOG(info) << "Gpu tuning is activated. TuningLevel: Normal (2)";
-            tuner.set_tuner_mode(arm_compute::CLTunerMode::NORMAL);
-            break;
-        case TuningLevel::Exhaustive:
-            ARMNN_LOG(info) << "Gpu tuning is activated. TuningLevel: Exhaustive (3)";
-            tuner.set_tuner_mode(arm_compute::CLTunerMode::EXHAUSTIVE);
-            break;
-        case TuningLevel::None:
-        default:
-            tuner.set_tune_new_kernels(false); // Turn off tuning. Set to "use" only mode.
-            break;
-    }
-}
-
 ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
     : IBackendContext(options)
     , m_TuningFile()
@@ -191,17 +113,17 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
             {
                 if (name == "KernelProfilingEnabled")
                 {
-                    kernelProfiling |= ParseBoolean(value, false);
+                    kernelProfiling |= ParseBooleanBackendOption(value, false);
                 } else if (name == "TuningFile")
                 {
-                    m_TuningFile = ParseFile(value, "");
+                    m_TuningFile = ParseStringBackendOption(value, "");
                 } else if (name == "TuningLevel")
                 {
                     tuningLevel = ParseTuningLevel(value, defaultTuningLevel);
                 }
                 else if (name == "MLGOTuningFilePath")
                 {
-                    m_MLGOTuningFile = ParseFile(value, "");
+                    m_MLGOTuningFile = ParseStringBackendOption(value, "");
                 }
             });
 

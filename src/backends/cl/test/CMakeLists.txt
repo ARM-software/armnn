@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -8,6 +8,7 @@ list(APPEND armnnClBackendUnitTests_sources
     ClContextControlFixture.hpp
     ClContextSerializerTests.cpp
     ClCustomAllocatorTests.cpp
+    ClDefaultAllocatorTests.cpp
     ClCreateWorkloadTests.cpp
     ClEndToEndTests.cpp
     ClImportTensorHandleFactoryTests.cpp
@@ -18,7 +19,6 @@ list(APPEND armnnClBackendUnitTests_sources
     ClOptimizedNetworkTests.cpp
     ClRuntimeTests.cpp
     ClWorkloadFactoryHelper.hpp
-    DefaultAllocatorTests.cpp
     Fp16SupportTest.cpp
     ICLTensorProxyTests.cpp
     OpenClTimerTest.cpp

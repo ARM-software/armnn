@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -44,7 +44,6 @@ if(ARMCOMPUTECL)
         ClTensorHandleFactory.hpp
         ClWorkloadFactory.cpp
         ClWorkloadFactory.hpp
-        IClTensorHandle.hpp
         ICLTensorProxy.hpp
         OpenClTimer.cpp
         OpenClTimer.hpp

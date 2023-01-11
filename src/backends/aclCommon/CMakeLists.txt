@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd. All rights reserved.
+# Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -8,9 +8,12 @@ list(APPEND armnnAclCommon_sources
     ArmComputeTensorHandle.hpp
     ArmComputeTensorUtils.hpp
     ArmComputeTensorUtils.cpp
+    ArmComputeTuningUtils.hpp
+    ArmComputeTuningUtils.cpp
     ArmComputeUtils.hpp
     BaseMemoryManager.cpp
     BaseMemoryManager.hpp
+    IClTensorHandle.hpp
 )
 
 if(BUILD_UNIT_TESTS)

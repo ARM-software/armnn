@@ -9,6 +9,7 @@
 
 COMMON_SOURCES := \
     ArmComputeTensorUtils.cpp \
+    ArmComputeTuningUtils.cpp \
     BaseMemoryManager.cpp
 
 # COMMON_TEST_SOURCES contains the list of files to be included

@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 ARM Ltd. All rights reserved.
+# Copyright © 2017,2023 Arm Ltd and Contributors.  All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -9,8 +9,12 @@
 
 COMMON_SOURCES := \
     ArmComputeTensorUtils.cpp \
-    ArmComputeTuningUtils.cpp \
     BaseMemoryManager.cpp
+
+ifeq ($(ARMNN_COMPUTE_CL_ENABLED),1)
+COMMON_SOURCES += \
+    ArmComputeTuningUtils.cpp
+endif # ARMNN_COMPUTE_CL_ENABLED == 1
 
 # COMMON_TEST_SOURCES contains the list of files to be included
 # in the Android unit test build (armnn-tests) and it is picked

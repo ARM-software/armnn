@@ -8,13 +8,18 @@ list(APPEND armnnAclCommon_sources
     ArmComputeTensorHandle.hpp
     ArmComputeTensorUtils.hpp
     ArmComputeTensorUtils.cpp
-    ArmComputeTuningUtils.hpp
-    ArmComputeTuningUtils.cpp
     ArmComputeUtils.hpp
     BaseMemoryManager.cpp
     BaseMemoryManager.hpp
     IClTensorHandle.hpp
 )
+
+if(ARMCOMPUTECL)
+    list(APPEND armnnAclCommon_sources
+        ArmComputeTuningUtils.hpp
+        ArmComputeTuningUtils.cpp
+    )
+endif()
 
 if(BUILD_UNIT_TESTS)
     add_subdirectory(test)

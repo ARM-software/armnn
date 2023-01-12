@@ -469,7 +469,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = UnidirectionalSequenceLstm
+    LastLayer = BatchMatMul
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

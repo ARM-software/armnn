@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -50,6 +50,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     QuantizedLstmEndToEndTestImpl.cpp
     QuantizedLstmEndToEndTestImpl.hpp
     RankEndToEndTestImpl.hpp
+    ReduceEndToEndTestImpl.hpp
     ReshapeEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp

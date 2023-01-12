@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,6 +18,8 @@
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
@@ -271,6 +273,29 @@ TEST_CASE("ClPreluEndToEndTestUint8")
     PreluEndToEndPositiveTest<armnn::DataType::QAsymmU8>(clDefaultBackends);
 }
 
+// Reduce
+TEST_CASE("ClReduceEndToEndTest")
+{
+    ReduceEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClReduceEndToEndTestFloat16")
+{
+    ReduceEndToEnd<armnn::DataType::Float16>(clDefaultBackends);
+}
+
+// Reshape
+TEST_CASE("ClReshapeEndToEndTest")
+{
+    ReshapeEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClReshapeEndToEndTestFloat16")
+{
+    ReshapeEndToEndFloat16<armnn::DataType::Float16>(clDefaultBackends);
+}
+
+// Space to depth
 TEST_CASE("ClSpaceToDepthNhwcEndToEndTest1")
 {
     SpaceToDepthNhwcEndToEndTest1(clDefaultBackends);
@@ -291,6 +316,7 @@ TEST_CASE("ClSpaceToDepthNchwEndToEndTest2")
     SpaceToDepthNchwEndToEndTest2(clDefaultBackends);
 }
 
+// Split
 TEST_CASE("ClSplitter1dEndToEndTest")
 {
     Splitter1dEndToEnd<armnn::DataType::Float32>(clDefaultBackends);

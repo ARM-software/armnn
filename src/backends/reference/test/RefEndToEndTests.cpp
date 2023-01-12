@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,6 +28,8 @@
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/RankEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -1438,6 +1440,28 @@ TEST_CASE("RefRankEndToEndTestQSymmS16")
 TEST_CASE("RefRankEndToEndTestQSymmS8")
 {
     RankEndToEnd<armnn::DataType::QSymmS8>(defaultBackends);
+}
+
+// Reduce
+TEST_CASE("RefReduceEndToEndTest")
+{
+    ReduceEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefReduceEndToEndTestFloat16")
+{
+    ReduceEndToEnd<armnn::DataType::Float16>(defaultBackends);
+}
+
+// Reshape
+TEST_CASE("RefReshapeEndToEndTest")
+{
+    ReshapeEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefReshapeEndToEndTestFloat16")
+{
+    ReshapeEndToEndFloat16<armnn::DataType::Float16>(defaultBackends);
 }
 
 TEST_CASE("RefForceImportWithAlignedBuffersEndToEndTest")

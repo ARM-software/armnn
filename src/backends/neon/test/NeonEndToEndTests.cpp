@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,6 +20,8 @@
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
@@ -177,42 +179,42 @@ TEST_CASE("NeonConcatEndToEndDim3Uint8Test")
 }
 
 // DepthToSpace
-TEST_CASE("DephtToSpaceEndToEndNchwFloat32")
+TEST_CASE("NeonDephtToSpaceEndToEndNchwFloat32")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNchwFloat16")
+TEST_CASE("NeonDephtToSpaceEndToEndNchwFloat16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNchwUint8")
+TEST_CASE("NeonDephtToSpaceEndToEndNchwUint8")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNchwInt16")
+TEST_CASE("NeonDephtToSpaceEndToEndNchwInt16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcFloat32")
+TEST_CASE("NeonDephtToSpaceEndToEndNhwcFloat32")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcFloat16")
+TEST_CASE("NeonDephtToSpaceEndToEndNhwcFloat16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcUint8")
+TEST_CASE("NeonDephtToSpaceEndToEndNhwcUint8")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcInt16")
+TEST_CASE("NeonDephtToSpaceEndToEndNhwcInt16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
@@ -476,7 +478,7 @@ TEST_CASE("NeonFillEndToEndTest")
     FillEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
-TEST_CASE("RefFillEndToEndTestFloat16")
+TEST_CASE("NeonFillEndToEndTestFloat16")
 {
     FillEndToEnd<armnn::DataType::Float16>(neonDefaultBackends);
 }
@@ -585,6 +587,28 @@ TEST_CASE("NeonArgMaxAxis3TestQuantisedAsymm8")
 TEST_CASE("NeonArgMinAxis3TestQuantisedAsymm8")
 {
     ArgMinAxis3EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
+}
+
+// Reduce
+TEST_CASE("NeonReduceEndToEndTest")
+{
+    ReduceEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonReduceEndToEndTestFloat16")
+{
+    ReduceEndToEnd<armnn::DataType::Float16>(neonDefaultBackends);
+}
+
+// Reshape
+TEST_CASE("NeonReshapeEndToEndTest")
+{
+    ReshapeEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonReshapeEndToEndTestFloat16")
+{
+    ReshapeEndToEndFloat16<armnn::DataType::Float16>(neonDefaultBackends);
 }
 
 TEST_CASE("NeonStridedSliceInvalidSliceEndToEndTest")

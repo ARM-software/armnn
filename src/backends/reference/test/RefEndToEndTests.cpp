@@ -43,46 +43,43 @@ TEST_SUITE("RefEndToEnd")
 {
 std::vector<armnn::BackendId> defaultBackends = {armnn::Compute::CpuRef};
 
+// ElementwiseUnary
 // Abs
 TEST_CASE("RefAbsEndToEndTestFloat32")
 {
-    std::vector<float> expectedOutput =
-    {
-        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
-        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
-    };
-
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
-                                                             UnaryOperation::Abs,
-                                                             expectedOutput);
+                                                             UnaryOperation::Abs);
 }
 
 TEST_CASE("RefAbsEndToEndTestUint8")
 {
-    // Note the expected output will be implicitly quantized by the below test function
-    std::vector<float> expectedOutput =
-    {
-        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
-        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
-    };
-
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
-                                                                     UnaryOperation::Abs,
-                                                                     expectedOutput);
+                                                              UnaryOperation::Abs);
 }
 
 TEST_CASE("RefAbsEndToEndTestInt16")
 {
-    // Note the expected output will be implicitly quantized by the below test function
-    std::vector<float> expectedOutput =
-    {
-        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
-        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
-    };
-
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::QSymmS16>(defaultBackends,
-                                                                     UnaryOperation::Abs,
-                                                                     expectedOutput);
+                                                              UnaryOperation::Abs);
+}
+
+// Rsqrt
+TEST_CASE("RefRsqrtEndToEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
+                                                             UnaryOperation::Rsqrt);
+}
+
+TEST_CASE("RefRsqrtEndToEndTestUint8")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
+                                                              UnaryOperation::Rsqrt);
+}
+
+TEST_CASE("RefRsqrtEndToEndTestInt16")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QSymmS16>(defaultBackends,
+                                                              UnaryOperation::Rsqrt);
 }
 
 // Addition

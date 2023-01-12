@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -68,6 +68,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             }
             break;
         }
+        case LayerType::ElementwiseUnary:
         case LayerType::Pooling2d:
         case LayerType::Reshape:
         case LayerType::Slice:
@@ -89,7 +90,8 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             break;
         }
         default:
-            break;
+            // Default to false for all unsupported layers.
+            return false;
     }
 
     auto mappings = GetTosaMapping(nullptr, type, inputInfos, outputInfos, descriptor);

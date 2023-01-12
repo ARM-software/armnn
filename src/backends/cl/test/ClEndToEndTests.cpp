@@ -31,18 +31,18 @@ TEST_SUITE("ClEndToEnd")
 {
 std::vector<armnn::BackendId> clDefaultBackends = {armnn::Compute::GpuAcc};
 
+// ElementwiseUnary
 // Abs
 TEST_CASE("ClAbsEndToEndTestFloat32")
 {
-    std::vector<float> expectedOutput =
-    {
-        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
-        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
-    };
-
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends,
-                                                             UnaryOperation::Abs,
-                                                             expectedOutput);
+                                                             UnaryOperation::Abs);
+}
+// Rsqrt
+TEST_CASE("ClRsqrtEndToEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends,
+                                                             UnaryOperation::Rsqrt);
 }
 
 // Addition

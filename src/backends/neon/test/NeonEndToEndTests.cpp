@@ -33,18 +33,18 @@ TEST_SUITE("NeonEndToEnd")
 {
 std::vector<armnn::BackendId> neonDefaultBackends = {armnn::Compute::CpuAcc};
 
+// ElementwiseUnary
 // Abs
 TEST_CASE("NeonAbsEndToEndTestFloat32")
 {
-    std::vector<float> expectedOutput =
-    {
-        1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
-        3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f
-    };
-
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends,
-                                                             UnaryOperation::Abs,
-                                                             expectedOutput);
+                                                             UnaryOperation::Abs);
+}
+// Rsqrt
+TEST_CASE("NeonRsqrtEndToEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends,
+                                                             UnaryOperation::Rsqrt);
 }
 
 // Constant

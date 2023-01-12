@@ -1,5 +1,5 @@
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -14,6 +14,8 @@ list(APPEND armnnTosaBackendOperators_sources
         Conv2dOperator.cpp
         ElementwiseBinaryOperator.hpp
         ElementwiseBinaryOperator.cpp
+        ElementwiseUnaryOperator.cpp
+        ElementwiseUnaryOperator.hpp
         Pooling2DOperator.hpp
         Pooling2DOperator.cpp
         ReshapeOperator.hpp

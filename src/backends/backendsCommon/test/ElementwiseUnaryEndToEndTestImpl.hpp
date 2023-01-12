@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2020-2021, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -47,8 +47,7 @@ INetworkPtr CreateElementwiseUnaryNetwork(const TensorShape& inputShape,
 template<armnn::DataType ArmnnInType,
          typename TInput = armnn::ResolveType<ArmnnInType>>
 void ElementwiseUnarySimpleEndToEnd(const std::vector<BackendId>& backends,
-                                    UnaryOperation operation,
-                                    const std::vector<float> expectedOutput)
+                                    UnaryOperation operation)
 {
     using namespace armnn;
 
@@ -63,8 +62,30 @@ void ElementwiseUnarySimpleEndToEnd(const std::vector<BackendId>& backends,
 
     CHECK(net);
 
-    const std::vector<float> input({ 1, -1, 1, 1,  5, -5, 5, 5,
-                                       -3, 3, 3, 3,  4, 4, -4, 4 });
+    std::vector<float> input;
+    std::vector<float> expectedOutput;
+    switch(operation)
+    {
+        case UnaryOperation::Abs:
+            input = { 1, -1, 1, 1,  5, -5, 5, 5,
+                      -3, 3, 3, 3,  4, 4, -4, 4 };
+            expectedOutput = { 1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
+                               3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f };
+            break;
+        case UnaryOperation::Rsqrt:
+            input = { 1, 1, 1, 1,  5, 5, 5, 5,
+                      3, 3, 3, 3,  4, 4, 4, 4 };
+            expectedOutput = { 1.f, 1.f, 1.f, 1.f, 0.447214f, 0.447214f, 0.447214f, 0.447214f,
+                               0.57735f, 0.57735f, 0.57735f, 0.57735f, 0.5f, 0.5f, 0.5f, 0.5f };
+            break;
+        default:
+            input = { 1, -1, 1, 1,  5, -5, 5, 5,
+                      -3, 3, 3, 3,  4, 4, -4, 4 };
+            expectedOutput = { 1.f, 1.f, 1.f, 1.f, 5.f, 5.f, 5.f, 5.f,
+                               3.f, 3.f, 3.f, 3.f, 4.f, 4.f, 4.f, 4.f };
+            break;
+    }
+
 
     // quantize data
     std::vector<TInput> qInputData      = armnnUtils::QuantizedVector<TInput>(input, qScale, qOffset);

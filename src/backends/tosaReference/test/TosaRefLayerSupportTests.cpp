@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -366,6 +366,46 @@ TEST_CASE("IsLayerSupportedTosaReferenceReshapeUnsupported")
     std::string reasonIfNotSupported;
     auto supported = supportChecker.IsLayerSupported(LayerType::Reshape,
                                                      {in, out},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceRsqrt")
+{
+    TensorShape shape0 = {2,2};
+    TensorShape outShape = {2,2};
+    TensorInfo in0(shape0, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
+
+    ElementwiseUnaryDescriptor desc(UnaryOperation::Rsqrt);
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::ElementwiseUnary,
+                                                     {in0, out},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceRsqrtUnsupported")
+{
+    TensorShape shape0 = {1,1,3,4};
+    TensorShape outShape = {1,3,1,4};
+    TensorInfo in0(shape0, DataType::Signed64);
+    TensorInfo out(outShape, DataType::Signed64);
+
+    ElementwiseUnaryDescriptor desc(UnaryOperation::Rsqrt);
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::ElementwiseUnary,
+                                                     {in0, out},
                                                      desc,
                                                      EmptyOptional(),
                                                      EmptyOptional(),

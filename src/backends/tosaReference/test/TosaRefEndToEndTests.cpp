@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,6 +11,7 @@
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
@@ -136,6 +137,12 @@ TEST_CASE("TosaRefReshapeEndtoEndTestInt32")
 TEST_CASE("TosaRefReshapeEndtoEndTestFloat16")
 {
     ReshapeEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefRsqrtEndtoEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends,
+                                                             UnaryOperation::Rsqrt);
 }
 
 // Slice

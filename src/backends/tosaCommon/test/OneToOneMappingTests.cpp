@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -251,6 +251,56 @@ TEST_CASE("GetTosaMappingFromLayer_Conv2dLayer")
     TosaSerializationBasicBlock* basicBlock = GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(convLayer));
     AssertTosaOneToOneMappingBasicBlock(
         basicBlock, inputShape, outputShape, Op_CONV2D, Attribute_ConvAttribute, descriptor, LayerType::Convolution2d);
+}
+TEST_CASE("GetTosaMapping_ElementwiseUnaryLayerRsqrt")
+{
+    TensorInfo inputInfo  = TensorInfo({ 2, 2 }, DataType::Float32, 0.0f, 0, true);
+    TensorInfo outputInfo = TensorInfo({ 2, 2 }, DataType::Float32, 0.0f, 0, true);
+    std::vector<std::vector<int32_t>> inputShape  = {{ 2, 2 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 2, 2 }};
+
+    ElementwiseUnaryDescriptor unaryDescriptor = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMapping(nullptr, LayerType::ElementwiseUnary, {&inputInfo,}, {&outputInfo}, unaryDescriptor);
+
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        tosa::Op_RSQRT,
+                                        tosa::Attribute_NONE,
+                                        unaryDescriptor,
+                                        LayerType::ElementwiseUnary);
+}
+TEST_CASE("GetTosaMappingFromLayer_ElementwiseUnaryLayerRsqrt")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+    ElementwiseUnaryDescriptor unaryDescriptor = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);
+    IConnectableLayer* input     = net->AddInputLayer(0, "input0");
+    IConnectableLayer* unaryRsqrt = net->AddElementwiseUnaryLayer(unaryDescriptor, "rsqrt");
+    IConnectableLayer* output    = net->AddOutputLayer(0, "output");
+
+    input->GetOutputSlot(0).Connect(unaryRsqrt->GetInputSlot(0));
+    unaryRsqrt->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+    TensorInfo inputInfo  = TensorInfo({ 2, 2 }, DataType::Float32, 0.0f, 0, true);
+    TensorInfo outputInfo = TensorInfo({ 2, 2 }, DataType::Float32, 0.0f, 0, true);
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    unaryRsqrt->GetOutputSlot(0).SetTensorInfo(outputInfo);
+    std::vector<std::vector<int32_t>> inputShape  = {{ 2, 2 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 2, 2 }};
+
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(unaryRsqrt));
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        tosa::Op_RSQRT,
+                                        tosa::Attribute_NONE,
+                                        unaryDescriptor,
+                                        LayerType::ElementwiseUnary);
 }
 
 TEST_CASE("GetTosaMapping_MultiplicationLayer")

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,6 +28,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         case LayerType::Subtraction:
         {
             return ConvertElementwiseBinaryToTosaOperator(layer, type, inputs, outputs);
+        }
+        case LayerType::ElementwiseUnary:
+        {
+            auto unaryDesc = PolymorphicDowncast<const ElementwiseUnaryDescriptor*>(&descriptor);
+            return ConvertElementwiseUnaryOperator(layer, inputs, outputs, unaryDesc);
         }
         case LayerType::Concat:
         {

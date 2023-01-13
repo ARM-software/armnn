@@ -60,3 +60,21 @@ The DefaultAsyncExeuteWithThreads test seems to be throwing intermittent segment
 Arm NN delegate build fails with "undefined reference to `absl::lts_20220623::raw_logging_internal::RawLog"
 ----------------------------------------------------------
 This build failure occurs because Tensorflow 2.10 has been built with GCC version older than 9.3.1. The solution is to rebuild with 9.3.1 or later.
+
+
+How can I run a pretrained model using Arm NN?.
+-----------------------------------------------
+The easiest way is to use Arm NN's tool ExecuteNetwork, the source code for this tool is located in armnn/tests/ExecuteNetwork/. This tool is highly configurable allowing multiple options to specify different parameters and it has profiling capabilities which can be enabled by specifying the option --event-based-profiling.
+
+An example of running a model with ExecuteNetwork:
+~~~
+LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH ./ExecuteNetwork -f tflite-binary -m ./my_test_model.tflite -c CpuAcc,CpuRef
+~~~
+In the command above we specify two backends, if the an operator required by the model is not supported in the first backend CpuAcc Arm NN will try to use the second backend CpuRef.
+
+Arm NN Multithreading support.
+------------------------------
+Running multiple inferences in multiple threads concurrently is not supported, but concurrent inferences can be executed in multiple processes and a simple way to do this is by using Arm NN's ExecuteNetwork.
+ArmNN supports multithreading at kernel level and this is implemented in Arm Compute Library (ACL) (https://github.com/ARM-software/ComputeLibrary/).
+During inference, at the operator level, the main thread will create multiple threads and execute the same kernel on different parts of the data. At runtime ACL will detect the number of CPU cores in the system and use one thread per cpu core for each kernel.
+Multithreading at operator level is not supported due to limitations in ACL, for more information please refer to https://arm-software.github.io/ComputeLibrary/latest/architecture.xhtml#architecture_thread_safety

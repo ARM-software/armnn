@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -99,6 +99,12 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     uint32_t inputRank = tfLiteTensors[tfLiteNode->inputs->data[0]].dims->size;
 
     auto* concatenationParameters = reinterpret_cast<TfLiteConcatenationParams*>(tfLiteNode->builtin_data);
+
+    if(!concatenationParameters)
+    {
+        throw armnn::Exception(&"TfLiteArmnnDelegate: Concat parameters are null in: " [ nodeIndex]);
+    }
+
     const unsigned int concatDimInput = static_cast<unsigned int>(
             (static_cast<int>(inputRank) + concatenationParameters->axis) % static_cast<int>(inputRank));
 
@@ -116,6 +122,17 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+    // Verify we support the fused activation before attempting to create a layer
+    TfLiteFusedActivation activationType = concatenationParameters->activation;
+
+    const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+    TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
+                                                                    outputTensorInfo, activationType);
+    if(activationStatus != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
 
     // Check if supported
     bool isSupported = false;
@@ -158,14 +175,13 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
     Connect(concatenationLayer, tfLiteNode, delegateData);
 
-    if (!concatenationParameters)
+    if (activationType == kTfLiteActNone)
     {
         // No Activation
         return kTfLiteOk;
     }
 
-    // Check activation
-    TfLiteFusedActivation activationType = concatenationParameters->activation;
+    // Check and Create activation
     return FusedActivation(tfLiteContext, tfLiteNode, activationType, concatenationLayer, 0, delegateData);
 }
 

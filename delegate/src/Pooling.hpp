@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -49,6 +49,22 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
+    auto* tfLiteNodeParameters = reinterpret_cast<TfLitePoolParams*>(tfLiteNode->builtin_data);
+    TfLiteFusedActivation activationType;
+    if (tfLiteNodeParameters)
+    {
+        activationType = tfLiteNodeParameters->activation;
+
+        const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+        TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
+                                                                        outputTensorInfo, activationType);
+        if(activationStatus != kTfLiteOk)
+        {
+            return kTfLiteError;
+        }
+
+    }
+
     armnn::PoolingAlgorithm poolingAlgorithm;
     switch(tfLitePoolingOperatorCode)
     {
@@ -68,20 +84,19 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
     armnn::Pooling2dDescriptor descriptor;
     descriptor.m_PoolType = poolingAlgorithm;
 
-    auto* params = reinterpret_cast<TfLitePoolParams*>(tfLiteNode->builtin_data);
-    descriptor.m_PoolWidth = params->filter_width;
-    descriptor.m_PoolHeight = params->filter_height;
-    descriptor.m_StrideX = params->stride_width;
-    descriptor.m_StrideY = params->stride_height;
+    descriptor.m_PoolWidth = tfLiteNodeParameters->filter_width;
+    descriptor.m_PoolHeight = tfLiteNodeParameters->filter_height;
+    descriptor.m_StrideX = tfLiteNodeParameters->stride_width;
+    descriptor.m_StrideY = tfLiteNodeParameters->stride_height;
     descriptor.m_DataLayout = armnn::DataLayout::NHWC;
 
     unsigned int inputHeight = inputTensorInfo.GetShape()[1];
     unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
 
     CalcPadding(inputHeight, descriptor.m_PoolHeight, descriptor.m_StrideY, 1u,
-                descriptor.m_PadTop, descriptor.m_PadBottom, params->padding);
+                descriptor.m_PadTop, descriptor.m_PadBottom, tfLiteNodeParameters->padding);
     CalcPadding(inputWidth, descriptor.m_PoolWidth, descriptor.m_StrideX, 1u,
-                descriptor.m_PadLeft, descriptor.m_PadRight, params->padding);
+                descriptor.m_PadLeft, descriptor.m_PadRight, tfLiteNodeParameters->padding);
 
     bool isSupported = false;
     armnn::BackendId setBackend;
@@ -112,8 +127,7 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
     Connect(poolingLayer, tfLiteNode, delegateData);
 
-    // Check activation
-    TfLiteFusedActivation activationType = params->activation;
+    // Check and create activation
     return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData);
 }
 
@@ -216,36 +230,6 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
     CalcPadding(inputDepth, descriptor.m_PoolDepth, descriptor.m_StrideZ, 1u,
                 descriptor.m_PadFront, descriptor.m_PadBack, padding);
 
-    // Validate the output info.
-    bool isSupported = false;
-    armnn::BackendId setBackend;
-    auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported) {
-        FORWARD_LAYER_SUPPORT_FUNC("POOLING_3D",
-                                   tfLiteContext,
-                                   IsPooling3dSupported,
-                                   delegateData.m_Backends,
-                                   isSupported,
-                                   setBackend,
-                                   inputTensorInfo,
-                                   outputTensorInfo,
-                                   descriptor);
-    };
-
-    if (!delegateData.m_Network)
-    {
-        validateFunc(outputTensorInfo, isSupported);
-        return isSupported ? kTfLiteOk : kTfLiteError;
-    }
-
-    // Create the Layer
-    armnn::IConnectableLayer* poolingLayer = delegateData.m_Network->AddPooling3dLayer(descriptor);
-    poolingLayer->SetBackendId(setBackend);
-    ARMNN_ASSERT(poolingLayer != nullptr);
-
-    // Create and set output slots
-    armnn::IOutputSlot& outputSlot = poolingLayer->GetOutputSlot(0);
-    outputSlot.SetTensorInfo(outputTensorInfo);
-    Connect(poolingLayer, tfLiteNode, delegateData);
 
     // Check activation by parsing the string from the flexbuffer map
     std::string activationTypeStr = m["activation"].AsString().str();
@@ -279,6 +263,46 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
     {
         activationType = kTfLiteActNone;
     }
+
+    const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+    TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
+                                                                    outputTensorInfo, activationType);
+    if(activationStatus != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
+
+
+    // Validate the output info.
+    bool isSupported = false;
+    armnn::BackendId setBackend;
+    auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported) {
+        FORWARD_LAYER_SUPPORT_FUNC("POOLING_3D",
+                                   tfLiteContext,
+                                   IsPooling3dSupported,
+                                   delegateData.m_Backends,
+                                   isSupported,
+                                   setBackend,
+                                   inputTensorInfo,
+                                   outputTensorInfo,
+                                   descriptor);
+    };
+
+    if (!delegateData.m_Network)
+    {
+        validateFunc(outputTensorInfo, isSupported);
+        return isSupported ? kTfLiteOk : kTfLiteError;
+    }
+
+    // Create the Layer
+    armnn::IConnectableLayer* poolingLayer = delegateData.m_Network->AddPooling3dLayer(descriptor);
+    poolingLayer->SetBackendId(setBackend);
+    ARMNN_ASSERT(poolingLayer != nullptr);
+
+    // Create and set output slots
+    armnn::IOutputSlot& outputSlot = poolingLayer->GetOutputSlot(0);
+    outputSlot.SetTensorInfo(outputTensorInfo);
+    Connect(poolingLayer, tfLiteNode, delegateData);
 
     return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData);
 }

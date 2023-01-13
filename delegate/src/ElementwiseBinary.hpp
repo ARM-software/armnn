@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -254,6 +254,21 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
+    auto* tfLiteNodeParameters = reinterpret_cast<TfLiteAddParams*>(tfLiteNode->builtin_data);
+    TfLiteFusedActivation activationType;
+    if (tfLiteNodeParameters)
+    {
+        activationType = tfLiteNodeParameters->activation;
+
+        const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+        TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
+                                                                        outputTensorInfo, activationType);
+        if(activationStatus != kTfLiteOk)
+        {
+            return kTfLiteError;
+        }
+    }
+
     if (!delegateData.m_Network)
     {
         switch(elementwiseBinaryOperatorCode)
@@ -361,14 +376,12 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    auto* tfLiteNodeParameters = reinterpret_cast<TfLiteAddParams*>(tfLiteNode->builtin_data);
     if (!tfLiteNodeParameters)
     {
         // No Activation
         return kTfLiteOk;
     }
-    // Check activation
-    TfLiteFusedActivation activationType = tfLiteNodeParameters->activation;
+    // Check and Create Activation
     return FusedActivation(tfLiteContext, tfLiteNode, activationType, elementwiseBinaryLayer, 0, delegateData);
 }
 

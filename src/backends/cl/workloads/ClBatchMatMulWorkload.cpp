@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -158,13 +158,13 @@ ClBatchMatMulWorkload::ClBatchMatMulWorkload(const BatchMatMulQueueDescriptor& d
     if (descriptor.m_Parameters.m_TransposeY == true)
     {
         armnn::PermutationVector permutationYVector
-                = GeneratePermutationVectorOnLastTwoDimensions(info.m_InputTensorInfos[0].GetNumDimensions());
-        const TensorInfo permutedYInfo = armnnUtils::Permuted(info.m_InputTensorInfos[0], permutationYVector);
+                = GeneratePermutationVectorOnLastTwoDimensions(info.m_InputTensorInfos[1].GetNumDimensions());
+        const TensorInfo permutedYInfo = armnnUtils::Permuted(info.m_InputTensorInfos[1], permutationYVector);
         const auto aclPermutationYVector = armcomputetensorutils::BuildArmComputePermutationVector(permutationYVector);
         armcomputetensorutils::BuildArmComputeTensor(m_PermutedTensorY, permutedYInfo);
         armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_PermutedTensorY);
 
-        std::unique_ptr<arm_compute::CLPermute> permuteLayerY(new arm_compute::CLPermute());
+        auto permuteLayerY = std::make_unique<arm_compute::CLPermute>();
         permuteLayerY->configure(clCompileContext,
                                  &inputY,
                                  &m_PermutedTensorY,

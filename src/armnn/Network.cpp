@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1731,8 +1731,17 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     else if (options.m_DebugToFile)
     {
         // Setup the output file path
-        armnnUtils::Filesystem::CreateDirectory("/ArmNNIntermediateLayerOutputs");
-        Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugToFileLayer()));
+        try
+        {
+            auto result = armnnUtils::Filesystem::CreateDirectory("/ArmNNIntermediateLayerOutputs");
+            ARMNN_LOG(info) << "Intermediate tensors will be written to: " << result;
+            Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugToFileLayer()));
+        }
+        catch (const armnn::RuntimeException& e)
+        {
+            // If we cannot create the output directory then we'll issue a warning and continue.
+            ARMNN_LOG(warning) << "Unable to print intermediate layer outputs : " << e.what();
+        }
     }
 
     // Calculate the compatibility strategies for tensor handles

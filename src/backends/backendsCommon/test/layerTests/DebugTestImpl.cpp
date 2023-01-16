@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -72,9 +72,8 @@ LayerTestResult<T, Dim> DebugTestImpl(
     {
         // Given that this is dependent on an ExNet switch, we need to explicitly set the directory that the
         //  files are stored in as this happens within the ExNet flow
-        fs::path tmpDir = fs::temp_directory_path();
-        armnnUtils::Filesystem::CreateDirectory("/ArmNNIntermediateLayerOutputs");
-        std::string full_path = tmpDir.generic_string() + "/ArmNNIntermediateLayerOutputs/" + layerName + ".numpy";
+        auto tmpDir = armnnUtils::Filesystem::CreateDirectory("/ArmNNIntermediateLayerOutputs");
+        std::string full_path = tmpDir + layerName + ".numpy";
 
         ExecuteWorkload(*workload, memoryManager);
 

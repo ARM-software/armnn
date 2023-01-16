@@ -1,11 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #if !defined(ARMNN_DISABLE_FILESYSTEM)
 
+#include <armnn/Exceptions.hpp>
 #include <armnnUtils/Filesystem.hpp>
-#include "armnn/Exceptions.hpp"
 
 namespace armnnUtils
 {
@@ -42,31 +42,54 @@ fs::path NamedTempFile(const char* fileName)
  *
  * @param path is the path required in the temporary directory.
  * @return path consisting of system temporary directory.
+ * @throws RuntimeException if the directory cannot be created or exists but cannot be removed.
  */
 std::string CreateDirectory(std::string path)
 {
+    // This line is very unlikely to throw an exception.
     fs::path tmpDir = fs::temp_directory_path();
-    mode_t permissions = 0733;
-    int result = 0;
-
     std::string full_path = tmpDir.generic_string() + path;
     if (fs::exists(full_path))
     {
-        fs::remove_all(full_path);
+        try
+        {
+            // This could throw an exception on a multi-user system.
+            fs::remove_all(full_path);
+        }
+        catch (const std::system_error& e)
+        {
+            std::string error = "Directory exists and cannot be removed. Reason: ";
+            error.append(e.what());
+            throw armnn::RuntimeException(error);
+        }
     }
-
 #if defined(_WIN32)
     result = _mkdir(full_path.c_str()); // can be used on Windows
     armnn::ConditionalThrow<armnn::RuntimeException>((result == 0), "Was unable to create temporary directory");
 #else
-    result = mkdir(full_path.c_str(), permissions);
-    armnn::ConditionalThrow<armnn::RuntimeException>((result == 0), "Was unable to create temporary directory");
+    try
+    {
+        if(!fs::create_directory(full_path))
+        {
+            throw armnn::RuntimeException("Unable to create directory: " + full_path);
+        }
+    }
+    catch (const std::system_error& e)
+    {
+        std::string error = "Unable to create directory. Reason: ";
+        error.append(e.what());
+        throw armnn::RuntimeException(error);
+    }
 #endif
 
     return full_path + "/";
 }
 
 FileContents ReadFileContentsIntoString(const std::string path) {
+    if (!fs::exists(path))
+    {
+        throw armnn::RuntimeException("Path does not exist: " + path);
+    }
     std::ifstream input_file(path);
     armnn::ConditionalThrow<armnn::RuntimeException>((input_file.is_open()), "Could not read file contents");
     return FileContents((std::istreambuf_iterator<char>(input_file)), std::istreambuf_iterator<char>());

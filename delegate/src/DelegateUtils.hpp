@@ -545,10 +545,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
 }
 
 armnn::ConstTensor CreateConstTensor(const TfLiteTensor* tfLiteTensor,
-                                     armnn::TensorInfo& tensorInfo,
-                                     armnn::Optional<armnn::PermutationVector&>
-                                             permutationVector = armnn::EmptyOptional(),
-                                     void* permutationData = nullptr)
+                                     const armnn::TensorInfo& tensorInfo)
 {
     if (tfLiteTensor->allocation_type != kTfLiteMmapRo)
     {
@@ -556,28 +553,7 @@ armnn::ConstTensor CreateConstTensor(const TfLiteTensor* tfLiteTensor,
             "TfLiteArmnnDelegate:  Not constant allocation type: " + std::to_string(tfLiteTensor->allocation_type));
     }
 
-    if(tflite::IsConstantTensor(tfLiteTensor))
-    {
-        tensorInfo.SetConstant();
-    }
-
-    if (permutationVector.has_value() && permutationVector.value().GetSize() > 0 && permutationData != nullptr)
-    {
-        // Permute tensor info
-        tensorInfo = armnnUtils::Permuted(tensorInfo, permutationVector.value());
-        // then permute data using the shape from permuted tensor info
-        armnnUtils::Permute(tensorInfo.GetShape(),
-                            permutationVector.value(),
-                            tfLiteTensor->data.data,
-                            permutationData,
-                            armnn::GetDataTypeSize(tensorInfo.GetDataType()));
-
-        return armnn::ConstTensor(tensorInfo, permutationData);
-    }
-    else
-    {
-        return armnn::ConstTensor(tensorInfo, tfLiteTensor->data.data);
-    }
+    return armnn::ConstTensor(tensorInfo, tfLiteTensor->data.data);
 }
 
 armnn::ConstTensor* GetConstTensorForTfLiteTensor(const TfLiteTensor* tfLiteTensors, TfLiteNode* tfLiteNode, int index)
@@ -611,7 +587,7 @@ void CalcPadding(uint32_t inputSize,
 }
 
 TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
-                             armnn::TensorInfo& constTensorInfo,
+                             const armnn::TensorInfo& constTensorInfo,
                              TfLiteContext* tfLiteContext,
                              const TfLiteTensor& tfLiteTensor,
                              armnnDelegate::DelegateData& data,
@@ -633,8 +609,7 @@ TfLiteStatus ConnectConstant(armnn::IConnectableLayer* layer,
     }
 
     auto constantInput = CreateConstTensor(&tfLiteTensor,
-                                           constTensorInfo,
-                                           armnn::Optional<armnn::PermutationVector&>());
+                                           constTensorInfo);
     armnn::IConnectableLayer* constantLayer = data.m_Network->AddConstantLayer(constantInput);
     constantLayer->SetBackendId(setBackend);
     armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
@@ -684,8 +659,7 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
                 return kTfLiteError;
             }
             auto constantInput = CreateConstTensor(&tfLiteInputTensor,
-                                                   inputTensorInfo,
-                                                   armnn::Optional<armnn::PermutationVector&>());
+                                                   inputTensorInfo);
             armnn::IConnectableLayer* constantLayer = delegateData.m_Network->AddConstantLayer(constantInput);
             constantLayer->SetBackendId(setBackend);
             armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);

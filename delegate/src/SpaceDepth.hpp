@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -68,6 +68,12 @@ TfLiteStatus VisitSpaceToDepthOperator(DelegateData& delegateData,
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
+
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
@@ -132,6 +138,12 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
+
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
 
     // Connect
     return Connect(layer, tfLiteNode, delegateData);

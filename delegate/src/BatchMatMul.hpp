@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -95,8 +95,13 @@ namespace armnnDelegate
 
         armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
         outputSlot.SetTensorInfo(outputTensorInfo);
-        Connect(layer, tfLiteNode, delegateData);
 
-        return kTfLiteOk;
+        // try to connect the Constant Inputs if there are any
+        if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+        {
+            return kTfLiteError;
+        }
+
+       return Connect(layer, tfLiteNode, delegateData);
     }
 } // namespace armnnDelegate

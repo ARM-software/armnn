@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -119,6 +119,12 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
 
     armnn::IOutputSlot& outputSlot = activationLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
+
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(activationLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
 
     // Connect
     return Connect(activationLayer, tfLiteNode, delegateData);

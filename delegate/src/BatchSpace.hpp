@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -103,6 +103,12 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
+
     // Connect
     return Connect(layer, tfLiteNode, delegateData);
 }
@@ -196,6 +202,12 @@ TfLiteStatus VisitSpaceToBatchNdOperator(DelegateData& delegateData,
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
+
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
 
     // Connect
     return Connect(layer, tfLiteNode, delegateData);

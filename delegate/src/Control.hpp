@@ -303,6 +303,13 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
 
     armnn::IOutputSlot& outputSlot = meanLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
+
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(meanLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
+
     return Connect(meanLayer, tfLiteNode, delegateData);
 }
 

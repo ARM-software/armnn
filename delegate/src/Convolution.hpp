@@ -115,7 +115,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
 
     }
 
-    armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
+    const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
     armnn::TensorInfo biasTensorInfo;
     if(biasEnabled)
@@ -181,12 +181,11 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddConvolution2dLayer(descriptor);
     layer->SetBackendId(setBackend);
 
-    if(tflite::IsConstantTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[1]]))
+    if(filterTensorInfo.IsConstant())
     {
         auto filter =
                 CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[1]],
-                                  filterTensorInfo,
-                                  armnn::Optional<armnn::PermutationVector &>());
+                                  filterTensorInfo);
 
         armnn::IConnectableLayer *weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
         weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
@@ -196,7 +195,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     if (biasEnabled)
     {
         const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
-        if(tflite::IsConstantTensor(&tfLiteBiasTensor))
+        if(biasTensorInfo.IsConstant())
         {
             auto biasTensor = CreateConstTensor(&tfLiteBiasTensor, biasTensorInfo);
             armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
@@ -204,6 +203,18 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
             biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
             biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensorInfo);
         }
+    }
+
+    // The data input can also be constant, so we must check that this is also allocated to an input slot
+    if(inputTensorInfo.IsConstant())
+    {
+        auto input =
+                CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[0]],
+                                  inputTensorInfo);
+
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
+        inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
 
     ARMNN_ASSERT(layer != nullptr);
@@ -290,7 +301,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
 
     }
 
-    armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
+    const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
     armnn::TensorInfo biasTensorInfo;
     if(biasEnabled)
@@ -354,11 +365,10 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
 
     // Add a constant layer for weights and biases if inputs are constant,
     // which are connected to the Convolution3d layer as inputs.
-    if (tflite::IsConstantTensor(&tfLiteFilterTensor))
+    if (filterTensorInfo.IsConstant())
     {
         auto filter = CreateConstTensor(&tfLiteFilterTensor,
-                                        filterTensorInfo,
-                                        armnn::Optional<armnn::PermutationVector&>());
+                                        filterTensorInfo);
 
         armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
         ARMNN_ASSERT(weightsLayer != nullptr);
@@ -370,11 +380,10 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     if(biasEnabled)
     {
         const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
-        if(tflite::IsConstantTensor(&tfLiteBiasTensor))
+        if(biasTensorInfo.IsConstant())
         {
             auto biases = CreateConstTensor(&tfLiteBiasTensor,
-                                            biasTensorInfo,
-                                            armnn::Optional<armnn::PermutationVector&>());
+                                            biasTensorInfo);
 
             armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biases);
             ARMNN_ASSERT(biasLayer != nullptr);
@@ -382,6 +391,18 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
             biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
             biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensorInfo);
         }
+    }
+
+    // The data input can also be constant, so we must check that this is also allocated to an input slot
+    if(inputTensorInfo.IsConstant())
+    {
+        auto input =
+                CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[0]],
+                                  inputTensorInfo);
+
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
+        inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
@@ -499,7 +520,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
 
     }
 
-    armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
+    const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
     // Assuming input is NHWC
     unsigned int inputHeight = inputTensorInfo.GetShape()[1];
@@ -563,7 +584,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthwiseConvolution2dLayer(descriptor);
     layer->SetBackendId(setBackend);
 
-    if(tflite::IsConstantTensor(&tfLiteFilterTensor))
+    if(filterTensorInfo.IsConstant())
     {
         // For depthwise the weights layout is the same as for tflite [1, H, W, I*M]. No permutation required.
         auto filter = CreateConstTensor(&tfLiteFilterTensor, filterTensorInfo);
@@ -576,7 +597,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     if (biasEnabled)
     {
         const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
-        if(tflite::IsConstantTensor(&tfLiteBiasTensor))
+        if(biasTensorInfo.IsConstant())
         {
             auto biasTensor = CreateConstTensor(&tfLiteBiasTensor, biasTensorInfo);
             armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
@@ -584,6 +605,18 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
             biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
             biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensorInfo);
         }
+    }
+
+    // The data input can also be constant, so we must check that this is also allocated to an input slot
+    if(inputTensorInfo.IsConstant())
+    {
+        auto input =
+                CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[0]],
+                                  inputTensorInfo);
+
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
+        inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
 
     ARMNN_ASSERT(layer != nullptr);
@@ -636,19 +669,19 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    armnn::TensorInfo tensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputShapeTensor);
-    std::vector<int32_t> outputShape(tensorInfo.GetNumElements());
-    if (tensorInfo.GetDataType() == armnn::DataType::Signed32)
+    const armnn::TensorInfo outputShapeTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputShapeTensor);
+    std::vector<int32_t> outputShape(outputShapeTensorInfo.GetNumElements());
+    if (outputShapeTensorInfo.GetDataType() == armnn::DataType::Signed32)
     {
-        for(unsigned int i=0; i < tensorInfo.GetNumElements(); i++)
+        for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); i++)
         {
             outputShape[i] = ::tflite::GetTensorData<int32_t>(&tfLiteOutputShapeTensor)[i];
         }
     }
 
-    if (tensorInfo.GetDataType() == armnn::DataType::QAsymmU8)
+    if (outputShapeTensorInfo.GetDataType() == armnn::DataType::QAsymmU8)
     {
-        for(unsigned int i=0; i < tensorInfo.GetNumElements(); i++)
+        for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); i++)
         {
             outputShape[i] = ::tflite::GetTensorData<uint8_t>(&tfLiteOutputShapeTensor)[i];
         }
@@ -716,7 +749,7 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
-    armnn::TensorInfo filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
+    const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
     // TfLite uses NHWC tensors
     const unsigned int inputHeight = inputTensorInfo.GetShape()[1];
@@ -743,8 +776,7 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
 
     // Set up filter
     auto filterTensor = CreateConstTensor(&tfLiteFilterTensor,
-                                          filterTensorInfo,
-                                          armnn::Optional<armnn::PermutationVector&>());
+                                          filterTensorInfo);
     armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
@@ -768,6 +800,18 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
                                                                                              armnn::EmptyOptional());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
+
+    // The data input can be constant, so we must check that this is allocated to an input slot
+    if(inputTensorInfo.IsConstant())
+    {
+        auto input =
+                CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[2]],
+                                  inputTensorInfo);
+
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
+        inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    }
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);

@@ -123,7 +123,17 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
 
     armnn::IOutputSlot& outputSlot = poolingLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
-    Connect(poolingLayer, tfLiteNode, delegateData);
+
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(poolingLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
+
+    if(Connect(poolingLayer, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
 
     // Check and create activation
     return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData);
@@ -299,7 +309,17 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
     // Create and set output slots
     armnn::IOutputSlot& outputSlot = poolingLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
-    Connect(poolingLayer, tfLiteNode, delegateData);
+
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(poolingLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
+    }
+
+    if(Connect(poolingLayer, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
 
     return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData);
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -332,6 +332,12 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     for (unsigned int k = 0; k < layer->GetNumOutputSlots(); ++k)
     {
         layer->GetOutputSlot(k).SetTensorInfo(outputs[k]);
+    }
+
+    // try to connect the Constant Inputs if there are any
+    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    {
+        return kTfLiteError;
     }
 
     // Connect

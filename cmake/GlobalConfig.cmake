@@ -177,7 +177,9 @@ if (NOT BUILD_PIPE_ONLY)
   include_directories(SYSTEM "${GHC_INCLUDE}")
 endif()
 
-if(NOT BUILD_SHARED_LIBS)
+# JNI_BUILD has DBUILD_SHARED_LIBS set to 0 and not finding libs while building
+# hence added NOT BUILD_ARMNN_TFLITE_DELEGATE condition
+if(NOT BUILD_SHARED_LIBS AND NOT BUILD_ARMNN_TFLITE_DELEGATE)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
 endif()
 

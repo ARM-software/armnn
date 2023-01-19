@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -497,9 +497,19 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
             }
 
             std::unique_ptr<bool[]> dimMask = std::make_unique<bool[]>(tensorPtr->shape_signature.size());
+            bool batchOnly = true;
             for (unsigned int i = 0; i < tensorPtr->shape_signature.size(); ++i)
             {
-                dimMask[i] = tensorPtr->shape_signature[i] == -1 ? false : true;
+                dimMask[i] = tensorPtr->shape_signature[i] != -1;
+
+                if (i > 0 && !dimMask[i])
+                {
+                    batchOnly = false;
+                }
+            }
+            if (batchOnly)
+            {
+                dimMask[0] = true;
             }
             tensorShape = TensorShape(static_cast<unsigned int>(safeShape.size()), safeShape.data(), dimMask.get());
         }
@@ -1163,7 +1173,7 @@ void TfLiteParserImpl::ParseUnsupportedOperator(size_t subgraphIndex, size_t ope
 
     for (unsigned int i = 0u; i < numOutputs; ++i)
     {
-        layer->GetOutputSlot(i).SetTensorInfo(OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, i, {}));
+        layer->GetOutputSlot(i).SetTensorInfo(ToTensorInfo(outputs[0], true));
     }
 
     auto inputTensorIds  = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -2969,10 +2979,17 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
                 try
                 {
                     // We attempt to infer during Runtime.
-                    TensorShape reshapeShapes   =ToTensorInfo(inputs[1]).GetShape();
-                    reshapeShapes   = InputTensorInfo(subgraphIndex, operatorIndex, 1).GetShape();
+                    TensorShape reshapeShapes = ToTensorInfo(inputs[1]).GetShape();
+
+                    if (reshapeShapes[0] == actualOutputTensorInfo.GetNumDimensions())
+                    {
+                        for (unsigned int i = 0; i < actualOutputTensorInfo.GetShape().GetNumDimensions(); ++i)
+                        {
+                            targetShape.push_back(actualOutputTensorInfo.GetShape()[i]);
+                        }
+                    }
                     // The parser only supports shape (batch, -1) or (-1) for non-constant shape input.
-                    if (reshapeShapes[0] > 2)
+                    else if (reshapeShapes[0] > 2)
                     {
                         throw ParseException(fmt::format("Invalid input shape '{}' in Reshape layer '{}' {}. "
                                                          "When inferring during runtime, the parser only supports "
@@ -2981,16 +2998,18 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
                                                          layerName,
                                                          CHECK_LOCATION().AsString()));
                     }
-
-                    const int32_t numInputElements = inputTensorInfo.GetNumElements();
-                    const int32_t inputTensorShape = inputTensorInfo.GetShape()[0];
-                    if (reshapeShapes[0] == 1)
+                    else
                     {
-                        targetShape = {numInputElements};
-                    }
-                    else if (reshapeShapes[0] == 2)
-                    {
-                        targetShape = {inputTensorShape, numInputElements / inputTensorShape};
+                        const int32_t numInputElements = inputTensorInfo.GetNumElements();
+                        const int32_t inputTensorShape = inputTensorInfo.GetShape()[0];
+                        if (reshapeShapes[0] == 1)
+                        {
+                            targetShape = {numInputElements};
+                        }
+                        else if (reshapeShapes[0] == 2)
+                        {
+                            targetShape = {inputTensorShape, numInputElements / inputTensorShape};
+                        }
                     }
                 }
                 catch (const std::exception& exc)
@@ -3220,7 +3239,6 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     // Add the first input tensor to the registration list
     std::vector<unsigned int> tensorIndexesToRegister = {inputTensorIndexes[0]};
-    std::vector<unsigned int> ignoreInputWhenRegister = {};
     armnn::TensorInfo inputTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 0);
 
     desc.m_ConstantWeights = IsConstTensor(inputs[1]);
@@ -3278,13 +3296,11 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
         std::string reshapeLayerName = fmt::format("Reshape_for:{}", layer->GetName());
         armnn::ReshapeDescriptor reshapeDescriptor;
         reshapeDescriptor.m_TargetShape = reshapedTensorInfo.GetShape();
-        armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(reshapeDescriptor, layerName.c_str());
+        armnn::IConnectableLayer* reshapeLayer = m_Network->AddReshapeLayer(reshapeDescriptor,
+                                                                            reshapeLayerName.c_str());
 
         reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedTensorInfo);
         reshapeLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
-
-        auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
-        m_TensorInfos[outputTensorIndexes[0]] = reshapedTensorInfo;
 
         RegisterInputSlots(subgraphIndex, operatorIndex, reshapeLayer, {inputTensorIndexes[0]});
         // Fc layer connects to the reshape layer, so we skip the first input slot when registering fc's input slots
@@ -3297,7 +3313,29 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromShapes(subgraphIndex, operatorIndex, layer, 0,
                                                                     { inputTensorInfo.GetShape(),
                                                                       filterTensorInfo.GetShape() });
+
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    if (outputTensorInfo.GetNumDimensions() > 2)
+    {
+        // Calculate reshape to flatten to 2D [batch_size, input_size]
+        std::vector<unsigned int> reshapedDimensions(2);
+        reshapedDimensions[1] = filterTensorInfo.GetShape()[0];
+        reshapedDimensions[0] = outputTensorInfo.GetNumElements() / reshapedDimensions[1];
+        armnn::TensorInfo reshapedOutputTensorInfo = outputTensorInfo;
+        if (outputTensorInfo.GetNumElements() % reshapedDimensions[1] != 0)
+        {
+            throw ParseException(
+                    fmt::format("Failed to deduce output tensor shape from filter size {} {}",
+                                reshapedDimensions[1],
+                                CHECK_LOCATION().AsString()));
+        }
+        reshapedOutputTensorInfo.SetShape(armnn::TensorShape{ 2, reshapedDimensions.data() });
+        layer->GetOutputSlot(0).SetTensorInfo(reshapedOutputTensorInfo);
+
+        std::string reshapeLayerName = fmt::format("ExpandDims:{}:{}", subgraphIndex, operatorIndex);
+        layer = AddReshapeLayer(layer, 0, reshapeLayerName, outputTensorInfo);
+    }
 
     // we need to add the activation layer and fortunately we don't need to care about the data layout
     armnn::IConnectableLayer* fusedActivationLayer = AddFusedActivationLayer(layer, 0,
@@ -3306,6 +3344,8 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
     // register the output connection slots for the layer, connections are made after all layers have been created
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, fusedActivationLayer, {outputTensorIndexes[0]});
+
+    m_TensorInfos[outputTensorIndexes[0]] = layer->GetOutputSlot(0).GetTensorInfo();
 }
 
 void TfLiteParserImpl::ParseDetectionPostProcess(size_t subgraphIndex, size_t operatorIndex)
@@ -4531,6 +4571,23 @@ void TfLiteParserImpl::ParseComparison(size_t subgraphIndex, size_t operatorInde
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+armnn::IConnectableLayer* TfLiteParserImpl::AddReshapeLayer(armnn::IConnectableLayer* layer,
+                                                            unsigned int outputSlot,
+                                                            std::string reshapeLayerName,
+                                                            armnn::TensorInfo outputShape)
+{
+    ReshapeDescriptor desc;
+    desc.m_TargetShape = outputShape.GetShape();
+
+    IConnectableLayer* reshapeLayer =
+            m_Network->AddReshapeLayer(desc, reshapeLayerName.c_str());
+
+    auto & prevOutputSlot = layer->GetOutputSlot(outputSlot);
+    prevOutputSlot.Connect(reshapeLayer->GetInputSlot(0));
+    reshapeLayer->GetOutputSlot(0).SetTensorInfo(outputShape);
+    return reshapeLayer;
 }
 
 armnn::IConnectableLayer* TfLiteParserImpl::AddFusedActivationLayer(armnn::IConnectableLayer* prevLayer,

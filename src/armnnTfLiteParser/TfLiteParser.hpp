@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -217,6 +217,12 @@ private:
     void AddBroadcastReshapeLayer(size_t subgraphIndex,
                                   size_t operatorIndex,
                                   armnn::IConnectableLayer* layer);
+
+    /// Attach an reshape layer to the one passed as a parameter
+    armnn::IConnectableLayer* AddReshapeLayer(armnn::IConnectableLayer* layer,
+                                              unsigned int outputSlot,
+                                              std::string reshapeLayerName,
+                                              armnn::TensorInfo outputShape);
 
     /// Attach an activation layer to the one passed as a parameter
     armnn::IConnectableLayer* AddFusedActivationLayer(armnn::IConnectableLayer* layer,

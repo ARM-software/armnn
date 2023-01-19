@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -360,7 +360,7 @@ struct FullyConnectedWeightsBiasFloat : FullyConnectedFixture
 {
     FullyConnectedWeightsBiasFloat()
             : FullyConnectedFixture("[ 1, 4, 1, 1 ]",     // inputShape
-                                    "[ 1, 1 ]",           // outputShape
+                                    "[ 1, 1, 1, 1 ]",     // outputShape
                                     "[ 1, 4 ]",           // filterShape
                                     "[ 2, 3, 4, 5 ]",     // filterData
                                     "[ 1 ]",              // biasShape
@@ -373,7 +373,7 @@ struct FullyConnectedWeightsBiasFloat : FullyConnectedFixture
 
 TEST_CASE_FIXTURE(FullyConnectedWeightsBiasFloat, "FullyConnectedWeightsBiasFloat")
 {
-    RunTest<2, armnn::DataType::Float32>(
+    RunTest<4, armnn::DataType::Float32>(
             0,
             { 10, 20, 30, 40 },
             { 400 });

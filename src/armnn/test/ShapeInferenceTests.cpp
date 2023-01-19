@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -218,6 +218,26 @@ TEST_CASE("ComparisionTest")
     ComparisonDescriptor descriptor;
     descriptor.m_Operation = ComparisonOperation::Equal;
     CreateGraphAndRunTest<ComparisonLayer>({{ 5, 7, 6, 2 }, { 5, 7, 6, 2 }},
+                                           {{ 5, 7, 6, 2 }},
+                                           descriptor,
+                                           "comparision");
+}
+
+TEST_CASE("ComparisionTestSmallerRHS")
+{
+    ComparisonDescriptor descriptor;
+    descriptor.m_Operation = ComparisonOperation::Equal;
+    CreateGraphAndRunTest<ComparisonLayer>({{ 5, 7, 6, 2 }, { 1 }},
+                                           {{ 5, 7, 6, 2 }},
+                                           descriptor,
+                                           "comparision");
+}
+
+TEST_CASE("ComparisionTestSmallerLHS")
+{
+    ComparisonDescriptor descriptor;
+    descriptor.m_Operation = ComparisonOperation::Equal;
+    CreateGraphAndRunTest<ComparisonLayer>({{ 1 }, { 5, 7, 6, 2 }},
                                            {{ 5, 7, 6, 2 }},
                                            descriptor,
                                            "comparision");

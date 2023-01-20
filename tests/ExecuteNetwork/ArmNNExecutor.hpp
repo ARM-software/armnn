@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,6 +44,16 @@ public:
     void CompareAndPrintResult(std::vector<const void*> otherOutput) override;
 
 private:
+
+    /**
+     * Returns a pointer to the armnn::IRuntime* this will be shared by all ArmNNExecutors.
+     */
+    armnn::IRuntime* GetRuntime(const armnn::IRuntime::CreationOptions& options)
+    {
+        static armnn::IRuntimePtr instance = armnn::IRuntime::Create(options);
+        // Instantiated on first use.
+        return instance.get();
+    }
 
     struct IParser;
     struct IOInfo;
@@ -101,7 +111,7 @@ private:
     std::vector<armnn::OutputTensors> m_OutputTensorsVec;
     std::vector<std::vector<unsigned int>> m_ImportedInputIds;
     std::vector<std::vector<unsigned int>> m_ImportedOutputIds;
-    std::shared_ptr<armnn::IRuntime> m_Runtime;
+    armnn::IRuntime* m_Runtime;
     armnn::NetworkId m_NetworkId;
     ExecuteNetworkParams m_Params;
 

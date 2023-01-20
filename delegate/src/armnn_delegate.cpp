@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -133,17 +133,16 @@ TfLiteStatus DoPrepare(TfLiteContext* tfLiteContext, TfLiteDelegate* tfLiteDeleg
 }
 
 Delegate::Delegate(armnnDelegate::DelegateOptions options)
-  : m_Runtime(nullptr, nullptr),
-    m_Options(std::move(options))
+  : m_Options(std::move(options))
 {
     // Configures logging for ARMNN
     if (m_Options.IsLoggingEnabled())
     {
         armnn::ConfigureLogging(true, true, m_Options.GetLoggingSeverity());
     }
-    // Create ArmNN Runtime
-    m_Runtime = armnn::IRuntime::Create(m_Options.GetRuntimeOptions());
-
+    // Create/Get the static ArmNN Runtime. Note that the m_Runtime will be shared by all armnn_delegate
+    // instances so the RuntimeOptions cannot be altered for different armnn_delegate instances.
+    m_Runtime = GetRuntime(m_Options.GetRuntimeOptions());
     std::vector<armnn::BackendId> backends;
     if (m_Runtime)
     {
@@ -463,7 +462,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
                     << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
 
     // Create a new SubGraph with networkId and runtime
-    return new ArmnnSubgraph(networkId, delegate->m_Runtime.get(), inputBindings, outputBindings);
+    return new ArmnnSubgraph(networkId, delegate->m_Runtime, inputBindings, outputBindings);
 }
 
 TfLiteStatus ArmnnSubgraph::Prepare(TfLiteContext* tfLiteContext)

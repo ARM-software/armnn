@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -64,6 +64,16 @@ public:
     static const std::string GetVersion();
 
 private:
+    /**
+     * Returns a pointer to the armnn::IRuntime* this will be shared by all armnn_delegates.
+     */
+    armnn::IRuntime* GetRuntime(const armnn::IRuntime::CreationOptions& options)
+    {
+        static armnn::IRuntimePtr instance = armnn::IRuntime::Create(options);
+        // Instantiated on first use.
+        return instance.get();
+    }
+
     TfLiteDelegate m_Delegate = {
         reinterpret_cast<void*>(this),  // .data_
         DoPrepare,                      // .Prepare
@@ -74,7 +84,7 @@ private:
     };
 
     /// ArmNN Runtime pointer
-    armnn::IRuntimePtr m_Runtime;
+    armnn::IRuntime* m_Runtime;
     /// ArmNN Delegate Options
     armnnDelegate::DelegateOptions m_Options;
 };

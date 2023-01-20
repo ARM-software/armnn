@@ -19,7 +19,10 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
 {
     runtimeOptions.m_EnableGpuProfiling = params.m_EnableProfiling;
     runtimeOptions.m_DynamicBackendsPath = params.m_DynamicBackendsPath;
-    m_Runtime = armnn::IRuntime::Create(runtimeOptions);
+
+    // Create/Get the static ArmNN Runtime. Note that the m_Runtime will be shared by all ArmNNExecutor
+    // instances so the RuntimeOptions cannot be altered for different ArmNNExecutor instances.
+    m_Runtime = GetRuntime(runtimeOptions);
 
     auto parser = CreateParser();
     auto network = parser->CreateNetwork(m_Params);
@@ -100,7 +103,7 @@ void ArmNNExecutor::ExecuteAsync()
     }
 
     threadpool = std::make_unique<armnn::Threadpool>(m_Params.m_ThreadPoolSize,
-                                                     m_Runtime.get(),
+                                                     m_Runtime,
                                                      memHandles);
 
     ARMNN_LOG(info) << "Asynchronous Execution with Arm NN thread pool...  \n";

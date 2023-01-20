@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -157,7 +157,7 @@ Layer2dT* FoldPadIntoLayer2dImpl(Graph& graph, InputSlot& connection)
     // Save original parent output slot of the pad layer
     OutputSlot& parentSlot = *padLayer.GetInputSlot(0).GetConnectedOutputSlot();
 
-    // Insert new layer2d layer between the pad layer an its parent layer.
+    // Insert new layer2d layer between the pad layer and its parent layer.
     const std::string name = std::string("folded-") + padLayer.GetName() + "-into-" + layer2d.GetName();
     auto& newLayer2d = *graph.InsertNewLayer<Layer2dT>(padLayer.GetInputSlot(0), newLayer2dDescriptor, name.c_str());
 
@@ -168,13 +168,9 @@ Layer2dT* FoldPadIntoLayer2dImpl(Graph& graph, InputSlot& connection)
         if (layer2d.GetInputSlot(i).GetConnectedOutputSlot() != nullptr)
         {
             Layer& tgtLayer = layer2d.GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
-            // Ensure we are definitely connecting the necessary constant layers
-            if (tgtLayer.GetType() == armnn::LayerType::Constant)
-            {
-                // Remove old connection and connect to new layer2d
-                tgtLayer.GetOutputSlot(0).Disconnect(layer2d.GetInputSlot(i));
-                tgtLayer.GetOutputSlot(0).Connect(newLayer2d.GetInputSlot(i));
-            }
+            // Remove old connection and connect to new layer2d
+            tgtLayer.GetOutputSlot(0).Disconnect(layer2d.GetInputSlot(i));
+            tgtLayer.GetOutputSlot(0).Connect(newLayer2d.GetInputSlot(i));
         }
     }
 

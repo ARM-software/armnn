@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -194,7 +194,7 @@ TEST_CASE ("Neon_Backends_Capability_Test")
     auto neonCapabilities = neonBackend->GetCapabilities();
 
     CapabilityTestHelper(neonCapabilities,
-                         {{"NonConstWeights", false},
+                         {{"NonConstWeights", true},
                           {"AsyncExecution", false},
                           {"ProtectedContentAllocation", false},
                           {"ConstantTensorsAsInputs", true},

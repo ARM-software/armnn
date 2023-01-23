@@ -508,34 +508,36 @@ endif()
 
 # Flatbuffers is not included in armnn if the armnnSerializer is not present
 # Required to target link both flatbuffers and tosa_serialization_lib to armnn
-if (ARMNNTOSAREF)
+if(ARMNNTOSACOMMON)
     if (FLATBUFFERS_LIBRARY)
         target_link_libraries(armnn PUBLIC ${FLATBUFFERS_LIBRARY})
     else()
         # Use PATH_SUFFIXES to help find separate libs for debug/release on Windows builds
         find_library(FLATBUFFERS_LIBRARY_DEBUG NAMES flatbuffers
-                HINTS ${FLATBUFFERS_BUILD_DIR}
-                PATH_SUFFIXES "Debug")
+                     HINTS ${FLATBUFFERS_BUILD_DIR}
+                     PATH_SUFFIXES "Debug")
         find_library(FLATBUFFERS_LIBRARY_RELEASE NAMES flatbuffers
-                HINTS ${FLATBUFFERS_BUILD_DIR}
-                PATH_SUFFIXES "Release")
+                     HINTS ${FLATBUFFERS_BUILD_DIR}
+                     PATH_SUFFIXES "Release")
         target_link_libraries(armnn PUBLIC
-                debug ${FLATBUFFERS_LIBRARY_DEBUG}
-                optimized ${FLATBUFFERS_LIBRARY_RELEASE})
+                     debug ${FLATBUFFERS_LIBRARY_DEBUG}
+                     optimized ${FLATBUFFERS_LIBRARY_RELEASE})
     endif()
 
     if (TOSA_SERIALIZATION_LIB)
         target_link_libraries(armnn PUBLIC -Wl,--whole-archive ${TOSA_SERIALIZATION_LIB} -Wl,--no-whole-archive)
     else()
         find_library(TOSA_SERIALIZATION_LIB
-            NAMES libtosa_serialization_lib.a tosa_serialization_lib
-            HINTS ${TOSA_SERIALIZATION_LIB_ROOT}/lib /usr/local/lib /usr/lib)
+                     NAMES libtosa_serialization_lib.a tosa_serialization_lib
+                     HINTS ${TOSA_SERIALIZATION_LIB_ROOT}/lib /usr/local/lib /usr/lib)
 
         message(STATUS "TOSA serialization library set to ${TOSA_SERIALIZATION_LIB}")
 
         target_link_libraries(armnn PUBLIC -Wl,--whole-archive ${TOSA_SERIALIZATION_LIB} -Wl,--no-whole-archive)
     endif()
+endif()
 
+if (ARMNNTOSAREF)
     if (TOSA_REFERENCE_MODEL_LIB)
         target_link_libraries(armnn PUBLIC -Wl,--whole-archive ${TOSA_REFERENCE_MODEL_LIB} -Wl,--no-whole-archive)
     else()

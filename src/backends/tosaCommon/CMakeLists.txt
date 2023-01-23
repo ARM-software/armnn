@@ -1,11 +1,7 @@
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-
-include_directories(SYSTEM ${FLATBUFFERS_INCLUDE_PATH})
-include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/third-party/half)
-include_directories(SYSTEM ${TOSA_SERIALIZATION_LIB_INCLUDE})
 
 list(APPEND armnnTosaBackend_sources
         TosaMappings.hpp

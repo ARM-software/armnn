@@ -376,9 +376,13 @@ if(ARMNNREF)
     add_definitions(-DARMNNREF_ENABLED)
 endif()
 
-# ArmNN TOSA reference backend
+# If a backend requires TOSA common, add it here.
 if(ARMNNTOSAREF)
-    # Locate the includes for the TOSA serialization library.
+    set(ARMNNTOSACOMMON ON)
+endif()
+
+if(ARMNNTOSACOMMON)
+    # Locate the includes for the TOSA serialization library as it is needed for TOSA common and TOSA backends.
     message(STATUS "TOSA serialization library root set to ${TOSA_SERIALIZATION_LIB_ROOT}")
 
     find_path(TOSA_SERIALIZATION_LIB_INCLUDE tosa_serialization_handler.h
@@ -390,12 +394,22 @@ if(ARMNNTOSAREF)
                  HINTS ${TOSA_SERIALIZATION_LIB_ROOT}/lib /usr/local/lib /usr/lib)
     message(STATUS "TOSA serialization library set to ${TOSA_SERIALIZATION_LIB}")
 
-    # Next, locate the includes for the TOSA Reference Model.
+    # Include required headers for TOSA Serialization Library
+    include_directories(SYSTEM ${FLATBUFFERS_INCLUDE_PATH})
+    include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/third-party/half)
+    include_directories(SYSTEM ${TOSA_SERIALIZATION_LIB_INCLUDE})
+endif()
+
+# ArmNN TOSA reference backend
+if(ARMNNTOSAREF)
+    # Locate the includes for the TOSA Reference Model, which is specific to the TOSA Reference Backend.
     message(STATUS "TOSA Reference Model root set to ${TOSA_REFERENCE_MODEL_ROOT}")
 
     find_path(TOSA_REFERENCE_MODEL_INCLUDE model_runner.h
               HINTS ${TOSA_REFERENCE_MODEL_ROOT}/include)
     message(STATUS "TOSA Reference Model include directory located at: ${TOSA_REFERENCE_MODEL_INCLUDE}")
+
+    include_directories(SYSTEM ${TOSA_REFERENCE_MODEL_INCLUDE})
 
     find_library(TOSA_REFERENCE_MODEL_LIB
                  NAMES tosa_reference_model_lib.a tosa_reference_model_lib

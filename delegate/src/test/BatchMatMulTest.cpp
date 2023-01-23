@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -677,6 +677,7 @@ namespace armnnDelegate
             std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
             BatchMatMul2DFp32SimpleTest       (backends);
             BatchMatMul3DFp32SimpleTest       (backends);
+            BatchMatMul4DFp32SimpleTest       (backends);
             BatchMatMul3DFp32BatchTest        (backends);
             BatchMatMul3DFp32BroadcastTest    (backends);
             BatchMatMul3D2DFp32BroadcastTest  (backends);

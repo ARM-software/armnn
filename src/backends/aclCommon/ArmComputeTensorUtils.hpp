@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -36,15 +36,37 @@ arm_compute::Coordinates BuildArmComputeReductionCoordinates(size_t inputDimensi
 /// Utility function used to setup an arm_compute::TensorShape object from an armnn::TensorShape.
 arm_compute::TensorShape BuildArmComputeTensorShape(const armnn::TensorShape& tensorShape);
 
+/// Utility function used to setup an arm_compute::TensorShape object from an armnn::TensorShape. This will
+/// attempt to reduce the number of leading 1s until the dimension length is equal to the dimensions passed in.
+arm_compute::TensorShape BuildArmComputeTensorShape(const armnn::TensorShape& tensorShape, unsigned int dimensions);
+
 /// Utility function used to setup an arm_compute::ITensorInfo object whose dimensions are based on the given
 /// armnn::ITensorInfo.
 arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo);
+
+/// Utility function used to setup an arm_compute::ITensorInfo object whose dimensions are based on the given
+/// armnn::ITensorInfo. This will attempt to reduce the number of leading 1s until the dimension length is equal
+/// to the dimensions passed in.
+arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo, unsigned int dimensions);
+
+/// Utility function used to setup an arm_compute::ITensorInfo object whose dimensions are based on the given
+/// armnn::ITensorInfo. This will attempt to reduce the number of leading 1s until the dimension length is equal
+/// to the dimensions passed in.
+arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo,
+                                                  armnn::DataLayout dataLayout,
+                                                  unsigned int dimensions);
 
 /// Utility function used to setup an arm_compute::ITensorInfo object whose dimensions are based on the given
 /// armnn::ITensorInfo.
 /// armnn::DataLayout.
 arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo,
                                                   armnn::DataLayout dataLayout);
+
+/// Utility function used to setup an arm_compute::ITensorInfo object whose dimensions are based on the given
+/// armnn::ITensorInfo. This will attempt to reduce the number of leading 1s until the dimension length is equal
+/// to the dimensions passed in.
+arm_compute::TensorInfo BuildArmComputeTensorInfo(const armnn::TensorInfo& tensorInfo,
+                                                  armnn::DataLayout dataLayout, unsigned int dimensions);
 
 /// Utility function used to convert armnn::DataLayout to arm_compute::DataLayout
 /// armnn::DataLayout.

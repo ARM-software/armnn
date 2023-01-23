@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -80,6 +80,9 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DSimpleFloat32,
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DSimpleFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul3DSimpleTest<DataType::Float32>);
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMulNCHWSimpleFloat32,
+                                 ClContextControlFixture,
+                                 BatchMatMulNCHWSimpleTest<DataType::Float32>);
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul3DBatchFloat32,
                                  ClContextControlFixture,
                                  BatchMatMul3DBatchTest<DataType::Float32>);

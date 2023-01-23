@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -101,6 +101,40 @@ std::pair<float, float> FindMinMax(ITensorHandle* tensorHandle)
     tensorHandle->Unmap();
 
     return std::make_pair(min, max);
+}
+
+TensorShape ReduceDims(const TensorShape& tensorShape, unsigned int dimensions)
+{
+    if (tensorShape.GetNumDimensions() <= dimensions)
+    {
+        return tensorShape;
+    }
+    std::vector<unsigned int> newShape;
+
+    unsigned int dimsToSkip = tensorShape.GetNumDimensions() - dimensions;
+    unsigned int dimsSkipped = 0;
+    bool insertRemainder = false;
+
+    for (unsigned int i = 0; i < tensorShape.GetNumDimensions(); ++i)
+    {
+        if (tensorShape[i] == 1 && dimsSkipped < dimsToSkip && !insertRemainder)
+        {
+            ++dimsSkipped;
+            continue;
+        }
+        newShape.push_back(tensorShape[i]);
+        // Once we insert the first dimension we can't skip any more
+        insertRemainder = true;
+    }
+    return TensorShape(static_cast<unsigned int>(newShape.size()), newShape.data());
+}
+
+TensorInfo ReduceDims(const TensorInfo& tensorInfo, unsigned int dimensions)
+{
+    TensorInfo strippedTensor(tensorInfo);
+    TensorShape strippedShape = ReduceDims(tensorInfo.GetShape(), dimensions);
+    strippedTensor.SetShape(strippedShape);
+    return strippedTensor;
 }
 
 TensorShape ExpandDims(const TensorShape& tensorShape, int axis)

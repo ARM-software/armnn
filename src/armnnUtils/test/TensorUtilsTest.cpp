@@ -1,5 +1,5 @@
 //
-// Copyright © 2019,2021-2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -124,6 +124,62 @@ TEST_CASE("ExpandDimsInvalidAxisTest")
 
     // Invalid expand dimension 4
     CHECK_THROWS_AS(ExpandDims(inputShape, 4), armnn::InvalidArgumentException);
+}
+
+TEST_CASE("ReduceDimsShapeAll1s")
+{
+    armnn::TensorShape inputShape({ 1, 1, 1 });
+
+    // Invalid expand dimension 4
+    armnn::TensorShape outputShape = ReduceDims(inputShape, 2);
+    CHECK(outputShape.GetNumDimensions() == 2);
+    CHECK(outputShape[0] == 1);
+    CHECK(outputShape[1] == 1);
+}
+
+TEST_CASE("ReduceDimsShapeNotEnough1s")
+{
+    armnn::TensorShape inputShape({ 1, 2, 1 });
+
+    // Invalid expand dimension 4
+    armnn::TensorShape outputShape = ReduceDims(inputShape, 1);
+    CHECK(outputShape.GetNumDimensions() == 2);
+    CHECK(outputShape[0] == 2);
+    CHECK(outputShape[1] == 1);
+}
+
+TEST_CASE("ReduceDimsInfoAll1s")
+{
+    armnn::TensorInfo inputInfo({ 1, 1, 1 }, DataType::Float32);
+
+    // Invalid expand dimension 4
+    armnn::TensorInfo outputInfo = ReduceDims(inputInfo, 2);
+    CHECK(outputInfo.GetShape().GetNumDimensions() == 2);
+    CHECK(outputInfo.GetShape()[0] == 1);
+    CHECK(outputInfo.GetShape()[1] == 1);
+}
+
+TEST_CASE("ReduceDimsInfoNotEnough1s")
+{
+    armnn::TensorInfo inputInfo({ 1, 2, 1 }, DataType::Float32);
+
+    // Invalid expand dimension 4
+    armnn::TensorInfo outputInfo = ReduceDims(inputInfo, 1);
+    CHECK(outputInfo.GetNumDimensions() == 2);
+    CHECK(outputInfo.GetShape()[0] == 2);
+    CHECK(outputInfo.GetShape()[1] == 1);
+}
+
+TEST_CASE("ReduceDimsShapeDimensionGreaterThanSize")
+{
+    armnn::TensorShape inputShape({ 1, 1, 1 });
+
+    // Invalid expand dimension 4
+    armnn::TensorShape outputShape = ReduceDims(inputShape, 4);
+    CHECK(outputShape.GetNumDimensions() == 3);
+    CHECK(outputShape[0] == 1);
+    CHECK(outputShape[1] == 1);
+    CHECK(outputShape[2] == 1);
 }
 
 TEST_CASE("ExpandDimsInvalidNegativeAxisTest")

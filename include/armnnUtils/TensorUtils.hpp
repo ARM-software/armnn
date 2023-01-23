@@ -1,5 +1,5 @@
 //
-// Copyright © 2019,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,6 +8,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/Tensor.hpp>
 #include <armnn/Types.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 #include <utility>
 #include <vector>
 
@@ -40,6 +41,10 @@ armnn::TensorInfo GetTensorInfo(unsigned int numberOfBatches,
                                 const armnn::DataType dataType);
 
 std::pair<float, float> FindMinMax(armnn::ITensorHandle* tensorHandle);
+
+armnn::TensorShape ReduceDims(const armnn::TensorShape& tensorInfo, unsigned int dimensions);
+
+armnn::TensorInfo ReduceDims(const armnn::TensorInfo& tensorInfo, unsigned int dimensions);
 
 armnn::TensorShape ExpandDims(const armnn::TensorShape& tensorShape, int axis);
 

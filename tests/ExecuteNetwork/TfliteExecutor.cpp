@@ -8,7 +8,10 @@
 TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(params)
 {
     m_Model = tflite::FlatBufferModel::BuildFromFile(m_Params.m_ModelPath.c_str());
-
+    if (!m_Model)
+    {
+        LogAndThrow("Failed to load TfLite model from: " + m_Params.m_ModelPath);
+    }
     m_TfLiteInterpreter =  std::make_unique<Interpreter>();
     tflite::ops::builtin::BuiltinOpResolver resolver;
 

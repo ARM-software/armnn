@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,7 +20,7 @@ std::unique_ptr<IExecutor> BuildExecutor(ProgramOptions& programOptions)
         return std::make_unique<TfLiteExecutor>(programOptions.m_ExNetParams);
 #else
         ARMNN_LOG(fatal) << "Not built with Arm NN Tensorflow-Lite delegate support.";
-            return nullptr;
+        return nullptr;
 #endif
     }
     else
@@ -59,7 +59,7 @@ int main(int argc, const char* argv[])
     try
     {
         executor = BuildExecutor(programOptions);
-        if (executor->m_constructionFailed)
+        if ((!executor) || (executor->m_constructionFailed))
         {
             return EXIT_FAILURE;
         }

@@ -2603,13 +2603,109 @@ TEST_CASE("MultipleInputMultipleOutputSlots_SubstituteGraph")
     SubgraphView::IOutputSlots expectedOutputSlots = {activationOutputSlot,
                                                       &standInLayer->GetOutputSlot(0)};
 
-    // expecting addition input slot to be changed with standin input slot
     // convInputSlot MUST remain as an expected input slot
-    SubgraphView::IInputSlots expectedInputSlots = {convInputSlot,
-                                                    &standInLayer->GetInputSlot(0)};
+    SubgraphView::IInputSlots expectedInputSlots = {convInputSlot};
 
     CHECK(expectedOutputSlots == viewCopy.GetIOutputSlots());
     CHECK(expectedInputSlots == viewCopy.GetIInputSlots());
+}
+
+
+
+TEST_CASE("MultipleInputMultipleOutputSlots_SubstituteGraphNewSlots")
+{
+    //         Construct graph      //
+    //                              //
+    //               input          //
+    //                 |            //
+    //              conv2d          //
+    //                 |            //
+    //      const    relu           //
+    //         \   /     \          //
+    //          add    output       //
+    //           |                  //
+    //         output               //
+    //                              //
+    // SubgraphView layers: conv2d relu add const
+
+    Graph graph;
+    Layer* inputLayer = graph.AddLayer<InputLayer>(0, "input");
+
+    Layer* convLayer = graph.AddLayer<Convolution2dLayer>(Convolution2dDescriptor(), "conv");
+    Layer* reluLayer = graph.AddLayer<ActivationLayer>(ActivationDescriptor(), "activation");
+    Layer* constLayer = graph.AddLayer<ConstantLayer>("const");
+    Layer* addLayer = graph.AddLayer<AdditionLayer>("add");
+
+    Layer* outputLayer1 = graph.AddLayer<OutputLayer>(0, "output1");
+    Layer* outputLayer2 = graph.AddLayer<OutputLayer>(1, "output2");
+
+    inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
+    convLayer->GetOutputSlot(0).Connect(reluLayer->GetInputSlot(0));
+    constLayer->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
+    reluLayer->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
+    reluLayer->GetOutputSlot(0).Connect(outputLayer1->GetInputSlot(0));
+    addLayer->GetOutputSlot(0).Connect(outputLayer2->GetInputSlot(0));
+
+    // main subgraph creation
+    SubgraphView::IInputSlots inputSlots = {&convLayer->GetInputSlot(0)};
+    SubgraphView::IOutputSlots outputSlots = {&reluLayer->GetOutputSlot(0), &addLayer->GetOutputSlot(0)};
+    auto view = CreateSubgraphViewFrom({convLayer, reluLayer, addLayer, constLayer},
+                                       std::move(inputSlots),
+                                       std::move(outputSlots));
+
+    // need to call GetWorkingCopy() in order for SubstituteSubgraph() to work later on
+    SubgraphView viewCopy = view->GetWorkingCopy();
+    IConnectableLayer* addCopyLayer = nullptr;
+    for (auto layer : viewCopy.GetIConnectableLayers())
+    {
+        // GetWorkingCopy() has caused address pointer of convolution layer to change.
+        // Finding new address pointer...
+        if (layer->GetType() == LayerType::Addition)
+        {
+            addCopyLayer = layer;
+        }
+    }
+
+    // substitute subgraph creation
+    OptimizationViews optimizationViews;
+    IConnectableLayer* standInLayer = optimizationViews.GetINetwork()->AddStandInLayer(StandInDescriptor(2,2),
+                                                                                       "standin");
+    // Extra inputSlot (needed explicit use of vector to prevent ambiguity)
+    auto substituteSubgraph1 = CreateSubgraphViewFrom({standInLayer},
+                                                      {&standInLayer->GetInputSlot(0),
+                                                       &standInLayer->GetInputSlot(1)},
+                                                      std::vector<IOutputSlot*>{&standInLayer->GetOutputSlot(0)});
+    // Extra outputSlot
+    auto substituteSubgraph2 = CreateSubgraphViewFrom({standInLayer},
+                                                      {&standInLayer->GetInputSlot(0)},
+                                                      std::vector<IOutputSlot*>{&standInLayer->GetOutputSlot(0),
+                                                       &standInLayer->GetOutputSlot(1)});
+
+    // pattern subgraph creation
+    IConnectableLayer* constCopyLayer = &addCopyLayer->GetInputSlot(0).GetConnection()->GetOwningIConnectableLayer();
+
+    // Mismatched number of input slots (needed explicit use of vector to prevent ambiguity)
+    SubgraphView::SubgraphViewPtr patternSubgraph1 =
+            CreateSubgraphViewFrom({addCopyLayer, constCopyLayer},
+                                   {&addCopyLayer->GetInputSlot(0)},
+                                   std::vector<IOutputSlot*>{&addCopyLayer->GetOutputSlot(0)});
+
+    // Mismatched number of output slots
+    SubgraphView::SubgraphViewPtr patternSubgraph2 = CreateSubgraphViewFrom({addCopyLayer, constCopyLayer},
+                                                                            {&addCopyLayer->GetInputSlot(0)},
+                                                                            {&addCopyLayer->GetOutputSlot(0)});
+
+
+
+
+    // Ensure that a substitute subgraphView has same number of InputSlots as the pattern subgraphView
+    CHECK_THROWS_AS(viewCopy.SubstituteSubgraph(*patternSubgraph1, *substituteSubgraph1),
+                    armnn::InvalidArgumentException);
+
+    // Ensure that a substitute subgraphView has same number of OutputSlots as the pattern subgraphView
+    CHECK_THROWS_AS(viewCopy.SubstituteSubgraph(*patternSubgraph2, *substituteSubgraph2),
+                    armnn::InvalidArgumentException);
+
 }
 
 }

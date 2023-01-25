@@ -50,7 +50,7 @@ The recommended way to build the python packages is by CMake.
 
 ### CMake build
 
-The recommended aproach is to build PyArmNN together with Arm NN by adding the following options to your CMake command:
+The recommended approach is to build PyArmNN together with Arm NN by adding the following options to your CMake command:
 ```
 -DBUILD_PYTHON_SRC=1
 ```
@@ -104,6 +104,44 @@ If PyArmNN installation script fails to find Arm NN libraries it will raise an e
 `RuntimeError: ArmNN library was not found in ('/usr/lib/gcc/aarch64-linux-gnu/8/', <...> ,'/lib/', '/usr/lib/'). Please install ArmNN to one of the standard locations or set correct ARMNN_INCLUDE and ARMNN_LIB env variables.`
 
 You can now verify that PyArmNN library is installed and check PyArmNN version using:
+```bash
+$ pip show pyarmnn
+```
+You can also verify it by running the following and getting output similar to below:
+```bash
+$ python -c "import pyarmnn as ann;print(ann.GetVersion())"
+'32.0.0'
+```
+
+
+## Installing PyArmNN while using ArmNN prebuilt binaries
+
+If you wish to use ArmNN prebuilt binaries from our release page, you will need to generate the PyArmNN SWIG wrappers.
+
+Again setup your environmental variables along with a virtual environment:
+
+```bash
+$ python -m venv env
+$ source env/bin/activate
+
+$ export  ARMNN_LIB=/path/to/libs
+$ export  LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/libs
+$ export  ARMNN_INCLUDE=/full/path/to/armnn/include:/full/path/to/armnn/profiling/common/include
+```
+
+Then generate the SWIG wrappers:
+```bash
+$ cd armnn/python/pyarmnn/
+$ python swig_generate.py -v
+```
+
+Then install PyArmNN:
+```bash
+# From directory armnn/python/pyarmnn/
+$ pip install .
+```
+
+As above, you can verify that PyArmNN library is installed and check PyArmNN version using:
 ```bash
 $ pip show pyarmnn
 ```

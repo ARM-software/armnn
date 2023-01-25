@@ -222,7 +222,10 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
-    Connect(layer, tfLiteNode, delegateData);
+    if(Connect(layer, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
 
     if (!tfLiteNodeParameters)
     {
@@ -408,7 +411,10 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
-    Connect(layer, tfLiteNode, delegateData);
+    if(Connect(layer, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
 
     if (!tfLiteNodeParameters)
     {
@@ -624,7 +630,11 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
-    Connect(layer, tfLiteNode, delegateData);
+    if(Connect(layer, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
+
     if (!tfLiteNodeParameters)
     {
         // No Activation

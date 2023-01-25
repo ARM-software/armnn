@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,6 +46,13 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
     armnn::TensorInfo inputTensorInfo1 = GetTensorInfoForTfLiteTensor(tfLiteInputTensor1);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
+    // Check if we need to expand the dims of any of the input tensor infos.
+    // This is required for a few of the backends.
+    if(inputTensorInfo0.GetNumDimensions() != inputTensorInfo1.GetNumDimensions())
+    {
+        ExpandTensorRankToEqual(inputTensorInfo0, inputTensorInfo1);
+    }
+
     // Setup descriptor and assign operation
     armnn::LogicalBinaryDescriptor desc;
     desc.m_Operation = binaryOperation;
@@ -89,18 +96,7 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
         return inputsTensorsProcess;
     }
 
-    // LogicalBinary operators support broadcasting
-    auto reshapeLayer = BroadcastTensor(inputTensorInfo0,
-                                        inputTensorInfo1,
-                                        logicalBinaryLayer,
-                                        tfLiteContext,
-                                        tfLiteNode,
-                                        delegateData);
-    if (!reshapeLayer)
-    {
-        return kTfLiteError;
-    }
-    return kTfLiteOk;
+    return Connect(logicalBinaryLayer, tfLiteNode, delegateData);
 }
 
 } // namespace armnnDelegate

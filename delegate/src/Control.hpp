@@ -172,7 +172,10 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
 
     armnn::IOutputSlot& outputSlot = concatenationLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
-    Connect(concatenationLayer, tfLiteNode, delegateData);
+    if(Connect(concatenationLayer, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
 
     if (activationType == kTfLiteActNone)
     {

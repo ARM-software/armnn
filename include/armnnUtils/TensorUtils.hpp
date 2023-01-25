@@ -48,6 +48,8 @@ armnn::TensorInfo ReduceDims(const armnn::TensorInfo& tensorInfo, unsigned int d
 
 armnn::TensorShape ExpandDims(const armnn::TensorShape& tensorShape, int axis);
 
+armnn::TensorShape ExpandDimsToRank(const armnn::TensorShape& tensorShape, unsigned int rank);
+
 std::vector<unsigned int> SqueezeDims(const armnn::TensorShape& tensorShape);
 
 unsigned int GetNumElementsBetween(const armnn::TensorShape& shape,

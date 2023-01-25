@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -885,7 +885,7 @@ TEST_CASE ("ADD_Broadcast_CpuAcc_Test")
     AddBroadcastTest(backends);
 }
 
-TEST_CASE ("ADD_Actiation_CpuAcc_Test")
+TEST_CASE ("ADD_Activation_CpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
     AddActivationTest(backends);
@@ -1017,7 +1017,7 @@ TEST_CASE ("ADD_Constant_Input_CpuRef_Test")
     AddConstInputTest(backends);
 }
 
-TEST_CASE ("ADD_Actiation_CpuRef_Test")
+TEST_CASE ("ADD_Activation_CpuRef_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     AddActivationTest(backends);

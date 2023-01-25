@@ -1,5 +1,5 @@
 //
-// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -101,8 +101,6 @@ TfLiteStatus VisitGatherOperator(DelegateData& delegateData,
         return inputsTensorsProcess;
     }
 
-    Connect(layer, tfLiteNode, delegateData);
-
-    return kTfLiteOk;
+    return Connect(layer, tfLiteNode, delegateData);
 }
 } // namespace armnnDelegate

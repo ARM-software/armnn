@@ -243,6 +243,11 @@ TfLiteIntArray* Delegate::IdentifyOperatorsToDelegate(TfLiteContext* tfLiteConte
         exMessage << "This should only be disabled under test conditions.";
         throw armnn::Exception(exMessage.str());
     }
+    if (nodesToDelegate->size == 0)
+    {
+        ARMNN_LOG(info) << "No operators in this model are supported by the Arm NN TfLite delegate." <<
+                           " The model will be executed entirely by TfLite runtime.";
+    }
 
     std::sort(&nodesToDelegate->data[0], &nodesToDelegate->data[nodesToDelegate->size]);
     return nodesToDelegate;

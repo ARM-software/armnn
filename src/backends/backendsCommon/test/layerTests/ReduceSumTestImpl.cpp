@@ -1,5 +1,6 @@
 //
 // Copyright © 2020 Samsung Electronics Co Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 

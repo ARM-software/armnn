@@ -200,6 +200,15 @@ std::vector<const void *> TfLiteExecutor::Execute()
                         }
                         break;
                     }
+                    case kTfLiteBool:
+                    {
+                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<bool>(
+                                tfLiteDelegateOutputId);
+                        for (int i = 0; i < outputSize; ++i) {
+                            fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+                        }
+                        break;
+                    }
                     default:
                     {
                         LogAndThrow("Unsupported output type");

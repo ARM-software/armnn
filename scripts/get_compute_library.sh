@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_22_11" # Release 22.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="cc2877368d5e15d9ea89d31c84ec651fc0fffd13" #8991: Change dynamic fusion API to return destination tensor info | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8991
+DEFAULT_CLFRAMEWORKREVISION="002e6530f6218b00a28aef9be8b21efb08cf3602" #8986: Implement dynamic fusion softmax operator | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8986
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

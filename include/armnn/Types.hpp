@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -233,7 +233,7 @@ enum class MemorySource : uint32_t
     Malloc = 1,
     DmaBuf = 2,
     DmaBufProtected = 4,
-    Gralloc = 5
+    Gralloc = 8
 };
 
 enum class MemBlockStrategyType

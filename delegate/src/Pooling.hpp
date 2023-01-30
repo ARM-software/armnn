@@ -50,12 +50,10 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     auto* tfLiteNodeParameters = reinterpret_cast<TfLitePoolParams*>(tfLiteNode->builtin_data);
-    TfLiteFusedActivation activationType;
+    TfLiteFusedActivation activationType = kTfLiteActNone;
     if (tfLiteNodeParameters)
     {
         activationType = tfLiteNodeParameters->activation;
-
-        const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
         TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
                                                                         outputTensorInfo, activationType);
         if(activationStatus != kTfLiteOk)
@@ -233,7 +231,7 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
 
     // Check activation by parsing the string from the flexbuffer map
     std::string activationTypeStr = m["activation"].AsString().str();
-    TfLiteFusedActivation activationType;
+    TfLiteFusedActivation activationType = kTfLiteActNone;
 
     if (activationTypeStr == "kTfLiteActRelu")
     {
@@ -264,7 +262,6 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
         activationType = kTfLiteActNone;
     }
 
-    const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
     TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
                                                                     outputTensorInfo, activationType);
     if(activationStatus != kTfLiteOk)

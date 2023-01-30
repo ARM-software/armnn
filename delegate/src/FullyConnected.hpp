@@ -59,12 +59,10 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
 
     // Check that we support fused activation before we attempt to create a layer
     auto* tfLiteNodeParameters = reinterpret_cast<TfLiteFullyConnectedParams *>(tfLiteNode->builtin_data);
-    TfLiteFusedActivation activationType;
+    TfLiteFusedActivation activationType=kTfLiteActNone;
     if (tfLiteNodeParameters)
     {
         activationType = tfLiteNodeParameters->activation;
-
-        const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
         TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
                                                                         outputTensorInfo, activationType);
         if(activationStatus != kTfLiteOk)

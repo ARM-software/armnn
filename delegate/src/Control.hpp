@@ -126,7 +126,6 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     // Verify we support the fused activation before attempting to create a layer
     TfLiteFusedActivation activationType = concatenationParameters->activation;
 
-    const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
     TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
                                                                     outputTensorInfo, activationType);
     if(activationStatus != kTfLiteOk)

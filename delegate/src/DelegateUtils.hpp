@@ -342,7 +342,7 @@ TfLiteStatus FusedActivation(TfLiteContext* tfLiteContext,
                                data.m_Backends,
                                isSupported,
                                setBackend,
-                               prevLayer->GetOutputSlot(0).GetTensorInfo(),
+                               activationOutputInfo,
                                activationOutputInfo,
                                activationDesc);
     if (!isSupported)

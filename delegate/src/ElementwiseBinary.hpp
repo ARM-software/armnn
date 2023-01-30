@@ -255,12 +255,10 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     auto* tfLiteNodeParameters = reinterpret_cast<TfLiteAddParams*>(tfLiteNode->builtin_data);
-    TfLiteFusedActivation activationType;
+    TfLiteFusedActivation activationType = kTfLiteActNone;
     if (tfLiteNodeParameters)
     {
         activationType = tfLiteNodeParameters->activation;
-
-        const armnn::TensorInfo& activationOutputInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
         TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
                                                                         outputTensorInfo, activationType);
         if(activationStatus != kTfLiteOk)

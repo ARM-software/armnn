@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -59,7 +59,6 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
     armnn::OptimizerOptions optimizerOptions;
     bool internalProfilingState = false;
     armnn::ProfilingDetailsMethod internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
-    arm::pipe::ProfilingOptions extProfilingParams;
     for (size_t i = 0; i < num_options; ++i)
     {
         // Process backends
@@ -200,39 +199,40 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
             // Process enable-external-profiling
         else if (std::string(options_keys[i]) == std::string("enable-external-profiling"))
         {
-            extProfilingParams.m_EnableProfiling = armnn::stringUtils::StringToBool(options_values[i]);
+            runtimeOptions.m_ProfilingOptions.m_EnableProfiling =
+                armnn::stringUtils::StringToBool(options_values[i]);
         }
-            // Process timeline-profiling
+        // Process timeline-profiling
         else if (std::string(options_keys[i]) == std::string("timeline-profiling"))
         {
-            extProfilingParams.m_TimelineEnabled = armnn::stringUtils::StringToBool(options_values[i]);
+            runtimeOptions.m_ProfilingOptions.m_TimelineEnabled = armnn::stringUtils::StringToBool(options_values[i]);
         }
-            // Process outgoing-capture-file
+        // Process outgoing-capture-file
         else if (std::string(options_keys[i]) == std::string("outgoing-capture-file"))
         {
-            extProfilingParams.m_OutgoingCaptureFile = options_values[i];
+            runtimeOptions.m_ProfilingOptions.m_OutgoingCaptureFile = options_values[i];
         }
-            // Process incoming-capture-file
+        // Process incoming-capture-file
         else if (std::string(options_keys[i]) == std::string("incoming-capture-file"))
         {
-            extProfilingParams.m_IncomingCaptureFile = options_values[i];
+            runtimeOptions.m_ProfilingOptions.m_IncomingCaptureFile = options_values[i];
         }
-            // Process file-only-external-profiling
+        // Process file-only-external-profiling
         else if (std::string(options_keys[i]) == std::string("file-only-external-profiling"))
         {
-            extProfilingParams.m_FileOnly = armnn::stringUtils::StringToBool(options_values[i]);
+            runtimeOptions.m_ProfilingOptions.m_FileOnly = armnn::stringUtils::StringToBool(options_values[i]);
         }
-            // Process counter-capture-period
+        // Process counter-capture-period
         else if (std::string(options_keys[i]) == std::string("counter-capture-period"))
         {
-            extProfilingParams.m_CapturePeriod = static_cast<uint32_t>(std::stoul(options_values[i]));
+            runtimeOptions.m_ProfilingOptions.m_CapturePeriod = static_cast<uint32_t>(std::stoul(options_values[i]));
         }
-            // Process profiling-file-format
+        // Process profiling-file-format
         else if (std::string(options_keys[i]) == std::string("profiling-file-format"))
         {
-            extProfilingParams.m_FileFormat = options_values[i];
+            runtimeOptions.m_ProfilingOptions.m_FileFormat = options_values[i];
         }
-            // Process serialize-to-dot
+        // Process serialize-to-dot
         else if (std::string(options_keys[i]) == std::string("serialize-to-dot"))
         {
             this->SetSerializeToDot(options_values[i]);
@@ -252,6 +252,5 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
     this->SetRuntimeOptions(runtimeOptions);
     this->SetOptimizerOptions(optimizerOptions);
     this->SetInternalProfilingParams(internalProfilingState, internalProfilingDetail);
-    this->SetExternalProfilingParams(extProfilingParams);
 }
 } // namespace armnnDelegate

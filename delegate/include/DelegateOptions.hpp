@@ -1,17 +1,13 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/ArmNN.hpp>
-#include <armnn/Logging.hpp>
 #include <armnn/Optional.hpp>
 
-#include <client/include/ProfilingOptions.hpp>
-
-#include <set>
 #include <string>
 #include <vector>
 
@@ -247,13 +243,6 @@ public:
     bool GetInternalProfilingState() const { return m_InternalProfilingEnabled; }
     const armnn::ProfilingDetailsMethod& GetInternalProfilingDetail() const { return m_InternalProfilingDetail; }
 
-    void SetExternalProfilingParams(
-        const arm::pipe::ProfilingOptions& externalProfilingParams)
-        { m_ProfilingOptions = externalProfilingParams; }
-
-    const arm::pipe::ProfilingOptions& GetExternalProfilingParams() const
-        { return m_ProfilingOptions; }
-
     void SetSerializeToDot(const std::string& serializeToDotFile) { m_SerializeToDot = serializeToDotFile; }
     const std::string& GetSerializeToDot() const { return m_SerializeToDot; }
 
@@ -291,10 +280,7 @@ private:
     /// Options for the optimization step for the network
     armnn::OptimizerOptions m_OptimizerOptions;
 
-    /// External profiling options.
-    arm::pipe::ProfilingOptions m_ProfilingOptions;
-
-    /// Internal profiling options.
+    /// Internal profiling options. Written to INetworkProperties during model load.
     /// Indicates whether internal profiling is enabled or not.
     bool m_InternalProfilingEnabled = false;
     /// Sets the level of detail output by the profiling. Options are DetailsWithEvents = 1 and DetailsOnly = 2

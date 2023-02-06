@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -21,7 +21,7 @@ using namespace tflite;
 class  TfLiteExecutor : public IExecutor
 {
 public:
-    TfLiteExecutor(const ExecuteNetworkParams& m_Params);
+    TfLiteExecutor(const ExecuteNetworkParams& m_Params, armnn::IRuntime::CreationOptions runtimeOptions);
 
     std::vector<const void*> Execute() override;
     void PrintNetworkInfo() override{};

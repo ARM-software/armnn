@@ -17,7 +17,7 @@ std::unique_ptr<IExecutor> BuildExecutor(ProgramOptions& programOptions)
         programOptions.m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
     {
 #if defined(ARMNN_TFLITE_DELEGATE)
-        return std::make_unique<TfLiteExecutor>(programOptions.m_ExNetParams);
+        return std::make_unique<TfLiteExecutor>(programOptions.m_ExNetParams, programOptions.m_RuntimeOptions);
 #else
         ARMNN_LOG(fatal) << "Not built with Arm NN Tensorflow-Lite delegate support.";
         return nullptr;

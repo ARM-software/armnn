@@ -6,7 +6,8 @@
 #include "TfliteExecutor.hpp"
 #include "tensorflow/lite/kernels/kernel_util.h"
 
-TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(params)
+TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRuntime::CreationOptions runtimeOptions)
+                             : m_Params(params)
 {
     m_Model = tflite::FlatBufferModel::BuildFromFile(m_Params.m_ModelPath.c_str());
     if (!m_Model)
@@ -26,8 +27,7 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params) : m_Params(pa
         // Create the Armnn Delegate
         // Populate a DelegateOptions from the ExecuteNetworkParams.
         armnnDelegate::DelegateOptions delegateOptions = m_Params.ToDelegateOptions();
-        delegateOptions.SetExternalProfilingParams(delegateOptions.GetExternalProfilingParams());
-
+        delegateOptions.SetRuntimeOptions(runtimeOptions);
         std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
                 theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
                                  armnnDelegate::TfLiteArmnnDelegateDelete);

@@ -19,6 +19,7 @@ The instructions show how to build the Arm NN core library.
 Building protobuf is optional. We have given steps should the user wish to build it (i.e. as an Onnx dependency).
 All downloaded or generated files will be saved inside the `$HOME/armnn-devenv` directory.
 
+
 ## Download the Android NDK and make a standalone toolchain
 
 * Download the Android NDK from [the official website](https://developer.android.com/ndk/downloads/index.html):
@@ -132,9 +133,9 @@ git checkout <branch_name>
 git pull
 ```
 
-For example, if you want to check out the 21.11 release branch:
+For example, if you want to check out the 23.02 release branch:
 ```bash
-git checkout branches/armnn_21_11
+git checkout branches/armnn_23_02
 git pull
 ```
 
@@ -150,9 +151,9 @@ git clone https://github.com/ARM-software/ComputeLibrary.git
 cd ComputeLibrary
 git checkout <tag_name>
 ```
-For example, if you want to checkout the 21.11 release tag:
+For example, if you want to checkout the 23.02 release tag:
 ```bash
-git checkout v21.11
+git checkout v23.02
 ```
 
 Arm NN and Arm Compute Library are developed closely together. If you would like to use a particular release of Arm NN you will need the same release tag of ACL too.

@@ -49,20 +49,8 @@ std::string CreateDirectory(std::string path)
     // This line is very unlikely to throw an exception.
     fs::path tmpDir = fs::temp_directory_path();
     std::string full_path = tmpDir.generic_string() + path;
-    if (fs::exists(full_path))
-    {
-        try
-        {
-            // This could throw an exception on a multi-user system.
-            fs::remove_all(full_path);
-        }
-        catch (const std::system_error& e)
-        {
-            std::string error = "Directory exists and cannot be removed. Reason: ";
-            error.append(e.what());
-            throw armnn::RuntimeException(error);
-        }
-    }
+    // This could throw a file permission exception.
+    RemoveDirectoryAndContents(full_path);
 #if defined(_WIN32)
     result = _mkdir(full_path.c_str()); // can be used on Windows
     armnn::ConditionalThrow<armnn::RuntimeException>((result == 0), "Was unable to create temporary directory");
@@ -85,7 +73,33 @@ std::string CreateDirectory(std::string path)
     return full_path + "/";
 }
 
-FileContents ReadFileContentsIntoString(const std::string path) {
+/**
+ * @brief Remove a directory and its contents.
+ *
+ * Given a directory path delete it's contents and the directory. If the specified directory doesn't exist this
+ * does nothing. If any item cannot be removed this will throw a RuntimeException.
+ *
+ * @param full_path
+ */
+void RemoveDirectoryAndContents(const std::string& path)
+{
+    if (fs::exists(path))
+    {
+        try
+        {
+            // This could throw an exception on a multi-user system.
+            fs::remove_all(path);
+        }
+        catch (const std::system_error& e)
+        {
+            std::string error = "Directory exists and cannot be removed. Reason: ";
+            error.append(e.what());
+            throw armnn::RuntimeException(error);
+        }
+    }
+}
+
+FileContents ReadFileContentsIntoString(const std::string& path) {
     if (!fs::exists(path))
     {
         throw armnn::RuntimeException("Path does not exist: " + path);

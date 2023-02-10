@@ -79,6 +79,9 @@ LayerTestResult<T, Dim> DebugTestImpl(
 
         armnnUtils::Filesystem::FileContents output = armnnUtils::Filesystem::ReadFileContentsIntoString(full_path);
         CHECK((output == expectedStringOutput));
+
+        // Clean up afterwards.
+        armnnUtils::Filesystem::RemoveDirectoryAndContents(tmpDir);
     }
     else
     {

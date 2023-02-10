@@ -29,7 +29,9 @@ fs::path NamedTempFile(const char* fileName);
 /// Returns full path to temporary folder
 std::string CreateDirectory(std::string sPath);
 
-FileContents ReadFileContentsIntoString(const std::string path);
+FileContents ReadFileContentsIntoString(const std::string& path);
+
+void RemoveDirectoryAndContents(const std::string& path);
 
 } // namespace armnnUtils
 } // namespace Filesystem

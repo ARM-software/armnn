@@ -143,6 +143,12 @@ This enables machine processing of license information based on the SPDX License
 here: http://spdx.org/licenses/
 
 
+## Inclusive language commitment
+Arm NN conforms to Arm's inclusive language policy and, to the best of our knowledge, does not contain any non-inclusive language.
+
+If you find something that concerns you, please email terms@arm.com
+
+
 ## Third-party
 Third party tools used by Arm NN:
 

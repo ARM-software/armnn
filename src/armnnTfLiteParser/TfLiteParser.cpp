@@ -2255,6 +2255,9 @@ void TfLiteParserImpl::ParseSqueeze(size_t subgraphIndex, size_t operatorIndex)
     ReshapeDescriptor reshapeDesc;
     reshapeDesc.m_TargetShape = outputTensorInfo.GetShape();
 
+    auto outputTensorIds = GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex);
+    m_TensorInfos[outputTensorIds[0]] = outputTensorInfo;
+
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

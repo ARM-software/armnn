@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -196,7 +196,7 @@ private:
     static const std::map<std::string, OperationParsingFunction> m_ParserFunctions;
 
     /// A mapping of an output slot to each of the input slots it should be connected to
-    /// The outputSlot is from the layer that creates this tensor as one of its ouputs
+    /// The outputSlot is from the layer that creates this tensor as one of its outputs
     /// The inputSlots are from the layers that use this tensor as one of their inputs
     struct TensorSlots
     {

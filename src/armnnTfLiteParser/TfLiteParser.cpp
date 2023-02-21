@@ -1606,7 +1606,11 @@ void TfLiteParserImpl::ParseTransposeConv(size_t subgraphIndex, size_t operatorI
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    if (inputs[0])
+    // This block determines the output shape of the transpose convolution. If the output shape tensor ptr is not null
+    // And the tensor is a constant, we can access the data at load time and set the output shape of the
+    // layer. If this is not constant, We do not have access to the shape data, so we have to use
+    // infer output shape and skip this code block.
+    if (inputs[0] && IsConstTensor(inputs[0]))
     {
         armnn::TensorInfo tensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 0);
         std::vector<int> output_shape(tensorInfo.GetNumElements());

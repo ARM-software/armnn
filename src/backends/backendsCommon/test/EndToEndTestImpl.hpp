@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -56,7 +56,9 @@ bool ConstantUsageTest(const std::vector<BackendId>& computeDevice,
 
     // Loads it into the runtime.
     NetworkId netId;
-    runtime->LoadNetwork(netId, std::move(optNet));
+    std::string errorMessage;
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     // Creates structures for input & output.
     std::vector<T> outputData(inputData.size());
@@ -141,7 +143,9 @@ void EndToEndLayerTestImpl(INetworkPtr network,
 
     // Loads it into the runtime.
     NetworkId netId;
-    runtime->LoadNetwork(netId, std::move(optNet));
+    std::string errorMessage;
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     InputTensors inputTensors;
     inputTensors.reserve(inputTensorData.size());
@@ -211,10 +215,11 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
 
     // Loads it into the runtime.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     // Enable Importing
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Undefined);
-    runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     // Creates structures for input & output
     std::vector<float> inputData
@@ -279,10 +284,11 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
 
     // Loads it into the runtime.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     // Enable Importing and Exporting
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
-    runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     // Creates structures for input & output
     std::vector<float> inputData
@@ -353,10 +359,11 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
 
     // Loads it into the runtime.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     // Enable Importing
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
-    runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     // Creates structures for input & output
     std::vector<float> inputData
@@ -439,12 +446,10 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
-
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Undefined);
-
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     INFO("Generate Data");
     // Creates structures for input & output
@@ -531,10 +536,10 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Malloc);
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     INFO("Generate Data");
     // Creates structures for input & output
@@ -621,12 +626,10 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
-
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
-
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     INFO("Generate Data");
     // Creates structures for input & output
@@ -716,10 +719,11 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
 
     // Loads it into the runtime.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     // Enable Importing
     INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
-    runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     // Creates structures for input & output
     std::vector<float> inputData
@@ -852,10 +856,11 @@ inline void ForceImportWithAlignedBuffersEndToEndTest(std::vector<BackendId> bac
 
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
+
     INFO("Generate Data");
 
     // Creates structures for input & output
@@ -955,10 +960,11 @@ inline void ForceImportWithMisalignedInputBuffersEndToEndTest(std::vector<Backen
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
+
     INFO("Generate Data");
 
     // This code looks a little funky but the idea is to create a buffer of floats but offset by the size of a char
@@ -1077,10 +1083,11 @@ inline void ForceImportWithMisalignedOutputBuffersEndToEndTest(std::vector<Backe
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
+
     INFO("Generate Data");
 
     // This code looks a little funky but the idea is to create a buffer of floats but offset by the size of a char
@@ -1198,10 +1205,10 @@ inline void ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(std::vect
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
     INFO("Generate Data");
 
     // This code looks a little funky but the idea is to create a buffer of floats but offset by the size of a char
@@ -1316,10 +1323,10 @@ inline void ForceImportRepeatedInferencesEndToEndTest(std::vector<BackendId> bac
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
     INFO("Generate Data");
 
     // Creates structures for input & output
@@ -1502,10 +1509,10 @@ inline void ForceImportRepeatedInferencesInvertedEndToEndTest(std::vector<Backen
     INFO("Load Network");
     // Load it into the runtime. It should pass.
     NetworkId netId;
-    std::string ignoredErrorMessage;
+    std::string errorMessage;
     INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
-    CHECK(runtime->LoadNetwork(netId, std::move(optNet),ignoredErrorMessage, networkProperties)
-               == Status::Success);
+    armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
+    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
     INFO("Generate Data");
 
     // This code looks a little funky but the idea is to create a buffer of floats but offset by the size of a char

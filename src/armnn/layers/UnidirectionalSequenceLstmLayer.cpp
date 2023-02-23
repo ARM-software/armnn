@@ -274,7 +274,7 @@ void UnidirectionalSequenceLstmLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "UnidirectionalSequenceLstmLayer");
 }
 
-Layer::ConstantTensors UnidirectionalSequenceLstmLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors UnidirectionalSequenceLstmLayer::GetConstantTensorsByRef() const
 {
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_BasicParameters.m_InputToForgetWeights,

@@ -148,7 +148,7 @@ void QuantizedLstmLayer::ValidateTensorShapesFromInputs()
                          1);
 }
 
-Layer::ConstantTensors QuantizedLstmLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors QuantizedLstmLayer::GetConstantTensorsByRef() const
 {
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return

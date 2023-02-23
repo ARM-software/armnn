@@ -89,7 +89,7 @@ std::vector<TensorShape> DetectionPostProcessLayer::InferOutputShapes(const std:
     return results;
 }
 
-Layer::ConstantTensors DetectionPostProcessLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors DetectionPostProcessLayer::GetConstantTensorsByRef() const
 {
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return { m_Anchors };

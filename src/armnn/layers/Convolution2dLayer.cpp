@@ -119,9 +119,9 @@ void Convolution2dLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "Convolution2dLayer");
 }
 
-Layer::ConstantTensors Convolution2dLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors Convolution2dLayer::GetConstantTensorsByRef() const
 {
-    Layer::ConstantTensors tensors = GetConnectedConstantAsInputTensors();
+    Layer::ImmutableConstantTensors tensors = GetConnectedConstantAsInputTensors();
     return tensors;
 }
 

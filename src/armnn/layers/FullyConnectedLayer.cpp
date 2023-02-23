@@ -61,9 +61,9 @@ void FullyConnectedLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "FullyConnectedLayer");
 }
 
-Layer::ConstantTensors FullyConnectedLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors FullyConnectedLayer::GetConstantTensorsByRef() const
 {
-    Layer::ConstantTensors tensors = GetConnectedConstantAsInputTensors();
+    Layer::ImmutableConstantTensors tensors = GetConnectedConstantAsInputTensors();
     return tensors;
 }
 

@@ -406,7 +406,11 @@ protected:
 
     // Retrieve the Handles to the constants
     // Marking this as override and having this here keeps IConnectable abstract with only pure virtual function
-    virtual ConstantTensors GetConstantTensorsByRef() override {return ConstantTensors(); };
+    virtual ConstantTensors GetConstantTensorsByRef() override final;
+
+    // Retrieve the Handles to the constants
+    // Marking this as override and having this here keeps IConnectable abstract with only pure virtual function
+    virtual ImmutableConstantTensors GetConstantTensorsByRef() const override { return ImmutableConstantTensors(); };
 
     // "Blob"
     AdditionalInfoObjectPtr m_AdditionalInfoObject;

@@ -56,7 +56,7 @@ protected:
 
     /// Retrieve the handles to the constant values connected to the layer.
     /// @return A vector of the constant tensors connected to the layer.
-    ConstantTensors GetConstantTensorsByRef() override;
+    ImmutableConstantTensors GetConstantTensorsByRef() const override;
 };
 
 } // namespace

@@ -53,7 +53,7 @@ protected:
 
     /// Retrieve the handles to the constant values stored by the layer.
     // For API stability DO NOT ALTER order and add new members to the end of vector
-    ConstantTensors GetConstantTensorsByRef() override { return {m_LayerOutput}; }
+    ImmutableConstantTensors GetConstantTensorsByRef() const override { return {m_LayerOutput}; }
 };
 
 } // namespace

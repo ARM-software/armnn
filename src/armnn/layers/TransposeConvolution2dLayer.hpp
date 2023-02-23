@@ -54,7 +54,7 @@ protected:
 
     /// Retrieve the handles to the constant values stored by the layer.
     /// @return A vector of the constant tensors stored by this layer.
-    ConstantTensors GetConstantTensorsByRef() override;
+    ImmutableConstantTensors GetConstantTensorsByRef() const override;
 };
 
 } // namespace armnn

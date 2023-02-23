@@ -269,7 +269,7 @@ void QLstmLayer::ValidateTensorShapesFromInputs()
     }
 }
 
-Layer::ConstantTensors QLstmLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors QLstmLayer::GetConstantTensorsByRef() const
 {
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_BasicParameters.m_InputToForgetWeights,

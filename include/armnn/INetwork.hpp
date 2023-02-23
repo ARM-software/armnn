@@ -126,6 +126,11 @@ public:
     // Returns ConstantTensors of this Layer if it has any, otherwise returns empty vector.
     virtual ConstantTensors GetConstantTensorsByRef() = 0;
 
+    using ImmutableConstantTensors = std::vector<std::reference_wrapper<const std::shared_ptr<ConstTensorHandle>>>;
+
+    // Returns ConstantTensors of this Layer if it has any, otherwise returns empty vector.
+    virtual ImmutableConstantTensors GetConstantTensorsByRef() const = 0;
+
 protected:
       /// Objects are not deletable via the handle
     ~IConnectableLayer() {}

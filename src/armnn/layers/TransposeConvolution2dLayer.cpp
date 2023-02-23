@@ -116,7 +116,7 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, expectedOutputShape[0], m_ShapeInferenceMethod, "TransposeConvolution2dLayer");
 }
 
-Layer::ConstantTensors TransposeConvolution2dLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors TransposeConvolution2dLayer::GetConstantTensorsByRef() const
 {
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_Weight, m_Bias};

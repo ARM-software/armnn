@@ -267,7 +267,7 @@ void LstmLayer::ValidateTensorShapesFromInputs()
     }
 }
 
-Layer::ConstantTensors LstmLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors LstmLayer::GetConstantTensorsByRef() const
 {
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_BasicParameters.m_InputToForgetWeights,

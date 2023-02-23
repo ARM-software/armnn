@@ -123,9 +123,9 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DepthwiseConvolution2dLayer");
 }
 
-Layer::ConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors DepthwiseConvolution2dLayer::GetConstantTensorsByRef() const
 {
-    Layer::ConstantTensors tensors = GetConnectedConstantAsInputTensors();
+    Layer::ImmutableConstantTensors tensors = GetConnectedConstantAsInputTensors();
     return tensors;
 }
 

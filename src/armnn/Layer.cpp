@@ -538,6 +538,19 @@ void Layer::ExecuteStrategy(IStrategy& strategy) const
     strategy.ExecuteStrategy(this, BaseDescriptor(), {}, GetName());
 }
 
+Layer::ConstantTensors Layer::GetConstantTensorsByRef()
+{
+    const Layer *constThis = const_cast<const Layer*>(this);
+    ConstantTensors res;
+
+    ImmutableConstantTensors immutableData = constThis->GetConstantTensorsByRef();
+    for (auto i : immutableData)
+    {
+        res.push_back(const_cast<std::shared_ptr<ConstTensorHandle>&>(i.get()));
+    }
+    return res;
+}
+
 const IConnectableLayer& OutputSlot::GetOwningIConnectableLayer() const
 {
     return m_OwningLayer;

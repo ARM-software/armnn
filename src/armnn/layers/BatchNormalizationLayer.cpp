@@ -65,7 +65,7 @@ void BatchNormalizationLayer::ValidateTensorShapesFromInputs()
 
 }
 
-Layer::ConstantTensors BatchNormalizationLayer::GetConstantTensorsByRef()
+Layer::ImmutableConstantTensors BatchNormalizationLayer::GetConstantTensorsByRef() const
 {
     // For API stability DO NOT ALTER order and add new members to the end of vector
     return {m_Mean, m_Variance, m_Beta, m_Gamma};

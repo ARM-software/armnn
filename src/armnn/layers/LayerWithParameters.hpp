@@ -56,9 +56,9 @@ protected:
         strategy.ExecuteStrategy(this, GetParameters(), {}, GetName());
     }
 
-    Layer::ConstantTensors GetConnectedConstantAsInputTensors()
+    Layer::ImmutableConstantTensors GetConnectedConstantAsInputTensors() const
     {
-        Layer::ConstantTensors tensors;
+        Layer::ImmutableConstantTensors tensors;
         for (unsigned int i = 0; i < GetNumInputSlots(); ++i)
         {
             if (GetInputSlot(i).GetConnection() && GetInputSlot(i).GetConnection()->GetTensorInfo().IsConstant())

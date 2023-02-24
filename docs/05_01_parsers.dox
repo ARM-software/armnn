@@ -1,4 +1,4 @@
-/// Copyright (c) 2022 Arm Ltd and Contributors. All rights reserved.
+/// Copyright (c) 2022-2023 Arm Ltd and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -176,6 +176,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - SLICE
 - SOFTMAX
 - SPACE_TO_BATCH
+- SPACE_TO_DEPTH
 - SPLIT
 - SPLIT_V
 - SQUEEZE

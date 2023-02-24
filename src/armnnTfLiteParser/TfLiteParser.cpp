@@ -790,6 +790,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_SLICE]                   = &TfLiteParserImpl::ParseSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SOFTMAX]                 = &TfLiteParserImpl::ParseSoftmax;
     m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_BATCH_ND]       = &TfLiteParserImpl::ParseSpaceToBatchND;
+    m_ParserFunctions[tflite::BuiltinOperator_SPACE_TO_DEPTH]          = &TfLiteParserImpl::ParseSpaceToDepth;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]                   = &TfLiteParserImpl::ParseSplit;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT_V]                 = &TfLiteParserImpl::ParseSplitV;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]                 = &TfLiteParserImpl::ParseSqueeze;
@@ -2129,6 +2130,42 @@ void TfLiteParserImpl::ParseSpaceToBatchND(size_t subgraphIndex, size_t operator
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParserImpl::ParseSpaceToDepth(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    TfLiteParserImpl::TensorRawPtrVector inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+    TfLiteParserImpl::TensorRawPtrVector outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::SpaceToDepthDescriptor descriptor;
+
+    const auto& operatorPtr = m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
+    const auto* options = operatorPtr->builtin_options.AsSpaceToDepthOptions();
+    auto blockSize = options->block_size;
+    if (blockSize < 2)
+    {
+        throw ParseException(
+                fmt::format("Operation has invalid block size: {} Block size should be >= 2 {}",
+                            blockSize,
+                            CHECK_LOCATION().AsString()));
+    }
+    descriptor.m_BlockSize = armnn::numeric_cast<uint32_t>(blockSize);
+
+    auto layerName = fmt::format("SpaceToDepth:{}:{}", subgraphIndex, operatorIndex);
+    IConnectableLayer* layer = m_Network->AddSpaceToDepthLayer(descriptor, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+    TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));

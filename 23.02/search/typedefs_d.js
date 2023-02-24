@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['operand',['Operand',['../classarmnn__driver_1_1_converter.xhtml#aa9b4bc8d4cfb04be14771dbb1bc1a1ac',1,'armnn_driver::Converter::Operand()'],['../namespacearmnn__driver.xhtml#aa9b4bc8d4cfb04be14771dbb1bc1a1ac',1,'armnn_driver::Operand()']]],
+  ['operandlifetime',['OperandLifeTime',['../classarmnn__driver_1_1_converter.xhtml#a275cd95635b854a80bb33f171d861ddc',1,'armnn_driver::Converter::OperandLifeTime()'],['../namespacearmnn__driver.xhtml#a275cd95635b854a80bb33f171d861ddc',1,'armnn_driver::OperandLifeTime()']]],
+  ['operandtype',['OperandType',['../classarmnn__driver_1_1_converter.xhtml#a53bfb6eb38a90244ba166b641a6965d9',1,'armnn_driver::Converter::OperandType()'],['../namespacearmnn__driver.xhtml#a53bfb6eb38a90244ba166b641a6965d9',1,'armnn_driver::OperandType()']]],
+  ['operation',['Operation',['../classarmnn__driver_1_1_converter.xhtml#ad3a9c1424b37970a54624f514196b985',1,'armnn_driver::Converter::Operation()'],['../namespacearmnn__driver.xhtml#ad3a9c1424b37970a54624f514196b985',1,'armnn_driver::Operation()']]],
+  ['operationtype',['OperationType',['../classarmnn__driver_1_1_converter.xhtml#ace6b45d6363c32d1b93b7fce14bf6344',1,'armnn_driver::Converter::OperationType()'],['../namespacearmnn__driver.xhtml#ace6b45d6363c32d1b93b7fce14bf6344',1,'armnn_driver::OperationType()']]],
+  ['operatorcodeptr',['OperatorCodePtr',['../classarmnn_tf_lite_parser_1_1_tf_lite_parser_impl.xhtml#ab80edc19da7460a95a0ac05902f244b7',1,'armnnTfLiteParser::TfLiteParserImpl']]],
+  ['operatorptr',['OperatorPtr',['../classarmnn_tf_lite_parser_1_1_tf_lite_parser_impl.xhtml#aadad81a95152fe5aad839db352d4012c',1,'armnnTfLiteParser::TfLiteParserImpl']]],
+  ['optimizationptr',['OptimizationPtr',['../classarmnn_1_1_optimizer.xhtml#a621bdb49c4a2f879b27d27e771693a46',1,'armnn::Optimizer']]],
+  ['optimizations',['Optimizations',['../classarmnn_1_1_optimizer.xhtml#ad1794808004025d6e06c176507197b24',1,'armnn::Optimizer']]],
+  ['optimizeconsecutivereshapes',['OptimizeConsecutiveReshapes',['../namespacearmnn_1_1optimizations.xhtml#a8341ca3512ebafb19d60eba44d40d9e4',1,'armnn::optimizations']]],
+  ['optimizeinverseconversionsfp16',['OptimizeInverseConversionsFp16',['../namespacearmnn_1_1optimizations.xhtml#a1a9d718b48612b5817a3c369f9fd71ee',1,'armnn::optimizations']]],
+  ['optimizeinverseconversionsfp32',['OptimizeInverseConversionsFp32',['../namespacearmnn_1_1optimizations.xhtml#ae1509d340bc981b11101c3316ee8afd6',1,'armnn::optimizations']]],
+  ['optimizeinversepermutes',['OptimizeInversePermutes',['../namespacearmnn_1_1optimizations.xhtml#aa31127c77d2117f78d43ca2958dcae19',1,'armnn::optimizations']]],
+  ['optimizeinversetransposes',['OptimizeInverseTransposes',['../namespacearmnn_1_1optimizations.xhtml#a2f9d1a13be2ac1c4213729a0ef181fc0',1,'armnn::optimizations']]],
+  ['outputqueuedescriptor',['OutputQueueDescriptor',['../namespacearmnn.xhtml#a37a1a6b381ccc76df203fee023234996',1,'armnn']]],
+  ['outputslots',['OutputSlots',['../classarmnn_1_1_subgraph_view.xhtml#a78293334750ec5279eb9c96d56deaf08',1,'armnn::SubgraphView']]],
+  ['outputtensors',['OutputTensors',['../namespacearmnn.xhtml#a8f091a512915d1cb29a4ebf13dfc53ea',1,'armnn']]],
+  ['outtype',['OutType',['../structarmnn_1_1_elementwise_binary_function.xhtml#a8052a16ed0d9f7009e6fd20b8abc1e83',1,'armnn::ElementwiseBinaryFunction::OutType()'],['../structarmnn_1_1_elementwise_unary_function.xhtml#a8052a16ed0d9f7009e6fd20b8abc1e83',1,'armnn::ElementwiseUnaryFunction::OutType()'],['../structarmnn_1_1_logical_binary_function.xhtml#a1925c6964d026112dbab9e9269175cc2',1,'armnn::LogicalBinaryFunction::OutType()'],['../structarmnn_1_1_logical_unary_function.xhtml#a1925c6964d026112dbab9e9269175cc2',1,'armnn::LogicalUnaryFunction::OutType()']]]
+];

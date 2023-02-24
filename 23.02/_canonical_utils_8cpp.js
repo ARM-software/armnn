@@ -1,0 +1,25 @@
+var _canonical_utils_8cpp =
+[
+    [ "LOG_TAG", "_canonical_utils_8cpp.xhtml#a7ce0df38eb467e59f209470c8f5ac4e6", null ],
+    [ "DumpElementFunction", "_canonical_utils_8cpp.xhtml#a34209101a89c1ae72081a0fb53725852", null ],
+    [ "AreDynamicTensorsSupported", "_canonical_utils_8cpp.xhtml#a85d53debffd9611a3b5bc6031afd5073", null ],
+    [ "CommitPools", "_canonical_utils_8cpp.xhtml#a7c1c80ee0f432b6b621c40571410195a", null ],
+    [ "DumpJsonProfilingIfRequired", "_canonical_utils_8cpp.xhtml#aa313ae79f70102e3451d45d3387c2e46", null ],
+    [ "DumpTensor", "_canonical_utils_8cpp.xhtml#aa25bddb175983b2d3e0965440323d789", null ],
+    [ "DumpTensor< armnn::ConstTensor >", "_canonical_utils_8cpp.xhtml#a46cd012184b5106f810f5b6ea75863c4", null ],
+    [ "DumpTensor< armnn::Tensor >", "_canonical_utils_8cpp.xhtml#a533bbc27789ba037d6f6b75f58624567", null ],
+    [ "ExportNetworkGraphToDotFile", "_canonical_utils_8cpp.xhtml#a5304cf930377fc082e7494d20de2be12", null ],
+    [ "GetFileTimestamp", "_canonical_utils_8cpp.xhtml#a419cd7b9bad83f31f6db8ba9a3b9517a", null ],
+    [ "GetMemoryFromPointer", "_canonical_utils_8cpp.xhtml#a915f2652854e417e26afc297f12e107c", null ],
+    [ "GetMemoryFromPool", "_canonical_utils_8cpp.xhtml#a96666c2945d7fe8c34aee30a449287d5", null ],
+    [ "GetModelSummary", "_canonical_utils_8cpp.xhtml#a31b494d1b36f5ed7fc7556a0fbc2c17c", null ],
+    [ "GetOperandSummary", "_canonical_utils_8cpp.xhtml#ac0532f3c7d143a04aee7f5991ee5d381", null ],
+    [ "GetTensorInfoForOperand", "_canonical_utils_8cpp.xhtml#a93f4874062e34819806d36b74c73dc61", null ],
+    [ "IsDynamicTensor", "_canonical_utils_8cpp.xhtml#a208149d5c08f84debf8b265bb508fe02", null ],
+    [ "isQuantizedOperand", "_canonical_utils_8cpp.xhtml#ab3c135a0d4b1152f6b989ea6afddd6bc", null ],
+    [ "RenameExportedFiles", "_canonical_utils_8cpp.xhtml#a3d30e31a46482fbc714fc34e0d5a1c90", null ],
+    [ "RenameFile", "_canonical_utils_8cpp.xhtml#a00b317cd97319ac7b6a248a768ceb201", null ],
+    [ "SerializeNetwork", "_canonical_utils_8cpp.xhtml#a31f074135a3dba97d9baf1dffd0a07fd", null ],
+    [ "SwizzleAndroidNn4dTensorToArmNn", "_canonical_utils_8cpp.xhtml#a5665b88a0b22c6341dd8075048981689", null ],
+    [ "g_DontPermute", "_canonical_utils_8cpp.xhtml#ae059aea66ee0867a204aa2f2d9abb42c", null ]
+];

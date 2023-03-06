@@ -455,24 +455,6 @@ uint32_t DepthwiseConvolution2dDescriptor::GetNumInputs() const
     return armnn::GetNumInputs(m_BiasEnabled);
 }
 
-std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int>>
-BatchMatMulDescriptor::GetAxesToMul(
-    const BatchMatMulDescriptor& desc,
-    const TensorShape& tensorXShape,
-    const TensorShape& tensorYShape)
-{
-    return { GetAxesToMul(desc.m_DataLayoutX, tensorXShape),
-             GetAxesToMul(desc.m_DataLayoutY, tensorYShape) };
-}
-std::pair<std::vector<unsigned int>, std::vector<unsigned int>> BatchMatMulDescriptor::GetAxesNotMul(
-    const BatchMatMulDescriptor& desc,
-    const TensorShape& inputXShape,
-    const TensorShape& inputYShape)
-{
-    return { GetAxesNotMul(desc.m_DataLayoutX, inputXShape),
-             GetAxesNotMul(desc.m_DataLayoutY, inputYShape) };
-}
-
 std::pair<unsigned int, unsigned int> BatchMatMulDescriptor::GetAxesToMul(
     DataLayout dataLayout,
     const TensorShape& tensorShape)

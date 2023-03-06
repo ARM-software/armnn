@@ -1588,22 +1588,6 @@ struct BatchMatMulDescriptor : BaseDescriptor
     DataLayout m_DataLayoutX;
     DataLayout m_DataLayoutY;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use ABI Stable "
-                                      "GetAxesToMul(DataLayout dataLayout, const TensorShape& tensorShape) instead.",
-                                      "23.05")
-    static std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int>> GetAxesToMul(
-        const BatchMatMulDescriptor& desc,
-        const TensorShape& tensorXShape,
-        const TensorShape& tensorYShape);
-
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This method is deprecated. Use ABI Stable "
-                                      "GetAxesNotMul(DataLayout dataLayout, const TensorShape& tensorShape) instead.",
-                                      "23.05")
-    static std::pair<std::vector<unsigned int>, std::vector<unsigned int>> GetAxesNotMul(
-        const BatchMatMulDescriptor& desc,
-        const TensorShape& inputXShape,
-        const TensorShape& inputYShape);
-
     /// Static helper to get the two axes (for each input) for multiplication
     static std::pair<unsigned int, unsigned int> GetAxesToMul(
         DataLayout dataLayout,

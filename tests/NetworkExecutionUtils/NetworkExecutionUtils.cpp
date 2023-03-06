@@ -78,3 +78,21 @@ void LogAndThrow(std::string eMsg)
     throw armnn::Exception(eMsg);
 }
 
+/// Compute the root-mean-square error (RMSE) at a byte level between two tensors of the same size.
+/// @param expected
+/// @param actual
+/// @param size size of the tensor in bytes.
+/// @return float the RMSE
+double ComputeByteLevelRMSE(const void* expected, const void* actual, const size_t size)
+{
+    const uint8_t* byteExpected = reinterpret_cast<const uint8_t*>(expected);
+    const uint8_t* byteActual = reinterpret_cast<const uint8_t*>(actual);
+
+    double errorSum = 0;
+    for (unsigned int i = 0; i < size; i++)
+    {
+        int difference = byteExpected[i] - byteActual[i];
+        errorSum += std::pow(difference, 2);
+    }
+    return std::sqrt(errorSum/armnn::numeric_cast<double>(size));
+}

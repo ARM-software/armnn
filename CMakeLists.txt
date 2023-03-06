@@ -835,6 +835,12 @@ if(BUILD_UNIT_TESTS)
                 )
     endif()
 
+    if(BUILD_TESTS)
+        list(APPEND unittest_sources
+            ./tests/NetworkExecutionUtils/NetworkExecutionUtils.cpp
+            ./tests/NetworkExecutionUtils/test/NetworkExecutionUtilsTests.cpp)
+    endif()
+
     foreach(lib ${armnnUnitTestLibraries})
         message(STATUS "Adding object library dependency to UnitTests: ${lib}")
         list(APPEND unittest_sources $<TARGET_OBJECTS:${lib}>)

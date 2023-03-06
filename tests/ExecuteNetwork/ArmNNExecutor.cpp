@@ -707,48 +707,14 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
 void ArmNNExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
 {
     unsigned int index = 0;
-
+    std::string typeString;
     for (const auto& outputTensors: m_OutputTensorsVec)
     {
         for (const auto& outputTensor: outputTensors)
         {
-            float result = 0;
             size_t size = outputTensor.second.GetNumBytes();
-
-            switch (outputTensor.second.GetDataType())
-            {
-                case armnn::DataType::Float32:
-                {
-                    result = ComputeRMSE<float>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
-                    break;
-                }
-                case armnn::DataType::Signed32:
-                {
-                    result = ComputeRMSE<int32_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
-                    break;
-                }
-                case armnn::DataType::QSymmS16:
-                {
-                    result = ComputeRMSE<int16_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
-                    break;
-                }
-                case armnn::DataType::QSymmS8:
-                case armnn::DataType::QAsymmS8:
-                {
-                    result = ComputeRMSE<int8_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
-                    break;
-                }
-                case armnn::DataType::QAsymmU8:
-                {
-                    result = ComputeRMSE<uint8_t>(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
-                    break;
-                }
-                default:
-                {
-                    LogAndThrow("Unexpected DataType");
-                }
-            }
-            std::cout << "RMSE: of " << result << "\n";
+            double result = ComputeByteLevelRMSE(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
+            std::cout << "Byte level root mean square error: " << result << "\n";
         }
     }
 }

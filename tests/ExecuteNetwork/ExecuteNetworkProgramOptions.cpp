@@ -359,17 +359,19 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::string>()->default_value("parser"))
 
                 ("C, compare-output",
-                 "Compare the output of the network with an output file that has been previously "
-                 "produced by running a network through ExecuteNetwork. See --write-outputs-to-file "
-                 "to produce an output file for an execution.",
+                 "Perform a per byte root mean square error calculation of the inference output with an output"
+                 " file that has been previously produced by running a network through ExecuteNetwork."
+                 " See --write-outputs-to-file to produce an output file for an execution.",
                  cxxopts::value<std::string>(m_ExNetParams.m_ComparisonFile))
 
                 ("B, compare-output-with-backend",
-                 "Compare the output of the network with a different backend.",
+                 "Perform a per byte root mean square error calculation of the output of the inference with a"
+                 " different backend.",
                  cxxopts::value<std::vector<std::string>>())
 
                 ("A, compare-with-tflite",
-                 "Compare the output of the network with the tflite ref model.",
+                 "Perform an per byte root mean square error calculation of the output of the inference with"
+                 " the tflite ref model.",
                  cxxopts::value<bool>(m_ExNetParams.m_CompareWithTflite)->default_value("false")
                          ->implicit_value("true"));
 

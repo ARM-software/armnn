@@ -73,6 +73,8 @@ std::vector<unsigned int> ParseArray(std::istream& stream);
 /// Splits a given string at every accurance of delimiter into a vector of string
 std::vector<std::string> ParseStringList(const std::string& inputString, const char* delimiter);
 
+double ComputeByteLevelRMSE(const void* expected, const void* actual, const size_t size);
+
 /// Dequantize an array of a given type
 /// @param array Type erased array to dequantize
 /// @param numElements Elements in the array
@@ -284,30 +286,4 @@ std::vector<T> ParseArrayImpl(std::istream& stream, TParseElementFunc parseEleme
     }
 
     return result;
-}
-
-/// Compute the root-mean-square error (RMSE)
-/// @param expected
-/// @param actual
-/// @param size size of the tensor
-/// @return float the RMSE
-template<typename T>
-float ComputeRMSE(const void* expected, const void* actual, const size_t size)
-{
-    auto typedExpected = reinterpret_cast<const T*>(expected);
-    auto typedActual = reinterpret_cast<const T*>(actual);
-
-    T errorSum = 0;
-
-    for (unsigned int i = 0; i < size; i++)
-    {
-        if (std::abs(typedExpected[i] - typedActual[i]) != 0)
-        {
-            std::cout << "";
-        }
-        errorSum += std::pow(std::abs(typedExpected[i] - typedActual[i]), 2);
-    }
-
-    float rmse = std::sqrt(armnn::numeric_cast<float>(errorSum) / armnn::numeric_cast<float>(size / sizeof(T)));
-    return rmse;
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -35,11 +35,12 @@ std::vector<char> CreateSplitTfLiteModel(tflite::TensorType tensorType,
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
-    std::array<flatbuffers::Offset<tflite::Buffer>, 2> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-    buffers[1] = CreateBuffer(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(axisData.data()),
-                                                             sizeof(int32_t) * axisData.size()));
+    std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder,
+                                   flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(axisData.data()),
+                                                                  sizeof(int32_t) * axisData.size())));
 
     auto quantizationParameters =
             CreateQuantizationParameters(flatBufferBuilder,
@@ -53,27 +54,28 @@ std::vector<char> CreateSplitTfLiteModel(tflite::TensorType tensorType,
                               flatBufferBuilder.CreateVector<int32_t>(axisTensorShape.data(),
                                                                       axisTensorShape.size()),
                               ::tflite::TensorType_INT32,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("axis"),
                               quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"),
                               quantizationParameters);
 
     // Create output tensor
     for (unsigned int i = 0; i < outputTensorShapes.size(); ++i)
     {
+        buffers.push_back(CreateBuffer(flatBufferBuilder));
         tensors[i + 2] = CreateTensor(flatBufferBuilder,
-                                  flatBufferBuilder.CreateVector<int32_t>(outputTensorShapes[i].data(),
-                                                                          outputTensorShapes[i].size()),
-                                  tensorType,
-                                  0,
-                                  flatBufferBuilder.CreateString("output"),
-                                  quantizationParameters);
+                                      flatBufferBuilder.CreateVector<int32_t>(outputTensorShapes[i].data(),
+                                                                              outputTensorShapes[i].size()),
+                                      tensorType,
+                                      (i+3),
+                                      flatBufferBuilder.CreateString("output"),
+                                      quantizationParameters);
     }
 
     // create operator. Mean uses ReducerOptions.
@@ -109,7 +111,7 @@ std::vector<char> CreateSplitTfLiteModel(tflite::TensorType tensorType,
                         flatBufferBuilder.CreateVector(&operatorCode, 1),
                         flatBufferBuilder.CreateVector(&subgraph, 1),
                         modelDescription,
-                        flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+                        flatBufferBuilder.CreateVector(buffers));
 
     flatBufferBuilder.Finish(flatbufferModel);
 
@@ -144,21 +146,21 @@ void SplitTest(tflite::TensorType tensorType,
     // Create TfLite Interpreters
     std::unique_ptr<Interpreter> armnnDelegate;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&armnnDelegate) == kTfLiteOk);
+                  (&armnnDelegate) == kTfLiteOk);
     CHECK(armnnDelegate != nullptr);
     CHECK(armnnDelegate->AllocateTensors() == kTfLiteOk);
 
     std::unique_ptr<Interpreter> tfLiteDelegate;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&tfLiteDelegate) == kTfLiteOk);
+                  (&tfLiteDelegate) == kTfLiteOk);
     CHECK(tfLiteDelegate != nullptr);
     CHECK(tfLiteDelegate->AllocateTensors() == kTfLiteOk);
 
     // Create the ArmNN Delegate
     armnnDelegate::DelegateOptions delegateOptions(backends);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-    theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                     armnnDelegate::TfLiteArmnnDelegateDelete);
+            theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                             armnnDelegate::TfLiteArmnnDelegateDelete);
     CHECK(theArmnnDelegate != nullptr);
 
     // Modify armnnDelegateInterpreter to use armnnDelegate
@@ -210,11 +212,11 @@ std::vector<char> CreateSplitVTfLiteModel(tflite::TensorType tensorType,
                                                              sizeof(int32_t) * axisData.size()));
 
     auto quantizationParameters =
-        CreateQuantizationParameters(flatBufferBuilder,
-                                     0,
-                                     0,
-                                     flatBufferBuilder.CreateVector<float>({ quantScale }),
-                                     flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
+            CreateQuantizationParameters(flatBufferBuilder,
+                                         0,
+                                         0,
+                                         flatBufferBuilder.CreateVector<float>({ quantScale }),
+                                         flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
 
     std::array<flatbuffers::Offset<Tensor>, 5> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
@@ -258,33 +260,33 @@ std::vector<char> CreateSplitVTfLiteModel(tflite::TensorType tensorType,
     const std::vector<int> operatorInputs{ {0, 1, 2} };
     const std::vector<int> operatorOutputs{ {3, 4} };
     flatbuffers::Offset <Operator> controlOperator =
-        CreateOperator(flatBufferBuilder,
-                       0,
-                       flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
-                       operatorBuiltinOptionsType,
-                       operatorBuiltinOptions);
+            CreateOperator(flatBufferBuilder,
+                           0,
+                           flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
+                           flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
+                           operatorBuiltinOptionsType,
+                           operatorBuiltinOptions);
 
     const std::vector<int> subgraphInputs{ {0, 1, 2} };
     const std::vector<int> subgraphOutputs{ {3, 4} };
     flatbuffers::Offset <SubGraph> subgraph =
-        CreateSubGraph(flatBufferBuilder,
-                       flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(subgraphInputs.data(), subgraphInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs.data(), subgraphOutputs.size()),
-                       flatBufferBuilder.CreateVector(&controlOperator, 1));
+            CreateSubGraph(flatBufferBuilder,
+                           flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
+                           flatBufferBuilder.CreateVector<int32_t>(subgraphInputs.data(), subgraphInputs.size()),
+                           flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs.data(), subgraphOutputs.size()),
+                           flatBufferBuilder.CreateVector(&controlOperator, 1));
 
     flatbuffers::Offset <flatbuffers::String> modelDescription =
-        flatBufferBuilder.CreateString("ArmnnDelegate: SPLIT_V Operator Model");
+            flatBufferBuilder.CreateString("ArmnnDelegate: SPLIT_V Operator Model");
     flatbuffers::Offset <OperatorCode> operatorCode = CreateOperatorCode(flatBufferBuilder, BuiltinOperator_SPLIT_V);
 
     flatbuffers::Offset <Model> flatbufferModel =
-        CreateModel(flatBufferBuilder,
-                    TFLITE_SCHEMA_VERSION,
-                    flatBufferBuilder.CreateVector(&operatorCode, 1),
-                    flatBufferBuilder.CreateVector(&subgraph, 1),
-                    modelDescription,
-                    flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+            CreateModel(flatBufferBuilder,
+                        TFLITE_SCHEMA_VERSION,
+                        flatBufferBuilder.CreateVector(&operatorCode, 1),
+                        flatBufferBuilder.CreateVector(&subgraph, 1),
+                        modelDescription,
+                        flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
 
     flatBufferBuilder.Finish(flatbufferModel);
 

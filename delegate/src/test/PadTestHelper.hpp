@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -70,12 +70,12 @@ std::vector<char> CreatePadTfLiteModel(
     std::vector<flatbuffers::Offset<Tensor>> tensors = { inputTensor, paddingTensor, outputTensor};
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(paddingDim.data()),
                                                     sizeof(int32_t) * paddingDim.size())));
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     std::vector<int32_t> operatorInputs;
     std::vector<int> subgraphInputs;

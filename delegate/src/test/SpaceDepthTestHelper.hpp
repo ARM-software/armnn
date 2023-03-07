@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -37,21 +37,23 @@ std::vector<char> CreateSpaceDepthTfLiteModel(tflite::BuiltinOperator spaceDepth
                                      flatBufferBuilder.CreateVector<int64_t>({ 0 }));
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     std::array<flatbuffers::Offset<Tensor>, 2> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"),
                               quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              2,
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 

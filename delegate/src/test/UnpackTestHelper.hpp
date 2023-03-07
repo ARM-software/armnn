@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,7 +36,9 @@ std::vector<char> CreateUnpackTfLiteModel(tflite::BuiltinOperator unpackOperator
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,
@@ -57,7 +59,7 @@ std::vector<char> CreateUnpackTfLiteModel(tflite::BuiltinOperator unpackOperator
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                                                                       tensorType,
-                                                                      0,
+                                                                      1,
                                                                       flatBufferBuilder.CreateString("input"),
                                                                       quantizationParameters);
 
@@ -67,10 +69,11 @@ std::vector<char> CreateUnpackTfLiteModel(tflite::BuiltinOperator unpackOperator
                                   flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                           outputTensorShape.size()),
                                   tensorType,
-                                  0,
+                                      (i + 2),
                                   flatBufferBuilder.CreateString("output" + std::to_string(i)),
                                   quantizationParameters);
 
+        buffers.push_back(CreateBuffer(flatBufferBuilder));
         operatorOutputs.push_back(i + 1);
         subgraphOutputs.push_back(i + 1);
     }
@@ -105,7 +108,7 @@ std::vector<char> CreateUnpackTfLiteModel(tflite::BuiltinOperator unpackOperator
                     flatBufferBuilder.CreateVector(&operatorCode, 1),
                     flatBufferBuilder.CreateVector(&subgraph, 1),
                     modelDescription,
-                    flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+                    flatBufferBuilder.CreateVector(buffers));
 
     flatBufferBuilder.Finish(flatbufferModel);
 

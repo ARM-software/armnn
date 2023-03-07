@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,31 +32,33 @@ std::vector<char> CreateResizeTfLiteModel(tflite::BuiltinOperator operatorCode,
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     buffers.push_back(CreateBuffer(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector(
                                            reinterpret_cast<const uint8_t*>(sizeTensorData.data()),
                                            sizeof(int32_t) * sizeTensorData.size())));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     std::array<flatbuffers::Offset<Tensor>, 3> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(), inputTensorShape.size()),
                               inputTensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input_tensor"));
 
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(sizeTensorShape.data(),
                                                                       sizeTensorShape.size()),
                               TensorType_INT32,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("size_input_tensor"));
 
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               inputTensorType,
-                              0,
+                              3,
                               flatBufferBuilder.CreateString("output_tensor"));
 
     // Create Operator

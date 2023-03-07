@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -101,7 +101,7 @@ std::vector<char> CreateLstmTfLiteModel(tflite::TensorType tensorType,
                                      flatBufferBuilder.CreateVector<float>({ outputQuantScale }),
                                      flatBufferBuilder.CreateVector<int64_t>({ outputQuantOffset }));
 
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(inputShape.data(),
                                                                            inputShape.size()),
@@ -388,7 +388,7 @@ std::vector<char> CreateLstmTfLiteModel(tflite::TensorType tensorType,
         operatorInputs.push_back(kTfLiteOptionalTensor);
     }
 
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(outputStateInDimensions.data(),
                                                                            outputStateInDimensions.size()),
@@ -399,7 +399,7 @@ std::vector<char> CreateLstmTfLiteModel(tflite::TensorType tensorType,
                                    true));
     operatorInputs.push_back(buffers.size() - 1);
 
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(cellStateInDimensions.data(),
                                                                            cellStateInDimensions.size()),
@@ -493,7 +493,7 @@ std::vector<char> CreateLstmTfLiteModel(tflite::TensorType tensorType,
         operatorInputs.push_back(kTfLiteOptionalTensor);
     }
     int outputBufferId = buffers.size();
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(outputShape.data(),
                                                                            outputShape.size()),

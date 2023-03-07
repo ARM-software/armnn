@@ -81,6 +81,7 @@ private:
         nullptr,                        // .CopyToBufferHandle
         nullptr,                        // .FreeBufferHandle
         kTfLiteDelegateFlagsNone,       // .flags
+        nullptr,                        // .opaque_delegate_builder
     };
 
     /// ArmNN Runtime pointer

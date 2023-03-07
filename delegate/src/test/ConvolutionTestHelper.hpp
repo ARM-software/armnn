@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -50,15 +50,17 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
-    std::array<flatbuffers::Offset<tflite::Buffer>, 3> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-    buffers[1] = CreateBuffer(flatBufferBuilder,
+    std::array<flatbuffers::Offset<tflite::Buffer>, 5> buffers;
+    buffers[0] = CreateBuffer(flatBufferBuilder);
+    buffers[1] = CreateBuffer(flatBufferBuilder);
+    buffers[2] = CreateBuffer(flatBufferBuilder,
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(filterData.data()),
                                                              sizeof(T) * filterData.size()));
 
-    buffers[2] = CreateBuffer(flatBufferBuilder,
+    buffers[3] = CreateBuffer(flatBufferBuilder,
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
                                                              sizeof(B) * biasData.size()));
+    buffers[4] = CreateBuffer(flatBufferBuilder);
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,
@@ -95,14 +97,14 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"),
                               quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(filterTensorShape.data(),
                                                                       filterTensorShape.size()),
                               tensorType,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("filter"),
                               filterQuantizationParameters);
 
@@ -114,14 +116,14 @@ std::vector<char> CreateConv2dTfLiteModel(tflite::BuiltinOperator convolutionOpe
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(biasTensorShape.data(), biasTensorShape.size()),
                               biasTensorType,
-                              2,
+                              3,
                               flatBufferBuilder.CreateString("bias"),
                               biasQuantizationParameters);
     tensors[3] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              4,
                               flatBufferBuilder.CreateString("output"),
                               outputQuantizationParameters);
 
@@ -334,7 +336,7 @@ std::vector<char> CreateConv3dTfLiteModel(tflite::BuiltinOperator convolutionOpe
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::array<flatbuffers::Offset<tflite::Buffer>, 3> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
+    buffers[0] = CreateBuffer(flatBufferBuilder);
     buffers[1] = CreateBuffer(flatBufferBuilder,
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(filterData.data()),
                                                              sizeof(T) * filterData.size()));
@@ -581,7 +583,7 @@ std::vector<char> CreateTransposeConvTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::array<flatbuffers::Offset<tflite::Buffer>, 3> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
+    buffers[0] = CreateBuffer(flatBufferBuilder);
     buffers[1] = CreateBuffer(flatBufferBuilder,
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(transposeData.data()),
                                                              sizeof(int32_t) * transposeData.size()));

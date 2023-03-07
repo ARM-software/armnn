@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,7 +44,12 @@ std::vector<char> CreateAddDivTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,
@@ -59,35 +64,35 @@ std::vector<char> CreateAddDivTfLiteModel(tflite::TensorType tensorType,
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input_0"),
                               quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0,
+                              2,
                               flatBufferBuilder.CreateString("input_1"),
                               quantizationParameters);
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0,
+                              3,
                               flatBufferBuilder.CreateString("input_2"),
                               quantizationParameters);
     tensors[3] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0,
+                              4,
                               flatBufferBuilder.CreateString("add"),
                               quantizationParameters);
     tensors[4] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0,
+                              5,
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 
@@ -157,7 +162,7 @@ std::vector<char> CreateCeilTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,

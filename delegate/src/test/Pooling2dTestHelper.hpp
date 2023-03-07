@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,8 +38,9 @@ std::vector<char> CreatePooling2dTfLiteModel(
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
-    std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    flatbuffers::Offset<tflite::Buffer> buffers[3] = {CreateBuffer(flatBufferBuilder),
+                                                                        CreateBuffer(flatBufferBuilder),
+                                                                        CreateBuffer(flatBufferBuilder)};
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,
@@ -48,22 +49,21 @@ std::vector<char> CreatePooling2dTfLiteModel(
                                      flatBufferBuilder.CreateVector<float>({ quantScale }),
                                      flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
 
-    std::array<flatbuffers::Offset<Tensor>, 2> tensors;
-    tensors[0] = CreateTensor(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
-                                                                      inputTensorShape.size()),
+    flatbuffers::Offset<Tensor> tensors[2] {
+         CreateTensor(flatBufferBuilder,
+                              flatBufferBuilder.CreateVector<int32_t>(inputTensorShape),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"),
-                              quantizationParameters);
+                              quantizationParameters),
 
-    tensors[1] = CreateTensor(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
-                                                                      outputTensorShape.size()),
+         CreateTensor(flatBufferBuilder,
+                              flatBufferBuilder.CreateVector<int32_t>(outputTensorShape),
                               tensorType,
-                              0,
+                              2,
                               flatBufferBuilder.CreateString("output"),
-                              quantizationParameters);
+                              quantizationParameters)
+    };
 
     // create operator
     tflite::BuiltinOptions operatorBuiltinOptionsType = BuiltinOptions_Pool2DOptions;
@@ -80,18 +80,18 @@ std::vector<char> CreatePooling2dTfLiteModel(
     flatbuffers::Offset <Operator> poolingOperator =
         CreateOperator(flatBufferBuilder,
                        0,
-                       flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
+                       flatBufferBuilder.CreateVector<int32_t>(operatorInputs),
+                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs),
                        operatorBuiltinOptionsType,
                        operatorBuiltinOptions);
 
-    const std::vector<int> subgraphInputs{0};
-    const std::vector<int> subgraphOutputs{1};
+    const int subgraphInputs[1] = {0};
+    const int subgraphOutputs[1] = {1};
     flatbuffers::Offset <SubGraph> subgraph =
         CreateSubGraph(flatBufferBuilder,
-                       flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(subgraphInputs.data(), subgraphInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs.data(), subgraphOutputs.size()),
+                       flatBufferBuilder.CreateVector(tensors, 2),
+                       flatBufferBuilder.CreateVector<int32_t>(subgraphInputs, 1),
+                       flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs, 1),
                        flatBufferBuilder.CreateVector(&poolingOperator, 1));
 
     flatbuffers::Offset <flatbuffers::String> modelDescription =
@@ -104,7 +104,7 @@ std::vector<char> CreatePooling2dTfLiteModel(
                     flatBufferBuilder.CreateVector(&operatorCode, 1),
                     flatBufferBuilder.CreateVector(&subgraph, 1),
                     modelDescription,
-                    flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+                    flatBufferBuilder.CreateVector(buffers, 3));
 
     flatBufferBuilder.Finish(flatbufferModel);
 

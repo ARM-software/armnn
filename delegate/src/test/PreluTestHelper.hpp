@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,10 +33,12 @@ std::vector<char> CreatePreluTfLiteModel(tflite::BuiltinOperator preluOperatorCo
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
-
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector(
         reinterpret_cast<const uint8_t *>(alphaData.data()), sizeof(float) * alphaData.size())));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,
@@ -49,7 +51,7 @@ std::vector<char> CreatePreluTfLiteModel(tflite::BuiltinOperator preluOperatorCo
                                     flatBufferBuilder.CreateVector<int32_t>(inputShape.data(),
                                                                           inputShape.size()),
                                     tensorType,
-                                    0,
+                                    1,
                                     flatBufferBuilder.CreateString("input"),
                                     quantizationParameters);
 
@@ -57,7 +59,7 @@ std::vector<char> CreatePreluTfLiteModel(tflite::BuiltinOperator preluOperatorCo
                                     flatBufferBuilder.CreateVector<int32_t>(alphaShape.data(),
                                                                           alphaShape.size()),
                                     tensorType,
-                                    1,
+                                    2,
                                     flatBufferBuilder.CreateString("alpha"),
                                     quantizationParameters);
 
@@ -65,7 +67,7 @@ std::vector<char> CreatePreluTfLiteModel(tflite::BuiltinOperator preluOperatorCo
                                      flatBufferBuilder.CreateVector<int32_t>(outputShape.data(),
                                                                            outputShape.size()),
                                      tensorType,
-                                     0,
+                                     3,
                                      flatBufferBuilder.CreateString("output"),
                                      quantizationParameters);
 

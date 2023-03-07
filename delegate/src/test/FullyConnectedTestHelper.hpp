@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -37,8 +37,9 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
 {
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
-    std::array<flatbuffers::Offset<tflite::Buffer>, 3> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
+    std::array<flatbuffers::Offset<tflite::Buffer>, 5> buffers;
+    buffers[0] = CreateBuffer(flatBufferBuilder);
+    buffers[1] = CreateBuffer(flatBufferBuilder);
 
     auto biasTensorType = ::tflite::TensorType_FLOAT32;
     if (tensorType == ::tflite::TensorType_INT8)
@@ -47,14 +48,14 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
     }
     if (constantWeights)
     {
-        buffers[1] = CreateBuffer(flatBufferBuilder,
+        buffers[2] = CreateBuffer(flatBufferBuilder,
                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(weightsData.data()),
                                                     sizeof(T) * weightsData.size()));
 
         if (tensorType == ::tflite::TensorType_INT8)
         {
             std::vector<int32_t> biasData = { 10 };
-            buffers[2] = CreateBuffer(flatBufferBuilder,
+            buffers[3] = CreateBuffer(flatBufferBuilder,
                                       flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
                                                                      sizeof(int32_t) * biasData.size()));
 
@@ -62,16 +63,17 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
         else
         {
             std::vector<float> biasData = { 10 };
-            buffers[2] = CreateBuffer(flatBufferBuilder,
+            buffers[3] = CreateBuffer(flatBufferBuilder,
                                       flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
                                                                      sizeof(float) * biasData.size()));
         }
     }
     else
     {
-        buffers[1] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-        buffers[2] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
+        buffers[2] = CreateBuffer(flatBufferBuilder);
+        buffers[3] = CreateBuffer(flatBufferBuilder);
     }
+    buffers[4] = CreateBuffer(flatBufferBuilder);
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,
@@ -92,21 +94,21 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input_0"),
                               quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(weightsTensorShape.data(),
                                                                       weightsTensorShape.size()),
                               tensorType,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("weights"),
                               quantizationParameters);
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(biasTensorShape.data(),
                                                                       biasTensorShape.size()),
                               biasTensorType,
-                              2,
+                              3,
                               flatBufferBuilder.CreateString("bias"),
                               quantizationParameters);
 
@@ -114,7 +116,7 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              4,
                               flatBufferBuilder.CreateString("output"),
                               outputQuantizationParameters);
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,10 @@ std::vector<char> CreateComparisonTfLiteModel(tflite::BuiltinOperator comparison
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     auto quantizationParameters =
         CreateQuantizationParameters(flatBufferBuilder,
@@ -47,21 +50,21 @@ std::vector<char> CreateComparisonTfLiteModel(tflite::BuiltinOperator comparison
                               flatBufferBuilder.CreateVector<int32_t>(input0TensorShape.data(),
                                                                       input0TensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input_0"),
                               quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(input1TensorShape.data(),
                                                                       input1TensorShape.size()),
                               tensorType,
-                              0,
+                              2,
                               flatBufferBuilder.CreateString("input_1"),
                               quantizationParameters);
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               ::tflite::TensorType_BOOL,
-                              0);
+                              3);
 
     // create operator
     tflite::BuiltinOptions operatorBuiltinOptionsType = BuiltinOptions_EqualOptions;;

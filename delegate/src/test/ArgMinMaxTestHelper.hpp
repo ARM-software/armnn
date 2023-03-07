@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,7 +46,7 @@ std::vector<char> CreateArgMinMaxTfLiteModel(tflite::BuiltinOperator argMinMaxOp
                                     flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                             inputTensorShape.size()),
                                     tensorType,
-                                    0,
+                                    1,
                                     flatBufferBuilder.CreateString("input"),
                                     quantizationParameters);
 
@@ -54,26 +54,27 @@ std::vector<char> CreateArgMinMaxTfLiteModel(tflite::BuiltinOperator argMinMaxOp
                                    flatBufferBuilder.CreateVector<int32_t>(axisTensorShape.data(),
                                                                            axisTensorShape.size()),
                                    tflite::TensorType_INT32,
-                                   1,
+                                   2,
                                    flatBufferBuilder.CreateString("axis"));
 
     auto outputTensor = CreateTensor(flatBufferBuilder,
                                      flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                              outputTensorShape.size()),
                                      outputType,
-                                     2,
+                                     3,
                                      flatBufferBuilder.CreateString("output"),
                                      quantizationParameters);
 
     std::vector<flatbuffers::Offset<Tensor>> tensors = { inputTensor, axisTensor, outputTensor };
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(axisValue.data()),
                                                     sizeof(OutputT))));
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     std::vector<int32_t> operatorInputs = {{ 0, 1 }};
     std::vector<int> subgraphInputs = {{ 0, 1 }};

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,10 @@ std::vector<char> CreateGatherNdTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     auto quantizationParameters =
              CreateQuantizationParameters(flatBufferBuilder,
@@ -46,21 +49,21 @@ std::vector<char> CreateGatherNdTfLiteModel(tflite::TensorType tensorType,
                               flatBufferBuilder.CreateVector<int32_t>(paramsShape.data(),
                                                                       paramsShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("params"),
                               quantizationParameters);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(indicesShape.data(),
                                                                       indicesShape.size()),
                               ::tflite::TensorType_INT32,
-                              0,
+                              2,
                               flatBufferBuilder.CreateString("indices"),
                               quantizationParameters);
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(expectedOutputShape.data(),
                                                                       expectedOutputShape.size()),
                               tensorType,
-                              0,
+                              3,
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 

@@ -3,8 +3,10 @@
 # Copyright © 2020 NXP
 # SPDX-License-Identifier: MIT
 #
-cmake_minimum_required (VERSION 3.0.2) # 3.0.2 required for return() statement used in AddDllCopyCommands.cmake
+cmake_minimum_required (VERSION 3.7.0)
 project(armnn)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(additional_cmake_files)
 list(APPEND additional_cmake_files

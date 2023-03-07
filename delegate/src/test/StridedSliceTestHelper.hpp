@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,48 +43,51 @@ std::vector<char> CreateStridedSliceTfLiteModel(tflite::TensorType tensorType,
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
-    std::array<flatbuffers::Offset<tflite::Buffer>, 4> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-    buffers[1] = CreateBuffer(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(beginTensorData.data()),
-                                                             sizeof(int32_t) * beginTensorData.size()));
-    buffers[2] = CreateBuffer(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(endTensorData.data()),
-                                                             sizeof(int32_t) * endTensorData.size()));
-    buffers[3] = CreateBuffer(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(strideTensorData.data()),
-                                                             sizeof(int32_t) * strideTensorData.size()));
+    flatbuffers::Offset<tflite::Buffer> buffers[6] = {
+            CreateBuffer(flatBufferBuilder),
+            CreateBuffer(flatBufferBuilder),
+            CreateBuffer(flatBufferBuilder,
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(beginTensorData.data()),
+                                                        sizeof(int32_t) * beginTensorData.size())),
+            CreateBuffer(flatBufferBuilder,
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(endTensorData.data()),
+                                                        sizeof(int32_t) * endTensorData.size())),
+            CreateBuffer(flatBufferBuilder,
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(strideTensorData.data()),
+                                                        sizeof(int32_t) * strideTensorData.size())),
+            CreateBuffer(flatBufferBuilder)
+    };
 
     std::array<flatbuffers::Offset<Tensor>, 5> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"));
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(beginTensorShape.data(),
                                                                       beginTensorShape.size()),
                               ::tflite::TensorType_INT32,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("begin_tensor"));
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(endTensorShape.data(),
                                                                       endTensorShape.size()),
                               ::tflite::TensorType_INT32,
-                              2,
+                              3,
                               flatBufferBuilder.CreateString("end_tensor"));
     tensors[3] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(strideTensorShape.data(),
                                                                       strideTensorShape.size()),
                               ::tflite::TensorType_INT32,
-                              3,
+                              4,
                               flatBufferBuilder.CreateString("stride_tensor"));
     tensors[4] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              5,
                               flatBufferBuilder.CreateString("output"));
 
 
@@ -127,7 +130,7 @@ std::vector<char> CreateStridedSliceTfLiteModel(tflite::TensorType tensorType,
                         flatBufferBuilder.CreateVector(&operatorCode, 1),
                         flatBufferBuilder.CreateVector(&subgraph, 1),
                         modelDescription,
-                        flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+                        flatBufferBuilder.CreateVector(buffers, 6));
 
     flatBufferBuilder.Finish(flatbufferModel);
 
@@ -177,21 +180,21 @@ void StridedSliceTestImpl(std::vector<armnn::BackendId>& backends,
     // Create TfLite Interpreters
     std::unique_ptr<Interpreter> armnnDelegate;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&armnnDelegate) == kTfLiteOk);
+                  (&armnnDelegate) == kTfLiteOk);
     CHECK(armnnDelegate != nullptr);
     CHECK(armnnDelegate->AllocateTensors() == kTfLiteOk);
 
     std::unique_ptr<Interpreter> tfLiteDelegate;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&tfLiteDelegate) == kTfLiteOk);
+                  (&tfLiteDelegate) == kTfLiteOk);
     CHECK(tfLiteDelegate != nullptr);
     CHECK(tfLiteDelegate->AllocateTensors() == kTfLiteOk);
 
     // Create the ArmNN Delegate
     armnnDelegate::DelegateOptions delegateOptions(backends);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-                                   theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                                                    armnnDelegate::TfLiteArmnnDelegateDelete);
+            theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                             armnnDelegate::TfLiteArmnnDelegateDelete);
     CHECK(theArmnnDelegate != nullptr);
 
     // Modify armnnDelegateInterpreter to use armnnDelegate

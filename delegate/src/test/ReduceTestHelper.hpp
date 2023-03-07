@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -37,14 +37,17 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
-    std::array<flatbuffers::Offset<tflite::Buffer>, 2> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-    buffers[1] = CreateBuffer(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(axisData.data()),
-                                                             sizeof(int32_t) * axisData.size()));
+    flatbuffers::Offset<tflite::Buffer> buffers[4] = {
+            CreateBuffer(flatBufferBuilder),
+            CreateBuffer(flatBufferBuilder),
+            CreateBuffer(flatBufferBuilder,
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(axisData.data()),
+                                                        sizeof(int32_t) * axisData.size())),
+            CreateBuffer(flatBufferBuilder)
+    };
 
     flatbuffers::Offset<tflite::QuantizationParameters> quantizationParametersAxis
-    = CreateQuantizationParameters(flatBufferBuilder);
+            = CreateQuantizationParameters(flatBufferBuilder);
 
     flatbuffers::Offset<tflite::QuantizationParameters> quantizationParameters;
 
@@ -81,7 +84,7 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
                               flatBufferBuilder.CreateVector<int32_t>(input0TensorShape.data(),
                                                                       input0TensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"),
                               quantizationParameters);
 
@@ -89,7 +92,7 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
                               flatBufferBuilder.CreateVector<int32_t>(input1TensorShape.data(),
                                                                       input1TensorShape.size()),
                               ::tflite::TensorType_INT32,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("axis"),
                               quantizationParametersAxis);
 
@@ -98,7 +101,7 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              3,
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 
@@ -135,7 +138,7 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
                         flatBufferBuilder.CreateVector(&operatorCode, 1),
                         flatBufferBuilder.CreateVector(&subgraph, 1),
                         modelDescription,
-                        flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+                        flatBufferBuilder.CreateVector(buffers, 4));
 
     flatBufferBuilder.Finish(flatbufferModel);
 

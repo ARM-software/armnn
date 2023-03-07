@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -38,8 +38,6 @@ if (TfLite_LIB MATCHES .a$)
                  PATH ${TFLITE_LIB_ROOT}/_deps/flatbuffers-build)
     find_library(TfLite_cpuinfo_LIB "libcpuinfo.a" PATH
                  ${TFLITE_LIB_ROOT}/_deps/cpuinfo-build)
-    find_library(TfLite_clog_LIB "libclog.a" PATH
-                 ${TFLITE_LIB_ROOT}/_deps/clog-build)
 
     # All remaining libraries are part of libruy.
     find_library(TfLite_ruy_allocator_LIB "libruy_allocator.a" PATH
@@ -100,6 +98,8 @@ if (TfLite_LIB MATCHES .a$)
                  ${TFLITE_LIB_ROOT}/_deps/ruy-build/ruy)
     find_library(TfLite_ruy_profiler_LIB "libruy_profiler_instrumentation.a" PATH
                 ${TFLITE_LIB_ROOT}/_deps/ruy-build/ruy/profiler)
+    find_library(TfLite_pthread_pool_LIB "libpthreadpool.a" PATH
+                ${TFLITE_LIB_ROOT}/pthreadpool)
 
     ## Set TFLITE_FOUND if all libraries are satisfied for static lib
     find_package_handle_standard_args(TfLite DEFAULT_MSG TfLite_LIB TfLite_abseilstrings_LIB TfLite_farmhash_LIB TfLite_fftsg_LIB TfLite_fftsg2d_LIB
@@ -110,8 +110,8 @@ if (TfLite_LIB MATCHES .a$)
                                       TfLite_ruy_kernel_avx2_fma_LIB TfLite_ruy_kernel_avx512_LIB TfLite_ruy_kernel_avx_LIB TfLite_ruy_pack_arm_LIB
                                       TfLite_ruy_pack_avx2_fma_LIB TfLite_ruy_pack_avx512_LIB TfLite_ruy_pack_avx_LIB TfLite_ruy_prepacked_cache_LIB
                                       TfLite_ruy_prepare_packed_matrices_LIB TfLite_ruy_system_aligned_alloc_LIB TfLite_ruy_threadpool_LIB
-                                      TfLite_ruy_trmul_LIB TfLite_ruy_tune_LIB TfLite_ruy_wait_LIB TfLite_ruy_profiler_LIB TfLite_cpuinfo_LIB TfLite_clog_LIB
-                                      TfLite_abseil_synchronization_LIB)
+                                      TfLite_ruy_trmul_LIB TfLite_ruy_tune_LIB TfLite_ruy_wait_LIB TfLite_ruy_profiler_LIB TfLite_cpuinfo_LIB
+                                      TfLite_abseil_synchronization_LIB TfLite_pthread_pool_LIB)
     # Set external variables for usage in CMakeLists.txt
     if (TFLITE_FOUND)
         # WARNING! The order of these libraries is critical. Moving them
@@ -126,7 +126,7 @@ if (TfLite_LIB MATCHES .a$)
                                      ${TfLite_ruy_pack_avx2_fma_LIB} ${TfLite_ruy_pack_avx512_LIB} ${TfLite_ruy_pack_avx_LIB} ${TfLite_ruy_prepacked_cache_LIB}
                                      ${TfLite_ruy_prepare_packed_matrices_LIB} ${TfLite_ruy_system_aligned_alloc_LIB}
                                      ${TfLite_ruy_tune_LIB} ${TfLite_ruy_wait_LIB} ${TfLite_ruy_profiler_LIB}
-                                     ${TfLite_cpuinfo_LIB} ${TfLite_clog_LIB} ${TfLite_abseil_synchronization_LIB})
+                                     ${TfLite_cpuinfo_LIB} ${TfLite_abseil_synchronization_LIB} ${TfLite_pthread_pool_LIB})
     endif ()
 elseif (TfLite_LIB MATCHES .so$)
     message("-- Dynamic tensorflow lite library found, using for ArmNN build")

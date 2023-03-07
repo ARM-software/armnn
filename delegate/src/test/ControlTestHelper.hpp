@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,7 +36,9 @@ std::vector<char> CreateConcatTfLiteModel(tflite::BuiltinOperator controlOperato
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     auto quantizationParameters =
             CreateQuantizationParameters(flatBufferBuilder,
@@ -57,7 +59,7 @@ std::vector<char> CreateConcatTfLiteModel(tflite::BuiltinOperator controlOperato
                                   flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                           inputTensorShape.size()),
                                   tensorType,
-                                  0,
+                                  1,
                                   flatBufferBuilder.CreateString("input" + std::to_string(i)),
                                   quantizationParameters);
 
@@ -71,7 +73,7 @@ std::vector<char> CreateConcatTfLiteModel(tflite::BuiltinOperator controlOperato
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              2,
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 
@@ -126,7 +128,7 @@ std::vector<char> CreateMeanTfLiteModel(tflite::BuiltinOperator controlOperatorC
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::array<flatbuffers::Offset<tflite::Buffer>, 2> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
+    buffers[0] = CreateBuffer(flatBufferBuilder);
     buffers[1] = CreateBuffer(flatBufferBuilder,
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(axisData.data()),
                                                              sizeof(int32_t) * axisData.size()));

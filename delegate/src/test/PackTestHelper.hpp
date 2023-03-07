@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,7 +36,8 @@ std::vector<char> CreatePackTfLiteModel(tflite::BuiltinOperator packOperatorCode
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     auto quantizationParameters =
             CreateQuantizationParameters(flatBufferBuilder,
@@ -57,7 +58,7 @@ std::vector<char> CreatePackTfLiteModel(tflite::BuiltinOperator packOperatorCode
                                   flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                           inputTensorShape.size()),
                                   tensorType,
-                                  0,
+                                  1,
                                   flatBufferBuilder.CreateString("input" + std::to_string(i)),
                                   quantizationParameters);
 

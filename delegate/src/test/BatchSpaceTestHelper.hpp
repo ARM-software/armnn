@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,14 +33,16 @@ std::vector<char> CreateBatchSpaceTfLiteModel(tflite::BuiltinOperator batchSpace
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
-    std::array<flatbuffers::Offset<tflite::Buffer>, 3> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-    buffers[1] = CreateBuffer(flatBufferBuilder,
+    std::array<flatbuffers::Offset<tflite::Buffer>, 5> buffers;
+    buffers[0] = CreateBuffer(flatBufferBuilder);
+    buffers[1] = CreateBuffer(flatBufferBuilder);
+    buffers[2] = CreateBuffer(flatBufferBuilder,
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(blockData.data()),
                                                                   sizeof(int32_t) * blockData.size()));
-    buffers[2] = CreateBuffer(flatBufferBuilder,
+    buffers[3] = CreateBuffer(flatBufferBuilder,
                               flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(cropsPadData.data()),
                                                                   sizeof(int64_t) * cropsPadData.size()));
+    buffers[4] = CreateBuffer(flatBufferBuilder);
 
     auto quantizationParameters =
             CreateQuantizationParameters(flatBufferBuilder,
@@ -60,7 +62,7 @@ std::vector<char> CreateBatchSpaceTfLiteModel(tflite::BuiltinOperator batchSpace
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"),
                               quantizationParameters);
 
@@ -68,7 +70,7 @@ std::vector<char> CreateBatchSpaceTfLiteModel(tflite::BuiltinOperator batchSpace
                               flatBufferBuilder.CreateVector<int32_t>(blockShape.data(),
                                                                       blockShape.size()),
                               ::tflite::TensorType_INT32,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("block"),
                               quantizationParameters);
 
@@ -76,7 +78,7 @@ std::vector<char> CreateBatchSpaceTfLiteModel(tflite::BuiltinOperator batchSpace
                               flatBufferBuilder.CreateVector<int32_t>(cropsOrPaddingShape.data(),
                                                                       cropsOrPaddingShape.size()),
                               ::tflite::TensorType_INT32,
-                              2,
+                              3,
                               flatBufferBuilder.CreateString(cropsOrPadding),
                               quantizationParameters);
 
@@ -85,7 +87,7 @@ std::vector<char> CreateBatchSpaceTfLiteModel(tflite::BuiltinOperator batchSpace
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              4,
                               flatBufferBuilder.CreateString("output"),
                               quantizationParameters);
 

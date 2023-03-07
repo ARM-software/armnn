@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -35,39 +35,42 @@ std::vector<char> CreateSliceTfLiteModel(tflite::TensorType tensorType,
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
-    std::array<flatbuffers::Offset<tflite::Buffer>, 3> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
-    buffers[1] = CreateBuffer(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(beginTensorData.data()),
-                                                             sizeof(int32_t) * beginTensorData.size()));
-    buffers[2] = CreateBuffer(flatBufferBuilder,
-                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(sizeTensorData.data()),
-                                                             sizeof(int32_t) * sizeTensorData.size()));
+    flatbuffers::Offset<tflite::Buffer> buffers[5] = {
+            CreateBuffer(flatBufferBuilder),
+            CreateBuffer(flatBufferBuilder),
+            CreateBuffer(flatBufferBuilder,
+            flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(beginTensorData.data()),
+            sizeof(int32_t) * beginTensorData.size())),
+            CreateBuffer(flatBufferBuilder,
+            flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(sizeTensorData.data()),
+            sizeof(int32_t) * sizeTensorData.size())),
+            CreateBuffer(flatBufferBuilder)
+    };
 
     std::array<flatbuffers::Offset<Tensor>, 4> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                       inputTensorShape.size()),
                               tensorType,
-                              0,
+                              1,
                               flatBufferBuilder.CreateString("input"));
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(beginTensorShape.data(),
                                                                       beginTensorShape.size()),
                               ::tflite::TensorType_INT32,
-                              1,
+                              2,
                               flatBufferBuilder.CreateString("begin_tensor"));
     tensors[2] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(sizeTensorShape.data(),
                                                                       sizeTensorShape.size()),
                               ::tflite::TensorType_INT32,
-                              2,
+                              3,
                               flatBufferBuilder.CreateString("size_tensor"));
     tensors[3] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
                                                                       outputTensorShape.size()),
                               tensorType,
-                              0,
+                              4,
                               flatBufferBuilder.CreateString("output"));
 
 
@@ -105,7 +108,7 @@ std::vector<char> CreateSliceTfLiteModel(tflite::TensorType tensorType,
                     flatBufferBuilder.CreateVector(&operatorCode, 1),
                     flatBufferBuilder.CreateVector(&subgraph, 1),
                     modelDescription,
-                    flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+                    flatBufferBuilder.CreateVector(buffers, 5));
 
     flatBufferBuilder.Finish(flatbufferModel);
 

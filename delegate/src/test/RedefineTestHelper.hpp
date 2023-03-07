@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,43 +22,35 @@ namespace
 {
 
 std::vector<char> CreateRedefineTfLiteModel(
-    tflite::BuiltinOperator redefineOperatorCode,
-    tflite::TensorType tensorType,
-    const std::vector<int32_t>& inputTensorShape,
-    const std::vector<int32_t>& outputTensorShape,
-    const std::vector<int32_t>& targetShape,
-    bool useOption = true,
-    float quantScale = 1.0f,
-    int quantOffset  = 0)
+        tflite::BuiltinOperator redefineOperatorCode,
+        tflite::TensorType tensorType,
+        const std::vector<int32_t>& inputTensorShape,
+        const std::vector<int32_t>& outputTensorShape,
+        const std::vector<int32_t>& targetShape,
+        bool useOption = true,
+        float quantScale = 1.0f,
+        int quantOffset  = 0)
 {
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     auto quantizationParameters =
-        CreateQuantizationParameters(flatBufferBuilder,
-                                     0,
-                                     0,
-                                     flatBufferBuilder.CreateVector<float>({ quantScale }),
-                                     flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
+            CreateQuantizationParameters(flatBufferBuilder,
+                                         0,
+                                         0,
+                                         flatBufferBuilder.CreateVector<float>({ quantScale }),
+                                         flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
 
     auto inputTensor = CreateTensor(flatBufferBuilder,
                                     flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
                                                                             inputTensorShape.size()),
                                     tensorType,
-                                    0,
+                                    1,
                                     flatBufferBuilder.CreateString("input"),
                                     quantizationParameters);
-
-    auto outputTensor = CreateTensor(flatBufferBuilder,
-                                     flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
-                                                                             outputTensorShape.size()),
-                                     tensorType,
-                                     1,
-                                     flatBufferBuilder.CreateString("output"),
-                                     quantizationParameters);
 
     std::vector<flatbuffers::Offset<Tensor>> tensors;
     std::vector<int32_t> operatorInputs;
@@ -67,25 +59,43 @@ std::vector<char> CreateRedefineTfLiteModel(
 
     if (useOption)
     {
+        buffers.push_back(CreateBuffer(flatBufferBuilder));
+        auto outputTensor = CreateTensor(flatBufferBuilder,
+                                         flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
+                                                                                 outputTensorShape.size()),
+                                         tensorType,
+                                         2,
+                                         flatBufferBuilder.CreateString("output"),
+                                         quantizationParameters);
         tensors = { inputTensor, outputTensor};
         operatorInputs = {0};
         subgraphInputs = {0};
         operatorBuiltinOptions = CreateReshapeOptions(
-            flatBufferBuilder,
-            flatBufferBuilder.CreateVector(targetShape.data(), targetShape.size())).Union();
+                flatBufferBuilder,
+                flatBufferBuilder.CreateVector(targetShape.data(), targetShape.size())).Union();
     }
     else
     {
         buffers.push_back(
-            CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(targetShape.data()),
-                                                        sizeof(int32_t) * targetShape.size())));
+                CreateBuffer(flatBufferBuilder,
+                             flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(targetShape.data()),
+                                                            sizeof(int32_t) * targetShape.size())));
         int32_t size = static_cast<int32_t>(targetShape.size());
         auto shapeTensor = CreateTensor(flatBufferBuilder,
                                         flatBufferBuilder.CreateVector<int32_t>( { size } ),
                                         tflite::TensorType_INT32,
                                         2,
                                         flatBufferBuilder.CreateString("shape"));
+
+        buffers.push_back(CreateBuffer(flatBufferBuilder));
+        auto outputTensor = CreateTensor(flatBufferBuilder,
+                                         flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
+                                                                                 outputTensorShape.size()),
+                                         tensorType,
+                                         3,
+                                         flatBufferBuilder.CreateString("output"),
+                                         quantizationParameters);
+
         tensors = { inputTensor, outputTensor, shapeTensor };
         operatorInputs = {0, 2};
         subgraphInputs = {0, 2};
@@ -97,33 +107,33 @@ std::vector<char> CreateRedefineTfLiteModel(
 
     const std::vector<int32_t> operatorOutputs{1};
     flatbuffers::Offset <Operator> redefineOperator =
-        CreateOperator(flatBufferBuilder,
-                       0,
-                       flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
-                       operatorBuiltinOptionsType,
-                       operatorBuiltinOptions);
+            CreateOperator(flatBufferBuilder,
+                           0,
+                           flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
+                           flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
+                           operatorBuiltinOptionsType,
+                           operatorBuiltinOptions);
 
     const std::vector<int> subgraphOutputs{1};
     flatbuffers::Offset <SubGraph> subgraph =
-        CreateSubGraph(flatBufferBuilder,
-                       flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(subgraphInputs.data(), subgraphInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs.data(), subgraphOutputs.size()),
-                       flatBufferBuilder.CreateVector(&redefineOperator, 1));
+            CreateSubGraph(flatBufferBuilder,
+                           flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
+                           flatBufferBuilder.CreateVector<int32_t>(subgraphInputs.data(), subgraphInputs.size()),
+                           flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs.data(), subgraphOutputs.size()),
+                           flatBufferBuilder.CreateVector(&redefineOperator, 1));
 
     flatbuffers::Offset <flatbuffers::String> modelDescription =
-        flatBufferBuilder.CreateString("ArmnnDelegate: Reshape Operator Model");
+            flatBufferBuilder.CreateString("ArmnnDelegate: Reshape Operator Model");
     flatbuffers::Offset <OperatorCode> operatorCode = CreateOperatorCode(flatBufferBuilder,
                                                                          redefineOperatorCode);
 
     flatbuffers::Offset <Model> flatbufferModel =
-        CreateModel(flatBufferBuilder,
-                    TFLITE_SCHEMA_VERSION,
-                    flatBufferBuilder.CreateVector(&operatorCode, 1),
-                    flatBufferBuilder.CreateVector(&subgraph, 1),
-                    modelDescription,
-                    flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+            CreateModel(flatBufferBuilder,
+                        TFLITE_SCHEMA_VERSION,
+                        flatBufferBuilder.CreateVector(&operatorCode, 1),
+                        flatBufferBuilder.CreateVector(&subgraph, 1),
+                        modelDescription,
+                        flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
 
     flatBufferBuilder.Finish(flatbufferModel);
 
@@ -172,8 +182,8 @@ void RedefineTest(tflite::BuiltinOperator redefineOperatorCode,
     // Create the ArmNN Delegate
     armnnDelegate::DelegateOptions delegateOptions(backends);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                         armnnDelegate::TfLiteArmnnDelegateDelete);
+            theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                             armnnDelegate::TfLiteArmnnDelegateDelete);
     CHECK(theArmnnDelegate != nullptr);
     // Modify armnnDelegateInterpreter to use armnnDelegate
     CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);

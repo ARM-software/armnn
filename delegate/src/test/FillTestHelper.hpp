@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,9 +32,7 @@ std::vector<char> CreateFillTfLiteModel(tflite::BuiltinOperator fillOperatorCode
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(
-        CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(tensorShape.data()),
@@ -43,6 +41,7 @@ std::vector<char> CreateFillTfLiteModel(tflite::BuiltinOperator fillOperatorCode
         CreateBuffer(flatBufferBuilder,
                      flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(fillValue.data()),
                                                     sizeof(T) * fillValue.size())));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     std::array<flatbuffers::Offset<Tensor>, 3> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
@@ -64,7 +63,7 @@ std::vector<char> CreateFillTfLiteModel(tflite::BuiltinOperator fillOperatorCode
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0,
+                              3,
                               flatBufferBuilder.CreateString("output"));
 
     tflite::BuiltinOptions operatorBuiltinOptionsType = BuiltinOptions_FillOptions;

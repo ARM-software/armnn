@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,7 +19,6 @@
 
 #include <doctest/doctest.h>
 
-
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/TypesUtils.hpp>
@@ -33,7 +32,7 @@
 namespace
 {
 
-template <typename T>
+template<typename T>
 std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType tensorType,
                                                               int32_t batchSize,
                                                               int32_t timeSize,
@@ -78,7 +77,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                                               float clippingThresProj,
                                                               bool isTimeMajor,
                                                               float quantScale,
-                                                              int quantOffset  = 0)
+                                                              int quantOffset = 0)
 {
 
     std::vector<int32_t> tensorInfo0{};
@@ -105,39 +104,41 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
 
     std::vector<int> operatorInputs;
     using namespace tflite;
-    flatbuffers::FlatBufferBuilder flatBufferBuilder;
+    flatbuffers::FlatBufferBuilder                   flatBufferBuilder;
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    std::vector<flatbuffers::Offset<Tensor>> tensors;
+    std::vector<flatbuffers::Offset<Tensor>>         tensors;
 
     auto quantizationParameters =
-        CreateQuantizationParameters(flatBufferBuilder,
-                                     0,
-                                     0,
-                                     flatBufferBuilder.CreateVector<float>({ 1.0f }),
-                                     flatBufferBuilder.CreateVector<int64_t>({ 0 }));
+             CreateQuantizationParameters(flatBufferBuilder,
+                                          0,
+                                          0,
+                                          flatBufferBuilder.CreateVector<float>({1.0f}),
+                                          flatBufferBuilder.CreateVector<int64_t>({0}));
 
     auto weightQuantizationParameters =
-        CreateQuantizationParameters(flatBufferBuilder,
-                                     0,
-                                     0,
-                                     flatBufferBuilder.CreateVector<float>({ quantScale }),
-                                     flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
+             CreateQuantizationParameters(flatBufferBuilder,
+                                          0,
+                                          0,
+                                          flatBufferBuilder.CreateVector<float>({quantScale}),
+                                          flatBufferBuilder.CreateVector<int64_t>({quantOffset}));
 
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(inputShape.data(),
                                                                            inputShape.size()),
                                    ::tflite::TensorType_FLOAT32,
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("input_0")));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     if (hasInputToInputWeights)
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(inputToInputWeights.data()),
-                                                        sizeof(T) * inputToInputWeights.size())));
+                         flatBufferBuilder.CreateVector(
+                             reinterpret_cast<const uint8_t*>(inputToInputWeights.data()),
+                             sizeof(T) * inputToInputWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoInputSize.data(),
                                                                                tensorInfoInputSize.size()),
@@ -145,7 +146,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("inputToInputWeights"),
                                        weightQuantizationParameters));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -154,8 +155,9 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(inputToForgetWeights.data()),
-                                                    sizeof(T) * inputToForgetWeights.size())));
+                     flatBufferBuilder.CreateVector(
+                         reinterpret_cast<const uint8_t*>(inputToForgetWeights.data()),
+                         sizeof(T) * inputToForgetWeights.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoInputSize.data(),
                                                                            tensorInfoInputSize.size()),
@@ -163,12 +165,13 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("inputToForgetWeights"),
                                    weightQuantizationParameters));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(inputToCellWeights.data()),
-                                                    sizeof(T) * inputToCellWeights.size())));
+                     flatBufferBuilder.CreateVector(
+                         reinterpret_cast<const uint8_t*>(inputToCellWeights.data()),
+                         sizeof(T) * inputToCellWeights.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoInputSize.data(),
                                                                            tensorInfoInputSize.size()),
@@ -176,12 +179,13 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("inputToCellWeights"),
                                    weightQuantizationParameters));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(inputToOutputWeights.data()),
-                                                    sizeof(T) * inputToOutputWeights.size())));
+                     flatBufferBuilder.CreateVector(
+                         reinterpret_cast<const uint8_t*>(inputToOutputWeights.data()),
+                         sizeof(T) * inputToOutputWeights.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoInputSize.data(),
                                                                            tensorInfoInputSize.size()),
@@ -189,7 +193,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("inputToOutputWeights"),
                                    weightQuantizationParameters));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     if (hasRecurrentToInputWeights)
     {
@@ -204,7 +208,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("recurrentToInputWeights"),
                                        weightQuantizationParameters));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -213,7 +217,8 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(recurrentToForgetWeights.data()),
+                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(
+                                                        recurrentToForgetWeights.data()),
                                                     sizeof(T) * recurrentToForgetWeights.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoOutputSize.data(),
@@ -222,11 +227,12 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("recurrentToForgetWeights"),
                                    weightQuantizationParameters));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(recurrentToCellWeights.data()),
+                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(
+                                                        recurrentToCellWeights.data()),
                                                     sizeof(T) * recurrentToCellWeights.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoOutputSize.data(),
@@ -235,26 +241,28 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("recurrentToCellWeights"),
                                    weightQuantizationParameters));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(recurrentToOutputWeights.data()),
+                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(
+                                                        recurrentToOutputWeights.data()),
                                                     sizeof(T) * recurrentToOutputWeights.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoOutputSize.data(),
                                                                            tensorInfoOutputSize.size()),
                                    tensorType,
-                                   buffers.size() - 1 ,
+                                   buffers.size() - 1,
                                    flatBufferBuilder.CreateString("recurrentToOutputWeights"),
                                    weightQuantizationParameters));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     if (hasCellToInputWeights)
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(cellToInputWeights.data()),
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(
+                                                            cellToInputWeights.data()),
                                                         sizeof(T) * cellToInputWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -263,7 +271,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("cellToInputWeights"),
                                        weightQuantizationParameters));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -274,7 +282,8 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(cellToForgetWeights.data()),
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(
+                                                            cellToForgetWeights.data()),
                                                         sizeof(T) * cellToForgetWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -283,7 +292,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("cellToForgetWeights"),
                                        weightQuantizationParameters));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -294,7 +303,8 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(cellToOutputWeights.data()),
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(
+                                                            cellToOutputWeights.data()),
                                                         sizeof(T) * cellToOutputWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -303,7 +313,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("cellToOutputWeights"),
                                        weightQuantizationParameters));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -322,7 +332,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        ::tflite::TensorType_FLOAT32,
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("inputGateBias")));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -331,7 +341,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(forgetGateBias.data()),
+                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(forgetGateBias.data()),
                                                     sizeof(float) * forgetGateBias.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -339,11 +349,11 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    ::tflite::TensorType_FLOAT32,
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("forgetGateBias")));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(cellBias.data()),
+                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(cellBias.data()),
                                                     sizeof(float) * cellBias.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -351,11 +361,11 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    ::tflite::TensorType_FLOAT32,
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("cellBias")));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     buffers.push_back(
         CreateBuffer(flatBufferBuilder,
-                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(outputGateBias.data()),
+                     flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(outputGateBias.data()),
                                                     sizeof(float) * outputGateBias.size())));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -363,14 +373,15 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    ::tflite::TensorType_FLOAT32,
                                    buffers.size() - 1,
                                    flatBufferBuilder.CreateString("outputGateBias")));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     if (hasProjectionWeights)
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(projectionWeights.data()),
-                                                        sizeof(T) * projectionWeights.size())));
+                         flatBufferBuilder.CreateVector(
+                             reinterpret_cast<const uint8_t*>(projectionWeights.data()),
+                             sizeof(T) * projectionWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(projectionWeightDimensions.data(),
                                                                                projectionWeightDimensions.size()),
@@ -378,7 +389,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("projectionWeights"),
                                        weightQuantizationParameters));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -389,22 +400,23 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(projectionBias.data()),
-                                                        sizeof(float) * projectionBias.size())));
+                         flatBufferBuilder.CreateVector(
+                             reinterpret_cast<const uint8_t*>(projectionBias.data()),
+                             sizeof(float) * projectionBias.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(projectionBiasDimensions.data(),
                                                                                projectionBiasDimensions.size()),
                                        ::tflite::TensorType_FLOAT32,
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("projectionBias")));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
         operatorInputs.push_back(kTfLiteOptionalTensor);
     }
 
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(outputStateInDimensions.data(),
                                                                            outputStateInDimensions.size()),
@@ -413,9 +425,9 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    flatBufferBuilder.CreateString("outputStateInInfo"),
                                    quantizationParameters,
                                    true));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(cellStateInDimensions.data(),
                                                                            cellStateInDimensions.size()),
@@ -424,22 +436,22 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                    flatBufferBuilder.CreateString("cellStateInInfo"),
                                    quantizationParameters,
                                    true));
-    operatorInputs.push_back(buffers.size() - 1);
+    operatorInputs.push_back(tensors.size() - 1);
 
     if (hasInputLayerNormWeights)
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
                          flatBufferBuilder.CreateVector(
-                                              reinterpret_cast<const uint8_t *>(inputLayerNormWeights.data()),
-                                              sizeof(float) * inputLayerNormWeights.size())));
+                             reinterpret_cast<const uint8_t*>(inputLayerNormWeights.data()),
+                             sizeof(float) * inputLayerNormWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
                                                                                tensorInfoNumUnits.size()),
                                        ::tflite::TensorType_FLOAT32,
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("inputLayerNormWeights")));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -451,15 +463,15 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
                          flatBufferBuilder.CreateVector(
-                                              reinterpret_cast<const uint8_t *>(forgetLayerNormWeights.data()),
-                                              sizeof(float) * forgetLayerNormWeights.size())));
+                             reinterpret_cast<const uint8_t*>(forgetLayerNormWeights.data()),
+                             sizeof(float) * forgetLayerNormWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
                                                                                tensorInfoNumUnits.size()),
                                        ::tflite::TensorType_FLOAT32,
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("forgetLayerNormWeights")));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -470,7 +482,8 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
     {
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
-                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t *>(cellLayerNormWeights.data()),
+                         flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(
+                                                            cellLayerNormWeights.data()),
                                                         sizeof(float) * cellLayerNormWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -478,7 +491,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        ::tflite::TensorType_FLOAT32,
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("cellLayerNormWeights")));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
@@ -490,7 +503,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
         buffers.push_back(
             CreateBuffer(flatBufferBuilder,
                          flatBufferBuilder.CreateVector(
-                             reinterpret_cast<const uint8_t *>(outputLayerNormWeights.data()),
+                             reinterpret_cast<const uint8_t*>(outputLayerNormWeights.data()),
                              sizeof(float) * outputLayerNormWeights.size())));
         tensors.push_back(CreateTensor(flatBufferBuilder,
                                        flatBufferBuilder.CreateVector<int32_t>(tensorInfoNumUnits.data(),
@@ -498,58 +511,63 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                                        ::tflite::TensorType_FLOAT32,
                                        buffers.size() - 1,
                                        flatBufferBuilder.CreateString("outputLayerNormWeights")));
-        operatorInputs.push_back(buffers.size() - 1);
+        operatorInputs.push_back(tensors.size() - 1);
     }
     else
     {
         operatorInputs.push_back(kTfLiteOptionalTensor);
     }
-    int outputBufferId = buffers.size();
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
     tensors.push_back(CreateTensor(flatBufferBuilder,
                                    flatBufferBuilder.CreateVector<int32_t>(outputShape.data(),
                                                                            outputShape.size()),
                                    ::tflite::TensorType_FLOAT32,
-                                   outputBufferId,
+                                   buffers.size() - 1,
                                    flatBufferBuilder.CreateString("output")));
     std::vector<int> operatorOutputs;
-    operatorOutputs.push_back(buffers.size() - 1);
+    operatorOutputs.push_back(tensors.size() - 1);
 
     // create operator
-    tflite::BuiltinOptions operatorBuiltinOptionsType = BuiltinOptions_UnidirectionalSequenceLSTMOptions;
-    flatbuffers::Offset<void> operatorBuiltinOptions =
-        CreateUnidirectionalSequenceLSTMOptions(flatBufferBuilder,
-                          activationFunction,
-                          clippingThresCell,
-                          clippingThresProj,
-                          isTimeMajor).Union();
+    tflite::BuiltinOptions    operatorBuiltinOptionsType = BuiltinOptions_UnidirectionalSequenceLSTMOptions;
+    flatbuffers::Offset<void> operatorBuiltinOptions     =
+                                  CreateUnidirectionalSequenceLSTMOptions(flatBufferBuilder,
+                                                                          activationFunction,
+                                                                          clippingThresCell,
+                                                                          clippingThresProj,
+                                                                          isTimeMajor).Union();
 
     flatbuffers::Offset<Operator> lstmOperator =
-        CreateOperator(flatBufferBuilder,
-                       0,
-                       flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
-                       operatorBuiltinOptionsType, operatorBuiltinOptions);
+                                      CreateOperator(flatBufferBuilder,
+                                                     0,
+                                                     flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(),
+                                                                                             operatorInputs.size()),
+                                                     flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(),
+                                                                                             operatorOutputs.size()),
+                                                     operatorBuiltinOptionsType, operatorBuiltinOptions);
 
-    flatbuffers::Offset <SubGraph> subgraph =
-        CreateSubGraph(flatBufferBuilder,
-                       flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
-                       flatBufferBuilder.CreateVector(&lstmOperator, 1));
+    flatbuffers::Offset<SubGraph> subgraph =
+                                      CreateSubGraph(flatBufferBuilder,
+                                                     flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
+                                                     flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(),
+                                                                                             operatorInputs.size()),
+                                                     flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(),
+                                                                                             operatorOutputs.size()),
+                                                     flatBufferBuilder.CreateVector(&lstmOperator, 1));
 
-    flatbuffers::Offset <flatbuffers::String> modelDescription =
-        flatBufferBuilder.CreateString("ArmnnDelegate: UnidirectionalSequenceLSTM Operator Model");
-    flatbuffers::Offset <OperatorCode> operatorCode =
-        CreateOperatorCode(flatBufferBuilder, tflite::BuiltinOperator_UNIDIRECTIONAL_SEQUENCE_LSTM);
+    flatbuffers::Offset<flatbuffers::String> modelDescription =
+                                                 flatBufferBuilder.CreateString(
+                                                     "ArmnnDelegate: UnidirectionalSequenceLSTM Operator Model");
+    flatbuffers::Offset<OperatorCode> operatorCode =
+                                                 CreateOperatorCode(flatBufferBuilder,
+                                                 tflite::BuiltinOperator_UNIDIRECTIONAL_SEQUENCE_LSTM);
 
-    flatbuffers::Offset <Model> flatbufferModel =
-        CreateModel(flatBufferBuilder,
-                    TFLITE_SCHEMA_VERSION,
-                    flatBufferBuilder.CreateVector(&operatorCode, 1),
-                    flatBufferBuilder.CreateVector(&subgraph, 1),
-                    modelDescription,
-                    flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+    flatbuffers::Offset<Model> flatbufferModel =
+                                   CreateModel(flatBufferBuilder,
+                                               TFLITE_SCHEMA_VERSION,
+                                               flatBufferBuilder.CreateVector(&operatorCode, 1),
+                                               flatBufferBuilder.CreateVector(&subgraph, 1),
+                                               modelDescription,
+                                               flatBufferBuilder.CreateVector(buffers));
 
     flatBufferBuilder.Finish(flatbufferModel);
 
@@ -557,7 +575,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
                              flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
 }
 
-template <typename T>
+template<typename T>
 void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
                                         tflite::TensorType tensorType,
                                         int32_t batchSize,
@@ -609,69 +627,69 @@ void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
     using namespace tflite;
 
     std::vector<char> modelBuffer = CreateUnidirectionalSequenceLstmTfLiteModel(tensorType,
-                                                          batchSize,
-                                                          timeSize,
-                                                          inputSize,
-                                                          outputSize,
-                                                          numUnits,
-                                                          hasInputToInputWeights,
-                                                          inputToInputWeights,
-                                                          inputToForgetWeights,
-                                                          inputToCellWeights,
-                                                          inputToOutputWeights,
-                                                          hasRecurrentToInputWeights,
-                                                          recurrentToInputWeights,
-                                                          recurrentToForgetWeights,
-                                                          recurrentToCellWeights,
-                                                          recurrentToOutputWeights,
-                                                          hasCellToInputWeights,
-                                                          cellToInputWeights,
-                                                          hasCellToForgetWeights,
-                                                          cellToForgetWeights,
-                                                          hasCellToOutputWeights,
-                                                          cellToOutputWeights,
-                                                          hasInputGateBias,
-                                                          inputGateBias,
-                                                          forgetGateBias,
-                                                          cellBias,
-                                                          outputGateBias,
-                                                          hasProjectionWeights,
-                                                          projectionWeights,
-                                                          hasProjectionBias,
-                                                          projectionBias,
-                                                          hasInputLayerNormWeights,
-                                                          inputLayerNormWeights,
-                                                          hasForgetLayerNormWeights,
-                                                          forgetLayerNormWeights,
-                                                          hasCellLayerNormWeights,
-                                                          cellLayerNormWeights,
-                                                          hasOutputLayerNormWeights,
-                                                          outputLayerNormWeights,
-                                                          activationFunction,
-                                                          clippingThresCell,
-                                                          clippingThresProj,
-                                                          isTimeMajor,
-                                                          quantScale);
+                                                                                batchSize,
+                                                                                timeSize,
+                                                                                inputSize,
+                                                                                outputSize,
+                                                                                numUnits,
+                                                                                hasInputToInputWeights,
+                                                                                inputToInputWeights,
+                                                                                inputToForgetWeights,
+                                                                                inputToCellWeights,
+                                                                                inputToOutputWeights,
+                                                                                hasRecurrentToInputWeights,
+                                                                                recurrentToInputWeights,
+                                                                                recurrentToForgetWeights,
+                                                                                recurrentToCellWeights,
+                                                                                recurrentToOutputWeights,
+                                                                                hasCellToInputWeights,
+                                                                                cellToInputWeights,
+                                                                                hasCellToForgetWeights,
+                                                                                cellToForgetWeights,
+                                                                                hasCellToOutputWeights,
+                                                                                cellToOutputWeights,
+                                                                                hasInputGateBias,
+                                                                                inputGateBias,
+                                                                                forgetGateBias,
+                                                                                cellBias,
+                                                                                outputGateBias,
+                                                                                hasProjectionWeights,
+                                                                                projectionWeights,
+                                                                                hasProjectionBias,
+                                                                                projectionBias,
+                                                                                hasInputLayerNormWeights,
+                                                                                inputLayerNormWeights,
+                                                                                hasForgetLayerNormWeights,
+                                                                                forgetLayerNormWeights,
+                                                                                hasCellLayerNormWeights,
+                                                                                cellLayerNormWeights,
+                                                                                hasOutputLayerNormWeights,
+                                                                                outputLayerNormWeights,
+                                                                                activationFunction,
+                                                                                clippingThresCell,
+                                                                                clippingThresProj,
+                                                                                isTimeMajor,
+                                                                                quantScale);
 
     const Model* tfLiteModel = GetModel(modelBuffer.data());
     // Create TfLite Interpreters
     std::unique_ptr<Interpreter> armnnDelegateInterpreter;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-                  (&armnnDelegateInterpreter) == kTfLiteOk);
+              (&armnnDelegateInterpreter) == kTfLiteOk);
     CHECK(armnnDelegateInterpreter != nullptr);
     CHECK(armnnDelegateInterpreter->AllocateTensors() == kTfLiteOk);
 
     std::unique_ptr<Interpreter> tfLiteInterpreter;
     CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-                  (&tfLiteInterpreter) == kTfLiteOk);
+              (&tfLiteInterpreter) == kTfLiteOk);
     CHECK(tfLiteInterpreter != nullptr);
     CHECK(tfLiteInterpreter->AllocateTensors() == kTfLiteOk);
 
     // Create the ArmNN Delegate
     armnnDelegate::DelegateOptions delegateOptions(backends);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-    theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                     armnnDelegate::TfLiteArmnnDelegateDelete);
+                                   theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
+                                                    armnnDelegate::TfLiteArmnnDelegateDelete);
     CHECK(theArmnnDelegate != nullptr);
     // Modify armnnDelegateInterpreter to use armnnDelegate
     CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
@@ -684,7 +702,7 @@ void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
         tfLiteDelageInputData[i] = inputValues[i];
     }
 
-    auto armnnDelegateInputId = armnnDelegateInterpreter->inputs()[0];
+    auto armnnDelegateInputId   = armnnDelegateInterpreter->inputs()[0];
     auto armnnDelegateInputData = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateInputId);
     for (unsigned int i = 0; i < inputValues.size(); ++i)
     {
@@ -696,10 +714,10 @@ void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
     CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
 
     // Compare output data
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
+    auto tfLiteDelegateOutputId   = tfLiteInterpreter->outputs()[0];
     auto tfLiteDelagateOutputData = tfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateOutputId);
+    auto armnnDelegateOutputId    = armnnDelegateInterpreter->outputs()[0];
+    auto armnnDelegateOutputData  = armnnDelegateInterpreter->typed_tensor<float>(armnnDelegateOutputId);
 
     if (tensorType == ::tflite::TensorType_INT8)
     {
@@ -713,8 +731,10 @@ void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
     }
     else
     {
-        armnnDelegate::CompareData(expectedOutputValues.data(), armnnDelegateOutputData, expectedOutputValues.size());
-        armnnDelegate::CompareData(expectedOutputValues.data(), tfLiteDelagateOutputData, expectedOutputValues.size());
+        armnnDelegate::CompareData(expectedOutputValues.data(), armnnDelegateOutputData,
+                                   expectedOutputValues.size());
+        armnnDelegate::CompareData(expectedOutputValues.data(), tfLiteDelagateOutputData,
+                                   expectedOutputValues.size());
         armnnDelegate::CompareData(tfLiteDelagateOutputData, armnnDelegateOutputData, expectedOutputValues.size());
     }
 }

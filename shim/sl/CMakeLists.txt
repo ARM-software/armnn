@@ -1,11 +1,13 @@
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 cmake_minimum_required (VERSION 3.7.0)
 enable_language(ASM)
 project(armnn_support_library)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++17 -Wall -fexceptions -Werror -Wno-unused-parameter -Wno-unused-private-field -Wno-unused-variable -Wno-attributes -Wno-format-security -Wno-extern-c-compat -Wno-invalid-partial-specialization -Wno-unneeded-internal-declaration -Wno-unused-function -DNN_COMPATIBILITY_LIBRARY_BUILD -DNN_DEBUGGABLE")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden -DOPENSSL_SMALL -DBORINGSSL_ANDROID_SYSTEM -DBORINGSSL_SHARED_LIBRARY -DBORINGSSL_IMPLEMENTATION")

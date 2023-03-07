@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,7 +29,7 @@ std::vector<char> CreateActivationTfLiteModel(tflite::BuiltinOperator activation
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::array<flatbuffers::Offset<tflite::Buffer>, 1> buffers;
-    buffers[0] = CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({}));
+    buffers[0] = CreateBuffer(flatBufferBuilder);
 
     std::array<flatbuffers::Offset<Tensor>, 2> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,19 +28,21 @@ std::vector<char> CreateSoftmaxTfLiteModel(tflite::BuiltinOperator softmaxOperat
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
 
     std::vector<flatbuffers::Offset<tflite::Buffer>> buffers;
-    buffers.push_back(CreateBuffer(flatBufferBuilder, flatBufferBuilder.CreateVector({})));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
+    buffers.push_back(CreateBuffer(flatBufferBuilder));
 
     std::array<flatbuffers::Offset<Tensor>, 2> tensors;
     tensors[0] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0);
+                              1);
     tensors[1] = CreateTensor(flatBufferBuilder,
                               flatBufferBuilder.CreateVector<int32_t>(tensorShape.data(),
                                                                       tensorShape.size()),
                               tensorType,
-                              0);
+                              2);
 
     const std::vector<int32_t> operatorInputs({0});
     const std::vector<int32_t> operatorOutputs({1});

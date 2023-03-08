@@ -1,6 +1,6 @@
 #
-# Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
-# Copyright 2020 NXP
+# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020 NXP
 # SPDX-License-Identifier: MIT
 #
 cmake_minimum_required (VERSION 3.0.2) # 3.0.2 required for return() statement used in AddDllCopyCommands.cmake
@@ -222,6 +222,8 @@ list(APPEND armnn_sources
     src/armnn/layers/DetectionPostProcessLayer.cpp
     src/armnn/layers/ElementwiseBaseLayer.hpp
     src/armnn/layers/ElementwiseBaseLayer.cpp
+    src/armnn/layers/ElementwiseBinaryLayer.hpp
+    src/armnn/layers/ElementwiseBinaryLayer.cpp
     src/armnn/layers/ElementwiseUnaryLayer.hpp
     src/armnn/layers/ElementwiseUnaryLayer.cpp
     src/armnn/layers/FakeQuantizationLayer.hpp

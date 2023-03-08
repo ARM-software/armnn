@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -189,6 +189,36 @@ bool RefLayerSupport::IsLayerSupported(const LayerType& type,
             return IsDequantizeSupported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::Division:
             return IsDivisionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+        case LayerType::ElementwiseBinary:
+        {
+            std::array<DataType, 7> supportedTypes =
+                    {
+                            DataType::Float32,
+                            DataType::Float16,
+                            DataType::QAsymmS8,
+                            DataType::QAsymmU8,
+                            DataType::QSymmS16,
+                            DataType::Signed32
+                    };
+
+            bool supported = true;
+            supported &= CheckSupportRule(TypeAnyOf(infos[0], supportedTypes), reasonIfUnsupported,
+                                          "Reference elementwise unary: input type not supported");
+
+            supported &= CheckSupportRule(TypeAnyOf(infos[1], supportedTypes), reasonIfUnsupported,
+                                          "Reference elementwise unary: input type not supported");
+
+            supported &= CheckSupportRule(TypeAnyOf(infos[2], supportedTypes), reasonIfUnsupported,
+                                          "Reference elementwise unary: output type not supported");
+
+            supported &= CheckSupportRule(TypesAreEqual(infos[0], infos[1]), reasonIfUnsupported,
+                                          "Reference elementwise unary: input types not matching");
+
+            supported &= CheckSupportRule(TypesAreEqual(infos[0], infos[2]), reasonIfUnsupported,
+                                          "Reference elementwise unary: input and output types not matching");
+
+            return supported;
+        }
         case LayerType::ElementwiseUnary:
             return IsElementwiseUnarySupported(infos[0],
                                                infos[1],

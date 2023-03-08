@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,7 +20,6 @@
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 
 #include <armnn/Exceptions.hpp>
-#include <armnn/Utils.hpp>
 #include <armnn/TypesUtils.hpp>
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Logging.hpp>
@@ -36,10 +35,8 @@
 
 #include <fcntl.h>
 #include <algorithm>
-#include <fstream>
 #include <memory>
 #include <vector>
-#include <algorithm>
 
 namespace armnn
 {
@@ -57,7 +54,6 @@ IConnectableLayer* INetwork::AddInputLayer(LayerBindingId id, const char* name)
 {
     return pNetworkImpl->AddInputLayer(id, name);
 }
-
 
 IConnectableLayer* INetwork::AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
                                                const char* name)
@@ -126,13 +122,17 @@ IConnectableLayer* INetwork::AddDetectionPostProcessLayer(
     return pNetworkImpl->AddDetectionPostProcessLayer(descriptor, anchors, name);
 }
 
+IConnectableLayer* INetwork::AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseBinaryDescriptor,
+                                                       const char* name)
+{
+    return pNetworkImpl->AddElementwiseBinaryLayer(elementwiseBinaryDescriptor, name);
+}
 
 IConnectableLayer* INetwork::AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                       const char* name)
 {
     return pNetworkImpl->AddElementwiseUnaryLayer(elementwiseUnaryDescriptor, name);
 }
-
 
 IConnectableLayer* INetwork::AddFillLayer(const FillDescriptor& fillDescriptor,
                                           const char* name)
@@ -1851,6 +1851,12 @@ IConnectableLayer* NetworkImpl::AddComparisonLayer(const ComparisonDescriptor& c
                                                const char* name)
 {
     return m_Graph->AddLayer<ComparisonLayer>(comparisonDescriptor, name);
+}
+
+IConnectableLayer* NetworkImpl::AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseBinaryDesc,
+                                                          const char* name)
+{
+    return m_Graph->AddLayer<ElementwiseBinaryLayer>(elementwiseBinaryDesc, name);
 }
 
 IConnectableLayer* NetworkImpl::AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,

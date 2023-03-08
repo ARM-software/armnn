@@ -18,6 +18,7 @@
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FullyConnectedEndToEndTestImpl.hpp>
@@ -185,7 +186,7 @@ TEST_CASE("TrivialAdd")
 
     IConnectableLayer* input1 = net->AddInputLayer(0);
     IConnectableLayer* input2 = net->AddInputLayer(1);
-    IConnectableLayer* add    = net->AddAdditionLayer();
+    IConnectableLayer* add    = net->AddElementwiseBinaryLayer(ElementwiseBinaryDescriptor(BinaryOperation::Add));
     IConnectableLayer* output = net->AddOutputLayer(0);
 
     input1->GetOutputSlot(0).Connect(add->GetInputSlot(0));
@@ -347,7 +348,7 @@ TEST_CASE("TrivialMin")
 
     IConnectableLayer* input1 = net->AddInputLayer(0);
     IConnectableLayer* input2 = net->AddInputLayer(1);
-    IConnectableLayer* min    = net->AddMinimumLayer();
+    IConnectableLayer* min    = net->AddElementwiseBinaryLayer(ElementwiseBinaryDescriptor(BinaryOperation::Minimum));
     IConnectableLayer* output = net->AddOutputLayer(0);
 
     input1->GetOutputSlot(0).Connect(min->GetInputSlot(0));
@@ -1546,6 +1547,55 @@ TEST_CASE("RefAsyncFP32StridedSlicedMultiThreadedEndToEndTest")
 TEST_CASE("RefAsyncFP32StridedSlicedScheduledMultiThreadedEndToEndTest")
 {
     armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends, 3);
+}
+
+TEST_CASE("RefAddEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Add);
+}
+TEST_CASE("RefAddEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Add);
+}
+TEST_CASE("RefDivEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Div);
+}
+TEST_CASE("RefDivEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Div);
+}
+TEST_CASE("RefMulEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Mul);
+}
+TEST_CASE("RefMulEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Mul);
+}
+TEST_CASE("RefSubEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Sub);
+}
+TEST_CASE("RefSubEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Sub);
+}
+TEST_CASE("RefMaximumEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Maximum);
+}
+TEST_CASE("RefMaximumEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Maximum);
+}
+TEST_CASE("RefMinimumEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Minimum);
+}
+TEST_CASE("RefMinimumEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Minimum);
 }
 #endif
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -319,6 +319,11 @@ public:
                                                     infos[3],
                                                     reasonIfUnsupported);
                 }
+            }
+            case LayerType::ElementwiseBinary:
+            {
+                auto elementwiseDesc = *(PolymorphicDowncast<const ElementwiseBinaryDescriptor*>(&descriptor));
+                return (elementwiseDesc.m_Operation == BinaryOperation::Add);
             }
             default:
                 return false;

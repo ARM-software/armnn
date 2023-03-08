@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "Serializer.hpp"
@@ -531,6 +531,21 @@ void SerializerStrategy::SerializeDivisionLayer(const armnn::IConnectableLayer* 
     auto fbDivisionLayer     = serializer::CreateDivisionLayer(m_flatBufferBuilder, fbDivisionBaseLayer);
 
     CreateAnyLayer(fbDivisionLayer.o, serializer::Layer::Layer_DivisionLayer);
+}
+
+void SerializerStrategy::SerializeElementwiseBinaryLayer(const armnn::IConnectableLayer* layer,
+                                                         const armnn::ElementwiseBinaryDescriptor& descriptor,
+                                                         const char* name)
+{
+    IgnoreUnused(name);
+
+    auto fbBaseLayer  = CreateLayerBase(layer, serializer::LayerType::LayerType_ElementwiseBinary);
+    auto fbDescriptor = serializer::CreateElementwiseBinaryDescriptor(
+            m_flatBufferBuilder,
+            GetFlatBufferBinaryOperation(descriptor.m_Operation));
+
+    auto fbLayer = serializer::CreateElementwiseBinaryLayer(m_flatBufferBuilder, fbBaseLayer, fbDescriptor);
+    CreateAnyLayer(fbLayer.o, serializer::Layer::Layer_ElementwiseBinaryLayer);
 }
 
 void SerializerStrategy::SerializeElementwiseUnaryLayer(const armnn::IConnectableLayer* layer,
@@ -2117,6 +2132,13 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
         case armnn::LayerType::Division :
         {
             SerializeDivisionLayer(layer, name);
+            break;
+        }
+        case armnn::LayerType::ElementwiseBinary :
+        {
+            const armnn::ElementwiseBinaryDescriptor& layerDescriptor =
+                    static_cast<const armnn::ElementwiseBinaryDescriptor&>(descriptor);
+            SerializeElementwiseBinaryLayer(layer, layerDescriptor, name);
             break;
         }
         case armnn::LayerType::ElementwiseUnary :

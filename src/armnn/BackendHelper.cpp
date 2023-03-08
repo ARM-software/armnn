@@ -600,6 +600,22 @@ bool LayerSupportHandle::IsDivisionSupported(const TensorInfo& input0,
                                             reasonIfUnsupported);
 }
 
+bool LayerSupportHandle::IsElementwiseBinarySupported(const TensorInfo &input0,
+                                                      const TensorInfo &input1,
+                                                      const TensorInfo &output,
+                                                      const ElementwiseBinaryDescriptor &descriptor,
+                                                      Optional<std::string &> reasonIfUnsupported)
+{
+    TensorInfos infos{input0, input1, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ElementwiseBinary,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported);
+}
+
 bool LayerSupportHandle::IsElementwiseUnarySupported(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const ElementwiseUnaryDescriptor& descriptor,

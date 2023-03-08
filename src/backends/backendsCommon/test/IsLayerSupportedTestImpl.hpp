@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -663,6 +663,8 @@ DECLARE_LAYER_POLICY_2_PARAM(DepthwiseConvolution2d)
 DECLARE_LAYER_POLICY_1_PARAM(Dequantize)
 
 DECLARE_LAYER_POLICY_2_PARAM(DetectionPostProcess)
+
+DECLARE_LAYER_POLICY_2_PARAM(ElementwiseBinary)
 
 DECLARE_LAYER_POLICY_2_PARAM(ElementwiseUnary)
 

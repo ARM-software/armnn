@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -27,6 +27,7 @@
 #include "layers/DequantizeLayer.hpp"
 #include "layers/DetectionPostProcessLayer.hpp"
 #include "layers/DivisionLayer.hpp"
+#include "layers/ElementwiseBinaryLayer.hpp"
 #include "layers/ElementwiseUnaryLayer.hpp"
 #include "layers/FakeQuantizationLayer.hpp"
 #include "layers/FillLayer.hpp"
@@ -127,6 +128,7 @@ DECLARE_LAYER(DepthwiseConvolution2d)
 DECLARE_LAYER(Dequantize)
 DECLARE_LAYER(DetectionPostProcess)
 DECLARE_LAYER(Division)
+DECLARE_LAYER(ElementwiseBinary)
 DECLARE_LAYER(ElementwiseUnary)
 DECLARE_LAYER(FakeQuantization)
 DECLARE_LAYER(Fill)

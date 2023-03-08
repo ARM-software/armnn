@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -94,6 +94,9 @@ public:
                                                     const char* name = nullptr);
 
     IConnectableLayer* AddDivisionLayer(const char* name = nullptr);
+
+    IConnectableLayer* AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseBinaryDescriptor,
+                                                 const char* name = nullptr);
 
     IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                 const char* name = nullptr);

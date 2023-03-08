@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -107,9 +107,30 @@ armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout
     }
 }
 
-armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperation comparisonOperation)
+armnnSerializer::BinaryOperation GetFlatBufferBinaryOperation(armnn::BinaryOperation binaryOperation)
 {
-    switch (comparisonOperation)
+    switch (binaryOperation)
+    {
+        case armnn::BinaryOperation::Add:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Add;
+        case armnn::BinaryOperation::Div:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Div;
+        case armnn::BinaryOperation::Maximum:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Maximum;
+        case armnn::BinaryOperation::Minimum:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Minimum;
+        case armnn::BinaryOperation::Mul:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Mul;
+        case armnn::BinaryOperation::Sub:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Sub;
+        default:
+            throw armnn::InvalidArgumentException("Elementwise Binary operation unknown");
+    }
+}
+
+armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperation unaryOperation)
+{
+    switch (unaryOperation)
     {
         case armnn::UnaryOperation::Abs:
             return armnnSerializer::UnaryOperation::UnaryOperation_Abs;
@@ -128,7 +149,7 @@ armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperatio
         case armnn::UnaryOperation::Sin:
             return armnnSerializer::UnaryOperation::UnaryOperation_Sin;
         default:
-            throw armnn::InvalidArgumentException("Unary operation unknown");
+            throw armnn::InvalidArgumentException("Elementwise Unary operation unknown");
     }
 }
 

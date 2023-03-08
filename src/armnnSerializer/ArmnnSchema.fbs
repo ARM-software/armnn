@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -183,6 +183,7 @@ enum LayerType : uint {
     Pooling3d = 66,
     GatherNd = 67,
     BatchMatMul = 68,
+    ElementwiseBinary = 69,
 }
 
 // Base layer table to be used as part of other layers
@@ -322,6 +323,24 @@ table DepthToSpaceDescriptor {
 
 table DivisionLayer {
     base:LayerBase;
+}
+
+enum BinaryOperation : byte {
+    Add     = 0,
+    Div     = 1,
+    Maximum = 2,
+    Minimum = 3,
+    Mul     = 4,
+    Sub     = 5
+}
+
+table ElementwiseBinaryDescriptor {
+    operation:BinaryOperation;
+}
+
+table ElementwiseBinaryLayer {
+    base:LayerBase;
+    descriptor:ElementwiseBinaryDescriptor;
 }
 
 enum UnaryOperation : byte {
@@ -1094,6 +1113,7 @@ union Layer {
     Pooling3dLayer,
     GatherNdLayer,
     BatchMatMulLayer,
+    ElementwiseBinaryLayer,
 }
 
 table AnyLayer {

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -135,6 +135,27 @@ LayerType* FuseMultiplicationLayer(OptimizationViews& optimizationViews,
                                    std::string name)
 {
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddMultiplicationLayer(name.c_str());
+    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+
+    FuseLayer(optimizationViews,
+              baseLayer,
+              replacementLayer,
+              activationLayer,
+              activationDesc);
+
+    return replacementLayer;
+}
+
+template<typename LayerType>
+LayerType* FuseElementwiseBinaryLayer(OptimizationViews& optimizationViews,
+                                      LayerType* baseLayer,
+                                      ActivationLayer* activationLayer,
+                                      ActivationDescriptor& activationDesc,
+                                      BinaryOperation operation,
+                                      std::string name)
+{
+    IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddElementwiseBinaryLayer(operation,
+                                                                                                name.c_str());
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
     FuseLayer(optimizationViews,

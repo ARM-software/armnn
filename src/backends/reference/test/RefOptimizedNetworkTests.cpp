@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -53,7 +53,7 @@ TEST_CASE("OptimizeValidateCpuRefWorkloads")
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     armnn::IConnectableLayer* prevLayer = layer;
-    layer = net->AddMultiplicationLayer("ml");
+    layer = net->AddElementwiseBinaryLayer(armnn::BinaryOperation::Mul, "ml");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));

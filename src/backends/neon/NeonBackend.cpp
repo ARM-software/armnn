@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -394,6 +394,92 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
+                            }
+                            else if (base.GetType() == LayerType::ElementwiseBinary)
+                            {
+                                ElementwiseBinaryLayer* baseLayer = PolymorphicDowncast<ElementwiseBinaryLayer*>(&base);
+
+                                if (baseLayer->GetParameters().m_Operation == BinaryOperation::Add)
+                                {
+                                    arm_compute::Status status = NeonAdditionWorkloadValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Add,
+                                                                                           name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
+                                    }
+                                }
+                                else if (baseLayer->GetParameters().m_Operation == BinaryOperation::Div)
+                                {
+                                    arm_compute::Status status = NeonDivisionWorkloadValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Div,
+                                                                                           name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
+                                    }
+                                }
+                                else if (baseLayer->GetParameters().m_Operation == BinaryOperation::Mul)
+                                {
+                                    arm_compute::Status status = NeonMultiplicationWorkloadValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Mul,
+                                                                                           name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
+                                    }
+                                }
+                                else if (baseLayer->GetParameters().m_Operation == BinaryOperation::Sub)
+                                {
+                                    arm_compute::Status status = NeonSubtractionWorkloadValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Sub,
+                                                                                           name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
+                                    }
+                                }
+                                // No fusion available for other BinaryOperations
                             }
                         }
                     }

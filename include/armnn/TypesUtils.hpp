@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -69,6 +69,20 @@ constexpr char const* GetComparisonOperationAsCString(ComparisonOperation operat
         case ComparisonOperation::LessOrEqual:    return "LessOrEqual";
         case ComparisonOperation::NotEqual:       return "NotEqual";
         default:                                  return "Unknown";
+    }
+}
+
+constexpr char const* GetBinaryOperationAsCString(BinaryOperation operation)
+{
+    switch (operation)
+    {
+        case BinaryOperation::Add:      return "Add";
+        case BinaryOperation::Div:      return "Div";
+        case BinaryOperation::Maximum:  return "Maximum";
+        case BinaryOperation::Minimum:  return "Minimum";
+        case BinaryOperation::Mul:      return "Mul";
+        case BinaryOperation::Sub:      return "Sub";
+        default:                        return "Unknown";
     }
 }
 

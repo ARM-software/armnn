@@ -1,11 +1,9 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "TestNameAndDescriptorLayerVisitor.hpp"
 #include "Network.hpp"
-
-#include <armnn/Exceptions.hpp>
 
 #include <doctest/doctest.h>
 
@@ -81,6 +79,12 @@ armnn::ConcatDescriptor GetDescriptor<armnn::ConcatDescriptor>()
     }
 
     return descriptor;
+}
+
+template<>
+armnn::ElementwiseBinaryDescriptor GetDescriptor<armnn::ElementwiseBinaryDescriptor>()
+{
+    return armnn::ElementwiseBinaryDescriptor(armnn::BinaryOperation::Add);
 }
 
 template<>
@@ -273,12 +277,14 @@ armnn::TransposeDescriptor GetDescriptor<armnn::TransposeDescriptor>()
 
 TEST_SUITE("TestNameAndDescriptorLayerVisitor")
 {
-TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Activation, CheckAdditionLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Activation, CheckActivationLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(ArgMinMax, CheckArgMinMaxLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(DepthToSpace, CheckDepthToSpaceLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(BatchToSpaceNd, CheckBatchToSpaceNdLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Comparison, CheckComparisonLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Concat, CheckConcatLayerVisitorNameAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(ElementwiseBinary,
+                                                  CheckElementwiseBinaryLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(ElementwiseUnary, CheckElementwiseUnaryLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Fill, CheckFillLayerVisitorNameAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Gather, CheckGatherLayerVisitorNameAndDescriptor)
@@ -304,7 +310,7 @@ TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(StridedSlice, CheckStridedSlic
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_AND_DESCRIPTOR(Transpose, CheckTransposeLayerVisitorNameAndDescriptor)
 
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Activation,
-    CheckAdditionLayerVisitorNameNullptrAndDescriptor)
+    CheckActivationLayerVisitorNameNullptrAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(ArgMinMax,
     CheckArgMinMaxLayerVisitorNameNullptrAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(DepthToSpace,
@@ -315,6 +321,8 @@ TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Comparison,
     CheckComparisonLayerVisitorNameNullptrAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Concat,
     CheckConcatLayerVisitorNameNullptrAndDescriptor)
+TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(ElementwiseBinary,
+    CheckElementwiseBinaryLayerVisitorNameNullptrAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(ElementwiseUnary,
     CheckElementwiseUnaryLayerVisitorNameNullptrAndDescriptor)
 TEST_CASE_CHECK_LAYER_VISITOR_NAME_NULLPTR_AND_DESCRIPTOR(Fill,

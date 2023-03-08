@@ -1838,7 +1838,7 @@ void TfLiteParserImpl::ParseMaximum(size_t subgraphIndex, size_t operatorIndex)
     TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
-    IConnectableLayer* layer = m_Network->AddMaximumLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Maximum, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
@@ -1868,7 +1868,7 @@ void TfLiteParserImpl::ParseMinimum(size_t subgraphIndex, size_t operatorIndex)
     TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
-    IConnectableLayer* layer = m_Network->AddMinimumLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Minimum, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
@@ -2384,7 +2384,7 @@ void TfLiteParserImpl::ParseSub(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     auto layerName = fmt::format("Sub:{}:{}", subgraphIndex, operatorIndex);
-    IConnectableLayer* layer = m_Network->AddSubtractionLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Sub, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
@@ -2416,7 +2416,7 @@ void TfLiteParserImpl::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     auto layerName = fmt::format("Div:{}:{}", subgraphIndex, operatorIndex);
-    IConnectableLayer* layer = m_Network->AddDivisionLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Div, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
@@ -2444,7 +2444,7 @@ void TfLiteParserImpl::ParseFloorDiv(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     auto layerName = fmt::format("Div:{}:{}", subgraphIndex, operatorIndex);
-    IConnectableLayer* layer = m_Network->AddDivisionLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Div, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
@@ -2475,7 +2475,7 @@ void TfLiteParserImpl::ParseAdd(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     auto layerName = fmt::format("Add:{}:{}", subgraphIndex, operatorIndex);
-    IConnectableLayer* layer = m_Network->AddAdditionLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Add, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
@@ -2506,7 +2506,7 @@ void TfLiteParserImpl::ParseMul(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     auto layerName = fmt::format("Mul:{}:{}", subgraphIndex, operatorIndex);
-    IConnectableLayer* layer = m_Network->AddMultiplicationLayer(layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Mul, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});

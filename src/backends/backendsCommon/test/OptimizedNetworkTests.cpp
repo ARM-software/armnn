@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,7 +21,7 @@ TEST_CASE("SerializeToDot")
 
     //Defines layers.
     auto input = net->AddInputLayer(0);
-    auto add = net->AddAdditionLayer();
+    auto add = net->AddElementwiseBinaryLayer(armnn::BinaryOperation::Add);
     auto output = net->AddOutputLayer(0);
 
     // Connects layers.
@@ -54,7 +54,7 @@ TEST_CASE("SerializeToDot")
         "    edge [fontsize=8 fontcolor=\"blue\" fontname=\"arial-bold\"];\n"
         "    " << inputId << " [label=\"{Input|Guid : " << inputId << "\\lLayerType : Input\\l"
                              "BackendID : CpuRef\\l}\"];\n"
-        "    " << addId << " [label=\"{Addition|Guid : " << addId << "\\lLayerType : Addition\\l"
+        "    " << addId << " [label=\"{ElementwiseBinary|Guid : " << addId << "\\lLayerType : ElementwiseBinary\\l"
                            "BackendID : CpuRef\\l}\"];\n"
         "    " << outputId << " [label=\"{Output|Guid : " << outputId << "\\lLayerType : Output\\l"
                               "BackendID : CpuRef\\l}\"];\n"
@@ -187,7 +187,7 @@ TEST_CASE("OptimizeValidateWorkloadsUndefinedComputeDevice")
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     armnn::IConnectableLayer* prevLayer = layer;
-    layer = net->AddMultiplicationLayer("ml");
+    layer = net->AddElementwiseBinaryLayer(armnn::BinaryOperation::Mul, "ml");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -258,7 +258,7 @@ TEST_CASE("OptimizeValidateWorkloadsUndefinedComputeDeviceWithFallback")
     layer->GetOutputSlot(0).SetTensorInfo(desc);
 
     armnn::IConnectableLayer* prevLayer = layer;
-    layer = net->AddMultiplicationLayer("ml");
+    layer = net->AddElementwiseBinaryLayer(armnn::BinaryOperation::Mul, "ml");
 
     prevLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
     normLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));

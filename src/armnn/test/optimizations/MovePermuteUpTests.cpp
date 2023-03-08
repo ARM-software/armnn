@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,7 +36,7 @@ TEST_CASE("MovePermuteUpTest")
     head = graph.InsertNewLayer<armnn::ActivationLayer>(head->GetInputSlot(0), armnn::ActivationDescriptor{}, "");
     head->GetOutputHandler().SetTensorInfo(info);
 
-    head = graph.InsertNewLayer<armnn::AdditionLayer>(head->GetInputSlot(0), "");
+    head = graph.InsertNewLayer<armnn::ElementwiseBinaryLayer>(head->GetInputSlot(0), armnn::BinaryOperation::Add, "");
     head->GetOutputHandler().SetTensorInfo(info);
 
     // Inserts input for 2nd input of Addition.
@@ -54,7 +54,7 @@ TEST_CASE("MovePermuteUpTest")
     head = graph.InsertNewLayer<armnn::MemCopyLayer>(head->GetInputSlot(0), "");
     head->GetOutputHandler().SetTensorInfo(info);
 
-    head = graph.InsertNewLayer<armnn::MultiplicationLayer>(head->GetInputSlot(0), "");
+    head = graph.InsertNewLayer<armnn::ElementwiseBinaryLayer>(head->GetInputSlot(0), armnn::BinaryOperation::Mul, "");
     head->GetOutputHandler().SetTensorInfo(info);
 
     // Inserts input for 2nd input of Multiplication.
@@ -69,9 +69,9 @@ TEST_CASE("MovePermuteUpTest")
 
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::InputLayer>, &IsLayerOfType<armnn::InputLayer>,
-                             &IsLayerOfType<armnn::MultiplicationLayer>, &IsLayerOfType<armnn::MemCopyLayer>,
+                             &IsLayerOfType<armnn::ElementwiseBinaryLayer>, &IsLayerOfType<armnn::MemCopyLayer>,
                              &IsLayerOfType<armnn::FloorLayer>, &IsLayerOfType<armnn::FakeQuantizationLayer>,
-                             &IsLayerOfType<armnn::AdditionLayer>, &IsLayerOfType<armnn::ActivationLayer>,
+                             &IsLayerOfType<armnn::ElementwiseBinaryLayer>, &IsLayerOfType<armnn::ActivationLayer>,
                              &IsLayerOfType<armnn::PermuteLayer>, &IsLayerOfType<armnn::OutputLayer>));
 
     armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(MovePermuteUp()));
@@ -80,10 +80,11 @@ TEST_CASE("MovePermuteUpTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::InputLayer>, &IsLayerOfType<armnn::InputLayer>,
                              &IsLayerOfType<armnn::PermuteLayer>, &IsLayerOfType<armnn::PermuteLayer>,
-                             &IsLayerOfType<armnn::PermuteLayer>, &IsLayerOfType<armnn::MultiplicationLayer>,
+                             &IsLayerOfType<armnn::PermuteLayer>, &IsLayerOfType<armnn::ElementwiseBinaryLayer>,
                              &IsLayerOfType<armnn::MemCopyLayer>, &IsLayerOfType<armnn::FloorLayer>,
-                             &IsLayerOfType<armnn::FakeQuantizationLayer>, &IsLayerOfType<armnn::AdditionLayer>,
-                             &IsLayerOfType<armnn::ActivationLayer>, &IsLayerOfType<armnn::OutputLayer>));
+                             &IsLayerOfType<armnn::FakeQuantizationLayer>,
+                             &IsLayerOfType<armnn::ElementwiseBinaryLayer>, &IsLayerOfType<armnn::ActivationLayer>,
+                             &IsLayerOfType<armnn::OutputLayer>));
 
     std::list<std::string> testRelatedLayers = { permuteLayerName };
 

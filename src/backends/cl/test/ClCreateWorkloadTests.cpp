@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -66,19 +66,17 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateActivationFloat16Workload")
 }
 
 template <typename WorkloadType,
-          typename DescriptorType,
-          typename LayerType,
           armnn::DataType DataType>
-static void ClCreateElementwiseWorkloadTest()
+static void ClCreateElementwiseWorkloadTest(BinaryOperation binaryOperator)
 {
     Graph graph;
     ClWorkloadFactory factory =
         ClWorkloadFactoryHelper::GetFactory(ClWorkloadFactoryHelper::GetMemoryManager());
 
-    auto workload = CreateElementwiseWorkloadTest<WorkloadType, DescriptorType, LayerType, DataType>(factory, graph);
+    auto workload = CreateElementwiseBinaryWorkloadTest<WorkloadType, DataType>(factory, graph, binaryOperator);
 
     // Checks that inputs/outputs are as we expect them (see definition of CreateElementwiseWorkloadTest).
-    DescriptorType queueDescriptor = workload->GetData();
+    auto queueDescriptor = workload->GetData();
     auto inputHandle1 = PolymorphicDowncast<IClTensorHandle*>(queueDescriptor.m_Inputs[0]);
     auto inputHandle2 = PolymorphicDowncast<IClTensorHandle*>(queueDescriptor.m_Inputs[1]);
     auto outputHandle = PolymorphicDowncast<IClTensorHandle*>(queueDescriptor.m_Outputs[0]);
@@ -93,73 +91,55 @@ static void ClCreateElementwiseWorkloadTest()
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateAdditionFloatWorkload")
 {
     ClCreateElementwiseWorkloadTest<ClAdditionWorkload,
-                                    AdditionQueueDescriptor,
-                                    AdditionLayer,
-                                    armnn::DataType::Float32>();
+                                    armnn::DataType::Float32>(BinaryOperation::Add);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateAdditionFloat16Workload")
 {
     ClCreateElementwiseWorkloadTest<ClAdditionWorkload,
-                                    AdditionQueueDescriptor,
-                                    AdditionLayer,
-                                    armnn::DataType::Float16>();
+                                    armnn::DataType::Float16>(BinaryOperation::Add);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateSubtractionFloatWorkload")
 {
     ClCreateElementwiseWorkloadTest<ClSubtractionWorkload,
-                                    SubtractionQueueDescriptor,
-                                    SubtractionLayer,
-                                    armnn::DataType::Float32>();
+                                    armnn::DataType::Float32>(BinaryOperation::Sub);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateSubtractionFloat16Workload")
 {
     ClCreateElementwiseWorkloadTest<ClSubtractionWorkload,
-                                    SubtractionQueueDescriptor,
-                                    SubtractionLayer,
-                                    armnn::DataType::Float16>();
+                                    armnn::DataType::Float16>(BinaryOperation::Sub);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateMultiplicationFloatWorkloadTest")
 {
     ClCreateElementwiseWorkloadTest<ClMultiplicationWorkload,
-                                    MultiplicationQueueDescriptor,
-                                    MultiplicationLayer,
-                                    armnn::DataType::Float32>();
+                                    armnn::DataType::Float32>(BinaryOperation::Mul);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateMultiplicationFloat16WorkloadTest")
 {
     ClCreateElementwiseWorkloadTest<ClMultiplicationWorkload,
-                                    MultiplicationQueueDescriptor,
-                                    MultiplicationLayer,
-                                    armnn::DataType::Float16>();
+                                    armnn::DataType::Float16>(BinaryOperation::Mul);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateMultiplicationUint8WorkloadTest")
 {
     ClCreateElementwiseWorkloadTest<ClMultiplicationWorkload,
-                                    MultiplicationQueueDescriptor,
-                                    MultiplicationLayer,
-                                    armnn::DataType::QAsymmU8>();
+                                    armnn::DataType::QAsymmU8>(BinaryOperation::Mul);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateDivisionFloatWorkloadTest")
 {
     ClCreateElementwiseWorkloadTest<ClDivisionWorkload,
-                                    DivisionQueueDescriptor,
-                                    DivisionLayer,
-                                    armnn::DataType::Float32>();
+                                    armnn::DataType::Float32>(BinaryOperation::Div);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "CreateDivisionFloat16WorkloadTest")
 {
     ClCreateElementwiseWorkloadTest<ClDivisionWorkload,
-                                    DivisionQueueDescriptor,
-                                    DivisionLayer,
-                                    armnn::DataType::Float16>();
+                                    armnn::DataType::Float16>(BinaryOperation::Div);
 }
 
 template <typename WorkloadType, 

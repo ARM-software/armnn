@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -108,6 +108,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefDequantizeWorkload.hpp
     RefDetectionPostProcessWorkload.cpp
     RefDetectionPostProcessWorkload.hpp
+    RefElementwiseBinaryWorkload.cpp
+    RefElementwiseBinaryWorkload.hpp
     RefElementwiseUnaryWorkload.cpp
     RefElementwiseUnaryWorkload.hpp
     RefFakeQuantizationFloat32Workload.cpp

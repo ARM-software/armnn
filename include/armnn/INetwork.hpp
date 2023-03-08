@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -349,9 +349,16 @@ public:
         const ConstTensor& anchors,
         const char* name = nullptr);
 
+    /// Add an ElementwiseBinary layer to the network.
+    /// @param name - Optional name for the layer.
+    /// @param desc - Descriptor for the elementwiseBinary operations.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseUnaryDescriptor,
+                                                 const char* name = nullptr);
+
     /// Add an ElementwiseUnary layer to the network.
     /// @param name - Optional name for the layer.
-    /// @param desc - Descriptor for the elementwiseUnary operation.
+    /// @param desc - Descriptor for the elementwiseUnary operations.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddElementwiseUnaryLayer(const ElementwiseUnaryDescriptor& elementwiseUnaryDescriptor,
                                                 const char* name = nullptr);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2019-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -17,6 +17,8 @@ armnnSerializer::ConstTensorData GetFlatBufferConstTensorData(armnn::DataType da
 armnnSerializer::DataType GetFlatBufferDataType(armnn::DataType dataType);
 
 armnnSerializer::DataLayout GetFlatBufferDataLayout(armnn::DataLayout dataLayout);
+
+armnnSerializer::BinaryOperation GetFlatBufferBinaryOperation(armnn::BinaryOperation binaryOperation);
 
 armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperation unaryOperation);
 

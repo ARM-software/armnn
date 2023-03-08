@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -35,11 +35,8 @@ DataType GetBiasDataType(DataType inputDataType)
         case DataType::Float32:
             return DataType::Float32;
         case DataType::QAsymmS8:
-            return DataType::Signed32;
         case DataType::QAsymmU8:
-            return DataType::Signed32;
         case DataType::QSymmS8:
-            return DataType::Signed32;
         case DataType::QSymmS16:
             return DataType::Signed32;
         default:
@@ -3666,6 +3663,35 @@ void ComparisonQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     {
         throw InvalidArgumentException(descriptorName + ": Output tensor type must be Boolean.");
     }
+}
+
+void ElementwiseBinaryQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string descriptorName{"ElementwiseBinaryQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 2);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0 = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1 = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+            {
+                    DataType::BFloat16,
+                    DataType::Float16,
+                    DataType::Float32,
+                    DataType::QAsymmS8,
+                    DataType::QAsymmU8,
+                    DataType::QSymmS16,
+                    DataType::Signed32
+            };
+
+    ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo1, supportedTypes, descriptorName);
+
+    ValidateTensorDataTypesMatch(inputTensorInfo0, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorDataTypesMatch(inputTensorInfo1, outputTensorInfo, descriptorName, "input", "output");
 }
 
 void ElementwiseUnaryQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

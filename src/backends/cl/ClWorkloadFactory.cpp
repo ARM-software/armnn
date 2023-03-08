@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ClWorkloadFactory.hpp"
@@ -404,6 +404,75 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
         {
             auto divisionQueueDescriptor = PolymorphicDowncast<const DivisionQueueDescriptor*>(&descriptor);
             return std::make_unique<ClDivisionWorkload>(*divisionQueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::ElementwiseBinary :
+        {
+            auto elementwiseBinaryQueueDescriptor
+                    = PolymorphicDowncast<const ElementwiseBinaryQueueDescriptor*>(&descriptor);
+
+            switch (elementwiseBinaryQueueDescriptor->m_Parameters.m_Operation)
+            {
+                case BinaryOperation::Add:
+                {
+                    AdditionQueueDescriptor additionQueueDescriptor;
+                    additionQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    additionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    additionQueueDescriptor.m_AdditionalInfoObject =
+                            elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
+                    return std::make_unique<ClAdditionWorkload>(additionQueueDescriptor, info, m_CLCompileContext);
+                }
+                case BinaryOperation::Div:
+                {
+                    DivisionQueueDescriptor divisionQueueDescriptor;
+                    divisionQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    divisionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    divisionQueueDescriptor.m_AdditionalInfoObject =
+                            elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
+                    return std::make_unique<ClDivisionWorkload>(divisionQueueDescriptor, info, m_CLCompileContext);
+                }
+                case BinaryOperation::Maximum:
+                {
+                    MaximumQueueDescriptor maximumQueueDescriptor;
+                    maximumQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    maximumQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    maximumQueueDescriptor.m_AdditionalInfoObject =
+                            elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
+                    return std::make_unique<ClMaximumWorkload>(maximumQueueDescriptor, info, m_CLCompileContext);
+                }
+                case BinaryOperation::Minimum:
+                {
+                    MinimumQueueDescriptor minimumQueueDescriptor;
+                    minimumQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    minimumQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    minimumQueueDescriptor.m_AdditionalInfoObject =
+                            elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
+                    return std::make_unique<ClMinimumWorkload>(minimumQueueDescriptor, info, m_CLCompileContext);
+                }
+                case BinaryOperation::Mul:
+                {
+                    MultiplicationQueueDescriptor multiplicationQueueDescriptor;
+                    multiplicationQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    multiplicationQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    multiplicationQueueDescriptor.m_AdditionalInfoObject =
+                            elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
+                    return std::make_unique<ClMultiplicationWorkload>(multiplicationQueueDescriptor,
+                                                                      info,
+                                                                      m_CLCompileContext);
+                }
+                case BinaryOperation::Sub:
+                {
+                    SubtractionQueueDescriptor subtractionQueueDescriptor;
+                    subtractionQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    subtractionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    subtractionQueueDescriptor.m_AdditionalInfoObject =
+                            elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
+                    return std::make_unique<ClSubtractionWorkload>(subtractionQueueDescriptor,
+                                                                   info,
+                                                                   m_CLCompileContext);
+                }
+                default:
+                    return nullptr;
+            }
         }
         case LayerType::ElementwiseUnary :
         {

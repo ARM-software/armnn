@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,6 +20,7 @@ struct Convolution2dDescriptor;
 struct Convolution3dDescriptor;
 struct DepthwiseConvolution2dDescriptor;
 struct DetectionPostProcessDescriptor;
+struct ElementwiseBinaryDescriptor;
 struct ElementwiseUnaryDescriptor;
 struct FakeQuantizationDescriptor;
 struct FillDescriptor;

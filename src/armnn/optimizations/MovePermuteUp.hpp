@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2018,2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -68,6 +68,12 @@ private:
             case LayerType::MemCopy:
             case LayerType::Multiplication:
                 return true;
+            case LayerType::ElementwiseBinary:
+            {
+                auto descriptor = PolymorphicDowncast<const ElementwiseBinaryDescriptor*>(&base.GetParameters());
+                return (descriptor->m_Operation == BinaryOperation::Add ||
+                        descriptor->m_Operation == BinaryOperation::Mul);
+            }
             default:
                 return false;
         }

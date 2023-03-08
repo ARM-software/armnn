@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -347,6 +347,56 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
             return IsDequantizeSupported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::Division:
             return IsDivisionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+        case LayerType::ElementwiseBinary:
+        {
+            auto desc = *(PolymorphicDowncast<const ElementwiseBinaryDescriptor *>(&descriptor));
+
+            switch (desc.m_Operation)
+            {
+                case BinaryOperation::Add:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClAdditionValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                case BinaryOperation::Div:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClDivisionWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                case BinaryOperation::Minimum:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClMinimumWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2]);
+                case BinaryOperation::Maximum:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClMaximumWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2]);
+                case BinaryOperation::Mul:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClMultiplicationWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                case BinaryOperation::Sub:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClSubtractionValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                default:
+                    return false;
+            }
+        }
         case LayerType::ElementwiseUnary:
             return IsElementwiseUnarySupported(infos[0],
                                                infos[1],

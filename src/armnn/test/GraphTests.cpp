@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <GraphUtils.hpp>
@@ -36,7 +36,7 @@ TEST_CASE("TopologicalSort")
 
     CHECK_NOTHROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
     CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
-    CHECK_NOTHROW(graph.AddLayer<armnn::AdditionLayer>("layerC"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ElementwiseBinaryLayer>(armnn::BinaryOperation::Add, "layerC"));
     CHECK_NOTHROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
     CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerD"));
     CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerE"));
@@ -82,7 +82,7 @@ TEST_CASE("InsertNewLayerBefore")
     CHECK_NOTHROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
     CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
     CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerC"));
-    CHECK_NOTHROW(graph.AddLayer<armnn::AdditionLayer>("layerD"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ElementwiseBinaryLayer>(armnn::BinaryOperation::Add, "layerD"));
     CHECK_NOTHROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
 
     armnn::Layer* const layerA = GetFirstLayerWithName(graph, "layerA");
@@ -168,7 +168,7 @@ TEST_CASE("InsertNewLayerAfter")
     CHECK_NOTHROW(graph.AddLayer<armnn::InputLayer>(0, "layerA"));
     CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerB"));
     CHECK_NOTHROW(graph.AddLayer<armnn::ActivationLayer>(activationDefaults, "layerC"));
-    CHECK_NOTHROW(graph.AddLayer<armnn::AdditionLayer>("layerD"));
+    CHECK_NOTHROW(graph.AddLayer<armnn::ElementwiseBinaryLayer>(armnn::BinaryOperation::Add, "layerD"));
     CHECK_NOTHROW(graph.AddLayer<armnn::OutputLayer>(0, "output"));
 
     armnn::Layer* const layerA = GetFirstLayerWithName(graph, "layerA");
@@ -548,7 +548,7 @@ TEST_CASE_FIXTURE(CopyLayersFixture, "CopyLayersAddedBetweenSameLayersHaveDiffer
     armnn::SplitterLayer* const splitterLayer = graph.AddLayer<armnn::SplitterLayer>(splitterDesc, "splitter");
     splitterLayer->SetBackendId(armnn::Compute::GpuAcc);
 
-    armnn::AdditionLayer* const additionLayer = graph.AddLayer<armnn::AdditionLayer>("addition");
+    auto* const additionLayer = graph.AddLayer<armnn::ElementwiseBinaryLayer>(armnn::BinaryOperation::Add, "addition");
     additionLayer->SetBackendId(armnn::Compute::CpuRef);
 
     armnn::OutputLayer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "output");

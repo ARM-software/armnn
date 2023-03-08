@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -103,6 +103,7 @@ private:
     void ParseDequantize(GraphPtr graph, unsigned int layerIndex);
     void ParseDetectionPostProcess(GraphPtr graph, unsigned int layerIndex);
     void ParseDivision(GraphPtr graph, unsigned int layerIndex);
+    void ParseElementwiseBinary(GraphPtr graph, unsigned int layerIndex);
     void ParseElementwiseUnary(GraphPtr graph, unsigned int layerIndex);
     void ParseEqual(GraphPtr graph, unsigned int layerIndex);
     void ParseFill(GraphPtr graph, unsigned int layerIndex);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -160,6 +160,12 @@ public:
                              const TensorInfo& input1,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
+    bool IsElementwiseBinarySupported(const TensorInfo& input0,
+                                      const TensorInfo& input1,
+                                      const TensorInfo& output,
+                                      const ElementwiseBinaryDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
     bool IsElementwiseUnarySupported(const TensorInfo& input,
                                      const TensorInfo& output,

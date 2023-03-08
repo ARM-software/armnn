@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <Layer.hpp>
@@ -301,6 +301,12 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
             {
                 return std::make_unique<RefDivisionWorkload<float>>(*divisionQueueDescriptor, info);
             }
+        }
+        case LayerType::ElementwiseBinary:
+        {
+            auto elementwiseBinaryQueueDescriptor
+                    = PolymorphicDowncast<const ElementwiseBinaryQueueDescriptor*>(&descriptor);
+            return std::make_unique<RefElementwiseBinaryWorkload>(*elementwiseBinaryQueueDescriptor, info);
         }
         case LayerType::ElementwiseUnary:
         {

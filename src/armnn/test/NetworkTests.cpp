@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,7 @@ TEST_CASE("LayerGuids")
 {
     armnn::NetworkImpl net;
     LayerGuid inputId = net.AddInputLayer(0)->GetGuid();
-    LayerGuid addId = net.AddAdditionLayer()->GetGuid();
+    LayerGuid addId = net.AddElementwiseBinaryLayer(armnn::BinaryOperation::Add)->GetGuid();
     LayerGuid outputId = net.AddOutputLayer(0)->GetGuid();
 
     CHECK(inputId != addId);
@@ -50,7 +50,7 @@ TEST_CASE("LayerNamesAreOptionalForINetwork")
 {
     armnn::INetworkPtr inet(armnn::INetwork::Create());
     inet->AddInputLayer(0);
-    inet->AddAdditionLayer();
+    inet->AddElementwiseBinaryLayer(armnn::BinaryOperation::Add);
     inet->AddActivationLayer(armnn::ActivationDescriptor());
     inet->AddOutputLayer(0);
 }
@@ -59,7 +59,7 @@ TEST_CASE("LayerNamesAreOptionalForNetwork")
 {
     armnn::NetworkImpl net;
     net.AddInputLayer(0);
-    net.AddAdditionLayer();
+    net.AddElementwiseBinaryLayer(armnn::BinaryOperation::Add);
     net.AddActivationLayer(armnn::ActivationDescriptor());
     net.AddOutputLayer(0);
 }
@@ -136,13 +136,15 @@ TEST_CASE("NetworkModification")
 
     softmaxLayer->GetOutputSlot(0).Connect(batchNormalizationLayer->GetInputSlot(0));
 
-    armnn::IConnectableLayer* const additionLayer = net.AddAdditionLayer("addition");
+    armnn::IConnectableLayer* const additionLayer = net.AddElementwiseBinaryLayer(armnn::BinaryOperation::Add,
+                                                                                  "addition");
     CHECK(additionLayer);
 
     batchNormalizationLayer->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(0));
     batchNormalizationLayer->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(1));
 
-    armnn::IConnectableLayer* const multiplicationLayer = net.AddMultiplicationLayer("multiplication");
+    armnn::IConnectableLayer* const multiplicationLayer = net.AddElementwiseBinaryLayer(armnn::BinaryOperation::Mul,
+                                                                                        "multiplication");
     CHECK(multiplicationLayer);
 
     additionLayer->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(0));
@@ -338,7 +340,7 @@ TEST_CASE("NetworkModification_SplitterAddition")
     splitterLayer->GetOutputSlot(1).Connect(softmax2Layer->GetInputSlot(0));
 
     // Adds addition layer.
-    layer = net.AddAdditionLayer("add layer");
+    layer = net.AddElementwiseBinaryLayer(armnn::BinaryOperation::Add, "add layer");
     CHECK(layer);
 
     softmax1Layer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
@@ -382,7 +384,7 @@ TEST_CASE("NetworkModification_SplitterMultiplication")
     splitterLayer->GetOutputSlot(1).Connect(softmax2Layer->GetInputSlot(0));
 
     // Adds multiplication layer.
-    layer = net.AddMultiplicationLayer("multiplication layer");
+    layer = net.AddElementwiseBinaryLayer(armnn::BinaryOperation::Mul, "multiplication layer");
     CHECK(layer);
 
     softmax1Layer->GetOutputSlot(0).Connect(layer->GetInputSlot(0));
@@ -634,15 +636,27 @@ TEST_CASE("ObtainConv2DDescriptorFromIConnectableLayer")
     CHECK(originalDescriptor.m_DataLayout == armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("CheckNullDescriptor")
+TEST_CASE("CheckNotNullDescriptor")
 {
     armnn::NetworkImpl net;
-    armnn::IConnectableLayer* const addLayer = net.AddAdditionLayer();
+    armnn::IConnectableLayer* const addLayer = net.AddElementwiseBinaryLayer(armnn::BinaryOperation::Add);
 
     CHECK(addLayer);
 
     const armnn::BaseDescriptor& descriptor = addLayer->GetParameters();
     // additional layer has no descriptor so a NullDescriptor will be returned
+    CHECK(descriptor.IsNull() == false);
+}
+
+TEST_CASE("CheckNullDescriptor")
+{
+    armnn::NetworkImpl net;
+    armnn::IConnectableLayer* const addLayer = net.AddPreluLayer();
+
+    CHECK(addLayer);
+
+    const armnn::BaseDescriptor& descriptor = addLayer->GetParameters();
+    // Prelu has no descriptor so a NullDescriptor will be returned
     CHECK(descriptor.IsNull() == true);
 }
 

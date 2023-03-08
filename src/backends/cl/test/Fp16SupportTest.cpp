@@ -28,7 +28,7 @@ TEST_CASE("Fp16DataTypeSupport")
     Layer* const inputLayer1 = graph.AddLayer<InputLayer>(1, "input1");
     Layer* const inputLayer2 = graph.AddLayer<InputLayer>(2, "input2");
 
-    Layer* const additionLayer = graph.AddLayer<AdditionLayer>("addition");
+    Layer* const additionLayer = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "addition");
     Layer* const outputLayer = graph.AddLayer<armnn::OutputLayer>(0, "output");
 
     TensorInfo fp16TensorInfo({1, 2, 3, 5}, armnn::DataType::Float16);
@@ -57,7 +57,7 @@ TEST_CASE("Fp16AdditionTest")
 
    IConnectableLayer* inputLayer1 = net->AddInputLayer(0);
    IConnectableLayer* inputLayer2 = net->AddInputLayer(1);
-   IConnectableLayer* additionLayer = net->AddAdditionLayer();
+   IConnectableLayer* additionLayer = net->AddElementwiseBinaryLayer(BinaryOperation::Add);
    IConnectableLayer* outputLayer = net->AddOutputLayer(0);
 
    inputLayer1->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(0));

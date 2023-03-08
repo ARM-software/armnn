@@ -663,6 +663,11 @@ struct ComparisonQueueDescriptor : QueueDescriptorWithParameters<ComparisonDescr
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct ElementwiseBinaryQueueDescriptor : QueueDescriptorWithParameters<ElementwiseBinaryDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 struct ElementwiseUnaryQueueDescriptor : QueueDescriptorWithParameters<ElementwiseUnaryDescriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;

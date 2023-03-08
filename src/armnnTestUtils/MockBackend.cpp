@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -69,6 +69,7 @@ bool IsLayerSupported(const armnn::Layer* layer)
         case armnn::LayerType::Constant:
         case armnn::LayerType::Addition:
         case armnn::LayerType::Convolution2d:
+        case armnn::LayerType::ElementwiseBinary:
             // Layer supported
             return true;
         default:

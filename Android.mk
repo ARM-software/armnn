@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 ARM Ltd. All rights reserved.
+# Copyright © 2017-2023 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -227,6 +227,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/DetectionPostProcessLayer.cpp \
         src/armnn/layers/DivisionLayer.cpp \
         src/armnn/layers/ElementwiseBaseLayer.cpp \
+        src/armnn/layers/ElementwiseBinaryLayer.cpp \
         src/armnn/layers/ElementwiseUnaryLayer.cpp \
         src/armnn/layers/FakeQuantizationLayer.cpp \
         src/armnn/layers/FillLayer.cpp \

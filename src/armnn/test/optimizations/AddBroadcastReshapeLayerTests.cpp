@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,7 +27,7 @@ void AddBroadcastReshapeLayerOptimizerTest(const TensorInfo& info0,
 
     auto input0 = graph.AddLayer<InputLayer>(0, "input0");
     auto input1 = graph.AddLayer<InputLayer>(1, "input1");
-    auto add = graph.AddLayer<AdditionLayer>("add");
+    auto add = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "add");
     auto output = graph.AddLayer<OutputLayer>(0, "output");
     input0->GetOutputSlot().SetTensorInfo(info0);
     input1->GetOutputSlot().SetTensorInfo(info1);
@@ -40,7 +40,7 @@ void AddBroadcastReshapeLayerOptimizerTest(const TensorInfo& info0,
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<AdditionLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Run optimizer
@@ -48,19 +48,19 @@ void AddBroadcastReshapeLayerOptimizerTest(const TensorInfo& info0,
 
     // Broadcast reshape layer has been added to the graph correctly
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
-                             &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<ReshapeLayer>,
-                             &IsLayerOfType<AdditionLayer>,
-                             &IsLayerOfType<OutputLayer>));
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<ReshapeLayer>,
+                        &IsLayerOfType<ElementwiseBinaryLayer>,
+                        &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, reshapeLayerName);
     CHECK(reshapeLayer);
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    CHECK((addedReshapeTensorInfo.GetShape() == expectedReshapeShape));
-    CHECK((addedReshapeTensorInfo.GetDataType() == expectedDataType));
+    CHECK_EQ(addedReshapeTensorInfo.GetShape(), expectedReshapeShape);
+    CHECK_EQ(addedReshapeTensorInfo.GetDataType(), expectedDataType);
 }
 
 TEST_CASE("AddBroadcastReshapeLayerSimpleTest")
@@ -121,7 +121,7 @@ TEST_CASE("AddBroadcastReshapeLayerSubtractionTest")
 
     auto input0 = graph.AddLayer<InputLayer>(0, "input0");
     auto input1 = graph.AddLayer<InputLayer>(1, "input1");
-    auto sub = graph.AddLayer<SubtractionLayer>("sub");
+    auto sub = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Sub, "sub");
     auto output = graph.AddLayer<OutputLayer>(0, "output");
     input0->GetOutputSlot().SetTensorInfo(info0);
     input1->GetOutputSlot().SetTensorInfo(info1);
@@ -134,7 +134,7 @@ TEST_CASE("AddBroadcastReshapeLayerSubtractionTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<SubtractionLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Run optimizer
@@ -145,7 +145,7 @@ TEST_CASE("AddBroadcastReshapeLayerSubtractionTest")
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ReshapeLayer>,
-                             &IsLayerOfType<SubtractionLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:sub-0");
@@ -153,8 +153,8 @@ TEST_CASE("AddBroadcastReshapeLayerSubtractionTest")
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    CHECK((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 1, 5 })));
-    CHECK((addedReshapeTensorInfo.GetDataType() == DataType::Float32));
+    CHECK_EQ(addedReshapeTensorInfo.GetShape(), TensorShape({ 1, 1, 1, 5 }));
+    CHECK_EQ(addedReshapeTensorInfo.GetDataType(), DataType::Float32);
 }
 
 TEST_CASE("AddBroadcastReshapeLayerDivisionTest")
@@ -166,7 +166,7 @@ TEST_CASE("AddBroadcastReshapeLayerDivisionTest")
 
     auto input0 = graph.AddLayer<InputLayer>(0, "input0");
     auto input1 = graph.AddLayer<InputLayer>(1, "input1");
-    auto div = graph.AddLayer<DivisionLayer>("div");
+    auto div = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Div, "div");
     auto output = graph.AddLayer<OutputLayer>(0, "output");
     input0->GetOutputSlot().SetTensorInfo(info0);
     input1->GetOutputSlot().SetTensorInfo(info1);
@@ -179,7 +179,7 @@ TEST_CASE("AddBroadcastReshapeLayerDivisionTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<DivisionLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Run optimizer
@@ -190,7 +190,7 @@ TEST_CASE("AddBroadcastReshapeLayerDivisionTest")
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ReshapeLayer>,
-                             &IsLayerOfType<DivisionLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:div-0");
@@ -198,8 +198,8 @@ TEST_CASE("AddBroadcastReshapeLayerDivisionTest")
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    CHECK((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 4, 5 })));
-    CHECK((addedReshapeTensorInfo.GetDataType() == DataType::QAsymmS8));
+    CHECK_EQ(addedReshapeTensorInfo.GetShape(), TensorShape({ 1, 1, 4, 5 }));
+    CHECK_EQ(addedReshapeTensorInfo.GetDataType(), DataType::QAsymmS8);
 }
 
 TEST_CASE("AddBroadcastReshapeLayerMultiplicationTest")
@@ -211,7 +211,7 @@ TEST_CASE("AddBroadcastReshapeLayerMultiplicationTest")
 
     auto input0 = graph.AddLayer<InputLayer>(0, "input0");
     auto input1 = graph.AddLayer<InputLayer>(1, "input1");
-    auto mul = graph.AddLayer<MultiplicationLayer>("mul");
+    auto mul = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Mul, "mul");
     auto output = graph.AddLayer<OutputLayer>(0, "output");
     input0->GetOutputSlot().SetTensorInfo(info0);
     input1->GetOutputSlot().SetTensorInfo(info1);
@@ -224,7 +224,7 @@ TEST_CASE("AddBroadcastReshapeLayerMultiplicationTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Run optimizer
@@ -235,7 +235,7 @@ TEST_CASE("AddBroadcastReshapeLayerMultiplicationTest")
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ReshapeLayer>,
-                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:mul-0");
@@ -243,8 +243,8 @@ TEST_CASE("AddBroadcastReshapeLayerMultiplicationTest")
     auto addedReshapeTensorInfo = reshapeLayer->GetOutputSlot().GetTensorInfo();
 
     // Tensorshape and the data type are correct
-    CHECK((addedReshapeTensorInfo.GetShape() == TensorShape({ 1, 1, 3, 5 })));
-    CHECK((addedReshapeTensorInfo.GetDataType() == DataType::QAsymmU8));
+    CHECK_EQ(addedReshapeTensorInfo.GetShape(), TensorShape({ 1, 1, 3, 5 }));
+    CHECK_EQ(addedReshapeTensorInfo.GetDataType(), DataType::QAsymmU8);
 }
 
 TEST_CASE("AddNoBroadcastReshapeLayerTest")
@@ -256,7 +256,7 @@ TEST_CASE("AddNoBroadcastReshapeLayerTest")
 
     auto input0 = graph.AddLayer<InputLayer>(0, "input0");
     auto input1 = graph.AddLayer<InputLayer>(1, "input1");
-    auto mul = graph.AddLayer<MultiplicationLayer>("mul");
+    auto mul = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Mul, "mul");
     auto output = graph.AddLayer<OutputLayer>(0, "output");
     input0->GetOutputSlot().SetTensorInfo(info0);
     input1->GetOutputSlot().SetTensorInfo(info1);
@@ -269,7 +269,7 @@ TEST_CASE("AddNoBroadcastReshapeLayerTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Run optimizer
@@ -279,7 +279,7 @@ TEST_CASE("AddNoBroadcastReshapeLayerTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<InputLayer>,
-                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     Layer* const reshapeLayer = GetFirstLayerWithName(graph, "Reshape_for:mul-0");
@@ -295,7 +295,7 @@ TEST_CASE("ReshapeParentConstLayerTest")
 
     auto input = graph.AddLayer<InputLayer>(0, "input");
     auto constant = graph.AddLayer<ConstantLayer>("constant");
-    auto mul = graph.AddLayer<MultiplicationLayer>("mul");
+    auto mul = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Mul, "mul");
     auto output = graph.AddLayer<OutputLayer>(0, "output");
 
     uint8_t tensor[] = { 1, 1, 1, 1, 1 };
@@ -313,7 +313,7 @@ TEST_CASE("ReshapeParentConstLayerTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ConstantLayer>,
-                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Run optimizer
@@ -323,7 +323,7 @@ TEST_CASE("ReshapeParentConstLayerTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ConstantLayer>,
-                             &IsLayerOfType<MultiplicationLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     TensorShape expectedShape = TensorShape{ 1, 1, 1, 5 };
@@ -351,8 +351,8 @@ TEST_CASE("ReshapeParentConstAddLayerMultipleConnectionsTest")
 
     auto input = graph.AddLayer<InputLayer>(0, "input");
     auto constant = graph.AddLayer<ConstantLayer>("constant");
-    auto add1 = graph.AddLayer<AdditionLayer>("add1");
-    auto add2 = graph.AddLayer<AdditionLayer>("add2");
+    auto add1 = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "add1");
+    auto add2 = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "add2");
     auto output = graph.AddLayer<OutputLayer>(0, "output");
 
     input->GetOutputSlot().SetTensorInfo(inputInfo);
@@ -371,8 +371,8 @@ TEST_CASE("ReshapeParentConstAddLayerMultipleConnectionsTest")
     CHECK(CheckSequence(graph.cbegin(), graph.cend(),
                              &IsLayerOfType<InputLayer>,
                              &IsLayerOfType<ConstantLayer>,
-                             &IsLayerOfType<AdditionLayer>,
-                             &IsLayerOfType<AdditionLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Run optimizer
@@ -384,8 +384,8 @@ TEST_CASE("ReshapeParentConstAddLayerMultipleConnectionsTest")
                              &IsLayerOfType<ConstantLayer>,
                              &IsLayerOfType<ReshapeLayer>,
                              &IsLayerOfType<ReshapeLayer>,
-                             &IsLayerOfType<AdditionLayer>,
-                             &IsLayerOfType<AdditionLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
+                             &IsLayerOfType<ElementwiseBinaryLayer>,
                              &IsLayerOfType<OutputLayer>));
 
     // Ensure the output shape of the constant hasn't changed.

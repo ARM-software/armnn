@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -16,7 +16,7 @@ class MockImportLayerSupport : public LayerSupportBase
 public:
     bool IsLayerSupported(const LayerType& type,
                           const std::vector<TensorInfo>& infos,
-                          const BaseDescriptor& /*descriptor*/,
+                          const BaseDescriptor& descriptor,
                           const Optional<LstmInputParamsInfo>& /*lstmParamsInfo*/,
                           const Optional<QuantizedLstmInputParamsInfo>& /*quantizedLstmParamsInfo*/,
                           Optional<std::string&> reasonIfUnsupported) const override
@@ -25,6 +25,11 @@ public:
         {
             case LayerType::Addition:
                 return IsAdditionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            case LayerType::ElementwiseBinary:
+            {
+                auto elementwiseDesc = *(PolymorphicDowncast<const ElementwiseBinaryDescriptor*>(&descriptor));
+                return (elementwiseDesc.m_Operation == BinaryOperation::Add);
+            }
             case LayerType::Input:
                 return IsInputSupported(infos[0], reasonIfUnsupported);
             case LayerType::Output:

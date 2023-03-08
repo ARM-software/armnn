@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -18,7 +18,7 @@ namespace optimizations
 static const std::set<armnn::LayerType> broadcastOps{ LayerType::Addition,       LayerType::Division,
                                                       LayerType::Maximum,        LayerType::Minimum,
                                                       LayerType::Multiplication, LayerType::Prelu,
-                                                      LayerType::Subtraction };
+                                                      LayerType::Subtraction,    LayerType::ElementwiseBinary };
 
 class AddBroadcastReshapeLayerImpl
 {

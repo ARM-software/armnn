@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -279,6 +279,59 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
         {
             auto divisionQueueDescriptor = PolymorphicDowncast<const DivisionQueueDescriptor*>(&descriptor);
             return std::make_unique<NeonDivisionWorkload>(*divisionQueueDescriptor, info);
+        }
+        case LayerType::ElementwiseBinary :
+        {
+            auto elementwiseBinaryQueueDescriptor
+                    = PolymorphicDowncast<const ElementwiseBinaryQueueDescriptor*>(&descriptor);
+
+            switch (elementwiseBinaryQueueDescriptor->m_Parameters.m_Operation)
+            {
+                case BinaryOperation::Add:
+                {
+                    AdditionQueueDescriptor additionQueueDescriptor;
+                    additionQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    additionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    return std::make_unique<NeonAdditionWorkload>(additionQueueDescriptor, info);
+                }
+                case BinaryOperation::Div:
+                {
+                    DivisionQueueDescriptor divisionQueueDescriptor;
+                    divisionQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    divisionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    return std::make_unique<NeonDivisionWorkload>(divisionQueueDescriptor, info);
+                }
+                case BinaryOperation::Maximum:
+                {
+                    MaximumQueueDescriptor maximumQueueDescriptor;
+                    maximumQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    maximumQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    return std::make_unique<NeonMaximumWorkload>(maximumQueueDescriptor, info);
+                }
+                case BinaryOperation::Minimum:
+                {
+                    MinimumQueueDescriptor minimumQueueDescriptor;
+                    minimumQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    minimumQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    return std::make_unique<NeonMinimumWorkload>(minimumQueueDescriptor, info);
+                }
+                case BinaryOperation::Mul:
+                {
+                    MultiplicationQueueDescriptor multiplicationQueueDescriptor;
+                    multiplicationQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    multiplicationQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    return std::make_unique<NeonMultiplicationWorkload>(multiplicationQueueDescriptor, info);
+                }
+                case BinaryOperation::Sub:
+                {
+                    SubtractionQueueDescriptor subtractionQueueDescriptor;
+                    subtractionQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    subtractionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    return std::make_unique<NeonSubtractionWorkload>(subtractionQueueDescriptor, info);
+                }
+                default:
+                    return nullptr;
+            }
         }
         case LayerType::ElementwiseUnary :
         {

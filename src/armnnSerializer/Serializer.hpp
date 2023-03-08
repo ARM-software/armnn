@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -171,6 +171,10 @@ private:
 
     void SerializeDivisionLayer(const armnn::IConnectableLayer* layer,
                                 const char* name = nullptr);
+
+    void SerializeElementwiseBinaryLayer(const armnn::IConnectableLayer* layer,
+                                         const armnn::ElementwiseBinaryDescriptor& descriptor,
+                                         const char* name = nullptr);
 
     void SerializeElementwiseUnaryLayer(const armnn::IConnectableLayer* layer,
                                         const armnn::ElementwiseUnaryDescriptor& descriptor,

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -331,6 +331,7 @@ TEST_CASE("SerializeConstant")
                 case armnn::LayerType::Input: break;
                 case armnn::LayerType::Output: break;
                 case armnn::LayerType::Addition: break;
+                case armnn::LayerType::ElementwiseBinary: break;
                 default:
                 {
                     this->VerifyNameAndConnections(layer, name);
@@ -970,6 +971,47 @@ TEST_CASE("SerializeDeserializeComparisonEqual")
 
     LayerVerifierBase verifier(layerName, {inputTensorInfo1, inputTensorInfo2}, {outputTensorInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+void SerializeElementwiseBinaryTest(armnn::BinaryOperation binaryOperation)
+{
+    auto layerName = GetBinaryOperationAsCString(binaryOperation);
+    const armnn::TensorInfo tensorInfo({ 1, 5, 2, 3 }, armnn::DataType::Float32);
+    armnn::ElementwiseBinaryDescriptor descriptor(binaryOperation);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const elementwiseBinaryLayer = network->AddElementwiseBinaryLayer(descriptor,
+                                                                                                layerName);
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(elementwiseBinaryLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(elementwiseBinaryLayer->GetInputSlot(1));
+    elementwiseBinaryLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+    elementwiseBinaryLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
+
+    std::string serializedNetwork = SerializeNetwork(*network);
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(serializedNetwork);
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBaseWithDescriptor<armnn::ElementwiseBinaryDescriptor>
+            verifier(layerName, { tensorInfo, tensorInfo }, { tensorInfo }, descriptor);
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+TEST_CASE("SerializeElementwiseBinary")
+{
+    using op = armnn::BinaryOperation;
+    std::initializer_list<op> allBinaryOperations = {op::Add, op::Div, op::Maximum, op::Minimum, op::Mul, op::Sub};
+
+    for (auto binaryOperation : allBinaryOperations)
+    {
+        SerializeElementwiseBinaryTest(binaryOperation);
+    }
 }
 
 void SerializeElementwiseUnaryTest(armnn::UnaryOperation unaryOperation)
@@ -2883,6 +2925,7 @@ TEST_CASE("SerializeDeserializeNonLinearNetwork")
                     CompareConstTensor(constants.at(0), m_LayerInput);
                     break;
                 }
+                case armnn::LayerType::ElementwiseBinary: break;
                 default:
                 {
                     throw armnn::Exception("Unexpected layer type in test model");

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -131,6 +131,16 @@ enum class UnaryOperation
     LogicalNot = 5,
     Log        = 6,
     Sin        = 7
+};
+
+enum class BinaryOperation
+{
+    Add     = 0,
+    Div     = 1,
+    Maximum = 2,
+    Minimum = 3,
+    Mul     = 4,
+    Sub     = 5
 };
 
 enum class PoolingAlgorithm
@@ -385,6 +395,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
 
 /// This list uses X macro technique.
 /// See https://en.wikipedia.org/wiki/X_Macro for more info
+// New layers should be added at last position to minimize instability.
 #define LIST_OF_LAYER_TYPE \
     X(Activation) \
     X(Addition) \
@@ -458,8 +469,9 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(Pooling3d) \
     X(GatherNd) \
     X(BatchMatMul) \
+    X(ElementwiseBinary) \
 
-// New layers should be added at last to minimize instability.
+// New layers should be added at last position to minimize instability.
 
 /// When adding a new layer, adapt also the LastLayer enum value in the
 /// enum class LayerType below
@@ -469,7 +481,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = BatchMatMul
+    LastLayer = ElementwiseBinary
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

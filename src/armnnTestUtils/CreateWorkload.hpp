@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -125,7 +125,41 @@ std::unique_ptr<WorkloadType> CreateElementwiseWorkloadTest(armnn::IWorkloadFact
     // Makes the workload and checks it.
     auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, factory);
 
-    DescriptorType queueDescriptor = workload->GetData();
+    auto queueDescriptor = workload->GetData();
+    CHECK(queueDescriptor.m_Inputs.size() == 2);
+    CHECK(queueDescriptor.m_Outputs.size() == 1);
+
+    // Returns so we can do extra, backend-specific tests.
+    return workload;
+}
+
+template <typename WorkloadType, armnn::DataType DataType>
+std::unique_ptr<WorkloadType> CreateElementwiseBinaryWorkloadTest(armnn::IWorkloadFactory & factory,
+                                                                  armnn::Graph & graph,
+                                                                  armnn::BinaryOperation binaryOperation)
+{
+    // Creates the layer we're testing.
+    ElementwiseBinaryDescriptor descriptor(binaryOperation);
+    //ElementwiseBinaryDescriptor descriptor = ElementwiseBinaryDescriptor(binaryOperation);
+
+    Layer* const layer = graph.AddLayer<ElementwiseBinaryLayer>(descriptor, "layer");
+
+    // Creates extra layers.
+    Layer* const input1 = graph.AddLayer<InputLayer>(1, "input1");
+    Layer* const input2 = graph.AddLayer<InputLayer>(2, "input2");
+    Layer* const output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connects up.
+    armnn::TensorInfo tensorInfo({2, 3}, DataType);
+    Connect(input1, layer, tensorInfo, 0, 0);
+    Connect(input2, layer, tensorInfo, 0, 1);
+    Connect(layer, output, tensorInfo);
+    CreateTensorHandles(graph, factory);
+
+    // Makes the workload and checks it.
+    auto workload = MakeAndCheckWorkload<WorkloadType>(*layer, factory);
+
+    auto queueDescriptor = workload->GetData();
     CHECK(queueDescriptor.m_Inputs.size() == 2);
     CHECK(queueDescriptor.m_Outputs.size() == 1);
 
@@ -190,6 +224,7 @@ std::unique_ptr<WorkloadType> CreateSubtractionWithBlobWorkloadTest(armnn::IWork
 
     return workload;
 }
+
 
 template<typename WorkloadType,
          typename DescriptorType,

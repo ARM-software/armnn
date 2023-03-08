@@ -67,6 +67,7 @@ BACKEND_SOURCES := \
         workloads/RefDepthwiseConvolution2dWorkload.cpp \
         workloads/RefDequantizeWorkload.cpp \
         workloads/RefDetectionPostProcessWorkload.cpp \
+        workloads/RefElementwiseBinaryWorkload.cpp \
         workloads/RefElementwiseWorkload.cpp \
         workloads/RefElementwiseUnaryWorkload.cpp \
         workloads/RefFakeQuantizationFloat32Workload.cpp \

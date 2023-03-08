@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -311,7 +311,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
         if ((base.GetType() == LayerType::DepthwiseConvolution2d || base.GetType() == LayerType::Convolution2d
             || base.GetType() == LayerType::BatchNormalization || base.GetType() == LayerType::FullyConnected
             || base.GetType() == LayerType::Addition || base.GetType() == LayerType::Multiplication
-            || base.GetType() == LayerType::Subtraction || base.GetType() == LayerType::Division)
+            || base.GetType() == LayerType::Subtraction || base.GetType() == LayerType::Division
+            || base.GetType() == LayerType::ElementwiseBinary)
             && (base.GetAdditionalInformation<ActivationDescriptor>() == nullptr))
         {
             for (auto output = base.BeginOutputSlots(); output != base.EndOutputSlots(); ++output)
@@ -541,6 +542,90 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
+                            }
+                            else if (base.GetType() == LayerType::ElementwiseBinary)
+                            {
+                                ElementwiseBinaryLayer* baseLayer = PolymorphicDowncast<ElementwiseBinaryLayer*>(&base);
+
+                                if (baseLayer->GetParameters().m_Operation == BinaryOperation::Add)
+                                {
+                                    arm_compute::Status status = ClAdditionValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Add,
+                                                                                           name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
+                                    }
+                                }
+                                else if (baseLayer->GetParameters().m_Operation == BinaryOperation::Div)
+                                {
+                                    arm_compute::Status status = ClDivisionWorkloadValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Div,
+                                                                                           name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
+                                    }
+                                }
+                                else if (baseLayer->GetParameters().m_Operation == BinaryOperation::Mul)
+                                {
+                                    arm_compute::Status status = ClMultiplicationWorkloadValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Mul,
+                                                                                           name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
+                                    }
+                                }
+                                else if (baseLayer->GetParameters().m_Operation == BinaryOperation::Sub)
+                                {
+                                    arm_compute::Status status = ClSubtractionValidate(
+                                            baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            baseLayer->GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            activationLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo(),
+                                            &activationDesc);
+
+                                    if (status)
+                                    {
+                                        FuseElementwiseBinaryLayer<ElementwiseBinaryLayer>(optimizationViews,
+                                                                                           baseLayer,
+                                                                                           activationLayer,
+                                                                                           activationDesc,
+                                                                                           BinaryOperation::Sub,
+                                                                                           name);
+                                    }
+                                }
+                                // No fusion available for other BinaryOperations
                             }
                         }
                     }

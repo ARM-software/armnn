@@ -24,6 +24,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     DetectionPostProcessEndToEndTestImpl.hpp
     DynamicBackendTests.cpp
     DynamicBackendTests.hpp
+    ElementwiseBinaryEndToEndTestImpl.hpp
     ElementwiseUnaryEndToEndTestImpl.hpp
     EndToEndTestImpl.hpp
     FillEndToEndTestImpl.hpp

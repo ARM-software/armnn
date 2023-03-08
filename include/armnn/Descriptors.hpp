@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -103,6 +103,26 @@ struct ComparisonDescriptor : BaseDescriptor
 
     /// Specifies the comparison operation to execute
     ComparisonOperation m_Operation;
+};
+
+/// A ElementwiseBinaryDescriptor for the ElementwiseBinaryLayer
+struct ElementwiseBinaryDescriptor : BaseDescriptor
+{
+    ElementwiseBinaryDescriptor()
+            : ElementwiseBinaryDescriptor(BinaryOperation::Add)
+    {}
+
+    ElementwiseBinaryDescriptor(BinaryOperation operation)
+            : m_Operation(operation)
+    {}
+
+    bool operator ==(const ElementwiseBinaryDescriptor &rhs) const
+    {
+        return m_Operation == rhs.m_Operation;
+    }
+
+    /// Specifies the elementwiseBinary operation to execute
+    BinaryOperation m_Operation;
 };
 
 /// A ElementwiseUnaryDescriptor for the ElementwiseUnaryLayer

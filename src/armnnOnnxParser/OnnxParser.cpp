@@ -1558,7 +1558,7 @@ void OnnxParserImpl::ParseAdd(const onnx::NodeProto& node)
     }
 
 
-    IConnectableLayer* layer = m_Network->AddAdditionLayer(node.name().c_str());
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Add, node.name().c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     auto outputInfo = ComputeOutputInfo({ node.output(0) }, layer,

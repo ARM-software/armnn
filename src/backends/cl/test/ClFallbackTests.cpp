@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,8 +24,8 @@ TEST_CASE("ClImportEnabledFallbackToNeon")
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
     IConnectableLayer* input2 = net->AddInputLayer(2, "input2");
-    IConnectableLayer* add = net->AddAdditionLayer("add");
-    IConnectableLayer* sub = net->AddSubtractionLayer("sub");
+    IConnectableLayer* add = net->AddElementwiseBinaryLayer(BinaryOperation::Add, "add");
+    IConnectableLayer* sub = net->AddElementwiseBinaryLayer(BinaryOperation::Sub, "sub");
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
 
     input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));
@@ -172,8 +172,8 @@ TEST_CASE("ClImportDisabledFallbackToNeon")
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
     IConnectableLayer* input2 = net->AddInputLayer(2, "input2");
-    IConnectableLayer* add = net->AddAdditionLayer("add");
-    IConnectableLayer* sub = net->AddSubtractionLayer("sub");
+    IConnectableLayer* add = net->AddElementwiseBinaryLayer(BinaryOperation::Add, "add");
+    IConnectableLayer* sub = net->AddElementwiseBinaryLayer(BinaryOperation::Sub, "sub");
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
 
     input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));
@@ -301,8 +301,8 @@ TEST_CASE("ClImportEnabledFallbackSubgraphToNeon")
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
     IConnectableLayer* input2 = net->AddInputLayer(2, "input2");
-    IConnectableLayer* add = net->AddAdditionLayer("add");
-    IConnectableLayer* sub = net->AddSubtractionLayer("sub");
+    IConnectableLayer* add = net->AddElementwiseBinaryLayer(BinaryOperation::Add, "add");
+    IConnectableLayer* sub = net->AddElementwiseBinaryLayer(BinaryOperation::Sub, "sub");
     IConnectableLayer* pooling = net->AddPooling2dLayer(desc, "pooling");
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
 
@@ -460,8 +460,8 @@ TEST_CASE("ClImportDisableFallbackSubgraphToNeon")
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
     IConnectableLayer* input2 = net->AddInputLayer(2, "input2");
-    IConnectableLayer* add = net->AddAdditionLayer("add");
-    IConnectableLayer* sub = net->AddSubtractionLayer("sub");
+    IConnectableLayer* add = net->AddElementwiseBinaryLayer(BinaryOperation::Add, "add");
+    IConnectableLayer* sub = net->AddElementwiseBinaryLayer(BinaryOperation::Sub, "sub");
     IConnectableLayer* pooling = net->AddPooling2dLayer(desc, "pooling");
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
 

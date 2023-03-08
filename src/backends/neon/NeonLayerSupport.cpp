@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -346,6 +346,56 @@ bool IsLayerTypeSupported(const LayerType& type,
         }
         case LayerType::Division:
             return support.IsDivisionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+        case LayerType::ElementwiseBinary:
+        {
+            auto desc = *(PolymorphicDowncast<const ElementwiseBinaryDescriptor *>(&descriptor));
+
+            switch (desc.m_Operation)
+            {
+                case BinaryOperation::Add:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonAdditionWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                case BinaryOperation::Div:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDivisionWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                case BinaryOperation::Maximum:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMaximumWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2]);
+                case BinaryOperation::Minimum:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMinimumWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2]);
+                case BinaryOperation::Mul:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonMultiplicationWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                case BinaryOperation::Sub:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSubtractionWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                default:
+                    return false;
+            }
+        }
         case LayerType::ElementwiseUnary:
             return support.IsElementwiseUnarySupported(infos[0],
                                                        infos[1],

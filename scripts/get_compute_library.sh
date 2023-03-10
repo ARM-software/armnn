@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="f800adf185e966b16385f65b9c7250766949dbe4" #8881: Implement dynamic fusion reshape operator | https://review.mlplatform.org/c/ml/ComputeLibrary/+/8881
+DEFAULT_CLFRAMEWORKREVISION="37c989a58a04985dfdc21089c7dacc7e1925a4d0" #9199: Add support for arbitrary parameters for CPU Gather | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9199
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

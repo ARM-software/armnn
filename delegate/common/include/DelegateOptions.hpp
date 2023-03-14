@@ -14,9 +14,15 @@
 namespace armnnDelegate
 {
 
+struct DelegateOptionsImpl;
+
 class DelegateOptions
 {
 public:
+    ~DelegateOptions();
+    DelegateOptions();
+    DelegateOptions(const DelegateOptions& other);
+
     DelegateOptions(armnn::Compute computeDevice,
                     const std::vector<armnn::BackendOptions>& backendOptions = {},
                     armnn::Optional<armnn::LogSeverity> logSeverityLevel = armnn::EmptyOptional());
@@ -186,118 +192,61 @@ public:
                     size_t num_options,
                     void (*report_error)(const char*));
 
-    const std::vector<armnn::BackendId>& GetBackends() const { return m_Backends; }
+    const std::vector<armnn::BackendId>& GetBackends() const;
 
-    void SetBackends(const std::vector<armnn::BackendId>& backends) { m_Backends = backends; }
+    void SetBackends(const std::vector<armnn::BackendId>& backends);
 
-    void SetDynamicBackendsPath(const std::string& dynamicBackendsPath)
-    {
-        m_RuntimeOptions.m_DynamicBackendsPath = dynamicBackendsPath;
-    }
-    const std::string& GetDynamicBackendsPath() const
-    {
-        return m_RuntimeOptions.m_DynamicBackendsPath;
-    }
+    void SetDynamicBackendsPath(const std::string& dynamicBackendsPath);
 
-    void SetGpuProfilingState(bool gpuProfilingState)
-    {
-        m_RuntimeOptions.m_EnableGpuProfiling = gpuProfilingState;
-    }
-    bool GetGpuProfilingState()
-    {
-        return m_RuntimeOptions.m_EnableGpuProfiling;
-    }
+    const std::string& GetDynamicBackendsPath() const;
 
-    const std::vector<armnn::BackendOptions>& GetBackendOptions() const
-    {
-        return m_RuntimeOptions.m_BackendOptions;
-    }
+    void SetGpuProfilingState(bool gpuProfilingState);
+
+    bool GetGpuProfilingState();
+
+    const std::vector<armnn::BackendOptions>& GetBackendOptions() const;
 
     /// Appends a backend option to the list of backend options
-    void AddBackendOption(const armnn::BackendOptions& option)
-    {
-        m_RuntimeOptions.m_BackendOptions.push_back(option);
-    }
+    void AddBackendOption(const armnn::BackendOptions& option);
 
     /// Sets the severity level for logging within ArmNN that will be used on creation of the delegate
-    void SetLoggingSeverity(const armnn::LogSeverity& level) { m_LoggingSeverity = level; }
-    void SetLoggingSeverity(const std::string& level) { m_LoggingSeverity = armnn::StringToLogLevel(level); }
+    void SetLoggingSeverity(const armnn::LogSeverity& level);
+    void SetLoggingSeverity(const std::string& level);
 
     /// Returns the severity level for logging within ArmNN
-    armnn::LogSeverity GetLoggingSeverity() { return m_LoggingSeverity.value(); }
+    armnn::LogSeverity GetLoggingSeverity();
 
-    bool IsLoggingEnabled() { return m_LoggingSeverity.has_value(); }
+    bool IsLoggingEnabled();
 
-    const armnn::OptimizerOptions& GetOptimizerOptions() const { return m_OptimizerOptions; }
+    const armnn::OptimizerOptions& GetOptimizerOptions() const;
 
-    void SetOptimizerOptions(const armnn::OptimizerOptions& optimizerOptions) { m_OptimizerOptions = optimizerOptions; }
+    void SetOptimizerOptions(const armnn::OptimizerOptions& optimizerOptions);
 
-    const armnn::Optional<armnn::DebugCallbackFunction>& GetDebugCallbackFunction() const
-    { return m_DebugCallbackFunc; }
+    const armnn::Optional<armnn::DebugCallbackFunction>& GetDebugCallbackFunction() const;
 
     void SetInternalProfilingParams(bool internalProfilingState,
-                                    const armnn::ProfilingDetailsMethod& internalProfilingDetail)
-    { m_InternalProfilingEnabled = internalProfilingState; m_InternalProfilingDetail = internalProfilingDetail; }
+                                    const armnn::ProfilingDetailsMethod& internalProfilingDetail);
 
-    bool GetInternalProfilingState() const { return m_InternalProfilingEnabled; }
-    const armnn::ProfilingDetailsMethod& GetInternalProfilingDetail() const { return m_InternalProfilingDetail; }
+    bool GetInternalProfilingState() const;
 
-    void SetSerializeToDot(const std::string& serializeToDotFile) { m_SerializeToDot = serializeToDotFile; }
-    const std::string& GetSerializeToDot() const { return m_SerializeToDot; }
+    const armnn::ProfilingDetailsMethod& GetInternalProfilingDetail() const;
+
+    void SetSerializeToDot(const std::string& serializeToDotFile);
+
+    const std::string& GetSerializeToDot() const;
 
     /// @Note: This might overwrite options that were set with other setter functions of DelegateOptions
-    void SetRuntimeOptions(const armnn::IRuntime::CreationOptions& runtimeOptions)
-    {
-        m_RuntimeOptions = runtimeOptions;
-    }
+    void SetRuntimeOptions(const armnn::IRuntime::CreationOptions& runtimeOptions);
 
-    const armnn::IRuntime::CreationOptions& GetRuntimeOptions()
-    {
-        return m_RuntimeOptions;
-    }
+    const armnn::IRuntime::CreationOptions& GetRuntimeOptions();
 
-    void DisableTfLiteRuntimeFallback(bool fallbackState)
-    {
-        m_DisableTfLiteRuntimeFallback = fallbackState;
-    }
-    bool TfLiteRuntimeFallbackDisabled()
-    {
-        return m_DisableTfLiteRuntimeFallback;
-    }
+    void DisableTfLiteRuntimeFallback(bool fallbackState);
+
+    bool TfLiteRuntimeFallbackDisabled();
 
 private:
-    /// Which backend to run Delegate on.
-    /// Examples of possible values are: CpuRef, CpuAcc, GpuAcc.
-    /// CpuRef as default.
-    std::vector<armnn::BackendId> m_Backends = { armnn::Compute::CpuRef };
+    std::unique_ptr<armnnDelegate::DelegateOptionsImpl> p_DelegateOptionsImpl;
 
-    /// Creation options for the ArmNN runtime
-    /// Contains options for global settings that are valid for the whole lifetime of ArmNN
-    /// i.e. BackendOptions, DynamicBackendPath, ExternalProfilingOptions and more
-    armnn::IRuntime::CreationOptions m_RuntimeOptions;
-
-    /// Options for the optimization step for the network
-    armnn::OptimizerOptions m_OptimizerOptions;
-
-    /// Internal profiling options. Written to INetworkProperties during model load.
-    /// Indicates whether internal profiling is enabled or not.
-    bool m_InternalProfilingEnabled = false;
-    /// Sets the level of detail output by the profiling. Options are DetailsWithEvents = 1 and DetailsOnly = 2
-    armnn::ProfilingDetailsMethod m_InternalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
-
-    /// Severity level for logging within ArmNN that will be used on creation of the delegate
-    armnn::Optional<armnn::LogSeverity> m_LoggingSeverity;
-
-    /// A callback function to debug layers performing custom computations on intermediate tensors.
-    /// If a function is not registered, and debug is enabled in OptimizerOptions,
-    /// debug will print information of the intermediate tensors.
-    armnn::Optional<armnn::DebugCallbackFunction> m_DebugCallbackFunc;
-
-    /// If not empty then the optimized model will be serialized to a file with this file name in "dot" format.
-    std::string m_SerializeToDot = "";
-
-    /// Option to disable TfLite Runtime fallback for unsupported operators.
-    bool m_DisableTfLiteRuntimeFallback = false;
 };
 
 } // namespace armnnDelegate

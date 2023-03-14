@@ -141,7 +141,7 @@ endif()
 if (BUILD_ARMNN_SERIALIZER
         OR BUILD_TF_LITE_PARSER
         OR BUILD_ONNX_PARSER
-        OR BUILD_ARMNN_TFLITE_DELEGATE)
+        OR BUILD_CLASSIC_DELEGATE)
     set(ExecuteNetwork_sources
         ExecuteNetwork/IExecutor.hpp
         ExecuteNetwork/ArmNNExecutor.cpp
@@ -154,7 +154,7 @@ if (BUILD_ARMNN_SERIALIZER
         NetworkExecutionUtils/NetworkExecutionUtils.cpp
         NetworkExecutionUtils/NetworkExecutionUtils.hpp)
 
-    if(BUILD_ARMNN_TFLITE_DELEGATE)
+    if(BUILD_CLASSIC_DELEGATE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-comment")
         set(ExecuteNetwork_sources
             ${ExecuteNetwork_sources}
@@ -186,7 +186,7 @@ if (BUILD_ARMNN_SERIALIZER
         if (BUILD_ONNX_PARSER)
             target_link_libraries(ExecuteNetwork armnnOnnxParser)
         endif()
-        if (BUILD_ARMNN_TFLITE_DELEGATE)
+        if (BUILD_CLASSIC_DELEGATE)
             target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnDelegate)
         endif()
         target_link_libraries(ExecuteNetwork armnn)

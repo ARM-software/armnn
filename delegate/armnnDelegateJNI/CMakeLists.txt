@@ -1,5 +1,5 @@
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -33,19 +33,10 @@ include_directories(${JNI_INCLUDE_DIRS})
 
 add_library(armnn_delegate_jni SHARED ${jni_delegate_sources})
 
-target_include_directories(
-        armnn_delegate_jni
-        PUBLIC
-        ${ARMNN_INCLUDE_DIR}
-        ${ARMNN_DELEGATE_INCLUDE_DIR}
-        ${ARMCOMPUTE_INCLUDE}
-        )
-
-target_link_libraries(
-        armnn_delegate_jni
+target_link_libraries(armnn_delegate_jni
         PRIVATE
-        Armnn::Armnn
-        ArmnnDelegate::ArmnnDelegate
+            Armnn::Armnn
+            ArmnnDelegate::ArmnnDelegate
         )
 
 # A version script is used to hide all symbols that are not required to use the jni interface

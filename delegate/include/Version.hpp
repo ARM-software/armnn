@@ -1,29 +1,8 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#pragma once
-
-namespace armnnDelegate
-{
-
-/// Macro utils
-#define STRINGIFY_VALUE(s) STRINGIFY_MACRO(s)
-#define STRINGIFY_MACRO(s) #s
-
-// ArmNN Delegate version components
-#define DELEGATE_MAJOR_VERSION 28
-#define DELEGATE_MINOR_VERSION 0
-#define DELEGATE_PATCH_VERSION 0
-
-/// DELEGATE_VERSION: "X.Y.Z"
-/// where:
-///   X = Major version number
-///   Y = Minor version number
-///   Z = Patch version number
-#define DELEGATE_VERSION STRINGIFY_VALUE(DELEGATE_MAJOR_VERSION) "." \
-                         STRINGIFY_VALUE(DELEGATE_MINOR_VERSION) "." \
-                         STRINGIFY_VALUE(DELEGATE_PATCH_VERSION)
-
-} //namespace armnnDelegate
+#include <armnn/delegate/classic/include/Version.hpp>
+#pragma message("armnn/delegate/include/Version.hpp has been deprecated, it is due for removal in"\
+                " 24.02 release. Please use public interface ")

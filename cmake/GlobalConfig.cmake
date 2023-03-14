@@ -36,8 +36,8 @@ option(BUILD_PYTHON_WHL "Build Python wheel package" OFF)
 option(BUILD_PYTHON_SRC "Build Python source package" OFF)
 option(BUILD_STATIC_PIPE_LIBS "Build Static PIPE libraries" OFF)
 option(BUILD_PIPE_ONLY "Build the PIPE libraries only" OFF)
-option(BUILD_ARMNN_TFLITE_DELEGATE "Build the Arm NN TfLite delegate" OFF)
-option(BUILD_ARMNN_TFLITE_OPAQUE_DELEGATE "Build the Arm NN TfLite Opaque delegate" OFF)
+option(BUILD_CLASSIC_DELEGATE "Build the Arm NN TfLite delegate" OFF)
+option(BUILD_OPAQUE_DELEGATE "Build the Arm NN TfLite Opaque delegate" OFF)
 option(BUILD_MEMORY_STRATEGY_BENCHMARK "Build the MemoryBenchmark" OFF)
 option(BUILD_BARE_METAL "Disable features requiring operating system support" OFF)
 option(BUILD_SHARED_LIBS "Determines if Armnn will be built statically or dynamically.
@@ -51,12 +51,17 @@ option(EXECUTE_NETWORK_STATIC " This is a limited experimental build that is ent
                                 ARMNNREF=1/0
                                 ARMCOMPUTECL=0
                                 BUILD_ONNX_PARSER=0
-                                BUILD_ARMNN_TFLITE_DELEGATE=0
-                                BUILD_ARMNN_TFLITE_OPAQUE_DELEGATE=0
+                                BUILD_CLASSIC_DELEGATE=0
+                                BUILD_OPAQUE_DELEGATE=0
                                 BUILD_TIMELINE_DECODER=0
                                 BUILD_BASE_PIPE_SERVER=0
                                 BUILD_UNIT_TESTS=0
                                 BUILD_GATORD_MOCK=0" OFF)
+
+if(BUILD_ARMNN_TFLITE_DELEGATE)
+    message(BUILD_ARMNN_TFLITE_DELEGATE option is deprecated, it will be removed in 24.02, please use BUILD_CLASSIC_DELEGATE instead)
+    set(BUILD_CLASSIC_DELEGATE 1)
+endif()
 
 include(SelectLibraryConfigurations)
 
@@ -180,8 +185,8 @@ if (NOT BUILD_PIPE_ONLY)
 endif()
 
 # JNI_BUILD has DBUILD_SHARED_LIBS set to 0 and not finding libs while building
-# hence added NOT BUILD_ARMNN_TFLITE_DELEGATE/BUILD_ARMNN_TFLITE_OPAQUE_DELEGATE condition
-if(NOT BUILD_SHARED_LIBS AND NOT BUILD_ARMNN_TFLITE_DELEGATE AND NOT BUILD_ARMNN_TFLITE_OPAQUE_DELEGATE)
+# hence added NOT BUILD_CLASSIC_DELEGATE/BUILD_OPAQUE_DELEGATE condition
+if(NOT BUILD_SHARED_LIBS AND NOT BUILD_CLASSIC_DELEGATE AND NOT BUILD_OPAQUE_DELEGATE)
     set(CMAKE_FIND_LIBRARY_SUFFIXES .a .lib)
 endif()
 
@@ -224,11 +229,11 @@ if(BUILD_ONNX_PARSER)
     include_directories(SYSTEM "${ONNX_GENERATED_SOURCES}")
 endif()
 
-if(BUILD_ARMNN_TFLITE_DELEGATE)
+if(BUILD_CLASSIC_DELEGATE)
     add_definitions(-DARMNN_TFLITE_DELEGATE)
 endif()
 
-if(BUILD_ARMNN_TFLITE_OPAQUE_DELEGATE)
+if(BUILD_OPAQUE_DELEGATE)
     add_definitions(-DARMNN_TFLITE_OPAQUE_DELEGATE)
 endif()
 

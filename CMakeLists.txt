@@ -11,7 +11,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(additional_cmake_files)
 list(APPEND additional_cmake_files
     cmake/ArmnnVersion.cmake
-    cmake/DelegateVersion.cmake
+    cmake/ClassicDelegateVersion.cmake
+    cmake/OpaqueDelegateVersion.cmake
     cmake/ParserVersion.cmake
     cmake/Utils.cmake
     cmake/GlobalConfig.cmake
@@ -443,11 +444,16 @@ endforeach()
 # Because backends are added as object libraries they won't be linked to armnn when building armnn statically.
 # A target that uses a static armnn library has to link to the object libraries in the variable armnnLibraries
 # manually to include all symbols from backends.
-if (BUILD_ARMNN_TFLITE_DELEGATE)
+if (BUILD_CLASSIC_DELEGATE OR BUILD_OPAQUE_DELEGATE)
     set(ARMNN_SUB_PROJECT ON)
     set(ARMNN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     add_subdirectory(delegate)
+endif()
+if (BUILD_CLASSIC_DELEGATE)
     add_definitions(-DARMNN_TFLITE_DELEGATE)
+endif()
+if (BUILD_OPAQUE_DELEGATE)
+    add_definitions(-DARMNN_TFLITE_OPAQUE_DELEGATE)
 endif()
 
 if(BUILD_BARE_METAL OR EXECUTE_NETWORK_STATIC)

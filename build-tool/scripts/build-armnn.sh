@@ -1,6 +1,7 @@
 #!/bin/bash
+
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -95,7 +96,7 @@ build_armnn()
 
   eval "$compile_flags" \
   cmake -DCMAKE_BUILD_TYPE="$build_type" \
-        -DBUILD_ARMNN_TFLITE_DELEGATE="$flag_tflite_delegate" \
+        -DBUILD_CLASSIC_DELEGATE="$flag_tflite_delegate" \
         -DBUILD_TF_LITE_PARSER="$flag_tflite_parser" \
         -DBUILD_ONNX_PARSER="$flag_onnx_parser" \
         -DARMCOMPUTENEON="$flag_neon_backend" \

@@ -43,7 +43,7 @@ public:
 
     IConnectableLayer* AddActivationLayer(const ActivationDescriptor& activationDescriptor,
                                           const char* name = nullptr);
-
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddAdditionLayer(const char* name = nullptr);
 
     IConnectableLayer* AddArgMinMaxLayer(const ArgMinMaxDescriptor& desc,
@@ -93,6 +93,7 @@ public:
                                                     const ConstTensor& anchors,
                                                     const char* name = nullptr);
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddDivisionLayer(const char* name = nullptr);
 
     IConnectableLayer* AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseBinaryDescriptor,
@@ -132,12 +133,15 @@ public:
                                     const LstmInputParams& params,
                                     const char* name = nullptr);
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddMaximumLayer(const char* name = nullptr);
 
     IConnectableLayer* AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name = nullptr);
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddMinimumLayer(const char* name = nullptr);
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddMultiplicationLayer(const char* name = nullptr);
 
     IConnectableLayer* AddNormalizationLayer(const NormalizationDescriptor& normalizationDescriptor,
@@ -208,6 +212,7 @@ public:
     IConnectableLayer* AddStridedSliceLayer(const StridedSliceDescriptor& stridedSliceDescriptor,
                                             const char* name = nullptr);
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddSubtractionLayer(const char* name = nullptr);
 
     IConnectableLayer* AddSwitchLayer(const char* name = nullptr);

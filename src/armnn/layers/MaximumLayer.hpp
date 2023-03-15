@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,7 +11,8 @@ namespace armnn
 {
 
 /// This layer represents a maximum operation.
-class MaximumLayer : public ElementwiseBaseLayer
+class ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ElementwiseBinaryLayer instead.", "24.02")
+      MaximumLayer : public ElementwiseBaseLayer
 {
 public:
     /// Makes a workload for the Maximum type.

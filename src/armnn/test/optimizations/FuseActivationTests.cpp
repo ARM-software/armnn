@@ -1,11 +1,10 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "LayersFwd.hpp"
 
-#include <Network.hpp>
 #include <ResolveType.hpp>
 #include <armnn/INetwork.hpp>
 #include <GraphUtils.hpp>
@@ -238,6 +237,7 @@ public:
     }
 };
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct MultiplicationTest
 {
@@ -272,7 +272,9 @@ struct MultiplicationTest
         return {};
     }
 };
+ARMNN_NO_DEPRECATE_WARN_END
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct AdditionTest
 {
@@ -307,7 +309,9 @@ struct AdditionTest
         return {};
     }
 };
+ARMNN_NO_DEPRECATE_WARN_END
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct SubtractionTest
 {
@@ -342,7 +346,9 @@ struct SubtractionTest
         return {};
     }
 };
+ARMNN_NO_DEPRECATE_WARN_END
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 template<DataType ArmnnType, typename T = ResolveType<ArmnnType>>
 struct DivisionTest
 {
@@ -377,6 +383,7 @@ struct DivisionTest
         return {};
     }
 };
+ARMNN_NO_DEPRECATE_WARN_END
 
 template<typename LayerTest,
          DataType ArmnnType>

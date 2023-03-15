@@ -313,6 +313,7 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                             }
                             else if (base.GetType() == LayerType::Addition)
                             {
+                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 AdditionLayer* baseLayer = PolymorphicDowncast<AdditionLayer*>(&base);
 
                                 arm_compute::Status status = NeonAdditionWorkloadValidate(
@@ -331,9 +332,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
+                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::Division)
                             {
+                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 DivisionLayer* baseLayer = PolymorphicDowncast<DivisionLayer*>(&base);
 
                                 arm_compute::Status status = NeonDivisionWorkloadValidate(
@@ -352,9 +355,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
+                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::Multiplication)
                             {
+                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 MultiplicationLayer* baseLayer = PolymorphicDowncast<MultiplicationLayer*>(&base);
 
                                 arm_compute::Status status = NeonMultiplicationWorkloadValidate(
@@ -373,9 +378,11 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
+                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::Subtraction)
                             {
+                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 SubtractionLayer* baseLayer = PolymorphicDowncast<SubtractionLayer*>(&base);
 
                                 arm_compute::Status status = NeonSubtractionWorkloadValidate(
@@ -394,6 +401,7 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
+                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::ElementwiseBinary)
                             {

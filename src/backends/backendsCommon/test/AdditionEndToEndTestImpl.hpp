@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -30,8 +30,7 @@ armnn::INetworkPtr CreateAdditionNetwork(const armnn::TensorShape& inputXShape,
 
     TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset);
 
-
-    IConnectableLayer* addition = network->AddAdditionLayer("addition");
+    IConnectableLayer* addition = network->AddElementwiseBinaryLayer(BinaryOperation::Add, "addition");
     IConnectableLayer* inputX = network->AddInputLayer(0, "inputX");
     IConnectableLayer* inputY = network->AddInputLayer(1, "inputY");
     IConnectableLayer* output = network->AddOutputLayer(0, "output");

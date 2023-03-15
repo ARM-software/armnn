@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,6 +43,7 @@ public:
                                                 const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use CreateElementwiseBinary instead", "24.02")
     std::unique_ptr<IWorkload> CreateAddition(const AdditionQueueDescriptor& /*descriptor*/,
                                               const WorkloadInfo& /*info*/) const override
     { return nullptr; }
@@ -103,6 +104,7 @@ public:
                                                           const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use CreateElementwiseBinary instead", "24.02")
     std::unique_ptr<IWorkload> CreateDivision(const DivisionQueueDescriptor& /*descriptor*/,
                                               const WorkloadInfo& /*info*/) const override
     { return nullptr; }
@@ -152,6 +154,7 @@ public:
                                           const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use CreateElementwiseBinary instead", "24.02")
     std::unique_ptr<IWorkload> CreateMaximum(const MaximumQueueDescriptor& /*descriptor*/,
                                              const WorkloadInfo& /*info*/) const override
     { return nullptr; }
@@ -172,10 +175,12 @@ public:
                                            const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use CreateElementwiseBinary instead", "24.02")
     std::unique_ptr<IWorkload> CreateMinimum(const MinimumQueueDescriptor& /*descriptor*/,
                                              const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use CreateElementwiseBinary instead", "24.02")
     std::unique_ptr<IWorkload> CreateMultiplication(const MultiplicationQueueDescriptor& /*descriptor*/,
                                                     const WorkloadInfo& /*info*/) const override
     { return nullptr; }
@@ -248,6 +253,7 @@ public:
                                                   const WorkloadInfo& /*info*/) const override
     { return nullptr; }
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use CreateElementwiseBinary instead", "24.02")
     std::unique_ptr<IWorkload> CreateSubtraction(const SubtractionQueueDescriptor& /*descriptor*/,
                                                  const WorkloadInfo& /*info*/) const override
     { return nullptr; }

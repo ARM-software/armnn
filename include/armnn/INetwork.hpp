@@ -481,11 +481,13 @@ public:
     /// Adds an addition layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddAdditionLayer(const char* name = nullptr);
 
     /// Adds a multiplication layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddMultiplicationLayer(const char* name = nullptr);
 
     /// Adds a batch normalization layer to the network.
@@ -603,16 +605,19 @@ public:
     /// Adds a division layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddDivisionLayer(const char* name = nullptr);
 
     /// Adds a subtraction layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddSubtractionLayer(const char* name = nullptr);
 
     /// Add a Maximum layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddMaximumLayer(const char* name = nullptr);
 
     /// Add a Mean layer to the network.
@@ -645,6 +650,7 @@ public:
     /// Add a Minimum layer to the network.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use AddElementwiseBinaryLayer instead", "24.02")
     IConnectableLayer* AddMinimumLayer(const char* name = nullptr);
 
     /// Add Gather layer to the network.

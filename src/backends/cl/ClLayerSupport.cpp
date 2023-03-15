@@ -346,7 +346,9 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
         case LayerType::Dequantize:
             return IsDequantizeSupported(infos[0], infos[1], reasonIfUnsupported);
         case LayerType::Division:
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             return IsDivisionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            ARMNN_NO_DEPRECATE_WARN_END
         case LayerType::ElementwiseBinary:
         {
             auto desc = *(PolymorphicDowncast<const ElementwiseBinaryDescriptor *>(&descriptor));
@@ -474,16 +476,22 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
                                                       infos[2],
                                                       reasonIfUnsupported);
         case LayerType::Maximum:
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             return IsMaximumSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            ARMNN_NO_DEPRECATE_WARN_END
         case LayerType::Mean:
             return IsMeanSupported(infos[0],
                                    infos[1],
                                    *(PolymorphicDowncast<const MeanDescriptor*>(&descriptor)),
                                    reasonIfUnsupported);
         case LayerType::Minimum:
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             return IsMinimumSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            ARMNN_NO_DEPRECATE_WARN_END
         case LayerType::Multiplication:
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             return IsMultiplicationSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            ARMNN_NO_DEPRECATE_WARN_END
         case LayerType::Normalization:
             return IsNormalizationSupported(infos[0],
                                             infos[1],
@@ -604,7 +612,9 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
                                            *(PolymorphicDowncast<const StridedSliceDescriptor*>(&descriptor)),
                                            reasonIfUnsupported);
         case LayerType::Subtraction:
+            ARMNN_NO_DEPRECATE_WARN_BEGIN
             return IsSubtractionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+            ARMNN_NO_DEPRECATE_WARN_END
         case LayerType::Transpose:
             return IsTransposeSupported(infos[0],
                                         infos[1],

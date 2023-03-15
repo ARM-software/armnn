@@ -39,7 +39,7 @@ bool ConstantUsageTest(const std::vector<BackendId>& computeDevice,
 
     IConnectableLayer* input = net->AddInputLayer(0);
     IConnectableLayer* constant = net->AddConstantLayer(ConstTensor(commonTensorInfo, constantData));
-    IConnectableLayer* add = net->AddAdditionLayer();
+    IConnectableLayer* add = net->AddElementwiseBinaryLayer(BinaryOperation::Add);
     IConnectableLayer* output = net->AddOutputLayer(0);
 
     input->GetOutputSlot(0).Connect(add->GetInputSlot(0));
@@ -176,7 +176,8 @@ void EndToEndLayerTestImpl(INetworkPtr network,
         for (unsigned int i = 0; i < out.size(); ++i)
         {
             CHECK_MESSAGE(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true,
-                    "Actual output: " << out[i] << ". Expected output:" << it.second[i]);
+                    "Position: " << i <<" Actual output: " << static_cast<uint32_t>(out[i]) <<
+                    ". Expected output:" << static_cast<uint32_t>(it.second[i]));
 
         }
     }

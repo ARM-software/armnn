@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,7 +13,8 @@ namespace armnn
 /// NOTE: this is an abstract class to encapsulate the element wise operations, it does not implement:
 /// std::unique_ptr<IWorkload> Layer::CreateWorkload(const IWorkloadFactory& factory) const = 0;
 /// Layer* Clone(Graph& graph) const = 0;
-class ElementwiseBaseLayer : public Layer
+class ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ElementwiseBinaryLayer instead.", "24.02")
+      ElementwiseBaseLayer : public Layer
 {
 public:
     /// Check if the input tensor shape(s)

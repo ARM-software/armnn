@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -128,70 +128,86 @@ TEST_CASE("CreateAdditionFloat16Workload")
 
 TEST_CASE("CreateAdditionFloatWorkload")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonAdditionWorkload,
                                       AdditionQueueDescriptor,
                                       AdditionLayer,
                                       DataType::Float32>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 TEST_CASE("CreateSubtractionFloat16Workload")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
                                       DataType::Float16>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 #endif
 
 TEST_CASE("CreateSubtractionFloatWorkload")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
                                       DataType::Float32>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateSubtractionUint8Workload")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
                                       SubtractionQueueDescriptor,
                                       SubtractionLayer,
                                       DataType::QAsymmU8>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 #ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
 TEST_CASE("CreateMultiplicationFloat16Workload")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
                                       DataType::Float16>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 #endif
 
 TEST_CASE("CreateMultiplicationFloatWorkload")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
                                       DataType::Float32>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateMultiplicationUint8Workload")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
                                       MultiplicationQueueDescriptor,
                                       MultiplicationLayer,
                                       DataType::QAsymmU8>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateDivisionFloatWorkloadTest")
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     NeonCreateElementwiseWorkloadTest<NeonDivisionWorkload,
                                       DivisionQueueDescriptor,
                                       DivisionLayer,
                                       armnn::DataType::Float32>();
+    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 template <typename BatchNormalizationWorkloadType, typename armnn::DataType DataType>

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,7 +10,6 @@
 #include <armnn/Descriptors.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/INetwork.hpp>
-#include <armnn/TypesUtils.hpp>
 
 #include <armnn/profiling/ArmNNProfiling.hpp>
 
@@ -18,9 +17,6 @@
 #include <common/include/Processes.hpp>
 
 #include <test/ProfilingTestUtils.hpp>
-
-#include <HeapProfiling.hpp>
-#include <LeakChecking.hpp>
 
 #ifdef WITH_VALGRIND
 #include <valgrind/memcheck.h>
@@ -76,7 +72,9 @@ TEST_CASE("RuntimePreImportInputs")
 
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
 
     TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
@@ -1306,7 +1304,9 @@ TEST_CASE("RuntimeOptimizeImportOff_LoadNetworkImportOn")
 
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
 
     TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
@@ -1349,7 +1349,9 @@ TEST_CASE("RuntimeOptimizeExportOff_LoadNetworkExportOn")
 
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
 
     TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
@@ -1392,7 +1394,9 @@ TEST_CASE("RuntimeOptimizeImportOn_LoadNetworkImportOff")
 
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
 
     TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
@@ -1435,7 +1439,9 @@ TEST_CASE("RuntimeOptimizeExportOn_LoadNetworkExportOff")
 
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer = testNetwork->AddAdditionLayer("add layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
 
     TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
@@ -1483,7 +1489,9 @@ TEST_CASE("SyncExecutePreImportInputsHappyPath")
 
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer    = testNetwork->AddAdditionLayer("add layer");
+    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
 
     TensorInfo tensorInfo{ { 4 }, armnn::DataType::Signed32 };

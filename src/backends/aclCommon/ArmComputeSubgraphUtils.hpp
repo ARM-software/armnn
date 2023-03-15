@@ -77,8 +77,10 @@ LayerType* FuseAdditionLayer(OptimizationViews& optimizationViews,
                              ActivationDescriptor& activationDesc,
                              std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddAdditionLayer(name.c_str());
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     FuseLayer(optimizationViews,
               baseLayer,
@@ -96,8 +98,10 @@ LayerType* FuseSubtractionLayer(OptimizationViews& optimizationViews,
                                 ActivationDescriptor& activationDesc,
                                 std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddSubtractionLayer(name.c_str());
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     FuseLayer(optimizationViews,
               baseLayer,
@@ -115,8 +119,10 @@ LayerType* FuseDivisionLayer(OptimizationViews& optimizationViews,
                              ActivationDescriptor& activationDesc,
                              std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddDivisionLayer(name.c_str());
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     FuseLayer(optimizationViews,
               baseLayer,
@@ -134,8 +140,10 @@ LayerType* FuseMultiplicationLayer(OptimizationViews& optimizationViews,
                                    ActivationDescriptor& activationDesc,
                                    std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddMultiplicationLayer(name.c_str());
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
+    ARMNN_NO_DEPRECATE_WARN_END
 
     FuseLayer(optimizationViews,
               baseLayer,

@@ -1,11 +1,10 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "LayersFwd.hpp"
 
-#include <Network.hpp>
 #include <ResolveType.hpp>
 #include <armnn/INetwork.hpp>
 #include <GraphUtils.hpp>
@@ -259,7 +258,9 @@ struct MultiplicationTest
         IgnoreUnused(scale);
         IgnoreUnused(offset);
 
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         return network->AddMultiplicationLayer(name);
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
@@ -294,7 +295,9 @@ struct AdditionTest
         IgnoreUnused(scale);
         IgnoreUnused(offset);
 
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         return network->AddAdditionLayer(name);
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
@@ -329,7 +332,9 @@ struct SubtractionTest
         IgnoreUnused(scale);
         IgnoreUnused(offset);
 
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         return network->AddSubtractionLayer(name);
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,
@@ -364,7 +369,9 @@ struct DivisionTest
         IgnoreUnused(scale);
         IgnoreUnused(offset);
 
+        ARMNN_NO_DEPRECATE_WARN_BEGIN
         return network->AddDivisionLayer(name);
+        ARMNN_NO_DEPRECATE_WARN_END
     }
 
     static std::vector<IConnectableLayer*> AddConstantLayers(INetwork* network,

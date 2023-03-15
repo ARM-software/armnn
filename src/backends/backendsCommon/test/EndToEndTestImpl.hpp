@@ -39,7 +39,9 @@ bool ConstantUsageTest(const std::vector<BackendId>& computeDevice,
 
     IConnectableLayer* input = net->AddInputLayer(0);
     IConnectableLayer* constant = net->AddConstantLayer(ConstTensor(commonTensorInfo, constantData));
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* add = net->AddAdditionLayer();
+    ARMNN_NO_DEPRECATE_WARN_END
     IConnectableLayer* output = net->AddOutputLayer(0);
 
     input->GetOutputSlot(0).Connect(add->GetInputSlot(0));

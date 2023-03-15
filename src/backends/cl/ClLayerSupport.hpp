@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -30,6 +30,7 @@ public:
                                const ActivationDescriptor& descriptor,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsLayerSupported instead", "24.02")
     bool IsAdditionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,
@@ -128,13 +129,14 @@ public:
                                                 const Optional<TensorInfo>& biases,
                                                 Optional<std::string&> reason = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsLayerSupported instead", "24.02")
     bool IsDivisionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,
                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
     bool IsElementwiseUnarySupported(const TensorInfo& input,
-                                     const TensorInfo& ouput,
+                                     const TensorInfo& output,
                                      const ElementwiseUnaryDescriptor& descriptor,
                                      Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
@@ -200,6 +202,7 @@ public:
                          const LstmInputParamsInfo& paramsInfo,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsLayerSupported instead", "24.02")
     bool IsMaximumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
@@ -210,11 +213,13 @@ public:
                          const MeanDescriptor& descriptor,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsLayerSupported instead", "24.02")
     bool IsMinimumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsLayerSupported instead", "24.02")
     bool IsMultiplicationSupported(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    const TensorInfo& output,
@@ -325,6 +330,7 @@ public:
                                  const StridedSliceDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsLayerSupported instead", "24.02")
     bool IsSubtractionSupported(const TensorInfo& input0,
                                 const TensorInfo& input1,
                                 const TensorInfo& output,

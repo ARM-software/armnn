@@ -77,7 +77,9 @@ LayerType* FuseAdditionLayer(OptimizationViews& optimizationViews,
                              ActivationDescriptor& activationDesc,
                              std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddAdditionLayer(name.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
     FuseLayer(optimizationViews,
@@ -96,7 +98,9 @@ LayerType* FuseSubtractionLayer(OptimizationViews& optimizationViews,
                                 ActivationDescriptor& activationDesc,
                                 std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddSubtractionLayer(name.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
     FuseLayer(optimizationViews,
@@ -115,7 +119,9 @@ LayerType* FuseDivisionLayer(OptimizationViews& optimizationViews,
                              ActivationDescriptor& activationDesc,
                              std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddDivisionLayer(name.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
     FuseLayer(optimizationViews,
@@ -134,7 +140,9 @@ LayerType* FuseMultiplicationLayer(OptimizationViews& optimizationViews,
                                    ActivationDescriptor& activationDesc,
                                    std::string name)
 {
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* replacement = optimizationViews.GetINetwork()->AddMultiplicationLayer(name.c_str());
+    ARMNN_NO_DEPRECATE_WARN_END
     LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
     FuseLayer(optimizationViews,

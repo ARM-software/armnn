@@ -263,7 +263,9 @@ TEST_CASE("OptimizeViewsValidateDeviceMockBackend")
     armnn::IConnectableLayer* input = net->AddInputLayer(0, "inLayer0");
     armnn::IConnectableLayer* input1 = net->AddInputLayer(1, "inLayer1");
 
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* addition = net->AddAdditionLayer("addLayer");
+    ARMNN_NO_DEPRECATE_WARN_END
 
     armnn::IConnectableLayer* output = net->AddOutputLayer(0, "outLayer");
 

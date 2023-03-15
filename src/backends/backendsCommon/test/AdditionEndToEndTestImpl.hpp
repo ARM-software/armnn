@@ -30,8 +30,9 @@ armnn::INetworkPtr CreateAdditionNetwork(const armnn::TensorShape& inputXShape,
 
     TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset);
 
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* addition = network->AddAdditionLayer("addition");
+    ARMNN_NO_DEPRECATE_WARN_END
     IConnectableLayer* inputX = network->AddInputLayer(0, "inputX");
     IConnectableLayer* inputY = network->AddInputLayer(1, "inputY");
     IConnectableLayer* output = network->AddOutputLayer(0, "output");

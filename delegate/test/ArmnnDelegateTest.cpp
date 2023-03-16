@@ -6,7 +6,9 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <doctest/doctest.h>
 
-#include <armnn_delegate.hpp>
+#include <classic/include/armnn_delegate.hpp>
+#include <opaque/include/armnn_delegate.hpp>
+#include <opaque/include/Version.hpp>
 
 #include <tensorflow/lite/kernels/builtin_op_kernels.h>
 #include <tensorflow/lite/interpreter.h>
@@ -86,6 +88,42 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsRegistered")
     auto status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
     CHECK(status == kTfLiteOk);
     CHECK(tfLiteInterpreter != nullptr);
+}
+
+TEST_CASE ("DelegateOptions_OpaqueDelegateDefault")
+{
+    // Check default options can be created
+    auto options = TfLiteArmnnDelegateOptionsDefault();
+    armnnOpaqueDelegate::ArmnnOpaqueDelegate delegate(options);
+
+    // Check version returns correctly
+    auto version = delegate.GetVersion();
+    CHECK_EQ(version, OPAQUE_DELEGATE_VERSION);
+
+    auto* builder = delegate.GetDelegateBuilder();
+    CHECK(builder);
+
+    // Check Opaque delegate created
+    auto opaqueDelegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(&options);
+    CHECK(opaqueDelegate);
+
+    // Check Opaque Delegate can be deleted
+    CHECK(opaqueDelegate->opaque_delegate_builder->data);
+    armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete(opaqueDelegate);
+}
+
+TEST_CASE ("DelegateOptions_ClassicDelegateDefault")
+{
+    // Check default options can be created
+    auto options = TfLiteArmnnDelegateOptionsDefault();
+
+    // Check Classic delegate created
+    auto classicDelegate = armnnDelegate::TfLiteArmnnDelegateCreate(options);
+    CHECK(classicDelegate);
+
+    // Check Classic Delegate can be deleted
+    CHECK(classicDelegate->data_);
+    armnnDelegate::TfLiteArmnnDelegateDelete(classicDelegate);
 }
 
 }

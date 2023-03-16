@@ -129,7 +129,7 @@ private:
 
     /// The Network Id
     armnn::NetworkId m_NetworkId;
-    /// ArmNN Rumtime
+    /// ArmNN Runtime
     armnn::IRuntime* m_Runtime;
 
     // Binding information for inputs and outputs

@@ -6,7 +6,8 @@
 set(armnnOpaqueDelegateObject_sources)
 list(APPEND armnnOpaqueDelegateObject_sources
         include/armnn_delegate.hpp
-        include/Version.hpp)
+        include/Version.hpp
+        src/armnn_delegate.cpp)
 
 add_library(armnnOpaqueDelegateObject OBJECT ${armnnOpaqueDelegateObject_sources})
 

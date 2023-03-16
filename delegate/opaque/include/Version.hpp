@@ -5,7 +5,7 @@
 
 #pragma once
 
-namespace armnnDelegate
+namespace armnnOpaqueDelegate
 {
 
 /// Macro utils
@@ -22,8 +22,8 @@ namespace armnnDelegate
 ///   X = Major version number
 ///   Y = Minor version number
 ///   Z = Patch version number
-#define DELEGATE_VERSION STRINGIFY_VALUE(OPAQUE_DELEGATE_MAJOR_VERSION) "." \
-                         STRINGIFY_VALUE(OPAQUE_DELEGATE_MINOR_VERSION) "." \
-                         STRINGIFY_VALUE(OPAQUE_DELEGATE_PATCH_VERSION)
+#define OPAQUE_DELEGATE_VERSION STRINGIFY_VALUE(OPAQUE_DELEGATE_MAJOR_VERSION) "." \
+                                STRINGIFY_VALUE(OPAQUE_DELEGATE_MINOR_VERSION) "." \
+                                STRINGIFY_VALUE(OPAQUE_DELEGATE_PATCH_VERSION)
 
 } //namespace armnnDelegate

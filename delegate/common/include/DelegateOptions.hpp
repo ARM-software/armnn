@@ -35,7 +35,6 @@ public:
                     const armnn::Optional<armnn::LogSeverity>& logSeverityLevel = armnn::EmptyOptional(),
                     const armnn::Optional<armnn::DebugCallbackFunction>& func = armnn::EmptyOptional());
 
-
     /**
      * This constructor processes delegate options in form of command line arguments.
      * It works in conjunction with the TfLite external delegate plugin.

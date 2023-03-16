@@ -3,10 +3,9 @@
 // SPDX-License-Identifier: MIT
 //
 
-
 #include "SharedFunctions.hpp"
 
-#include <DelegateUtils.hpp>
+#include <ClassicDelegateUtils.hpp>
 
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>

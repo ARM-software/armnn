@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include <DelegateUtils.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
+#include <ClassicDelegateUtils.hpp>
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/Descriptors.hpp>
 
 #include <tensorflow/lite/builtin_ops.h>

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <DelegateUtils.hpp>
+#include <ClassicDelegateUtils.hpp>
 
 #include <algorithm>
 #include <iterator>

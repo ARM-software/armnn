@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <DelegateUtils.hpp>
-#include "SharedFunctions.hpp"
+#include <ClassicDelegateUtils.hpp>
+#include <SharedFunctions.hpp>
 
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>

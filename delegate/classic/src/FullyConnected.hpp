@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include <DelegateUtils.hpp>
+#include <ClassicDelegateUtils.hpp>
+
 #include "armnnUtils/TensorUtils.hpp"
 #include <armnn/utility/IgnoreUnused.hpp>
 

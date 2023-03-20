@@ -37,6 +37,8 @@ if(BUILD_BASE_PIPE_SERVER)
        endif()
 
        set_target_properties(armnnBasePipeServer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+       set_target_properties(armnnBasePipeServer PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
        set_target_properties(armnnBasePipeServer PROPERTIES VERSION ${GENERIC_LIB_VERSION}
                                                             SOVERSION ${GENERIC_LIB_SOVERSION})
 

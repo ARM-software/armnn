@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-if(NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
+if(NOT DISABLE_DYNAMIC_BACKENDS)
 list(APPEND armnnBackendsCommon_sources
     DynamicBackend.cpp
     DynamicBackend.hpp

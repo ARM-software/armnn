@@ -36,6 +36,8 @@ if(BUILD_TIMELINE_DECODER)
       endif()
 
       set_target_properties(timelineDecoder PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+      set_target_properties(timelineDecoder PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
       set_target_properties(timelineDecoder PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION} )
 
       install(TARGETS timelineDecoder

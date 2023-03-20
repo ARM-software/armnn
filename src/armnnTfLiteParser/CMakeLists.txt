@@ -11,14 +11,15 @@ if(BUILD_TF_LITE_PARSER)
         TfLiteParser.cpp
         )
 
-    if(EXECUTE_NETWORK_STATIC)
-        add_library_ex(armnnTfLiteParser OBJECT ${armnn_tf_lite_parser_sources})
-    else()
+    if(BUILD_SHARED_LIBS)
         add_library_ex(armnnTfLiteParser SHARED ${armnn_tf_lite_parser_sources})
+    else()
+        add_library_ex(armnnTfLiteParser STATIC ${armnn_tf_lite_parser_sources})
     endif()
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
     set_target_properties(armnnTfLiteParser PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+    set_target_properties(armnnTfLiteParser PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
     target_include_directories(armnnTfLiteParser PRIVATE ../armnn)
     target_include_directories(armnnTfLiteParser PRIVATE ../armnnUtils)
     target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
@@ -66,7 +67,6 @@ if(BUILD_TF_LITE_PARSER)
     endif()
 
     set_target_properties(armnnTfLiteParser PROPERTIES VERSION ${TFLITE_PARSER_LIB_VERSION} SOVERSION ${TFLITE_PARSER_LIB_SOVERSION} )
-
     install(TARGETS armnnTfLiteParser
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})

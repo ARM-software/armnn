@@ -22,6 +22,7 @@ if(BUILD_TIMELINE_DECODER)
     add_library_ex(timelineDecoderJson SHARED ${timelineDecoderJson_sources})
 
     set_target_properties(timelineDecoderJson PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+    set_target_properties(timelineDecoderJson PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
     set_target_properties(timelineDecoderJson PROPERTIES VERSION ${GENERIC_LIB_VERSION} SOVERSION ${GENERIC_LIB_SOVERSION} )
 
     target_link_libraries(timelineDecoderJson armnn)

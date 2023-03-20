@@ -7,6 +7,7 @@
 option(BUILD_ONNX_PARSER "Build Onnx parser" OFF)
 option(BUILD_UNIT_TESTS "Build unit tests" ON)
 option(BUILD_TESTS "Build test applications" OFF)
+option(ARMNN_SAMPLE_APPS_ENABLED "Build Sample ArmNN Applications" ON)
 option(BUILD_FOR_COVERAGE "Use no optimization and output .gcno and .gcda files" OFF)
 option(ARMCOMPUTENEON "Build with ARM Compute NEON support" OFF)
 option(ARMCOMPUTECL "Build with ARM Compute OpenCL support" OFF)
@@ -56,7 +57,11 @@ option(EXECUTE_NETWORK_STATIC " This is a limited experimental build that is ent
                                 BUILD_TIMELINE_DECODER=0
                                 BUILD_BASE_PIPE_SERVER=0
                                 BUILD_UNIT_TESTS=0
-                                BUILD_GATORD_MOCK=0" OFF)
+                                ARMNN_SAMPLE_APPS_ENABLED=0
+                                BUILD_SHARED_LIBS=0
+                                BUILD_GATORD_MOCK=0
+                                HEAP_PROFILING=0
+                                LEAK_CHECKING=0" OFF)
 
 if(BUILD_ARMNN_TFLITE_DELEGATE)
     message(BUILD_ARMNN_TFLITE_DELEGATE option is deprecated, it will be removed in 24.02, please use BUILD_CLASSIC_DELEGATE instead)
@@ -160,16 +165,23 @@ include(CMakeFindDependencyMacro)
 
 if(EXECUTE_NETWORK_STATIC)
     add_definitions(-DARMNN_DISABLE_SOCKETS
-                    -DBUILD_SHARED_LIBS=0
-                    -DARMNN_EXECUTE_NETWORK_STATIC)
+                    -DARMNN_STUB_PROFILING
+                    -DARMNN_DISABLE_DYNAMIC_BACKENDS)
+    set(ARMNN_SAMPLE_APPS_ENABLED 0)
+    set(DISABLE_DYNAMIC_BACKENDS 1)
+    set(BUILD_SHARED_LIBS  0)
 endif()
 
 if(BUILD_BARE_METAL)
     add_definitions(-DARMNN_BUILD_BARE_METAL
-            -DARMNN_DISABLE_FILESYSTEM
-            -DARMNN_DISABLE_PROCESSES
-            -DARMNN_DISABLE_THREADS
-            -DARMNN_DISABLE_SOCKETS)
+                    -DARMNN_DISABLE_FILESYSTEM
+                    -DARMNN_DISABLE_PROCESSES
+                    -DARMNN_DISABLE_THREADS
+                    -DARMNN_DISABLE_SOCKETS
+                    -DARMNN_STUB_PROFILING
+                    -DARMNN_DISABLE_DYNAMIC_BACKENDS)
+    set(DISABLE_DYNAMIC_BACKENDS 1)
+    set(BUILD_SHARED_LIBS 0)
 endif()
 
 if (NOT BUILD_PIPE_ONLY)
@@ -452,7 +464,6 @@ if(PROFILING_BACKEND_STREAMLINE)
     add_definitions(-DARMNN_STREAMLINE_ENABLED)
 endif()
 
-if(NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
 if(HEAP_PROFILING OR LEAK_CHECKING)
     find_path(HEAP_PROFILER_INCLUDE gperftools/heap-profiler.h
             PATHS ${GPERFTOOLS_ROOT}/include
@@ -472,8 +483,8 @@ if(HEAP_PROFILING OR LEAK_CHECKING)
     endif()
 else()
     # Valgrind only works with gperftools version number <= 2.4
-    CHECK_INCLUDE_FILE(valgrind/memcheck.h VALGRIND_FOUND)
-endif()
+    include(CheckIncludeFiles)
+    CHECK_INCLUDE_FILES("valgrind/memcheck.h" VALGRIND_FOUND)
 endif()
 
 if(NOT BUILD_TF_LITE_PARSER)

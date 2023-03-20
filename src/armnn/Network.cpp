@@ -1950,8 +1950,10 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         // Setup the output file path
         try
         {
+#if !defined(ARMNN_DISABLE_FILESYSTEM)
             auto result = armnnUtils::Filesystem::CreateDirectory("/ArmNNIntermediateLayerOutputs");
             ARMNN_LOG(info) << "Intermediate tensors will be written to: " << result;
+#endif
             Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugToFileLayer()));
         }
         catch (const armnn::RuntimeException& e)

@@ -31,23 +31,20 @@ list(APPEND armnnTestUtils_sources
         TestUtils.hpp
         )
 
-if(NOT BUILD_BARE_METAL AND NOT EXECUTE_NETWORK_STATIC)
 list(APPEND armnnTestUtils_sources
         UnitTests.cpp
         UnitTests.hpp
         )
-endif()
 
-
-if(BUILD_BARE_METAL)
-    add_library_ex(armnnTestUtils STATIC ${armnnTestUtils_sources})
-elseif(EXECUTE_NETWORK_STATIC)
-    add_library_ex(armnnTestUtils OBJECT ${armnnTestUtils_sources})
-else()
+if(BUILD_SHARED_LIBS)
     add_library_ex(armnnTestUtils SHARED ${armnnTestUtils_sources})
+else()
+    add_library_ex(armnnTestUtils STATIC ${armnnTestUtils_sources})
 endif()
 
 set_target_properties(armnnTestUtils PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+set_target_properties(armnnTestUtils PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
 
 target_include_directories(armnnTestUtils
         PUBLIC

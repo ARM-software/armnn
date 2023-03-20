@@ -29,12 +29,17 @@ if(BUILD_ARMNN_DESERIALIZER)
             Deserializer.hpp
             Deserializer.cpp
         )
-
+if(BUILD_SHARED_LIBS)
     add_library_ex(armnnDeserializer SHARED ${armnn_deserializer_sources})
+else()
+    add_library_ex(armnnDeserializer STATIC ${armnn_deserializer_sources})
+endif()
 
     include_directories(SYSTEM "${FLATBUFFERS_INCLUDE_PATH}")
 
     set_target_properties(armnnDeserializer PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+    set_target_properties(armnnDeserializer PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
+
     target_include_directories(armnnDeserializer PRIVATE ../armnn)
     target_include_directories(armnnDeserializer PRIVATE ../armnnUtils)
     target_include_directories(armnnDeserializer PRIVATE ../../generated)

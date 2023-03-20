@@ -103,10 +103,12 @@ void Debug(const TensorInfo& inputInfo,
 {
     if (outputsToFile)
     {
+#if !defined(ARMNN_DISABLE_FILESYSTEM)
         fs::path tmpDir = fs::temp_directory_path();
         std::ofstream out(tmpDir.generic_string() + "/ArmNNIntermediateLayerOutputs/" + layerName + ".numpy");
         PrintOutput<T>(inputInfo, inputData, guid, layerName, slotIndex, out);
         out.close();
+#endif
     }
     else
     {

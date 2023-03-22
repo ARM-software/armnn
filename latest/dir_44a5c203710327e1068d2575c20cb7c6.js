@@ -1,0 +1,27 @@
+var dir_44a5c203710327e1068d2575c20cb7c6 =
+[
+    [ "AvgPool2DIgnoreValueOperator.cpp", "_avg_pool2_d_ignore_value_operator_8cpp.xhtml", "_avg_pool2_d_ignore_value_operator_8cpp" ],
+    [ "AvgPool2DIgnoreValueOperator.hpp", "_avg_pool2_d_ignore_value_operator_8hpp.xhtml", "_avg_pool2_d_ignore_value_operator_8hpp" ],
+    [ "ConcatOperator.cpp", "_concat_operator_8cpp.xhtml", "_concat_operator_8cpp" ],
+    [ "ConcatOperator.hpp", "_concat_operator_8hpp.xhtml", "_concat_operator_8hpp" ],
+    [ "ConstantOperator.cpp", "_constant_operator_8cpp.xhtml", "_constant_operator_8cpp" ],
+    [ "ConstantOperator.hpp", "_constant_operator_8hpp.xhtml", "_constant_operator_8hpp" ],
+    [ "Conv2dOperator.cpp", "_conv2d_operator_8cpp.xhtml", "_conv2d_operator_8cpp" ],
+    [ "Conv2dOperator.hpp", "_conv2d_operator_8hpp.xhtml", "_conv2d_operator_8hpp" ],
+    [ "ElementwiseBinaryOperator.cpp", "_elementwise_binary_operator_8cpp.xhtml", "_elementwise_binary_operator_8cpp" ],
+    [ "ElementwiseBinaryOperator.hpp", "_elementwise_binary_operator_8hpp.xhtml", "_elementwise_binary_operator_8hpp" ],
+    [ "ElementwiseUnaryOperator.cpp", "_elementwise_unary_operator_8cpp.xhtml", "_elementwise_unary_operator_8cpp" ],
+    [ "ElementwiseUnaryOperator.hpp", "_elementwise_unary_operator_8hpp.xhtml", "_elementwise_unary_operator_8hpp" ],
+    [ "Pooling2DOperator.cpp", "_pooling2_d_operator_8cpp.xhtml", "_pooling2_d_operator_8cpp" ],
+    [ "Pooling2DOperator.hpp", "_pooling2_d_operator_8hpp.xhtml", "_pooling2_d_operator_8hpp" ],
+    [ "ReshapeOperator.cpp", "_reshape_operator_8cpp.xhtml", "_reshape_operator_8cpp" ],
+    [ "ReshapeOperator.hpp", "_reshape_operator_8hpp.xhtml", "_reshape_operator_8hpp" ],
+    [ "SliceOperator.cpp", "_slice_operator_8cpp.xhtml", "_slice_operator_8cpp" ],
+    [ "SliceOperator.hpp", "_slice_operator_8hpp.xhtml", "_slice_operator_8hpp" ],
+    [ "TosaCommonOperators.hpp", "_tosa_common_operators_8hpp.xhtml", null ],
+    [ "TosaOperatorUtils.hpp", "_tosa_operator_utils_8hpp.xhtml", "_tosa_operator_utils_8hpp" ],
+    [ "TransposeConv2dOperator.cpp", "_transpose_conv2d_operator_8cpp.xhtml", "_transpose_conv2d_operator_8cpp" ],
+    [ "TransposeConv2dOperator.hpp", "_transpose_conv2d_operator_8hpp.xhtml", "_transpose_conv2d_operator_8hpp" ],
+    [ "TransposeOperator.cpp", "_transpose_operator_8cpp.xhtml", "_transpose_operator_8cpp" ],
+    [ "TransposeOperator.hpp", "_transpose_operator_8hpp.xhtml", "_transpose_operator_8hpp" ]
+];

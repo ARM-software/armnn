@@ -602,6 +602,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                      tfLiteNode,
                                      nodeIndex,
                                      kTfLiteBuiltinCast);
+        case kTfLiteBuiltinCeil:
+            return VisitElementwiseUnaryOperator(delegateData,
+                                                 tfLiteContext,
+                                                 tfLiteNode,
+                                                 nodeIndex,
+                                                 armnn::UnaryOperation::Ceil);
         case kTfLiteBuiltinConcatenation:
             return VisitControlOperator(delegateData,
                                         tfLiteContext,

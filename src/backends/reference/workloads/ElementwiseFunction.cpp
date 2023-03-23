@@ -1,14 +1,14 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ElementwiseFunction.hpp"
 #include "Broadcast.hpp"
-#include <functional>
 #include "Minimum.hpp"
 #include "Maximum.hpp"
 #include "Abs.hpp"
+#include "Ceil.hpp"
 #include "Exp.hpp"
 #include "Log.hpp"
 #include "Rsqrt.hpp"
@@ -85,6 +85,7 @@ template struct armnn::ElementwiseBinaryFunction<std::not_equal_to<float>>;
 
 // Unary
 template struct armnn::ElementwiseUnaryFunction<armnn::abs<float>>;
+template struct armnn::ElementwiseUnaryFunction<armnn::ceil<float>>;
 template struct armnn::ElementwiseUnaryFunction<armnn::exp<float>>;
 template struct armnn::ElementwiseUnaryFunction<armnn::log<float>>;
 template struct armnn::ElementwiseUnaryFunction<std::negate<float>>;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,6 +10,7 @@
 #include "Encoders.hpp"
 #include "RefWorkloadUtils.hpp"
 #include "Abs.hpp"
+#include "Ceil.hpp"
 #include "Exp.hpp"
 #include "Log.hpp"
 #include "Rsqrt.hpp"
@@ -56,6 +57,7 @@ void RefElementwiseUnaryWorkload::Execute(std::vector<ITensorHandle*> inputs, st
     std::unique_ptr<Encoder<OutType>> output= MakeEncoder<OutType>(outputInfo, outputs[0]->Map());
 
     using AbsFunction   = ElementwiseUnaryFunction<abs<InType>>;
+    using CeilFunction  = ElementwiseUnaryFunction<ceil<InType>>;
     using ExpFunction   = ElementwiseUnaryFunction<exp<InType>>;
     using LogFunction   = ElementwiseUnaryFunction<log<InType>>;
     using NegFunction   = ElementwiseUnaryFunction<std::negate<InType>>;
@@ -68,6 +70,11 @@ void RefElementwiseUnaryWorkload::Execute(std::vector<ITensorHandle*> inputs, st
         case UnaryOperation::Abs:
         {
             AbsFunction(inShape, outShape, *input, *output);
+            break;
+        }
+        case UnaryOperation::Ceil:
+        {
+            CeilFunction(inShape, outShape, *input, *output);
             break;
         }
         case UnaryOperation::Exp:

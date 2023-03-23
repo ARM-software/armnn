@@ -295,6 +295,26 @@ TEST_CASE ("Abs_Float32_CpuRef_Test")
     ElementwiseUnaryFP32Test(tflite::BuiltinOperator_ABS, backends, inputValues, expectedOutputValues);
 }
 
+TEST_CASE ("Ceil_Float32_CpuRef_Test")
+{
+    // Create the ArmNN Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    // Set input data
+    std::vector<float> inputValues
+    {
+        0.0f, 1.1f, -16.1f,
+        0.5f, -0.5f, -1.3f
+    };
+    // Set output data
+    std::vector<float> expectedOutputValues
+    {
+        0.0f, 2.0f, -16.0f,
+        1.0f, 0.0f, -1.0f
+    };
+
+    ElementwiseUnaryFP32Test(tflite::BuiltinOperator_CEIL, backends, inputValues, expectedOutputValues);
+}
+
 TEST_CASE ("Exp_Float32_CpuRef_Test")
 {
     // Create the ArmNN Delegate

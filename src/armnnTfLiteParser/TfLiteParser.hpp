@@ -118,6 +118,7 @@ private:
     void ParseBatchMatMul(size_t subgraphIndex, size_t operatorIndex);
     void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
     void ParseCast(size_t subgraphIndex, size_t operatorIndex);
+    void ParseCeil(size_t subgraphIndex, size_t operatorIndex);
     void ParseComparison(size_t subgraphIndex, size_t operatorIndex, armnn::ComparisonOperation comparisonOperation);
     void ParseConcatenation(size_t subgraphIndex, size_t operatorIndex);
     void ParseConv2D(size_t subgraphIndex, size_t operatorIndex);

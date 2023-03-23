@@ -1056,7 +1056,7 @@ void SerializeElementwiseUnaryTest(armnn::UnaryOperation unaryOperation)
 TEST_CASE("SerializeElementwiseUnary")
 {
     using op = armnn::UnaryOperation;
-    std::initializer_list<op> allUnaryOperations = {op::Abs, op::Exp, op::Sqrt, op::Rsqrt, op::Neg,
+    std::initializer_list<op> allUnaryOperations = {op::Abs, op::Ceil, op::Exp, op::Sqrt, op::Rsqrt, op::Neg,
                                                     op::LogicalNot, op::Log, op::Sin};
 
     for (auto unaryOperation : allUnaryOperations)

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -178,6 +178,17 @@ TEST_CASE_FIXTURE(SimpleSinFixture, "ParseSin")
                                                                 0.5f, 36.0f, -1.f } }},
                                          {{ "outputTensor",{ 0.0f, 0.8414709848f, -0.28790331666f,
                                                              0.4794255386f, -0.99177885344f, -0.8414709848f} }});
+}
+
+struct SimpleCeilFixture : public ElementWiseUnaryFixture
+{
+    SimpleCeilFixture() : ElementWiseUnaryFixture("CEIL", "FLOAT32", "[ 1, 2, 3, 1 ]", "[ 1, 2, 3, 1 ]") {}
+};
+
+TEST_CASE_FIXTURE(SimpleCeilFixture, "ParseCeil")
+{
+    RunTest<4, armnn::DataType::Float32>(0, {{ "inputTensor", { -50.5f, -25.9999f, -0.5f, 0.0f, 1.5555f, 25.5f } }},
+                                            {{ "outputTensor",{ -50.0f, -25.0f, 0.0f, 0.0f, 2.0f, 26.0f} }});
 }
 
 }

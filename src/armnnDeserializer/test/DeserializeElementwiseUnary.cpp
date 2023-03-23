@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -169,5 +169,22 @@ FIXTURE_TEST_CASE(SimpleSinTest, SimpleSinFixture)
         {{"InputLayer", {-100.0f, -50.5f, -25.9999f, -0.5f, 0.0f, 1.5555f, 25.5f, 100.0f}}},
         {{"OutputLayer", {0.50636564111f, -0.23237376165f, -0.76249375473f, -0.4794255386f,
                                                 0.0f, 0.99988301347f, 0.35905835402f, -0.50636564111f}}});
+}
+
+struct SimpleCeilFixture : ElementwiseUnaryFixture
+{
+    SimpleCeilFixture() : ElementwiseUnaryFixture("[ 1, 2, 2, 2 ]", // inputShape
+                                                  "[ 1, 2, 2, 2 ]", // outputShape
+                                                  "Float32",        // dataType
+                                                  "Ceil")           // unaryOperation
+    {}
+};
+
+FIXTURE_TEST_CASE(SimpleCeilTest, SimpleCeilFixture)
+{
+    RunTest<4, armnn::DataType::Float32>(
+            0,
+            {{"InputLayer", {-100.0f, -50.5f, -25.9999f, -0.5f, 0.0f, 1.5555f, 25.5f, 100.0f}}},
+            {{"OutputLayer", {-100.0f, -50.0f, -25.0f, 0.0f, 0.0f, 2.0f, 26.0f, 100.0f}}});
 }
 }

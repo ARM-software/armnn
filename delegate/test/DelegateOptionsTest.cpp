@@ -177,7 +177,7 @@ TEST_CASE ("ArmnnDelegateStringParsingOptionEnableTfLiteRuntimeFallback")
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
     std::vector<float> inputData = { 0.1f, -2.1f, 3.0f, -4.6f };
-    std::vector<float> expectedResult = { 1.0f, -2.0f, 3.0f, -4.0f };
+    std::vector<float> expectedResult = { 0.995004177f, -0.504846036f, -0.989992499f, -0.112152621f };
 
     // Create options_keys and options_values char array
     size_t num_options = keys.size();

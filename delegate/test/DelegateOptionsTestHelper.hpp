@@ -152,10 +152,10 @@ std::vector<char> CreateAddDivTfLiteModel(tflite::TensorType tensorType,
                              flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
 }
 
-std::vector<char> CreateCeilTfLiteModel(tflite::TensorType tensorType,
-                                        const std::vector <int32_t>& tensorShape,
-                                        float quantScale = 1.0f,
-                                        int quantOffset = 0)
+std::vector<char> CreateCosTfLiteModel(tflite::TensorType tensorType,
+                                       const std::vector <int32_t>& tensorShape,
+                                       float quantScale = 1.0f,
+                                       int quantOffset = 0)
 {
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
@@ -199,7 +199,7 @@ std::vector<char> CreateCeilTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::Offset<flatbuffers::String> modelDescription =
         flatBufferBuilder.CreateString("ArmnnDelegate: CEIL Operator Model");
     flatbuffers::Offset<OperatorCode> operatorCode =
-        CreateOperatorCode(flatBufferBuilder, tflite::BuiltinOperator_CEIL);
+        CreateOperatorCode(flatBufferBuilder, tflite::BuiltinOperator_COS);
 
     const std::vector<int32_t> subgraphInputs({0});
     const std::vector<int32_t> subgraphOutputs({1});
@@ -277,10 +277,10 @@ void DelegateOptionNoFallbackTest(tflite::TensorType tensorType,
                                   int quantOffset  = 0)
 {
     using namespace delegateTestInterpreter;
-    std::vector<char> modelBuffer = CreateCeilTfLiteModel(tensorType,
-                                                          tensorShape,
-                                                          quantScale,
-                                                          quantOffset);
+    std::vector<char> modelBuffer = CreateCosTfLiteModel(tensorType,
+                                                         tensorShape,
+                                                         quantScale,
+                                                         quantOffset);
 
     // Setup interpreter with just TFLite Runtime.
     auto tfLiteInterpreter = DelegateTestInterpreter(modelBuffer);

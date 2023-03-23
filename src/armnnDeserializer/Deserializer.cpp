@@ -592,6 +592,8 @@ armnn::UnaryOperation ToElementwiseUnaryOperation(armnnSerializer::UnaryOperatio
     {
         case armnnSerializer::UnaryOperation::UnaryOperation_Abs:
             return armnn::UnaryOperation::Abs;
+        case armnnSerializer::UnaryOperation::UnaryOperation_Ceil:
+            return armnn::UnaryOperation::Ceil;
         case armnnSerializer::UnaryOperation::UnaryOperation_Rsqrt:
             return armnn::UnaryOperation::Rsqrt;
         case armnnSerializer::UnaryOperation::UnaryOperation_Sqrt:

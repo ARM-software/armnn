@@ -729,6 +729,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_AVERAGE_POOL_2D]         = &TfLiteParserImpl::ParseAveragePool2D;
     m_ParserFunctions[tflite::BuiltinOperator_BATCH_TO_SPACE_ND]       = &TfLiteParserImpl::ParseBatchToSpaceND;
     m_ParserFunctions[tflite::BuiltinOperator_BATCH_MATMUL]            = &TfLiteParserImpl::ParseBatchMatMul;
+    m_ParserFunctions[tflite::BuiltinOperator_CEIL]                    = &TfLiteParserImpl::ParseCeil;
     m_ParserFunctions[tflite::BuiltinOperator_CAST]                    = &TfLiteParserImpl::ParseCast;
     m_ParserFunctions[tflite::BuiltinOperator_CONCATENATION]           = &TfLiteParserImpl::ParseConcatenation;
     m_ParserFunctions[tflite::BuiltinOperator_CONV_2D]                 = &TfLiteParserImpl::ParseConv2D;
@@ -4507,6 +4508,11 @@ void TfLiteParserImpl::ParseLocalResponseNormalization(size_t subgraphIndex, siz
 void TfLiteParserImpl::ParseAbs(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Abs);
+}
+
+void TfLiteParserImpl::ParseCeil(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Ceil);
 }
 
 void TfLiteParserImpl::ParseExp(size_t subgraphIndex, size_t operatorIndex)

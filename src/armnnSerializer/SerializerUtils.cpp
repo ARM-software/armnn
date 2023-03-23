@@ -134,6 +134,8 @@ armnnSerializer::UnaryOperation GetFlatBufferUnaryOperation(armnn::UnaryOperatio
     {
         case armnn::UnaryOperation::Abs:
             return armnnSerializer::UnaryOperation::UnaryOperation_Abs;
+        case armnn::UnaryOperation::Ceil:
+            return armnnSerializer::UnaryOperation::UnaryOperation_Ceil;
         case armnn::UnaryOperation::Rsqrt:
             return armnnSerializer::UnaryOperation::UnaryOperation_Rsqrt;
         case armnn::UnaryOperation::Sqrt:

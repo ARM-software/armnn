@@ -76,7 +76,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsRegistered")
     // Create the Armnn Delegate
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
 
-    armnn::OptimizerOptions optimizerOptions(true, true, false, true);
+    armnn::OptimizerOptionsOpaque optimizerOptions(true, true, false, true);
 
     armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
     std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>

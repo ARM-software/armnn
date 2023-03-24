@@ -543,7 +543,7 @@ TEST_CASE("IVGCVSW_1929_QuantizedSoftmaxIssue")
         armnn::IOptimizedNetworkPtr optNet = Optimize(*net,
                                                       backends,
                                                       runtime->GetDeviceSpec(),
-                                                      OptimizerOptions(),
+                                                      OptimizerOptionsOpaque(),
                                                       errMessages);
         FAIL("An exception should have been thrown");
     }
@@ -1327,10 +1327,10 @@ TEST_CASE("RuntimeOptimizeImportOff_LoadNetworkImportOn")
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
-    OptimizerOptions optimizedOptions;
+    OptimizerOptionsOpaque optimizedOptions;
     // Hard set import and export to off.
-    optimizedOptions.m_ImportEnabled = false;
-    optimizedOptions.m_ExportEnabled = false;
+    optimizedOptions.SetImportEnabled(false);
+    optimizedOptions.SetExportEnabled(false);
     IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
@@ -1372,10 +1372,10 @@ TEST_CASE("RuntimeOptimizeExportOff_LoadNetworkExportOn")
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
-    OptimizerOptions optimizedOptions;
+    OptimizerOptionsOpaque optimizedOptions;
     // Hard set import and export to off.
-    optimizedOptions.m_ImportEnabled = false;
-    optimizedOptions.m_ExportEnabled = false;
+    optimizedOptions.SetImportEnabled(false);
+    optimizedOptions.SetExportEnabled(false);
     IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
@@ -1417,10 +1417,10 @@ TEST_CASE("RuntimeOptimizeImportOn_LoadNetworkImportOff")
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
-    OptimizerOptions optimizedOptions;
+    OptimizerOptionsOpaque optimizedOptions;
     // Hard set import and export to off.
-    optimizedOptions.m_ImportEnabled = true;
-    optimizedOptions.m_ExportEnabled = false;
+    optimizedOptions.SetImportEnabled(true);
+    optimizedOptions.SetExportEnabled(false);
     IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
@@ -1462,10 +1462,10 @@ TEST_CASE("RuntimeOptimizeExportOn_LoadNetworkExportOff")
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
-    OptimizerOptions optimizedOptions;
+    OptimizerOptionsOpaque optimizedOptions;
     // Hard set import and export to off.
-    optimizedOptions.m_ImportEnabled = false;
-    optimizedOptions.m_ExportEnabled = true;
+    optimizedOptions.SetImportEnabled(false);
+    optimizedOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*testNetwork, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 

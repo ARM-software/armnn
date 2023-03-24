@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -55,7 +55,7 @@ TEST_CASE("ErrorOnLoadNetwork")
 
     try
     {
-        Optimize(*net, backends, runtime->GetDeviceSpec(), OptimizerOptions(), errMessages);
+        Optimize(*net, backends, runtime->GetDeviceSpec(), OptimizerOptionsOpaque(), errMessages);
         FAIL("Should have thrown an exception.");
     }
     catch (const InvalidArgumentException&)

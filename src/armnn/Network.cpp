@@ -45,6 +45,194 @@ INetwork::INetwork(NetworkOptions networkOptions) : pNetworkImpl(new NetworkImpl
 
 INetwork::~INetwork() = default;
 
+OptimizerOptionsOpaque::OptimizerOptionsOpaque()
+        : p_OptimizerOptionsImpl(std::make_unique<OptimizerOptionsOpaqueImpl>())
+{
+}
+
+OptimizerOptionsOpaque::OptimizerOptionsOpaque(OptimizerOptionsOpaque const &other)
+        : p_OptimizerOptionsImpl(std::make_unique<OptimizerOptionsOpaqueImpl>(*other.p_OptimizerOptionsImpl))
+{
+}
+
+OptimizerOptionsOpaque::~OptimizerOptionsOpaque() = default;
+
+OptimizerOptionsOpaque::OptimizerOptionsOpaque(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16,
+                                               bool importEnabled, ModelOptions modelOptions, bool exportEnabled,
+                                               bool debugToFile)
+        : p_OptimizerOptionsImpl(std::make_unique<OptimizerOptionsOpaqueImpl>(reduceFp32ToFp16, debug, reduceFp32ToBf16,
+                                                                              importEnabled, modelOptions,
+                                                                              exportEnabled, debugToFile))
+{
+}
+
+OptimizerOptionsOpaque::OptimizerOptionsOpaque(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16,
+                                               ShapeInferenceMethod shapeInferenceMethod,
+                                               bool importEnabled, ModelOptions modelOptions, bool exportEnabled,
+                                               bool debugToFile, bool allowExpandedDims)
+        : p_OptimizerOptionsImpl(std::make_unique<OptimizerOptionsOpaqueImpl>(reduceFp32ToFp16, debug, reduceFp32ToBf16,
+                                                                              shapeInferenceMethod, importEnabled,
+                                                                              modelOptions, exportEnabled,
+                                                                              debugToFile, allowExpandedDims))
+{
+}
+
+OptimizerOptionsOpaque::OptimizerOptionsOpaque(const OptimizerOptions& OptimizerStruct)
+    : p_OptimizerOptionsImpl(std::make_unique<OptimizerOptionsOpaqueImpl>())
+{
+    p_OptimizerOptionsImpl->m_ImportEnabled = OptimizerStruct.m_ImportEnabled;
+    p_OptimizerOptionsImpl->m_shapeInferenceMethod = OptimizerStruct.m_shapeInferenceMethod;
+    p_OptimizerOptionsImpl->m_ModelOptions = OptimizerStruct.m_ModelOptions;
+    p_OptimizerOptionsImpl->m_ProfilingEnabled = OptimizerStruct.m_ProfilingEnabled;
+    p_OptimizerOptionsImpl->m_DebugToFile = OptimizerStruct.m_DebugToFile;
+    p_OptimizerOptionsImpl->m_Debug = OptimizerStruct.m_Debug;
+    p_OptimizerOptionsImpl->m_ReduceFp32ToFp16 = OptimizerStruct.m_ReduceFp32ToFp16;
+    p_OptimizerOptionsImpl->m_ExportEnabled = OptimizerStruct.m_ExportEnabled;
+    p_OptimizerOptionsImpl->m_AllowExpandedDims = OptimizerStruct.m_AllowExpandedDims;
+    p_OptimizerOptionsImpl->m_ReduceFp32ToBf16 = OptimizerStruct.m_ReduceFp32ToBf16;
+}
+
+OptimizerOptionsOpaque& OptimizerOptionsOpaque::operator= (OptimizerOptionsOpaque other)
+{
+    p_OptimizerOptionsImpl->m_ImportEnabled = other.GetImportEnabled();
+    p_OptimizerOptionsImpl->m_shapeInferenceMethod = other.GetShapeInferenceMethod();
+    p_OptimizerOptionsImpl->m_ModelOptions = other.GetModelOptions();
+    p_OptimizerOptionsImpl->m_ProfilingEnabled = other.GetProfilingEnabled();
+    p_OptimizerOptionsImpl->m_DebugToFile = other.GetDebugToFileEnabled();
+    p_OptimizerOptionsImpl->m_Debug = other.GetDebugEnabled();
+    p_OptimizerOptionsImpl->m_ReduceFp32ToFp16 = other.GetReduceFp32ToFp16();
+    p_OptimizerOptionsImpl->m_ExportEnabled = other.GetExportEnabled();
+    p_OptimizerOptionsImpl->m_AllowExpandedDims = other.GetAllowExpandedDims();
+    p_OptimizerOptionsImpl->m_ReduceFp32ToBf16 = other.GetReduceFp32ToBf16();
+    return *this;
+}
+
+void OptimizerOptionsOpaque::SetImportEnabled(bool ImportState)
+{
+    p_OptimizerOptionsImpl->m_ImportEnabled = ImportState;
+}
+
+void OptimizerOptionsOpaque::SetExportEnabled(bool ExportState)
+{
+    p_OptimizerOptionsImpl->m_ExportEnabled = ExportState;
+}
+
+void OptimizerOptionsOpaque::SetProfilingEnabled(bool ProfilingState)
+{
+    p_OptimizerOptionsImpl->m_ProfilingEnabled = ProfilingState;
+}
+
+void OptimizerOptionsOpaque::SetDebugEnabled(bool DebugState)
+{
+    p_OptimizerOptionsImpl->m_Debug = DebugState;
+}
+
+void OptimizerOptionsOpaque::SetDebugToFileEnabled(bool DebugFileState)
+{
+    p_OptimizerOptionsImpl->m_DebugToFile = DebugFileState;
+}
+
+void OptimizerOptionsOpaque::SetReduceFp32ToFp16(bool ReduceFp32ToFp16State)
+{
+    p_OptimizerOptionsImpl->m_ReduceFp32ToFp16 = ReduceFp32ToFp16State;
+}
+
+void OptimizerOptionsOpaque::SetShapeInferenceMethod(armnn::ShapeInferenceMethod ShapeInferenceMethodType)
+{
+    p_OptimizerOptionsImpl->m_shapeInferenceMethod = ShapeInferenceMethodType;
+}
+
+void OptimizerOptionsOpaque::SetAllowExpandedDims(bool ExpandedDimsAllowed)
+{
+    p_OptimizerOptionsImpl->m_AllowExpandedDims = ExpandedDimsAllowed;
+}
+
+void OptimizerOptionsOpaque::AddModelOption(armnn::BackendOptions NewModelOption)
+{
+    p_OptimizerOptionsImpl->m_ModelOptions.push_back(NewModelOption);
+}
+
+bool OptimizerOptionsOpaque::GetProfilingEnabled() const
+{
+    return p_OptimizerOptionsImpl->m_ProfilingEnabled;
+};
+
+bool OptimizerOptionsOpaque::GetImportEnabled() const
+{
+    return p_OptimizerOptionsImpl->m_ImportEnabled;
+};
+
+bool OptimizerOptionsOpaque::GetExportEnabled() const
+{
+    return p_OptimizerOptionsImpl->m_ExportEnabled;
+};
+
+bool OptimizerOptionsOpaque::GetReduceFp32ToFp16() const
+{
+    return p_OptimizerOptionsImpl->m_ReduceFp32ToFp16;
+};
+
+bool OptimizerOptionsOpaque::GetReduceFp32ToBf16() const
+{
+    return p_OptimizerOptionsImpl->m_ReduceFp32ToBf16;
+}
+
+bool OptimizerOptionsOpaque::GetDebugEnabled() const
+{
+    return p_OptimizerOptionsImpl->m_Debug;
+}
+
+bool OptimizerOptionsOpaque::GetDebugToFileEnabled() const
+{
+    return p_OptimizerOptionsImpl->m_DebugToFile;
+}
+
+bool OptimizerOptionsOpaque::GetAllowExpandedDims() const
+{
+    return p_OptimizerOptionsImpl->m_AllowExpandedDims;
+}
+
+armnn::ModelOptions OptimizerOptionsOpaque::GetModelOptions() const
+{
+    return p_OptimizerOptionsImpl->m_ModelOptions;
+}
+
+armnn::ShapeInferenceMethod OptimizerOptionsOpaque::GetShapeInferenceMethod() const
+{
+    return p_OptimizerOptionsImpl->m_shapeInferenceMethod;
+}
+
+const std::string OptimizerOptionsOpaque::ToString() const
+{
+    std::stringstream stream;
+    stream << "OptimizerOptions: \n";
+    stream << "\tReduceFp32ToFp16: " << p_OptimizerOptionsImpl->m_ReduceFp32ToFp16 << "\n";
+    stream << "\tReduceFp32ToBf16: " << p_OptimizerOptionsImpl->m_ReduceFp32ToBf16 << "\n";
+    stream << "\tDebug: " << p_OptimizerOptionsImpl->m_Debug << "\n";
+    stream << "\tDebug to file: " << p_OptimizerOptionsImpl->m_DebugToFile << "\n";
+    stream << "\tShapeInferenceMethod: " <<
+           (p_OptimizerOptionsImpl->m_shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly ?
+           "ValidateOnly" : "InferAndValidate") << "\n";
+    stream << "\tImportEnabled: " << p_OptimizerOptionsImpl->m_ImportEnabled << "\n";
+    stream << "\tExportEnabled: " << p_OptimizerOptionsImpl->m_ExportEnabled << "\n";
+    stream << "\tProfilingEnabled: " << p_OptimizerOptionsImpl->m_ProfilingEnabled << "\n";
+    stream << "\tAllowExpandedDims: " << p_OptimizerOptionsImpl->m_AllowExpandedDims << "\n";
+
+    stream << "\tModelOptions: \n";
+    for (auto optionsGroup : p_OptimizerOptionsImpl->m_ModelOptions)
+    {
+        for (size_t i=0; i < optionsGroup.GetOptionCount(); i++)
+        {
+            const armnn::BackendOptions::BackendOption option = optionsGroup.GetOption(i);
+            stream << "\t\tBackend: "  << optionsGroup.GetBackendId() << "\n"
+                   << "\t\t\tOption: " << option.GetName() << "\n"
+                   << "\t\t\tValue: "  << std::string(option.GetValue().ToString()) << "\n";
+        }
+    }
+
+    return stream.str();
+}
+
 Status INetwork::PrintGraph()
 {
     return pNetworkImpl->PrintGraph();
@@ -1581,10 +1769,24 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
     return result;
 }
 
+// Forwarding function to remain backward compatible with legacy OptimizerOptions
 IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                               const std::vector<BackendId>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
                               const OptimizerOptions& options,
+                              Optional<std::vector<std::string>&> messages)
+{
+    return Optimize(inGraph,
+                    backendPreferences,
+                    deviceSpec,
+                    OptimizerOptionsOpaque(options),
+                    messages);
+}
+
+IOptimizedNetworkPtr Optimize(const Graph& inGraph,
+                              const std::vector<BackendId>& backendPreferences,
+                              const IDeviceSpec& deviceSpec,
+                              const OptimizerOptionsOpaque& options,
                               Optional<std::vector<std::string>&> messages)
 {
     ARMNN_LOG(debug) << options.ToString();
@@ -1592,7 +1794,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     // Enable profiling
     auto profiler = inGraph.GetProfiler();
     ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
-    profiler->EnableProfiling(options.m_ProfilingEnabled);
+    profiler->EnableProfiling(options.GetProfilingEnabled());
 
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer");
     if (backendPreferences.empty())
@@ -1600,13 +1802,13 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         throw InvalidArgumentException("Invoked Optimize with no backends specified");
     }
 
-    if (options.m_ReduceFp32ToBf16)
+    if (options.GetReduceFp32ToBf16())
     {
         throw InvalidArgumentException("BFloat16 optimization is currently ignored. In order to use Bf16 optimization "
                                        "Please use the FastMathEnabled backend option for CpuAcc or GpuAcc.");
     }
 
-    if (options.m_ReduceFp32ToFp16 && options.m_ReduceFp32ToBf16)
+    if (options.GetReduceFp32ToFp16() && options.GetReduceFp32ToBf16())
     {
         throw InvalidArgumentException("BFloat16 and Float16 optimization cannot be enabled at the same time.");
     }
@@ -1619,9 +1821,9 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     // We need to pass on the information about whether import and export is enabled to the LoadNetwork phase.
     // The mechanism to do that is to add model options to the optimized network.
     armnn::BackendOptions importExport("Global",
-                                        {{"ImportEnabled", options.m_ImportEnabled},
-                                         {"ExportEnabled", options.m_ExportEnabled}});
-    ModelOptions optimizedOptions(options.m_ModelOptions);
+                                        {{"ImportEnabled", options.GetImportEnabled()},
+                                         {"ExportEnabled", options.GetExportEnabled()}});
+    ModelOptions optimizedOptions(options.GetModelOptions());
     optimizedOptions.push_back(importExport);
 
     auto optNet = IOptimizedNetworkPtr(new IOptimizedNetwork(std::move(graph), optimizedOptions),
@@ -1632,7 +1834,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     // Get the optimized graph
     Graph& optGraph = optNetObjPtr->pOptimizedNetworkImpl->GetGraph();
 
-    if(options.m_shapeInferenceMethod == ShapeInferenceMethod::InferAndValidate)
+    if(options.GetShapeInferenceMethod() == ShapeInferenceMethod::InferAndValidate)
     {
         // Infer the tensor infos for all output slots. Throws an exception on failure
         optGraph.InferTensorInfos();
@@ -1642,7 +1844,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     using namespace optimizations;
     Optimizer::Pass(optGraph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
-    if(options.m_shapeInferenceMethod == ShapeInferenceMethod::ValidateOnly)
+    if(options.GetShapeInferenceMethod() == ShapeInferenceMethod::ValidateOnly)
     {
         // Validate the tensor infos for all output slots. Throws an exception on failure
         optGraph.InferTensorInfos();
@@ -1677,8 +1879,8 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat32(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat16()));
 
-    // If Fp32 to Fp16 optimization is set convert Fp32 network to Fp16
-    if (options.m_ReduceFp32ToFp16)
+
+    if (options.GetReduceFp32ToFp16())
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToFp16");
         Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
@@ -1721,7 +1923,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     OptimizationResult backendOptimizationResult = ApplyBackendOptimizations(optNetObjPtr->pOptimizedNetworkImpl.get(),
                                                                              backendSettings,
                                                                              backends,
-                                                                             options.m_ModelOptions,
+                                                                             options.GetModelOptions(),
                                                                              messages);
     if (backendOptimizationResult.m_Error)
     {
@@ -1739,11 +1941,11 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     // This must occur after all topological changes to the graph and any redirection of variables
     // If the debug flag is set, then insert a DebugLayer after each layer
     // Doing this after applying the backend optimizations as they might have changed some layers
-    if (options.m_Debug && !options.m_DebugToFile)
+    if (options.GetDebugEnabled() && !options.GetDebugToFileEnabled())
     {
         Optimizer::Pass(optGraph, MakeOptimizations(InsertDebugLayer()));
     }
-    else if (options.m_DebugToFile)
+    else if (options.GetDebugToFileEnabled())
     {
         // Setup the output file path
         try
@@ -1763,8 +1965,8 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     OptimizationResult strategyResult = SelectTensorHandleStrategy(optGraph,
                                                                    backends,
                                                                    tensorHandleFactoryRegistry,
-                                                                   options.m_ImportEnabled,
-                                                                   options.m_ExportEnabled,
+                                                                   options.GetImportEnabled(),
+                                                                   options.GetExportEnabled(),
                                                                    messages);
 
     if (strategyResult.m_Error)
@@ -1782,10 +1984,24 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     return optNet;
 }
 
+// Forwarding function to remain backward compatible with legacy OptimizerOptions
 IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
                               const std::vector<BackendId>& backendPreferences,
                               const IDeviceSpec& deviceSpec,
                               const OptimizerOptions& options,
+                              Optional<std::vector<std::string>&> messages)
+{
+    return Optimize(inNetwork,
+                    backendPreferences,
+                    deviceSpec,
+                    OptimizerOptionsOpaque(options),
+                    messages);
+}
+
+IOptimizedNetworkPtr Optimize(const INetwork& inNetwork,
+                              const std::vector<BackendId>& backendPreferences,
+                              const IDeviceSpec& deviceSpec,
+                              const OptimizerOptionsOpaque& options,
                               Optional<std::vector<std::string>&> messages)
 {
     return Optimize(inNetwork.pNetworkImpl->GetGraph(),

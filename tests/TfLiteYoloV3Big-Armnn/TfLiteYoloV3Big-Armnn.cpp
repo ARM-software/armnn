@@ -128,8 +128,8 @@ int LoadModel(const char* filename,
     ARMNN_LOG(debug) << "Model loaded ok: " << filename;
 
     // Optimize backbone model
-    OptimizerOptions options;
-    options.m_ImportEnabled = enableImport != ImportMemory::False;
+    OptimizerOptionsOpaque options;
+    options.SetImportEnabled(enableImport != ImportMemory::False);
     auto optimizedModel = Optimize(*model, backendPreferences, runtime.GetDeviceSpec(), options);
     if (!optimizedModel)
     {
@@ -149,7 +149,7 @@ int LoadModel(const char* filename,
     {
         std::string errorMessage;
 
-        armnn::MemorySource memSource = options.m_ImportEnabled ? armnn::MemorySource::Malloc
+        armnn::MemorySource memSource = options.GetImportEnabled() ? armnn::MemorySource::Malloc
                                                                 : armnn::MemorySource::Undefined;
         INetworkProperties modelProps(false, memSource, memSource);
         Status status = runtime.LoadNetwork(networkId, std::move(optimizedModel), errorMessage, modelProps);

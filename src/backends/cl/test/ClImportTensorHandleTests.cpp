@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -140,9 +140,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClImportEndToEnd")
     activation->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 
     // Optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -337,9 +337,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     // Optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(false);
+    optOptions.SetExportEnabled(false);
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -473,9 +473,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp16toFp32EndToE
     convLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(false);
+    optOptions.SetExportEnabled(false);
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(network.GetGraph(), backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -621,9 +621,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp32toFp16EndToE
     convLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(false);
+    optOptions.SetExportEnabled(false);
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(network.GetGraph(), backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -760,9 +760,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportSimpleConvertFp32toFp16
     convLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(false);
+    optOptions.SetExportEnabled(false);
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(network.GetGraph(), backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -912,9 +912,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     // Optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(false);
+    optOptions.SetExportEnabled(false);
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);
@@ -1138,9 +1138,9 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     convLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     // Optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = false;
-    optOptions.m_ExportEnabled = false;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(false);
+    optOptions.SetExportEnabled(false);
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
     IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optOptions);
     CHECK(optNet);

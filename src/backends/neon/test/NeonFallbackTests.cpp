@@ -58,9 +58,9 @@ TEST_CASE("FallbackImportToCpuAcc")
 
     // optimize the network
     std::vector<BackendId> backends = { "MockRef", Compute::CpuAcc };
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -202,9 +202,9 @@ TEST_CASE("FallbackPaddingCopyToCpuAcc")
 
     // optimize the network
     std::vector<BackendId> backends = { "MockRef", Compute::CpuAcc };
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -338,9 +338,9 @@ TEST_CASE("FallbackImportFromCpuAcc")
 
     // optimize the network
     std::vector<BackendId> backends = { "MockRef", Compute::CpuAcc };
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -483,9 +483,9 @@ TEST_CASE("FallbackPaddingCopyFromCpuAcc")
 
     // optimize the network
     std::vector<BackendId> backends = { "MockRef", Compute::CpuAcc };
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -748,9 +748,9 @@ TEST_CASE("NeonImportEnabledFallbackToCl")
     sub->BackendSelectionHint(backends[1]);
 
     // optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -901,7 +901,7 @@ TEST_CASE("NeonImportDisabledFallbackToCl")
     sub->BackendSelectionHint(backends[1]);
 
     // optimize the network
-    OptimizerOptions optOptions;
+    OptimizerOptionsOpaque optOptions;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -1040,9 +1040,9 @@ TEST_CASE("NeonImportEnabledFallbackSubgraphToCl")
     sub->BackendSelectionHint(backends[1]);
 
     // optimize the network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());
@@ -1204,7 +1204,7 @@ TEST_CASE("NeonImportDisableFallbackSubgraphToCl")
     sub->BackendSelectionHint(backends[1]);
 
     // optimize the network
-    OptimizerOptions optOptions;
+    OptimizerOptionsOpaque optOptions;
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
 
     Graph& graph = GetGraphForTesting(optNet.get());

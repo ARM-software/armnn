@@ -518,15 +518,15 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
 {
     armnn::IOptimizedNetworkPtr optNet{nullptr, [](armnn::IOptimizedNetwork*){}};
 
-    armnn::OptimizerOptions options;
-    options.m_ReduceFp32ToFp16 = m_Params.m_EnableFp16TurboMode;
-    options.m_Debug = m_Params.m_PrintIntermediate;
-    options.m_DebugToFile = m_Params.m_PrintIntermediateOutputsToFile;
-    options.m_shapeInferenceMethod = m_Params.m_InferOutputShape ?
-                                     armnn::ShapeInferenceMethod::InferAndValidate :
-                                     armnn::ShapeInferenceMethod::ValidateOnly;
-    options.m_ProfilingEnabled = m_Params.m_EnableProfiling;
-    options.m_AllowExpandedDims = m_Params.m_AllowExpandedDims;
+    armnn::OptimizerOptionsOpaque options;
+    options.SetReduceFp32ToFp16(m_Params.m_EnableFp16TurboMode);
+    options.SetDebugEnabled(m_Params.m_PrintIntermediate);
+    options.SetDebugToFileEnabled(m_Params.m_PrintIntermediateOutputsToFile);
+    options.SetShapeInferenceMethod(m_Params.m_InferOutputShape ?
+                                    armnn::ShapeInferenceMethod::InferAndValidate :
+                                    armnn::ShapeInferenceMethod::ValidateOnly);
+    options.SetProfilingEnabled(m_Params.m_EnableProfiling);
+    options.SetAllowExpandedDims(m_Params.m_AllowExpandedDims);
 
     armnn::BackendOptions gpuAcc("GpuAcc",
                                  {
@@ -541,8 +541,8 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
                                          { "FastMathEnabled", m_Params.m_EnableFastMath },
                                          { "NumberOfThreads", m_Params.m_NumberOfThreads }
                                  });
-    options.m_ModelOptions.push_back(gpuAcc);
-    options.m_ModelOptions.push_back(cpuAcc);
+    options.AddModelOption(gpuAcc);
+    options.AddModelOption(cpuAcc);
     // The shapeInferenceMethod and allowExpandedDims values have to be added to the model options
     // because these are what are passed to the OptimizeSubgraphViews method and are used to create
     // the new optimized INetwork that method uses
@@ -550,12 +550,12 @@ armnn::IOptimizedNetworkPtr ArmNNExecutor::OptimizeNetwork(armnn::INetwork* netw
                                         {
                                                 { "AllowExpandedDims", m_Params.m_AllowExpandedDims }
                                         });
-    options.m_ModelOptions.push_back(allowExDimOpt);
+    options.AddModelOption(allowExDimOpt);
     armnn::BackendOptions shapeInferOpt("ShapeInferenceMethod",
                                         {
                                                 { "InferAndValidate", m_Params.m_InferOutputShape }
                                         });
-    options.m_ModelOptions.push_back(shapeInferOpt);
+    options.AddModelOption(shapeInferOpt);
 
     const auto optimization_start_time = armnn::GetTimeNow();
     optNet = armnn::Optimize(*network, m_Params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);

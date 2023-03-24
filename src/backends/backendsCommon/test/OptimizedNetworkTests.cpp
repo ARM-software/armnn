@@ -93,7 +93,7 @@ TEST_CASE("OptimizeValidateDeviceNonSupportLayerNoFallback")
 
     try
     {
-        Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
+        Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptionsOpaque(), errMessages);
         FAIL("Should have thrown an exception.");
     }
     catch (const armnn::InvalidArgumentException&)
@@ -213,7 +213,8 @@ TEST_CASE("OptimizeValidateWorkloadsUndefinedComputeDevice")
 
     try
     {
-        Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
+        Optimize(*net, backends, runtime->GetDeviceSpec(),
+                 armnn::OptimizerOptionsOpaque(), errMessages);
         FAIL("Should have thrown an exception.");
     }
     catch (const armnn::InvalidArgumentException&)
@@ -421,7 +422,8 @@ TEST_CASE("OptimizeNetworkCopy")
 
     std::vector<armnn::BackendId> preferredBackends { "CpuRef" };
     armnn::ModelOptions modelOptions;
-    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions, false);
+    armnn::OptimizerOptionsOpaque optimizerOptions(false, false, false,
+                                                   false, modelOptions, false);
     std::vector<std::string> errorMessages;
 
     // optimize the network.

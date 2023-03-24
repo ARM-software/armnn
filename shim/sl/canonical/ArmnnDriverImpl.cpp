@@ -144,9 +144,9 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModel(
 
     // Optimize the network
     armnn::IOptimizedNetworkPtr optNet(nullptr, nullptr);
-    armnn::OptimizerOptions OptOptions;
-    OptOptions.m_ReduceFp32ToFp16 = float32ToFloat16;
-    OptOptions.m_ProfilingEnabled = options.IsGpuProfilingEnabled();
+    armnn::OptimizerOptionsOpaque OptOptions;
+    OptOptions.SetReduceFp32ToFp16(float32ToFloat16);
+    OptOptions.SetProfilingEnabled(options.IsGpuProfilingEnabled());
 
     int cachedFd = -1;
     bool saveCachedNetwork = options.SaveCachedNetwork();
@@ -188,8 +188,8 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModel(
         { "FastMathEnabled", options.IsFastMathEnabled() },
         { "NumberOfThreads", options.GetNumberOfThreads() }
     });
-    OptOptions.m_ModelOptions.push_back(gpuAcc);
-    OptOptions.m_ModelOptions.push_back(cpuAcc);
+    OptOptions.AddModelOption(gpuAcc);
+    OptOptions.AddModelOption(cpuAcc);
 
     std::vector<std::string> errMessages;
     try
@@ -464,9 +464,9 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModelFromCache(
 
     // Optimize the network
     armnn::IOptimizedNetworkPtr optNet(nullptr, nullptr);
-    armnn::OptimizerOptions OptOptions;
-    OptOptions.m_ReduceFp32ToFp16 = float32ToFloat16;
-    OptOptions.m_ProfilingEnabled = options.IsGpuProfilingEnabled();
+    armnn::OptimizerOptionsOpaque OptOptions;
+    OptOptions.SetReduceFp32ToFp16(float32ToFloat16);
+    OptOptions.SetProfilingEnabled(options.IsGpuProfilingEnabled());
 
     armnn::BackendOptions gpuAcc("GpuAcc",
     {
@@ -482,8 +482,8 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModelFromCache(
         { "FastMathEnabled", options.IsFastMathEnabled() },
         { "NumberOfThreads", options.GetNumberOfThreads() }
     });
-    OptOptions.m_ModelOptions.push_back(gpuAcc);
-    OptOptions.m_ModelOptions.push_back(cpuAcc);
+    OptOptions.AddModelOption(gpuAcc);
+    OptOptions.AddModelOption(cpuAcc);
 
     std::vector<std::string> errMessages;
     try

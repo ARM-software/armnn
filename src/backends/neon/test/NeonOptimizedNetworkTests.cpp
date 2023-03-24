@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -71,7 +71,8 @@ TEST_CASE("OptimizeValidateDeviceNonSupportLayerNoFallback")
 
     try
     {
-        Optimize(*net, backends, runtime->GetDeviceSpec(), armnn::OptimizerOptions(), errMessages);
+        Optimize(*net, backends, runtime->GetDeviceSpec(),
+                 armnn::OptimizerOptionsOpaque(), errMessages);
         FAIL("Should have thrown an exception.");
     }
     catch (const armnn::InvalidArgumentException& e)
@@ -95,9 +96,9 @@ TEST_CASE("FastMathEnabledTestOnCpuAcc")
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    armnn::OptimizerOptions optimizerOptions;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
     armnn::BackendOptions modelOptions("CpuAcc", {{"FastMathEnabled", true}});
-    optimizerOptions.m_ModelOptions.push_back(modelOptions);
+    optimizerOptions.AddModelOption(modelOptions);
 
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
     *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
@@ -127,16 +128,16 @@ TEST_CASE("NumberOfThreadsTestOnCpuAcc")
     unsigned int numberOfThreads = 2;
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    armnn::OptimizerOptions optimizerOptions;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
     armnn::BackendOptions modelOptions("CpuAcc", {{"NumberOfThreads", numberOfThreads}});
-    optimizerOptions.m_ModelOptions.push_back(modelOptions);
+    optimizerOptions.AddModelOption(modelOptions);
 
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
             *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 
     CHECK(optimizedNet);
     std::unique_ptr<armnn::Graph> graphPtr;
-    armnn::OptimizedNetworkImpl impl(std::move(graphPtr), optimizerOptions.m_ModelOptions);
+    armnn::OptimizedNetworkImpl impl(std::move(graphPtr), optimizerOptions.GetModelOptions());
 
     auto modelOptionsOut = impl.GetModelOptions();
 

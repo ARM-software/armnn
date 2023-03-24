@@ -32,12 +32,12 @@ public:
                     armnn::Optional<armnn::LogSeverity> logSeverityLevel = armnn::EmptyOptional());
 
     DelegateOptions(armnn::Compute computeDevice,
-                    const armnn::OptimizerOptions& optimizerOptions,
+                    const armnn::OptimizerOptionsOpaque& optimizerOptions,
                     const armnn::Optional<armnn::LogSeverity>& logSeverityLevel = armnn::EmptyOptional(),
                     const armnn::Optional<armnn::DebugCallbackFunction>& func = armnn::EmptyOptional());
 
     DelegateOptions(const std::vector<armnn::BackendId>& backends,
-                    const armnn::OptimizerOptions& optimizerOptions,
+                    const armnn::OptimizerOptionsOpaque& optimizerOptions,
                     const armnn::Optional<armnn::LogSeverity>& logSeverityLevel = armnn::EmptyOptional(),
                     const armnn::Optional<armnn::DebugCallbackFunction>& func = armnn::EmptyOptional());
 
@@ -218,9 +218,9 @@ public:
 
     bool IsLoggingEnabled();
 
-    const armnn::OptimizerOptions& GetOptimizerOptions() const;
+    const armnn::OptimizerOptionsOpaque& GetOptimizerOptions() const;
 
-    void SetOptimizerOptions(const armnn::OptimizerOptions& optimizerOptions);
+    void SetOptimizerOptions(const armnn::OptimizerOptionsOpaque& optimizerOptions);
 
     const armnn::Optional<armnn::DebugCallbackFunction>& GetDebugCallbackFunction() const;
 

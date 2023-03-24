@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -104,7 +104,7 @@ ArmnnNetworkExecutor<Tout>::ArmnnNetworkExecutor(std::string& modelPath,
                                            m_profiling(isProfilingEnabled)
 {
     m_profiling.ProfilingStart();
-    armnn::OptimizerOptions optimizerOptions;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
     m_model = tflite::FlatBufferModel::BuildFromFile(modelPath.c_str());
     if (m_model == nullptr)
     {
@@ -130,12 +130,12 @@ ArmnnNetworkExecutor<Tout>::ArmnnNetworkExecutor(std::string& modelPath,
 
     /* enable fast math optimization */
     armnn::BackendOptions modelOptionGpu("GpuAcc", {{"FastMathEnabled", true}});
-    optimizerOptions.m_ModelOptions.push_back(modelOptionGpu);
+    optimizerOptions.AddModelOption(modelOptionGpu);
 
     armnn::BackendOptions modelOptionCpu("CpuAcc", {{"FastMathEnabled", true}});
-    optimizerOptions.m_ModelOptions.push_back(modelOptionCpu);
+    optimizerOptions.AddModelOption(modelOptionCpu);
     /* enable reduce float32 to float16 optimization */
-    optimizerOptions.m_ReduceFp32ToFp16 = true;
+    optimizerOptions.SetReduceFp32ToFp16(true);
 
     armnnDelegate::DelegateOptions delegateOptions(preferredBackends, optimizerOptions);
 

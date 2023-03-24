@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -47,7 +47,7 @@ TEST_CASE("RuntimeRegisterDebugCallback")
     IRuntimePtr runtime(IRuntime::Create(options));
 
     // Optimize the network with debug option
-    OptimizerOptions optimizerOptions(false, true);
+    OptimizerOptionsOpaque optimizerOptions(false, true);
     std::vector<BackendId> backends = { "CpuRef" };
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizerOptions);
 

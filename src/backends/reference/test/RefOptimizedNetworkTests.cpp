@@ -187,8 +187,8 @@ TEST_CASE("DebugTestOnCpuRef")
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
 
-    armnn::OptimizerOptions optimizerOptions;
-    optimizerOptions.m_Debug = true;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
+    optimizerOptions.SetDebugEnabled(true);
 
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(*net, backends, runtime->GetDeviceSpec(),
                                                                optimizerOptions);

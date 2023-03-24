@@ -32,7 +32,7 @@ struct DelegateOptionsImpl
     }
 
     explicit DelegateOptionsImpl(armnn::Compute computeDevice,
-                                 const armnn::OptimizerOptions& optimizerOptions,
+                                 const armnn::OptimizerOptionsOpaque& optimizerOptions,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
             : p_Backends({computeDevice}),
@@ -44,7 +44,7 @@ struct DelegateOptionsImpl
     }
 
     explicit DelegateOptionsImpl(const std::vector<armnn::BackendId>& backends,
-                                 const armnn::OptimizerOptions& optimizerOptions,
+                                 const armnn::OptimizerOptionsOpaque& optimizerOptions,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
             : p_Backends(backends),
@@ -66,7 +66,7 @@ struct DelegateOptionsImpl
     armnn::IRuntime::CreationOptions p_RuntimeOptions;
 
     /// Options for the optimization step for the network
-    armnn::OptimizerOptions p_OptimizerOptions;
+    armnn::OptimizerOptionsOpaque p_OptimizerOptions;
 
     /// Internal profiling options. Written to INetworkProperties during model load.
     /// Indicates whether internal profiling is enabled or not.
@@ -118,7 +118,7 @@ DelegateOptions::DelegateOptions(const std::vector<armnn::BackendId>& backends,
 }
 
 DelegateOptions::DelegateOptions(armnn::Compute computeDevice,
-                                 const armnn::OptimizerOptions& optimizerOptions,
+                                 const armnn::OptimizerOptionsOpaque& optimizerOptions,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
     : p_DelegateOptionsImpl(std::make_unique<DelegateOptionsImpl>(computeDevice, optimizerOptions,
@@ -127,7 +127,7 @@ DelegateOptions::DelegateOptions(armnn::Compute computeDevice,
 }
 
 DelegateOptions::DelegateOptions(const std::vector<armnn::BackendId>& backends,
-                                 const armnn::OptimizerOptions& optimizerOptions,
+                                 const armnn::OptimizerOptionsOpaque& optimizerOptions,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
     : p_DelegateOptionsImpl(std::make_unique<DelegateOptionsImpl>(backends, optimizerOptions,
@@ -142,7 +142,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
     : p_DelegateOptionsImpl(std::make_unique<DelegateOptionsImpl>())
 {
     armnn::IRuntime::CreationOptions runtimeOptions;
-    armnn::OptimizerOptions optimizerOptions;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
     bool internalProfilingState = false;
     armnn::ProfilingDetailsMethod internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
     for (size_t i = 0; i < num_options; ++i)
@@ -182,7 +182,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         {
             armnn::BackendOptions option("GpuAcc", {{"MLGOTuningFilePath",
                                                      std::string(options_values[i])}});
-            optimizerOptions.m_ModelOptions.push_back(option);
+            optimizerOptions.AddModelOption(option);
         }
         else if (std::string(options_keys[i]) == std::string("gpu-tuning-file"))
         {
@@ -204,24 +204,24 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         {
             armnn::BackendOptions option("GpuAcc", {{"SaveCachedNetwork",
                                                      armnn::stringUtils::StringToBool(options_values[i])}});
-            optimizerOptions.m_ModelOptions.push_back(option);
+            optimizerOptions.AddModelOption(option);
         }
         else if (std::string(options_keys[i]) == std::string("cached-network-filepath"))
         {
             armnn::BackendOptions option("GpuAcc", {{"CachedNetworkFilePath",
                                                      std::string(options_values[i])}});
-            optimizerOptions.m_ModelOptions.push_back(option);
+            optimizerOptions.AddModelOption(option);
         }
             // Process GPU & CPU backend options
         else if (std::string(options_keys[i]) == std::string("enable-fast-math"))
         {
             armnn::BackendOptions modelOptionGpu("GpuAcc", {{"FastMathEnabled",
-                                                     armnn::stringUtils::StringToBool(options_values[i])}});
-            optimizerOptions.m_ModelOptions.push_back(modelOptionGpu);
+                                                 armnn::stringUtils::StringToBool(options_values[i])}});
+            optimizerOptions.AddModelOption(modelOptionGpu);
 
             armnn::BackendOptions modelOptionCpu("CpuAcc", {{"FastMathEnabled",
-                                                     armnn::stringUtils::StringToBool(options_values[i])}});
-            optimizerOptions.m_ModelOptions.push_back(modelOptionCpu);
+                                                 armnn::stringUtils::StringToBool(options_values[i])}});
+            optimizerOptions.AddModelOption(modelOptionCpu);
         }
             // Process CPU backend options
         else if (std::string(options_keys[i]) == std::string("number-of-threads"))
@@ -229,17 +229,17 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
             unsigned int numberOfThreads = armnn::numeric_cast<unsigned int>(atoi(options_values[i]));
             armnn::BackendOptions modelOption("CpuAcc",
                                               {{"NumberOfThreads", numberOfThreads}});
-            optimizerOptions.m_ModelOptions.push_back(modelOption);
+            optimizerOptions.AddModelOption(modelOption);
         }
             // Process reduce-fp32-to-fp16 option
         else if (std::string(options_keys[i]) == std::string("reduce-fp32-to-fp16"))
         {
-            optimizerOptions.m_ReduceFp32ToFp16 = armnn::stringUtils::StringToBool(options_values[i]);
+            optimizerOptions.SetReduceFp32ToFp16(armnn::stringUtils::StringToBool(options_values[i]));
         }
             // Process debug-data
         else if (std::string(options_keys[i]) == std::string("debug-data"))
         {
-            optimizerOptions.m_Debug = armnn::stringUtils::StringToBool(options_values[i]);
+            optimizerOptions.SetDebugEnabled(armnn::stringUtils::StringToBool(options_values[i]));
         }
             // Infer output-shape
         else if (std::string(options_keys[i]) == std::string("infer-output-shape"))
@@ -248,7 +248,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
             {
                 { "InferAndValidate", armnn::stringUtils::StringToBool(options_values[i]) }
             });
-            optimizerOptions.m_ModelOptions.push_back(backendOption);
+            optimizerOptions.AddModelOption(backendOption);
         }
             // Allow expanded dims
         else if (std::string(options_keys[i]) == std::string("allow-expanded-dims"))
@@ -257,18 +257,18 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
             {
                 { "AllowExpandedDims", armnn::stringUtils::StringToBool(options_values[i]) }
             });
-            optimizerOptions.m_ModelOptions.push_back(backendOption);
+            optimizerOptions.AddModelOption(backendOption);
         }
             // Process memory-import
         else if (std::string(options_keys[i]) == std::string("memory-import"))
         {
-            optimizerOptions.m_ImportEnabled = armnn::stringUtils::StringToBool(options_values[i]);
+            optimizerOptions.SetImportEnabled(armnn::stringUtils::StringToBool(options_values[i]));
         }
             // Process enable-internal-profiling
         else if (std::string(options_keys[i]) == std::string("enable-internal-profiling"))
         {
             internalProfilingState = *options_values[i] != '0';
-            optimizerOptions.m_ProfilingEnabled = internalProfilingState;
+            optimizerOptions.SetProfilingEnabled(internalProfilingState);
         }
             // Process internal-profiling-detail
         else if (std::string(options_keys[i]) == std::string("internal-profiling-detail"))
@@ -312,7 +312,8 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         // Process file-only-external-profiling
         else if (std::string(options_keys[i]) == std::string("file-only-external-profiling"))
         {
-            runtimeOptions.m_ProfilingOptions.m_FileOnly = armnn::stringUtils::StringToBool(options_values[i]);
+            runtimeOptions.m_ProfilingOptions.m_FileOnly =
+                    armnn::stringUtils::StringToBool(options_values[i]);
         }
         // Process counter-capture-period
         else if (std::string(options_keys[i]) == std::string("counter-capture-period"))
@@ -408,12 +409,12 @@ bool DelegateOptions::IsLoggingEnabled()
     return p_DelegateOptionsImpl->m_LoggingSeverity.has_value();
 }
 
-const armnn::OptimizerOptions& DelegateOptions::GetOptimizerOptions() const
+const armnn::OptimizerOptionsOpaque& DelegateOptions::GetOptimizerOptions() const
 {
     return p_DelegateOptionsImpl->p_OptimizerOptions;
 }
 
-void DelegateOptions::SetOptimizerOptions(const armnn::OptimizerOptions& optimizerOptions)
+void DelegateOptions::SetOptimizerOptions(const armnn::OptimizerOptionsOpaque& optimizerOptions)
 {
     p_DelegateOptionsImpl->p_OptimizerOptions = optimizerOptions;
 }

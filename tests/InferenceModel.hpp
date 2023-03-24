@@ -455,13 +455,13 @@ public:
 
             ARMNN_SCOPED_HEAP_PROFILING("Optimizing");
 
-            armnn::OptimizerOptions options;
-            options.m_ReduceFp32ToFp16 = params.m_EnableFp16TurboMode;
-            options.m_Debug = params.m_PrintIntermediateLayers;
-            options.m_DebugToFile = params.m_PrintIntermediateLayersToFile;
-            options.m_shapeInferenceMethod = params.m_InferOutputShape ?
-                    armnn::ShapeInferenceMethod::InferAndValidate : armnn::ShapeInferenceMethod::ValidateOnly;
-            options.m_ProfilingEnabled = m_EnableProfiling;
+            armnn::OptimizerOptionsOpaque options;
+            options.SetReduceFp32ToFp16(params.m_EnableFp16TurboMode);
+            options.SetDebugEnabled(params.m_PrintIntermediateLayers);
+            options.SetDebugToFileEnabled(params.m_PrintIntermediateLayersToFile);
+            options.SetShapeInferenceMethod(params.m_InferOutputShape ?
+                    armnn::ShapeInferenceMethod::InferAndValidate : armnn::ShapeInferenceMethod::ValidateOnly);
+            options.SetProfilingEnabled(m_EnableProfiling);
 
             armnn::BackendOptions gpuAcc("GpuAcc",
             {
@@ -476,8 +476,8 @@ public:
                 { "FastMathEnabled", params.m_EnableFastMath },
                 { "NumberOfThreads", params.m_NumberOfThreads }
             });
-            options.m_ModelOptions.push_back(gpuAcc);
-            options.m_ModelOptions.push_back(cpuAcc);
+            options.AddModelOption(gpuAcc);
+            options.AddModelOption(cpuAcc);
 
             const auto optimization_start_time = armnn::GetTimeNow();
             optNet = armnn::Optimize(*network, params.m_ComputeDevices, m_Runtime->GetDeviceSpec(), options);

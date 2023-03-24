@@ -23,6 +23,7 @@
 
 namespace armnn
 {
+
 class Graph;
 
 using NetworkImplPtr = std::unique_ptr<NetworkImpl, void (*)(NetworkImpl* network)>;
@@ -291,5 +292,92 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   SubgraphView::IConnectableLayerIterator& firstLayer,
                                   SubgraphView::IConnectableLayerIterator& lastLayer,
                                   Optional<std::vector<std::string>&> errMessages);
+
+struct OptimizerOptionsOpaqueImpl
+{
+    ~OptimizerOptionsOpaqueImpl() = default;
+
+    explicit OptimizerOptionsOpaqueImpl()
+            : m_ReduceFp32ToFp16(false)
+            , m_Debug(false)
+            , m_DebugToFile(false)
+            , m_ReduceFp32ToBf16(false)
+            , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
+            , m_ImportEnabled(false)
+            , m_ModelOptions()
+            , m_ProfilingEnabled(false)
+            , m_ExportEnabled(false)
+            , m_AllowExpandedDims(false)
+    {
+    }
+
+    explicit OptimizerOptionsOpaqueImpl(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16,
+                                        bool importEnabled, ModelOptions modelOptions = {},
+                                        bool exportEnabled = false, bool debugToFile = false)
+            : m_ReduceFp32ToFp16(reduceFp32ToFp16)
+            , m_Debug(debug)
+            , m_DebugToFile(debugToFile)
+            , m_ReduceFp32ToBf16(reduceFp32ToBf16)
+            , m_shapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly)
+            , m_ImportEnabled(importEnabled)
+            , m_ModelOptions(modelOptions)
+            , m_ProfilingEnabled(false)
+            , m_ExportEnabled(exportEnabled)
+            , m_AllowExpandedDims(false)
+    {
+    }
+
+    explicit OptimizerOptionsOpaqueImpl(bool reduceFp32ToFp16, bool debug, bool reduceFp32ToBf16,
+                                        ShapeInferenceMethod shapeInferenceMethod,
+                                        bool importEnabled, ModelOptions modelOptions, bool exportEnabled,
+                                        bool debugToFile, bool allowExpandedDims)
+            : m_ReduceFp32ToFp16(reduceFp32ToFp16)
+            , m_Debug(debug)
+            , m_DebugToFile(debugToFile)
+            , m_ReduceFp32ToBf16(reduceFp32ToBf16)
+            , m_shapeInferenceMethod(shapeInferenceMethod)
+            , m_ImportEnabled(importEnabled)
+            , m_ModelOptions(modelOptions)
+            , m_ProfilingEnabled(false)
+            , m_ExportEnabled(exportEnabled)
+            , m_AllowExpandedDims(allowExpandedDims)
+    {
+    }
+
+    /// Reduces all Fp32 operators in the model to Fp16 for faster processing.
+    /// @Note This feature works best if all operators of the model are in Fp32. ArmNN will add conversion layers
+    ///       between layers that weren't in Fp32 in the first place or if the operator is not supported in Fp16.
+    ///       The overhead of these conversions can lead to a slower overall performance if too many conversions are
+    ///       required.
+    bool m_ReduceFp32ToFp16 = false;
+
+    /// Add debug data for easier troubleshooting
+    bool m_Debug = false;
+
+    /// Pass debug data to separate output files for easier troubleshooting
+    bool m_DebugToFile = false;
+
+    /// @Note This feature has been replaced by enabling Fast Math in compute library backend options.
+    /// This is currently a placeholder option
+    bool m_ReduceFp32ToBf16 = false;
+
+    /// Infer output size when not available
+    ShapeInferenceMethod m_shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly;
+
+    /// Enable Import
+    bool m_ImportEnabled = false;
+
+    /// Enable Model Options
+    ModelOptions m_ModelOptions;
+
+    /// Enable profiling dump of the optimizer phase
+    bool m_ProfilingEnabled = false;
+
+    /// Enable Export
+    bool m_ExportEnabled = false;
+
+    /// When calculating tensor sizes, dimensions of size == 1 will be ignored
+    bool m_AllowExpandedDims = false;
+};
 
 } // namespace armnn

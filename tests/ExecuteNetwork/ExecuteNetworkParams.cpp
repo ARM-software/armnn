@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -137,33 +137,33 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
     }
 
     // Optimizer options next.
-    armnn::OptimizerOptions optimizerOptions;
-    optimizerOptions.m_ReduceFp32ToFp16 = m_EnableFp16TurboMode;
-    optimizerOptions.m_Debug = m_PrintIntermediate;
-    optimizerOptions.m_DebugToFile = m_PrintIntermediateOutputsToFile;
-    optimizerOptions.m_ProfilingEnabled = m_EnableProfiling;
-    optimizerOptions.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::ValidateOnly;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
+    optimizerOptions.SetReduceFp32ToFp16(m_EnableFp16TurboMode);
+    optimizerOptions.SetDebugEnabled(m_PrintIntermediate);
+    optimizerOptions.SetDebugToFileEnabled(m_PrintIntermediateOutputsToFile);
+    optimizerOptions.SetProfilingEnabled(m_EnableProfiling);
+    optimizerOptions.SetShapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly);
     if (m_InferOutputShape)
     {
-        optimizerOptions.m_shapeInferenceMethod = armnn::ShapeInferenceMethod::InferAndValidate;
+        optimizerOptions.SetShapeInferenceMethod(armnn::ShapeInferenceMethod::InferAndValidate);
         armnn::BackendOptions networkOption("ShapeInferenceMethod",
                                             {
                                                 {"InferAndValidate", true}
                                             });
-        optimizerOptions.m_ModelOptions.push_back(networkOption);
+        optimizerOptions.AddModelOption(networkOption);
     }
 
     {
         armnn::BackendOptions option("GpuAcc", {{"FastMathEnabled", m_EnableFastMath}});
-        optimizerOptions.m_ModelOptions.push_back(option);
+        optimizerOptions.AddModelOption(option);
     }
     {
         armnn::BackendOptions option("GpuAcc", {{"CachedNetworkFilePath", m_CachedNetworkFilePath}});
-        optimizerOptions.m_ModelOptions.push_back(option);
+        optimizerOptions.AddModelOption(option);
     }
     {
         armnn::BackendOptions option("GpuAcc", {{"MLGOTuningFilePath", m_MLGOTuningFilePath}});
-        optimizerOptions.m_ModelOptions.push_back(option);
+        optimizerOptions.AddModelOption(option);
     }
 
     armnn::BackendOptions cpuAcc("CpuAcc",
@@ -171,14 +171,14 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
         { "FastMathEnabled", m_EnableFastMath },
         { "NumberOfThreads", m_NumberOfThreads }
                                  });
-    optimizerOptions.m_ModelOptions.push_back(cpuAcc);
+    optimizerOptions.AddModelOption(cpuAcc);
     if (m_AllowExpandedDims)
     {
         armnn::BackendOptions networkOption("AllowExpandedDims",
                                             {
                                                     {"AllowExpandedDims", true}
                                             });
-        optimizerOptions.m_ModelOptions.push_back(networkOption);
+        optimizerOptions.AddModelOption(networkOption);
     }
     delegateOptions.SetOptimizerOptions(optimizerOptions);
     return delegateOptions;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -88,14 +88,14 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClContextSerializerTest")
     armnn::INetworkPtr net2 = CreateNetwork();
 
     // Add specific optimizerOptions to each network.
-    armnn::OptimizerOptions optimizerOptions1;
-    armnn::OptimizerOptions optimizerOptions2;
+    armnn::OptimizerOptionsOpaque optimizerOptions1;
+    armnn::OptimizerOptionsOpaque optimizerOptions2;
     armnn::BackendOptions modelOptions1("GpuAcc",
                                        {{"SaveCachedNetwork", true}, {"CachedNetworkFilePath", filePathString}});
     armnn::BackendOptions modelOptions2("GpuAcc",
                                         {{"SaveCachedNetwork", false}, {"CachedNetworkFilePath", filePathString}});
-    optimizerOptions1.m_ModelOptions.push_back(modelOptions1);
-    optimizerOptions2.m_ModelOptions.push_back(modelOptions2);
+    optimizerOptions1.AddModelOption(modelOptions1);
+    optimizerOptions2.AddModelOption(modelOptions2);
 
     armnn::IOptimizedNetworkPtr optNet1 = armnn::Optimize(
             *net1, backends, runtime->GetDeviceSpec(), optimizerOptions1);

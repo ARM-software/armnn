@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -118,9 +118,9 @@ TEST_CASE("ClCustomAllocatorTest")
     IRuntimePtr run = IRuntime::Create(options);
 
     // Optimise ArmNN network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
-    optOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
+    optOptions.SetExportEnabled(true);
     armnn::IOptimizedNetworkPtr optNet = Optimize(*myNetwork, {"GpuAcc"}, run->GetDeviceSpec(), optOptions);
     CHECK(optNet);
 
@@ -188,8 +188,8 @@ TEST_CASE("ClCustomAllocatorCpuAccNegativeTest")
     INetworkPtr myNetwork = CreateTestNetwork(inputTensorInfo);
 
     // Optimise ArmNN network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
     IOptimizedNetworkPtr optNet(nullptr, nullptr);
     std::vector<std::string> errMessages;
 

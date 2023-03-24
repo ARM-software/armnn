@@ -26,7 +26,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsReduceFp32ToFp16")
         std::vector<float> expectedResult = { 1, 2, 2, 2 };
 
         // Enable ReduceFp32ToFp16
-        armnn::OptimizerOptions optimizerOptions(true, true, false, false);
+        armnn::OptimizerOptionsOpaque optimizerOptions(true, true, false, false);
         armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
         DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
@@ -55,7 +55,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebug")
         std::vector<float> expectedResult = { 1, 2, 2, 2 };
 
         // Enable Debug
-        armnn::OptimizerOptions optimizerOptions(false, true, false, false);
+        armnn::OptimizerOptionsOpaque optimizerOptions(false, true, false, false);
         armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
         DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
@@ -83,7 +83,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebugFunction")
     std::vector<float> expectedResult = { 1, 2, 2, 2 };
 
     // Enable debug with debug callback function
-    armnn::OptimizerOptions optimizerOptions(false, true, false, false);
+    armnn::OptimizerOptionsOpaque optimizerOptions(false, true, false, false);
     bool callback = false;
     auto mockCallback = [&](LayerGuid guid, unsigned int slotIndex, armnn::ITensorHandle* tensor)
     {
@@ -121,7 +121,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsImport")
     std::vector<uint8_t> divData = { 2, 2, 3, 4 };
     std::vector<uint8_t> expectedResult = { 1, 2, 2, 2 };
 
-    armnn::OptimizerOptions optimizerOptions(false, false, false, true);
+    armnn::OptimizerOptionsOpaque optimizerOptions(false, false, false, true);
     armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
     DelegateOptionTest<uint8_t>(::tflite::TensorType_UINT8,
@@ -227,7 +227,8 @@ TEST_CASE ("ArmnnDelegateModelOptions_CpuAcc_Test")
                                  });
     modelOptions.push_back(cpuAcc);
 
-    armnn::OptimizerOptions optimizerOptions(false, false, false, false, modelOptions, false);
+    armnn::OptimizerOptionsOpaque optimizerOptions(false, false, false,
+                                                   false, modelOptions, false);
     armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
     DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
@@ -256,7 +257,8 @@ TEST_CASE ("ArmnnDelegateSerializeToDot")
         std::vector<float> divData = { 2, 2, 3, 4 };
         std::vector<float> expectedResult = { 1, 2, 2, 2 };
 
-        armnn::OptimizerOptions optimizerOptions(false, false, false, false);
+        armnn::OptimizerOptionsOpaque optimizerOptions(false, false,
+                                                       false, false);
         armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
         // Enable serialize to dot by specifying the target file name.
         delegateOptions.SetSerializeToDot(filename);
@@ -299,7 +301,8 @@ void CreateFp16StringParsingTestRun(std::vector<std::string>& keys,
         options_values.get()[i] = values[i].c_str();
     }
 
-    armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(), num_options, nullptr);
+    armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(),
+                                                   num_options, nullptr);
     DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
                               tensorShape,
                               inputData,

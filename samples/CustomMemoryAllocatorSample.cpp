@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -121,8 +121,8 @@ int main()
     fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // Optimise ArmNN network
-    OptimizerOptions optOptions;
-    optOptions.m_ImportEnabled = true;
+    OptimizerOptionsOpaque optOptions;
+    optOptions.SetImportEnabled(true);
     IOptimizedNetworkPtr optNet =
                 Optimize(*network, {"GpuAcc"}, runtime->GetDeviceSpec(), optOptions);
     if (!optNet)

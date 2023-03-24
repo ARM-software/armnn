@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -157,8 +157,8 @@ std::string GetSoftmaxProfilerJson(const std::vector<armnn::BackendId>& backends
     softmax->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // optimize the network
-    armnn::OptimizerOptions optOptions;
-    optOptions.m_ProfilingEnabled = true;
+    armnn::OptimizerOptionsOpaque optOptions;
+    optOptions.SetProfilingEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optOptions);
     if(!optNet)
     {

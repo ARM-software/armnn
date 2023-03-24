@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -86,8 +86,8 @@ TEST_CASE("FP16TurboModeTestOnGpuAcc")
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
 
-    armnn::OptimizerOptions optimizerOptions;
-    optimizerOptions.m_ReduceFp32ToFp16 = true;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
+    optimizerOptions.SetReduceFp32ToFp16(true);
 
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
             *net, backends, runtime->GetDeviceSpec(), optimizerOptions);
@@ -119,9 +119,9 @@ TEST_CASE("FastMathEnabledTestOnGpuAcc")
     armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
 
     std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    armnn::OptimizerOptions optimizerOptions;
+    armnn::OptimizerOptionsOpaque optimizerOptions;
     armnn::BackendOptions modelOptions("GpuAcc", {{"FastMathEnabled", true}});
-    optimizerOptions.m_ModelOptions.push_back(modelOptions);
+    optimizerOptions.AddModelOption(modelOptions);
 
     armnn::IOptimizedNetworkPtr optimizedNet = armnn::Optimize(
     *net, backends, runtime->GetDeviceSpec(), optimizerOptions);

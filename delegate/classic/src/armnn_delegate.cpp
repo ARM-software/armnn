@@ -335,7 +335,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
     DelegateData delegateData(delegate->m_Options.GetBackends());
 
     // Build ArmNN Network
-    armnn::NetworkOptions networkOptions = delegate->m_Options.GetOptimizerOptions().m_ModelOptions;
+    armnn::NetworkOptions networkOptions = delegate->m_Options.GetOptimizerOptions().GetModelOptions();
     armnn::NetworkId networkId;
     delegateData.m_Network = armnn::INetwork::Create(networkOptions);
 
@@ -424,11 +424,11 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteContext* tfLiteContext,
         armnn::MemorySource inputSource = armnn::MemorySource::Undefined;
         armnn::MemorySource outputSource = armnn::MemorySource::Undefined;
         // There's a bit of an assumption here that the delegate will only support Malloc memory source.
-        if (delegate->m_Options.GetOptimizerOptions().m_ImportEnabled)
+        if (delegate->m_Options.GetOptimizerOptions().GetImportEnabled())
         {
             inputSource = armnn::MemorySource::Malloc;
         }
-        if (delegate->m_Options.GetOptimizerOptions().m_ExportEnabled)
+        if (delegate->m_Options.GetOptimizerOptions().GetExportEnabled())
         {
             outputSource = armnn::MemorySource::Malloc;
         }

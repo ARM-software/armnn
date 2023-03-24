@@ -210,8 +210,8 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
-    OptimizerOptions optimizedOptions;
-    optimizedOptions.m_ImportEnabled = true;
+    OptimizerOptionsOpaque optimizedOptions;
+    optimizedOptions.SetImportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
@@ -278,9 +278,9 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
-    OptimizerOptions optimizedOptions;
-    optimizedOptions.m_ImportEnabled = true;
-    optimizedOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optimizedOptions;
+    optimizedOptions.SetImportEnabled(true);
+    optimizedOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
@@ -353,9 +353,9 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // Optimize the network
-    OptimizerOptions optimizedOptions;
-    optimizedOptions.m_ImportEnabled = true;
-    optimizedOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optimizedOptions;
+    optimizedOptions.SetImportEnabled(true);
+    optimizedOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 
@@ -441,8 +441,8 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // optimize the network
-    OptimizerOptions optimizedOptions;
-    optimizedOptions.m_ImportEnabled = true;
+    OptimizerOptionsOpaque optimizedOptions;
+    optimizedOptions.SetImportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     INFO("Load Network");
@@ -531,8 +531,8 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
     // optimize the network
-    OptimizerOptions optimizedOptions;
-    optimizedOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optimizedOptions;
+    optimizedOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     INFO("Load Network");
@@ -620,9 +620,9 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32, 0.0f, 0, true));
     pooling->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 1, 4 }, DataType::Float32));
 
-    OptimizerOptions optimizedOptions;
-    optimizedOptions.m_ImportEnabled = true;
-    optimizedOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optimizedOptions;
+    optimizedOptions.SetImportEnabled(true);
+    optimizedOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     INFO("Load Network");
@@ -714,9 +714,9 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
     activation->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 1, 1, 4, 1 }, DataType::Float32));
 
     // Optimize the network
-    OptimizerOptions optimizedOptions;
-    optimizedOptions.m_ImportEnabled = true;
-    optimizedOptions.m_ExportEnabled = true;
+    OptimizerOptionsOpaque optimizedOptions;
+    optimizedOptions.SetImportEnabled(true);
+    optimizedOptions.SetExportEnabled(true);
     IOptimizedNetworkPtr optNet = Optimize(*net, backends, runtime->GetDeviceSpec(), optimizedOptions);
 
     // Loads it into the runtime.

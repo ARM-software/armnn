@@ -593,7 +593,6 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/FoldPadTests.cpp
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp
         src/armnn/test/optimizations/FuseActivationTests.cpp
-        src/armnn/test/optimizations/FuseBatchNormTests.cpp
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp
         src/armnn/test/optimizations/MovePermuteUpTests.cpp
         src/armnn/test/optimizations/MoveTransposeUpTests.cpp
@@ -655,6 +654,7 @@ if(BUILD_UNIT_TESTS)
 
     if(ARMNNREF)
         list(APPEND unittest_sources
+            src/armnn/test/optimizations/FuseBatchNormTests.cpp
             src/armnn/test/DebugCallbackTest.cpp
             src/armnn/test/RuntimeTests.cpp
             src/armnn/test/RuntimeTests.hpp

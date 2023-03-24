@@ -16,7 +16,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ConcatEndToEndTestImpl.hpp
     Convolution2dEndToEndTestImpl.hpp
     Convolution3dEndToEndTestImpl.hpp
-    CustomMemoryOptimizerStrategyTests.cpp
     DefaultAsyncExecuteTest.cpp
     DepthToSpaceEndToEndTestImpl.hpp
     DepthwiseConvolution2dEndToEndTests.hpp
@@ -197,6 +196,12 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/UnidirectionalSequenceLstmTestImpl.cpp
     layerTests/UnidirectionalSequenceLstmTestImpl.hpp
 )
+
+if(ARMCOMPUTENEON OR ARMNNREF)
+    list(APPEND armnnBackendsCommonUnitTests_sources
+        CustomMemoryOptimizerStrategyTests.cpp
+        )
+endif()
 
 if (ARMNNREF)
     list(APPEND armnnBackendsCommonUnitTests_sources

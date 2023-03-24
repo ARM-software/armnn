@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="37c989a58a04985dfdc21089c7dacc7e1925a4d0" #9199: Add support for arbitrary parameters for CPU Gather | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9199
+DEFAULT_CLFRAMEWORKREVISION="b531b7549abdd5c10b14b00107ea647591baa430" #Add Texture Pipe Support for Matmul Lhs T/NT Rhs T kernels
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -108,7 +108,7 @@ unsigned int ComputeDepthwiseConv2dDepthMultiplier(armnn::DataLayout layout,
                                                    const arm_compute::TensorShape& weightsShape,
                                                    const arm_compute::TensorShape& inputShape);
 
-/// Utility function used to setup an arm_compute::PadStrideInfo object from an armnn layer descriptor.
+/// Utility function used to setup an arm_compute::PadStrideInfo object from an ArmNN layer descriptor.
 template <typename Descriptor>
 arm_compute::PadStrideInfo BuildArmComputePadStrideInfo(const Descriptor &descriptor)
 {
@@ -119,6 +119,14 @@ arm_compute::PadStrideInfo BuildArmComputePadStrideInfo(const Descriptor &descri
                                       descriptor.m_PadTop,
                                       descriptor.m_PadBottom,
                                       arm_compute::DimensionRoundingType::FLOOR);
+}
+
+/// Utility function used to setup an arm_compute::CropInfo object from an ArmNN layer descriptor.
+template <typename Descriptor>
+arm_compute::CropInfo BuildArmComputeCropInfo(const Descriptor& descriptor)
+{
+    return arm_compute::CropInfo(descriptor.m_Crops[1].first, descriptor.m_Crops[1].second,
+                                 descriptor.m_Crops[0].first, descriptor.m_Crops[0].second);
 }
 
 /// Sets up the given ArmCompute tensor's dimensions based on the given ArmNN tensor.

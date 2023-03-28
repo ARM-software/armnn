@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,26 +29,50 @@ using FactoryType = NeonWorkloadFactory;
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat321, BatchToSpaceNdNhwcTest1<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat322, BatchToSpaceNdNhwcTest2<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat323, BatchToSpaceNdNhwcTest3<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat324, BatchToSpaceNdNhwcTest4<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat325, BatchToSpaceNdNhwcTest5<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat326, BatchToSpaceNdNhwcTest6<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat327, BatchToSpaceNdNhwcTest7<DataType::Float32>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat321, BatchToSpaceNdNchwTest1<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat322, BatchToSpaceNdNchwTest2<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat323, BatchToSpaceNdNchwTest3<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat324, BatchToSpaceNdNchwTest4<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat325, BatchToSpaceNdNchwTest5<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat326, BatchToSpaceNdNchwTest6<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat327, BatchToSpaceNdNchwTest7<DataType::Float32>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt1, BatchToSpaceNdNhwcTest1<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt2, BatchToSpaceNdNhwcTest2<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt3, BatchToSpaceNdNhwcTest3<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt4, BatchToSpaceNdNhwcTest4<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt5, BatchToSpaceNdNhwcTest5<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt6, BatchToSpaceNdNhwcTest6<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt7, BatchToSpaceNdNhwcTest7<DataType::QAsymmS8>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt1, BatchToSpaceNdNchwTest1<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt2, BatchToSpaceNdNchwTest2<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt3, BatchToSpaceNdNchwTest3<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt4, BatchToSpaceNdNchwTest4<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt5, BatchToSpaceNdNchwTest5<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt6, BatchToSpaceNdNchwTest6<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt7, BatchToSpaceNdNchwTest7<DataType::QAsymmS8>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint1, BatchToSpaceNdNhwcTest1<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint2, BatchToSpaceNdNhwcTest2<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint3, BatchToSpaceNdNhwcTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint4, BatchToSpaceNdNhwcTest4<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint5, BatchToSpaceNdNhwcTest5<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint6, BatchToSpaceNdNhwcTest6<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint7, BatchToSpaceNdNhwcTest7<DataType::QAsymmU8>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint1, BatchToSpaceNdNchwTest1<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint2, BatchToSpaceNdNchwTest2<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint3, BatchToSpaceNdNchwTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint4, BatchToSpaceNdNchwTest4<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint5, BatchToSpaceNdNchwTest5<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint6, BatchToSpaceNdNchwTest6<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint7, BatchToSpaceNdNchwTest7<DataType::QAsymmU8>)
 
 // Batch Mat Mul
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DSimpleFloat32, BatchMatMul2DSimpleTest<DataType::Float32>);

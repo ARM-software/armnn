@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,10 +28,13 @@ arm_compute::Status NeonBatchToSpaceNdWorkloadValidate(const TensorInfo& input,
     int32_t blockHeight = armnn::numeric_cast<int32_t>(descriptor.m_BlockShape[0]);
     int32_t blockWidth = armnn::numeric_cast<int32_t>(descriptor.m_BlockShape[1]);
 
+    const arm_compute::CropInfo cropInfo = BuildArmComputeCropInfo(descriptor);
+
     const arm_compute::Status aclStatus = arm_compute::NEBatchToSpaceLayer::validate(&aclInputInfo,
                                                                                      blockWidth,
                                                                                      blockHeight,
-                                                                                     &aclOutputInfo);
+                                                                                     &aclOutputInfo,
+                                                                                     cropInfo);
     return aclStatus;
 }
 
@@ -60,8 +63,10 @@ NeonBatchToSpaceNdWorkload::NeonBatchToSpaceNdWorkload(const BatchToSpaceNdQueue
     int32_t blockHeight = armnn::numeric_cast<int32_t>(descriptor.m_Parameters.m_BlockShape[0]);
     int32_t blockWidth = armnn::numeric_cast<int32_t>(descriptor.m_Parameters.m_BlockShape[1]);
 
+    const arm_compute::CropInfo cropInfo = BuildArmComputeCropInfo(descriptor.m_Parameters);
+
     m_Layer.reset(new arm_compute::NEBatchToSpaceLayer());
-    m_Layer->configure(&input, blockWidth, blockHeight, &output);
+    m_Layer->configure(&input, blockWidth, blockHeight, &output, cropInfo);
     m_Layer->prepare();
 }
 

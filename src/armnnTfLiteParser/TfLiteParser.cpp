@@ -2529,20 +2529,38 @@ void TfLiteParserImpl::ParseMean(size_t subgraphIndex, size_t operatorIndex)
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    armnn::TensorInfo dimTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
-    BufferRawPtr bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    TensorInfo inputTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 0);
+    TensorInfo dimTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     armnn::MeanDescriptor desc;
-    std::vector<unsigned int> axis(dimTensorInfo.GetNumElements());
-    ::memcpy(axis.data(), bufferPtr->data.data(), dimTensorInfo.GetNumBytes());
-    desc.m_Axis = axis;
+    BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    // Get const axis value from model and set it to descriptor.
+    if (axisBufferPtr != nullptr)
+    {
+        std::vector<int32_t> axisData(dimTensorInfo.GetNumElements());
+        ::memcpy(axisData.data(), axisBufferPtr->data.data(), dimTensorInfo.GetNumBytes());
 
-    armnn::TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
+        // Convert the axis to unsigned int and remove duplicates.
+        auto rank = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
+        std::set<unsigned int> uniqueAxis;
+        std::transform(axisData.begin(),
+                       axisData.end(),
+                       std::inserter(uniqueAxis, uniqueAxis.begin()),
+                       [rank](int i)->unsigned int{
+                           return static_cast<uint32_t>(((i + rank) % rank)); });
+        desc.m_Axis.assign(uniqueAxis.begin(), uniqueAxis.end());
+    }
+    else
+    {
+        for (uint32_t i = 0; i < inputTensorInfo.GetNumDimensions(); ++i)
+        {
+            desc.m_Axis.push_back(i);
+        }
+    }
+
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
 
-    desc.m_KeepDims =
-            inputTensorInfo.GetNumDimensions() == outputTensorInfo.GetNumDimensions() ?
-            true : false;
+    desc.m_KeepDims = inputTensorInfo.GetNumDimensions() == outputTensorInfo.GetNumDimensions() ? true : false;
 
     auto layerName = fmt::format("Mean:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddMeanLayer(desc, layerName.c_str());

@@ -111,10 +111,12 @@ LayerTestResult<T, 2> FullyConnectedTest(
     armnn::TensorInfo weightsDesc({ outputChannels, inputSize }, ArmnnType);
     weightsDesc.SetQuantizationScale(0.2f);
     weightsDesc.SetQuantizationOffset(93);
+    weightsDesc.SetConstant(constantWeights);
 
     armnn::TensorInfo biasesDesc({ outputChannels }, GetBiasTypeFromWeightsType(weightsDesc.GetDataType()).value());
     biasesDesc.SetQuantizationScale(inputTensorInfo.GetQuantizationScale() * weightsDesc.GetQuantizationScale());
     biasesDesc.SetQuantizationOffset(0);
+    biasesDesc.SetConstant(true);
 
     LayerTestResult<T, 2> result(outputTensorInfo);
 
@@ -183,6 +185,9 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
     unsigned int outputChannels = 1;
     unsigned int outputNum = 1;
 
+    bool isBiasEnabled = true;
+    bool isConstantWeights = true;
+
     // Define the tensor descriptors.
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -203,6 +208,8 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
     outputTensorInfo = armnn::TensorInfo(2, outputShape, ArmnnType);
     weightsDesc = armnn::TensorInfo(2, weightsShape, ArmnnType);
     biasesDesc = armnn::TensorInfo(1, biasShape, ArmnnType);
+    weightsDesc.SetConstant(isConstantWeights);
+    biasesDesc.SetConstant(true);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -236,7 +243,7 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
         inputTensorInfo, outputTensorInfo,
         weightsDesc, biasesDesc,
         weights, biasValues, input,
-        true, transposeWeights, true
+        isBiasEnabled, transposeWeights, isConstantWeights
     );
 
     result.m_ExpectedData = armnnUtils::QuantizedVector<T>({ 965432.0f }, qScale, qOffset);
@@ -283,6 +290,8 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(
     unsigned int outputChannels = 3;
     unsigned int outputNum = 2;
 
+    bool isConstantWeights = true;
+
     // Define the tensor descriptors.
     armnn::TensorInfo inputTensorInfo;
     armnn::TensorInfo outputTensorInfo;
@@ -304,6 +313,8 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(
     outputTensorInfo = armnn::TensorInfo(2, outputShape, armnn::DataType::Float32);
     weightsDesc = armnn::TensorInfo(2, weightsShape, armnn::DataType::Float32);
     biasesDesc = armnn::TensorInfo(1, biasShape, armnn::DataType::Float32);
+    weightsDesc.SetConstant(isConstantWeights);
+    biasesDesc.SetConstant(true);
 
     LayerTestResult<float, 2> result(outputTensorInfo);
 
@@ -345,7 +356,7 @@ LayerTestResult<float, 2> FullyConnectedFloat32Test(
         inputTensorInfo, outputTensorInfo,
         weightsDesc, biasesDesc,
         weights, biasValues, input,
-        biasEnabled, transposeWeights, true
+        biasEnabled, transposeWeights, isConstantWeights
     );
 
     std::vector<float> expectedOutput =

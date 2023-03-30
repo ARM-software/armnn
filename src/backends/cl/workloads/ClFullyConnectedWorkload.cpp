@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,6 +46,7 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
 
     const arm_compute::FullyConnectedLayerInfo fullyConnectedLayerInfo =
         ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor, activationDescriptor);
+
     return arm_compute::CLFullyConnectedLayer::validate(&aclInput,
                                                         &aclWeights,
                                                         optionalAclBiases,
@@ -60,34 +61,22 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
     const arm_compute::CLCompileContext& clCompileContext)
     : ClBaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info), m_FullyConnectedLayer(memoryManager)
 {
-    // Add details for profiling output
-    WorkloadInfo detailsInfo;
+    m_Data.ValidateInputsOutputs("ClFullyConnectedWorkload", descriptor.m_Parameters.GetNumInputs(), 1);
 
-    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
-    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
-    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[1]);
-    if (descriptor.m_Parameters.m_BiasEnabled)
-    {
-        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[2]);
-    }
-
-    // Report Profiling Details
-    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClFullyConnectedWorkload_Construct",
-                                         descriptor.m_Parameters,
-                                         detailsInfo,
-                                         this->GetGuid());
-
-    m_Data.ValidateInputsOutputs("ClFullyConnectedWorkload", descriptor.m_Parameters.GetNumInputs(),
-                                 1);
-
-    arm_compute::ICLTensor& input = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    arm_compute::ICLTensor& input = PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
+    arm_compute::ICLTensor& output = PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     arm_compute::ICLTensor& weights = PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+
+    weights.info()->set_are_values_constant(info.m_InputTensorInfos[1].IsConstant());
 
     arm_compute::ICLTensor* bias  = nullptr;
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         bias = &PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+        bias->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
+
+        // We do not support dynamic bias
+        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
@@ -105,6 +94,23 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
                                         &output,
                                         fc_info);
     }
+
+    // Add details for profiling output
+    WorkloadInfo detailsInfo;
+
+    detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
+    detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
+    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[1]);
+    if (descriptor.m_Parameters.m_BiasEnabled)
+    {
+        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[2]);
+    }
+
+    // Report Profiling Details
+    ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClFullyConnectedWorkload_Construct",
+                                         descriptor.m_Parameters,
+                                         detailsInfo,
+                                         this->GetGuid());
 }
 
 void ClFullyConnectedWorkload::Execute() const

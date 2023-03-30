@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -24,7 +24,7 @@ namespace armnn
 // add new capabilities here..
 const BackendCapabilities gpuAccCapabilities("GpuAcc",
                                              {
-                                                     {"NonConstWeights", false},
+                                                     {"NonConstWeights", true},
                                                      {"AsyncExecution", false},
                                                      {"ProtectedContentAllocation", true},
                                                      {"ConstantTensorsAsInputs", true},

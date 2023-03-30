@@ -246,7 +246,9 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
             armnnUtils::GetTensorInfo(2*outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
     armnn::TensorInfo kernelDesc =
             armnnUtils::GetTensorInfo(kernelDepthMul, kernelChannels, kernelHeight, kernelWidth, layout, ArmnnType);
+    kernelDesc.SetConstant(true);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
+    biasDesc.SetConstant(true);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -412,10 +414,11 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
 
     // Creates the tensors.
     armnn::TensorInfo inputTensorInfo({inputNum, inputHeight, inputWidth, inputChannels}, ArmnnType);
-    armnn::TensorInfo outputTensorInfo({outputNum, outputHeight, outputWidth, outputChannels},
-                                       OutType);
+    armnn::TensorInfo outputTensorInfo({outputNum, outputHeight, outputWidth, outputChannels}, OutType);
     armnn::TensorInfo kernelDesc({kernelChanMul, kernelHeight, kernelWidth, kernelChannels}, ArmnnType);
+    kernelDesc.SetConstant(true);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
+    biasDesc.SetConstant(true);
 
     // Construct the input data.
     std::vector<T> inputData;
@@ -431,11 +434,6 @@ LayerTestResult<O, 4> SimpleConvolution2dNhwcTestImpl(
     std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
     std::unique_ptr<armnn::ITensorHandle> weightsHandle = tensorHandleFactory.CreateTensorHandle(kernelDesc);
     std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
-
-//    armnn::ScopedTensorHandle weightsTensor(kernelDesc);
-//    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernel.data());
-
-//    armnn::ScopedTensorHandle biasTensor(biasDesc);
 
     armnn::Convolution2dQueueDescriptor data;
 
@@ -512,7 +510,9 @@ LayerTestResult<T,4> Convolution1dTestImpl(
     armnn::TensorInfo inputInfo({batchSize, inputChannels, inputSize, 1}, ArmnnType);
     armnn::TensorInfo outputInfo({batchSize, outputChannels, outputSize, 1}, ArmnnType);
     armnn::TensorInfo kernelInfo({outputChannels, inputChannels, kernelSize, 1}, ArmnnType);
+    kernelInfo.SetConstant(true);
     armnn::TensorInfo biasInfo({outputChannels}, ArmnnBType);
+    biasInfo.SetConstant(true);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -578,11 +578,6 @@ LayerTestResult<T,4> Convolution1dTestImpl(
 
     armnn::Convolution2dQueueDescriptor data;
     armnn::WorkloadInfo info;
-//    armnn::ScopedTensorHandle weightsTensor(kernelInfo);
-//    armnn::ScopedTensorHandle biasTensor(biasInfo);
-//
-//    AllocateAndCopyDataToITensorHandle(&weightsTensor, kernelData.data());
-//    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
 
     AddInputToWorkload(data, info, inputInfo, inputHandle.get());
     AddInputToWorkload(data, info, kernelInfo, weightsHandle.get());
@@ -1390,7 +1385,9 @@ LayerTestResult<T,4> CompareConvolution2dTestImpl(
     inputTensorInfo = armnn::TensorInfo(4, inputShape, ArmnnType);
     outputTensorInfo = armnn::TensorInfo(4, outputShape, ArmnnType);
     kernelDesc = armnn::TensorInfo(4, kernelShape, ArmnnType);
+    kernelDesc.SetConstant(true);
     biasDesc = armnn::TensorInfo(1, biasShape, ArmnnType);
+    biasDesc.SetConstant(true);
 
     auto input  = MakeRandomTensor<T>(inputTensorInfo, 124908);
     auto kernel = MakeRandomTensor<T>(kernelDesc, 891234);
@@ -1730,7 +1727,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
     armnn::TensorInfo outputTensorInfo =
             armnnUtils::GetTensorInfo(outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
     armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, kernelChannels}, ArmnnType);
+    kernelDesc.SetConstant(true);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
+    biasDesc.SetConstant(true);
 
     // Set quantization parameters if the requested type is a quantized type.
     if (armnn::IsQuantizedType<T>())
@@ -1874,9 +1873,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dDepthMul1TestImpl(
             armnnUtils::GetTensorInfo(inputNum, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo =
             armnnUtils::GetTensorInfo(outputNum, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
-    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, outputChannels},
-                                 ArmnnType);
+    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, outputChannels}, ArmnnType);
+    kernelDesc.SetConstant(true);
     armnn::TensorInfo biasDesc({ outputChannels }, ArmnnBType);
+    biasDesc.SetConstant(true);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -2047,9 +2047,10 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
             inputBatchSize, inputChannels, inputHeight, inputWidth, layout, ArmnnType);
     armnn::TensorInfo outputTensorInfo = armnnUtils::GetTensorInfo(
             outputBatchSize, outputChannels, outputHeight, outputWidth, layout, ArmnnType);
-    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, outputChannels},
-                                 ArmnnType);
+    armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, outputChannels}, ArmnnType);
+    kernelDesc.SetConstant(true);
     armnn::TensorInfo biasDesc({outputChannels}, ArmnnBType);
+    biasDesc.SetConstant(true);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -2291,8 +2292,9 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
 
     // Kernel must be NCHW layout always, independently of the layout of the input and output for depthwise convolution.
     armnn::TensorInfo kernelDesc({1, kernelHeight, kernelWidth, kernelChannels}, ArmnnType);
-
+    kernelDesc.SetConstant(true);
     armnn::TensorInfo biasDesc({static_cast<unsigned int>(bias.size())}, ArmnnBType);
+    biasDesc.SetConstant(true);
 
     // Set quantization parameters if the requested type is a quantized type.
     if(armnn::IsQuantizedType<T>())
@@ -3084,8 +3086,8 @@ LayerTestResult<T, 4> CompareDepthwiseConvolution2dTestImpl(
 
     inputTensorInfo = armnn::TensorInfo(4, inputShape.data(), ArmnnType, inputsQScale, qOffset);
     outputTensorInfo = armnn::TensorInfo(4, outputShape.data(), ArmnnType, outputQScale, qOffset);
-    kernelDesc = armnn::TensorInfo(4, kernelShape.data(), ArmnnType, inputsQScale, qOffset);
-    biasDesc = armnn::TensorInfo(1, biasShape.data(), armnn::GetBiasDataType(ArmnnType), inputsQScale, qOffset);
+    kernelDesc = armnn::TensorInfo(4, kernelShape.data(), ArmnnType, inputsQScale, qOffset, true);
+    biasDesc = armnn::TensorInfo(1, biasShape.data(), armnn::GetBiasDataType(ArmnnType), inputsQScale, qOffset, true);
 
     auto input  = MakeRandomTensor<T>(inputTensorInfo, 124908, 0.0f, 255.0f);
     auto kernel = MakeRandomTensor<T>(kernelDesc, 891234, 0.0f, 255.0f);
@@ -3575,10 +3577,10 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     const std::vector<float> quantScales{ 0.5f, 0.75f, 1.0f };
     constexpr unsigned int quantDimension = 0;
 
-    TensorInfo kernelInfo({ 3, 1, 1, 2 }, kernelType, quantScales, quantDimension);
+    TensorInfo kernelInfo({ 3, 1, 1, 2 }, kernelType, quantScales, quantDimension, true);
 
     const std::vector<float> biasQuantScales{ 0.25f, 0.375f, 0.5f };
-    TensorInfo biasInfo({ 3 }, biasType, biasQuantScales, quantDimension);
+    TensorInfo biasInfo({ 3 }, biasType, biasQuantScales, quantDimension, true);
 
     std::vector<uint8_t> inputData =
     {
@@ -3625,11 +3627,6 @@ LayerTestResult<uint8_t, 4> Convolution2dPerAxisQuantTest(
     std::unique_ptr<armnn::ITensorHandle> biasHandle = nullptr;
 
     WorkloadInfo workloadInfo;
-//    ScopedTensorHandle weightTensor(kernelInfo);
-//    ScopedTensorHandle biasTensor(biasInfo);
-//
-//    AllocateAndCopyDataToITensorHandle(&weightTensor, kernelData.data());
-//    AllocateAndCopyDataToITensorHandle(&biasTensor, biasData.data());
 
     Convolution2dQueueDescriptor queueDescriptor;
     queueDescriptor.m_Parameters = descriptor;
@@ -3843,11 +3840,11 @@ LayerTestResult<uint8_t, 4> DepthwiseConvolution2dPerAxisQuantTest(
 
     const std::vector<float> quantScales{ 1.0f, 0.5f, 1.0f, 0.5f };
     const unsigned int quantDimension = 3;
-    TensorInfo kernelInfo({ 1, 2, 2, 4 }, kernelType, quantScales, quantDimension); // [1, H, W, I*M]
+    TensorInfo kernelInfo({ 1, 2, 2, 4 }, kernelType, quantScales, quantDimension, true); // [1, H, W, I*M]
 
     const std::vector<float> biasQuantScales{ 0.5f, 0.25f, 0.5f, 0.25f };
     constexpr unsigned int biasQuantDimension = 0;
-    TensorInfo biasInfo({ 4 }, biasType, biasQuantScales, biasQuantDimension);
+    TensorInfo biasInfo({ 4 }, biasType, biasQuantScales, biasQuantDimension, true);
 
     std::vector<uint8_t> inputData =
     {

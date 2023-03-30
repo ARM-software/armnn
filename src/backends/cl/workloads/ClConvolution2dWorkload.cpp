@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -88,9 +88,15 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     arm_compute::ICLTensor& input  = static_cast<IClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     arm_compute::ICLTensor& weights = static_cast<IClTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
+    weights.info()->set_are_values_constant(info.m_InputTensorInfos[1].IsConstant());
+
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         arm_compute::ICLTensor& bias = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
+        bias.info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
+        // We do not support dynamic bias
+        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
+
         m_BiasProxy = std::make_unique<ICLTensorProxy>(&bias);
     }
 

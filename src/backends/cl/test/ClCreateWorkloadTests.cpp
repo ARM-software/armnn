@@ -410,10 +410,10 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dClCompiledContext
     const std::vector<float> quantScales{ 0.5f, 0.75f, 1.0f };
     constexpr unsigned int quantDimension = 0;
 
-    TensorInfo kernelInfo({ 3, 1, 1, 2 }, kernelType, quantScales, quantDimension);
+    TensorInfo kernelInfo({ 3, 1, 1, 2 }, kernelType, quantScales, quantDimension, true);
 
     const std::vector<float> biasQuantScales{ 0.25f, 0.375f, 0.5f };
-    TensorInfo biasInfo({ 3 }, biasType, biasQuantScales, quantDimension);
+    TensorInfo biasInfo({ 3 }, biasType, biasQuantScales, quantDimension, true);
 
     std::vector<uint8_t> inputData =
     {

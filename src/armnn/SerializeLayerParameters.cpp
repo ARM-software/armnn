@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SerializeLayerParameters.hpp"
@@ -205,6 +205,7 @@ void StringifyLayerParameters<FullyConnectedDescriptor>::Serialize(ParameterStri
 {
     fn("BiasEnabled", (desc.m_BiasEnabled ? "true" : "false"));
     fn("TransposeWeightMatrix", (desc.m_TransposeWeightMatrix ? "true" : "false"));
+    fn("ConstantWeights", (desc.m_ConstantWeights ? "true" : "false"));
 }
 
 void StringifyLayerParameters<GatherDescriptor>::Serialize(ParameterStringifyFunction& fn,

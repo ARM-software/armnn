@@ -213,7 +213,7 @@ TEST_CASE ("Cl_Backends_Capability_Test")
     auto clCapabilities = clBackend->GetCapabilities();
 
     CapabilityTestHelper(clCapabilities,
-                         {{"NonConstWeights", false},
+                         {{"NonConstWeights", true},
                           {"AsyncExecution", false},
                           {"ProtectedContentAllocation", true},
                           {"ConstantTensorsAsInputs", true},

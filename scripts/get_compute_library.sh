@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b531b7549abdd5c10b14b00107ea647591baa430" #Add Texture Pipe Support for Matmul Lhs T/NT Rhs T kernels
+DEFAULT_CLFRAMEWORKREVISION="5a7d1571a2de24eefc6f1d8d22deeef9f47521ee" #Fix BatchToSpaceFixture
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

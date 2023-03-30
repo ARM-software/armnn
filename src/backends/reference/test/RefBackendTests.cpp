@@ -3,9 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <reference/RefBackend.hpp>
 #include <reference/RefTensorHandleFactory.hpp>
 
+#include <armnn/backends/WorkloadFactory.hpp>
 #include <doctest/doctest.h>
 
 using namespace armnn;

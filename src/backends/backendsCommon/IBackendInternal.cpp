@@ -5,6 +5,7 @@
 
 #include <armnn/BackendOptions.hpp>
 #include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/backends/WorkloadFactory.hpp>
 
 namespace armnn
 {

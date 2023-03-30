@@ -5,6 +5,7 @@
 #pragma once
 
 #include <armnn/backends/IBackendInternal.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
 {

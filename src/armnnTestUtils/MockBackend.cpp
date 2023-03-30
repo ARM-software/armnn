@@ -11,6 +11,8 @@
 #include <backendsCommon/test/MockBackendId.hpp>
 #include <SubgraphViewSelector.hpp>
 
+#include "Layer.hpp"
+
 namespace armnn
 {
 

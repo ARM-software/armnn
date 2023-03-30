@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <cl/ClBackend.hpp>
 #include <cl/ClTensorHandleFactory.hpp>
 #include <cl/ClImportTensorHandleFactory.hpp>

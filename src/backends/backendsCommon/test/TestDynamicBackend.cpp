@@ -6,7 +6,7 @@
 #include "TestDynamicBackend.hpp"
 
 #include <armnn/backends/IBackendInternal.hpp>
-
+#include <armnn/backends/WorkloadFactory.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 
 constexpr const char* TestDynamicBackendId()

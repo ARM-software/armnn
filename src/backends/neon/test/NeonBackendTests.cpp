@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 //
 
+#include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <neon/NeonBackend.hpp>
 #include <neon/NeonTensorHandleFactory.hpp>
 

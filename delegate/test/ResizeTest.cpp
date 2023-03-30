@@ -42,7 +42,7 @@ void ResizeBiliniarFloat32Test(std::vector<armnn::BackendId>& backends)
 
     const std::vector<int32_t> input1Shape { 1, 3, 3, 1 };
     const std::vector<int32_t> input2Shape { 2 };
-    const std::vector<int32_t> expectedOutputShape = input2NewShape;
+    const std::vector<int32_t> expectedOutputShape = { 1, 5, 5, 1 };
 
     ResizeFP32TestImpl(tflite::BuiltinOperator_RESIZE_BILINEAR,
                        backends,
@@ -66,7 +66,7 @@ void ResizeNearestNeighbourFloat32Test(std::vector<armnn::BackendId>& backends)
 
     const std::vector<int32_t> input1Shape { 1, 2, 2, 1 };
     const std::vector<int32_t> input2Shape { 2 };
-    const std::vector<int32_t> expectedOutputShape = input2NewShape;
+    const std::vector<int32_t> expectedOutputShape = { 1, 1, 1, 1 };
 
     ResizeFP32TestImpl(tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR,
                        backends,

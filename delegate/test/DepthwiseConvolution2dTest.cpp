@@ -25,7 +25,7 @@ void DepthwiseConv2dValidReluFp32Test(std::vector<armnn::BackendId>& backends)
     std::vector<int32_t> inputShape { 1, 3, 2, 2 };
     std::vector<int32_t> filterShape { 1, 2, 2, 4 };
     std::vector<int32_t> biasShape { 4 };
-    std::vector<int32_t> outputShape { 1, 3, 3, 1 };
+    std::vector<int32_t> outputShape { 1, 2, 1, 4 };
 
     static std::vector<float> inputValues =
         {

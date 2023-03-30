@@ -17,7 +17,7 @@ void CompareData(bool tensor1[], bool tensor2[], size_t tensorSize)
     }
 }
 
-void CompareData(std::vector<bool>& tensor1, bool tensor2[], size_t tensorSize)
+void CompareData(std::vector<bool>& tensor1, std::vector<bool>& tensor2, size_t tensorSize)
 {
     auto compareBool = [](auto a, auto b) {return (((a == 0) && (b == 0)) || ((a != 0) && (b != 0)));};
     for (size_t i = 0; i < tensorSize; i++)
@@ -108,44 +108,18 @@ void CompareData(TfLiteFloat16 tensor1[], Half tensor2[], size_t tensorSize) {
     }
 }
 
-template <>
-void CompareOutputData(std::unique_ptr<tflite::Interpreter>& tfLiteInterpreter,
-                       std::unique_ptr<tflite::Interpreter>& armnnDelegateInterpreter,
-                       std::vector<int32_t>& expectedOutputShape,
-                       std::vector<Half>& expectedOutputValues,
-                       unsigned int outputIndex)
+void CompareOutputShape(const std::vector<int32_t>& tfLiteDelegateShape,
+                        const std::vector<int32_t>& armnnDelegateShape,
+                        const std::vector<int32_t>& expectedOutputShape)
 {
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[outputIndex];
-    auto tfLiteDelegateOutputTensor = tfLiteInterpreter->tensor(tfLiteDelegateOutputId);
-    auto tfLiteDelegateOutputData = tfLiteInterpreter->typed_tensor<TfLiteFloat16>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[outputIndex];
-    auto armnnDelegateOutputTensor = armnnDelegateInterpreter->tensor(armnnDelegateOutputId);
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<TfLiteFloat16>(armnnDelegateOutputId);
-
-        CHECK(expectedOutputShape.size() == tfLiteDelegateOutputTensor->dims->size);
-        CHECK(expectedOutputShape.size() == armnnDelegateOutputTensor->dims->size);
+    CHECK(expectedOutputShape.size() == tfLiteDelegateShape.size());
+    CHECK(expectedOutputShape.size() == armnnDelegateShape.size());
 
     for (size_t i = 0; i < expectedOutputShape.size(); i++)
     {
-        CHECK(armnnDelegateOutputTensor->dims->data[i] == expectedOutputShape[i]);
-        CHECK(tfLiteDelegateOutputTensor->dims->data[i] == expectedOutputShape[i]);
-        CHECK(tfLiteDelegateOutputTensor->dims->data[i] == armnnDelegateOutputTensor->dims->data[i]);
-    }
-
-    armnnDelegate::CompareData(armnnDelegateOutputData, expectedOutputValues.data(), expectedOutputValues.size());
-    armnnDelegate::CompareData(tfLiteDelegateOutputData, expectedOutputValues.data(), expectedOutputValues.size());
-    armnnDelegate::CompareData(tfLiteDelegateOutputData, armnnDelegateOutputData, expectedOutputValues.size());
-}
-
-template <>
-void FillInput<Half>(std::unique_ptr<tflite::Interpreter>& interpreter, int inputIndex, std::vector<Half>& inputValues)
-{
-    auto tfLiteDelegateInputId = interpreter->inputs()[inputIndex];
-    auto tfLiteDelageInputData = interpreter->typed_tensor<TfLiteFloat16>(tfLiteDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        tfLiteDelageInputData[i].data = half_float::detail::float2half<std::round_indeterminate, float>(inputValues[i]);
-
+        CHECK(expectedOutputShape[i] == armnnDelegateShape[i]);
+        CHECK(tfLiteDelegateShape[i] == expectedOutputShape[i]);
+        CHECK(tfLiteDelegateShape[i] == armnnDelegateShape[i]);
     }
 }
 

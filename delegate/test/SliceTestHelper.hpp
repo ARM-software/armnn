@@ -8,18 +8,15 @@
 #include "TestUtils.hpp"
 
 #include <armnn_delegate.hpp>
-#include <armnn/DescriptorsFwd.hpp>
+#include <DelegateTestInterpreter.hpp>
 
 #include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
 #include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-#include <schema_generated.h>
 #include <tensorflow/lite/version.h>
 
-#include <doctest/doctest.h>
+#include <schema_generated.h>
 
-#include <string>
+#include <doctest/doctest.h>
 
 namespace
 {
@@ -110,7 +107,7 @@ std::vector<char> CreateSliceTfLiteModel(tflite::TensorType tensorType,
                     modelDescription,
                     flatBufferBuilder.CreateVector(buffers, 5));
 
-    flatBufferBuilder.Finish(flatbufferModel);
+    flatBufferBuilder.Finish(flatbufferModel, armnnDelegate::FILE_IDENTIFIER);
 
     return std::vector<char>(flatBufferBuilder.GetBufferPointer(),
                              flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
@@ -127,7 +124,7 @@ void SliceTestImpl(std::vector<armnn::BackendId>& backends,
                    std::vector<int32_t>& sizeTensorShape,
                    std::vector<int32_t>& outputTensorShape)
 {
-    using namespace tflite;
+    using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateSliceTfLiteModel(
         ::tflite::TensorType_FLOAT32,
         inputTensorShape,
@@ -137,47 +134,27 @@ void SliceTestImpl(std::vector<armnn::BackendId>& backends,
         sizeTensorShape,
         outputTensorShape);
 
-    auto tfLiteModel = GetModel(modelBuffer.data());
+    // Setup interpreter with just TFLite Runtime.
+    auto tfLiteInterpreter = DelegateTestInterpreter(modelBuffer);
+    CHECK(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
+    CHECK(tfLiteInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
+    CHECK(tfLiteInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       tfLiteOutputValues = tfLiteInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
-    // Create TfLite Interpreters
-    std::unique_ptr<Interpreter> armnnDelegate;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-        (&armnnDelegate) == kTfLiteOk);
-    CHECK(armnnDelegate != nullptr);
-    CHECK(armnnDelegate->AllocateTensors() == kTfLiteOk);
+    // Setup interpreter with Arm NN Delegate applied.
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
+    CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
+    CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       armnnOutputValues = armnnInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> armnnOutputShape  = armnnInterpreter.GetOutputShape(0);
 
-    std::unique_ptr<Interpreter> tfLiteDelegate;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-        (&tfLiteDelegate) == kTfLiteOk);
-    CHECK(tfLiteDelegate != nullptr);
-    CHECK(tfLiteDelegate->AllocateTensors() == kTfLiteOk);
+    armnnDelegate::CompareOutputData<T>(tfLiteOutputValues, armnnOutputValues, expectedOutputValues);
+    armnnDelegate::CompareOutputShape(tfLiteOutputShape, armnnOutputShape, outputTensorShape);
 
-    // Create the ArmNN Delegate
-    armnnDelegate::DelegateOptions delegateOptions(backends);
-    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                         armnnDelegate::TfLiteArmnnDelegateDelete);
-    CHECK(theArmnnDelegate != nullptr);
-
-    // Modify armnnDelegateInterpreter to use armnnDelegate
-    CHECK(armnnDelegate->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
-
-    // Set input data
-    armnnDelegate::FillInput<T>(tfLiteDelegate, 0, inputValues);
-    armnnDelegate::FillInput<T>(armnnDelegate, 0, inputValues);
-
-    // Run EnqueWorkload
-    CHECK(tfLiteDelegate->Invoke() == kTfLiteOk);
-    CHECK(armnnDelegate->Invoke() == kTfLiteOk);
-
-    // Compare output data
-    armnnDelegate::CompareOutputData<T>(tfLiteDelegate,
-                                        armnnDelegate,
-                                        outputTensorShape,
-                                        expectedOutputValues);
-
-    tfLiteDelegate.reset(nullptr);
-    armnnDelegate.reset(nullptr);
+    tfLiteInterpreter.Cleanup();
+    armnnInterpreter.Cleanup();
 } // End of Slice Test
 
 } // anonymous namespace

@@ -8,15 +8,15 @@
 #include "TestUtils.hpp"
 
 #include <armnn_delegate.hpp>
+#include <DelegateTestInterpreter.hpp>
 
 #include <flatbuffers/flatbuffers.h>
 #include <flatbuffers/flexbuffers.h>
-#include <tensorflow/lite/interpreter.h>
-#include <tensorflow/lite/kernels/custom_ops_register.h>
 #include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-#include <schema_generated.h>
+#include <tensorflow/lite/kernels/custom_ops_register.h>
 #include <tensorflow/lite/version.h>
+
+#include <schema_generated.h>
 
 #include <doctest/doctest.h>
 
@@ -131,7 +131,7 @@ std::vector<char> CreatePooling3dTfLiteModel(
                     modelDescription,
                     flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
 
-    flatBufferBuilder.Finish(flatbufferModel);
+    flatBufferBuilder.Finish(flatbufferModel, armnnDelegate::FILE_IDENTIFIER);
 
     return std::vector<char>(flatBufferBuilder.GetBufferPointer(),
                              flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
@@ -156,7 +156,7 @@ void Pooling3dTest(std::string poolType,
                    float quantScale = 1.0f,
                    int quantOffset = 0)
 {
-    using namespace tflite;
+    using namespace delegateTestInterpreter;
     // Create the single op model buffer
     std::vector<char> modelBuffer = CreatePooling3dTfLiteModel(poolType,
                                                                tensorType,
@@ -173,79 +173,37 @@ void Pooling3dTest(std::string poolType,
                                                                quantScale,
                                                                quantOffset);
 
-    const Model* tfLiteModel = GetModel(modelBuffer.data());
-    CHECK(tfLiteModel != nullptr);
-    // Create TfLite Interpreters
-    std::unique_ptr<Interpreter> armnnDelegateInterpreter;
-
-    // Custom ops need to be added to the BuiltinOp resolver before the interpreter is created
-    // Based on the poolType from the test case add the custom operator using the name and the tflite
-    // registration function
-    tflite::ops::builtin::BuiltinOpResolver armnn_op_resolver;
+    std::string opType = "";
     if (poolType == "kMax")
     {
-        armnn_op_resolver.AddCustom("MaxPool3D", tflite::ops::custom::Register_MAX_POOL_3D());
+        opType = "MaxPool3D";
     }
     else
     {
-        armnn_op_resolver.AddCustom("AveragePool3D", tflite::ops::custom::Register_AVG_POOL_3D());
+        opType = "AveragePool3D";
     }
 
-    CHECK(InterpreterBuilder(tfLiteModel, armnn_op_resolver)
-              (&armnnDelegateInterpreter) == kTfLiteOk);
-    CHECK(armnnDelegateInterpreter != nullptr);
-    CHECK(armnnDelegateInterpreter->AllocateTensors() == kTfLiteOk);
+    // Setup interpreter with just TFLite Runtime.
+    auto tfLiteInterpreter = DelegateTestInterpreter(modelBuffer, opType);
+    CHECK(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
+    CHECK(tfLiteInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
+    CHECK(tfLiteInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       tfLiteOutputValues = tfLiteInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
-    std::unique_ptr<Interpreter> tfLiteInterpreter;
+    // Setup interpreter with Arm NN Delegate applied.
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends, opType);
+    CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
+    CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
+    CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       armnnOutputValues = armnnInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> armnnOutputShape  = armnnInterpreter.GetOutputShape(0);
 
-    // Custom ops need to be added to the BuiltinOp resolver before the interpreter is created
-    // Based on the poolType from the test case add the custom operator using the name and the tflite
-    // registration function
-    tflite::ops::builtin::BuiltinOpResolver tflite_op_resolver;
-    if (poolType == "kMax")
-    {
-        tflite_op_resolver.AddCustom("MaxPool3D", tflite::ops::custom::Register_MAX_POOL_3D());
-    }
-    else
-    {
-        tflite_op_resolver.AddCustom("AveragePool3D", tflite::ops::custom::Register_AVG_POOL_3D());
-    }
+    armnnDelegate::CompareOutputData<T>(tfLiteOutputValues, armnnOutputValues, expectedOutputValues);
+    armnnDelegate::CompareOutputShape(tfLiteOutputShape, armnnOutputShape, outputShape);
 
-    CHECK(InterpreterBuilder(tfLiteModel, tflite_op_resolver)
-              (&tfLiteInterpreter) == kTfLiteOk);
-    CHECK(tfLiteInterpreter != nullptr);
-    CHECK(tfLiteInterpreter->AllocateTensors() == kTfLiteOk);
-
-    // Create the ArmNN Delegate
-    armnnDelegate::DelegateOptions delegateOptions(backends);
-    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                         armnnDelegate::TfLiteArmnnDelegateDelete);
-    CHECK(theArmnnDelegate != nullptr);
-
-    // Modify armnnDelegateInterpreter to use armnnDelegate
-    CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
-
-    // Set input data
-    auto tfLiteDelegateInputId = tfLiteInterpreter->inputs()[0];
-    auto tfLiteDelegateInputData = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        tfLiteDelegateInputData[i] = inputValues[i];
-    }
-
-    auto armnnDelegateInputId = armnnDelegateInterpreter->inputs()[0];
-    auto armnnDelegateInputData = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInputId);
-    for (unsigned int i = 0; i < inputValues.size(); ++i)
-    {
-        armnnDelegateInputData[i] = inputValues[i];
-    }
-
-    // Run EnqueueWorkload
-    CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
-    CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
-
-    armnnDelegate::CompareOutputData(tfLiteInterpreter, armnnDelegateInterpreter, outputShape, expectedOutputValues);
+    tfLiteInterpreter.Cleanup();
+    armnnInterpreter.Cleanup();
 }
 
 // Function to create the flexbuffer custom options for the custom pooling3d operator.

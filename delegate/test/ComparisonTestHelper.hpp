@@ -8,13 +8,13 @@
 #include "TestUtils.hpp"
 
 #include <armnn_delegate.hpp>
+#include <DelegateTestInterpreter.hpp>
 
 #include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
 #include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-#include <schema_generated.h>
 #include <tensorflow/lite/version.h>
+
+#include <schema_generated.h>
 
 #include <doctest/doctest.h>
 
@@ -141,7 +141,7 @@ std::vector<char> CreateComparisonTfLiteModel(tflite::BuiltinOperator comparison
                     modelDescription,
                     flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
 
-    flatBufferBuilder.Finish(flatbufferModel);
+    flatBufferBuilder.Finish(flatbufferModel, armnnDelegate::FILE_IDENTIFIER);
 
     return std::vector<char>(flatBufferBuilder.GetBufferPointer(),
                              flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
@@ -160,7 +160,7 @@ void ComparisonTest(tflite::BuiltinOperator comparisonOperatorCode,
                     float quantScale = 1.0f,
                     int quantOffset  = 0)
 {
-    using namespace tflite;
+    using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateComparisonTfLiteModel(comparisonOperatorCode,
                                                                 tensorType,
                                                                 input0Shape,
@@ -169,70 +169,32 @@ void ComparisonTest(tflite::BuiltinOperator comparisonOperatorCode,
                                                                 quantScale,
                                                                 quantOffset);
 
-    const Model* tfLiteModel = GetModel(modelBuffer.data());
-    // Create TfLite Interpreters
-    std::unique_ptr<Interpreter> armnnDelegateInterpreter;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&armnnDelegateInterpreter) == kTfLiteOk);
-    CHECK(armnnDelegateInterpreter != nullptr);
-    CHECK(armnnDelegateInterpreter->AllocateTensors() == kTfLiteOk);
+    // Setup interpreter with just TFLite Runtime.
+    auto tfLiteInterpreter = DelegateTestInterpreter(modelBuffer);
+    CHECK(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
+    CHECK(tfLiteInterpreter.FillInputTensor<T>(input0Values, 0) == kTfLiteOk);
+    CHECK(tfLiteInterpreter.FillInputTensor<T>(input1Values, 1) == kTfLiteOk);
+    CHECK(tfLiteInterpreter.Invoke() == kTfLiteOk);
+    std::vector<bool>    tfLiteOutputValues = tfLiteInterpreter.GetOutputResult(0);
+    std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
-    std::unique_ptr<Interpreter> tfLiteInterpreter;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&tfLiteInterpreter) == kTfLiteOk);
-    CHECK(tfLiteInterpreter != nullptr);
-    CHECK(tfLiteInterpreter->AllocateTensors() == kTfLiteOk);
+    // Setup interpreter with Arm NN Delegate applied.
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
+    CHECK(armnnInterpreter.FillInputTensor<T>(input0Values, 0) == kTfLiteOk);
+    CHECK(armnnInterpreter.FillInputTensor<T>(input1Values, 1) == kTfLiteOk);
+    CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
+    std::vector<bool>    armnnOutputValues = armnnInterpreter.GetOutputResult(0);
+    std::vector<int32_t> armnnOutputShape  = armnnInterpreter.GetOutputShape(0);
 
-    // Create the ArmNN Delegate
-    armnnDelegate::DelegateOptions delegateOptions(backends);
-    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-        theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                         armnnDelegate::TfLiteArmnnDelegateDelete);
-    CHECK(theArmnnDelegate != nullptr);
-    // Modify armnnDelegateInterpreter to use armnnDelegate
-    CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
+    armnnDelegate::CompareData(expectedOutputValues, armnnOutputValues, expectedOutputValues.size());
+    armnnDelegate::CompareData(expectedOutputValues, tfLiteOutputValues, expectedOutputValues.size());
+    armnnDelegate::CompareData(tfLiteOutputValues, armnnOutputValues, expectedOutputValues.size());
 
-    // Set input data
-    auto tfLiteDelegateInput0Id = tfLiteInterpreter->inputs()[0];
-    auto tfLiteDelageInput0Data = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInput0Id);
-    for (unsigned int i = 0; i < input0Values.size(); ++i)
-    {
-        tfLiteDelageInput0Data[i] = input0Values[i];
-    }
+    armnnDelegate::CompareOutputShape(tfLiteOutputShape, armnnOutputShape, outputShape);
 
-    auto tfLiteDelegateInput1Id = tfLiteInterpreter->inputs()[1];
-    auto tfLiteDelageInput1Data = tfLiteInterpreter->typed_tensor<T>(tfLiteDelegateInput1Id);
-    for (unsigned int i = 0; i < input1Values.size(); ++i)
-    {
-        tfLiteDelageInput1Data[i] = input1Values[i];
-    }
-
-    auto armnnDelegateInput0Id = armnnDelegateInterpreter->inputs()[0];
-    auto armnnDelegateInput0Data = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInput0Id);
-    for (unsigned int i = 0; i < input0Values.size(); ++i)
-    {
-        armnnDelegateInput0Data[i] = input0Values[i];
-    }
-
-    auto armnnDelegateInput1Id = armnnDelegateInterpreter->inputs()[1];
-    auto armnnDelegateInput1Data = armnnDelegateInterpreter->typed_tensor<T>(armnnDelegateInput1Id);
-    for (unsigned int i = 0; i < input1Values.size(); ++i)
-    {
-        armnnDelegateInput1Data[i] = input1Values[i];
-    }
-
-    // Run EnqueWorkload
-    CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
-    CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
-    // Compare output data
-    auto tfLiteDelegateOutputId = tfLiteInterpreter->outputs()[0];
-    auto tfLiteDelageOutputData = tfLiteInterpreter->typed_tensor<bool>(tfLiteDelegateOutputId);
-    auto armnnDelegateOutputId = armnnDelegateInterpreter->outputs()[0];
-    auto armnnDelegateOutputData = armnnDelegateInterpreter->typed_tensor<bool>(armnnDelegateOutputId);
-
-    armnnDelegate::CompareData(expectedOutputValues  , armnnDelegateOutputData, expectedOutputValues.size());
-    armnnDelegate::CompareData(expectedOutputValues  , tfLiteDelageOutputData , expectedOutputValues.size());
-    armnnDelegate::CompareData(tfLiteDelageOutputData, armnnDelegateOutputData, expectedOutputValues.size());
+    tfLiteInterpreter.Cleanup();
+    armnnInterpreter.Cleanup();
 }
 
 } // anonymous namespace

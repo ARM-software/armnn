@@ -8,13 +8,13 @@
 #include "TestUtils.hpp"
 
 #include <armnn_delegate.hpp>
+#include <DelegateTestInterpreter.hpp>
 
 #include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
 #include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-#include <schema_generated.h>
 #include <tensorflow/lite/version.h>
+
+#include <schema_generated.h>
 
 #include <doctest/doctest.h>
 
@@ -159,7 +159,7 @@ std::vector<char> CreateFullyConnectedTfLiteModel(tflite::TensorType tensorType,
                     modelDescription,
                     flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
 
-    flatBufferBuilder.Finish(flatbufferModel);
+    flatBufferBuilder.Finish(flatbufferModel, armnnDelegate::FILE_IDENTIFIER);
 
     return std::vector<char>(flatBufferBuilder.GetBufferPointer(),
                              flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
@@ -180,7 +180,7 @@ void FullyConnectedTest(std::vector<armnn::BackendId>& backends,
                         float quantScale = 1.0f,
                         int quantOffset  = 0)
 {
-    using namespace tflite;
+    using namespace delegateTestInterpreter;
 
     std::vector<char> modelBuffer = CreateFullyConnectedTfLiteModel(tensorType,
                                                                     activationType,
@@ -192,64 +192,50 @@ void FullyConnectedTest(std::vector<armnn::BackendId>& backends,
                                                                     constantWeights,
                                                                     quantScale,
                                                                     quantOffset);
-    const Model* tfLiteModel = GetModel(modelBuffer.data());
 
-    // Create TfLite Interpreters
-    std::unique_ptr<Interpreter> armnnDelegateInterpreter;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&armnnDelegateInterpreter) == kTfLiteOk);
-    CHECK(armnnDelegateInterpreter != nullptr);
-    CHECK(armnnDelegateInterpreter->AllocateTensors() == kTfLiteOk);
+    // Setup interpreter with just TFLite Runtime.
+    auto tfLiteInterpreter = DelegateTestInterpreter(modelBuffer);
+    CHECK(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
 
-    std::unique_ptr<Interpreter> tfLiteInterpreter;
-    CHECK(InterpreterBuilder(tfLiteModel, ::tflite::ops::builtin::BuiltinOpResolver())
-              (&tfLiteInterpreter) == kTfLiteOk);
-    CHECK(tfLiteInterpreter != nullptr);
-    CHECK(tfLiteInterpreter->AllocateTensors() == kTfLiteOk);
+    // Setup interpreter with Arm NN Delegate applied.
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
 
-    // Create the ArmNN Delegate
-    armnnDelegate::DelegateOptions delegateOptions(backends);
-    std::unique_ptr<TfLiteDelegate, decltype(&armnnDelegate::TfLiteArmnnDelegateDelete)>
-    theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
-                     armnnDelegate::TfLiteArmnnDelegateDelete);
-    CHECK(theArmnnDelegate != nullptr);
-
-    // Modify armnnDelegateInterpreter to use armnnDelegate
-    CHECK(armnnDelegateInterpreter->ModifyGraphWithDelegate(theArmnnDelegate.get()) == kTfLiteOk);
-
-    // Set input data
-    armnnDelegate::FillInput<T>(tfLiteInterpreter, 0, inputValues);
-    armnnDelegate::FillInput<T>(armnnDelegateInterpreter, 0, inputValues);
+    CHECK(tfLiteInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
+    CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
 
     if (!constantWeights)
     {
-        armnnDelegate::FillInput<T>(tfLiteInterpreter, 1, weightsData);
-        armnnDelegate::FillInput<T>(armnnDelegateInterpreter, 1, weightsData);
+        CHECK(tfLiteInterpreter.FillInputTensor<T>(weightsData, 1) == kTfLiteOk);
+        CHECK(armnnInterpreter.FillInputTensor<T>(weightsData, 1) == kTfLiteOk);
 
         if (tensorType == ::tflite::TensorType_INT8)
         {
             std::vector <int32_t> biasData = {10};
-            armnnDelegate::FillInput<int32_t>(tfLiteInterpreter, 2, biasData);
-            armnnDelegate::FillInput<int32_t>(armnnDelegateInterpreter, 2, biasData);
+            CHECK(tfLiteInterpreter.FillInputTensor<int32_t>(biasData, 2) == kTfLiteOk);
+            CHECK(armnnInterpreter.FillInputTensor<int32_t>(biasData, 2) == kTfLiteOk);
         }
         else
         {
             std::vector<float> biasData = {10};
-            armnnDelegate::FillInput<float>(tfLiteInterpreter, 2, biasData);
-            armnnDelegate::FillInput<float>(armnnDelegateInterpreter, 2, biasData);
+            CHECK(tfLiteInterpreter.FillInputTensor<float>(biasData, 2) == kTfLiteOk);
+            CHECK(armnnInterpreter.FillInputTensor<float>(biasData, 2) == kTfLiteOk);
         }
     }
 
-    // Run EnqueWorkload
-    CHECK(tfLiteInterpreter->Invoke() == kTfLiteOk);
-    CHECK(armnnDelegateInterpreter->Invoke() == kTfLiteOk);
+    CHECK(tfLiteInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       tfLiteOutputValues = tfLiteInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
-    // Compare output data
-    armnnDelegate::CompareOutputData<T>(tfLiteInterpreter,
-                                        armnnDelegateInterpreter,
-                                        outputTensorShape,
-                                        expectedOutputValues);
-    armnnDelegateInterpreter.reset(nullptr);
+    CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       armnnOutputValues = armnnInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> armnnOutputShape  = armnnInterpreter.GetOutputShape(0);
+
+    armnnDelegate::CompareOutputData<T>(tfLiteOutputValues, armnnOutputValues, expectedOutputValues);
+    armnnDelegate::CompareOutputShape(tfLiteOutputShape, armnnOutputShape, outputTensorShape);
+
+    tfLiteInterpreter.Cleanup();
+    armnnInterpreter.Cleanup();
 }
 
 } // anonymous namespace

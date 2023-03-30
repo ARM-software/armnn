@@ -27,15 +27,15 @@ void LogicalBinaryAndBoolTest(std::vector<armnn::BackendId>& backends)
     std::vector<bool> input1Values { 0, 1, 0, 1 };
     std::vector<bool> expectedOutputValues { 0, 0, 0, 1 };
 
-    LogicalBinaryTest<bool>(tflite::BuiltinOperator_LOGICAL_AND,
-                            ::tflite::TensorType_BOOL,
-                            backends,
-                            input0Shape,
-                            input1Shape,
-                            expectedOutputShape,
-                            input0Values,
-                            input1Values,
-                            expectedOutputValues);
+    LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_AND,
+                      ::tflite::TensorType_BOOL,
+                      backends,
+                      input0Shape,
+                      input1Shape,
+                      expectedOutputShape,
+                      input0Values,
+                      input1Values,
+                      expectedOutputValues);
 }
 
 void LogicalBinaryAndBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -48,15 +48,15 @@ void LogicalBinaryAndBroadcastTest(std::vector<armnn::BackendId>& backends)
     std::vector<bool> input1Values { 1 };
     std::vector<bool> expectedOutputValues { 0, 1, 0, 1 };
 
-    LogicalBinaryTest<bool>(tflite::BuiltinOperator_LOGICAL_AND,
-                            ::tflite::TensorType_BOOL,
-                            backends,
-                            input0Shape,
-                            input1Shape,
-                            expectedOutputShape,
-                            input0Values,
-                            input1Values,
-                            expectedOutputValues);
+    LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_AND,
+                      ::tflite::TensorType_BOOL,
+                      backends,
+                      input0Shape,
+                      input1Shape,
+                      expectedOutputShape,
+                      input0Values,
+                      input1Values,
+                      expectedOutputValues);
 }
 
 void LogicalBinaryOrBoolTest(std::vector<armnn::BackendId>& backends)
@@ -69,15 +69,15 @@ void LogicalBinaryOrBoolTest(std::vector<armnn::BackendId>& backends)
     std::vector<bool> input1Values { 0, 1, 0, 1 };
     std::vector<bool> expectedOutputValues { 0, 1, 1, 1 };
 
-    LogicalBinaryTest<bool>(tflite::BuiltinOperator_LOGICAL_OR,
-                            ::tflite::TensorType_BOOL,
-                            backends,
-                            input0Shape,
-                            input1Shape,
-                            expectedOutputShape,
-                            input0Values,
-                            input1Values,
-                            expectedOutputValues);
+    LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_OR,
+                      ::tflite::TensorType_BOOL,
+                      backends,
+                      input0Shape,
+                      input1Shape,
+                      expectedOutputShape,
+                      input0Values,
+                      input1Values,
+                      expectedOutputValues);
 }
 
 void LogicalBinaryOrBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -90,15 +90,15 @@ void LogicalBinaryOrBroadcastTest(std::vector<armnn::BackendId>& backends)
     std::vector<bool> input1Values { 1 };
     std::vector<bool> expectedOutputValues { 1, 1, 1, 1 };
 
-    LogicalBinaryTest<bool>(tflite::BuiltinOperator_LOGICAL_OR,
-                            ::tflite::TensorType_BOOL,
-                            backends,
-                            input0Shape,
-                            input1Shape,
-                            expectedOutputShape,
-                            input0Values,
-                            input1Values,
-                            expectedOutputValues);
+    LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_OR,
+                      ::tflite::TensorType_BOOL,
+                      backends,
+                      input0Shape,
+                      input1Shape,
+                      expectedOutputShape,
+                      input0Values,
+                      input1Values,
+                      expectedOutputValues);
 }
 
 // LogicalNot operator uses ElementwiseUnary unary layer and descriptor but is still classed as logical operator.

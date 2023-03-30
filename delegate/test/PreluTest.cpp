@@ -18,7 +18,8 @@
 
 namespace armnnDelegate {
 
-void PreluFloatSimpleTest(std::vector <armnn::BackendId>& backends, bool isAlphaConst, bool isDynamicOutput = false) {
+void PreluFloatSimpleTest(std::vector <armnn::BackendId>& backends, bool isAlphaConst, bool isDynamicOutput = false)
+{
     std::vector<int32_t> inputShape { 1, 2, 3 };
     std::vector<int32_t> alphaShape { 1 };
     std::vector<int32_t> outputShape { 1, 2, 3 };

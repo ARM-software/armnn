@@ -30,7 +30,6 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsReduceFp32ToFp16")
         armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
         DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
-                                  backends,
                                   tensorShape,
                                   inputData,
                                   inputData,
@@ -60,7 +59,6 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebug")
         armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
         DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
-                                  backends,
                                   tensorShape,
                                   inputData,
                                   inputData,
@@ -104,7 +102,6 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebugFunction")
     CHECK(!callback);
 
     DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
-                              backends,
                               tensorShape,
                               inputData,
                               inputData,
@@ -118,7 +115,7 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsDebugFunction")
 
 TEST_CASE ("ArmnnDelegateOptimizerOptionsImport")
 {
-    std::vector<armnn::BackendId> backends = {  armnn::Compute::CpuAcc, armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     std::vector<int32_t> tensorShape { 1, 2, 2, 1 };
     std::vector<uint8_t> inputData = { 1, 2, 3, 4 };
     std::vector<uint8_t> divData = { 2, 2, 3, 4 };
@@ -128,7 +125,6 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsImport")
     armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
     DelegateOptionTest<uint8_t>(::tflite::TensorType_UINT8,
-                                backends,
                                 tensorShape,
                                 inputData,
                                 inputData,
@@ -164,7 +160,6 @@ TEST_CASE ("ArmnnDelegateStringParsingOptionDisableTfLiteRuntimeFallback")
 
     armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(), num_options, nullptr);
     DelegateOptionNoFallbackTest<float>(::tflite::TensorType_FLOAT32,
-                                        backends,
                                         tensorShape,
                                         inputData,
                                         expectedResult,
@@ -200,7 +195,6 @@ TEST_CASE ("ArmnnDelegateStringParsingOptionEnableTfLiteRuntimeFallback")
 
     armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(), num_options, nullptr);
     DelegateOptionNoFallbackTest<float>(::tflite::TensorType_FLOAT32,
-                                        backends,
                                         tensorShape,
                                         inputData,
                                         expectedResult,
@@ -237,7 +231,6 @@ TEST_CASE ("ArmnnDelegateModelOptions_CpuAcc_Test")
     armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
 
     DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
-                              backends,
                               tensorShape,
                               inputData,
                               inputData,
@@ -268,7 +261,6 @@ TEST_CASE ("ArmnnDelegateSerializeToDot")
         // Enable serialize to dot by specifying the target file name.
         delegateOptions.SetSerializeToDot(filename);
         DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
-                                  backends,
                                   tensorShape,
                                   inputData,
                                   inputData,
@@ -309,7 +301,6 @@ void CreateFp16StringParsingTestRun(std::vector<std::string>& keys,
 
     armnnDelegate::DelegateOptions delegateOptions(options_keys.get(), options_values.get(), num_options, nullptr);
     DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
-                              backends,
                               tensorShape,
                               inputData,
                               inputData,

@@ -143,6 +143,9 @@ if(BUILD_UNIT_TESTS AND BUILD_CLASSIC_DELEGATE)
         test/ConvolutionTestHelper.hpp
         test/DelegateOptionsTest.cpp
         test/DelegateOptionsTestHelper.hpp
+        classic/src/test/DelegateTestInterpreter.cpp
+        common/src/test/DelegateTestInterpreter.hpp
+        common/src/test/DelegateTestInterpreterUtils.hpp
         test/DepthwiseConvolution2dTest.cpp
         test/ElementwiseBinaryTest.cpp
         test/ElementwiseBinaryTestHelper.hpp
@@ -236,6 +239,7 @@ if(BUILD_UNIT_TESTS AND BUILD_CLASSIC_DELEGATE)
         add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
 
         target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/common/src/test")
 
         # Add half library from armnn third-party libraries
         target_link_libraries(DelegateUnitTests PRIVATE thirdparty_headers)

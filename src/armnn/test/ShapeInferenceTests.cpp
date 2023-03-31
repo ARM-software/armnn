@@ -181,9 +181,7 @@ TEST_CASE("AbsTest")
 
 TEST_CASE("AdditionTest")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     CreateGraphAndRunTest<AdditionLayer>({{ 5, 7, 6, 2 }, { 5, 7, 6, 2 }}, {{ 5, 7, 6, 2 }}, "add");
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("ArgMinMaxTest")

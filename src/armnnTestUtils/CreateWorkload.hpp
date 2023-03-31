@@ -174,9 +174,8 @@ std::unique_ptr<WorkloadType> CreateSubtractionWithBlobWorkloadTest(armnn::IWork
                                                                     armnn::Graph& graph)
 {
     // Creates the layer we're testing.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    auto* const layer = graph.AddLayer<SubtractionLayer>("layer");
-    ARMNN_NO_DEPRECATE_WARN_END
+    SubtractionLayer* const layer = graph.AddLayer<SubtractionLayer>("layer");
+
     auto activationDesc = std::make_shared<ActivationDescriptor>();
     activationDesc->m_A        = 10.0f;
     activationDesc->m_B        = 5.0f;
@@ -234,9 +233,8 @@ std::unique_ptr<WorkloadType> CreateMultiplicationWithBlobWorkloadTest(armnn::IW
                                                                        armnn::Graph& graph)
 {
     // Creates the layer we're testing.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    auto* const layer = graph.AddLayer<MultiplicationLayer>("layer");
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
+    MultiplicationLayer* const layer = graph.AddLayer<MultiplicationLayer>("layer");
+
     auto activationDesc = std::make_shared<ActivationDescriptor>();
     activationDesc->m_A        = 10.0f;
     activationDesc->m_B        = 5.0f;
@@ -291,9 +289,8 @@ std::unique_ptr<WorkloadType> CreateAdditionWithBlobWorkloadTest(armnn::IWorkloa
                                                                  armnn::Graph& graph)
 {
     // Creates the layer we're testing.
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    auto* const layer = graph.AddLayer<AdditionLayer>("layer");
-    ARMNN_NO_DEPRECATE_WARN_END
+    AdditionLayer* const layer = graph.AddLayer<AdditionLayer>("layer");
+
     auto activationDesc = std::make_shared<ActivationDescriptor>();
     activationDesc->m_A        = 10.0f;
     activationDesc->m_B        = 5.0f;

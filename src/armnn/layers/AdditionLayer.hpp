@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,8 +10,7 @@
 namespace armnn
 {
 /// This layer represents an addition operation.
-class ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use ElementwiseBinaryLayer instead.", "24.02")
-      AdditionLayer : public ElementwiseBaseLayer
+class AdditionLayer : public ElementwiseBaseLayer
 {
 public:
     /// Makes a workload for the Addition type.

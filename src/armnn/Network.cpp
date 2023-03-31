@@ -213,16 +213,12 @@ IConnectableLayer* INetwork::AddMergeLayer(const char* name)
 
 IConnectableLayer* INetwork::AddAdditionLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return pNetworkImpl->AddAdditionLayer(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* INetwork::AddMultiplicationLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return pNetworkImpl->AddMultiplicationLayer(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* INetwork::AddBatchNormalizationLayer(const BatchNormalizationDescriptor& desc,
@@ -312,23 +308,17 @@ IConnectableLayer* INetwork::AddLstmLayer(const LstmDescriptor& descriptor,
 
 IConnectableLayer* INetwork::AddDivisionLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return pNetworkImpl->AddDivisionLayer(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* INetwork::AddSubtractionLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return pNetworkImpl->AddSubtractionLayer(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* INetwork::AddMaximumLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return pNetworkImpl->AddMaximumLayer(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* INetwork::AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name)
@@ -355,9 +345,7 @@ IConnectableLayer* INetwork::AddStridedSliceLayer(const StridedSliceDescriptor& 
 
 IConnectableLayer* INetwork::AddMinimumLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return pNetworkImpl->AddMinimumLayer(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* INetwork::AddGatherLayer(const GatherDescriptor& descriptor,
@@ -1996,30 +1984,22 @@ IConnectableLayer* NetworkImpl::AddSplitterLayer(const ViewsDescriptor& splitter
 
 IConnectableLayer* NetworkImpl::AddMaximumLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return m_Graph->AddLayer<MaximumLayer>(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* NetworkImpl::AddMinimumLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return m_Graph->AddLayer<MinimumLayer>(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* NetworkImpl::AddAdditionLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return m_Graph->AddLayer<AdditionLayer>(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* NetworkImpl::AddMultiplicationLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return m_Graph->AddLayer<MultiplicationLayer>(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* NetworkImpl::AddOutputLayer(LayerBindingId id, const char* name)
@@ -2258,16 +2238,12 @@ IConnectableLayer* NetworkImpl::AddLstmLayer(const LstmDescriptor&  descriptor,
 
 IConnectableLayer* NetworkImpl::AddDivisionLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return m_Graph->AddLayer<DivisionLayer>(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* NetworkImpl::AddSubtractionLayer(const char* name)
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return m_Graph->AddLayer<SubtractionLayer>(name);
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 IConnectableLayer* NetworkImpl::AddMeanLayer(const MeanDescriptor& meanDescriptor, const char* name)

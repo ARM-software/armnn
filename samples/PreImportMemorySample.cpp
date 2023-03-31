@@ -31,9 +31,7 @@ int main()
     armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
     auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
     auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer = testNetwork->AddAdditionLayer("add layer");
-    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
 
     // Set the tensors in the network.

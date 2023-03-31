@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,12 +27,10 @@ std::unique_ptr<IWorkload> SubtractionLayer::CreateWorkload(const IWorkloadFacto
     return factory.CreateWorkload(LayerType::Subtraction, descriptor, PrepInfoAndDesc(descriptor));
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
 SubtractionLayer* SubtractionLayer::Clone(Graph& graph) const
 {
     return CloneBase<SubtractionLayer>(graph, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 void SubtractionLayer::ExecuteStrategy(IStrategy& strategy) const
 {

@@ -1054,7 +1054,7 @@ TEST_CASE("MultiInputSingleOutput")
     auto layerX2 = graph.AddLayer<InputLayer>(1, "layerX2");
     auto layerM1 = graph.AddLayer<ActivationLayer>(activationDefaults, "layerM1");
     auto layerM2 = graph.AddLayer<ActivationLayer>(activationDefaults, "layerM2");
-    auto layerM3 = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "layerM3");
+    auto layerM3 = graph.AddLayer<AdditionLayer>("layerM3");
     auto layerX3 = graph.AddLayer<OutputLayer>(0, "layerX3");
 
     //  X1  X2
@@ -1081,7 +1081,7 @@ TEST_CASE("MultiInputSingleOutput")
                     [](const Layer & l)
                     {
                         bool toSelect = (l.GetType() == LayerType::Activation
-                                         || l.GetType() == LayerType::ElementwiseBinary);
+                                         || l.GetType() == LayerType::Addition);
                         return toSelect;
                     });
 
@@ -1772,7 +1772,7 @@ TEST_CASE("SubgraphCycles")
     auto m0 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "m0");
     auto x1 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "x1");
     auto m1 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "m1");
-    auto m2 = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "m2");
+    auto m2 = graph.AddLayer<AdditionLayer>("m2");
     auto x2 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "x2");
 
     x0->GetOutputSlot(0).Connect(m0->GetInputSlot(0));
@@ -1872,7 +1872,7 @@ TEST_CASE("SubgraphViewWorkingCopy")
 bool ReplaceConstantMultiplicationWithDepthwise(SubgraphView& subgraph,
                                                 IConnectableLayer* layer)
 {
-    if (layer->GetType() == LayerType::ElementwiseBinary)
+    if (layer->GetType() == LayerType::Multiplication)
     {
         IInputSlot* patternSubgraphInput = &layer->GetInputSlot(0);
         IInputSlot* patternSubgraphConstant = &layer->GetInputSlot(1);
@@ -1937,12 +1937,12 @@ bool ReplaceConstantMultiplicationWithDepthwise(SubgraphView& subgraph,
 bool ReplaceTestMultiplication(SubgraphView& subgraph,
                            IConnectableLayer* layer)
 {
-    if (layer->GetType() == LayerType::ElementwiseBinary)
+    if (layer->GetType() == LayerType::Multiplication)
     {
 
         switch (layer->GetType())
         {
-            case LayerType::ElementwiseBinary:
+            case LayerType::Multiplication:
                 return ReplaceConstantMultiplicationWithDepthwise(subgraph, layer);
                 break;
             default:
@@ -1993,7 +1993,7 @@ TEST_CASE("SubgraphViewWorkingCopyReplacementFunc")
     auto constant = graph.AddLayer<ConstantLayer>("const");
 
     constant->m_LayerOutput = std::make_shared<ScopedTensorHandle>(constTensor);
-    IConnectableLayer* mul      = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Mul,  "mul");
+    IConnectableLayer* mul      = graph.AddLayer<MultiplicationLayer>("mul");
     IConnectableLayer* output   = graph.AddLayer<OutputLayer>(0, "output");
 
     // Create connections between layers
@@ -2015,10 +2015,7 @@ TEST_CASE("SubgraphViewWorkingCopyReplacementFunc")
     // Check the WorkingCopy is as expected before replacement
     CHECK(workingCopy.GetIConnectableLayers().size() == 4);
     int idx=0;
-    LayerType expectedSorted[] = {LayerType::Input,
-                                  LayerType::Constant,
-                                  LayerType::ElementwiseBinary,
-                                  LayerType::Output};
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Constant, LayerType::Multiplication, LayerType::Output};
     workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
                                          {
                                              CHECK((expectedSorted[idx] == l->GetType()));
@@ -2212,7 +2209,7 @@ TEST_CASE("SubgraphViewWorkingCopyOptimizationViews")
     auto constant = graph.AddLayer<ConstantLayer>("const");
 
     constant->m_LayerOutput = std::make_shared<ScopedTensorHandle>(constTensor);
-    IConnectableLayer* mul      = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Mul,  "mul");
+    IConnectableLayer* mul      = graph.AddLayer<MultiplicationLayer>("mul");
     IConnectableLayer* output   = graph.AddLayer<OutputLayer>(0, "output");
 
     // Create connections between layers
@@ -2233,10 +2230,7 @@ TEST_CASE("SubgraphViewWorkingCopyOptimizationViews")
 
     // Check the WorkingCopy is as expected before replacement
     int idx=0;
-    LayerType expectedSorted[] = {LayerType::Input,
-                                  LayerType::Constant,
-                                  LayerType::ElementwiseBinary,
-                                  LayerType::Output};
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Constant, LayerType::Multiplication, LayerType::Output};
     workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
                                          {
                                              CHECK((expectedSorted[idx] == l->GetType()));
@@ -2291,7 +2285,7 @@ TEST_CASE("SubgraphViewWorkingCopyReplaceSlots")
     auto constant = graph.AddLayer<ConstantLayer>("const");
 
     constant->m_LayerOutput = std::make_shared<ScopedTensorHandle>(constTensor);
-    IConnectableLayer* mul      = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Mul,  "mul");
+    IConnectableLayer* mul      = graph.AddLayer<MultiplicationLayer>("mul");
     IConnectableLayer* output   = graph.AddLayer<OutputLayer>(0, "output");
 
     // Create connections between layers
@@ -2312,10 +2306,7 @@ TEST_CASE("SubgraphViewWorkingCopyReplaceSlots")
     // Check the WorkingCopy is as expected before replacement
     CHECK(workingCopy.GetIConnectableLayers().size() == 4);
     int idx=0;
-    LayerType expectedSorted[] = {LayerType::Input,
-                                  LayerType::Constant,
-                                  LayerType::ElementwiseBinary,
-                                  LayerType::Output};
+    LayerType expectedSorted[] = {LayerType::Input, LayerType::Constant, LayerType::Multiplication, LayerType::Output};
     workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
                                          {
                                              CHECK((expectedSorted[idx] == l->GetType()));
@@ -2355,7 +2346,7 @@ TEST_CASE("SubgraphViewWorkingCopyCloneInputAndOutputSlots")
     auto constant = graph.AddLayer<ConstantLayer>("const");
 
     constant->m_LayerOutput     = std::make_shared<ScopedTensorHandle>(constTensor);
-    IConnectableLayer* mul      = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Mul,  "mul");
+    IConnectableLayer* mul      = graph.AddLayer<MultiplicationLayer>("mul");
     armnn::ViewsDescriptor splitterDesc(2,4);
     IConnectableLayer* split    = graph.AddLayer<SplitterLayer>(splitterDesc, "split");
     IConnectableLayer* abs      = graph.AddLayer<ActivationLayer>(ActivationFunction::Abs, "abs");
@@ -2420,7 +2411,7 @@ TEST_CASE("SubgraphViewWorkingCopyCloneInputAndOutputSlots")
     CHECK(workingCopy.GetIConnectableLayers().size() == 4);
     int idx=0;
     LayerType expectedSorted[] = {LayerType::Constant,
-                                  LayerType::ElementwiseBinary,
+                                  LayerType::Multiplication,
                                   LayerType::Splitter,
                                   LayerType::Activation};
     workingCopy.ForEachIConnectableLayer([&idx, &expectedSorted](const IConnectableLayer* l)
@@ -2541,7 +2532,7 @@ TEST_CASE("MultipleInputMultipleOutputSlots_SubstituteGraph")
     Layer* convLayer = graph.AddLayer<Convolution2dLayer>(Convolution2dDescriptor(), "conv");
     Layer* reluLayer = graph.AddLayer<ActivationLayer>(ActivationDescriptor(), "activation");
     Layer* constLayer = graph.AddLayer<ConstantLayer>("const");
-    Layer* addLayer = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "add");
+    Layer* addLayer = graph.AddLayer<AdditionLayer>("add");
 
     Layer* outputLayer1 = graph.AddLayer<OutputLayer>(0, "output1");
     Layer* outputLayer2 = graph.AddLayer<OutputLayer>(1, "output2");
@@ -2592,7 +2583,7 @@ TEST_CASE("MultipleInputMultipleOutputSlots_SubstituteGraph")
 
         // GetWorkingCopy() has caused address pointer of convolution layer to change.
         // Finding new address pointer...
-        if (layer->GetType() == LayerType::ElementwiseBinary)
+        if (layer->GetType() == LayerType::Addition)
         {
             addCopyLayer = layer;
         }
@@ -2643,7 +2634,7 @@ TEST_CASE("MultipleInputMultipleOutputSlots_SubstituteGraphNewSlots")
     Layer* convLayer = graph.AddLayer<Convolution2dLayer>(Convolution2dDescriptor(), "conv");
     Layer* reluLayer = graph.AddLayer<ActivationLayer>(ActivationDescriptor(), "activation");
     Layer* constLayer = graph.AddLayer<ConstantLayer>("const");
-    Layer* addLayer = graph.AddLayer<ElementwiseBinaryLayer>(BinaryOperation::Add, "add");
+    Layer* addLayer = graph.AddLayer<AdditionLayer>("add");
 
     Layer* outputLayer1 = graph.AddLayer<OutputLayer>(0, "output1");
     Layer* outputLayer2 = graph.AddLayer<OutputLayer>(1, "output2");
@@ -2669,7 +2660,7 @@ TEST_CASE("MultipleInputMultipleOutputSlots_SubstituteGraphNewSlots")
     {
         // GetWorkingCopy() has caused address pointer of convolution layer to change.
         // Finding new address pointer...
-        if (layer->GetType() == LayerType::ElementwiseBinary)
+        if (layer->GetType() == LayerType::Addition)
         {
             addCopyLayer = layer;
         }

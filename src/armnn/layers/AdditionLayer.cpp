@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,12 +27,10 @@ std::unique_ptr<IWorkload> AdditionLayer::CreateWorkload(const IWorkloadFactory&
     return factory.CreateWorkload(LayerType::Addition, descriptor, PrepInfoAndDesc(descriptor));
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
 AdditionLayer* AdditionLayer::Clone(Graph& graph) const
 {
     return CloneBase<AdditionLayer>(graph, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 void AdditionLayer::ExecuteStrategy(IStrategy &strategy) const
 {

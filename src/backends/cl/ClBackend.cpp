@@ -461,7 +461,6 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                             }
                             else if (base.GetType() == LayerType::Addition)
                             {
-                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 AdditionLayer* baseLayer = PolymorphicDowncast<AdditionLayer*>(&base);
 
                                 arm_compute::Status status = ClAdditionValidate(
@@ -480,11 +479,9 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
-                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::Division)
                             {
-                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 DivisionLayer* baseLayer = PolymorphicDowncast<DivisionLayer*>(&base);
 
                                 arm_compute::Status status = ClDivisionWorkloadValidate(
@@ -503,11 +500,9 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
-                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::Multiplication)
                             {
-                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 MultiplicationLayer* baseLayer = PolymorphicDowncast<MultiplicationLayer*>(&base);
 
                                 arm_compute::Status status = ClMultiplicationWorkloadValidate(
@@ -526,11 +521,9 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
-                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::Subtraction)
                             {
-                                ARMNN_NO_DEPRECATE_WARN_BEGIN
                                 SubtractionLayer* baseLayer = PolymorphicDowncast<SubtractionLayer*>(&base);
 
                                 arm_compute::Status status = ClSubtractionValidate(
@@ -549,7 +542,6 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
-                                ARMNN_NO_DEPRECATE_WARN_END
                             }
                             else if (base.GetType() == LayerType::ElementwiseBinary)
                             {

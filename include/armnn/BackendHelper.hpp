@@ -42,7 +42,6 @@ public:
                                const ActivationDescriptor& descriptor,
                                Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsElementwiseBinarySupported instead", "24.02")
     bool IsAdditionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,
@@ -157,7 +156,6 @@ public:
             const Optional<TensorInfo>& biases,
             Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsElementwiseBinarySupported instead", "24.02")
     bool IsDivisionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,
@@ -246,7 +244,6 @@ public:
                          const LstmInputParamsInfo& paramsInfo,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsElementwiseBinarySupported instead", "24.02")
     bool IsMaximumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
@@ -270,13 +267,11 @@ public:
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsElementwiseBinarySupported instead", "24.02")
     bool IsMinimumSupported(const TensorInfo& input0,
                             const TensorInfo& input1,
                             const TensorInfo& output,
                             Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsElementwiseBinarySupported instead", "24.02")
     bool IsMultiplicationSupported(const TensorInfo& input0,
                                    const TensorInfo& input1,
                                    const TensorInfo& output,
@@ -405,7 +400,6 @@ public:
                                  const StridedSliceDescriptor& descriptor,
                                  Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use IsElementwiseBinarySupported instead", "24.02")
     bool IsSubtractionSupported(const TensorInfo& input0,
                                 const TensorInfo& input1,
                                 const TensorInfo& output,

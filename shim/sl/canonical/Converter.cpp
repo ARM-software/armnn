@@ -209,7 +209,6 @@ bool Converter::ConvertAdd(const Operation& operation, const Model& model, Conve
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsAdditionSupported,
                                    data.m_Backends,
@@ -218,7 +217,6 @@ bool Converter::ConvertAdd(const Operation& operation, const Model& model, Conve
                                    inputInfo0,
                                    inputInfo1,
                                    outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
     };
 
     if(!IsDynamicTensor(outputInfo))
@@ -235,9 +233,7 @@ bool Converter::ConvertAdd(const Operation& operation, const Model& model, Conve
         return false;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddAdditionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
@@ -1540,7 +1536,6 @@ bool Converter::ConvertDiv(const Operation& operation, const Model& model, Conve
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsDivisionSupported,
                                    data.m_Backends,
@@ -1549,7 +1544,6 @@ bool Converter::ConvertDiv(const Operation& operation, const Model& model, Conve
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
     };
 
     if(!IsDynamicTensor(outputInfo))
@@ -1566,9 +1560,7 @@ bool Converter::ConvertDiv(const Operation& operation, const Model& model, Conve
         return false;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddDivisionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
@@ -3386,7 +3378,6 @@ bool Converter::ConvertMaximum(const Operation& operation, const Model& model, C
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsMaximumSupported,
                                    data.m_Backends,
@@ -3395,7 +3386,6 @@ bool Converter::ConvertMaximum(const Operation& operation, const Model& model, C
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
     };
 
     if(IsDynamicTensor(outInfo))
@@ -3412,9 +3402,7 @@ bool Converter::ConvertMaximum(const Operation& operation, const Model& model, C
         return false;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* layer = data.m_Network->AddMaximumLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
@@ -3536,7 +3524,6 @@ bool Converter::ConvertMinimum(const Operation& operation, const Model& model, C
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsMinimumSupported,
                                    data.m_Backends,
@@ -3545,7 +3532,6 @@ bool Converter::ConvertMinimum(const Operation& operation, const Model& model, C
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
     };
 
     if(IsDynamicTensor(outputInfo))
@@ -3562,9 +3548,7 @@ bool Converter::ConvertMinimum(const Operation& operation, const Model& model, C
         return false;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* const layer = data.m_Network->AddMinimumLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
@@ -3609,7 +3593,6 @@ bool Converter::ConvertMul(const Operation& operation, const Model& model, Conve
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsMultiplicationSupported,
                                    data.m_Backends,
@@ -3618,7 +3601,6 @@ bool Converter::ConvertMul(const Operation& operation, const Model& model, Conve
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
     };
 
     if(!IsDynamicTensor(outputInfo))
@@ -3635,9 +3617,7 @@ bool Converter::ConvertMul(const Operation& operation, const Model& model, Conve
         return false;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddMultiplicationLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
@@ -5360,7 +5340,6 @@ bool Converter::ConvertSub(const Operation& operation, const Model& model, Conve
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
                                    IsSubtractionSupported,
                                    data.m_Backends,
@@ -5369,7 +5348,6 @@ bool Converter::ConvertSub(const Operation& operation, const Model& model, Conve
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
                                    outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
     };
 
     if(IsDynamicTensor(outputInfo))
@@ -5386,9 +5364,7 @@ bool Converter::ConvertSub(const Operation& operation, const Model& model, Conve
         return false;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const startLayer = data.m_Network->AddSubtractionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     startLayer->SetBackendId(setBackend);
 
     bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);

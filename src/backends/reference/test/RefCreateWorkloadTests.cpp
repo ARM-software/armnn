@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -142,182 +142,146 @@ TEST_CASE("CreateMultiplicationWorkloadWithBlobTest")
 
 TEST_CASE("CreateAdditionFloatWorkload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefAdditionWorkload<>,
         AdditionQueueDescriptor,
         AdditionLayer,
         armnn::DataType::Float32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateAdditionUint8Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefAdditionWorkload<>,
         AdditionQueueDescriptor,
         AdditionLayer,
         armnn::DataType::QAsymmU8>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateAdditionInt16Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefAdditionWorkload<>,
         AdditionQueueDescriptor,
         AdditionLayer,
         armnn::DataType::QSymmS16>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateAdditionInt32Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefAdditionWorkload<int32_t>,
             AdditionQueueDescriptor,
             AdditionLayer,
             armnn::DataType::Signed32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateSubtractionFloat32Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefSubtractionWorkload<>,
         SubtractionQueueDescriptor,
         SubtractionLayer,
         armnn::DataType::Float32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateSubtractionFloat16Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefSubtractionWorkload<>,
         SubtractionQueueDescriptor,
         SubtractionLayer,
         armnn::DataType::Float16>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateSubtractionUint8Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefSubtractionWorkload<>,
         SubtractionQueueDescriptor,
         SubtractionLayer,
         armnn::DataType::QAsymmU8>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateSubtractionInt16Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefSubtractionWorkload<>,
         SubtractionQueueDescriptor,
         SubtractionLayer,
         armnn::DataType::QSymmS16>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateSubtractionInt32Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefSubtractionWorkload<int32_t>,
             SubtractionQueueDescriptor,
             SubtractionLayer,
             armnn::DataType::Signed32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateMultiplicationFloatWorkload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefMultiplicationWorkload<>,
         MultiplicationQueueDescriptor,
         MultiplicationLayer,
         armnn::DataType::Float32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateMultiplicationUint8Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefMultiplicationWorkload<>,
         MultiplicationQueueDescriptor,
         MultiplicationLayer,
         armnn::DataType::QAsymmU8>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateMultiplicationInt16Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefMultiplicationWorkload<>,
         MultiplicationQueueDescriptor,
         MultiplicationLayer,
         armnn::DataType::QSymmS16>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateMultiplicationInt32Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefMultiplicationWorkload<int32_t>,
             MultiplicationQueueDescriptor,
             MultiplicationLayer,
             armnn::DataType::Signed32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateDivisionFloat32Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefDivisionWorkload<>,
         DivisionQueueDescriptor,
         DivisionLayer,
         armnn::DataType::Float32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateDivisionFloat16Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefDivisionWorkload<>,
         DivisionQueueDescriptor,
         DivisionLayer,
         armnn::DataType::Float16>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateDivisionUint8Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefDivisionWorkload<>,
         DivisionQueueDescriptor,
         DivisionLayer,
         armnn::DataType::QAsymmU8>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateDivisionInt16Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefDivisionWorkload<>,
         DivisionQueueDescriptor,
         DivisionLayer,
         armnn::DataType::QSymmS16>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 TEST_CASE("CreateDivisionInt32Workload")
 {
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     RefCreateElementwiseWorkloadTest<RefDivisionWorkload<int32_t>,
             DivisionQueueDescriptor,
             DivisionLayer,
             armnn::DataType::Signed32>();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 template <typename BatchNormalizationWorkloadType, armnn::DataType DataType>

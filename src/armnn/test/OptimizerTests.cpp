@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -339,9 +339,7 @@ TEST_CASE("InsertConvertersTest")
 
     armnn::Layer* head = graph.AddLayer<armnn::OutputLayer>(0, "output");
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     head = graph.InsertNewLayer<armnn::AdditionLayer>(head->GetInputSlot(0), "");
-    ARMNN_NO_DEPRECATE_WARN_END
     head->GetOutputHandler().SetTensorInfo(info);
 
     graph.InsertNewLayer<armnn::InputLayer>(head->GetInputSlot(1), inputId++, "")
@@ -357,16 +355,14 @@ TEST_CASE("InsertConvertersTest")
         ->GetOutputHandler().SetTensorInfo(info);
 
     // Check graph layer sequence before inserting convert layers
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     CHECK(CheckSequence(graph.cbegin(),
-                        graph.cend(),
-                        &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::MemCopyLayer>,
-                        &IsLayerOfType<armnn::FloorLayer>,
-                        &IsLayerOfType<armnn::AdditionLayer>,
-                        &IsLayerOfType<armnn::OutputLayer>));
-    ARMNN_NO_DEPRECATE_WARN_END
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::MemCopyLayer>,
+                             &IsLayerOfType<armnn::FloorLayer>,
+                             &IsLayerOfType<armnn::AdditionLayer>,
+                             &IsLayerOfType<armnn::OutputLayer>));
 
     // Check layers have Float16 DataType
     for (auto& layer : graph)
@@ -409,21 +405,19 @@ TEST_CASE("InsertConvertersTest")
     }
 
     // Check sequence of layers after inserting convert layers
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     CHECK(CheckSequence(graph.cbegin(),
-                        graph.cend(),
-                        &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::InputLayer>,
-                        &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>,
-                        &IsLayerOfType<armnn::MemCopyLayer>,
-                        &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>,
-                        &IsLayerOfType<armnn::FloorLayer>,
-                        &IsLayerOfType<armnn::ConvertFp32ToFp16Layer>,
-                        &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>,
-                        &IsLayerOfType<armnn::AdditionLayer>,
-                        &IsLayerOfType<armnn::ConvertFp32ToFp16Layer>,
-                        &IsLayerOfType<armnn::OutputLayer>));
-    ARMNN_NO_DEPRECATE_WARN_END
+                             graph.cend(),
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::InputLayer>,
+                             &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>,
+                             &IsLayerOfType<armnn::MemCopyLayer>,
+                             &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>,
+                             &IsLayerOfType<armnn::FloorLayer>,
+                             &IsLayerOfType<armnn::ConvertFp32ToFp16Layer>,
+                             &IsLayerOfType<armnn::ConvertFp16ToFp32Layer>,
+                             &IsLayerOfType<armnn::AdditionLayer>,
+                             &IsLayerOfType<armnn::ConvertFp32ToFp16Layer>,
+                             &IsLayerOfType<armnn::OutputLayer>));
 }
 
 void CreateConvolution2dGraph(Graph &graph, const unsigned int* inputShape,

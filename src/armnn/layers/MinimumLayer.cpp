@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,12 +27,10 @@ std::unique_ptr<IWorkload> MinimumLayer::CreateWorkload(const IWorkloadFactory& 
     return factory.CreateWorkload(LayerType::Minimum, descriptor, PrepInfoAndDesc(descriptor));
 }
 
-ARMNN_NO_DEPRECATE_WARN_BEGIN
 MinimumLayer* MinimumLayer::Clone(Graph& graph) const
 {
     return CloneBase<MinimumLayer>(graph, GetName());
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 void MinimumLayer::ExecuteStrategy(IStrategy& strategy) const
 {

@@ -133,7 +133,6 @@ Pooling2dLayer* AddPoolingLayer(Graph& graph,
 }
 
 // Convenience function to add an addition layer to a graph
-ARMNN_NO_DEPRECATE_WARN_BEGIN
 AdditionLayer* AddAdditionaLayer(Graph& graph,
                                  LayerNameToLayerMap& layersInGraph,
                                  const std::string& layerName,
@@ -145,7 +144,6 @@ AdditionLayer* AddAdditionaLayer(Graph& graph,
     layersInGraph.insert(std::make_pair(additionLayer->GetName(), additionLayer));
     return additionLayer;
 }
-ARMNN_NO_DEPRECATE_WARN_END
 
 // Convenience function to check that the given substitution matches the specified expected values
 void CheckSubstitution(const OptimizationViews::SubstitutionPair& substitution,
@@ -752,9 +750,7 @@ SubgraphView::SubgraphViewPtr BuildPartiallyOptimizableSubgraph2(Graph& graph, L
                                                                "conv2 layer unoptimizable", outputInfo);
     Convolution2dLayer* const conv3Layer = AddConvolutionLayer(graph, layersInGraph, convolutionDescriptor,
                                                                "conv3 layer", outputInfo);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     AdditionLayer* const addLayer = AddAdditionaLayer(graph, layersInGraph, "add layer", outputInfo);
-    ARMNN_NO_DEPRECATE_WARN_END
     Layer* const outputLayer = AddOutputLayer(graph, "output layer");
 
     // Connect the network

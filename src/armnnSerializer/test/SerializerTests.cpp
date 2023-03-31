@@ -32,9 +32,7 @@ TEST_CASE("SerializeAddition")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const additionLayer = network->AddAdditionLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer0->GetOutputSlot(0).Connect(additionLayer->GetInputSlot(0));
@@ -359,9 +357,7 @@ TEST_CASE("SerializeConstant")
     armnn::INetworkPtr network(armnn::INetwork::Create());
     armnn::IConnectableLayer* input = network->AddInputLayer(0);
     armnn::IConnectableLayer* constant = network->AddConstantLayer(constTensor, layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* add = network->AddAdditionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* output = network->AddOutputLayer(0);
 
     input->GetOutputSlot(0).Connect(add->GetInputSlot(0));
@@ -931,9 +927,7 @@ TEST_CASE("SerializeDivision")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const divisionLayer = network->AddDivisionLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer0->GetOutputSlot(0).Connect(divisionLayer->GetInputSlot(0));
@@ -1633,9 +1627,7 @@ TEST_CASE("SerializeMaximum")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const maximumLayer = network->AddMaximumLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer0->GetOutputSlot(0).Connect(maximumLayer->GetInputSlot(0));
@@ -1860,9 +1852,7 @@ TEST_CASE("SerializeMinimum")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const minimumLayer = network->AddMinimumLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer0->GetOutputSlot(0).Connect(minimumLayer->GetInputSlot(0));
@@ -1888,9 +1878,7 @@ TEST_CASE("SerializeMultiplication")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const multiplicationLayer = network->AddMultiplicationLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer0->GetOutputSlot(0).Connect(multiplicationLayer->GetInputSlot(0));
@@ -2748,9 +2736,7 @@ TEST_CASE("SerializeSubtraction")
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
     armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* const subtractionLayer = network->AddSubtractionLayer(layerName.c_str());
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer0->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(0));
@@ -2959,9 +2945,7 @@ TEST_CASE("SerializeDeserializeNonLinearNetwork")
 
     armnn::INetworkPtr network(armnn::INetwork::Create());
     armnn::IConnectableLayer* input = network->AddInputLayer(0);
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::IConnectableLayer* add = network->AddAdditionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
     armnn::IConnectableLayer* constant = network->AddConstantLayer(constTensor, layerName.c_str());
     armnn::IConnectableLayer* output = network->AddOutputLayer(0);
 

@@ -1,9 +1,10 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
+#include <cstdint>
 #include <map>
 #include <string>
 

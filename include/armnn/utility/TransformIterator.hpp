@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -18,10 +18,15 @@ template<typename Function,
         typename Reference =
         typename std::result_of<const Function(typename std::iterator_traits<Iterator>::reference)>::type
 >
-class TransformIterator : public std::iterator<Category, T, Distance, Pointer, Reference>
+class TransformIterator
 {
-
 public:
+    using iterator_category = Category;
+    using value_type = T;
+    using difference_type = Distance;
+    using pointer = Pointer;
+    using reference = Reference;
+
 
     TransformIterator() = default;
     TransformIterator(TransformIterator const& transformIterator) = default;

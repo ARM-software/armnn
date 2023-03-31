@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="5a7d1571a2de24eefc6f1d8d22deeef9f47521ee" #Fix BatchToSpaceFixture
+DEFAULT_CLFRAMEWORKREVISION="8893e454fa699f5dc33ff6b71f47e4c36fd1c1be" #Add cropping support to NEBatchToSpace
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

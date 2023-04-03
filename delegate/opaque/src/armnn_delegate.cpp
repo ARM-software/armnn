@@ -4,6 +4,7 @@
 //
 
 #include <armnn_delegate.hpp>
+#include <OpaqueDelegateUtils.hpp>
 
 #include <Version.hpp>
 
@@ -131,6 +132,312 @@ const TfLiteOpaqueDelegatePlugin* GetArmnnDelegatePluginApi()
 
 const std::string ArmnnOpaqueDelegate::GetVersion() {
     return OPAQUE_DELEGATE_VERSION;
+}
+
+TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,
+                                          TfLiteOpaqueContext* tfLiteContext,
+                                          const TfLiteIntArray* inputs,
+                                          std::vector<armnn::BindingPointInfo>& inputBindings)
+{
+    const size_t numInputs = static_cast<size_t>(inputs->size);
+    for (unsigned int i = 0; i < numInputs; ++i)
+    {
+        const int32_t tensorId = inputs->data[i];
+        const TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, tensorId);
+
+        if(!tensor)
+        {
+            return kTfLiteError;
+        }
+
+        // Do not create bindings for constant inputs
+        if (TfLiteOpaqueTensorGetAllocationType(tensor) == kTfLiteMmapRo)
+        {
+            continue;
+        }
+
+        auto bindingId = static_cast<armnn::LayerBindingId>((tensorId));
+        armnn::IConnectableLayer* layer = delegateData.m_Network->AddInputLayer(bindingId);
+
+        auto tensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tensor);
+        armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
+        outputSlot.SetTensorInfo(tensorInfo);
+
+        // Store for creating connections
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)] = &outputSlot;
+
+        inputBindings.push_back(std::make_pair(bindingId, tensorInfo));
+    }
+
+    return kTfLiteOk;
+}
+
+TfLiteStatus ArmnnSubgraph::AddOutputLayer(DelegateData& delegateData,
+                                           TfLiteOpaqueContext* tfLiteContext,
+                                           const TfLiteIntArray* outputs,
+                                           std::vector<armnn::BindingPointInfo>& outputBindings)
+{
+    const size_t numOutputs = static_cast<size_t>(outputs->size);
+    for (unsigned int i = 0; i < numOutputs; ++i)
+    {
+        const int32_t tensorId = outputs->data[i];
+        const TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, tensorId);
+
+        if(!tensor)
+        {
+            return kTfLiteError;
+        }
+
+        auto bindingId = static_cast<armnn::LayerBindingId>((tensorId));
+        armnn::IConnectableLayer* layer = delegateData.m_Network->AddOutputLayer(bindingId);
+
+        auto tensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tensor);
+        ARMNN_ASSERT(delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)] != nullptr);
+        delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)]->Connect(layer->GetInputSlot(0));
+        outputBindings.push_back(std::make_pair(bindingId, tensorInfo));
+    }
+
+    return kTfLiteOk;
+}
+
+ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteOpaqueContext* tfLiteContext,
+                                     const TfLiteOpaqueDelegateParams* parameters,
+                                     const ArmnnOpaqueDelegate* delegate)
+{
+    const auto startTime = armnn::GetTimeNow();
+    ARMNN_LOG(info) << "ArmnnSubgraph creation";
+
+    TfLiteIntArray* executionPlan;
+    if (TfLiteOpaqueContextGetExecutionPlan(tfLiteContext, &executionPlan) != kTfLiteOk)
+    {
+        return nullptr;
+    }
+
+    // Initialize DelegateData holds network and output slots information
+    DelegateData delegateData(delegate->m_Options.GetBackends());
+
+    // Build ArmNN Network
+    armnn::NetworkOptions networkOptions = delegate->m_Options.GetOptimizerOptions().m_ModelOptions;
+    armnn::NetworkId networkId;
+    delegateData.m_Network = armnn::INetwork::Create(networkOptions);
+
+    delegateData.m_OutputSlotForNode = std::vector<armnn::IOutputSlot*>(
+                                                            TfLiteOpaqueContextGetNumTensors(tfLiteContext), nullptr);
+
+    std::vector<armnn::BindingPointInfo> inputBindings;
+    std::vector<armnn::BindingPointInfo> outputBindings;
+
+    // Add input layer
+    auto status = AddInputLayer(delegateData, tfLiteContext, parameters->input_tensors, inputBindings);
+    if (status != kTfLiteOk)
+    {
+        throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to add Inputs to the network!");
+    }
+
+    // Parse TfLite delegate nodes to ArmNN
+    const auto parseStartTime = armnn::GetTimeNow();
+    for (int i = 0; i < parameters->nodes_to_replace->size; ++i)
+    {
+        const int nodeIndex = parameters->nodes_to_replace->data[i];
+
+        TfLiteOpaqueNode* tfLiteNode = nullptr;
+        TfLiteRegistrationExternal* tfLiteRegistration = nullptr;
+        if (TfLiteOpaqueContextGetNodeAndRegistration(
+            tfLiteContext, nodeIndex, &tfLiteNode, &tfLiteRegistration) != kTfLiteOk)
+        {
+            throw armnn::Exception(&"TfLiteArmnnOpaqueDelegate: Unable to get node registration: " [ nodeIndex]);
+        }
+
+        if (VisitNode(delegateData, tfLiteContext, tfLiteRegistration, tfLiteNode, nodeIndex) != kTfLiteOk)
+        {
+            throw armnn::Exception(&"TfLiteArmnnOpaqueDelegate: Unable to parse node: " [ nodeIndex]);
+        }
+    }
+    ARMNN_LOG(info) << "Parse nodes to ArmNN time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(parseStartTime).count() << " ms";
+
+    // Add Output layer
+    status = AddOutputLayer(delegateData, tfLiteContext, parameters->output_tensors, outputBindings);
+    if (status != kTfLiteOk)
+    {
+        throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to add Outputs to the network!");
+    }
+
+    // Optimize ArmNN network
+    armnn::IOptimizedNetworkPtr optNet(nullptr, nullptr);
+    try
+    {
+        const auto optimizeStartTime = armnn::GetTimeNow();
+        optNet = armnn::Optimize(*(delegateData.m_Network.get()),
+                                 delegate->m_Options.GetBackends(),
+                                 delegate->m_Runtime->GetDeviceSpec(),
+                                 delegate->m_Options.GetOptimizerOptions());
+        ARMNN_LOG(info) << "Optimize ArmnnSubgraph time: " << std::setprecision(2)
+                        << std::fixed << armnn::GetTimeDuration(optimizeStartTime).count() << " ms";
+    }
+    catch (std::exception& ex)
+    {
+        std::stringstream exMessage;
+        exMessage << "TfLiteArmnnOpaqueDelegate: Exception (" << ex.what() << ") caught from optimize.";
+        throw armnn::Exception(exMessage.str());
+    }
+    if (!optNet)
+    {
+        // Optimize failed
+        throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to optimize the network!");
+    }
+
+    // If set, we will serialize the optimized model into a dot file.
+    const std::string serializeToDotFile = delegate->m_Options.GetSerializeToDot();
+    if (!serializeToDotFile.empty())
+    {
+        ARMNN_LOG(info) << "Writing graph to dot file: " << serializeToDotFile;
+        fs::path filename = serializeToDotFile;
+        std::fstream file(filename.c_str(), std::ios_base::out);
+        optNet->SerializeToDot(file);
+    }
+
+    try
+    {
+        const auto loadStartTime = armnn::GetTimeNow();
+
+        // Load graph into runtime
+        std::string errorMessage;
+        armnn::Status loadingStatus;
+        armnn::MemorySource inputSource = armnn::MemorySource::Undefined;
+        armnn::MemorySource outputSource = armnn::MemorySource::Undefined;
+        // There's a bit of an assumption here that the delegate will only support Malloc memory source.
+        if (delegate->m_Options.GetOptimizerOptions().m_ImportEnabled)
+        {
+            inputSource = armnn::MemorySource::Malloc;
+        }
+        if (delegate->m_Options.GetOptimizerOptions().m_ExportEnabled)
+        {
+            outputSource = armnn::MemorySource::Malloc;
+        }
+        armnn::INetworkProperties networkProperties(false,
+                                                    inputSource,
+                                                    outputSource,
+                                                    delegate->m_Options.GetInternalProfilingState(),
+                                                    delegate->m_Options.GetInternalProfilingDetail());
+        loadingStatus = delegate->m_Runtime->LoadNetwork(networkId,
+                                                         std::move(optNet),
+                                                         errorMessage,
+                                                         networkProperties);
+        if (loadingStatus != armnn::Status::Success)
+        {
+            // Network load failed.
+            throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Network could not be loaded: " + errorMessage);
+        }
+
+        ARMNN_LOG(info) << "Load ArmnnSubgraph time: " << std::setprecision(2)
+                        << std::fixed << armnn::GetTimeDuration(loadStartTime).count() << " ms";
+    }
+    catch (std::exception& ex)
+    {
+        std::stringstream exMessage;
+        exMessage << "TfLiteArmnnOpaqueDelegate: Exception (" << ex.what() << ") caught from LoadNetwork.";
+        throw armnn::Exception(exMessage.str());
+    }
+
+    // Register debug callback function
+    if (delegate->m_Options.GetDebugCallbackFunction().has_value())
+    {
+        delegate->m_Runtime->RegisterDebugCallback(networkId, delegate->m_Options.GetDebugCallbackFunction().value());
+    }
+
+    ARMNN_LOG(info) << "Overall ArmnnSubgraph creation time: " << std::setprecision(2)
+                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms\n";
+
+    // Create a new SubGraph with networkId and runtime
+    return new ArmnnSubgraph(networkId, delegate->m_Runtime, inputBindings, outputBindings);
+}
+
+TfLiteStatus ArmnnSubgraph::Prepare(TfLiteOpaqueContext* tfLiteContext)
+{
+    armnn::IgnoreUnused(tfLiteContext);
+    return kTfLiteOk;
+}
+
+TfLiteStatus ArmnnSubgraph::Invoke(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueNode* tfLiteNode)
+{
+    // Prepare inputs
+    armnn::InputTensors inputTensors;
+    size_t inputIndex = 0;
+    const int* inputs;
+    int numInputs;
+    if(TfLiteOpaqueNodeInputs(tfLiteNode, &inputs, &numInputs) != kTfLiteOk)
+    {
+        throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to load subgraph inputs!");
+    }
+    for (int inputIdx = 0; inputIdx < numInputs; inputIdx++)
+    {
+        TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputs[inputIdx]);
+
+        if(!tensor)
+        {
+            return kTfLiteError;
+        }
+
+        if (TfLiteOpaqueTensorGetAllocationType(tensor) != kTfLiteMmapRo)
+        {
+            const armnn::BindingPointInfo& inputBinding = m_InputBindings[inputIndex];
+            armnn::TensorInfo inputTensorInfo = inputBinding.second;
+            inputTensorInfo.SetConstant(true);
+            const armnn::ConstTensor inputTensor(inputTensorInfo, TfLiteOpaqueTensorData(tensor));
+            inputTensors.emplace_back(inputIdx, inputTensor);
+
+            ++inputIndex;
+        }
+    }
+
+    // Prepare outputs
+    armnn::OutputTensors outputTensors;
+    size_t outputIndex = 0;
+    const int* outputs;
+    int numOutputs;
+    if(TfLiteOpaqueNodeOutputs(tfLiteNode, &outputs, &numOutputs) != kTfLiteOk)
+    {
+        throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to load subgraph outputs!");
+    }
+    for (int outputIdx = 0; outputIdx < numOutputs; outputIdx++)
+    {
+        const armnn::BindingPointInfo& outputBinding = m_OutputBindings[outputIndex];
+        TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputs[outputIdx]);
+
+        if(!tensor)
+        {
+            return kTfLiteError;
+        }
+
+        const armnn::Tensor outputTensor(outputBinding.second, TfLiteOpaqueTensorData(tensor));
+        outputTensors.emplace_back(outputIdx, outputTensor);
+
+        ++outputIndex;
+    }
+
+    // Run graph
+    auto status = m_Runtime->EnqueueWorkload(m_NetworkId, inputTensors, outputTensors);
+    // The delegate holds its own Arm NN runtime so this is our last chance to print internal profiling data.
+    std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
+    if (profiler && profiler->IsProfilingEnabled())
+    {
+        profiler->Print(std::cout);
+    }
+    return (status == armnn::Status::Success) ? kTfLiteOk : kTfLiteError;
+}
+
+TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
+                                      TfLiteOpaqueContext* tfLiteContext,
+                                      TfLiteRegistrationExternal* tfLiteRegistration,
+                                      TfLiteOpaqueNode* tfLiteNode,
+                                      int nodeIndex)
+{
+    switch (TfLiteRegistrationExternalGetBuiltInCode(tfLiteRegistration))
+    {
+        default:
+            return kTfLiteError;
+    }
 }
 
 } // armnnOpaqueDelegate namespace

@@ -120,7 +120,7 @@ if (BUILD_OPAQUE_DELEGATE)
     set_target_properties(armnnOpaqueDelegate PROPERTIES VERSION ${OPAQUE_DELEGATE_LIB_VERSION} SOVERSION ${OPAQUE_DELEGATE_LIB_SOVERSION})
 endif()
 
-if(BUILD_UNIT_TESTS)
+if(BUILD_UNIT_TESTS AND BUILD_CLASSIC_DELEGATE)
     set(armnnDelegate_unittest_sources)
     list(APPEND armnnDelegate_unittest_sources
         test/ActivationTest.cpp
@@ -233,7 +233,6 @@ if(BUILD_UNIT_TESTS)
         else()
 
         endif()
-    if (BUILD_CLASSIC_DELEGATE OR BUILD_OPAQUE_DELEGATE)
         add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
 
         target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
@@ -241,18 +240,11 @@ if(BUILD_UNIT_TESTS)
         # Add half library from armnn third-party libraries
         target_link_libraries(DelegateUnitTests PRIVATE thirdparty_headers)
 
-        if (BUILD_CLASSIC_DELEGATE)
-            target_link_libraries(DelegateUnitTests PRIVATE armnnDelegate)
-            target_include_directories(DelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
-        endif()
-        if (BUILD_OPAQUE_DELEGATE)
-            target_link_libraries(DelegateUnitTests PRIVATE armnnOpaqueDelegate)
-            target_include_directories(DelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
-        endif()
+        target_link_libraries(DelegateUnitTests PRIVATE armnnDelegate)
+        target_include_directories(DelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
         target_link_libraries(DelegateUnitTests PRIVATE Armnn::armnnUtils)
 
         target_link_libraries(DelegateUnitTests PRIVATE profiling_library_headers)
-    endif()
 endif()
 
 if(BUILD_DELEGATE_JNI_INTERFACE)

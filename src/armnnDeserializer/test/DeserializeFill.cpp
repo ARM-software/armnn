@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -34,7 +34,7 @@ struct FillFixture : public ParserFlatbuffersSerializeFixture
                             4
                           ],
                           dataType: "Signed32",
-                          quantizationScale: 0.0
+                          quantizationScale: 1.0
                         }
                       }
                     ]

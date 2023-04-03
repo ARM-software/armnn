@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,7 @@ LayerTestResult<T, 4> InstanceNormTestImpl(
     const std::vector<float>& inputValues,
     const std::vector<float>& expectedOutputValues,
     armnn::InstanceNormalizationQueueDescriptor descriptor,
-    float qScale = 0.0f,
+    float qScale = 1.0f,
     int32_t qOffset = 0)
 {
     IgnoreUnused(memoryManager);

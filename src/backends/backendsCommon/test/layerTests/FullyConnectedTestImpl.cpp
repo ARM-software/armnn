@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -172,7 +172,7 @@ LayerTestResult<T, 2> FullyConnectedLargeTestCommon(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
     bool transposeWeights,
-    float qScale = 0.0f,
+    float qScale = 1.0f,
     int32_t qOffset = 0)
 {
     unsigned int inputWidth = 1;

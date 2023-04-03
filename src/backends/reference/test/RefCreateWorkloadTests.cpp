@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -479,8 +479,8 @@ TEST_CASE("RefCreateFullyConnectedWithBlobWorkloadTest")
                                                          armnn::DataType::Float32>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
-    float inputsQScale = 0.0f;
-    float outputQScale = 0.0f;
+    float inputsQScale = 1.0f;
+    float outputQScale = 1.0f;
     CheckInputOutput(std::move(workload),
         TensorInfo({ 3, 1, 4, 5 }, armnn::DataType::Float32, inputsQScale),
         TensorInfo({ 3, 7 }, armnn::DataType::Float32, outputQScale));
@@ -496,8 +496,8 @@ TEST_CASE("CreateFullyConnectedWorkloadWeightsBiasesAsInputsFloat32")
                                                                   armnn::DataType::Float32>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
-    float inputsQScale = 0.0f;
-    float outputQScale = 0.0f;
+    float inputsQScale = 1.0f;
+    float outputQScale = 1.0f;
     CheckInputsOutput(std::move(workload),
                       TensorInfo({ 3, 1, 4, 5 }, armnn::DataType::Float32, inputsQScale),
                       TensorInfo({ 7, 20 }, armnn::DataType::Float32, inputsQScale),
@@ -512,8 +512,8 @@ static void RefCreateFullyConnectedWorkloadTest()
     auto workload = CreateFullyConnectedWorkloadTest<FullyConnectedWorkloadType, DataType>(factory, graph);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0f;
     CheckInputOutput(std::move(workload),
         TensorInfo({ 3, 1, 4, 5 }, DataType, inputsQScale),
         TensorInfo({ 3, 7 }, DataType, outputQScale));

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -157,14 +157,14 @@ public:
 
     TensorInfo(const TensorShape& shape,
                DataType dataType,
-               float quantizationScale = 0.0f,
+               float quantizationScale = 1.0f,
                int32_t quantizationOffset = 0,
                bool isConstant = false);
 
     TensorInfo(unsigned int numDimensions,
                const unsigned int* dimensionSizes,
                DataType dataType,
-               float quantizationScale = 0.0f,
+               float quantizationScale = 1.0f,
                int32_t quantizationOffset = 0,
                bool isConstant = false);
 

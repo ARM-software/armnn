@@ -524,7 +524,7 @@ armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
         }
     }
 
-    float quantizationScale = 0.0f;
+    float quantizationScale = 1.0f;
     int32_t quantizationOffset = 0;
 
     if (tensorPtr->quantization.get())

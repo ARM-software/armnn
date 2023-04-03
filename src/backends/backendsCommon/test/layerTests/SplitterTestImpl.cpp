@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,7 +22,7 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
-    float qScale = 0.0f,
+    float qScale = 1.0f,
     int32_t qOffset = 0)
 {
     IgnoreUnused(memoryManager);

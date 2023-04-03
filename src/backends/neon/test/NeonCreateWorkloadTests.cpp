@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -357,8 +357,8 @@ static void NeonCreateFullyConnectedWorkloadTest()
     auto outputHandle = PolymorphicDowncast<IAclTensorHandle*>(queueDescriptor.m_Outputs[0]);
 
     // Checks that outputs and inputs are as we expect them (see definition of CreateFullyConnectedWorkloadTest).
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
     CHECK(TestNeonTensorHandleInfo(inputHandle, TensorInfo({3, 1, 4, 5}, DataType, inputsQScale)));
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({3, 7}, DataType, outputQScale)));
 }

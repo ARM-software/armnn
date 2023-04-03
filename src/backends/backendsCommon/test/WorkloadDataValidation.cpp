@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -494,7 +494,7 @@ TEST_CASE("LstmQueueDescriptor_Validate")
 {
     armnn::DataType dataType = armnn::DataType::Float32;
 
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
 
     unsigned int batchSize = 2;

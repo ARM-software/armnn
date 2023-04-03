@@ -1553,7 +1553,7 @@ TEST_CASE("EnsureL2NormalizationBackwardCompatibility")
     CHECK(deserializedNetwork);
 
     const std::string layerName("l2Normalization");
-    const armnn::TensorInfo inputInfo = armnn::TensorInfo({1, 2, 1, 5}, armnn::DataType::Float32);
+    const armnn::TensorInfo inputInfo = armnn::TensorInfo({1, 2, 1, 5}, armnn::DataType::Float32, 0.0f, 0);
 
     armnn::L2NormalizationDescriptor desc;
     desc.m_DataLayout = armnn::DataLayout::NCHW;
@@ -1805,8 +1805,8 @@ TEST_CASE("EnsureMergerLayerBackwardCompatibility")
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(std::string(mergerModel.begin(), mergerModel.end()));
     CHECK(deserializedNetwork);
 
-    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({ 2, 3, 2, 2 }, armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo = armnn::TensorInfo({ 4, 3, 2, 2 }, armnn::DataType::Float32);
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({ 2, 3, 2, 2 }, armnn::DataType::Float32, 0.0f, 0);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({ 4, 3, 2, 2 }, armnn::DataType::Float32, 0.0f, 0);
 
     const std::vector<armnn::TensorShape> shapes({inputInfo.GetShape(), inputInfo.GetShape()});
 
@@ -2071,8 +2071,8 @@ TEST_CASE("EnsurePadBackwardCompatibility")
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(std::string(padModel.begin(), padModel.end()));
     CHECK(deserializedNetwork);
 
-    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({ 1, 2, 3, 4 }, armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo = armnn::TensorInfo({ 1, 3, 5, 7 }, armnn::DataType::Float32);
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({ 1, 2, 3, 4 }, armnn::DataType::Float32, 0.0f, 0);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({ 1, 3, 5, 7 }, armnn::DataType::Float32, 0.0f, 0);
 
     armnn::PadDescriptor descriptor({{ 0, 0 }, { 1, 0 }, { 1, 1 }, { 1, 2 }});
 
@@ -2441,8 +2441,8 @@ TEST_CASE("EnsureResizeBilinearBackwardCompatibility")
         DeserializeNetwork(std::string(resizeBilinearModel.begin(), resizeBilinearModel.end()));
     CHECK(deserializedNetwork);
 
-    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32);
-    const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({1, 3, 5, 5}, armnn::DataType::Float32, 0.0f, 0);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({1, 3, 2, 4}, armnn::DataType::Float32, 0.0f, 0);
 
     armnn::ResizeDescriptor descriptor;
     descriptor.m_TargetWidth  = 4u;

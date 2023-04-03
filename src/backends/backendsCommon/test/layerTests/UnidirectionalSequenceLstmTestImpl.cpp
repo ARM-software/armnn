@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -26,7 +26,7 @@ UnidirectionalSequenceLstmTimeMajorSingleBatchTestImpl(
     const std::vector<T>& outputExpected,
     const armnn::TensorShape& inputShape,
     const armnn::TensorShape& outputExpectedShape,
-    float qScale = 0.0f,
+    float qScale = 1.0f,
     int32_t qOffset = 0,
     armnn::DataType constantDataType = armnn::DataType::Float32)
 {
@@ -222,7 +222,7 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     const std::vector<T>& outputExpected,
     const armnn::TensorShape& inputShape,
     const armnn::TensorShape& outputExpectedShape,
-    float qScale = 0.0f,
+    float qScale = 1.0f,
     int32_t qOffset = 0,
     armnn::DataType constantDataType = armnn::DataType::Float32) {
     IgnoreUnused(memoryManager);
@@ -411,7 +411,7 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     const std::vector<T>& outputExpected,
     const armnn::TensorShape& inputShape,
     const armnn::TensorShape& outputExpectedShape,
-    float qScale = 0.0f,
+    float qScale = 1.0f,
     int32_t qOffset = 0,
     armnn::DataType constantDataType = armnn::DataType::Float32) {
     IgnoreUnused(memoryManager);

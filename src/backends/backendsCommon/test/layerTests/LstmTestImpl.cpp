@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,7 @@ void LstmUtilsVectorBatchVectorAddTestImpl(
         std::vector<float>& expectedOutput,
         armnn::TensorShape& expectedShape)
 {
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
     armnn::TensorInfo tensorInfo({nBatch, vSize}, ArmnnType,  qScale, qOffset );
 
@@ -60,7 +60,7 @@ void LstmUtilsZeroVectorTestImpl(
         std::vector<float>& expectedOutput,
         armnn::TensorShape& expectedShape)
 {
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo tensorInfo({vSize}, ArmnnType,  qScale, qOffset );
@@ -89,7 +89,7 @@ void LstmUtilsMeanStddevNormalizationTestImpl(
         std::vector<float>& expectedOutput,
         armnn::TensorShape& expectedShape)
 {
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
     armnn::TensorInfo tensorInfo({nBatch, vSize}, ArmnnType,  qScale, qOffset );
 
@@ -117,7 +117,7 @@ void LstmUtilsVectorBatchVectorCwiseProductTestImpl(
         std::vector<float>& expectedOutput,
         armnn::TensorShape& expectedShape)
 {
-    float qScale = 0.0f;
+    float qScale = 1.0f;
     int32_t qOffset = 0;
     armnn::TensorInfo tensorInfo({nBatch, vSize}, ArmnnType,  qScale, qOffset );
 
@@ -149,7 +149,7 @@ LstmNoCifgNoPeepholeNoProjectionTestImpl(
         const std::vector<T>& outputExpected,
         const armnn::TensorShape& inputShape,
         const armnn::TensorShape& outputExpectedShape,
-        float qScale = 0.0f,
+        float qScale = 1.0f,
         int32_t qOffset = 0,
         armnn::DataType constantDataType = armnn::DataType::Float32)
 {
@@ -345,7 +345,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionTestImpl(armnn::IWorkloadFactory& workl
                                                   const armnn::ITensorHandleFactory& tensorHandleFactory,
                                                   const std::vector<T>& input,
                                                   const std::vector<T>& outputExpected,
-                                                  float qScale = 0.0f,
+                                                  float qScale = 1.0f,
                                                   int32_t qOffset = 0,
                                                   armnn::DataType constantDataType = armnn::DataType::Float32)
 {
@@ -1020,7 +1020,7 @@ LayerTestResult<T, 2> LstmLayerWithCifgWithPeepholeNoProjectionTestImpl(
         const std::vector<T>& outputExpected,
         const armnn::TensorShape& inputShape,
         const armnn::TensorShape& outputExpectedShape,
-        float qScale = 0.0f,
+        float qScale = 1.0f,
         int32_t qOffset = 0,
         armnn::DataType constantDataType = armnn::DataType::Float32)
 {
@@ -1252,7 +1252,7 @@ LstmLayerNoCifgWithPeepholeWithProjectionWithLayerNormTestImpl(armnn::IWorkloadF
                                                   const armnn::ITensorHandleFactory& tensorHandleFactory,
                                                   const std::vector<T>& input,
                                                   const std::vector<T>& outputExpected,
-                                                  float qScale = 0.0f,
+                                                  float qScale = 1.0f,
                                                   int32_t qOffset = 0,
                                                   armnn::DataType constantDataType = armnn::DataType::Float32)
 {

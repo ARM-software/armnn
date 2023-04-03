@@ -533,7 +533,9 @@ TEST_CASE("IVGCVSW_1929_QuantizedSoftmaxIssue")
                                                             0));
 
     softmax->GetOutputSlot(0).SetTensorInfo(armnn::TensorInfo(armnn::TensorShape({ 1, 5 }),
-                                                              armnn::DataType::QAsymmU8));
+                                                              armnn::DataType::QAsymmU8,
+                                                              0.0f,
+                                                              0));
 
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     std::vector<std::string>      errMessages;

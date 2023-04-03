@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1318,10 +1318,10 @@ TEST_CASE("EnsureLstmLayersBackwardCompatibility")
     params.m_CellToOutputWeights      = &cellToOutputWeights;
 
     const std::string layerName("lstm");
-    armnn::TensorInfo inputTensorInfo({ batchSize, inputSize }, armnn::DataType::Float32);
-    armnn::TensorInfo cellStateTensorInfo({ batchSize, numUnits}, armnn::DataType::Float32);
-    armnn::TensorInfo outputStateTensorInfo({ batchSize, outputSize }, armnn::DataType::Float32);
-    armnn::TensorInfo lstmTensorInfoScratchBuff({ batchSize, numUnits * 4 }, armnn::DataType::Float32);
+    armnn::TensorInfo inputTensorInfo({ batchSize, inputSize }, armnn::DataType::Float32, 0.0f , 0);
+    armnn::TensorInfo cellStateTensorInfo({ batchSize, numUnits}, armnn::DataType::Float32, 0.0f , 0);
+    armnn::TensorInfo outputStateTensorInfo({ batchSize, outputSize }, armnn::DataType::Float32, 0.0f , 0);
+    armnn::TensorInfo lstmTensorInfoScratchBuff({ batchSize, numUnits * 4 }, armnn::DataType::Float32, 0.0f , 0);
 
     VerifyLstmLayer<armnn::LstmDescriptor> checker(
             layerName,

@@ -521,8 +521,8 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadTest(armnn::IW
     layerDesc.m_BiasEnabled = false;
     layerDesc.m_DataLayout = dataLayout;
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
@@ -585,8 +585,8 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dFusedActivationWithBlo
     layerDesc.m_BiasEnabled = true;
     layerDesc.m_DataLayout = dataLayout;
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
@@ -678,8 +678,8 @@ std::unique_ptr<Convolution2dWorkload> CreateConvolution2dWorkloadFastMathTest(a
     layerDesc.m_BiasEnabled = true;
     layerDesc.m_DataLayout = dataLayout;
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
@@ -1141,8 +1141,8 @@ std::unique_ptr<Convolution2dWorkload> CreateDirectConvolution2dWorkloadTest(arm
 
     Convolution2dLayer* const layer = graph.AddLayer<Convolution2dLayer>(layerDesc, "layer");
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     TensorShape biasShape = TensorShape{ 2 };
     TensorShape weightShape = TensorShape{ 2, 3, 3, 3 };
@@ -1203,8 +1203,8 @@ std::unique_ptr<DepthwiseConvolution2dFloat32Workload> CreateDepthwiseConvolutio
     layerDesc.m_BiasEnabled = false;
     layerDesc.m_DataLayout  = dataLayout;
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     TensorShape weightShape({1, 4, 4, 2});
     TensorShape inputShape = (dataLayout == DataLayout::NCHW) ?
@@ -1257,8 +1257,8 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadTest(armnn::
 
     FullyConnectedLayer* const layer = graph.AddLayer<FullyConnectedLayer>(layerDesc, "layer");
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     armnn::TensorInfo weightsTensorInfo({7, 20}, DataType, inputsQScale);
     weightsTensorInfo.SetConstant();
@@ -1302,8 +1302,8 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWithBlobWorkloadTest
 
     FullyConnectedLayer* const layer = graph.AddLayer<FullyConnectedLayer>(layerDesc, "layer");
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     armnn::TensorInfo weightsTensorInfo({7, 20}, DataType, inputsQScale);
     armnn::TensorInfo biasesTensorInfo({7}, GetBiasDataType(DataType), inputsQScale);
@@ -1378,8 +1378,8 @@ std::unique_ptr<FullyConnectedWorkload> CreateFullyConnectedWorkloadWeightsBiase
 
     FullyConnectedLayer* const layer = graph.AddLayer<FullyConnectedLayer>(layerDesc, "layer");
 
-    float inputsQScale = DataType == armnn::DataType::QAsymmU8 ? 1.0f : 0.0;
-    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 0.0;
+    float inputsQScale = 1.0f;
+    float outputQScale = DataType == armnn::DataType::QAsymmU8 ? 2.0f : 1.0;
 
     // Creates extra layers with weights and biases as input layers.
     Layer* const input   = graph.AddLayer<InputLayer>(1, "input");

@@ -77,17 +77,10 @@ private:
 
 static int TfLiteArmnnOpaqueDelegateErrno(TfLiteOpaqueDelegate* delegate) { return 0; }
 
-
-    /// In order for the delegate to be loaded by TfLite
+/// In order for the delegate to be loaded by TfLite
 const TfLiteOpaqueDelegatePlugin* GetArmnnDelegatePluginApi();
 
-extern const TfLiteStableDelegate TFL_TheStableDelegate =
-{
-    /*delegate_abi_version=*/ TFL_STABLE_DELEGATE_ABI_VERSION,
-    /*delegate_name=*/        "ArmnnDelegatePlugin",
-    /*delegate_version=*/     "1.0.0",
-    /*delegate_plugin=*/      GetArmnnDelegatePluginApi()
-};
+extern const TfLiteStableDelegate TFL_TheStableDelegate;
 
 /// ArmnnSubgraph class where parsing the nodes to ArmNN format and creating the ArmNN Graph
 class ArmnnSubgraph

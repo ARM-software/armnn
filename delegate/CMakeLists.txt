@@ -120,14 +120,15 @@ if (BUILD_OPAQUE_DELEGATE)
     set_target_properties(armnnOpaqueDelegate PROPERTIES VERSION ${OPAQUE_DELEGATE_LIB_VERSION} SOVERSION ${OPAQUE_DELEGATE_LIB_SOVERSION})
 endif()
 
-if(BUILD_UNIT_TESTS AND BUILD_CLASSIC_DELEGATE)
-    set(armnnDelegate_unittest_sources)
-    list(APPEND armnnDelegate_unittest_sources
+if(BUILD_UNIT_TESTS)
+    set(commonDelegate_unittest_sources)
+    list(APPEND commonDelegate_unittest_sources
+        common/src/test/DelegateTestInterpreter.hpp
+        common/src/test/DelegateTestInterpreterUtils.hpp
         test/ActivationTest.cpp
         test/ActivationTestHelper.hpp
         test/ArgMinMaxTest.cpp
         test/ArgMinMaxTestHelper.hpp
-        test/ArmnnDelegateTest.cpp
         test/BatchMatMulTest.cpp
         test/BatchMatMulTestHelper.hpp
         test/BatchSpaceTest.cpp
@@ -143,9 +144,6 @@ if(BUILD_UNIT_TESTS AND BUILD_CLASSIC_DELEGATE)
         test/ConvolutionTestHelper.hpp
         test/DelegateOptionsTest.cpp
         test/DelegateOptionsTestHelper.hpp
-        classic/src/test/DelegateTestInterpreter.cpp
-        common/src/test/DelegateTestInterpreter.hpp
-        common/src/test/DelegateTestInterpreterUtils.hpp
         test/DepthwiseConvolution2dTest.cpp
         test/ElementwiseBinaryTest.cpp
         test/ElementwiseBinaryTestHelper.hpp
@@ -207,48 +205,76 @@ if(BUILD_UNIT_TESTS AND BUILD_CLASSIC_DELEGATE)
         test/UnpackTest.cpp
         test/UnpackTestHelper.hpp)
 
-        # There's a known Android NDK bug which causes a subset of NeonLayerTests to
-        # fail. We'll exclude these tests in NeonLayerTests_NDK_Bug.cpp if we're doing
-        # a debug build and NDK is less than r21.
-        # https://github.com/android/ndk/issues/1135
+    # There's a known Android NDK bug which causes a subset of NeonLayerTests to
+    # fail. We'll exclude these tests in NeonLayerTests_NDK_Bug.cpp if we're doing
+    # a debug build and NDK is less than r21.
+    # https://github.com/android/ndk/issues/1135
 
-        # Default to always including these tests.
-        set(INCLUDE_NDK_BUG_TESTS "ON")
-        # Reconsider if we in a debug build.
-        string( TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE_LOWERCASE )
-        if ( NOT BUILD_TYPE_LOWERCASE STREQUAL "release" )
-            message("CMAKE:: BUILD TYPE IS ${CMAKE_BUILD_TYPE}")
-            # And NDK_VERSION has been set.
-            if ( DEFINED NDK_VERSION )
-                message("CMAKE:: NDK DEFINED")
-                # And the version is less than r21.
-                if ( ${NDK_VERSION} STRLESS "r21" )
-                    message("CMAKE:: BUG TESTS OFF")
-                    set(INCLUDE_NDK_BUG_TESTS "OFF")
-                endif()
+    # Default to always including these tests.
+    set(INCLUDE_NDK_BUG_TESTS "ON")
+    # Reconsider if we in a debug build.
+    string( TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE_LOWERCASE )
+    if ( NOT BUILD_TYPE_LOWERCASE STREQUAL "release" )
+        message("CMAKE:: BUILD TYPE IS ${CMAKE_BUILD_TYPE}")
+        # And NDK_VERSION has been set.
+        if ( DEFINED NDK_VERSION )
+            message("CMAKE:: NDK DEFINED")
+            # And the version is less than r21.
+            if ( ${NDK_VERSION} STRLESS "r21" )
+                message("CMAKE:: BUG TESTS OFF")
+                set(INCLUDE_NDK_BUG_TESTS "OFF")
             endif()
         endif()
+    endif()
 
-        if ( INCLUDE_NDK_BUG_TESTS STREQUAL "ON" )
-           list(APPEND armnnDelegate_unittest_sources
-                test/NeonDelegateTests_NDK_Issue.cpp
-                )
-        else()
+    if ( INCLUDE_NDK_BUG_TESTS STREQUAL "ON" )
+        list(APPEND commonDelegate_unittest_sources
+             test/NeonDelegateTests_NDK_Issue.cpp)
+    endif()
 
-        endif()
-        add_executable(DelegateUnitTests ${armnnDelegate_unittest_sources})
+    if (BUILD_CLASSIC_DELEGATE)
+        set(classicDelegate_unittest_sources)
+        list(APPEND classicDelegate_unittest_sources
+             classic/src/test/ArmnnClassicDelegateTest.cpp
+             classic/src/test/DelegateTestInterpreter.cpp)
+
+        add_executable(DelegateUnitTests ${commonDelegate_unittest_sources} ${classicDelegate_unittest_sources})
 
         target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
         target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/common/src/test")
+        target_include_directories(DelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
 
         # Add half library from armnn third-party libraries
         target_link_libraries(DelegateUnitTests PRIVATE thirdparty_headers)
-
         target_link_libraries(DelegateUnitTests PRIVATE armnnDelegate)
-        target_include_directories(DelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
         target_link_libraries(DelegateUnitTests PRIVATE Armnn::armnnUtils)
-
         target_link_libraries(DelegateUnitTests PRIVATE profiling_library_headers)
+    endif()
+
+    if (BUILD_OPAQUE_DELEGATE)
+        set(opaqueDelegate_unittest_sources)
+        list(APPEND opaqueDelegate_unittest_sources
+             common/src/test/DelegateTestInterpreter.hpp
+             common/src/test/DelegateTestInterpreterUtils.hpp
+             opaque/src/test/ArmnnOpaqueDelegateTest.cpp
+             opaque/src/test/DelegateTestInterpreter.cpp
+             test/TestUtils.hpp
+             test/TestUtils.cpp)
+
+        # Until all operators are supported, we have to add tests one by one above to opaqueDelegate_unittest_sources.
+        # After we add can add commonDelegate_unittest_sources to the add_executable below.
+        add_executable(OpaqueDelegateUnitTests ${opaqueDelegate_unittest_sources})
+
+        target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/common/src/test")
+        target_include_directories(OpaqueDelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
+
+        # Add half library from armnn third-party libraries
+        target_link_libraries(OpaqueDelegateUnitTests PRIVATE thirdparty_headers)
+        target_link_libraries(OpaqueDelegateUnitTests PRIVATE armnnOpaqueDelegate)
+        target_link_libraries(OpaqueDelegateUnitTests PRIVATE Armnn::armnnUtils)
+        target_link_libraries(OpaqueDelegateUnitTests PRIVATE profiling_library_headers)
+    endif()
 endif()
 
 if(BUILD_DELEGATE_JNI_INTERFACE)

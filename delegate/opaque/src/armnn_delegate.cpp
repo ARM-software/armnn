@@ -59,6 +59,14 @@
 namespace armnnOpaqueDelegate
 {
 
+const TfLiteStableDelegate TFL_TheStableDelegate =
+{
+    /*delegate_abi_version=*/ TFL_STABLE_DELEGATE_ABI_VERSION,
+    /*delegate_name=*/        "ArmnnDelegatePlugin",
+    /*delegate_version=*/     "1.0.0",
+    /*delegate_plugin=*/      GetArmnnDelegatePluginApi()
+};
+
 ArmnnOpaqueDelegate::ArmnnOpaqueDelegate(armnnDelegate::DelegateOptions options)
     : m_Options(std::move(options))
 {

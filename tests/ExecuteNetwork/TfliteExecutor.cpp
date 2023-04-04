@@ -18,10 +18,14 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
     tflite::ops::builtin::BuiltinOpResolver resolver;
 
     tflite::InterpreterBuilder builder(*m_Model, resolver);
-    builder(&m_TfLiteInterpreter);
-    m_TfLiteInterpreter->AllocateTensors();
-
-    int status = kTfLiteError;
+    if (builder(&m_TfLiteInterpreter) != kTfLiteOk)
+    {
+        LogAndThrow("Error loading the model into the TfLiteInterpreter.");
+    }
+    if (m_TfLiteInterpreter->AllocateTensors() != kTfLiteOk)
+    {
+        LogAndThrow("Failed to allocate tensors in the TfLiteInterpreter.");
+    }
     if (m_Params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate)
     {
         // Create the Armnn Delegate
@@ -32,10 +36,9 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
                 theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
                                  armnnDelegate::TfLiteArmnnDelegateDelete);
         // Register armnn_delegate to TfLiteInterpreter
-        status = m_TfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
-        if (status != kTfLiteOk)
+        if (m_TfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate)) != kTfLiteOk)
         {
-            LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter");
+            LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter.");
         }
     }
     else

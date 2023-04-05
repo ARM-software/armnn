@@ -26,6 +26,11 @@
 #include "RuntimeTests.hpp"
 #include <TestUtils.hpp>
 
+#ifdef ARMNN_LEAK_CHECKING_ENABLED
+#include <HeapProfiling.hpp>
+#include <LeakChecking.hpp>
+#endif
+
 namespace armnn
 {
 

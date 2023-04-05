@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/INetwork.hpp>
@@ -21,7 +21,7 @@ int main()
 
     IConnectableLayer* input0 = myNetwork->AddInputLayer(0);
     IConnectableLayer* input1 = myNetwork->AddInputLayer(1);
-    IConnectableLayer* add    = myNetwork->AddAdditionLayer();
+    IConnectableLayer* add    = myNetwork->AddElementwiseBinaryLayer(BinaryOperation::Add);
     IConnectableLayer* output = myNetwork->AddOutputLayer(0);
 
     input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));

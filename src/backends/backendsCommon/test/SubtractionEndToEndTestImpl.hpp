@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -30,8 +30,9 @@ armnn::INetworkPtr CreateSubtractionNetwork(const armnn::TensorShape& inputXShap
 
     TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset);
 
-
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* subtraction = network->AddSubtractionLayer("subtraction");
+    ARMNN_NO_DEPRECATE_WARN_END
     IConnectableLayer* inputX = network->AddInputLayer(0, "inputX");
     IConnectableLayer* inputY = network->AddInputLayer(1, "inputY");
     IConnectableLayer* output = network->AddOutputLayer(0, "output");

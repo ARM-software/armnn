@@ -34,7 +34,9 @@ TEST_CASE("GetTosaMappingFromLayer_AdditionLayer")
 
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* add    = net->AddAdditionLayer("add");
+    ARMNN_NO_DEPRECATE_WARN_END
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
 
     input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));
@@ -329,7 +331,9 @@ TEST_CASE("GetTosaMappingFromLayer_MultiplicationLayer")
 
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* add    = net->AddMultiplicationLayer("multiplication");
+    ARMNN_NO_DEPRECATE_WARN_END
     IConnectableLayer* output = net->AddOutputLayer(0, "output");
 
     input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));

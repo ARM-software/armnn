@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1568,7 +1568,9 @@ void SampleDynamicBackendEndToEndTestImpl()
 
     IConnectableLayer* input0 = net->AddInputLayer(0);
     IConnectableLayer* input1 = net->AddInputLayer(1);
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     IConnectableLayer* add = net->AddAdditionLayer();
+    ARMNN_NO_DEPRECATE_WARN_END
     IConnectableLayer* output = net->AddOutputLayer(0);
 
     input0->GetOutputSlot(0).Connect(add->GetInputSlot(0));

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,7 +21,9 @@ TEST_CASE("SimpleSupportedOptimizedNetwork")
 
     auto inputLayer1 = network->AddInputLayer(0, "input_1");
     auto inputLayer2 = network->AddInputLayer(1, "input_2");
+    ARMNN_NO_DEPRECATE_WARN_BEGIN
     auto addLayer = network->AddAdditionLayer("add");
+    ARMNN_NO_DEPRECATE_WARN_END
     auto outputLayer = network->AddOutputLayer(2, "output");
 
     armnn::TensorInfo tensorInfo{{4}, armnn::DataType::Float32};

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -417,7 +417,7 @@ struct ParseArgs
             {
                 std::stringstream ss;
                 ss << "Argument given to" << argName << "is not a valid file path";
-                throw cxxopts::option_syntax_exception(ss.str().c_str());
+                throw cxxopts::exceptions::invalid_option_syntax(ss.str().c_str());
             }
             return path;
         }
@@ -428,7 +428,7 @@ struct ParseArgs
                 return "";
             }
 
-            throw cxxopts::missing_argument_exception(argName);
+            throw cxxopts::exceptions::missing_argument(argName);
         }
     }
 
@@ -440,7 +440,7 @@ struct ParseArgs
             {
                 return std::vector<std::string>();
             }
-            throw cxxopts::option_syntax_exception("Comparison files requires 5 file paths.");
+            throw cxxopts::exceptions::invalid_option_syntax("Comparison files requires 5 file paths.");
         }
 
         std::vector<std::string> filePaths;
@@ -449,7 +449,8 @@ struct ParseArgs
             filePaths.push_back(path);
             if (!ValidateFilePath(filePaths.back(), ExpectFile::True))
             {
-                throw cxxopts::option_syntax_exception("Argument given to Comparison Files is not a valid file path");
+                throw cxxopts::exceptions::invalid_option_syntax(
+                    "Argument given to Comparison Files is not a valid file path");
             }
         }
         return filePaths;

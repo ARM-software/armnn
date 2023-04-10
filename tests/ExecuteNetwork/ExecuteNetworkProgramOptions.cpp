@@ -34,7 +34,7 @@ void CheckOptionDependency(const cxxopts::ParseResult& result,
     // Check that the given options are valid.
     if (option == nullptr || required == nullptr)
     {
-        throw cxxopts::OptionParseException("Invalid option to check dependency for");
+        throw cxxopts::exceptions::exception("Invalid option to check dependency for");
     }
 
     // Check that if 'option' is provided, 'required' is also provided.
@@ -42,7 +42,7 @@ void CheckOptionDependency(const cxxopts::ParseResult& result,
     {
         if (CheckOption(result, required) == 0 || result[required].has_default())
         {
-            throw cxxopts::OptionParseException(
+            throw cxxopts::exceptions::exception(
                     std::string("Option '") + option + "' requires option '" + required + "'.");
         }
     }
@@ -514,7 +514,7 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
          m_ExNetParams.m_OutputDetailsOnlyToStdOut) &&
         !m_ExNetParams.m_EnableProfiling)
     {
-        throw cxxopts::OptionParseException("You must enable profiling if you would like to output layer details");
+        throw cxxopts::exceptions::exception("You must enable profiling if you would like to output layer details");
     }
 
     // Some options can't be assigned directly because they need some post-processing:
@@ -617,4 +617,3 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
         m_ExNetParams.m_ComparisonComputeDevices = GetBackendIDs(comparisonComputDevices);
     }
 }
-

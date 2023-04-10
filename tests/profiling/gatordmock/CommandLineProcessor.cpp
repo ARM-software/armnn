@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -63,7 +63,7 @@ bool CommandLineProcessor::ProcessCommandLine(int argc, char *argv[])
             m_Echo = true;
         }
     }
-    catch (const cxxopts::OptionException& e)
+    catch (const cxxopts::exceptions::exception& e)
     {
         std::cerr << e.what() << std::endl;
         return false;

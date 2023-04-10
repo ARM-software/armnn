@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "../InferenceTest.hpp"
@@ -76,7 +76,7 @@ std::string GetLabelsFilenameFromOptions(int argc, char* argv[])
 
         auto result = options.parse(argc, argv);
     }
-    catch (const cxxopts::OptionException& e)
+    catch (const cxxopts::exceptions::exception& e)
     {
         std::cerr << e.what() << std::endl;
         exit(EXIT_FAILURE);

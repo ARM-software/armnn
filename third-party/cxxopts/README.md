@@ -7,9 +7,9 @@ tagged release version.
 
 ## Version 3 breaking changes
 
-If you have used version 2, there are a couple of breaking changes in (the as
-yet unreleased, current master) version 3 that you should be aware of. If you are new to
-`cxxopts` you can skip this section.
+If you have used version 2, there are a couple of breaking changes in version 3
+that you should be aware of. If you are new to `cxxopts` you can skip this
+section.
 
 The parser no longer modifies its arguments, so you can pass a const `argc` and
 `argv` and expect them not to be changed.
@@ -109,9 +109,9 @@ result.unmatched()
 
 Exceptional situations throw C++ exceptions. There are two types of
 exceptions: errors defining the options, and errors when parsing a list of
-arguments. All exceptions derive from `cxxopts::OptionException`. Errors
-defining options derive from `cxxopts::OptionSpecException` and errors
-parsing arguments derive from `cxxopts::OptionParseException`.
+arguments. All exceptions derive from `cxxopts::exceptions::exception`. Errors
+defining options derive from `cxxopts::exceptions::specification` and errors
+parsing arguments derive from `cxxopts::exceptions::parsing`.
 
 All exceptions define a `what()` function to get a printable string
 explaining the error.
@@ -125,15 +125,37 @@ vector to the `help` function.
 
 ## Positional Arguments
 
-Positional arguments can be optionally parsed into one or more options.
-To set up positional arguments, call
+Positional arguments are those given without a preceding flag and can be used
+alongside non-positional arguments. There may be multiple positional arguments,
+and the final positional argument may be a container type to hold a list of all
+remaining positionals.
+
+To set up positional arguments, first declare the options, then configure a
+set of those arguments as positional like:
 
 ```cpp
-options.parse_positional({"first", "second", "last"})
+options.add_options()
+  ("script", "The script file to execute", cxxopts::value<std::string>())
+  ("server", "The server to execute on", cxxopts::value<std::string>())
+  ("filenames", "The filename(s) to process", cxxopts::value<std::vector<std::string>>());
+
+options.parse_positional({"script", "server", "filenames"});
+
+// Parse options the usual way
+options.parse(argc, argv);
 ```
 
-where "last" should be the name of an option with a container type, and the
-others should have a single value.
+For example, parsing the following arguments:
+~~~
+my_script.py my_server.com file1.txt file2.txt file3.txt
+~~~
+will result in parsed arguments like the following table:
+
+| Field         | Value                                     |
+| ------------- | ----------------------------------------- |
+| `"script"`    | `"my_script.py"`                          |
+| `"server"`    | `"my_server.com"`                         |
+| `"filenames"` | `{"file1.txt", "file2.txt", "file3.txt"}` |
 
 ## Default and implicit values
 
@@ -160,6 +182,8 @@ and writing `--option=another` would give it the value `"another"`.
 Note that the default and implicit value is always stored as a string,
 regardless of the type that you want to store it in. It will be parsed as
 though it was given on the command line.
+
+Default values are not counted by `Options::count`.
 
 ## Boolean values
 

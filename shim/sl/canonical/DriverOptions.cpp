@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -106,7 +106,7 @@ DriverOptions::DriverOptions()
     string optionsAsString(rawEnv);
     regex whiteSpaceRegex("\\s+");
     // Tokienize the string based on whitespace.
-    sregex_token_iterator iter(optionsAsString.begin(), optionsAsString.end(), whiteSpaceRegex, -1);  
+    sregex_token_iterator iter(optionsAsString.begin(), optionsAsString.end(), whiteSpaceRegex, -1);
     sregex_token_iterator end;
     vector<string> cliAsVector(iter, end);
     // As we're pretending to be a command line, argv[0] should be an executable name.
@@ -216,7 +216,7 @@ DriverOptions::DriverOptions()
     {
         cxxopts::ParseResult result = optionsDesc.parse(argc, argv);
     }
-    catch (const cxxopts::OptionException& e)
+    catch (const cxxopts::exceptions::exception& e)
     {
         VLOG(DRIVER) << "An exception occurred attempting to parse program options: " << e.what();
         std::cout << optionsDesc.help() << std::endl

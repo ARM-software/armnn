@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -205,7 +205,7 @@ public:
                 return false;
             }
         }
-        catch (const cxxopts::OptionException& e)
+        catch (const cxxopts::exceptions::exception& e)
         {
             std::cerr << e.what() << std::endl << std::endl;
             return false;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -28,7 +28,7 @@ inline std::istream& operator>>(std::istream& in, armnn::Compute& compute)
     if (compute == armnn::Compute::Undefined)
     {
         in.setstate(std::ios_base::failbit);
-        throw cxxopts::OptionException(fmt::format("Unrecognised compute device: {}", token));
+        throw cxxopts::exceptions::exception(fmt::format("Unrecognised compute device: {}", token));
     }
     return in;
 }
@@ -41,7 +41,7 @@ inline std::istream& operator>>(std::istream& in, armnn::BackendId& backend)
     if (compute == armnn::Compute::Undefined)
     {
         in.setstate(std::ios_base::failbit);
-        throw cxxopts::OptionException(fmt::format("Unrecognised compute device: {}", token));
+        throw cxxopts::exceptions::exception(fmt::format("Unrecognised compute device: {}", token));
     }
     backend = compute;
     return in;

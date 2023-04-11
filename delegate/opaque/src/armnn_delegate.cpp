@@ -106,11 +106,14 @@ ArmnnOpaqueDelegate::ArmnnOpaqueDelegate(armnnDelegate::DelegateOptions options)
     TFLITE_LOG_PROD_ONCE(tflite::TFLITE_LOG_INFO, "TfLiteArmnnOpaqueDelegate: Created TfLite ArmNN delegate.");
 }
 
-TfLiteStatus DoPrepare(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueDelegate* tfLiteDelegate)
+TfLiteStatus DoPrepare(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueDelegate* tfLiteDelegate, void* data)
 {
+    // We are required to have the void* data parameter in the function signature, but we don't actually use it.
+    armnn::IgnoreUnused(data);
+
     TfLiteIntArray* supportedOperators =
             static_cast<::armnnOpaqueDelegate::ArmnnOpaqueDelegate*>
-                    (tfLiteDelegate->data_)->IdentifyOperatorsToDelegate(tfLiteContext);
+                    (TfLiteOpaqueDelegateGetData(tfLiteDelegate))->IdentifyOperatorsToDelegate(tfLiteContext);
     if(supportedOperators == nullptr)
     {
         return kTfLiteError;
@@ -142,7 +145,7 @@ TfLiteStatus DoPrepare(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueDelegate*
                         ArmnnSubgraph::Create(tfLiteContext,
                                               parameters,
                                               static_cast<::armnnOpaqueDelegate::ArmnnOpaqueDelegate*>(
-                                                      parameters->delegate->data_)));
+                                                      parameters->delegate->opaque_delegate_builder->data)));
             }
     );
 
@@ -366,7 +369,7 @@ TfLiteStatus ArmnnSubgraph::AddOutputLayer(DelegateData& delegateData,
         const int32_t tensorId = outputs->data[i];
         const TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, tensorId);
 
-        if(!tensor)
+        if(!IsValid(tensor))
         {
             return kTfLiteError;
         }
@@ -411,8 +414,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteOpaqueContext* tfLiteContext,
     std::vector<armnn::BindingPointInfo> outputBindings;
 
     // Add input layer
-    auto status = AddInputLayer(delegateData, tfLiteContext, parameters->input_tensors, inputBindings);
-    if (status != kTfLiteOk)
+    if (AddInputLayer(delegateData, tfLiteContext, parameters->input_tensors, inputBindings) != kTfLiteOk)
     {
         throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to add Inputs to the network!");
     }
@@ -440,8 +442,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteOpaqueContext* tfLiteContext,
                     << std::fixed << armnn::GetTimeDuration(parseStartTime).count() << " ms";
 
     // Add Output layer
-    status = AddOutputLayer(delegateData, tfLiteContext, parameters->output_tensors, outputBindings);
-    if (status != kTfLiteOk)
+    if (AddOutputLayer(delegateData, tfLiteContext, parameters->output_tensors, outputBindings) != kTfLiteOk)
     {
         throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to add Outputs to the network!");
     }
@@ -544,24 +545,27 @@ TfLiteStatus ArmnnSubgraph::Prepare(TfLiteOpaqueContext* tfLiteContext)
 
 TfLiteStatus ArmnnSubgraph::Invoke(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueNode* tfLiteNode)
 {
-    // Prepare inputs
-    armnn::InputTensors inputTensors;
-    size_t inputIndex = 0;
-    const int* inputs;
+    // Get array of input indices, inputIndexArray is set from the TfLiteOpaqueNodeInputs function
+    // This function turns inputIndexArray into an int array of indices. These indices point to the tensors for
+    // each input slot in the node.
+    const int* inputIndexArray;
     int numInputs;
-    if(TfLiteOpaqueNodeInputs(tfLiteNode, &inputs, &numInputs) != kTfLiteOk)
+    if(TfLiteOpaqueNodeInputs(tfLiteNode, &inputIndexArray, &numInputs) != kTfLiteOk)
     {
         throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to load subgraph inputs!");
     }
+    // Prepare inputs
+    armnn::InputTensors inputTensors;
+    size_t inputIndex = 0;
     for (int inputIdx = 0; inputIdx < numInputs; inputIdx++)
     {
-        TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputs[inputIdx]);
+        TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputIndexArray[inputIdx]);
 
-        if(!tensor)
+        if(!IsValid(tensor))
         {
             return kTfLiteError;
         }
-
+        // If tensor is not read only
         if (TfLiteOpaqueTensorGetAllocationType(tensor) != kTfLiteMmapRo)
         {
             const armnn::BindingPointInfo& inputBinding = m_InputBindings[inputIndex];
@@ -574,29 +578,29 @@ TfLiteStatus ArmnnSubgraph::Invoke(TfLiteOpaqueContext* tfLiteContext, TfLiteOpa
         }
     }
 
-    // Prepare outputs
-    armnn::OutputTensors outputTensors;
-    size_t outputIndex = 0;
-    const int* outputs;
+    // Get array of output indices, outputIndexArray is set from the TfLiteOpaqueNodeOutputs function
+    // This function turns outputIndexArray into an int array of indices. These indices point to the tensors for
+    // each output slot in the node.
+    const int* outputIndexArray;
     int numOutputs;
-    if(TfLiteOpaqueNodeOutputs(tfLiteNode, &outputs, &numOutputs) != kTfLiteOk)
+    if(TfLiteOpaqueNodeOutputs(tfLiteNode, &outputIndexArray, &numOutputs) != kTfLiteOk)
     {
         throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to load subgraph outputs!");
     }
+    // Assign the tensors from the outputIndexArray to the armnn BindingPointInfo
+    armnn::OutputTensors outputTensors;
     for (int outputIdx = 0; outputIdx < numOutputs; outputIdx++)
     {
-        const armnn::BindingPointInfo& outputBinding = m_OutputBindings[outputIndex];
-        TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputs[outputIdx]);
-
-        if(!tensor)
+        const armnn::BindingPointInfo& outputBinding = m_OutputBindings[outputIdx];
+        TfLiteOpaqueTensor* tensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputIndexArray[outputIdx]);
+        if(!IsValid(tensor))
         {
             return kTfLiteError;
         }
 
-        const armnn::Tensor outputTensor(outputBinding.second, TfLiteOpaqueTensorData(tensor));
-        outputTensors.emplace_back(outputIdx, outputTensor);
-
-        ++outputIndex;
+        const armnn::Tensor outputTensor(outputBinding.second, reinterpret_cast<TfLiteTensor*>(tensor)->data
+        .data);
+        outputTensors.emplace_back(outputIndexArray[outputIdx], outputTensor);
     }
 
     // Run graph
@@ -618,9 +622,14 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
 {
     switch (TfLiteRegistrationExternalGetBuiltInCode(tfLiteRegistration))
     {
+        case kTfLiteBuiltinCast:
+            return VisitCastOperator(delegateData,
+                                     tfLiteContext,
+                                     tfLiteNode,
+                                     nodeIndex,
+                                     kTfLiteBuiltinCast);
         default:
             return kTfLiteError;
     }
 }
-
 } // armnnOpaqueDelegate namespace

@@ -62,7 +62,7 @@ private:
     TfLiteOpaqueDelegateBuilder m_Builder =
     {
             reinterpret_cast<void*>(this),  // .data_
-            nullptr,                        // .Prepare
+            DoPrepare,                      // .Prepare
             nullptr,                        // .CopyFromBufferHandle
             nullptr,                        // .CopyToBufferHandle
             nullptr,                        // .FreeBufferHandle

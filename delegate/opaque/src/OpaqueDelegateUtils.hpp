@@ -115,9 +115,9 @@ bool IsConstantTensor(const TfLiteOpaqueTensor* tfLiteTensor)
     return false;
 }
 
-bool IsDynamicTensor(const TfLiteOpaqueTensor& tfLiteTensor)
+bool IsDynamicTensor(const TfLiteOpaqueTensor* tfLiteTensor)
 {
-    auto tensorAllocationType = TfLiteOpaqueTensorGetAllocationType(&tfLiteTensor);
+    auto tensorAllocationType = TfLiteOpaqueTensorGetAllocationType(tfLiteTensor);
     if (tensorAllocationType == kTfLiteDynamic)
     {
         return true;
@@ -131,11 +131,11 @@ bool IsValid(const TfLiteOpaqueTensor* tfLiteTensor)
 }
 
 bool IsValid(TfLiteOpaqueContext* tfLiteContext,
-             const TfLiteOpaqueTensor& tfLiteTensor,
+             const TfLiteOpaqueTensor* tfLiteTensor,
              int32_t operatorCode,
              int32_t nodeIndex)
 {
-    if(!IsValid(&tfLiteTensor))
+    if(!IsValid(tfLiteTensor))
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
@@ -164,89 +164,52 @@ bool IsAffineQuantization(const TfLiteOpaqueTensor& tfLiteTensor)
     return false;
 }
 
-// Load input indices into array if found and validate.
-// This replaces node->inputs->data.
-TfLiteStatus GetInputIndices(const int* inputIndices,
-                             TfLiteOpaqueNode* tfLiteNode,
-                             TfLiteOpaqueContext* tfLiteContext,
-                             unsigned int numInputs)
-{
-    int actualNumInputs = 0;
-
-    TfLiteStatus status = TfLiteOpaqueNodeInputs(tfLiteNode, &inputIndices, &actualNumInputs);
-    if(status != kTfLiteOk)
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext, "TfLiteArmnnOpaqueDelegate: Unable to gather input information from node.");
-        return kTfLiteError;
-    }
-
-    if (static_cast<unsigned int>(actualNumInputs) != numInputs)
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext, "TfLiteArmnnOpaqueDelegate: Unexpected number of inputs (%d != %d) in node.",
-                actualNumInputs, numInputs);
-        return kTfLiteError;
-    }
-
-    return kTfLiteOk;
-}
-
-// Load output indices into array if found and validate.
-// This replaces node->outputs->data.
-TfLiteStatus GetOutputIndices(const int* outputIndices,
-                              TfLiteOpaqueNode* tfLiteNode,
-                              TfLiteOpaqueContext* tfLiteContext,
-                              unsigned int numOutputs)
-{
-    int actualNumOutputs = 0;
-
-    TfLiteStatus status = TfLiteOpaqueNodeOutputs(tfLiteNode, &outputIndices, &actualNumOutputs);
-    if(status != kTfLiteOk)
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext, "TfLiteArmnnOpaqueDelegate: Unable to gather output information from node.");
-        return kTfLiteError;
-    }
-
-    if (static_cast<unsigned int>(actualNumOutputs) != numOutputs)
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext, "TfLiteArmnnOpaqueDelegate: Unexpected number of outputs (%d != %d) in node.",
-                actualNumOutputs, numOutputs);
-        return kTfLiteError;
-    }
-
-    return kTfLiteOk;
-}
-
+// Connects the layer to the graph
 TfLiteStatus Connect(armnn::IConnectableLayer* layer,
                      TfLiteOpaqueContext* tfLiteContext,
                      TfLiteOpaqueNode* tfLiteNode,
                      armnnOpaqueDelegate::DelegateData& data)
 {
-    // Get array of indices, replaces node->inputs->data
-    const int* inputIndices = nullptr;
-    TfLiteStatus inputStatus = GetInputIndices(inputIndices, tfLiteNode, tfLiteContext, layer->GetNumInputSlots());
-    if(inputStatus != kTfLiteOk)
+    // Get array of input indices, inputIndexArray is set from the TfLiteOpaqueNodeInputs function
+    // This function turns inputIndexArray into an int array of indices. These indices point to the index of the
+    // tensors for each input slot in the node.
+    const int* inputIndexArray;
+    int numInputs;
+    if(TfLiteOpaqueNodeInputs(tfLiteNode, &inputIndexArray, &numInputs) != kTfLiteOk)
     {
         return kTfLiteError;
     }
-
-    // Connect the input slots
+    // numInputs is set from TfLiteOpaqueNodeInputs.
+    if(numInputs != static_cast<int>(layer->GetNumInputSlots()))
+    {
+        ARMNN_LOG(error) << "Layer: " << layer->GetName() << ": Expected number of input slots does not match actual "
+                                                          "number of input slots.";
+        return kTfLiteError;
+    }
+    // Connect the input slots.
+    // For each input slot, get the index of the opaque tensor that was allocated for it.
     for (unsigned int inputIndex = 0; inputIndex < layer->GetNumInputSlots(); ++inputIndex)
     {
-        if (data.m_OutputSlotForNode[inputIndices[inputIndex]] != nullptr)
+        if (data.m_OutputSlotForNode[inputIndexArray[inputIndex]] != nullptr)
         {
-            data.m_OutputSlotForNode[inputIndices[inputIndex]]->Connect(layer->GetInputSlot(inputIndex));
+            data.m_OutputSlotForNode[inputIndexArray[inputIndex]]->Connect(layer->GetInputSlot(inputIndex));
         }
     }
 
-    // Get array of indices, replaces node->outputs->data
-    const int* outputIndices = nullptr;
-    TfLiteStatus outputStatus = GetOutputIndices(outputIndices, tfLiteNode, tfLiteContext, layer->GetNumOutputSlots());
-    if(outputStatus != kTfLiteOk)
+    // Get array of output indices, outputIndexArray is set from the TfLiteOpaqueNodeOutputs function
+    // This function turns outputIndexArray into an int array of indices. These indices point to the tensors for
+    // each output slot in the node.
+    const int* outputIndexArray;
+    int numOutputs;
+    if(TfLiteOpaqueNodeOutputs(tfLiteNode, &outputIndexArray, &numOutputs) != kTfLiteOk)
     {
+        return kTfLiteError;
+    }
+    // numOutputs is set from TfLiteOpaqueNodeOutputs.
+    if(numOutputs != static_cast<int>(layer->GetNumOutputSlots()))
+    {
+        ARMNN_LOG(error) << "Layer: " << layer->GetName() << ": Expected number of output slots does not match actual "
+                                                             "number of output slots.";
         return kTfLiteError;
     }
 
@@ -254,7 +217,7 @@ TfLiteStatus Connect(armnn::IConnectableLayer* layer,
     for (unsigned int outputIndex = 0; outputIndex < layer->GetNumOutputSlots(); ++outputIndex)
     {
         armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(outputIndex);
-        data.m_OutputSlotForNode[static_cast<unsigned long>(outputIndices[outputIndex])] = &outputSlot;
+        data.m_OutputSlotForNode[static_cast<unsigned long>(outputIndexArray[outputIndex])] = &outputSlot;
     }
 
     return kTfLiteOk;
@@ -334,13 +297,13 @@ TfLiteStatus FusedActivation(TfLiteOpaqueContext* tfLiteContext,
     ARMNN_ASSERT(activationLayer != nullptr);
     activationLayer->GetOutputSlot(0).SetTensorInfo(activationOutputInfo);
 
-    // Get array of indices, replaces node->outputs->data
-    const int* outputIndices = nullptr;
-    TfLiteStatus status = GetOutputIndices(outputIndices,
-                                           tfLiteNode,
-                                           tfLiteContext,
-                                           activationLayer->GetNumOutputSlots());
-    if(status != kTfLiteOk)
+    // Get array of output indices, outputIndexArray is set from the TfLiteOpaqueNodeOutputs function
+    // This function turns outputIndexArray into an int array of indices. These indices point to the tensors for
+    // each output slot in the node.
+    const int* outputIndexArray;
+    int numOutputs;
+    TfLiteStatus outputStatus = TfLiteOpaqueNodeOutputs(tfLiteNode, &outputIndexArray, &numOutputs);
+    if(outputStatus != kTfLiteOk)
     {
         return kTfLiteError;
     }
@@ -349,10 +312,10 @@ TfLiteStatus FusedActivation(TfLiteOpaqueContext* tfLiteContext,
     for (unsigned int outputIndex = 0; outputIndex < activationLayer->GetNumOutputSlots(); ++outputIndex)
     {
         data.m_OutputSlotForNode[static_cast<unsigned long>(
-                outputIndices[outputIndex])]->Connect(activationLayer->GetInputSlot(0));
+                outputIndexArray[outputIndex])]->Connect(activationLayer->GetInputSlot(0));
 
         armnn::IOutputSlot& outputSlot = activationLayer->GetOutputSlot(outputIndex);
-        data.m_OutputSlotForNode[static_cast<unsigned long>(outputIndices[outputIndex])] = &outputSlot;
+        data.m_OutputSlotForNode[static_cast<unsigned long>(outputIndexArray[outputIndex])] = &outputSlot;
     }
     return kTfLiteOk;
 }
@@ -586,11 +549,13 @@ armnn::ConstTensor* GetConstTensorForTfLiteTensor(const TfLiteOpaqueContext* tfL
 
 bool IsOptionalOperandPresent(TfLiteOpaqueNode* tfLiteNode, const int operandIndex)
 {
-    // Gather array of indices and it's length, replaces node->inputs->data[i] and node->inputs->size
-    const int* inputIndices = nullptr;
+    // Get array of input indices, inputIndexArray is set from the TfLiteOpaqueNodeInputs function
+    // This function turns inputIndexArray into an int array of indices. These indices point to the index of the
+    // tensors for each input slot in the node.
+    const int* inputIndexArray;
     int numInputs = 0;
 
-    TfLiteStatus status = TfLiteOpaqueNodeInputs(tfLiteNode, &inputIndices, &numInputs);
+    TfLiteStatus status = TfLiteOpaqueNodeInputs(tfLiteNode, &inputIndexArray, &numInputs);
     if(status != kTfLiteOk)
     {
         throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to gather input information from node.");
@@ -598,7 +563,7 @@ bool IsOptionalOperandPresent(TfLiteOpaqueNode* tfLiteNode, const int operandInd
 
     // If the inputs array has fewer than operandIndex entries or if the entry at operandIndex has a value of -1 or
     // less then the input is not present.
-    if (numInputs > operandIndex && inputIndices[operandIndex] >= 0)
+    if (numInputs > operandIndex && inputIndexArray[operandIndex] >= 0)
     {
         return true;
     }
@@ -610,12 +575,16 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
                            TfLiteOpaqueContext* tfLiteContext,
                            TfLiteOpaqueNode* tfLiteNode)
 {
-    // Get array of indices, replaces node->inputs->data
-    const int* inputIndices = nullptr;
-    TfLiteStatus status = GetInputIndices(inputIndices, tfLiteNode, tfLiteContext, layer->GetNumInputSlots());
+    // Get array of input indices, inputIndexArray is set from the TfLiteOpaqueNodeInputs function
+    // This function turns inputIndexArray into an int array of indices. These indices point to the index of the
+    // tensors for each input slot in the node.
+    const int* inputIndexArray;
+    int numInputs = 0;
+
+    TfLiteStatus status = TfLiteOpaqueNodeInputs(tfLiteNode, &inputIndexArray, &numInputs);
     if(status != kTfLiteOk)
     {
-        return kTfLiteError;
+        throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Unable to gather input information from node.");
     }
 
     // Process input tensors
@@ -649,7 +618,7 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
             armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
             outputSlot.SetTensorInfo(inputTensorInfo);
 
-            delegateData.m_OutputSlotForNode[inputIndices[inputIndex]] = &outputSlot;
+            delegateData.m_OutputSlotForNode[inputIndexArray[inputIndex]] = &outputSlot;
         }
     }
     return kTfLiteOk;

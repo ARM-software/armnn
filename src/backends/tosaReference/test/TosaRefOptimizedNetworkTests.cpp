@@ -39,7 +39,7 @@ TEST_CASE("SimpleSupportedOptimizedNetwork")
 
     std::vector<armnn::BackendId> backends = { "TosaRef" };
 
-    armnn::OptimizerOptions optimizedOptions;
+    armnn::OptimizerOptionsOpaque optimizedOptions;
     armnn::IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optimizedOptions);
     CHECK(optNet);
 

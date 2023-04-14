@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="dcab9ca1b7914eb8cadadfaa5fb468e469dca5d9" #9408: Fix unused variable warning reported in nightly nuild | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9408
+DEFAULT_CLFRAMEWORKREVISION="8b7f42aa0e76a65a4ffa46ee875df6a6220695ae" #9416: Enable quantized data types for  CpuElementwiseUnary on Armv7a | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9416
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

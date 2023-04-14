@@ -19,7 +19,7 @@ function Usage() {
   echo "    -n Neon (CpuAcc backend) enabled <1 or 0> defaults to 1"
   echo "    -g CL (GpuAcc backend) enabled <1 or 0> defaults to 1"
   echo "    -r Reference (CpuRef backend) enabled <1 or 0> defaults to 1"
-  echo "    -u Build unit tests <1 or 0> defaults to 1"
+  echo "    -u Build tests and test applications <1 or 0> defaults to 1"
   echo "    -d TfLite Delegate enabled <1 or 0> defaults to 1"
   echo "    -p TfLite Parser enabled <1 or 0> defaults to 1"
   echo "    -s Dynamic Sample enabled <1 or 0> defaults to 0"
@@ -287,6 +287,7 @@ function BuildArmNN {
             -DFLATBUFFERS_ROOT=$WORKING_DIR/flatbuffers-android \
             -DFLATC_DIR=$WORKING_DIR/flatbuffers-x86 \
             -DBUILD_UNIT_TESTS=$BUILD_TESTS \
+            -DBUILD_TESTS=$BUILD_TESTS \
             -fexceptions"
 
     if [[ $TFLITE_PARSER == 1 ]]; then

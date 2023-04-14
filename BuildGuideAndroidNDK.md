@@ -255,7 +255,8 @@ cmake .. \
     -DFLATBUFFERS_ROOT=$WORKING_DIR/flatbuffers-android \
     -DFLATC_DIR=$WORKING_DIR/flatbuffers-x86 \
     -DBUILD_UNIT_TESTS=1 \
-    -fexception
+    -DBUILD_TESTS=1 \
+    -fexception \
 ```
 
 To include the Arm NN TFLite delegate add these arguments to the above list:

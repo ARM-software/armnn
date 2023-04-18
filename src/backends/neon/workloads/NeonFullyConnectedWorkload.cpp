@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -63,15 +63,20 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
                                                        ACLMemManagerOnDemand& memoryManager)
     : NeonBaseWorkload<FullyConnectedQueueDescriptor>(descriptor, info)
 {
-    m_Data.ValidateInputsOutputs("NeonFullyConnectedWorkload", 1, 1);
+    m_Data.ValidateInputsOutputs("NeonFullyConnectedWorkload", descriptor.m_Parameters.GetNumInputs(), 1);
 
     arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
-    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
-
-    // Copy the weights' tensor into arm_compute tensor.
-    m_WeightsTensor = std::make_unique<arm_compute::Tensor>();
+    arm_compute::ITensor& weights = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     m_WeightsTensorInfo = info.m_InputTensorInfos[1];
-    BuildArmComputeTensor(*m_WeightsTensor, m_WeightsTensorInfo);
+    weights.info()->set_are_values_constant(m_WeightsTensorInfo.IsConstant());
+    arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
+    if (m_WeightsTensorInfo.IsConstant())
+    {
+        // Copy the weights' tensor into arm_compute tensor.
+        m_WeightsTensor = std::make_unique<arm_compute::Tensor>();
+        BuildArmComputeTensor(*m_WeightsTensor, m_WeightsTensorInfo);
+        m_WeightsTensor->info()->set_are_values_constant(m_WeightsTensorInfo.IsConstant());
+    }
 
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
@@ -79,6 +84,10 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
         m_BiasesTensor = std::make_unique<arm_compute::Tensor>();
         m_BiasesTensorInfo = info.m_InputTensorInfos[2];
         BuildArmComputeTensor(*m_BiasesTensor, m_BiasesTensorInfo);
+        m_BiasesTensor->info()->set_are_values_constant(m_BiasesTensorInfo.IsConstant());
+
+        // We do not support dynamic bias
+        ARMNN_ASSERT(m_BiasesTensorInfo.IsConstant() == true);
     }
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
@@ -86,7 +95,14 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
         ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo(descriptor.m_Parameters, activationInfo);
 
     auto layer = std::make_unique<arm_compute::NEFullyConnectedLayer>(memoryManager);
-    layer->configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
+    if (m_WeightsTensorInfo.IsConstant())
+    {
+        layer->configure(&input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output, fc_info);
+    }
+    else
+    {
+        layer->configure(&input, &weights, m_BiasesTensor.get(), &output, fc_info);
+    }
     m_FullyConnectedLayer.reset(layer.release());
 
     // Add details for profiling output
@@ -105,8 +121,6 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
                                          descriptor.m_Parameters,
                                          detailsInfo,
                                          this->GetGuid());
-
-    // Force Compute Library to perform the necessary copying and reshaping.
 }
 
 void NeonFullyConnectedWorkload::Execute() const
@@ -115,15 +129,25 @@ void NeonFullyConnectedWorkload::Execute() const
     // The constant tensors may not be fully in place until the workload is Executed
     if (!prepared)
     {
-        InitializeArmComputeTensorData(*m_WeightsTensor, m_WeightsTensorInfo, m_Data.m_Inputs[1]);
+        if (m_WeightsTensorInfo.IsConstant())
+        {
+            InitializeArmComputeTensorData(*m_WeightsTensor, m_WeightsTensorInfo, m_Data.m_Inputs[1]);
+            m_WeightsTensor->info()->set_are_values_constant(m_WeightsTensorInfo.IsConstant());
+        }
 
         if (m_Data.m_Parameters.m_BiasEnabled)
         {
             InitializeArmComputeTensorData(*m_BiasesTensor, m_BiasesTensorInfo, m_Data.m_Inputs[2]);
+            m_BiasesTensor->info()->set_are_values_constant(m_BiasesTensorInfo.IsConstant());
         }
-        m_FullyConnectedLayer->prepare();
-        FreeTensorIfUnused(m_WeightsTensor);
-        FreeTensorIfUnused(m_BiasesTensor);
+        if (m_WeightsTensorInfo.IsConstant())
+        {
+            FreeTensorIfUnused(m_WeightsTensor);
+        }
+        if (m_BiasesTensorInfo.IsConstant())
+        {
+            FreeTensorIfUnused(m_BiasesTensor);
+        }
         prepared = true;
     }
     m_FullyConnectedLayer->run();

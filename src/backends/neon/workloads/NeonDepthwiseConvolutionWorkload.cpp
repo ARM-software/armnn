@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -95,9 +95,13 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     arm_compute::ITensor& weights = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
     arm_compute::ITensor* biasesPtr = nullptr;
+    weights.info()->set_are_values_constant(info.m_InputTensorInfos[1].IsConstant());
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         biasesPtr = &PolymorphicDowncast<IAclTensorHandle *>(m_Data.m_Inputs[2])->GetTensor();
+        biasesPtr->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
+        // We do not support dynamic bias
+        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     arm_compute::ITensorInfo* weightsInfo = weights.info();

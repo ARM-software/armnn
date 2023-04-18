@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -91,10 +91,14 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
 
     m_KernelTensor = std::make_unique<arm_compute::Tensor>();
     BuildArmComputeTensor(*m_KernelTensor, info.m_InputTensorInfos[1], m_Data.m_Parameters.m_DataLayout);
+    m_KernelTensor->info()->set_are_values_constant(info.m_InputTensorInfos[1].IsConstant());
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
         BuildArmComputeTensor(*m_BiasTensor, info.m_InputTensorInfos[2], m_Data.m_Parameters.m_DataLayout);
+        m_BiasTensor->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
+        // We do not support dynamic bias
+        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);

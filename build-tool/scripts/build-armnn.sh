@@ -98,6 +98,7 @@ build_armnn()
   cmake -DCMAKE_BUILD_TYPE="$build_type" \
         -DBUILD_CLASSIC_DELEGATE="$flag_tflite_delegate" \
         -DBUILD_TF_LITE_PARSER="$flag_tflite_parser" \
+        -DBUILD_DELEGATE_JNI_INTERFACE="$flag_jni" \
         -DBUILD_ONNX_PARSER="$flag_onnx_parser" \
         -DARMCOMPUTENEON="$flag_neon_backend" \
         -DARMCOMPUTECL="$flag_cl_backend" \
@@ -256,6 +257,7 @@ flag_cl_backend=0
 flag_ref_backend=0
 flag_clean=0
 flag_debug=0
+flag_jni=0
 
 # Empty strings for optional additional args by default
 armnn_cmake_args=""

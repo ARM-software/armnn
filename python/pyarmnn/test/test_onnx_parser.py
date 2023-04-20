@@ -1,4 +1,4 @@
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020,2023 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 import os
 
@@ -45,7 +45,7 @@ def test_onnx_parser_get_network_input_binding_info(parser):
     assert tensor.GetNumDimensions() == 4
     assert tensor.GetNumElements() == 784
     assert tensor.GetQuantizationOffset() == 0
-    assert tensor.GetQuantizationScale() == 0
+    assert tensor.GetQuantizationScale() == 1
 
 
 def test_onnx_parser_get_network_output_binding_info(parser):
@@ -56,7 +56,7 @@ def test_onnx_parser_get_network_output_binding_info(parser):
     assert tensor.GetNumDimensions() == 4
     assert tensor.GetNumElements() == 10
     assert tensor.GetQuantizationOffset() == 0
-    assert tensor.GetQuantizationScale() == 0
+    assert tensor.GetQuantizationScale() == 1
 
 
 def test_onnx_filenotfound_exception(shared_data_folder):

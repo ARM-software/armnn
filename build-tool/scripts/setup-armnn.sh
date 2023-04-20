@@ -161,6 +161,9 @@ build_tflite()
 
   eval "$cmake_flags" \
   cmake -DTFLITE_ENABLE_XNNPACK=OFF \
+        -DFLATBUFFERS_BUILD_FLATC=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_TESTING=OFF \
         "$target_arch_cmd" \
         "$TFLITE_SRC"
   cmake --build . -j "$NUM_THREADS"

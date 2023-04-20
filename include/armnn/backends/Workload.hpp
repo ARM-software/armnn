@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -124,6 +124,8 @@ public:
 
             if (!info.m_InputTensorInfos.empty())
             {
+                expectedInputType = info.m_InputTensorInfos.front().GetDataType();
+
                 if (expectedOutputType != expectedInputType)
                 {
                     ARMNN_ASSERT_MSG(false, "Trying to create workload with incorrect type");

@@ -63,6 +63,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     TransposeEndToEndTestImpl.hpp
     TensorCopyUtils.hpp
     WorkloadFactoryHelper.hpp
+    WorkloadUtilsTest.cpp
     layerTests/AbsTestImpl.cpp
     layerTests/AbsTestImpl.hpp
     layerTests/ActivationTestImpl.cpp

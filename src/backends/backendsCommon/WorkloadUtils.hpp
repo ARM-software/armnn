@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -52,11 +52,9 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
     TensorShape srcStrides      = srcTensor->GetStrides();
     const TensorShape& srcShape = srcTensor->GetShape();
     const auto srcSize          = srcTensor->GetStrides()[0] * srcShape[0];
-    IgnoreUnused(srcSize);  // Only used for asserts
     TensorShape dstStrides      = dstTensor->GetStrides();
     const TensorShape& dstShape = dstTensor->GetShape();
     const auto dstSize          = dstTensor->GetStrides()[0] * dstShape[0];
-    IgnoreUnused(dstSize);  // Only used for asserts
 
     size_t srcDepth    = 1;
     size_t srcBatches  = 1;
@@ -121,6 +119,14 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
         srcDataStart = static_cast<const uint8_t*>(srcTensor->Map());
         dstDataStart = static_cast<uint8_t*>(dstTensor->Map());
     }
+    if (srcDataStart == nullptr)
+    {
+        throw MemoryValidationException("The source tensor is null.");
+    }
+    if (dstDataStart == nullptr)
+    {
+        throw MemoryValidationException("The destination tensor is null.");
+    }
 
     size_t copyLength  = std::min(srcChannels * srcChannelStride, dstChannels * dstChannelStride);
     size_t copyWidth   = std::min(srcWidth, dstWidth);
@@ -165,8 +171,17 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
                 auto dstPtrChannel = dstData;
                 for (unsigned int w = 0; w < copyWidth; ++w)
                 {
-                    ARMNN_ASSERT(srcData >= srcDataStart && srcData + copyLength <= srcDataStart + srcSize);
-                    ARMNN_ASSERT(dstData >= dstDataStart && dstData + copyLength <= dstDataStart + dstSize);
+                    // Sanity check the memory area we've been asked to copy from and to.
+                    if (copyLength > srcSize)
+                    {
+                        throw MemoryValidationException(
+                            "The source tensor size does not match the size of the allocated tensor.");
+                    }
+                    if (copyLength > dstSize)
+                    {
+                        throw MemoryValidationException(
+                            "The destination tensor size will overrun the destination tensor.");
+                    }
                     copy(dstData, srcData, copyLength);
                     dstData += dstWidthStride;
                     srcData += srcWidthStride;

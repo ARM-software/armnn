@@ -8,7 +8,10 @@ list(APPEND armnnOpaqueDelegateObject_sources
         include/armnn_delegate.hpp
         include/Version.hpp
         src/armnn_delegate.cpp
-        src/Redefine.hpp)
+        src/Convolution.hpp
+        src/Redefine.hpp
+        src/SharedFunctions.cpp
+        src/SharedFunctions.hpp)
 
 add_library(armnnOpaqueDelegateObject OBJECT ${armnnOpaqueDelegateObject_sources})
 

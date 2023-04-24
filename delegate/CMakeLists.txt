@@ -198,6 +198,7 @@ if(BUILD_UNIT_TESTS)
         test/SplitTestHelper.hpp
         test/TestUtils.hpp
         test/TestUtils.cpp
+        test/TransposeConvolution2dTest.cpp
         test/TransposeTest.cpp
         test/TransposeTestHelper.hpp
         test/UnidirectionalSequenceLstmTest.cpp
@@ -258,10 +259,13 @@ if(BUILD_UNIT_TESTS)
              common/src/test/DelegateTestInterpreterUtils.hpp
              opaque/src/test/ArmnnOpaqueDelegateTest.cpp
              opaque/src/test/DelegateTestInterpreter.cpp
-             test/TestUtils.hpp
-             test/TestUtils.cpp
              test/CastTest.cpp
-             test/CastTestHelper.hpp)
+             test/CastTestHelper.hpp
+             test/Convolution2dTest.cpp
+             test/ConvolutionTestHelper.hpp
+             test/DepthwiseConvolution2dTest.cpp
+             test/TestUtils.hpp
+             test/TestUtils.cpp)
 
         # Until all operators are supported, we have to add tests one by one above to opaqueDelegate_unittest_sources.
         # After we add can add commonDelegate_unittest_sources to the add_executable below.

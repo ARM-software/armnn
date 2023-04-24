@@ -55,22 +55,22 @@ void Conv2DWithBiasesFp32Test(std::vector<armnn::BackendId>& backends)
     tflite::Padding padding = tflite::Padding_SAME;
 
     ConvolutionTest<float>(tflite::BuiltinOperator_CONV_2D,
-                                 ::tflite::TensorType_FLOAT32,
-                                 2, // strideX
-                                 2, // strideY
-                                 1, // dilationX
-                                 1, // dilationY
-                                 padding,
-                                 tflite::ActivationFunctionType_NONE,
-                                 backends,
-                                 inputShape,
-                                 filterShape,
-                                 outputShape,
-                                 inputValues,
-                                 filterValues,
-                                 expectedOutputValues,
-                                 biasShape,
-                                 biasValues);
+                           ::tflite::TensorType_FLOAT32,
+                           2, // strideX
+                           2, // strideY
+                           1, // dilationX
+                           1, // dilationY
+                           padding,
+                           tflite::ActivationFunctionType_NONE,
+                           backends,
+                           inputShape,
+                           filterShape,
+                           outputShape,
+                           inputValues,
+                           filterValues,
+                           expectedOutputValues,
+                           biasShape,
+                           biasValues);
 }
 
 void Conv2DWithBiasesInt8Test(std::vector<armnn::BackendId>& backends)
@@ -98,22 +98,22 @@ void Conv2DWithBiasesInt8Test(std::vector<armnn::BackendId>& backends)
     tflite::Padding padding = tflite::Padding_SAME;
 
     ConvolutionTest<int8_t, int32_t>(tflite::BuiltinOperator_CONV_2D,
-                                            ::tflite::TensorType_INT8,
-                                            1, // strideX
-                                            1, // strideY
-                                            1, // dilationX
-                                            1, // dilationY
-                                            padding,
-                                            tflite::ActivationFunctionType_NONE,
-                                            backends,
-                                            inputShape,
-                                            filterShape,
-                                            outputShape,
-                                            inputValues,
-                                            filterValues,
-                                            expectedOutputValues,
-                                            biasShape,
-                                            biasValues);
+                                     ::tflite::TensorType_INT8,
+                                     1, // strideX
+                                     1, // strideY
+                                     1, // dilationX
+                                     1, // dilationY
+                                     padding,
+                                     tflite::ActivationFunctionType_NONE,
+                                     backends,
+                                     inputShape,
+                                     filterShape,
+                                     outputShape,
+                                     inputValues,
+                                     filterValues,
+                                     expectedOutputValues,
+                                     biasShape,
+                                     biasValues);
 }
 
 void Conv2DWithBiasesReluUint8Test(std::vector<armnn::BackendId>& backends)
@@ -150,28 +150,28 @@ void Conv2DWithBiasesReluUint8Test(std::vector<armnn::BackendId>& backends)
     tflite::Padding padding = tflite::Padding_SAME;
 
     ConvolutionTest<uint8_t, int32_t>(tflite::BuiltinOperator_CONV_2D,
-                                            ::tflite::TensorType_UINT8,
-                                            1, // strideX
-                                            1, // strideY
-                                            1, // dilationX
-                                            1, // dilationY
-                                            padding,
-                                            tflite::ActivationFunctionType_RELU,
-                                            backends,
-                                            inputShape,
-                                            filterShape,
-                                            outputShape,
-                                            inputValues,
-                                            filterValues,
-                                            expectedOutputValues,
-                                            biasShape,
-                                            biasValues,
-                                            {1.0f}, // biasScale
-                                            {0},    // biasOffset
-                                            {1.0f}, // filterScale
-                                            {4},    // filterOffsets
-                                            2, // output scale
-                                            20); // output offset
+                                      ::tflite::TensorType_UINT8,
+                                     1, // strideX
+                                     1, // strideY
+                                     1, // dilationX
+                                     1, // dilationY
+                                     padding,
+                                     tflite::ActivationFunctionType_RELU,
+                                     backends,
+                                     inputShape,
+                                     filterShape,
+                                     outputShape,
+                                     inputValues,
+                                     filterValues,
+                                     expectedOutputValues,
+                                     biasShape,
+                                     biasValues,
+                                     {1.0f}, // biasScale
+                                     {0},    // biasOffset
+                                     {1.0f}, // filterScale
+                                     {4},    // filterOffsets
+                                     2, // output scale
+                                     20); // output offset
 }
 
 void Conv2DWithBiasesRelu6Uint8Test(std::vector<armnn::BackendId>& backends)
@@ -204,22 +204,22 @@ void Conv2DWithBiasesRelu6Uint8Test(std::vector<armnn::BackendId>& backends)
     tflite::Padding padding = tflite::Padding_SAME;
 
     ConvolutionTest<uint8_t, int32_t>(tflite::BuiltinOperator_CONV_2D,
-                                            ::tflite::TensorType_UINT8,
-                                            1, // strideX
-                                            1, // strideY
-                                            1, // dilationX
-                                            1, // dilationY
-                                            padding,
-                                            tflite::ActivationFunctionType_RELU6,
-                                            backends,
-                                            inputShape,
-                                            filterShape,
-                                            outputShape,
-                                            inputValues,
-                                            filterValues,
-                                            expectedOutputValues,
-                                            biasShape,
-                                            biasValues);
+                                     ::tflite::TensorType_UINT8,
+                                     1, // strideX
+                                     1, // strideY
+                                     1, // dilationX
+                                     1, // dilationY
+                                     padding,
+                                     tflite::ActivationFunctionType_RELU6,
+                                     backends,
+                                     inputShape,
+                                     filterShape,
+                                     outputShape,
+                                     inputValues,
+                                     filterValues,
+                                     expectedOutputValues,
+                                     biasShape,
+                                     biasValues);
 }
 
 
@@ -271,32 +271,32 @@ void Conv2DPerChannelInt8Test(std::vector<armnn::BackendId>& backends)
     tflite::Padding padding = tflite::Padding_SAME;
 
     ConvolutionTest<int8_t, int32_t>(tflite::BuiltinOperator_CONV_2D,
-                                            ::tflite::TensorType_INT8,
-                                            1, // strideX
-                                            1, // strideY
-                                            1, // dilationX
-                                            1, // dilationY
-                                            padding,
-                                            tflite::ActivationFunctionType_NONE,
-                                            backends,
-                                            inputShape,
-                                            filterShape,
-                                            outputShape,
-                                            inputValues,
-                                            filterValues,
-                                            expectedOutputValues,
-                                            biasShape,
-                                            biasValues,
-                                            biasScales,
-                                            {0,0,0,0},
-                                            filterScales,
-                                            {0,0,0,0},
-                                            outputQuantScale,
-                                            outputQuantOffset,
-                                            inputQuantScale,
-                                            inputQuantOffset,
-                                            1, // depth_multiplier is ignored for conv2d value doesn't matter
-                                            filterQuantizationDim);
+                                     ::tflite::TensorType_INT8,
+                                     1, // strideX
+                                     1, // strideY
+                                     1, // dilationX
+                                     1, // dilationY
+                                     padding,
+                                     tflite::ActivationFunctionType_NONE,
+                                     backends,
+                                     inputShape,
+                                     filterShape,
+                                     outputShape,
+                                     inputValues,
+                                     filterValues,
+                                     expectedOutputValues,
+                                     biasShape,
+                                     biasValues,
+                                     biasScales,
+                                     {0,0,0,0},
+                                     filterScales,
+                                     {0,0,0,0},
+                                     outputQuantScale,
+                                     outputQuantOffset,
+                                     inputQuantScale,
+                                     inputQuantOffset,
+                                     1, // depth_multiplier is ignored for conv2d value doesn't matter
+                                     filterQuantizationDim);
 }
 
 TEST_SUITE("Convolution2dTest_CpuRefTests")
@@ -327,14 +327,14 @@ TEST_SUITE("Convolution2dTest_CpuAccTests")
 
 TEST_CASE ("Conv2DWithBiases_Fp32_CpuAcc_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-Conv2DWithBiasesFp32Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    Conv2DWithBiasesFp32Test(backends);
 }
 
 TEST_CASE ("Conv2DWithBiases_Int8_CpuAcc_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-Conv2DWithBiasesInt8Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
+    Conv2DWithBiasesInt8Test(backends);
 }
 
 TEST_CASE ("Conv2DPerChannel_Int8_CpuAcc_Test")
@@ -350,14 +350,14 @@ TEST_SUITE("Convolution2dTest_GpuAccTests")
 
 TEST_CASE ("Conv2DWithBiases_Fp32_GpuAcc_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-Conv2DWithBiasesFp32Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    Conv2DWithBiasesFp32Test(backends);
 }
 
 TEST_CASE ("Conv2DWithBiases_Int8_GpuAcc_Test")
 {
-std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-Conv2DWithBiasesInt8Test(backends);
+    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    Conv2DWithBiasesInt8Test(backends);
 }
 
 TEST_CASE ("Conv2DPerChannel_Int8_GpuAcc_Test")
@@ -367,123 +367,5 @@ TEST_CASE ("Conv2DPerChannel_Int8_GpuAcc_Test")
 }
 
 } //End of TEST_SUITE("Convolution2dTest_GpuAcc")
-
-void TransposeConvInt8Test(std::vector<armnn::BackendId>& backends)
-{
-    // Set input data
-    std::vector<int32_t> transposeTensorShape { 4 };
-    std::vector<int32_t> filterShape { 1, 2, 2, 1 };
-    std::vector<int32_t> inputShape { 1, 2, 2, 1 };
-    std::vector<int32_t> outputShape { 1, 3, 3, 1 };
-
-    std::vector<int32_t> transposeData = { 1, 3, 3, 1 };
-    static std::vector<int8_t> inputValues = { 1, 2, 3, 4 };
-    std::vector<int8_t> filterValues = { 0, 1, 2, 4 };
-    std::vector<int8_t> expectedOutputValues =
-        {
-            0, 1,  2,
-            2, 11, 12,
-            6, 20, 16
-        };
-
-    tflite::Padding padding = tflite::Padding_VALID;
-    TransposeConvTest<int8_t>(backends,
-                             ::tflite::TensorType_INT8,
-                             1, // strideX
-                             1, // strideY
-                             padding,
-                             transposeTensorShape,
-                             filterShape,
-                             inputShape,
-                             outputShape,
-                             transposeData,
-                             filterValues,
-                             inputValues,
-                             expectedOutputValues);
-}
-
-void TransposeConvFp32Test(std::vector<armnn::BackendId>& backends)
-{
-    std::vector<int32_t> transposeTensorShape { 4 };
-    std::vector<int32_t> filterShape { 1, 2, 2, 1 };
-    std::vector<int32_t> inputShape { 1, 2, 2, 1 };
-    std::vector<int32_t> outputShape { 1, 3, 3, 1 };
-
-    std::vector<int32_t> transposeData = { 1, 3, 3, 1 };
-    static std::vector<float> inputValues = { 1, 2, 3, 4 };
-    std::vector<float> filterValues = { 0, 1, 2, 4 };
-    std::vector<float> expectedOutputValues =
-        {
-            0, 1,  2,
-            2, 11, 12,
-            6, 20, 16
-        };
-
-    tflite::Padding padding = tflite::Padding_VALID;
-    TransposeConvTest<float>(backends,
-                             ::tflite::TensorType_FLOAT32,
-                             1, // strideX
-                             1, // strideY
-                             padding,
-                             transposeTensorShape,
-                             filterShape,
-                             inputShape,
-                             outputShape,
-                             transposeData,
-                             filterValues,
-                             inputValues,
-                             expectedOutputValues);
-}
-
-TEST_SUITE("TransposeConv_CpuRef_Test")
-{
-
-TEST_CASE ("TransposeConv_CpuRef_Fp32_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    TransposeConvFp32Test(backends);
-}
-
-TEST_CASE ("TransposeConv_CpuRef_Int8_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    TransposeConvInt8Test(backends);
-}
-
-} // End of  TEST_SUITE(TransposeConv_CpuRef_Test)
-
-TEST_SUITE("TransposeConv_CpuAcc_Test")
-{
-
-TEST_CASE ("TransposeConv_CpuAcc_Fp32_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    TransposeConvFp32Test(backends);
-}
-
-TEST_CASE ("TransposeConv_CpuAcc_Int8_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    TransposeConvInt8Test(backends);
-}
-
-} // End of  TEST_SUITE(TransposeConv_CpuAcc_Test)
-
-TEST_SUITE("TransposeConv_GpuAcc_Test")
-{
-
-TEST_CASE ("TransposeConv_GpuAcc_Fp32_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    TransposeConvFp32Test(backends);
-}
-
-TEST_CASE ("TransposeConv_GpuAcc_Int8_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    TransposeConvInt8Test(backends);
-}
-
-} // End of  TEST_SUITE(TransposeConv_GpuAcc_Test)
 
 } // namespace armnnDelegate

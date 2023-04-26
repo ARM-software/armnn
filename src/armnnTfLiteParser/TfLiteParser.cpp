@@ -411,6 +411,29 @@ void CalcPadding(uint32_t inputSize,
     }
 }
 
+// Function that calculates explicit padding when the output shape is known.
+// At the moment the output is only given as an input parameter in Transpose Convolution,
+// not in Convolution and Depthwise Convolution
+void CalcPadding(uint32_t inputSize,
+                 uint32_t filterSize,
+                 uint32_t stride,
+                 uint32_t dilation,
+                 uint32_t& paddingFront,
+                 uint32_t& paddingBack,
+                 tflite::Padding padding,
+                 uint32_t outputSize)
+{
+    IgnoreUnused(dilation);
+    paddingFront = 0;
+    paddingBack = 0;
+    if (padding == tflite::Padding_SAME)
+    {
+        uint32_t totalPadding = (inputSize - 1) * stride + filterSize - outputSize;
+        paddingFront = totalPadding / 2;
+        paddingBack = totalPadding - paddingFront;
+    }
+}
+
 armnn::TensorInfo ToTensorInfo(TfLiteParserImpl::TensorRawPtr tensorPtr,
                                const std::vector<unsigned int>& shape,
                                const bool outputTensor = false)
@@ -1608,6 +1631,17 @@ void TfLiteParserImpl::ParseTransposeConv(size_t subgraphIndex, size_t operatorI
     auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
+
+    armnn::TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 2);
+    armnn::TensorInfo filterTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
+
+    // TfLite uses NHWC tensors
+    const unsigned int inputHeight = inputTensorInfo.GetShape()[1];
+    const unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
+
+    const unsigned int filterHeight = filterTensorInfo.GetShape()[1];
+    const unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+
     // This block determines the output shape of the transpose convolution. If the output shape tensor ptr is not null
     // And the tensor is a constant, we can access the data at load time and set the output shape of the
     // layer. If this is not constant, We do not have access to the shape data, so we have to use
@@ -1634,32 +1668,47 @@ void TfLiteParserImpl::ParseTransposeConv(size_t subgraphIndex, size_t operatorI
             desc.m_OutputShape.push_back(static_cast<unsigned int>(dimension));
         }
         desc.m_OutputShapeEnabled = true;
+
+        // TfLite uses NHWC tensors
+        const unsigned int outputHeight = desc.m_OutputShape[1];
+        const unsigned int outputWidth  = desc.m_OutputShape[2];
+
+        CalcPadding(inputHeight,
+                    filterHeight,
+                    desc.m_StrideY,
+                    1, // DilationY
+                    desc.m_PadTop,
+                    desc.m_PadBottom,
+                    options->padding,
+                    outputHeight);
+
+        CalcPadding(inputWidth,
+                    filterWidth,
+                    desc.m_StrideX,
+                    1, // DilationX
+                    desc.m_PadLeft,
+                    desc.m_PadRight,
+                    options->padding,
+                    outputWidth);
     }
-    armnn::TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 2);
-    armnn::TensorInfo filterTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
+    else
+    {
+        CalcPadding(inputHeight,
+                    filterHeight,
+                    desc.m_StrideY,
+                    1, // DilationY
+                    desc.m_PadTop,
+                    desc.m_PadBottom,
+                    options->padding);
 
-    // TfLite uses NHWC tensors
-    const unsigned int inputHeight = inputTensorInfo.GetShape()[1];
-    const unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
-
-    const unsigned int filterHeight = filterTensorInfo.GetShape()[1];
-    const unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
-
-    CalcPadding(inputHeight,
-                filterHeight,
-                desc.m_StrideY,
-                1, // DilationY
-                desc.m_PadTop,
-                desc.m_PadBottom,
-                options->padding);
-
-    CalcPadding(inputWidth,
-                filterWidth,
-                desc.m_StrideX,
-                1, // DilationX
-                desc.m_PadLeft,
-                desc.m_PadRight,
-                options->padding);
+        CalcPadding(inputWidth,
+                    filterWidth,
+                    desc.m_StrideX,
+                    1, // DilationX
+                    desc.m_PadLeft,
+                    desc.m_PadRight,
+                    options->padding);
+    }
 
     auto filterTensorAndData = CreateConstTensorNonPermuted(inputs[1], filterTensorInfo, inputTensorInfo.GetDataType());
 

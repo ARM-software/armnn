@@ -622,6 +622,18 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
 {
     switch (TfLiteRegistrationExternalGetBuiltInCode(tfLiteRegistration))
     {
+        case kTfLiteBuiltinArgMax:
+            return VisitArgMinMaxOperator(delegateData,
+                                          tfLiteContext,
+                                          tfLiteNode,
+                                          nodeIndex,
+                                          kTfLiteBuiltinArgMax);
+        case kTfLiteBuiltinArgMin:
+            return VisitArgMinMaxOperator(delegateData,
+                                          tfLiteContext,
+                                          tfLiteNode,
+                                          nodeIndex,
+                                          kTfLiteBuiltinArgMin);
         case kTfLiteBuiltinBatchToSpaceNd:
             return VisitBatchToSpaceNdOperator(delegateData,
                                                tfLiteContext,

@@ -259,6 +259,8 @@ if(BUILD_UNIT_TESTS)
              common/src/test/DelegateTestInterpreterUtils.hpp
              opaque/src/test/ArmnnOpaqueDelegateTest.cpp
              opaque/src/test/DelegateTestInterpreter.cpp
+             test/ArgMinMaxTest.cpp
+             test/ArgMinMaxTestHelper.hpp
              test/BatchSpaceTest.cpp
              test/BatchSpaceTestHelper.hpp
              test/CastTest.cpp

@@ -7,6 +7,7 @@ set(armnnOpaqueDelegateObject_sources)
 list(APPEND armnnOpaqueDelegateObject_sources
         include/armnn_delegate.hpp
         include/Version.hpp
+        src/ArgMinMax.hpp
         src/armnn_delegate.cpp
         src/BatchSpace.hpp
         src/Convolution.hpp

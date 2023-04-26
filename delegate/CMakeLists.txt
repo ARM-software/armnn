@@ -272,6 +272,10 @@ if(BUILD_UNIT_TESTS)
              test/Convolution2dTest.cpp
              test/ConvolutionTestHelper.hpp
              test/DepthwiseConvolution2dTest.cpp
+             test/GatherTest.cpp
+             test/GatherTestHelper.hpp
+             test/GatherNdTest.cpp
+             test/GatherNdTestHelper.hpp
              test/TestUtils.hpp
              test/TestUtils.cpp)
 

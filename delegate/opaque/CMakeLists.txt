@@ -11,6 +11,8 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/armnn_delegate.cpp
         src/BatchSpace.hpp
         src/Convolution.hpp
+        src/Gather.hpp
+        src/GatherNd.hpp
         src/Redefine.hpp
         src/SharedFunctions.cpp
         src/SharedFunctions.hpp)

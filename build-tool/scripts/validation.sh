@@ -34,7 +34,7 @@ fi
 
 # Validation of chosen Arm NN dependencies
 if [ "$flag_tflite_delegate" -eq 0 ] && [ "$flag_tflite_parser" -eq 0 ] && [ "$flag_onnx_parser" -eq 0 ]; then
-  echo "$name: at least one of flags --tflite-delegate, --tflite-parser or --onnx-parser must be set (or --all)."
+  echo "$name: at least one of flags --tflite-classic-delegate, --tflite-opaque-delegate, --tflite-parser or --onnx-parser must be set (or --all)."
   exit 1
 fi
 

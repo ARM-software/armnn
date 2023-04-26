@@ -96,7 +96,8 @@ build_armnn()
 
   eval "$compile_flags" \
   cmake -DCMAKE_BUILD_TYPE="$build_type" \
-        -DBUILD_CLASSIC_DELEGATE="$flag_tflite_delegate" \
+        -DBUILD_CLASSIC_DELEGATE="$flag_tflite_classic_delegate" \
+        -DBUILD_OPAQUE_DELEGATE="$flag_tflite_opaque_delegate" \
         -DBUILD_TF_LITE_PARSER="$flag_tflite_parser" \
         -DBUILD_DELEGATE_JNI_INTERFACE="$flag_jni" \
         -DBUILD_ONNX_PARSER="$flag_onnx_parser" \
@@ -194,8 +195,10 @@ usage()
   cat <<EOF
 build-armnn.sh - Build Arm NN and ACL
 build-armnn.sh [OPTION]...
-  --tflite-delegate
-    build the Arm NN TF Lite Delegate component
+  --tflite-classic-delegate
+    build the existing Arm NN TF Lite Delegate component
+  --tflite-opaque-delegate
+    build the new Arm NN opaque delegate component
   --tflite-parser
     build the Arm NN TF Lite Parser component
   --onnx-parser
@@ -225,7 +228,7 @@ build-armnn.sh [OPTION]...
   -x
     enable shell tracing in this script
 
-At least one component (i.e. --tflite-delegate, --tflite-parser, --onnx-parser) must be provided or else provide --all to build all Arm NN components.
+At least one component (i.e. --tflite-classic-delegate, --tflite-opaque-delegate, --tflite-parser, --onnx-parser) must be provided or else provide --all to build all Arm NN components.
 At least one backend (i.e. --neon-backend, --cl-backend, --ref-backend) must be chosen.
 This script must be executed from the same root directory in which setup-armnn.sh was executed from.
 
@@ -239,7 +242,7 @@ Examples:
 Build for aarch64 with all Arm NN components, NEON enabled and OpenCL enabled:
   <PATH_TO>/build-armnn.sh --target-arch=aarch64 --all --neon-backend --cl-backend
 Build for aarch64 with TF Lite Delegate, OpenCL enabled and additional ACL scons params:
-  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --tflite-delegate --cl-backend --acl-scons-params='compress_kernels=1,benchmark_examples=1'
+  <PATH_TO>/build-armnn.sh --target-arch=aarch64 --tflite-classic-delegate --cl-backend --acl-scons-params='compress_kernels=1,benchmark_examples=1'
 Setup for aarch64 with all Arm NN dependencies, OpenCL enabled and additional Arm NN cmake args:
   <PATH_TO>/build-armnn.sh --target-arch=aarch64 --all --cl-backend --armnn-cmake-args='-DBUILD_SAMPLE_APP=1,-DBUILD_UNIT_TESTS=0'
 EOF
@@ -249,7 +252,8 @@ EOF
 target_arch=""
 
 # Default flag values
-flag_tflite_delegate=0
+flag_tflite_classic_delegate=0
+flag_tflite_opaque_delegate=0
 flag_tflite_parser=0
 flag_onnx_parser=0
 flag_neon_backend=0
@@ -274,7 +278,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$(getopt -ohx -l tflite-delegate,tflite-parser,onnx-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,help -n "$name"   -- "$@")
+args=$(getopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then
@@ -295,8 +299,12 @@ while [ $# -gt 0 ]; do
     flag_tflite_parser=1
     ;;
 
-  --tflite-delegate)
+  --tflite-classic-delegate)
     flag_tflite_delegate=1
+    ;;
+
+  --tflite-opaque-delegate)
+    flag_tflite_opaque_delegate=1
     ;;
 
   --onnx-parser)
@@ -304,7 +312,8 @@ while [ $# -gt 0 ]; do
     ;;
 
   --all)
-    flag_tflite_delegate=1
+    flag_tflite_classic_delegate=1
+    flag_tflite_opaque_delegate=1
     flag_tflite_parser=1
     flag_onnx_parser=1
     ;;
@@ -441,23 +450,24 @@ ARMNN_BUILD_TARGET="$ARMNN_BUILD_ROOT"/"$ARMNN_BUILD_DIR_NAME"
 ACL_BUILD_TARGET="$BUILD_DIR"/acl/"$TARGET_ARCH"_build"$DEBUG_POSTFIX"
 
 echo -e "\nINFO: Displaying configuration information before execution of $name"
-echo "     target-arch: $TARGET_ARCH"
-echo "       host-arch: $HOST_ARCH"
-echo " tflite-delegate: $flag_tflite_delegate"
-echo "   tflite-parser: $flag_tflite_parser"
-echo "     onnx-parser: $flag_onnx_parser"
-echo "    neon-backend: $flag_neon_backend"
-echo "      cl-backend: $flag_cl_backend"
-echo "     ref-backend: $flag_ref_backend"
-echo "           clean: $flag_clean"
-echo "           debug: $flag_debug"
-echo "armnn-cmake-args: $armnn_cmake_args"
-echo "acl-scons-params: $acl_scons_params"
-echo "     num-threads: $NUM_THREADS"
-echo "  root directory: $ROOT_DIR"
-echo "source directory: $SOURCE_DIR"
-echo " build directory: $BUILD_DIR"
-echo " armnn build dir: $ARMNN_BUILD_TARGET"
+echo "            target-arch: $TARGET_ARCH"
+echo "              host-arch: $HOST_ARCH"
+echo "tflite-classic-delegate: $flag_tflite_classic_delegate"
+echo "tflite-opaque-delegate : $flag_tflite_opaque_delegate"
+echo "          tflite-parser: $flag_tflite_parser"
+echo "            onnx-parser: $flag_onnx_parser"
+echo "           neon-backend: $flag_neon_backend"
+echo "             cl-backend: $flag_cl_backend"
+echo "            ref-backend: $flag_ref_backend"
+echo "                  clean: $flag_clean"
+echo "                  debug: $flag_debug"
+echo "       armnn-cmake-args: $armnn_cmake_args"
+echo "       acl-scons-params: $acl_scons_params"
+echo "            num-threads: $NUM_THREADS"
+echo "         root directory: $ROOT_DIR"
+echo "       source directory: $SOURCE_DIR"
+echo "        build directory: $BUILD_DIR"
+echo "        armnn build dir: $ARMNN_BUILD_TARGET"
 echo -e "\nScript execution will begin in 10 seconds..."
 
 sleep 10

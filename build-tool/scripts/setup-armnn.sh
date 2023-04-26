@@ -215,8 +215,10 @@ usage()
   cat <<EOF
 setup-armnn.sh - Download and build Arm NN dependencies in the current directory (ROOT_DIR)
 setup-armnn.sh [OPTION]...
-  --tflite-delegate
-    setup dependencies for the Arm NN TF Lite Delegate
+  --tflite-classic-delegate
+    setup dependencies for the existing Arm NN TF Lite Delegate
+  --tflite-opaque-delegate
+    setup dependencies for the new Opaque Delegate
   --tflite-parser
     setup dependencies for the Arm NN TF Lite Parser
   --onnx-parser
@@ -232,15 +234,15 @@ setup-armnn.sh [OPTION]...
   -x
     enable shell tracing in this script
 
-At least one dependency flag (e.g. --tflite-delegate) must be provided or else provide --all to setup all dependencies.
+At least one dependency flag (e.g. --tflite-classic-delegate) must be provided or else provide --all to setup all dependencies.
 Directories called "source" and "build" will be generated in the current directory (ROOT_DIR) from which this script is called.
 It's recommended to call this script in a directory outside of this Arm NN source repo, to avoid nested repositories.
 
 Examples:
 Setup for aarch64 with all Arm NN dependencies:
     <PATH_TO>/setup-armnn.sh --target-arch=aarch64 --all
-Setup for aarch64 with TF Lite Delegate and TF Lite Parser dependencies only:
-    <PATH_TO>/setup-armnn.sh --target-arch=aarch64 --tflite-delegate --tflite-parser
+Setup for aarch64 with the existing TF Lite Delegate and TF Lite Parser dependencies only:
+    <PATH_TO>/setup-armnn.sh --target-arch=aarch64 --tflite-classic-delegate --tflite-parser
 EOF
 }
 
@@ -248,7 +250,8 @@ EOF
 target_arch=""
 
 # Default flag values
-flag_tflite_delegate=0
+flag_tflite_classic_delegate=0
+flag_tflite_opaque_delegate=0
 flag_tflite_parser=0
 flag_onnx_parser=0
 
@@ -263,7 +266,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$(getopt -ohx -l tflite-delegate,tflite-parser,onnx-parser,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
+args=$(getopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then
@@ -284,8 +287,12 @@ while [ $# -gt 0 ]; do
     flag_tflite_parser=1
     ;;
 
-  --tflite-delegate)
-    flag_tflite_delegate=1
+  --tflite-classic-delegate)
+    flag_tflite_classic_delegate=1
+    ;;
+
+  --tflite-opaque-delegate)
+    flag_tflite_opaque_delegate=1
     ;;
 
   --onnx-parser)
@@ -293,7 +300,8 @@ while [ $# -gt 0 ]; do
     ;;
 
   --all)
-    flag_tflite_delegate=1
+    flag_tflite_classic_delegate=1
+    flag_tflite_opaque_delegate=1
     flag_tflite_parser=1
     flag_onnx_parser=1
     ;;
@@ -328,15 +336,16 @@ done
 source "$rel_path"/common.sh
 
 echo -e "\nINFO: Displaying configuration information before execution of $name"
-echo "     target-arch: $TARGET_ARCH"
-echo "       host-arch: $HOST_ARCH"
-echo " tflite-delegate: $flag_tflite_delegate"
-echo "   tflite-parser: $flag_tflite_parser"
-echo "     onnx-parser: $flag_onnx_parser"
-echo "     num-threads: $NUM_THREADS"
-echo "  root directory: $ROOT_DIR"
-echo "source directory: $SOURCE_DIR"
-echo " build directory: $BUILD_DIR"
+echo "            target-arch: $TARGET_ARCH"
+echo "              host-arch: $HOST_ARCH"
+echo "tflite-classic-delegate: $flag_tflite_classic_delegate"
+echo "tflite-opaque-delegate : $flag_tflite_opaque_delegate"
+echo "          tflite-parser: $flag_tflite_parser"
+echo "            onnx-parser: $flag_onnx_parser"
+echo "            num-threads: $NUM_THREADS"
+echo "         root directory: $ROOT_DIR"
+echo "       source directory: $SOURCE_DIR"
+echo "        build directory: $BUILD_DIR"
 
 if check_if_repository .; then
   echo -e "\n***** WARNING: Running script inside a git repository. To avoid nested repos, call this script from outside of this repo. *****"
@@ -349,7 +358,7 @@ sleep 10
 mkdir -p "$SOURCE_DIR"
 mkdir -p "$BUILD_DIR"
 
-if [ "$flag_tflite_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
+if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] ||  [ "$flag_tflite_parser" -eq 1 ]; then
   download_flatbuffers
 
   # Host build
@@ -367,7 +376,7 @@ if [ "$flag_tflite_parser" -eq 1 ]; then
   generate_tflite_schema
 fi
 
-if [ "$flag_tflite_delegate" -eq 1 ]; then
+if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ]; then
   build_tflite
 fi
 

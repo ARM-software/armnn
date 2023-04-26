@@ -272,6 +272,7 @@ if(BUILD_UNIT_TESTS)
              test/ControlTest.cpp
              test/ControlTestHelper.hpp
              test/Convolution2dTest.cpp
+             test/Convolution3dTest.cpp
              test/ConvolutionTestHelper.hpp
              test/DepthwiseConvolution2dTest.cpp
              test/ElementwiseUnaryTestHelper.hpp
@@ -289,7 +290,8 @@ if(BUILD_UNIT_TESTS)
              test/PreluTest.cpp
              test/PreluTestHelper.hpp
              test/TestUtils.hpp
-             test/TestUtils.cpp)
+             test/TestUtils.cpp
+             test/TransposeConvolution2dTest.cpp)
 
         # Until all operators are supported, we have to add tests one by one above to opaqueDelegate_unittest_sources.
         # After we add can add commonDelegate_unittest_sources to the add_executable below.

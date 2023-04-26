@@ -101,20 +101,8 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     {
         // Use input indices to get bias tensor.
         tfLiteBiasTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[2]);
-        if(!IsValid(tfLiteBiasTensor))
+        if (!IsValid(tfLiteContext, tfLiteBiasTensor, operatorCode, nodeIndex))
         {
-            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                    tfLiteContext,
-                    "TfLiteArmnnOpaqueDelegate: Invalid bias tensor in operator #%d node #%d: ",
-                    operatorCode, nodeIndex);
-            return kTfLiteError;
-        }
-        if (IsDynamicTensor(tfLiteBiasTensor))
-        {
-            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                    tfLiteContext,
-                    "TfLiteArmnnOpaqueDelegate: Dynamic bias tensors are not supported in node #%d: ",
-                    nodeIndex);
             return kTfLiteError;
         }
         biasTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteBiasTensor);
@@ -180,7 +168,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
 
     if (biasEnabled)
     {
-        if(biasTensorInfo.IsConstant())
+        if (biasTensorInfo.IsConstant())
         {
             auto biasTensor = CreateConstTensor(tfLiteBiasTensor, biasTensorInfo);
             armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
@@ -191,7 +179,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     }
 
     // The data input can also be constant, so we must check that this is also allocated to an input slot
-    if(inputTensorInfo.IsConstant())
+    if (inputTensorInfo.IsConstant())
     {
         auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
 
@@ -205,7 +193,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
-    if(Connect(layer, tfLiteContext, tfLiteNode, delegateData) != kTfLiteOk)
+    if (Connect(layer, tfLiteContext, tfLiteNode, delegateData) != kTfLiteOk)
     {
         return kTfLiteError;
     }
@@ -309,20 +297,8 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     {
         // Use input indices to get bias tensor.
         tfLiteBiasTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[2]);
-        if(!IsValid(tfLiteBiasTensor))
+        if (!IsValid(tfLiteContext, tfLiteBiasTensor, operatorCode, nodeIndex))
         {
-            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                    tfLiteContext,
-                    "TfLiteArmnnOpaqueDelegate: Invalid bias tensor in operator #%d node #%d: ",
-                    operatorCode, nodeIndex);
-            return kTfLiteError;
-        }
-        if (IsDynamicTensor(tfLiteBiasTensor))
-        {
-            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                    tfLiteContext,
-                    "TfLiteArmnnOpaqueDelegate: Dynamic bias tensors are not supported in node #%d: ",
-                    nodeIndex);
             return kTfLiteError;
         }
         biasTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteBiasTensor);
@@ -427,6 +403,392 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData);
 }
 
+TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
+                                 TfLiteOpaqueContext* tfLiteContext,
+                                 TfLiteOpaqueNode* tfLiteNode,
+                                 int nodeIndex,
+                                 int32_t operatorCode)
+{
+    auto numInputs = TfLiteOpaqueNodeNumberOfInputs(tfLiteNode);
+    if (numInputs < 2)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext, "TfLiteArmnnOpaqueDelegate: Minimum number of inputs (%d != %d) in node #%d",
+                2, numInputs, nodeIndex);
+        return kTfLiteError;
+    }
+    TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
+
+    armnn::Convolution3dDescriptor descriptor;
+    auto* params = reinterpret_cast<TfLiteConv3DParams*>(TfLiteOpaqueNodeGetBuiltinData(tfLiteNode));
+
+    bool biasEnabled = IsOptionalOperandPresent(tfLiteNode, 2);
+    descriptor.m_BiasEnabled = biasEnabled;
+    descriptor.m_DataLayout = armnn::DataLayout::NDHWC;
+    descriptor.m_StrideX = NonNegative(params->stride_width, nodeIndex);
+    descriptor.m_StrideY = NonNegative(params->stride_height, nodeIndex);
+    descriptor.m_StrideZ = NonNegative(params->stride_depth, nodeIndex);
+    descriptor.m_DilationX = NonNegative(params->dilation_width_factor, nodeIndex);
+    descriptor.m_DilationY = NonNegative(params->dilation_height_factor, nodeIndex);
+    descriptor.m_DilationZ = NonNegative(params->dilation_depth_factor, nodeIndex);
+
+    // Gather input indices and use to get input tensor.
+    const int* inputTensors;
+    if (TfLiteOpaqueNodeInputs(tfLiteNode, &inputTensors, &numInputs) != kTfLiteOk)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Unable to gather input tensor indices from node #%d: ",
+                nodeIndex);
+        return kTfLiteError;
+    }
+
+    const TfLiteOpaqueTensor* tfLiteInputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[0]);
+    if (!IsValid(tfLiteContext, tfLiteInputTensor, operatorCode, nodeIndex))
+    {
+        return kTfLiteError;
+    }
+
+    // Use input indices to get filter tensor.
+    const TfLiteOpaqueTensor* tfLiteFilterTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[1]);
+    if (!IsValid(tfLiteContext, tfLiteFilterTensor, operatorCode, nodeIndex))
+    {
+        return kTfLiteError;
+    }
+
+    // Gather output indices and use to get output tensors.
+    int numOutputs = 0;
+    const int* outputTensors;
+    if (TfLiteOpaqueNodeOutputs(tfLiteNode, &outputTensors, &numOutputs) != kTfLiteOk)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Unable to gather output tensor indices from node #%d: ",
+                nodeIndex);
+        return kTfLiteError;
+    }
+
+    const TfLiteOpaqueTensor* tfLiteOutputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
+    if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
+    {
+        return kTfLiteError;
+    }
+
+    const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteOpaqueTensor(tfLiteInputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
+
+    auto* tfLiteNodeParameters = reinterpret_cast<TfLiteConv3DParams*>(TfLiteOpaqueNodeGetBuiltinData(tfLiteNode));
+    TfLiteFusedActivation activationType=kTfLiteActNone;
+    if (tfLiteNodeParameters)
+    {
+        activationType = tfLiteNodeParameters->activation;
+        TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData, tfLiteContext, outputTensorInfo,
+                                                                        outputTensorInfo, activationType);
+        if(activationStatus != kTfLiteOk)
+        {
+            return kTfLiteError;
+        }
+
+    }
+
+    const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteFilterTensor);
+
+    armnn::TensorInfo biasTensorInfo;
+    const TfLiteOpaqueTensor* tfLiteBiasTensor = nullptr;
+
+    if (biasEnabled)
+    {
+        // Use input indices to get bias tensor.
+        tfLiteBiasTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[2]);
+        if (!IsValid(tfLiteContext, tfLiteBiasTensor, operatorCode, nodeIndex))
+        {
+            return kTfLiteError;
+        }
+        biasTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteBiasTensor);
+    }
+    else
+    {
+        biasTensorInfo = armnn::TensorInfo(armnn::TensorShape({1}), GetDataType(tfLiteInputTensor));
+    }
+
+    armnn::Optional<armnn::TensorInfo> optionalBiasInfo(biasTensorInfo);
+
+    // TfLite uses NDHWC tensors
+    const unsigned int inputDepth  = inputTensorInfo.GetShape()[1];
+    const unsigned int inputHeight = inputTensorInfo.GetShape()[2];
+    const unsigned int inputWidth  = inputTensorInfo.GetShape()[3];
+
+    // Assuming the filter is DHWIO : Depth, Height, Width, OutputChannels, InputChannels
+    const unsigned int filterDepth  = filterTensorInfo.GetShape()[0];
+    const unsigned int filterHeight = filterTensorInfo.GetShape()[1];
+    const unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+
+    // Calculate padding
+    CalcPadding(inputDepth, filterDepth, descriptor.m_StrideZ, descriptor.m_DilationZ,
+                descriptor.m_PadFront, descriptor.m_PadBack, params->padding);
+    CalcPadding(inputHeight, filterHeight, descriptor.m_StrideY, descriptor.m_DilationY,
+                descriptor.m_PadTop, descriptor.m_PadBottom, params->padding);
+    CalcPadding(inputWidth, filterWidth, descriptor.m_StrideX, descriptor.m_DilationX,
+                descriptor.m_PadLeft, descriptor.m_PadRight, params->padding);
+
+    // If the m_Network is a nullptr, this signals that a prerequisite TfLite callback is required to clarify the
+    // support for the operator
+    // If supported, VisitConvolutionOperator will be called again to add the layer to the network as seen below.
+    armnn::BackendId setBackend;
+    if (!delegateData.m_Network)
+    {
+        bool isSupported = false;
+        FORWARD_LAYER_OPAQUE_SUPPORT_FUNC("CONV3D",
+                                          tfLiteContext,
+                                          IsConvolution3dSupported,
+                                          delegateData.m_Backends,
+                                          isSupported,
+                                          setBackend,
+                                          inputTensorInfo,
+                                          outputTensorInfo,
+                                          descriptor,
+                                          filterTensorInfo,
+                                          optionalBiasInfo);
+        return isSupported ? kTfLiteOk : kTfLiteError;
+    }
+
+    armnn::IConnectableLayer* layer =  delegateData.m_Network->AddConvolution3dLayer(descriptor);
+    layer->SetBackendId(setBackend);
+    ARMNN_ASSERT(layer != nullptr);
+
+    // Add a constant layer for weights and biases if inputs are constant,
+    // which are connected to the Convolution3d layer as inputs.
+    if (filterTensorInfo.IsConstant())
+    {
+        auto filter = CreateConstTensor(tfLiteFilterTensor,
+                                        filterTensorInfo);
+
+        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
+        ARMNN_ASSERT(weightsLayer != nullptr);
+
+        weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
+        weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
+    }
+
+    if (biasEnabled)
+    {
+        if (biasTensorInfo.IsConstant())
+        {
+            auto biasTensor = CreateConstTensor(tfLiteBiasTensor, biasTensorInfo);
+
+            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
+            ARMNN_ASSERT(biasLayer != nullptr);
+
+            biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
+            biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensorInfo);
+        }
+    }
+
+    // The data input can also be constant, so we must check that this is also allocated to an input slot
+    if (inputTensorInfo.IsConstant())
+    {
+        auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
+
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
+        inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    }
+
+    armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
+    outputSlot.SetTensorInfo(outputTensorInfo);
+
+    if (Connect(layer, tfLiteContext, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
+
+    if (!tfLiteNodeParameters)
+    {
+        // No Activation
+        return kTfLiteOk;
+    }
+
+    // Check and create activation
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData);
+}
+
+
+
+TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
+                                          TfLiteOpaqueContext* tfLiteContext,
+                                          TfLiteOpaqueNode* tfLiteNode,
+                                          int nodeIndex,
+                                          int32_t operatorCode)
+{
+    TF_LITE_ENSURE_STATUS(ValidateNumInputs(tfLiteContext, tfLiteNode, 3, nodeIndex));
+    TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
+
+    armnn::TransposeConvolution2dDescriptor descriptor;
+    auto* parameters = reinterpret_cast<TfLiteTransposeConvParams*>(TfLiteOpaqueNodeGetBuiltinData(tfLiteNode));
+    descriptor.m_BiasEnabled = false;
+    descriptor.m_StrideX = NonNegative(parameters->stride_width, nodeIndex);
+    descriptor.m_StrideY = NonNegative(parameters->stride_height, nodeIndex);
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+
+
+
+
+    auto numInputs = TfLiteOpaqueNodeNumberOfInputs(tfLiteNode);
+    // Gather input indices and use to get input tensor.
+    const int* inputTensors;
+    if (TfLiteOpaqueNodeInputs(tfLiteNode, &inputTensors, &numInputs) != kTfLiteOk)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Unable to gather input tensor indices from node #%d: ",
+                nodeIndex);
+        return kTfLiteError;
+    }
+
+    const TfLiteOpaqueTensor* tfLiteOutputShapeTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext,
+                                                                                           inputTensors[0]);
+    if (!IsValid(tfLiteContext, tfLiteOutputShapeTensor, operatorCode, nodeIndex))
+    {
+        return kTfLiteError;
+    }
+
+    const armnn::TensorInfo outputShapeTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputShapeTensor);
+    std::vector<int32_t> outputShape(outputShapeTensorInfo.GetNumElements());
+    if (outputShapeTensorInfo.GetDataType() == armnn::DataType::Signed32)
+    {
+        for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); i++)
+        {
+            outputShape[i] = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLiteOutputShapeTensor))[i];
+        }
+    }
+
+    if (outputShapeTensorInfo.GetDataType() == armnn::DataType::QAsymmU8)
+    {
+        for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); i++)
+        {
+            outputShape[i] = static_cast<uint8_t*>(TfLiteOpaqueTensorData(tfLiteOutputShapeTensor))[i];
+        }
+    }
+
+    // Change from signed to unsigned int to store in TransposeConvolution2dDescriptor.
+    for (int dimension : outputShape)
+    {
+        descriptor.m_OutputShape.push_back(static_cast<unsigned int>(dimension));
+    }
+    descriptor.m_OutputShapeEnabled = true;
+
+    const TfLiteOpaqueTensor* tfLiteInputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[2]);
+    if (!IsValid(tfLiteContext, tfLiteInputTensor, operatorCode, nodeIndex))
+    {
+        return kTfLiteError;
+    }
+
+    const TfLiteOpaqueTensor* tfLiteFilterTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[1]);
+    if (!IsValid(tfLiteContext, tfLiteFilterTensor, operatorCode, nodeIndex))
+    {
+        return kTfLiteError;
+    }
+
+    // Gather output indices and use to get output tensors.
+    int numOutputs = 0;
+    const int* outputTensors;
+    if (TfLiteOpaqueNodeOutputs(tfLiteNode, &outputTensors, &numOutputs) != kTfLiteOk)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Unable to gather output tensor indices from node #%d: ",
+                nodeIndex);
+        return kTfLiteError;
+    }
+    const TfLiteOpaqueTensor* tfLiteOutputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
+    if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
+    {
+        return kTfLiteError;
+    }
+
+    const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteOpaqueTensor(tfLiteInputTensor);
+    const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
+    const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteFilterTensor);
+
+    // TfLite uses NHWC tensors
+    const unsigned int inputHeight = inputTensorInfo.GetShape()[1];
+    const unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
+
+    const unsigned int filterHeight = filterTensorInfo.GetShape()[1];
+    const unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+
+    // Calculate padding
+    CalcPadding(inputHeight,
+                filterHeight,
+                descriptor.m_StrideY,
+                1, // dilation y
+                descriptor.m_PadTop,
+                descriptor.m_PadBottom,
+                parameters->padding);
+    CalcPadding(inputWidth,
+                filterWidth,
+                descriptor.m_StrideX,
+                1, // dilation x
+                descriptor.m_PadLeft,
+                descriptor.m_PadRight,
+                parameters->padding);
+
+    // Set up filter
+    auto filterTensor = CreateConstTensor(tfLiteFilterTensor,
+                                          filterTensorInfo);
+    armnn::BackendId setBackend;
+    if (!delegateData.m_Network)
+    {
+        bool isSupported = false;
+        FORWARD_LAYER_OPAQUE_SUPPORT_FUNC("TRANSPOSE_CONV2D",
+                                          tfLiteContext,
+                                          IsTransposeConvolution2dSupported,
+                                          delegateData.m_Backends,
+                                          isSupported,
+                                          setBackend,
+                                          inputTensorInfo,
+                                          outputTensorInfo,
+                                          descriptor,
+                                          filterTensorInfo,
+                                          armnn::EmptyOptional());
+        return isSupported ? kTfLiteOk : kTfLiteError;
+    }
+
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddTransposeConvolution2dLayer(descriptor,
+                                                                                             filterTensor,
+                                                                                             armnn::EmptyOptional());
+    layer->SetBackendId(setBackend);
+    ARMNN_ASSERT(layer != nullptr);
+
+    // The data input can be constant, so we must check that this is allocated to an input slot
+    if(inputTensorInfo.IsConstant())
+    {
+        auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
+
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
+        inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    }
+
+    armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
+    outputSlot.SetTensorInfo(outputTensorInfo);
+
+
+    // Connect
+    if (delegateData.m_OutputSlotForNode[static_cast<unsigned int>(inputTensors[2])] != nullptr)
+    {
+        delegateData.m_OutputSlotForNode[static_cast<unsigned int>(inputTensors[2])]->
+                Connect(layer->GetInputSlot(0));
+    }
+
+    if (Connect(layer, tfLiteContext, tfLiteNode, delegateData) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
+
+    return kTfLiteOk;
+}
+
 TfLiteStatus VisitConvolutionOperator(DelegateData& delegateData,
                                       TfLiteOpaqueContext* tfLiteContext,
                                       TfLiteOpaqueNode* tfLiteNode,
@@ -437,8 +799,12 @@ TfLiteStatus VisitConvolutionOperator(DelegateData& delegateData,
     {
         case kTfLiteBuiltinConv2d:
             return VisitConv2dOperator(delegateData, tfLiteContext, tfLiteNode, nodeIndex, operatorCode);
+        case kTfLiteBuiltinConv3d:
+            return VisitConv3dOperator(delegateData, tfLiteContext, tfLiteNode, nodeIndex, operatorCode);
         case kTfLiteBuiltinDepthwiseConv2d:
             return VisitDepthwiseConv2dOperator(delegateData, tfLiteContext, tfLiteNode, nodeIndex, operatorCode);
+        case kTfLiteBuiltinTransposeConv:
+            return VisitTransposeConv2dOperator(delegateData, tfLiteContext, tfLiteNode, nodeIndex, operatorCode);
         default:
             return kTfLiteError;
     }

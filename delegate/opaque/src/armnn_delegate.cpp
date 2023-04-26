@@ -672,6 +672,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinConv2d);
+        case kTfLiteBuiltinConv3d:
+            return VisitConvolutionOperator(delegateData,
+                                            tfLiteContext,
+                                            tfLiteNode,
+                                            nodeIndex,
+                                            kTfLiteBuiltinConv3d);
         case kTfLiteBuiltinDepthwiseConv2d:
             return VisitConvolutionOperator(delegateData,
                                             tfLiteContext,
@@ -873,6 +879,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinTanh);
+        case kTfLiteBuiltinTransposeConv:
+            return VisitConvolutionOperator(delegateData,
+                                            tfLiteContext,
+                                            tfLiteNode,
+                                            nodeIndex,
+                                            kTfLiteBuiltinTransposeConv);
         default:
             return kTfLiteError;
     }

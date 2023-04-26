@@ -7,8 +7,13 @@
 
 #include <DelegateOptions.hpp>
 
+#include <tensorflow/core/public/version.h>
 #include <tensorflow/lite/c/c_api_opaque.h>
 #include <tensorflow/lite/core/experimental/acceleration/configuration/c/stable_delegate.h>
+
+#if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 5)
+#define ARMNN_POST_TFLITE_2_5
+#endif
 
 namespace armnnOpaqueDelegate
 {

@@ -8,6 +8,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         include/armnn_delegate.hpp
         include/Version.hpp
         src/armnn_delegate.cpp
+        src/BatchSpace.hpp
         src/Convolution.hpp
         src/Redefine.hpp
         src/SharedFunctions.cpp

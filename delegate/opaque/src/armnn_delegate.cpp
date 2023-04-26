@@ -622,6 +622,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
 {
     switch (TfLiteRegistrationExternalGetBuiltInCode(tfLiteRegistration))
     {
+        case kTfLiteBuiltinBatchToSpaceNd:
+            return VisitBatchToSpaceNdOperator(delegateData,
+                                               tfLiteContext,
+                                               tfLiteNode,
+                                               nodeIndex,
+                                               kTfLiteBuiltinBatchToSpaceNd);
         case kTfLiteBuiltinCast:
             return VisitCastOperator(delegateData,
                                      tfLiteContext,
@@ -688,6 +694,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinNotEqual);
+        case kTfLiteBuiltinSpaceToBatchNd:
+            return VisitSpaceToBatchNdOperator(delegateData,
+                                               tfLiteContext,
+                                               tfLiteNode,
+                                               nodeIndex,
+                                               kTfLiteBuiltinSpaceToBatchNd);
         default:
             return kTfLiteError;
     }

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <armnn/utility/IgnoreUnused.hpp>
+#include <DelegateUtils.hpp>
 
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
@@ -20,35 +20,6 @@
 
 namespace armnnDelegate
 {
-
-void SetupConcatViewOrigin(const armnn::TensorInfo& inputTensorInfo,
-                           armnn::OriginsDescriptor& concatDescriptor,
-                           const unsigned int concatAxis,
-                           unsigned int inputIndex,
-                           unsigned int& mergeDimOrigin)
-{
-    const uint32_t inputRank = concatDescriptor.GetNumDimensions();
-
-    // double check dimensions of the tensors
-    if (inputTensorInfo.GetNumDimensions() != inputRank)
-    {
-        throw armnn::ParseException("The number of dimensions for input tensors "
-                                    "of the concatenation operator should be: " + std::to_string(inputRank));
-    }
-
-    for (unsigned int j = 0; j < concatAxis; ++j)
-    {
-        concatDescriptor.SetViewOriginCoord(inputIndex, j, 0);
-    }
-
-    concatDescriptor.SetViewOriginCoord(inputIndex, concatAxis, mergeDimOrigin);
-    mergeDimOrigin += inputTensorInfo.GetShape()[concatAxis];
-
-    for (unsigned int j = concatAxis + 1; j < inputRank; ++j)
-    {
-        concatDescriptor.SetViewOriginCoord(inputIndex, j, 0);
-    }
-}
 
 TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
                                         TfLiteContext* tfLiteContext,
@@ -322,12 +293,6 @@ TfLiteStatus VisitControlOperator(DelegateData& delegateData,
                                   int nodeIndex,
                                   int32_t operatorCode)
 {
-    armnn::IgnoreUnused(delegateData,
-                        tfLiteContext,
-                        tfLiteNode,
-                        nodeIndex,
-                        operatorCode);
-                        
     switch(operatorCode)
     {
         case kTfLiteBuiltinConcatenation:

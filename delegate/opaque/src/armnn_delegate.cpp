@@ -628,6 +628,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                      tfLiteNode,
                                      nodeIndex,
                                      kTfLiteBuiltinCast);
+        case kTfLiteBuiltinConcatenation:
+            return VisitControlOperator(delegateData,
+                                        tfLiteContext,
+                                        tfLiteNode,
+                                        nodeIndex,
+                                        kTfLiteBuiltinConcatenation);
         case kTfLiteBuiltinConv2d:
             return VisitConvolutionOperator(delegateData,
                                             tfLiteContext,
@@ -640,6 +646,48 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinDepthwiseConv2d);
+        case kTfLiteBuiltinEqual:
+            return VisitComparisonOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinEqual);
+        case kTfLiteBuiltinGreater:
+            return VisitComparisonOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinGreater);
+        case kTfLiteBuiltinGreaterEqual:
+            return VisitComparisonOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinGreaterEqual);
+        case kTfLiteBuiltinLess:
+            return VisitComparisonOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinLess);
+        case kTfLiteBuiltinLessEqual:
+            return VisitComparisonOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinLessEqual);
+        case kTfLiteBuiltinMean:
+            return VisitControlOperator(delegateData,
+                                        tfLiteContext,
+                                        tfLiteNode,
+                                        nodeIndex,
+                                        kTfLiteBuiltinMean);
+        case kTfLiteBuiltinNotEqual:
+            return VisitComparisonOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinNotEqual);
         default:
             return kTfLiteError;
     }

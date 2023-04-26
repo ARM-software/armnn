@@ -261,6 +261,10 @@ if(BUILD_UNIT_TESTS)
              opaque/src/test/DelegateTestInterpreter.cpp
              test/CastTest.cpp
              test/CastTestHelper.hpp
+             test/ComparisonTest.cpp
+             test/ComparisonTestHelper.hpp
+             test/ControlTest.cpp
+             test/ControlTestHelper.hpp
              test/Convolution2dTest.cpp
              test/ConvolutionTestHelper.hpp
              test/DepthwiseConvolution2dTest.cpp

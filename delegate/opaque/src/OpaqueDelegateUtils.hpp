@@ -139,7 +139,7 @@ bool IsValid(TfLiteOpaqueContext* tfLiteContext,
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: Invalid TfLite tensor in operator #%d node #%d: ",
+                "TfLiteArmnnOpaqueDelegate: Invalid TfLite tensor in operator #%d node #%d: ",
                 operatorCode, nodeIndex);
         return false;
     }
@@ -147,7 +147,7 @@ bool IsValid(TfLiteOpaqueContext* tfLiteContext,
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: Dynamic tensors are not supported in operator #%d node #%d: ",
+                "TfLiteArmnnOpaqueDelegate: Dynamic tensors are not supported in operator #%d node #%d: ",
                 operatorCode, nodeIndex);
         return false;
     }
@@ -179,13 +179,10 @@ TfLiteStatus Connect(armnn::IConnectableLayer* layer,
     {
         return kTfLiteError;
     }
-    // numInputs is set from TfLiteOpaqueNodeInputs.
-    if(numInputs != static_cast<int>(layer->GetNumInputSlots()))
-    {
-        ARMNN_LOG(error) << "Layer: " << layer->GetName() << ": Expected number of input slots does not match actual "
-                                                          "number of input slots.";
-        return kTfLiteError;
-    }
+    // We can't validate the number of inputs vs the layer->GetNumOutputSlots() as some operators differ.
+    // An example is Mean where the number of TFLite inputs is 2, but number of Arm NN inputs is 1,
+    // as we store the axis within the descriptor.
+
     // Connect the input slots.
     // For each input slot, get the index of the opaque tensor that was allocated for it.
     for (unsigned int inputIndex = 0; inputIndex < layer->GetNumInputSlots(); ++inputIndex)

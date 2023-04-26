@@ -47,31 +47,11 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     {
         return kTfLiteError;
     }
-    if (IsDynamicTensor(tfLiteInputTensor))
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Dynamic input tensors are not supported in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
-        return kTfLiteError;
-    }
 
     // Use input indices to get filter tensor.
     const TfLiteOpaqueTensor* tfLiteFilterTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[1]);
-    if(!IsValid(tfLiteFilterTensor))
+    if (!IsValid(tfLiteContext, tfLiteFilterTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Invalid filter tensor in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
-        return kTfLiteError;
-    }
-    if (IsDynamicTensor(tfLiteFilterTensor))
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Dynamic filter tensors are not supported in node #%d: ",
-                nodeIndex);
         return kTfLiteError;
     }
 
@@ -90,14 +70,6 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     const TfLiteOpaqueTensor* tfLiteOutputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
     if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
     {
-        return kTfLiteError;
-    }
-    if (IsDynamicTensor(tfLiteOutputTensor))
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Dynamic output tensors are not supported in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
         return kTfLiteError;
     }
 
@@ -281,31 +253,11 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     {
         return kTfLiteError;
     }
-    if (IsDynamicTensor(tfLiteInputTensor))
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Dynamic input tensors are not supported in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
-        return kTfLiteError;
-    }
 
     // Use input indices to get filter tensor.
     const TfLiteOpaqueTensor* tfLiteFilterTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[1]);
-    if(!IsValid(tfLiteFilterTensor))
+    if (!IsValid(tfLiteContext, tfLiteFilterTensor, operatorCode, nodeIndex))
     {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Invalid filter tensor in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
-        return kTfLiteError;
-    }
-    if (IsDynamicTensor(tfLiteFilterTensor))
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Dynamic filter tensors are not supported in node #%d: ",
-                nodeIndex);
         return kTfLiteError;
     }
 
@@ -324,14 +276,6 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     const TfLiteOpaqueTensor* tfLiteOutputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
     if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
     {
-        return kTfLiteError;
-    }
-    if (IsDynamicTensor(tfLiteOutputTensor))
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Dynamic output tensors are not supported in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
         return kTfLiteError;
     }
 

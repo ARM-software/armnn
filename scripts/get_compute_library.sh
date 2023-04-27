@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="05a65e3f397946cacf5c17d8c528a9fad3f1b322" #9481: Disable Neon/MatMul/Quantized for armv7a | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9481
+DEFAULT_CLFRAMEWORKREVISION="f16eed979ecaa234b308c8eb145c5f9512673a54" #9472: Change fp16 GeMM heuristic for Arm® Mali™-G77 | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9472
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

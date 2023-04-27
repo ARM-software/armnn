@@ -23,13 +23,16 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/LogicalBinary.hpp
         src/Lstm.hpp
         src/Normalization.hpp
+        src/Pad.hpp
         src/Pooling.hpp
+        src/Pack.hpp
         src/Prelu.hpp
         src/Redefine.hpp
         src/Round.hpp
         src/Shape.hpp
         src/SharedFunctions.cpp
-        src/SharedFunctions.hpp)
+        src/SharedFunctions.hpp
+        src/Unpack.hpp)
 
 add_library(armnnOpaqueDelegateObject OBJECT ${armnnOpaqueDelegateObject_sources})
 

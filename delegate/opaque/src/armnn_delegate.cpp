@@ -918,6 +918,24 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            nodeIndex,
                                            kTfLiteBuiltinNotEqual,
                                            armnn::ComparisonOperation::NotEqual);
+        case kTfLiteBuiltinPack:
+            return VisitPackOperator(delegateData,
+                                     tfLiteContext,
+                                     tfLiteNode,
+                                     nodeIndex,
+                                     kTfLiteBuiltinPack);
+        case kTfLiteBuiltinPad:
+            return VisitPadOperator(delegateData,
+                                    tfLiteContext,
+                                    tfLiteNode,
+                                    nodeIndex,
+                                    kTfLiteBuiltinPad);
+        case kTfLiteBuiltinPadv2:
+            return VisitPadOperator(delegateData,
+                                    tfLiteContext,
+                                    tfLiteNode,
+                                    nodeIndex,
+                                    kTfLiteBuiltinPadv2);
         case kTfLiteBuiltinPrelu:
             return VisitPreluOperator(delegateData,
                                       tfLiteContext,
@@ -993,6 +1011,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinTransposeConv);
+        case kTfLiteBuiltinUnpack:
+            return VisitUnpackOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinUnpack);
         default:
             return kTfLiteError;
     }

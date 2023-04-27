@@ -292,6 +292,10 @@ if(BUILD_UNIT_TESTS)
              test/LogicalTestHelper.hpp
              test/NormalizationTest.cpp
              test/NormalizationTestHelper.hpp
+             test/PackTest.cpp
+             test/PackTestHelper.hpp
+             test/PadTest.cpp
+             test/PadTestHelper.hpp
              test/Pooling2dTest.cpp
              test/Pooling2dTestHelper.hpp
              test/Pooling3dTest.cpp
@@ -304,7 +308,9 @@ if(BUILD_UNIT_TESTS)
              test/ShapeTestHelper.hpp
              test/TestUtils.hpp
              test/TestUtils.cpp
-             test/TransposeConvolution2dTest.cpp)
+             test/TransposeConvolution2dTest.cpp
+             test/UnpackTest.cpp
+             test/UnpackTestHelper.hpp)
 
         # Until all operators are supported, we have to add tests one by one above to opaqueDelegate_unittest_sources.
         # After we add can add commonDelegate_unittest_sources to the add_executable below.

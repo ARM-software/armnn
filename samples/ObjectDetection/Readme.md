@@ -106,13 +106,13 @@ For implementation details see the scripts FindTfLite.cmake and FindTfLiteSrc.cm
 
 The application links with the Tensorflow lite library libtensorflow-lite.a
 
-#### Download and build Tensorflow Lite version 2.10
+#### Download and build Tensorflow Lite version. We currently use Tf 2.12 SHA which has a fix for the Cmake build.
 Example for Tensorflow Lite native compilation
 ```commandline
 sudo apt install build-essential
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/tensorflow
-git checkout 359c3cdfc5fabac82b3c70b3b6de2b0a8c16874f #Tensorflow 2.10
+git checkout 6f692f73cb2043b4a0b0446539cd8c15b3dd9220
 mkdir build && cd build
 cmake ../lite -DTFLITE_ENABLE_XNNPACK=OFF
 make

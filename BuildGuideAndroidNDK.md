@@ -167,7 +167,7 @@ First clone tensorflow:
 cd $WORKING_DIR
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-git fetch && git checkout "tags/v2.10.0"
+git fetch && git checkout "6f692f73cb2043b4a0b0446539cd8c15b3dd9220"
 ```
 Arm NN provides a script that downloads the version of Tensorflow that Arm NN was tested with:
 ```bash

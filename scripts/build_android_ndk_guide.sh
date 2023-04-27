@@ -210,7 +210,7 @@ function GetAndBuildComputeLibrary {
 }
 
 function GetAndBuildTFLite {
-    TENSORFLOW_REVISION="tags/v2.10.0" # Release 2.10.0 tag
+    TENSORFLOW_REVISION="6f692f73cb2043b4a0b0446539cd8c15b3dd9220" # TF r2.12 + PR #60015 to fix Cmake build.
     TFLITE_ROOT_DIR=${WORKING_DIR}/tensorflow/tensorflow/lite
 
     cd $WORKING_DIR
@@ -231,7 +231,10 @@ function GetAndBuildTFLite {
         cd $WORKING_DIR
     fi
 
-    CMARGS="-DTFLITE_ENABLE_XNNPACK=OFF"
+    CMARGS="-DTFLITE_ENABLE_XNNPACK=OFF \
+            -DFLATBUFFERS_BUILD_FLATC=OFF \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_TESTING=OFF"
 
     # Two different naming conventions; one for build and the other for CC_OPT_FLAGS
     ANDROID_ARM_ARCH="arm64-v8a"
@@ -303,7 +306,8 @@ function BuildArmNN {
             -DBUILD_ARMNN_TFLITE_DELEGATE=1 \
             -DTENSORFLOW_ROOT=$WORKING_DIR/tensorflow \
             -DTFLITE_LIB_ROOT=$WORKING_DIR/tflite-out/android \
-            -DTFLITE_ROOT_DIR=$WORKING_DIR/tensorflow/tensorflow/lite"
+            -DTFLITE_ROOT_DIR=$WORKING_DIR/tensorflow/tensorflow/lite \
+            -DBUILD_DELEGATE_JNI_INTERFACE=0"
     fi
 
     if [[ $DYNAMIC_SAMPLE == 1 ]]; then

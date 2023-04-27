@@ -10,6 +10,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Activation.hpp
         src/ArgMinMax.hpp
         src/armnn_delegate.cpp
+        src/BatchMatMul.hpp
         src/BatchSpace.hpp
         src/Comparison.hpp
         src/Control.hpp
@@ -22,6 +23,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Normalization.hpp
         src/Prelu.hpp
         src/Redefine.hpp
+        src/Shape.hpp
         src/SharedFunctions.cpp
         src/SharedFunctions.hpp)
 

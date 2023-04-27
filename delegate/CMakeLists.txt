@@ -263,6 +263,8 @@ if(BUILD_UNIT_TESTS)
              test/ActivationTestHelper.hpp
              test/ArgMinMaxTest.cpp
              test/ArgMinMaxTestHelper.hpp
+             test/BatchMatMulTest.cpp
+             test/BatchMatMulTestHelper.hpp
              test/BatchSpaceTest.cpp
              test/BatchSpaceTestHelper.hpp
              test/CastTest.cpp
@@ -289,6 +291,8 @@ if(BUILD_UNIT_TESTS)
              test/NormalizationTestHelper.hpp
              test/PreluTest.cpp
              test/PreluTestHelper.hpp
+             test/ShapeTest.cpp
+             test/ShapeTestHelper.hpp
              test/TestUtils.hpp
              test/TestUtils.cpp
              test/TransposeConvolution2dTest.cpp)

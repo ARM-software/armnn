@@ -63,7 +63,7 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
     }
 
     const TfLiteOpaqueTensor* tfLiteOutputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
-    if (!IsValid(tfLiteContext, tfLiteInputTensor, argMinMaxOperatorCode, nodeIndex))
+    if (!IsValid(tfLiteContext, tfLiteOutputTensor, argMinMaxOperatorCode, nodeIndex))
     {
         return kTfLiteError;
     }

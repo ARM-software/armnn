@@ -641,6 +641,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                           tfLiteNode,
                                           nodeIndex,
                                           kTfLiteBuiltinArgMin);
+        case kTfLiteBuiltinBatchMatmul:
+            return VisitBatchMatMulOperator(delegateData,
+                                            tfLiteContext,
+                                            tfLiteNode,
+                                            nodeIndex,
+                                            kTfLiteBuiltinBatchMatmul);
         case kTfLiteBuiltinBatchToSpaceNd:
             return VisitBatchToSpaceNdOperator(delegateData,
                                                tfLiteContext,
@@ -853,6 +859,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  nodeIndex,
                                                  kTfLiteBuiltinRsqrt,
                                                  armnn::UnaryOperation::Rsqrt);
+        case kTfLiteBuiltinShape:
+            return VisitShapeOperator(delegateData,
+                                      tfLiteContext,
+                                      tfLiteNode,
+                                      nodeIndex,
+                                      kTfLiteBuiltinShape);
         case kTfLiteBuiltinSin:
             return VisitElementwiseUnaryOperator(delegateData,
                                                  tfLiteContext,

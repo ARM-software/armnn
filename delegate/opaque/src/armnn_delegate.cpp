@@ -664,12 +664,24 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinDepthwiseConv2d);
+        case kTfLiteBuiltinElu:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinElu);
         case kTfLiteBuiltinEqual:
             return VisitComparisonOperator(delegateData,
                                            tfLiteContext,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinEqual);
+        case kTfLiteBuiltinFullyConnected:
+            return VisitFullyConnectedOperator(delegateData,
+                                               tfLiteContext,
+                                               tfLiteNode,
+                                               nodeIndex,
+                                               kTfLiteBuiltinFullyConnected);
         case kTfLiteBuiltinGather:
             return VisitGatherOperator(delegateData,
                                        tfLiteContext,
@@ -694,6 +706,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinGreaterEqual);
+        case kTfLiteBuiltinHardSwish:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinHardSwish);
         case kTfLiteBuiltinLess:
             return VisitComparisonOperator(delegateData,
                                            tfLiteContext,
@@ -706,6 +724,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinLessEqual);
+        case kTfLiteBuiltinLogistic:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinLogistic);
         case kTfLiteBuiltinMean:
             return VisitControlOperator(delegateData,
                                         tfLiteContext,
@@ -718,12 +742,42 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinNotEqual);
+        case kTfLiteBuiltinPrelu:
+            return VisitPreluOperator(delegateData,
+                                      tfLiteContext,
+                                      tfLiteNode,
+                                      nodeIndex,
+                                      kTfLiteBuiltinPrelu);
+        case kTfLiteBuiltinRelu:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinRelu);
+        case kTfLiteBuiltinReluN1To1:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinReluN1To1);
+        case kTfLiteBuiltinRelu6:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinRelu6);
         case kTfLiteBuiltinSpaceToBatchNd:
             return VisitSpaceToBatchNdOperator(delegateData,
                                                tfLiteContext,
                                                tfLiteNode,
                                                nodeIndex,
                                                kTfLiteBuiltinSpaceToBatchNd);
+        case kTfLiteBuiltinTanh:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinTanh);
         default:
             return kTfLiteError;
     }

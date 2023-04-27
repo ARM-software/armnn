@@ -259,6 +259,8 @@ if(BUILD_UNIT_TESTS)
              common/src/test/DelegateTestInterpreterUtils.hpp
              opaque/src/test/ArmnnOpaqueDelegateTest.cpp
              opaque/src/test/DelegateTestInterpreter.cpp
+             test/ActivationTest.cpp
+             test/ActivationTestHelper.hpp
              test/ArgMinMaxTest.cpp
              test/ArgMinMaxTestHelper.hpp
              test/BatchSpaceTest.cpp
@@ -272,10 +274,14 @@ if(BUILD_UNIT_TESTS)
              test/Convolution2dTest.cpp
              test/ConvolutionTestHelper.hpp
              test/DepthwiseConvolution2dTest.cpp
+             test/FullyConnectedTest.cpp
+             test/FullyConnectedTestHelper.hpp
              test/GatherTest.cpp
              test/GatherTestHelper.hpp
              test/GatherNdTest.cpp
              test/GatherNdTestHelper.hpp
+             test/PreluTest.cpp
+             test/PreluTestHelper.hpp
              test/TestUtils.hpp
              test/TestUtils.cpp)
 

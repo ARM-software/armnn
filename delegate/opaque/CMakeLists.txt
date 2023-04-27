@@ -20,9 +20,12 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Gather.hpp
         src/GatherNd.hpp
         src/LogicalBinary.hpp
+        src/Lstm.hpp
         src/Normalization.hpp
+        src/Pooling.hpp
         src/Prelu.hpp
         src/Redefine.hpp
+        src/Round.hpp
         src/Shape.hpp
         src/SharedFunctions.cpp
         src/SharedFunctions.hpp)

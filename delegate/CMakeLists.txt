@@ -285,12 +285,20 @@ if(BUILD_UNIT_TESTS)
              test/GatherTestHelper.hpp
              test/GatherNdTest.cpp
              test/GatherNdTestHelper.hpp
+             test/LstmTest.cpp
+             test/LstmTestHelper.hpp
              test/LogicalTest.cpp
              test/LogicalTestHelper.hpp
              test/NormalizationTest.cpp
              test/NormalizationTestHelper.hpp
+             test/Pooling2dTest.cpp
+             test/Pooling2dTestHelper.hpp
+             test/Pooling3dTest.cpp
+             test/Pooling3dTestHelper.hpp
              test/PreluTest.cpp
              test/PreluTestHelper.hpp
+             test/RoundTest.cpp
+             test/RoundTestHelper.hpp
              test/ShapeTest.cpp
              test/ShapeTestHelper.hpp
              test/TestUtils.hpp

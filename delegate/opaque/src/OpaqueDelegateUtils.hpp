@@ -424,7 +424,7 @@ armnn::DataType GetDataType(const TfLiteOpaqueTensor* tfLiteTensor)
             return armnn::DataType::Signed64;
         default:
             throw armnn::Exception(
-                    &"TfLiteArmnnDelegate: Unsupported data type: " [ TfLiteOpaqueTensorType(tfLiteTensor) ]);
+                    &"TfLiteArmnnOpaqueDelegate: Unsupported data type: " [ TfLiteOpaqueTensorType(tfLiteTensor) ]);
     }
 }
 
@@ -528,7 +528,7 @@ armnn::ConstTensor CreateConstTensor(const TfLiteOpaqueTensor* tfLiteTensor,
     auto allocType = TfLiteOpaqueTensorGetAllocationType(tfLiteTensor);
     if (allocType != kTfLiteMmapRo)
     {
-        throw armnn::Exception("TfLiteArmnnDelegate: Not constant allocation type: " + std::to_string(allocType));
+       throw armnn::Exception("TfLiteArmnnOpaqueDelegate: Not constant allocation type: " + std::to_string(allocType));
     }
 
     return armnn::ConstTensor(tensorInfo, TfLiteOpaqueTensorData(tfLiteTensor));

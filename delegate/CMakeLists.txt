@@ -274,12 +274,18 @@ if(BUILD_UNIT_TESTS)
              test/Convolution2dTest.cpp
              test/ConvolutionTestHelper.hpp
              test/DepthwiseConvolution2dTest.cpp
+             test/ElementwiseUnaryTestHelper.hpp
+             test/ElementwiseUnaryTest.cpp
              test/FullyConnectedTest.cpp
              test/FullyConnectedTestHelper.hpp
              test/GatherTest.cpp
              test/GatherTestHelper.hpp
              test/GatherNdTest.cpp
              test/GatherNdTestHelper.hpp
+             test/LogicalTest.cpp
+             test/LogicalTestHelper.hpp
+             test/NormalizationTest.cpp
+             test/NormalizationTestHelper.hpp
              test/PreluTest.cpp
              test/PreluTestHelper.hpp
              test/TestUtils.hpp

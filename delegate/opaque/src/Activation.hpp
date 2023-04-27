@@ -10,6 +10,53 @@
 namespace armnnOpaqueDelegate
 {
 
+std::string GetLayerName(armnn::ActivationFunction activationFunction)
+{
+    std::string layerName = "ACTIVATION";
+    switch (activationFunction)
+    {
+        case armnn::ActivationFunction::Abs:
+            layerName += " ABS";
+            break;
+        case armnn::ActivationFunction::BoundedReLu:
+            layerName += " BOUNDED_RELU";
+            break;
+        case armnn::ActivationFunction::Elu:
+            layerName += " ELU";
+            break;
+        case armnn::ActivationFunction::HardSwish:
+            layerName += " HARD_SWISH";
+            break;
+        case armnn::ActivationFunction::LeakyReLu:
+            layerName += " LEAKY_RELU";
+            break;
+        case armnn::ActivationFunction::Linear:
+            layerName += " LINEAR";
+            break;
+        case armnn::ActivationFunction::ReLu:
+            layerName += " RELU";
+            break;
+        case armnn::ActivationFunction::Sigmoid:
+            layerName += " SIGMOID";
+            break;
+        case armnn::ActivationFunction::SoftReLu:
+            layerName += " SOFT_RELU";
+            break;
+        case armnn::ActivationFunction::Square:
+            layerName += " SQUARE";
+            break;
+        case armnn::ActivationFunction::Sqrt:
+            layerName += " SQRT";
+            break;
+        case armnn::ActivationFunction::TanH:
+            layerName += " TANH";
+            break;
+        default:
+            layerName += " UNKNOWN";
+    }
+    return layerName;
+}
+
 TfLiteStatus ValidateActivationOperator(DelegateData& delegateData,
                                         TfLiteOpaqueContext* tfLiteContext,
                                         const armnn::TensorInfo& inputInfo,
@@ -17,9 +64,9 @@ TfLiteStatus ValidateActivationOperator(DelegateData& delegateData,
                                         armnn::ActivationDescriptor& activationDesc)
 {
     bool isSupported = false;
-    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
+    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported, std::string layerName)
     {
-        FORWARD_LAYER_OPAQUE_SUPPORT_FUNC("ACTIVATION",
+        FORWARD_LAYER_OPAQUE_SUPPORT_FUNC(layerName.c_str(),
                                           tfLiteContext,
                                           IsActivationSupported,
                                           delegateData.m_Backends,
@@ -30,7 +77,7 @@ TfLiteStatus ValidateActivationOperator(DelegateData& delegateData,
                                           activationDesc);
     };
 
-    validateFunc(outputInfo, isSupported);
+    validateFunc(outputInfo, isSupported, GetLayerName(activationDesc.m_Function));
     return isSupported ? kTfLiteOk : kTfLiteError;
 }
 

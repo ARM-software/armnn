@@ -14,9 +14,12 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Comparison.hpp
         src/Control.hpp
         src/Convolution.hpp
+        src/ElementwiseUnary.hpp
         src/FullyConnected.hpp
         src/Gather.hpp
         src/GatherNd.hpp
+        src/LogicalBinary.hpp
+        src/Normalization.hpp
         src/Prelu.hpp
         src/Redefine.hpp
         src/SharedFunctions.cpp

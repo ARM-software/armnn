@@ -7,11 +7,6 @@
 
 #include <OpaqueDelegateUtils.hpp>
 
-#include <algorithm>
-#include <iterator>
-#include <string>
-#include <vector>
-
 namespace armnnOpaqueDelegate
 {
 TfLiteStatus VisitGatherNdOperator(DelegateData& delegateData,

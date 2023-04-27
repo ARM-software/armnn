@@ -86,7 +86,7 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
 
     if(!concatenationParameters)
     {
-        throw armnn::Exception(&"TfLiteArmnnDelegate: Concat parameters are null in: " [ nodeIndex ]);
+        throw armnn::Exception(&"TfLiteArmnnOpaqueDelegate: Concat parameters are null in: " [ nodeIndex ]);
     }
 
     const auto concatDimInput = static_cast<unsigned int>(

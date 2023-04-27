@@ -5,12 +5,17 @@
 
 #pragma once
 
+#include <arm_compute/runtime/NEON/functions/NECast.h>
 #include <armnn/backends/Workload.hpp>
 #include <armnn/backends/WorkloadData.hpp>
+#include <memory>
 #include <neon/workloads/NeonWorkloadUtils.hpp>
+
 
 namespace armnn
 {
+
+arm_compute::Status NeonConvertFp16ToFp32WorkloadValidate(const TensorInfo& input, const TensorInfo& output);
 
 class NeonConvertFp16ToFp32Workload : public Float16ToFloat32Workload<ConvertFp16ToFp32QueueDescriptor>
 {
@@ -26,6 +31,7 @@ private:
     using TensorHandlePair = std::pair<const ITensorHandle*, ITensorHandle*>;
     std::vector<TensorHandlePair> m_TensorHandlePairs;
     virtual void Reconfigure();
+    mutable std::unique_ptr<arm_compute::NECast> m_Cast;
 };
 
 } //namespace armnn

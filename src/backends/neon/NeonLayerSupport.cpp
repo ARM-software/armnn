@@ -32,6 +32,8 @@
 #include "workloads/NeonComparisonWorkload.hpp"
 #include "workloads/NeonConcatWorkload.hpp"
 #include "workloads/NeonConstantWorkload.hpp"
+#include "workloads/NeonConvertFp16ToFp32Workload.hpp"
+#include "workloads/NeonConvertFp32ToFp16Workload.hpp"
 #include "workloads/NeonConvolution2dWorkload.hpp"
 #include "workloads/NeonConvolution3dWorkload.hpp"
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
@@ -887,20 +889,20 @@ bool NeonLayerSupport::IsConvertFp16ToFp32Supported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {
-    armnn::IgnoreUnused(input);
-    armnn::IgnoreUnused(output);
-    armnn::IgnoreUnused(reasonIfUnsupported);
-    return true;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConvertFp16ToFp32WorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool NeonLayerSupport::IsConvertFp32ToFp16Supported(const TensorInfo& input,
                                                     const TensorInfo& output,
                                                     Optional<std::string&> reasonIfUnsupported) const
 {
-    armnn::IgnoreUnused(input);
-    armnn::IgnoreUnused(output);
-    armnn::IgnoreUnused(reasonIfUnsupported);
-    return true;
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonConvertFp32ToFp16WorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output);
 }
 
 bool NeonLayerSupport::IsConvolution2dSupported(const TensorInfo& input,

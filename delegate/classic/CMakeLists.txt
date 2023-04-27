@@ -25,7 +25,6 @@ list(APPEND armnnClassicDelegateObject_sources
         src/GatherNd.hpp
         src/LogicalBinary.hpp
         src/Lstm.hpp
-        src/MultiLayerFacade.hpp
         src/Normalization.hpp
         src/Pack.hpp
         src/Pad.hpp

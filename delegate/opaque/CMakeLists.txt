@@ -15,6 +15,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Comparison.hpp
         src/Control.hpp
         src/Convolution.hpp
+	src/ElementwiseBinary.hpp
         src/ElementwiseUnary.hpp
         src/FullyConnected.hpp
         src/Gather.hpp

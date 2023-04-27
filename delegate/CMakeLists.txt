@@ -21,7 +21,8 @@ set(armnnDelegate_sources)
 list(APPEND armnnDelegate_sources
         common/include/DelegateOptions.hpp
         common/src/DelegateOptions.cpp
-        common/src/DelegateUtils.hpp)
+        common/src/DelegateUtils.hpp
+        common/src/MultiLayerFacade.hpp)
 
 ## Add Armnn as a Dependency
 if(NOT ARMNN_SUB_PROJECT)

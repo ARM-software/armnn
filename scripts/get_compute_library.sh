@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="f16eed979ecaa234b308c8eb145c5f9512673a54" #9472: Change fp16 GeMM heuristic for Arm® Mali™-G77 | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9472
+DEFAULT_CLFRAMEWORKREVISION="99b6fd210d84511b5d746871b8510a482a2950b8" #9517: Fix filelist issue with CPU MatMul | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9517
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

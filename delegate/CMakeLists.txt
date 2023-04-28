@@ -304,6 +304,7 @@ if(BUILD_UNIT_TESTS)
              test/PreluTestHelper.hpp
              test/ReduceTest.cpp
              test/ReduceTestHelper.hpp
+             test/ReshapeTest.cpp
              test/ResizeTest.cpp
              test/ResizeTestHelper.hpp
              test/RoundTest.cpp

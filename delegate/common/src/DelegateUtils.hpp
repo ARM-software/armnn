@@ -21,6 +21,8 @@
 #include <tensorflow/lite/minimal_logging.h>
 #include <tensorflow/lite/kernels/kernel_util.h>
 
+#include <numeric>
+
 namespace
 {
 
@@ -136,6 +138,35 @@ void SetupConcatViewOrigin(const armnn::TensorInfo& inputTensorInfo,
     {
         concatDescriptor.SetViewOriginCoord(inputIndex, j, 0);
     }
+}
+
+TfLiteStatus CreateOutputTensorShape(const armnn::TensorInfo& inputTensorInfo,
+                                     const std::vector<int32_t>& targetShape,
+                                     armnn::ReshapeDescriptor& reshapeDesc)
+{
+    std::vector<unsigned int> outputDims(targetShape.begin(), targetShape.end());
+    const auto stretchDim = std::find(targetShape.begin(), targetShape.end(), -1);
+
+    if (stretchDim != targetShape.end())
+    {
+        if (std::find(std::next(stretchDim), targetShape.end(), -1) != targetShape.end())
+        {
+            // Return kTfLiteError and log the error after returning
+            return kTfLiteError;
+        }
+
+        auto targetNumElements =
+                armnn::numeric_cast<unsigned int>(
+                        std::accumulate(targetShape.begin(), targetShape.end(), -1, std::multiplies<int32_t>()));
+
+        auto stretchIndex = static_cast<size_t>(std::distance(targetShape.begin(), stretchDim));
+        outputDims[stretchIndex] = inputTensorInfo.GetNumElements() / targetNumElements;
+    }
+
+    armnn::TensorShape outputShape = armnn::TensorShape(static_cast<unsigned int>(outputDims.size()),
+                                                        outputDims.data());
+    reshapeDesc.m_TargetShape = outputShape;
+    return kTfLiteOk;
 }
 
 } // namespace anonymous

@@ -1002,6 +1002,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinRelu6);
+        case kTfLiteBuiltinReshape:
+            return VisitReshapeOperator(delegateData,
+                                        tfLiteContext,
+                                        tfLiteNode,
+                                        nodeIndex,
+                                        kTfLiteBuiltinReshape);
         case kTfLiteBuiltinResizeNearestNeighbor:
             return VisitResizeOperator(delegateData,
                                        tfLiteContext,

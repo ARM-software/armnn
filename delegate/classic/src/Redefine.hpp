@@ -13,7 +13,6 @@
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
 #include <tensorflow/lite/minimal_logging.h>
-#include <numeric>
 
 namespace armnnDelegate
 {
@@ -82,36 +81,6 @@ TfLiteStatus VisitCastOperator(DelegateData& delegateData,
 
     // Connect
     return Connect(layer, tfLiteNode, delegateData);
-}
-
-
-TfLiteStatus CreateOutputTensorShape(const armnn::TensorInfo& inputTensorInfo,
-                                     const std::vector<int32_t>& targetShape,
-                                     armnn::ReshapeDescriptor& reshapeDesc)
-{
-    std::vector<unsigned int> outputDims(targetShape.begin(), targetShape.end());
-    const auto stretchDim = std::find(targetShape.begin(), targetShape.end(), -1);
-
-    if (stretchDim != targetShape.end())
-    {
-        if (std::find(std::next(stretchDim), targetShape.end(), -1) != targetShape.end())
-        {
-            // Return kTfLiteError and log the error after returning
-            return kTfLiteError;
-        }
-
-        auto targetNumElements =
-            armnn::numeric_cast<unsigned int>(
-                std::accumulate(targetShape.begin(), targetShape.end(), -1, std::multiplies<int32_t>()));
-
-        auto stretchIndex = static_cast<size_t>(std::distance(targetShape.begin(), stretchDim));
-        outputDims[stretchIndex] = inputTensorInfo.GetNumElements() / targetNumElements;
-    }
-
-    armnn::TensorShape outputShape = armnn::TensorShape(static_cast<unsigned int>(outputDims.size()),
-                                                        outputDims.data());
-    reshapeDesc.m_TargetShape = outputShape;
-    return kTfLiteOk;
 }
 
 TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,

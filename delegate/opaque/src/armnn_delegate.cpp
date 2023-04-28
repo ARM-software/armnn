@@ -726,6 +726,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinDepthwiseConv2d);
+        case kTfLiteBuiltinDequantize:
+            return VisitDequantizeOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinDequantize);
         case kTfLiteBuiltinDiv:
             return VisitElementwiseBinaryOperator(delegateData,
                                                   tfLiteContext,
@@ -942,6 +948,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                       tfLiteNode,
                                       nodeIndex,
                                       kTfLiteBuiltinPrelu);
+        case kTfLiteBuiltinQuantize:
+            return VisitQuantizeOperator(delegateData,
+                                         tfLiteContext,
+                                         tfLiteNode,
+                                         nodeIndex,
+                                         kTfLiteBuiltinQuantize);
         case kTfLiteBuiltinRelu:
             return VisitActivationOperator(delegateData,
                                            tfLiteContext,

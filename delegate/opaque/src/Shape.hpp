@@ -31,8 +31,7 @@ TfLiteStatus VisitShapeOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    const TfLiteOpaqueTensor* tfLiteInputTensor =
-            TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[0]);
+    const TfLiteOpaqueTensor* tfLiteInputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[0]);
     if (!IsValid(tfLiteContext, tfLiteInputTensor, operatorCode, nodeIndex))
     {
         return kTfLiteError;
@@ -50,8 +49,7 @@ TfLiteStatus VisitShapeOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    const TfLiteOpaqueTensor* tfLiteOutputTensor =
-            TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
+    const TfLiteOpaqueTensor* tfLiteOutputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
     if (!IsValid(tfLiteContext, tfLiteOutputTensor, operatorCode, nodeIndex))
     {
         return kTfLiteError;

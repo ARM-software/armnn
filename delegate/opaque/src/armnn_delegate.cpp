@@ -1034,6 +1034,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  nodeIndex,
                                                  kTfLiteBuiltinSin,
                                                  armnn::UnaryOperation::Sin);
+        case kTfLiteBuiltinSlice:
+            return VisitSliceOperator(delegateData,
+                                      tfLiteContext,
+                                      tfLiteNode,
+                                      nodeIndex,
+                                      kTfLiteBuiltinSlice);
         case kTfLiteBuiltinSoftmax:
             return VisitSoftmaxOperator(delegateData,
                                         tfLiteContext,
@@ -1065,6 +1071,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  nodeIndex,
                                                  kTfLiteBuiltinSqrt,
                                                  armnn::UnaryOperation::Sqrt);
+        case kTfLiteBuiltinStridedSlice:
+            return VisitStridedSliceOperator(delegateData,
+                                             tfLiteContext,
+                                             tfLiteNode,
+                                             nodeIndex,
+                                             kTfLiteBuiltinStridedSlice);
         case kTfLiteBuiltinSum:
             return VisitReduceOperator(delegateData,
                                        tfLiteContext,

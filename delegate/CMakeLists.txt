@@ -312,10 +312,14 @@ if(BUILD_UNIT_TESTS)
              test/QuantizationTestHelper.hpp
              test/ShapeTest.cpp
              test/ShapeTestHelper.hpp
+             test/SliceTest.cpp
+             test/SliceTestHelper.hpp
              test/SoftmaxTest.cpp
              test/SoftmaxTestHelper.hpp
              test/SpaceDepthTest.cpp
              test/SpaceDepthTestHelper.hpp
+             test/StridedSliceTest.cpp
+             test/StridedSliceTestHelper.hpp
              test/TestUtils.hpp
              test/TestUtils.cpp
              test/TransposeConvolution2dTest.cpp

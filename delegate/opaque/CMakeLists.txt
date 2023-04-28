@@ -34,8 +34,10 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Shape.hpp
         src/SharedFunctions.cpp
         src/SharedFunctions.hpp
+        src/Slice.hpp
         src/Softmax.hpp
         src/SpaceDepth.hpp
+        src/StridedSlice.hpp
         src/Transpose.hpp
         src/Unpack.hpp)
 

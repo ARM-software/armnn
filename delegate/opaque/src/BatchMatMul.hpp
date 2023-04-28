@@ -44,15 +44,6 @@ TfLiteStatus VisitBatchMatMulOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
-    if (IsDynamicTensor(kTfLiteLHSInputTensor) || IsDynamicTensor(kTfLiteRHSInputTensor))
-    {
-        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext,
-                "TfLiteArmnnOpaqueDelegate: Dynamic input tensors are not supported in operator #%d node #%d: ",
-                operatorCode, nodeIndex);
-        return kTfLiteError;
-    }
-
     // Gather output indices and use to get output tensors.
     int numOutputs = 0;
     const int* outputTensors;

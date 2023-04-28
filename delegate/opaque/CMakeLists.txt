@@ -28,6 +28,8 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Pack.hpp
         src/Prelu.hpp
         src/Redefine.hpp
+        src/Reduce.hpp
+        src/Resize.hpp
         src/Round.hpp
         src/Shape.hpp
         src/SharedFunctions.cpp

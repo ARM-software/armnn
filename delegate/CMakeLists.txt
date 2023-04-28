@@ -302,6 +302,10 @@ if(BUILD_UNIT_TESTS)
              test/Pooling3dTestHelper.hpp
              test/PreluTest.cpp
              test/PreluTestHelper.hpp
+             test/ReduceTest.cpp
+             test/ReduceTestHelper.hpp
+             test/ResizeTest.cpp
+             test/ResizeTestHelper.hpp
              test/RoundTest.cpp
              test/RoundTestHelper.hpp
              test/QuantizationTest.cpp

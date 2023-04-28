@@ -966,6 +966,24 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                          tfLiteNode,
                                          nodeIndex,
                                          kTfLiteBuiltinQuantize);
+        case kTfLiteBuiltinReduceMax:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinReduceMax);
+        case kTfLiteBuiltinReduceMin:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinReduceMin);
+        case kTfLiteBuiltinReduceProd:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinReduceProd);
         case kTfLiteBuiltinRelu:
             return VisitActivationOperator(delegateData,
                                            tfLiteContext,
@@ -984,6 +1002,18 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinRelu6);
+        case kTfLiteBuiltinResizeNearestNeighbor:
+            return VisitResizeOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinResizeNearestNeighbor);
+        case kTfLiteBuiltinResizeBilinear:
+            return VisitResizeOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinResizeBilinear);
         case kTfLiteBuiltinRsqrt:
             return VisitElementwiseUnaryOperator(delegateData,
                                                  tfLiteContext,
@@ -1035,6 +1065,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  nodeIndex,
                                                  kTfLiteBuiltinSqrt,
                                                  armnn::UnaryOperation::Sqrt);
+        case kTfLiteBuiltinSum:
+            return VisitReduceOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinSum);
         case kTfLiteBuiltinTanh:
             return VisitActivationOperator(delegateData,
                                            tfLiteContext,

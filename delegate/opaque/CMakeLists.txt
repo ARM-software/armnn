@@ -32,6 +32,9 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Shape.hpp
         src/SharedFunctions.cpp
         src/SharedFunctions.hpp
+        src/Softmax.hpp
+        src/SpaceDepth.hpp
+        src/Transpose.hpp
         src/Unpack.hpp)
 
 add_library(armnnOpaqueDelegateObject OBJECT ${armnnOpaqueDelegateObject_sources})

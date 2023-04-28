@@ -308,9 +308,15 @@ if(BUILD_UNIT_TESTS)
              test/QuantizationTestHelper.hpp
              test/ShapeTest.cpp
              test/ShapeTestHelper.hpp
+             test/SoftmaxTest.cpp
+             test/SoftmaxTestHelper.hpp
+             test/SpaceDepthTest.cpp
+             test/SpaceDepthTestHelper.hpp
              test/TestUtils.hpp
              test/TestUtils.cpp
              test/TransposeConvolution2dTest.cpp
+             test/TransposeTest.cpp
+             test/TransposeTestHelper.hpp
              test/UnpackTest.cpp
              test/UnpackTestHelper.hpp)
 

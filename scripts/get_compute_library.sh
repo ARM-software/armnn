@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="f0ff76dbfc9137d0dfc5e99666e24c7a2ca8b072" #9534: Add Reorder to changelog | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9534
+DEFAULT_CLFRAMEWORKREVISION="60ab4e66ea3cb85042035fd1aafbfea666bb4ea7" #Fix export_to_cl_image issue in the fp16 GeMM implementation
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

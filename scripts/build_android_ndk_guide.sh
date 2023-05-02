@@ -13,8 +13,8 @@ function Usage() {
   echo "Options:"
   echo "    -l Use this copy of Arm NN and ComputeLibrary instead of cloning new copies"
   echo "       <1 or 0> defaults to 1"
-  echo "    -a Override Arm NN branch (defaults to latest release branches/armnn_23_02)"
-  echo "    -b Override ACL branch (defaults to latest release v23.02)"
+  echo "    -a Override Arm NN branch (defaults to main branch). For example to use 23.02 release use branch name branches/armnn_23_02"
+  echo "    -b Override ACL branch (defaults to main branch). For example to use 23.02 release use tag v23.02"
   echo "    -A Android API level defaults to 30"
   echo "    -n Neon (CpuAcc backend) enabled <1 or 0> defaults to 1"
   echo "    -g CL (GpuAcc backend) enabled <1 or 0> defaults to 1"
@@ -42,8 +42,8 @@ BASE_DIR=$(dirname "$THIS_FILE")
 
 # Set variables and working directory
 CREATE_LINKS=1
-ARMNN_BRANCH=branches/armnn_23_02
-ACL_BRANCH=v23.02
+ARMNN_BRANCH=main
+ACL_BRANCH=main
 ACL_NEON=1
 ACL_CL=1
 REFERENCE=1
@@ -164,17 +164,22 @@ function GetArmNN {
     cd $WORKING_DIR
 
     if [[ ! -d armnn ]]; then
-        if [[ $CREATE_LINKS = 1  && -d $BASE_DIR/../../armnn ]]; then
-            echo "+++ Linking Arm NN"
-            ln -s $BASE_DIR/../../armnn $WORKING_DIR/armnn
+        if [[ $CREATE_LINKS = 1 ]]; then
+            if [[ -d $BASE_DIR/../../armnn ]]; then
+                echo "+++ Linking Arm NN"
+                echo "$BASE_DIR"
+               ln -s $BASE_DIR/../../armnn $WORKING_DIR/armnn
+           else
+               echo "Couldn't find Arm NN to link"
+           fi
         else
             echo "+++ Cloning Arm NN"
-            git clone https://review.mlplatform.org/ml/armnn.git armnn
+            git clone https://github.com/ARM-software/armnn.git armnn
             cd armnn
 
             git checkout $ARMNN_BRANCH
             git log -1
-        fi
+       fi
     fi
 }
 
@@ -188,7 +193,7 @@ function GetAndBuildComputeLibrary {
                 ln -s $BASE_DIR/../../ComputeLibrary $WORKING_DIR/ComputeLibrary
             else
                 echo "+++ Cloning ComputeLibrary"
-                git clone https://review.mlplatform.org/ml/ComputeLibrary.git ComputeLibrary
+                git clone https://github.com/ARM-software/ComputeLibrary.git ComputeLibrary
                 cd ComputeLibrary
                 git checkout $($BASE_DIR/../../armnn/scripts/get_compute_library.sh -p)
                 git log -1
@@ -196,7 +201,7 @@ function GetAndBuildComputeLibrary {
         else
             echo "+++ Cloning ComputeLibrary"
 
-            git clone https://review.mlplatform.org/ml/ComputeLibrary.git ComputeLibrary
+            git clone https://github.com/ARM-software/ComputeLibrary.git ComputeLibrary
             cd ComputeLibrary
             git checkout $ACL_BRANCH
             git log -1

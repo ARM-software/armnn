@@ -21,9 +21,12 @@ The instructions show how to build the Arm NN core library and its dependencies.
 For ease of use there is a shell script version of this guide located in the scripts directory called [build_android_ndk_guide.sh](scripts/build_android_ndk_guide.sh). 
 Run the script with a -h flag to see the command line parameters.
 
+The shell script version of this guide (build_android_ndk_guide.sh) also provides user the option to use the Arm NN and ComputeLibrary available in your BASE_DIR, instead of downloading a new version.
+BASE_DIR is path to the script file, which is armnn/scripts/.
+
 ## Initial Setup
 
-First, we need to specify the Android version and the directories you want to build armnn in and to install some applications required to build Arm NN and its dependencies.
+First, we need to specify the Android version and the directories you want to build Arm NN in and to install some applications required to build Arm NN and its dependencies.
 
 ```bash
 export ANDROID_API=30
@@ -126,7 +129,7 @@ CXXFLAGS="-fPIC" \
 cmake .. \
     -DCMAKE_ANDROID_NDK=$NDK_DIR \
     -DCMAKE_SYSTEM_NAME=Android \
-    -DCMAKE_SYSTEM_VERSION=27 \
+    -DCMAKE_SYSTEM_VERSION=$ANDROID_API \
     -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
     -DCMAKE_CXX_FLAGS=--std=c++14 \
     -DFLATBUFFERS_BUILD_FLATC=OFF \
@@ -162,28 +165,34 @@ git pull
 ## Get And Build TFLite
 This optional step is only required if you intend to build the TFLite delegate or parser for Arm NN. 
 
-First clone tensorflow:
+First clone Tensorflow manually and check out the version Arm NN was tested with:
 ```bash
 cd $WORKING_DIR
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow
 git fetch && git checkout "6f692f73cb2043b4a0b0446539cd8c15b3dd9220"
 ```
-Arm NN provides a script that downloads the version of Tensorflow that Arm NN was tested with:
+Or use the script that Arm NN provides:
 ```bash
 git fetch && git checkout $(../armnn/scripts/get_tensorflow.sh -p)
 ```
-Next build Tensorflow Lite:
+Next, set variable TFLITE_ROOT_DIR and build Tensorflow Lite:
 ```bash
+export TFLITE_ROOT_DIR=$WORKING_DIR/tensorflow/tensorflow/lite
 cd $WORKING_DIR
 mkdir -p tflite-out/android
 cd tflite-out/android
 
-CMARGS="-DCMAKE_TOOLCHAIN_FILE=$NDK_DIR/build/cmake/android.toolchain.cmake \
+CMARGS="-DTFLITE_ENABLE_XNNPACK=OFF \
+        -DFLATBUFFERS_BUILD_FLATC=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DBUILD_TESTING=OFF"
+
+CMARGS="$CMARGS -DCMAKE_TOOLCHAIN_FILE=$NDK_DIR/build/cmake/android.toolchain.cmake \
     -DANDROID_ABI=arm64-v8a \
     -DANDROID_PLATFORM=$ANDROID_API"
 
-cmake $CMARGS $WORKING_DIR/tensorflow/tensorflow/lite
+cmake $CMARGS $TFLITE_ROOT_DIR
 
 cd $WORKING_DIR
 cmake --build tflite-out/android -j 16
@@ -329,7 +338,11 @@ make
   Currently adb version we have used for testing is 1.0.41.
 ```bash
 adb push libarmnn.so /data/local/tmp/
-    adb push libtimelineDecoder.so /data/local/tmp/
+adb push libtimelineDecoder.so /data/local/tmp/
+adb push libtimelineDecoderJson.so /data/local/tmp/
+adb push GatordMock /data/local/tmp/
+adb push libarmnnBasePipeServer.so /data/local/tmp/
+adb push libarmnnTestUtils.so /data/local/tmp/
 adb push UnitTests /data/local/tmp/
 adb push $NDK_DIR/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
 ```

@@ -150,6 +150,7 @@ if(BUILD_UNIT_TESTS)
         test/ElementwiseBinaryTestHelper.hpp
         test/ElementwiseUnaryTest.cpp
         test/ElementwiseUnaryTestHelper.hpp
+        test/ExpandDimsTest.cpp
         test/FillTest.cpp
         test/FillTestHelper.hpp
         test/FullyConnectedTest.cpp
@@ -193,6 +194,7 @@ if(BUILD_UNIT_TESTS)
         test/ShapeTestHelper.hpp
         test/SliceTest.cpp
         test/SliceTestHelper.hpp
+        test/SqueezeTest.cpp
         test/StridedSliceTest.cpp
         test/StridedSliceTestHelper.hpp
         test/SplitTest.cpp
@@ -280,6 +282,7 @@ if(BUILD_UNIT_TESTS)
              test/DepthwiseConvolution2dTest.cpp
              test/ElementwiseUnaryTestHelper.hpp
              test/ElementwiseUnaryTest.cpp
+             test/ExpandDimsTest.cpp
              test/FullyConnectedTest.cpp
              test/FullyConnectedTestHelper.hpp
              test/GatherTest.cpp
@@ -319,6 +322,7 @@ if(BUILD_UNIT_TESTS)
              test/SoftmaxTestHelper.hpp
              test/SpaceDepthTest.cpp
              test/SpaceDepthTestHelper.hpp
+             test/SqueezeTest.cpp
              test/StridedSliceTest.cpp
              test/StridedSliceTestHelper.hpp
              test/TestUtils.hpp

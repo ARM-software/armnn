@@ -764,6 +764,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  nodeIndex,
                                                  kTfLiteBuiltinExp,
                                                  armnn::UnaryOperation::Exp);
+        case kTfLiteBuiltinExpandDims:
+            return VisitExpandDimsOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinExpandDims);
         case kTfLiteBuiltinFloor:
             return VisitFloorOperator(delegateData,
                                       tfLiteContext,
@@ -1089,6 +1095,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  nodeIndex,
                                                  kTfLiteBuiltinSqrt,
                                                  armnn::UnaryOperation::Sqrt);
+        case kTfLiteBuiltinSqueeze:
+            return VisitSqueezeOperator(delegateData,
+                                        tfLiteContext,
+                                        tfLiteNode,
+                                        nodeIndex,
+                                        kTfLiteBuiltinSqueeze);
         case kTfLiteBuiltinStridedSlice:
             return VisitStridedSliceOperator(delegateData,
                                              tfLiteContext,

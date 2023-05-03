@@ -1064,6 +1064,18 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                              tfLiteNode,
                                              nodeIndex,
                                              kTfLiteBuiltinSpaceToDepth);
+        case kTfLiteBuiltinSplit:
+            return VisitSplitOperator(delegateData,
+                                      tfLiteContext,
+                                      tfLiteNode,
+                                      nodeIndex,
+                                      kTfLiteBuiltinSplit);
+        case kTfLiteBuiltinSplitV:
+            return VisitSplitVOperator(delegateData,
+                                       tfLiteContext,
+                                       tfLiteNode,
+                                       nodeIndex,
+                                       kTfLiteBuiltinSplitV);
         case kTfLiteBuiltinSub:
             return VisitElementwiseBinaryOperator(delegateData,
                                                   tfLiteContext,

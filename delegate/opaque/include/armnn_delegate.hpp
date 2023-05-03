@@ -10,6 +10,7 @@
 #include <tensorflow/core/public/version.h>
 #include <tensorflow/lite/c/c_api_opaque.h>
 #include <tensorflow/lite/core/experimental/acceleration/configuration/c/stable_delegate.h>
+#include <tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h>
 
 #if TF_MAJOR_VERSION > 2 || (TF_MAJOR_VERSION == 2 && TF_MINOR_VERSION > 5)
 #define ARMNN_POST_TFLITE_2_5
@@ -86,6 +87,35 @@ static int TfLiteArmnnOpaqueDelegateErrno(TfLiteOpaqueDelegate* delegate) { retu
 const TfLiteOpaqueDelegatePlugin* GetArmnnDelegatePluginApi();
 
 extern const TfLiteStableDelegate TFL_TheStableDelegate;
+
+using tflite::delegates::DelegatePluginInterface;
+using TfLiteOpaqueDelegatePtr = tflite::delegates::TfLiteDelegatePtr;
+
+class ArmnnDelegatePlugin : public DelegatePluginInterface
+{
+public:
+    static std::unique_ptr<ArmnnDelegatePlugin> New(const tflite::TFLiteSettings& tflite_settings)
+    {
+        return std::make_unique<ArmnnDelegatePlugin>(tflite_settings);
+    }
+
+    tflite::delegates::TfLiteDelegatePtr Create() override
+    {
+        // Use default settings until options have been enabled.
+        return tflite::delegates::TfLiteDelegatePtr(
+            TfLiteArmnnOpaqueDelegateCreate(nullptr), TfLiteArmnnOpaqueDelegateDelete);
+    }
+
+    int GetDelegateErrno(TfLiteOpaqueDelegate* from_delegate) override
+    {
+        return 0;
+    }
+
+    explicit ArmnnDelegatePlugin(const tflite::TFLiteSettings& tfliteSettings)
+    {
+        // Use default settings until options have been enabled.
+    }
+};
 
 /// ArmnnSubgraph class where parsing the nodes to ArmNN format and creating the ArmNN Graph
 class ArmnnSubgraph

@@ -9,6 +9,9 @@
 #include <opaque/include/armnn_delegate.hpp>
 #include <opaque/include/Version.hpp>
 
+#include <flatbuffers/flatbuffers.h>
+#include <tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h>
+
 namespace armnnOpaqueDelegate
 {
 
@@ -37,6 +40,28 @@ TEST_CASE ("DelegateOptions_OpaqueDelegateDefault")
     armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete(opaqueDelegate);
 }
 
+TEST_CASE ("DelegatePluginTest")
+{
+    // Use default settings until options have been enabled.
+    flatbuffers::FlatBufferBuilder flatBufferBuilder;
+    tflite::TFLiteSettingsBuilder tfliteSettingBuilder(flatBufferBuilder);
+    flatbuffers::Offset<tflite::TFLiteSettings> tfliteSettings = tfliteSettingBuilder.Finish();
+    flatBufferBuilder.Finish(tfliteSettings);
+    const tflite::TFLiteSettings* settings = flatbuffers::GetRoot<tflite::TFLiteSettings>(
+        flatBufferBuilder.GetBufferPointer());
+
+    std::unique_ptr<tflite::delegates::DelegatePluginInterface> delegatePlugin =
+        tflite::delegates::DelegatePluginRegistry::CreateByName("armnn_delegate", *settings);
+
+    // Plugin is created correctly using armnn_delegate name.
+    CHECK((delegatePlugin != nullptr));
+
+    tflite::delegates::TfLiteDelegatePtr armnnDelegate = delegatePlugin->Create();
+
+    // Armnn Opaque Delegate is created correctly.
+    CHECK((armnnDelegate != nullptr));
+    CHECK((armnnDelegate->opaque_delegate_builder != nullptr));
 }
 
+}
 } // namespace armnnDelegate

@@ -92,6 +92,11 @@ target_compile_options(flatbuffer_headers_opaque INTERFACE -Wno-sign-conversion)
 
 target_link_libraries(armnnOpaqueDelegateObject PUBLIC flatbuffer_headers_opaque)
 
+# Additional Absl Sync for Opaque Delegate
+find_package(TfLiteAbsl REQUIRED MODULE)
+target_include_directories(armnnOpaqueDelegateObject PUBLIC ${TfLite_ABSL_SYNC_HEADERS})
+target_link_libraries(armnnOpaqueDelegateObject PUBLIC ${TfLite_Extra_Absl_LIB})
+
 ####################################################
 ## Export targets
 install(TARGETS armnnOpaqueDelegateObject

@@ -62,10 +62,14 @@ namespace armnnOpaqueDelegate
 const TfLiteStableDelegate TFL_TheStableDelegate =
 {
     /*delegate_abi_version=*/ TFL_STABLE_DELEGATE_ABI_VERSION,
-    /*delegate_name=*/        "ArmnnDelegatePlugin",
-    /*delegate_version=*/     "1.0.0",
+    /*delegate_name=*/        "armnn_delegate",
+    /*delegate_version=*/     OPAQUE_DELEGATE_VERSION,
     /*delegate_plugin=*/      GetArmnnDelegatePluginApi()
 };
+
+static auto* g_delegate_plugin_ArmnnDelegatePlugin_ =
+    new tflite::delegates::DelegatePluginRegistry::Register(TFL_TheStableDelegate.delegate_name,
+                                                            ArmnnDelegatePlugin::New);
 
 ArmnnOpaqueDelegate::ArmnnOpaqueDelegate(armnnDelegate::DelegateOptions options)
     : m_Options(std::move(options))
@@ -121,7 +125,9 @@ TfLiteStatus DoPrepare(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueDelegate*
 
     // ArmNN Opaque Delegate Registration
     TfLiteRegistrationExternal* kernelRegistration =
-            TfLiteRegistrationExternalCreate(kTfLiteBuiltinDelegate, "TfLiteArmNNOpaqueDelegate", /*version=*/1);
+            TfLiteRegistrationExternalCreate(kTfLiteBuiltinDelegate,
+                                             TFL_TheStableDelegate.delegate_name,
+                                             /*version=*/OPAQUE_DELEGATE_MAJOR_VERSION);
     if(kernelRegistration == nullptr)
     {
         return kTfLiteError;

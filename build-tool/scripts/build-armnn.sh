@@ -300,7 +300,7 @@ while [ $# -gt 0 ]; do
     ;;
 
   --tflite-classic-delegate)
-    flag_tflite_delegate=1
+    flag_tflite_classic_delegate=1
     ;;
 
   --tflite-opaque-delegate)

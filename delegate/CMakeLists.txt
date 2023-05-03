@@ -330,6 +330,8 @@ if(BUILD_UNIT_TESTS)
              test/TransposeConvolution2dTest.cpp
              test/TransposeTest.cpp
              test/TransposeTestHelper.hpp
+             test/UnidirectionalSequenceLstmTest.cpp
+             test/UnidirectionalSequenceLstmTestHelper.hpp
              test/UnpackTest.cpp
              test/UnpackTestHelper.hpp)
 

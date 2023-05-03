@@ -40,6 +40,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Split.hpp
         src/StridedSlice.hpp
         src/Transpose.hpp
+        src/UnidirectionalSequenceLstm.hpp
         src/Unpack.hpp)
 
 add_library(armnnOpaqueDelegateObject OBJECT ${armnnOpaqueDelegateObject_sources})

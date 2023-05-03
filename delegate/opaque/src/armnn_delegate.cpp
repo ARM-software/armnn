@@ -1131,6 +1131,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinTransposeConv);
+        case kTfLiteBuiltinUnidirectionalSequenceLstm:
+            return VisitUnidirectionalSequenceLstmOperator(delegateData,
+                                                           tfLiteContext,
+                                                           tfLiteNode,
+                                                           nodeIndex,
+                                                           kTfLiteBuiltinUnidirectionalSequenceLstm);
         case kTfLiteBuiltinUnpack:
             return VisitUnpackOperator(delegateData,
                                        tfLiteContext,

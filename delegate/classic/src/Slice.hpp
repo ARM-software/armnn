@@ -11,6 +11,7 @@
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
 #include <tensorflow/lite/minimal_logging.h>
+#include <fmt/format.h>
 
 namespace armnnDelegate
 {
@@ -41,15 +42,15 @@ TfLiteStatus VisitSliceOperator(DelegateData& delegateData,
 
     // We save the begin and size tensors in our descriptor. Therefore we have to read those values from inputs
     int inputRank = tfLiteInputs[0]->dims->size;
-    auto ReadInt32Input = [&](int inputIndex, std::vector<uint32_t>& outputData) ->  TfLiteStatus
+    auto ReadInt32Input = [&](int inputIndex, std::vector<int32_t>& outputData, const char* name) -> TfLiteStatus
     {
         if (tfLiteInputs[inputIndex]->type != kTfLiteInt32)
         {
             TF_LITE_MAYBE_KERNEL_LOG(
                     tfLiteContext,
-                    "TfLiteArmnnDelegate: The Begin- and Size-Tensors of the Slice operation need to "
+                    "TfLiteArmnnDelegate: The %s Tensor of the Slice operation needs to "
                     "be of type int32. Operator: #%d node #%d: ",
-                    sliceOperatorCode, nodeIndex);
+                    name, sliceOperatorCode, nodeIndex);
             return kTfLiteError;
         }
         int rank = tfLiteInputs[inputIndex]->dims->size;
@@ -57,9 +58,9 @@ TfLiteStatus VisitSliceOperator(DelegateData& delegateData,
         {
             TF_LITE_MAYBE_KERNEL_LOG(
                     tfLiteContext,
-                    "TfLiteArmnnDelegate: The Begin- and Size-Tensors of the Slice operation need to "
+                    "TfLiteArmnnDelegate: The %s Tensor of the Slice operation needs to "
                     "be a 1D-Tensor. Operator: #%d node #%d: ",
-                    sliceOperatorCode, nodeIndex);
+                    name, sliceOperatorCode, nodeIndex);
             return kTfLiteError;
         }
         int numValues = tfLiteInputs[inputIndex]->dims->data[0];
@@ -67,23 +68,53 @@ TfLiteStatus VisitSliceOperator(DelegateData& delegateData,
         {
             TF_LITE_MAYBE_KERNEL_LOG(
                     tfLiteContext,
-                    "TfLiteArmnnDelegate: The number of values in the Begin- and Size-Tensors of the "
-                    "Slice operation need to be equal to the rank of the Input-Tensor. Operator: #%d node #%d: ",
-                    sliceOperatorCode, nodeIndex);
+                    "TfLiteArmnnDelegate: The number of values in the %s Tensor of the "
+                    "Slice operation needs to be equal to the rank of the Input Tensor. Operator: #%d node #%d: ",
+                    name, sliceOperatorCode, nodeIndex);
             return kTfLiteError;
         }
         // return tensor data
-        auto* tensorDataPtr = tflite::GetTensorData<uint32_t>(tfLiteInputs[inputIndex]);
-        outputData.assign(tensorDataPtr, tensorDataPtr+numValues);
+        auto* tensorDataPtr = tflite::GetTensorData<int32_t>(tfLiteInputs[inputIndex]);
+        outputData.assign(tensorDataPtr, tensorDataPtr + numValues);
         return kTfLiteOk;
     };
 
-    std::vector<uint32_t> begin;
-    if (ReadInt32Input(1, begin) != kTfLiteOk)
+    std::vector<int32_t> signedBegin;
+    if (ReadInt32Input(1, signedBegin, "Begin") != kTfLiteOk)
+    {
         return kTfLiteError;
-    std::vector<uint32_t> size;
-    if (ReadInt32Input(2, size) != kTfLiteOk)
+    }
+
+    std::vector<int32_t> signedSize;
+    if (ReadInt32Input(2, signedSize, "Size") != kTfLiteOk)
+    {
         return kTfLiteError;
+    }
+    std::vector<uint32_t> begin({ signedBegin.begin(), signedBegin.end() });
+    std::vector<uint32_t> size(signedSize.size());
+
+    for (unsigned int i = 0; i < signedSize.size(); ++i)
+    {
+        int signedValue = signedSize[i];
+        if (signedValue < -1 || signedValue > tfLiteInputs[0]->dims->data[i] - signedBegin[i])
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                    tfLiteContext,
+                    "TfLiteArmnnDelegate: Invalid value for Size. Size must be in range [-1, inputDimSize - begin] "
+                    "[-1, %d] inclusive but was %d Operator: #%d node #%d: ",
+                    tfLiteInputs[0]->dims->data[i] - signedBegin[i], signedValue, sliceOperatorCode,
+                    nodeIndex);
+            return kTfLiteError;
+        }
+        if (signedValue == -1)
+        {
+            size[i] = tfLiteInputs[0]->dims->data[i] - signedBegin[i];
+        }
+        else
+        {
+            size[i] = static_cast<uint32_t>(signedValue);
+        }
+    }
 
     // Write all data to the descriptor
     armnn::SliceDescriptor descriptor(begin, size);
@@ -118,9 +149,10 @@ TfLiteStatus VisitSliceOperator(DelegateData& delegateData,
         validateFunc(outputTensorInfo, isSupported);
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
+    auto layerName = fmt::format("Slice:{}", nodeIndex);
 
     // Add a Slice layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddSliceLayer(descriptor);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddSliceLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 

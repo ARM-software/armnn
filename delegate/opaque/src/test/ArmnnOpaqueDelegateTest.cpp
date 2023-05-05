@@ -44,8 +44,8 @@ TEST_CASE ("DelegatePluginTest")
 {
     // Use default settings until options have been enabled.
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
-    tflite::TFLiteSettingsBuilder tfliteSettingBuilder(flatBufferBuilder);
-    flatbuffers::Offset<tflite::TFLiteSettings> tfliteSettings = tfliteSettingBuilder.Finish();
+    tflite::TFLiteSettingsBuilder tfliteSettingsBuilder(flatBufferBuilder);
+    flatbuffers::Offset<tflite::TFLiteSettings> tfliteSettings = tfliteSettingsBuilder.Finish();
     flatBufferBuilder.Finish(tfliteSettings);
     const tflite::TFLiteSettings* settings = flatbuffers::GetRoot<tflite::TFLiteSettings>(
         flatBufferBuilder.GetBufferPointer());

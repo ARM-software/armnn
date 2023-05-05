@@ -578,7 +578,7 @@ TfLiteStatus ArmnnSubgraph::Invoke(TfLiteOpaqueContext* tfLiteContext, TfLiteOpa
             armnn::TensorInfo inputTensorInfo = inputBinding.second;
             inputTensorInfo.SetConstant(true);
             const armnn::ConstTensor inputTensor(inputTensorInfo, TfLiteOpaqueTensorData(tensor));
-            inputTensors.emplace_back(inputIdx, inputTensor);
+            inputTensors.emplace_back(inputIndexArray[inputIdx], inputTensor);
 
             ++inputIndex;
         }

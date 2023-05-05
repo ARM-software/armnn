@@ -3,6 +3,11 @@
 // SPDX-License-Identifier: MIT
 //
 
+#if defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
+#include <../delegate/opaque/include/armnn_delegate.hpp>
+#endif
+
+#include <tensorflow/lite/core/c/c_api.h>
 #include "TfliteExecutor.hpp"
 #include "tensorflow/lite/kernels/kernel_util.h"
 
@@ -26,8 +31,33 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
     {
         LogAndThrow("Failed to allocate tensors in the TfLiteInterpreter.");
     }
-    if (m_Params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate)
+
+    if (m_Params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteOpaqueDelegate)
     {
+#if defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
+        // Use default settings until options have been enabled
+        flatbuffers::FlatBufferBuilder flatBufferBuilder;
+        TFLiteSettingsBuilder tfliteSettingsBuilder(flatBufferBuilder);
+        flatbuffers::Offset<TFLiteSettings> tfliteSettings = tfliteSettingsBuilder.Finish();
+        flatBufferBuilder.Finish(tfliteSettings);
+        const TFLiteSettings* settings =
+            flatbuffers::GetRoot<TFLiteSettings>(flatBufferBuilder.GetBufferPointer());
+
+        std::unique_ptr<delegates::DelegatePluginInterface> delegatePlugIn =
+            delegates::DelegatePluginRegistry::CreateByName("armnn_delegate", *settings);
+
+        // Create Armnn Opaque Delegate from Armnn Delegate Plugin
+        delegates::TfLiteDelegatePtr armnnDelegate = delegatePlugIn->Create();
+
+        // Add Delegate to the builder
+        builder.AddDelegate(armnnDelegate.get());
+#else
+        LogAndThrow("Not built with Arm NN Tensorflow-Lite opaque delegate support.");
+#endif
+    }
+    else if (m_Params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate)
+    {
+#if defined(ARMNN_TFLITE_DELEGATE)
         // Create the Armnn Delegate
         // Populate a DelegateOptions from the ExecuteNetworkParams.
         armnnDelegate::DelegateOptions delegateOptions = m_Params.ToDelegateOptions();
@@ -40,6 +70,9 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
         {
             LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter.");
         }
+#else
+        LogAndThrow("Not built with Arm NN Tensorflow-Lite delegate support.");
+#endif
     }
     else
     {

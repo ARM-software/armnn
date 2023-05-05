@@ -355,6 +355,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "Set the executor for the tflite model: parser, delegate, tflite"
                  "parser is the ArmNNTfLiteParser, "
                  "delegate is the ArmNNTfLiteDelegate, "
+                 "opaquedelegate is the ArmNNTfLiteOpaqueDelegate, "
                  "tflite is the TfliteInterpreter",
                  cxxopts::value<std::string>()->default_value("parser"))
 
@@ -538,6 +539,10 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     if (tfliteExecutor.size() == 0 || tfliteExecutor == "parser")
     {
         m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteParser;
+    }
+    else if (tfliteExecutor == "opaquedelegate")
+    {
+        m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteOpaqueDelegate;
     }
     else if (tfliteExecutor == "delegate")
     {

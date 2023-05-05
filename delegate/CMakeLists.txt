@@ -351,65 +351,94 @@ if(BUILD_UNIT_TESTS)
     endif()
 endif()
 
-if(BUILD_DELEGATE_JNI_INTERFACE)
+if(BUILD_DELEGATE_JNI_INTERFACE AND BUILD_CLASSIC_DELEGATE)
     add_subdirectory(armnnDelegateJNI)
 endif()
 
 ####################################################
 ## Export targets
-set(armnn_delegate_export_targets)
-list(APPEND armnn_delegate_export_targets
-            armnnClassicDelegateObject
-            armnnDelegate
-            tflite_headers
-            flatbuffer_headers
-            profiling_library_headers
-            thirdparty_headers)
+if (BUILD_CLASSIC_DELEGATE)
+    set(armnn_delegate_export_targets)
+    list(APPEND armnn_delegate_export_targets
+                armnnClassicDelegateObject
+                armnnDelegate
+                tflite_headers
+                flatbuffer_headers
+                profiling_library_headers
+                thirdparty_headers)
 
-install(
-        TARGETS ${armnn_delegate_export_targets}
-        EXPORT  armnn-delegate-targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(
+            TARGETS ${armnn_delegate_export_targets}
+            EXPORT  armnn-delegate-targets
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
-## Set export alias
-set_target_properties(armnnDelegate
-        PROPERTIES
-        EXPORT_NAME ArmnnDelegate)
+    ## Set export alias
+    set_target_properties(armnnDelegate
+            PROPERTIES
+            EXPORT_NAME ArmnnDelegate)
 
-## Export target scrips
-install(
-        EXPORT      armnn-delegate-targets
-        FILE        ArmnnDelegateTargets.cmake
-        NAMESPACE   ArmnnDelegate::
-        DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    ## Export target scrips
+    install(
+            EXPORT      armnn-delegate-targets
+            FILE        ArmnnDelegateTargets.cmake
+            NAMESPACE   ArmnnDelegate::
+            DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-## Create ArmnnDelegateConfig.cmake
-include(CMakePackageConfigHelpers)
-set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR})
-message(STATUS "CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_DIR}" )
-message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}" )
-SET(Armnn_DIR "${Armnn_DIR}")
+    ## Create ArmnnDelegateConfig.cmake
+    include(CMakePackageConfigHelpers)
+    set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR})
+    message(STATUS "CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_DIR}" )
+    message(STATUS "CMAKE_CURRENT_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}" )
+    SET(Armnn_DIR "${Armnn_DIR}")
 
-configure_package_config_file(
-        ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/ArmnnDelegateConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/ArmnnDelegateConfig.cmake
-        INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
-        PATH_VARS  Armnn_DIR)
+    configure_package_config_file(
+            ${CMAKE_CURRENT_LIST_DIR}/cmake/Modules/ArmnnDelegateConfig.cmake.in
+            ${CMAKE_CURRENT_BINARY_DIR}/ArmnnDelegateConfig.cmake
+            INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+            PATH_VARS  Armnn_DIR)
 
-## Install ArmNN Delegate config file
-install(
-        FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/ArmnnDelegateConfig.cmake
-        DESTINATION ${INSTALL_CONFIGDIR})
+    ## Install ArmNN Delegate config file
+    install(
+            FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/ArmnnDelegateConfig.cmake
+            DESTINATION ${INSTALL_CONFIGDIR})
 
-## Export from build tree
-export(
-        EXPORT      armnn-delegate-targets
-        FILE        ${CMAKE_CURRENT_BINARY_DIR}/ArmnnDelegateTargets.cmake
-        NAMESPACE   ArmnnDelegate::)
-add_library(ArmnnDelegate::ArmnnDelegate ALIAS armnnDelegate)
+    ## Export from build tree
+    export(
+            EXPORT      armnn-delegate-targets
+            FILE        ${CMAKE_CURRENT_BINARY_DIR}/ArmnnDelegateTargets.cmake
+            NAMESPACE   ArmnnDelegate::)
+    add_library(ArmnnDelegate::ArmnnDelegate ALIAS armnnDelegate)
+endif()
 
+####################################################
+## Export opaque delegate targets
+
+if(BUILD_OPAQUE_DELEGATE)
+    set(armnn_opaque_delegate_export_targets)
+    list(APPEND armnn_opaque_delegate_export_targets
+                armnnOpaqueDelegateObject
+                armnnOpaqueDelegate
+                tflite_headers
+                flatbuffer_headers
+                profiling_library_headers
+                thirdparty_headers)
+
+    install(
+            TARGETS armnnOpaqueDelegate
+            EXPORT  armnn-opaque-delegate-targets
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+    ## Set export alias
+    set_target_properties(armnnOpaqueDelegate
+            PROPERTIES
+            EXPORT_NAME ArmnnOpaqueDelegate)
+
+    add_library(ArmnnDelegate::ArmnnOpaqueDelegate ALIAS armnnOpaqueDelegate)
+endif()
 
 ####################################################

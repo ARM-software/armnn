@@ -5,7 +5,7 @@
 
 #include "ExecuteNetworkProgramOptions.hpp"
 #include "ArmNNExecutor.hpp"
-#if defined(ARMNN_TFLITE_DELEGATE)
+#if defined(ARMNN_TFLITE_DELEGATE) || defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
 #include "TfliteExecutor.hpp"
 #endif
 #include <armnn/Logging.hpp>
@@ -13,10 +13,12 @@
 
 std::unique_ptr<IExecutor> BuildExecutor(ProgramOptions& programOptions)
 {
-    if (programOptions.m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate ||
+    if (programOptions.m_ExNetParams.m_TfLiteExecutor ==
+            ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteOpaqueDelegate ||
+        programOptions.m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate ||
         programOptions.m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
     {
-#if defined(ARMNN_TFLITE_DELEGATE)
+#if defined(ARMNN_TFLITE_DELEGATE) || defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
         return std::make_unique<TfLiteExecutor>(programOptions.m_ExNetParams, programOptions.m_RuntimeOptions);
 #else
         ARMNN_LOG(fatal) << "Not built with Arm NN Tensorflow-Lite delegate support.";

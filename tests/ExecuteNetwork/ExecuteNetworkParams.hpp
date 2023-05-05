@@ -20,7 +20,8 @@ struct ExecuteNetworkParams
     {
         ArmNNTfLiteParser,
         ArmNNTfLiteDelegate,
-        TfliteInterpreter
+        TfliteInterpreter,
+        ArmNNTfLiteOpaqueDelegate,
     };
 
     bool                              m_AllowExpandedDims;

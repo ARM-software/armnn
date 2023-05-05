@@ -141,7 +141,8 @@ endif()
 if (BUILD_ARMNN_SERIALIZER
         OR BUILD_TF_LITE_PARSER
         OR BUILD_ONNX_PARSER
-        OR BUILD_CLASSIC_DELEGATE)
+        OR BUILD_CLASSIC_DELEGATE
+        OR BUILD_OPAQUE_DELEGATE)
     set(ExecuteNetwork_sources
         ExecuteNetwork/IExecutor.hpp
         ExecuteNetwork/ArmNNExecutor.cpp
@@ -154,7 +155,7 @@ if (BUILD_ARMNN_SERIALIZER
         NetworkExecutionUtils/NetworkExecutionUtils.cpp
         NetworkExecutionUtils/NetworkExecutionUtils.hpp)
 
-    if(BUILD_CLASSIC_DELEGATE)
+    if(BUILD_CLASSIC_DELEGATE OR BUILD_OPAQUE_DELEGATE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-comment")
         set(ExecuteNetwork_sources
             ${ExecuteNetwork_sources}
@@ -167,6 +168,7 @@ if (BUILD_ARMNN_SERIALIZER
     target_include_directories(ExecuteNetwork PRIVATE ../src/armnnUtils)
     target_include_directories(ExecuteNetwork PRIVATE ../src/backends)
     target_include_directories(ExecuteNetwork PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
     if(EXECUTE_NETWORK_STATIC)
         target_link_libraries(ExecuteNetwork
                 -Wl,--whole-archive
@@ -188,6 +190,9 @@ if (BUILD_ARMNN_SERIALIZER
         endif()
         if (BUILD_CLASSIC_DELEGATE)
             target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnDelegate)
+        endif()
+        if (BUILD_OPAQUE_DELEGATE)
+            target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnOpaqueDelegate)
         endif()
         target_link_libraries(ExecuteNetwork armnn)
     endif()

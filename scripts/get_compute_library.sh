@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_02" # Release 23.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="57132943e0df00aa008b90614ea5a9fa8b2dc18a" #Fix im2col for fast-maths mode with padding.
+DEFAULT_CLFRAMEWORKREVISION="352c07ddd49842b5c3a8e5a2b5a90832bfb70091" #9564: Implement OpenCL MatMul heuristic for Arm® Mali™-G710
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

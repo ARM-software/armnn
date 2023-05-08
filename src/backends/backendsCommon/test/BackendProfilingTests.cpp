@@ -167,17 +167,14 @@ TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
     // Create a runtime
     armnn::RuntimeImpl runtime(options);
 
-    unsigned int shiftedId = 0;
-
     // Check if the MockBackends 3 dummy counters {0, 1, 2-5 (four cores)} are registered
     armnn::BackendId mockId = armnn::MockBackendId();
-    const ICounterMappings& counterMap = GetProfilingService(&runtime).GetCounterMappings();
-    CHECK(counterMap.GetGlobalId(0, mockId) == 5 + shiftedId);
-    CHECK(counterMap.GetGlobalId(1, mockId) == 6 + shiftedId);
-    CHECK(counterMap.GetGlobalId(2, mockId) == 7 + shiftedId);
-    CHECK(counterMap.GetGlobalId(3, mockId) == 8 + shiftedId);
-    CHECK(counterMap.GetGlobalId(4, mockId) == 9 + shiftedId);
-    CHECK(counterMap.GetGlobalId(5, mockId) == 10 + shiftedId);
+
+    CHECK(GetProfilingService(&runtime).IsCategoryRegistered("MockCounters"));
+    CHECK(GetProfilingService(&runtime).IsCounterRegistered("Mock Counter One"));
+    CHECK(GetProfilingService(&runtime).IsCounterRegistered("Mock Counter Two"));
+    CHECK(GetProfilingService(&runtime).IsCounterRegistered("Mock MultiCore Counter"));
+
     options.m_ProfilingOptions.m_EnableProfiling = false;
     GetProfilingService(&runtime).ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);

@@ -51,6 +51,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - CAST
 
+- CEIL
+
 - CONCATENATION, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
 
 - CONV_2D, Supported Fused Activation: RELU, RELU6, RELU_N1_TO_1, SIGMOID, TANH, NONE
@@ -182,6 +184,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - SQRT
 
 - SQUEEZE
+
+- SLICE
 
 - STRIDED_SLICE
 

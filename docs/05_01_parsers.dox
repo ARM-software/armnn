@@ -123,6 +123,8 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - ARG_MIN
 - AVERAGE_POOL_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - BATCH_TO_SPACE
+- CAST
+- CEIL
 - CONCATENATION, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - CONV_2D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
 - CONV_3D, Supported Fused Activation: RELU , RELU6 , TANH, NONE
@@ -187,6 +189,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - TANH
 - TRANSPOSE
 - TRANSPOSE_CONV
+- UNIDIRECTIONAL_SEQUENCE_LSTM
 - UNPACK
 
 ### Custom Operator

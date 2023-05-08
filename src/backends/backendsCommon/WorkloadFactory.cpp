@@ -1561,7 +1561,6 @@ bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLaye
     return IsLayerConfigurationSupported(layer->GetBackendId(), connectableLayer, dataType, outReasonIfUnsupported);
 }
 
-// TODO merge with defaulted modelOptions above
 bool IWorkloadFactory::IsLayerSupported(const IConnectableLayer& connectableLayer,
                                         Optional<DataType> dataType,
                                         std::string& outReasonIfUnsupported,

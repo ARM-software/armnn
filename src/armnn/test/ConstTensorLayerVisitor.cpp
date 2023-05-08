@@ -950,7 +950,6 @@ TEST_CASE("CheckNamedLstmLayerCifgDisabled")
     layer->ExecuteStrategy(visitor);
 }
 
-// TODO add one with peephole
 TEST_CASE("CheckLstmLayerPeephole")
 {
     LstmDescriptor descriptor;
@@ -1275,7 +1274,6 @@ TEST_CASE("CheckNamedLstmLayerPeephole")
     layer->ExecuteStrategy(visitor);
 }
 
-// TODO add one with projection
 TEST_CASE("CheckLstmLayerProjection")
 {
     LstmDescriptor descriptor;

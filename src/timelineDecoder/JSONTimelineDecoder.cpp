@@ -74,9 +74,6 @@ JSONTimelineDecoder::TimelineStatus JSONTimelineDecoder::CreateRelationship(cons
     }
     else
     {
-        /*
-         * TODO Handle DataLink
-         */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 
@@ -99,9 +96,6 @@ void JSONTimelineDecoder::HandleExecutionLink(const ITimelineDecoder::Relationsh
     }
     else
     {
-        /*
-         * TODO Add some protection against packet ordering issues
-         */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 }
@@ -128,16 +122,10 @@ void JSONTimelineDecoder::HandleLabelLink(const ITimelineDecoder::Relationship& 
         }
         else
         {
-            /*
-             * TODO Add some protection against packet ordering issues
-             */
             m_Model.relationships.insert({relationship.m_Guid, relationship});
         }
     } else
     {
-        /*
-         * TODO Add some protection against packet ordering issues
-         */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 }
@@ -156,9 +144,6 @@ void JSONTimelineDecoder::HandleTypeLabel(const ITimelineDecoder::Relationship& 
     }
     else
     {
-        /*
-        * TODO Add some protection against packet ordering issues
-        */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 }
@@ -174,9 +159,6 @@ void JSONTimelineDecoder::HandleNameLabel(const ITimelineDecoder::Relationship& 
     }
     else
     {
-        /*
-        * TODO Add some protection against packet ordering issues
-        */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 }
@@ -192,9 +174,6 @@ void JSONTimelineDecoder::HandleBackendIdLabel(const ITimelineDecoder::Relations
     }
     else
     {
-        /*
-        * TODO Add some protection against packet ordering issues
-        */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 }
@@ -210,9 +189,6 @@ void JSONTimelineDecoder::HandleConnectionLabel(const ITimelineDecoder::Relation
     }
     else
     {
-        /*
-        * TODO Add some protection against packet ordering issues
-        */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 }
@@ -230,9 +206,6 @@ void JSONTimelineDecoder::HandleRetentionLink(const ITimelineDecoder::Relationsh
     }
     else
     {
-        /*
-        * TODO Add some protection against packet ordering issues
-        */
         m_Model.relationships.insert({relationship.m_Guid, relationship});
     }
 }

@@ -138,7 +138,7 @@ TEST_CASE("RuntimeMemoryUsage")
     CHECK(leakedBefore == leakedAfter);
 
     // Add resonable threshold after and before running valgrind with the ACL clear cache function.
-    // TODO Threshold set to 80k until the root cause of the memory leakage is found and fixed. Revert threshold
+    // Threshold set to 80k until the root cause of the memory leakage is found and fixed. Revert threshold
     // value to 1024 when fixed.
     CHECK(static_cast<long>(reachableAfter) - static_cast<long>(reachableBefore) < 81920);
 

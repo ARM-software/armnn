@@ -1528,8 +1528,7 @@ void OnnxParserImpl::ParseAdd(const onnx::NodeProto& node)
 
     VALID_INPUTS(node, STR_LIST(onnx::TensorProto::FLOAT));
 
-    // TODO: unify broadcast validation code across layers
-    // tracked by: IVGCVSW-1576
+    // IVGCVSW-1576: unify broadcast validation code across layers
 
     // Checking broadcast compatibility : only scalar or 1D tensors
     auto inputs = AddPrepareBroadcast(node.input(0), node.input(1));
@@ -1858,8 +1857,6 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
         }
         else
         {
-            // TODO: split the input by channels into channels/groups separate convolutions
-            //  and concatenate the results afterwards
             throw ParseException(fmt::format("Error parsing Convolution node: {}. "
                                              "The 'group'={} parameter should be 1 or be equal to the "
                                              "channel of the input shape={} (in NCHW format). {}",

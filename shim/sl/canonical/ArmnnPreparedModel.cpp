@@ -232,7 +232,6 @@ ErrorStatus ArmnnPreparedModel::PrepareMemoryForOutputs(
             return ErrorStatus::OUTPUT_INSUFFICIENT_SIZE;
         }
 
-        //TODO: Need to check for Request::Argument::LifeTime::POINTER
         if (outputArg.lifetime == Request::Argument::LifeTime::POOL)
         {
             size_t bufferSize = memPools.at(outputArg.location.poolIndex).getSize();
@@ -599,7 +598,6 @@ GeneralResult<SharedExecution> ArmnnPreparedModel::createReusableExecution(
 
 GeneralResult<SharedBurst> ArmnnPreparedModel::configureExecutionBurst() const
 {
-    // TODO: Implement BURST
     return nullptr;
 }
 

@@ -761,7 +761,6 @@ if(BUILD_UNIT_TESTS)
             src/armnnOnnxParser/test/OnnxParserTestUtils.cpp
             src/armnnOnnxParser/test/OnnxParserTestUtils.hpp
             src/armnnOnnxParser/test/Pooling.cpp
-            src/armnnOnnxParser/test/ProtoxtFixture.cpp
             src/armnnOnnxParser/test/Relu.cpp
             src/armnnOnnxParser/test/Reshape.cpp
             src/armnnOnnxParser/test/Shape.cpp

@@ -497,7 +497,7 @@ bool IsDynamicTensor(const armnn::TensorInfo& tensorInfo)
     return !tensorInfo.GetShape().AreAllDimensionsSpecified();
 }
 
-bool AreDynamicTensorsSupported() //TODO
+bool AreDynamicTensorsSupported() 
 {
     return true;
 }

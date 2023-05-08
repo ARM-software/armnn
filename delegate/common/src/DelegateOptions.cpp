@@ -18,28 +18,28 @@ struct DelegateOptionsImpl
     explicit DelegateOptionsImpl(armnn::Compute computeDevice,
                         const std::vector<armnn::BackendOptions>& backendOptions,
                         const armnn::Optional<armnn::LogSeverity> logSeverityLevel)
-                        : p_Backends({computeDevice}), p_RuntimeOptions(), m_LoggingSeverity(logSeverityLevel)
+                        : m_Backends({computeDevice}), m_RuntimeOptions(), m_LoggingSeverity(logSeverityLevel)
     {
-        p_RuntimeOptions.m_BackendOptions = backendOptions;
+        m_RuntimeOptions.m_BackendOptions = backendOptions;
     }
 
     explicit DelegateOptionsImpl(const std::vector<armnn::BackendId>& backends,
                                  const std::vector<armnn::BackendOptions>& backendOptions,
                                  const armnn::Optional<armnn::LogSeverity> logSeverityLevel)
-            : p_Backends(backends), p_RuntimeOptions(), m_LoggingSeverity(logSeverityLevel)
+            : m_Backends(backends), m_RuntimeOptions(), m_LoggingSeverity(logSeverityLevel)
     {
-        p_RuntimeOptions.m_BackendOptions = backendOptions;
+        m_RuntimeOptions.m_BackendOptions = backendOptions;
     }
 
     explicit DelegateOptionsImpl(armnn::Compute computeDevice,
                                  const armnn::OptimizerOptionsOpaque& optimizerOptions,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
-            : p_Backends({computeDevice}),
-              p_RuntimeOptions(),
-              p_OptimizerOptions(optimizerOptions),
+            : m_Backends({computeDevice}),
+              m_RuntimeOptions(),
+              m_OptimizerOptions(optimizerOptions),
               m_LoggingSeverity(logSeverityLevel),
-              p_DebugCallbackFunc(func)
+              m_DebugCallbackFunc(func)
     {
     }
 
@@ -47,33 +47,33 @@ struct DelegateOptionsImpl
                                  const armnn::OptimizerOptionsOpaque& optimizerOptions,
                                  const armnn::Optional<armnn::LogSeverity>& logSeverityLevel,
                                  const armnn::Optional<armnn::DebugCallbackFunction>& func)
-            : p_Backends(backends),
-              p_RuntimeOptions(),
-              p_OptimizerOptions(optimizerOptions),
+            : m_Backends(backends),
+              m_RuntimeOptions(),
+              m_OptimizerOptions(optimizerOptions),
               m_LoggingSeverity(logSeverityLevel),
-              p_DebugCallbackFunc(func)
+              m_DebugCallbackFunc(func)
     {
     }
 
     /// Which backend to run Delegate on.
     /// Examples of possible values are: CpuRef, CpuAcc, GpuAcc.
     /// CpuRef as default.
-    std::vector<armnn::BackendId> p_Backends = {armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> m_Backends = {armnn::Compute::CpuRef };
 
     /// Creation options for the ArmNN runtime
     /// Contains options for global settings that are valid for the whole lifetime of ArmNN
     /// i.e. BackendOptions, DynamicBackendPath, ExternalProfilingOptions and more
-    armnn::IRuntime::CreationOptions p_RuntimeOptions;
+    armnn::IRuntime::CreationOptions m_RuntimeOptions;
 
     /// Options for the optimization step for the network
-    armnn::OptimizerOptionsOpaque p_OptimizerOptions;
+    armnn::OptimizerOptionsOpaque m_OptimizerOptions;
 
     /// Internal profiling options. Written to INetworkProperties during model load.
     /// Indicates whether internal profiling is enabled or not.
     bool m_InternalProfilingEnabled = false;
     
     /// Sets the level of detail output by the profiling. Options are DetailsWithEvents = 1 and DetailsOnly = 2
-    armnn::ProfilingDetailsMethod p_InternalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
+    armnn::ProfilingDetailsMethod m_InternalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
 
     /// Severity level for logging within ArmNN that will be used on creation of the delegate
     armnn::Optional<armnn::LogSeverity> m_LoggingSeverity;
@@ -81,7 +81,7 @@ struct DelegateOptionsImpl
     /// A callback function to debug layers performing custom computations on intermediate tensors.
     /// If a function is not registered, and debug is enabled in OptimizerOptions,
     /// debug will print information of the intermediate tensors.
-    armnn::Optional<armnn::DebugCallbackFunction> p_DebugCallbackFunc;
+    armnn::Optional<armnn::DebugCallbackFunction> m_DebugCallbackFunc;
 
     /// If not empty then the optimized model will be serialized to a file with this file name in "dot" format.
     std::string m_SerializeToDot = "";
@@ -351,42 +351,42 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
 
 const std::vector<armnn::BackendId>& DelegateOptions::GetBackends() const
 {
-    return p_DelegateOptionsImpl->p_Backends;
+    return p_DelegateOptionsImpl->m_Backends;
 }
 
 void DelegateOptions::SetBackends(const std::vector<armnn::BackendId>& backends)
 {
-    p_DelegateOptionsImpl->p_Backends = backends;
+    p_DelegateOptionsImpl->m_Backends = backends;
 }
 
 void DelegateOptions::SetDynamicBackendsPath(const std::string& dynamicBackendsPath)
 {
-    p_DelegateOptionsImpl->p_RuntimeOptions.m_DynamicBackendsPath = dynamicBackendsPath;
+    p_DelegateOptionsImpl->m_RuntimeOptions.m_DynamicBackendsPath = dynamicBackendsPath;
 }
 
 const std::string& DelegateOptions::GetDynamicBackendsPath() const
 {
-    return p_DelegateOptionsImpl->p_RuntimeOptions.m_DynamicBackendsPath;
+    return p_DelegateOptionsImpl->m_RuntimeOptions.m_DynamicBackendsPath;
 }
 
 void DelegateOptions::SetGpuProfilingState(bool gpuProfilingState)
 {
-    p_DelegateOptionsImpl->p_RuntimeOptions.m_EnableGpuProfiling = gpuProfilingState;
+    p_DelegateOptionsImpl->m_RuntimeOptions.m_EnableGpuProfiling = gpuProfilingState;
 }
 
 bool DelegateOptions::GetGpuProfilingState()
 {
-    return p_DelegateOptionsImpl->p_RuntimeOptions.m_EnableGpuProfiling;
+    return p_DelegateOptionsImpl->m_RuntimeOptions.m_EnableGpuProfiling;
 }
 
 const std::vector<armnn::BackendOptions>& DelegateOptions::GetBackendOptions() const
 {
-    return p_DelegateOptionsImpl->p_RuntimeOptions.m_BackendOptions;
+    return p_DelegateOptionsImpl->m_RuntimeOptions.m_BackendOptions;
 }
 
 void DelegateOptions::AddBackendOption(const armnn::BackendOptions& option)
 {
-    p_DelegateOptionsImpl->p_RuntimeOptions.m_BackendOptions.push_back(option);
+    p_DelegateOptionsImpl->m_RuntimeOptions.m_BackendOptions.push_back(option);
 }
 
 void DelegateOptions::SetLoggingSeverity(const armnn::LogSeverity& level)
@@ -411,24 +411,24 @@ bool DelegateOptions::IsLoggingEnabled()
 
 const armnn::OptimizerOptionsOpaque& DelegateOptions::GetOptimizerOptions() const
 {
-    return p_DelegateOptionsImpl->p_OptimizerOptions;
+    return p_DelegateOptionsImpl->m_OptimizerOptions;
 }
 
 void DelegateOptions::SetOptimizerOptions(const armnn::OptimizerOptionsOpaque& optimizerOptions)
 {
-    p_DelegateOptionsImpl->p_OptimizerOptions = optimizerOptions;
+    p_DelegateOptionsImpl->m_OptimizerOptions = optimizerOptions;
 }
 
 const armnn::Optional<armnn::DebugCallbackFunction>& DelegateOptions::GetDebugCallbackFunction() const
 {
-    return p_DelegateOptionsImpl->p_DebugCallbackFunc;
+    return p_DelegateOptionsImpl->m_DebugCallbackFunc;
 }
 
 void DelegateOptions::SetInternalProfilingParams(bool internalProfilingState,
                                 const armnn::ProfilingDetailsMethod& internalProfilingDetail)
 {
     p_DelegateOptionsImpl->m_InternalProfilingEnabled = internalProfilingState;
-    p_DelegateOptionsImpl->p_InternalProfilingDetail = internalProfilingDetail;
+    p_DelegateOptionsImpl->m_InternalProfilingDetail = internalProfilingDetail;
 }
 
 bool DelegateOptions::GetInternalProfilingState() const
@@ -438,7 +438,7 @@ bool DelegateOptions::GetInternalProfilingState() const
 
 const armnn::ProfilingDetailsMethod& DelegateOptions::GetInternalProfilingDetail() const
 {
-    return p_DelegateOptionsImpl->p_InternalProfilingDetail;
+    return p_DelegateOptionsImpl->m_InternalProfilingDetail;
 }
 
 void DelegateOptions::SetSerializeToDot(const std::string& serializeToDotFile)
@@ -453,12 +453,12 @@ const std::string& DelegateOptions::GetSerializeToDot() const
 
 void DelegateOptions::SetRuntimeOptions(const armnn::IRuntime::CreationOptions& runtimeOptions)
 {
-    p_DelegateOptionsImpl->p_RuntimeOptions = runtimeOptions;
+    p_DelegateOptionsImpl->m_RuntimeOptions = runtimeOptions;
 }
 
 const armnn::IRuntime::CreationOptions& DelegateOptions::GetRuntimeOptions()
 {
-    return p_DelegateOptionsImpl->p_RuntimeOptions;
+    return p_DelegateOptionsImpl->m_RuntimeOptions;
 }
 
 void DelegateOptions::DisableTfLiteRuntimeFallback(bool fallbackState)

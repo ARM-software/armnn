@@ -82,6 +82,29 @@ void CalcPadding(uint32_t inputSize,
     }
 }
 
+// Function that calculates explicit padding when the output shape is known.
+// At the moment the output is only given as an input parameter in Transpose Convolution,
+// not in Convolution and Depthwise Convolution
+void CalcPadding(uint32_t inputSize,
+                 uint32_t filterSize,
+                 uint32_t stride,
+                 uint32_t dilation,
+                 uint32_t& paddingFront,
+                 uint32_t& paddingBack,
+                 TfLitePadding padding,
+                 uint32_t outputSize)
+{
+    armnn::IgnoreUnused(dilation);
+    paddingFront = 0;
+    paddingBack = 0;
+    if (padding == kTfLitePaddingSame)
+    {
+        uint32_t totalPadding = (inputSize - 1) * stride + filterSize - outputSize;
+        paddingFront = totalPadding / 2;
+        paddingBack = totalPadding - paddingFront;
+    }
+}
+
 unsigned int ComputeWrappedIndex(int index, unsigned int numDimensions)
 {
     int numDims = armnn::numeric_cast<int>(numDimensions);

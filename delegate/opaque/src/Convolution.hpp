@@ -589,7 +589,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     {
         auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
 
-        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        armnn::IConnectableLayer* inputLayer = delegateData.m_Network->AddConstantLayer(input);
         inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
         inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
@@ -630,9 +630,6 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     descriptor.m_StrideY = NonNegative(parameters->stride_height, nodeIndex);
     descriptor.m_DataLayout = armnn::DataLayout::NHWC;
 
-
-
-
     auto numInputs = TfLiteOpaqueNodeNumberOfInputs(tfLiteNode);
     // Gather input indices and use to get input tensor.
     const int* inputTensors;
@@ -651,31 +648,6 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     {
         return kTfLiteError;
     }
-
-    const armnn::TensorInfo outputShapeTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputShapeTensor);
-    std::vector<int32_t> outputShape(outputShapeTensorInfo.GetNumElements());
-    if (outputShapeTensorInfo.GetDataType() == armnn::DataType::Signed32)
-    {
-        for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); i++)
-        {
-            outputShape[i] = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLiteOutputShapeTensor))[i];
-        }
-    }
-
-    if (outputShapeTensorInfo.GetDataType() == armnn::DataType::QAsymmU8)
-    {
-        for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); i++)
-        {
-            outputShape[i] = static_cast<uint8_t*>(TfLiteOpaqueTensorData(tfLiteOutputShapeTensor))[i];
-        }
-    }
-
-    // Change from signed to unsigned int to store in TransposeConvolution2dDescriptor.
-    for (int dimension : outputShape)
-    {
-        descriptor.m_OutputShape.push_back(static_cast<unsigned int>(dimension));
-    }
-    descriptor.m_OutputShapeEnabled = true;
 
     const TfLiteOpaqueTensor* tfLiteInputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[2]);
     if (!IsValid(tfLiteContext, tfLiteInputTensor, operatorCode, nodeIndex))
@@ -717,21 +689,76 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     const unsigned int filterHeight = filterTensorInfo.GetShape()[1];
     const unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
 
-    // Calculate padding
-    CalcPadding(inputHeight,
-                filterHeight,
-                descriptor.m_StrideY,
-                1, // dilation y
-                descriptor.m_PadTop,
-                descriptor.m_PadBottom,
-                parameters->padding);
-    CalcPadding(inputWidth,
-                filterWidth,
-                descriptor.m_StrideX,
-                1, // dilation x
-                descriptor.m_PadLeft,
-                descriptor.m_PadRight,
-                parameters->padding);
+    // This block determines the output shape of the transpose convolution.
+    // If the output shape tensor is a constant, we can access the data at load time and set the shape of the layer.
+    // If this is not constant, we do not have access to the shape data, so we have to use infer output shape.
+    if (IsConstantTensor(tfLiteOutputShapeTensor))
+    {
+        const armnn::TensorInfo outputShapeTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputShapeTensor);
+        std::vector<int32_t> outputShape(outputShapeTensorInfo.GetNumElements());
+        if (outputShapeTensorInfo.GetDataType() == armnn::DataType::Signed32)
+        {
+            for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); ++i)
+            {
+                outputShape[i] = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLiteOutputShapeTensor))[i];
+            }
+        }
+
+        if (outputShapeTensorInfo.GetDataType() == armnn::DataType::QAsymmU8)
+        {
+            for(unsigned int i=0; i < outputShapeTensorInfo.GetNumElements(); ++i)
+            {
+                outputShape[i] = static_cast<uint8_t*>(TfLiteOpaqueTensorData(tfLiteOutputShapeTensor))[i];
+            }
+        }
+
+        // Change from signed to unsigned int to store in TransposeConvolution2dDescriptor.
+        for (int dimension : outputShape)
+        {
+            descriptor.m_OutputShape.push_back(static_cast<unsigned int>(dimension));
+        }
+        descriptor.m_OutputShapeEnabled = true;
+
+        // TfLite uses NHWC tensors
+        const unsigned int outputHeight = descriptor.m_OutputShape[1];
+        const unsigned int outputWidth  = descriptor.m_OutputShape[2];
+
+        CalcPadding(inputHeight,
+                    filterHeight,
+                    descriptor.m_StrideY,
+                    1, // DilationY
+                    descriptor.m_PadTop,
+                    descriptor.m_PadBottom,
+                    parameters->padding,
+                    outputHeight);
+
+        CalcPadding(inputWidth,
+                    filterWidth,
+                    descriptor.m_StrideX,
+                    1, // DilationX
+                    descriptor.m_PadLeft,
+                    descriptor.m_PadRight,
+                    parameters->padding,
+                    outputWidth);
+    }
+    else
+    {
+        CalcPadding(inputHeight,
+                    filterHeight,
+                    descriptor.m_StrideY,
+                    1, // DilationY
+                    descriptor.m_PadTop,
+                    descriptor.m_PadBottom,
+                    parameters->padding);
+
+        CalcPadding(inputWidth,
+                    filterWidth,
+                    descriptor.m_StrideX,
+                    1, // DilationX
+                    descriptor.m_PadLeft,
+                    descriptor.m_PadRight,
+                    parameters->padding);
+    }
 
     // Set up filter
     auto filterTensor = CreateConstTensor(tfLiteFilterTensor,

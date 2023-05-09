@@ -33,12 +33,6 @@ arm_compute::Status ClFullyConnectedWorkloadValidate(const TensorInfo& input,
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
-        // Same for bias as weights. We don't currently support non const.
-        if (!biases.value().IsConstant())
-        {
-            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                        "Arm NN ClFullyConnectedWorkload does not support non constant bias."};
-        }
         aclBiases = BuildArmComputeTensorInfo(biases.value());
         aclBiases.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiases = &aclBiases;
@@ -74,9 +68,6 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
     {
         bias = &PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
         bias->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
-
-        // We do not support dynamic bias
-        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);

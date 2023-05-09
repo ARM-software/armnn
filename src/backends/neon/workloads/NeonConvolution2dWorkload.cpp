@@ -43,12 +43,6 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
-        // Same for bias as weights. We don't currently support non const.
-        if (!biases.value().IsConstant())
-        {
-            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                       "ArmNN NeonConvolution2dWorkload does not support non constant bias."};
-        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -97,8 +91,6 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
         BuildArmComputeTensor(*m_BiasTensor, info.m_InputTensorInfos[2], m_Data.m_Parameters.m_DataLayout);
         m_BiasTensor->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
-        // We do not support dynamic bias
-        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);

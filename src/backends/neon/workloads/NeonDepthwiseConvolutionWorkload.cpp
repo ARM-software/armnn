@@ -58,12 +58,6 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
-        // Same for bias as weights. We don't currently support non const.
-        if (!biases.value().IsConstant())
-        {
-            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                       "ArmNN NeonDepthwiseConv2dWorkload does not support non constant bias."};
-        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -100,8 +94,6 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     {
         biasesPtr = &PolymorphicDowncast<IAclTensorHandle *>(m_Data.m_Inputs[2])->GetTensor();
         biasesPtr->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
-        // We do not support dynamic bias
-        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     arm_compute::ITensorInfo* weightsInfo = weights.info();

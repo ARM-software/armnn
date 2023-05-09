@@ -23,14 +23,6 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
     tflite::ops::builtin::BuiltinOpResolver resolver;
 
     tflite::InterpreterBuilder builder(*m_Model, resolver);
-    if (builder(&m_TfLiteInterpreter) != kTfLiteOk)
-    {
-        LogAndThrow("Error loading the model into the TfLiteInterpreter.");
-    }
-    if (m_TfLiteInterpreter->AllocateTensors() != kTfLiteOk)
-    {
-        LogAndThrow("Failed to allocate tensors in the TfLiteInterpreter.");
-    }
 
     if (m_Params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteOpaqueDelegate)
     {
@@ -51,6 +43,11 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
 
         // Add Delegate to the builder
         builder.AddDelegate(armnnDelegate.get());
+        if (builder(&m_TfLiteInterpreter) != kTfLiteOk)
+        {
+            LogAndThrow("Error loading the model into the TfLiteInterpreter.");
+        }
+
 #else
         LogAndThrow("Not built with Arm NN Tensorflow-Lite opaque delegate support.");
 #endif
@@ -58,6 +55,10 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
     else if (m_Params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate)
     {
 #if defined(ARMNN_TFLITE_DELEGATE)
+        if (builder(&m_TfLiteInterpreter) != kTfLiteOk)
+        {
+            LogAndThrow("Error loading the model into the TfLiteInterpreter.");
+        }
         // Create the Armnn Delegate
         // Populate a DelegateOptions from the ExecuteNetworkParams.
         armnnDelegate::DelegateOptions delegateOptions = m_Params.ToDelegateOptions();
@@ -77,6 +78,11 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
     else
     {
         std::cout << "Running on TfLite without ArmNN delegate\n";
+    }
+
+    if (m_TfLiteInterpreter->AllocateTensors() != kTfLiteOk)
+    {
+        LogAndThrow("Failed to allocate tensors in the TfLiteInterpreter.");
     }
 
     const size_t numInputs = m_TfLiteInterpreter->inputs().size();

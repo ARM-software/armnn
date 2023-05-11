@@ -6,8 +6,6 @@
 #include <armnn_delegate.hpp>
 #include <OpaqueDelegateUtils.hpp>
 
-#include <Version.hpp>
-
 #include "Activation.hpp"
 #include "ArgMinMax.hpp"
 #include "BatchMatMul.hpp"
@@ -50,7 +48,6 @@
 #include <tensorflow/lite/context_util.h>
 #include <tensorflow/lite/schema/schema_generated.h>
 #include <tensorflow/lite/minimal_logging.h>
-#include <tensorflow/lite/logger.h>
 
 #include <algorithm>
 #include <iostream>
@@ -59,16 +56,8 @@
 namespace armnnOpaqueDelegate
 {
 
-const TfLiteStableDelegate TFL_TheStableDelegate =
-{
-    /*delegate_abi_version=*/ TFL_STABLE_DELEGATE_ABI_VERSION,
-    /*delegate_name=*/        "armnn_delegate",
-    /*delegate_version=*/     OPAQUE_DELEGATE_VERSION,
-    /*delegate_plugin=*/      GetArmnnDelegatePluginApi()
-};
-
 static auto* g_delegate_plugin_ArmnnDelegatePlugin_ =
-    new tflite::delegates::DelegatePluginRegistry::Register(TFL_TheStableDelegate.delegate_name,
+    new tflite::delegates::DelegatePluginRegistry::Register("armnn_delegate",
                                                             ArmnnDelegatePlugin::New);
 
 ArmnnOpaqueDelegate::ArmnnOpaqueDelegate(armnnDelegate::DelegateOptions options)
@@ -126,7 +115,7 @@ TfLiteStatus DoPrepare(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueDelegate*
     // ArmNN Opaque Delegate Registration
     TfLiteRegistrationExternal* kernelRegistration =
             TfLiteRegistrationExternalCreate(kTfLiteBuiltinDelegate,
-                                             TFL_TheStableDelegate.delegate_name,
+                                             "armnn_delegate",
                                              /*version=*/OPAQUE_DELEGATE_MAJOR_VERSION);
     if(kernelRegistration == nullptr)
     {
@@ -225,13 +214,6 @@ void TfLiteArmnnOpaqueDelegateDelete(TfLiteOpaqueDelegate* tfLiteDelegate)
         delete static_cast<::armnnOpaqueDelegate::ArmnnOpaqueDelegate*>(TfLiteOpaqueDelegateGetData(tfLiteDelegate));
         TfLiteOpaqueDelegateDelete(tfLiteDelegate);
     }
-}
-
-const TfLiteOpaqueDelegatePlugin* GetArmnnDelegatePluginApi()
-{
-    static constexpr TfLiteOpaqueDelegatePlugin armnnPlugin{
-            TfLiteArmnnOpaqueDelegateCreate, TfLiteArmnnOpaqueDelegateDelete, TfLiteArmnnOpaqueDelegateErrno};
-    return &armnnPlugin;
 }
 
 const std::string ArmnnOpaqueDelegate::GetVersion() {
@@ -776,6 +758,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinExpandDims);
+        case kTfLiteBuiltinFill:
+            return VisitFillOperator(delegateData,
+                                     tfLiteContext,
+                                     tfLiteNode,
+                                     nodeIndex,
+                                     kTfLiteBuiltinFill);
         case kTfLiteBuiltinFloor:
             return VisitFloorOperator(delegateData,
                                       tfLiteContext,
@@ -928,6 +916,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                   tfLiteNode,
                                                   nodeIndex,
                                                   kTfLiteBuiltinMinimum);
+        case kTfLiteBuiltinMirrorPad:
+            return VisitPadOperator(delegateData,
+                                    tfLiteContext,
+                                    tfLiteNode,
+                                    nodeIndex,
+                                    kTfLiteBuiltinMirrorPad);
         case kTfLiteBuiltinMul:
             return VisitElementwiseBinaryOperator(delegateData,
                                                   tfLiteContext,

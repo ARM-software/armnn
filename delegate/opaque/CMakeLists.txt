@@ -10,6 +10,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/Activation.hpp
         src/ArgMinMax.hpp
         src/armnn_delegate.cpp
+        src/armnn_external_delegate.cpp
         src/BatchMatMul.hpp
         src/BatchSpace.hpp
         src/Comparison.hpp

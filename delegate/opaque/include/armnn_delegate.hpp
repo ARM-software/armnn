@@ -6,6 +6,7 @@
 #pragma once
 
 #include <DelegateOptions.hpp>
+#include <Version.hpp>
 
 #include <tensorflow/core/public/version.h>
 #include <tensorflow/lite/c/c_api_opaque.h>
@@ -85,8 +86,6 @@ static int TfLiteArmnnOpaqueDelegateErrno(TfLiteOpaqueDelegate* delegate) { retu
 
 /// In order for the delegate to be loaded by TfLite
 const TfLiteOpaqueDelegatePlugin* GetArmnnDelegatePluginApi();
-
-extern const TfLiteStableDelegate TFL_TheStableDelegate;
 
 using tflite::delegates::DelegatePluginInterface;
 using TfLiteOpaqueDelegatePtr = tflite::delegates::TfLiteDelegatePtr;

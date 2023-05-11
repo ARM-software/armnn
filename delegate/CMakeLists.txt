@@ -143,8 +143,6 @@ if(BUILD_UNIT_TESTS)
         test/Convolution2dTest.cpp
         test/Convolution3dTest.cpp
         test/ConvolutionTestHelper.hpp
-        test/DelegateOptionsTest.cpp
-        test/DelegateOptionsTestHelper.hpp
         test/DepthwiseConvolution2dTest.cpp
         test/ElementwiseBinaryTest.cpp
         test/ElementwiseBinaryTestHelper.hpp
@@ -240,7 +238,9 @@ if(BUILD_UNIT_TESTS)
         set(classicDelegate_unittest_sources)
         list(APPEND classicDelegate_unittest_sources
              classic/src/test/ArmnnClassicDelegateTest.cpp
-             classic/src/test/DelegateTestInterpreter.cpp)
+             classic/src/test/DelegateTestInterpreter.cpp
+             test/DelegateOptionsTest.cpp
+             test/DelegateOptionsTestHelper.hpp)
 
         add_executable(DelegateUnitTests ${commonDelegate_unittest_sources} ${classicDelegate_unittest_sources})
 
@@ -258,88 +258,12 @@ if(BUILD_UNIT_TESTS)
     if (BUILD_OPAQUE_DELEGATE)
         set(opaqueDelegate_unittest_sources)
         list(APPEND opaqueDelegate_unittest_sources
-             common/src/test/DelegateTestInterpreter.hpp
-             common/src/test/DelegateTestInterpreterUtils.hpp
              opaque/src/test/ArmnnOpaqueDelegateTest.cpp
-             opaque/src/test/DelegateTestInterpreter.cpp
-             test/ActivationTest.cpp
-             test/ActivationTestHelper.hpp
-             test/ArgMinMaxTest.cpp
-             test/ArgMinMaxTestHelper.hpp
-             test/BatchMatMulTest.cpp
-             test/BatchMatMulTestHelper.hpp
-             test/BatchSpaceTest.cpp
-             test/BatchSpaceTestHelper.hpp
-             test/CastTest.cpp
-             test/CastTestHelper.hpp
-             test/ComparisonTest.cpp
-             test/ComparisonTestHelper.hpp
-             test/ControlTest.cpp
-             test/ControlTestHelper.hpp
-             test/Convolution2dTest.cpp
-             test/Convolution3dTest.cpp
-             test/ConvolutionTestHelper.hpp
-             test/DepthwiseConvolution2dTest.cpp
-             test/ElementwiseBinaryTest.cpp
-             test/ElementwiseBinaryTestHelper.hpp
-             test/ElementwiseUnaryTestHelper.hpp
-             test/ElementwiseUnaryTest.cpp
-             test/ExpandDimsTest.cpp
-             test/FullyConnectedTest.cpp
-             test/FullyConnectedTestHelper.hpp
-             test/GatherTest.cpp
-             test/GatherTestHelper.hpp
-             test/GatherNdTest.cpp
-             test/GatherNdTestHelper.hpp
-             test/LstmTest.cpp
-             test/LstmTestHelper.hpp
-             test/LogicalTest.cpp
-             test/LogicalTestHelper.hpp
-             test/NormalizationTest.cpp
-             test/NormalizationTestHelper.hpp
-             test/PackTest.cpp
-             test/PackTestHelper.hpp
-             test/PadTest.cpp
-             test/PadTestHelper.hpp
-             test/Pooling2dTest.cpp
-             test/Pooling2dTestHelper.hpp
-             test/Pooling3dTest.cpp
-             test/Pooling3dTestHelper.hpp
-             test/PreluTest.cpp
-             test/PreluTestHelper.hpp
-             test/ReduceTest.cpp
-             test/ReduceTestHelper.hpp
-             test/ReshapeTest.cpp
-             test/ResizeTest.cpp
-             test/ResizeTestHelper.hpp
-             test/RoundTest.cpp
-             test/RoundTestHelper.hpp
-             test/QuantizationTest.cpp
-             test/QuantizationTestHelper.hpp
-             test/ShapeTest.cpp
-             test/ShapeTestHelper.hpp
-             test/SliceTest.cpp
-             test/SliceTestHelper.hpp
-             test/SoftmaxTest.cpp
-             test/SoftmaxTestHelper.hpp
-             test/SpaceDepthTest.cpp
-             test/SpaceDepthTestHelper.hpp
-             test/SqueezeTest.cpp
-             test/StridedSliceTest.cpp
-             test/StridedSliceTestHelper.hpp
-             test/TestUtils.hpp
-             test/TestUtils.cpp
-             test/TransposeConvolution2dTest.cpp
-             test/TransposeTest.cpp
-             test/TransposeTestHelper.hpp
-             test/UnidirectionalSequenceLstmTest.cpp
-             test/UnidirectionalSequenceLstmTestHelper.hpp
-             test/UnpackTest.cpp
-             test/UnpackTestHelper.hpp)
+             opaque/src/test/DelegateTestInterpreter.cpp)
 
         # Until all operators are supported, we have to add tests one by one above to opaqueDelegate_unittest_sources.
         # After we add can add commonDelegate_unittest_sources to the add_executable below.
-        add_executable(OpaqueDelegateUnitTests ${opaqueDelegate_unittest_sources})
+        add_executable(OpaqueDelegateUnitTests ${opaqueDelegate_unittest_sources} ${commonDelegate_unittest_sources})
 
         target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
         target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/common/src/test")

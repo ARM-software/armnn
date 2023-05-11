@@ -81,7 +81,8 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
         // -1 == 3, -2 == 2, -3 == 1, -4 == 0
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: Operation has invalid axis: #%d. Axis must be in range [-n, n) in node #%d:",
+                "TfLiteOpaqueArmnnDelegate: Operation has invalid axis: #%d. "
+                "Axis must be in range [-n, n) in node #%d:",
                 axis, nodeIndex);
     }
     const unsigned int splitDim = ComputeWrappedIndex(axis, inputTensorInfo.GetNumDimensions());
@@ -104,8 +105,9 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: The number of dimensions: #%d for input tensors of the split op cannot be "
-                "greater than #%d in node #%d: ", inputDimSize, MaxNumOfTensorDimensions, nodeIndex);
+                "TfLiteOpaqueArmnnDelegate: The number of dimensions: #%d for input tensors of the split op cannot be "
+                "greater than #%d in node #%d: ",
+                inputDimSize, MaxNumOfTensorDimensions, nodeIndex);
         return kTfLiteError;
     }
 
@@ -121,7 +123,7 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: Number of splits #%d must evenly divide the dimension #%d in node #%d: ",
+                "TfLiteOpaqueArmnnDelegate: Number of splits #%d must evenly divide the dimension #%d in node #%d: ",
                 numSplits, splitterDimSizes[splitDim], nodeIndex);
         return kTfLiteError;
     }
@@ -165,9 +167,24 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     }
 
     // Connect the input slots
-    if(Connect(layer, tfLiteContext, tfLiteNode, delegateData) != kTfLiteOk)
+    delegateData.m_OutputSlotForNode[inputTensors[1]]->Connect(layer->GetInputSlot(0));
+
+    if(numSplits != static_cast<int>(layer->GetNumOutputSlots()))
     {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteOpaqueArmnnDelegate: Expected number of splits #%d does not "
+                "match the number of output slots #%d in node #%d: ",
+                numSplits, layer->GetNumOutputSlots(), nodeIndex);
         return kTfLiteError;
+    }
+
+    // Prepare output slots
+    for (unsigned int outputIndex = 0; outputIndex < layer->GetNumOutputSlots(); ++outputIndex)
+    {
+        armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(outputIndex);
+        delegateData.m_OutputSlotForNode[
+                static_cast<unsigned long>(outputTensors[outputIndex])] = &outputSlot;
     }
     return kTfLiteOk;
 }
@@ -224,7 +241,8 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: Operation has invalid axis: #%d. Axis must be in range [-n, n) in node #%d:",
+                "TfLiteOpaqueArmnnDelegate: Operation has invalid axis: #%d. "
+                "Axis must be in range [-n, n) in node #%d:",
                 axis, nodeIndex);
     }
     const unsigned int splitDim = ComputeWrappedIndex(axisTensorData[0], inputTensorInfo.GetNumDimensions());
@@ -243,7 +261,8 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     if (numSplits <= 0)
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext, "TfLiteArmnnDelegate: Invalid number of splits %d  in node #%d",
+                tfLiteContext,
+                "TfLiteOpaqueArmnnDelegate: Invalid number of splits %d  in node #%d",
                 numSplits, nodeIndex);
         return kTfLiteError;
     }
@@ -278,8 +297,9 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
                 tfLiteContext,
-                "TfLiteArmnnDelegate: The number of dimensions: #%d for input tensors of the split op cannot be "
-                "greater than #%d in node #%d: ", inputDimSize, MaxNumOfTensorDimensions, nodeIndex);
+                "TfLiteOpaqueArmnnDelegate: The number of dimensions: #%d for input tensors of the split op cannot be "
+                "greater than #%d in node #%d: ",
+                inputDimSize, MaxNumOfTensorDimensions, nodeIndex);
         return kTfLiteError;
     }
 
@@ -312,8 +332,10 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
         if (splitSum != armnn::numeric_cast<int>(inputTensorInfo.GetShape()[splitDim]))
         {
             TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                    tfLiteContext, "TfLiteArmnnDelegate: SplitV split_sizes does not sum to the dimension of value "
-                                   "along split_dim in node #%d", nodeIndex);
+                    tfLiteContext,
+                    "TfLiteOpaqueArmnnDelegate: SplitV split_sizes does not sum to the dimension "
+                    "of value along split_dim in node #%d",
+                    nodeIndex);
             return kTfLiteError;
         }
     }
@@ -324,8 +346,9 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     else
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
-                tfLiteContext, "TfLiteArmnnDelegate: SplitV cannot infer split size for "
-                               "more than one split in node #%d",
+                tfLiteContext,
+                "TfLiteOpaqueArmnnDelegate: SplitV cannot infer split size for "
+                "more than one split in node #%d",
                 nodeIndex);
         return kTfLiteError;
     }

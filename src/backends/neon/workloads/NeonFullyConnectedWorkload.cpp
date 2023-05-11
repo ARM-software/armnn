@@ -38,6 +38,12 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
     if (descriptor.m_BiasEnabled)
     {
         ARMNN_ASSERT(biases.has_value());
+        // Same for bias as weights. We don't currently support non const.
+        if (!biases.value().IsConstant())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                        "Arm NN NeonFullyConnectedWorkload does not support non constant bias."};
+        }
         aclBiases = BuildArmComputeTensorInfo(biases.value());
         aclBiases.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiases = &aclBiases;
@@ -79,6 +85,9 @@ NeonFullyConnectedWorkload::NeonFullyConnectedWorkload(const FullyConnectedQueue
         m_BiasesTensorInfo = info.m_InputTensorInfos[2];
         BuildArmComputeTensor(*m_BiasesTensor, m_BiasesTensorInfo);
         m_BiasesTensor->info()->set_are_values_constant(m_BiasesTensorInfo.IsConstant());
+
+        // We do not support dynamic bias
+        ARMNN_ASSERT(m_BiasesTensorInfo.IsConstant() == true);
     }
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);

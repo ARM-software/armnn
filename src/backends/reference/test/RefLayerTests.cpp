@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1002,6 +1002,48 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationInt32, MultiplicationInt32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationBroadcast1ElementInt32, MultiplicationBroadcast1ElementInt32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(MultiplicationBroadcast1DVectorInt32, MultiplicationBroadcast1DVectorInt32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Multiplication5d, Multiplication5dTest)
+
+// SquaredDifference
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSquaredDifference, SquaredDifferenceTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcast1Element, SquaredDiffBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcast, SquaredDiffBroadcastTest)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDifferenceFloat16, SquaredDifferenceFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcast1ElementFloat16, SquaredDiffBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcastFloat16, SquaredDiffBroadcastFloat16Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDifferenceUint8, SquaredDifferenceUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcastUint8, SquaredDiffBroadcastUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcast1ElementUint8, SquaredDiffBroadcast1ElementUint8Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDifferenceInt16, SquaredDifferenceInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcastInt16, SquaredDiffBroadcastInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcast1ElementInt16, SquaredDiffBroadcast1ElementInt16Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDifferenceInt32, SquaredDifferenceInt32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcastInt32, SquaredDiffBroadcastInt32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SquaredDiffBroadcast1ElementInt32, SquaredDiffBroadcast1ElementInt32Test)
+
+// Power
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimplePower, PowerTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcast1Element, PowerBroadcast1ElementTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcast, PowerBroadcastTest)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerFloat16, PowerFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcast1ElementFloat16, PowerBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcastFloat16, PowerBroadcastFloat16Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerUint8, PowerUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcastUint8, PowerBroadcastUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcast1ElementUint8, PowerBroadcast1ElementUint8Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerInt16, PowerInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcastInt16, PowerBroadcastInt16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcast1ElementInt16, PowerBroadcast1ElementInt16Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerInt32, PowerInt32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcastInt32, PowerBroadcastInt32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(PowerBroadcast1ElementInt32, PowerBroadcast1ElementInt32Test)
 
 // Batch Mat Mul
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchMatMul2DSimpleFloat32, BatchMatMul2DSimpleTest<DataType::Float32>);

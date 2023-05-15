@@ -871,6 +871,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                     tfLiteNode,
                                     nodeIndex,
                                     kTfLiteBuiltinPadv2);
+        case kTfLiteBuiltinPow:
+            return VisitElementwiseBinaryOperator(delegateData,
+                                                  tfLiteContext,
+                                                  tfLiteNode,
+                                                  nodeIndex,
+                                                  kTfLiteBuiltinPow);
         case kTfLiteBuiltinPrelu:
             return VisitPreluOperator(delegateData,
                                       tfLiteContext,
@@ -979,6 +985,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                  tfLiteNode,
                                                  nodeIndex,
                                                  armnn::UnaryOperation::Sqrt);
+        case kTfLiteBuiltinSquaredDifference:
+            return VisitElementwiseBinaryOperator(delegateData,
+                                                  tfLiteContext,
+                                                  tfLiteNode,
+                                                  nodeIndex,
+                                                  kTfLiteBuiltinSquaredDifference);
         case kTfLiteBuiltinSqueeze:
             return VisitSqueezeOperator(delegateData,
                                         tfLiteContext,

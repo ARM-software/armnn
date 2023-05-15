@@ -1164,6 +1164,52 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>FLOAT32
     </table>
 <tr>
+  <td rowspan="3">ElementwiseBinaryLayer
+  <td rowspan="3" style="width:200px;"> Layer to perform Power and Square Difference operations.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_POW
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    </table>
+<tr>
   <td rowspan="3">ElementwiseUnaryLayer
   <td rowspan="3" style="width:200px;"> Layer to perform Rsqrt - Exp - Neg - Log - Abs - Sin - Sqrt operations.
   <td rowspan="3">

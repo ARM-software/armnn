@@ -89,6 +89,12 @@ void ElementwiseBinarySimpleEndToEnd(const std::vector<BackendId>& backends,
         case armnn::BinaryOperation::Sub:
             expectedOutput = { -1, -3, -1, -1,  3, -7, 3, 3,  -5, 1, 1, 1,  2, 2, -6, 2 };
             break;
+        case armnn::BinaryOperation::SqDiff:
+            expectedOutput = { 1, 9, 1, 1,  9, 49, 9, 9, 25, 1, 1, 1,  4, 4, 36, 4  };
+            break;
+        case armnn::BinaryOperation::Power:
+            expectedOutput = { 1, 1, 1, 1, 25, 25, 25, 25,  9, 9, 9, 9,  16, 16, 16, 16 };
+            break;
         default:
             throw("Invalid Elementwise Binary operation");
     }

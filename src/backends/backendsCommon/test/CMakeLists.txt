@@ -153,6 +153,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/Pooling2dTestImpl.hpp
     layerTests/Pooling3dTestImpl.cpp
     layerTests/Pooling3dTestImpl.hpp
+    layerTests/PowerTestImpl.cpp
+    layerTests/PowerTestImpl.hpp
     layerTests/PreluTestImpl.hpp
     layerTests/QuantizeTestImpl.cpp
     layerTests/QuantizeTestImpl.hpp
@@ -186,6 +188,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/SplitterTestImpl.hpp
     layerTests/SqrtTestImpl.cpp
     layerTests/SqrtTestImpl.hpp
+    layerTests/SquaredDifferenceTestImpl.cpp
+    layerTests/SquaredDifferenceTestImpl.hpp
     layerTests/StackTestImpl.cpp
     layerTests/StackTestImpl.hpp
     layerTests/StridedSliceTestImpl.cpp

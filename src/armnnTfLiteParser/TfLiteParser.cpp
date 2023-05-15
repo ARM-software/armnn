@@ -797,6 +797,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_PACK]                    = &TfLiteParserImpl::ParsePack;
     m_ParserFunctions[tflite::BuiltinOperator_PAD]                     = &TfLiteParserImpl::ParsePad;
     m_ParserFunctions[tflite::BuiltinOperator_PADV2]                   = &TfLiteParserImpl::ParsePad;
+    m_ParserFunctions[tflite::BuiltinOperator_POW]                     = &TfLiteParserImpl::ParsePower;
     m_ParserFunctions[tflite::BuiltinOperator_PRELU]                   = &TfLiteParserImpl::ParsePrelu;
     m_ParserFunctions[tflite::BuiltinOperator_QUANTIZE]                = &TfLiteParserImpl::ParseQuantize;
     m_ParserFunctions[tflite::BuiltinOperator_RELU]                    = &TfLiteParserImpl::ParseRelu;
@@ -818,6 +819,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]                   = &TfLiteParserImpl::ParseSplit;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT_V]                 = &TfLiteParserImpl::ParseSplitV;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]                 = &TfLiteParserImpl::ParseSqueeze;
+    m_ParserFunctions[tflite::BuiltinOperator_SQUARED_DIFFERENCE]      = &TfLiteParserImpl::ParseSquaredDifference;
     m_ParserFunctions[tflite::BuiltinOperator_STRIDED_SLICE]           = &TfLiteParserImpl::ParseStridedSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SUB]                     = &TfLiteParserImpl::ParseSub;
     m_ParserFunctions[tflite::BuiltinOperator_SUM]                     = &TfLiteParserImpl::ParseSum;
@@ -4584,6 +4586,36 @@ void TfLiteParserImpl::ParseNeg(size_t subgraphIndex, size_t operatorIndex)
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Neg);
 }
 
+void TfLiteParserImpl::ParsePower(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = fmt::format("Power:{}:{}", subgraphIndex, operatorIndex);
+
+    TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
+    TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
+    CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
+
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Power, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
 void TfLiteParserImpl::ParseRsqrt(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Rsqrt);
@@ -4597,6 +4629,36 @@ void TfLiteParserImpl::ParseSin(size_t subgraphIndex, size_t operatorIndex)
 void TfLiteParserImpl::ParseSqrt(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Sqrt);
+}
+
+void TfLiteParserImpl::ParseSquaredDifference(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto layerName = fmt::format("SquaredDifference:{}:{}", subgraphIndex, operatorIndex);
+
+    TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
+    TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
+    CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
+
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::SqDiff, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
 void TfLiteParserImpl::ParseElementwiseUnary(size_t subgraphIndex, size_t operatorIndex, UnaryOperation unaryOperation)

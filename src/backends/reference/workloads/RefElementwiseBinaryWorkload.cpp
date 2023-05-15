@@ -11,6 +11,8 @@
 #include "RefWorkloadUtils.hpp"
 #include "Maximum.hpp"
 #include "Minimum.hpp"
+#include "SquaredDifference.hpp"
+#include "Power.hpp"
 
 #include <Profiling.hpp>
 
@@ -44,6 +46,8 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
     using MinimumFunction = ElementwiseBinaryFunction<armnn::minimum<DataType>>;
     using MulFunction     = ElementwiseBinaryFunction<std::multiplies<DataType>>;
     using SubFunction     = ElementwiseBinaryFunction<std::minus<DataType>>;
+    using SqDiffFunction  = ElementwiseBinaryFunction<armnn::squaredDifference<DataType>>;
+    using PowerFunction   = ElementwiseBinaryFunction<armnn::power<DataType>>;
 
     switch (operation)
     {
@@ -75,6 +79,16 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
         case BinaryOperation::Sub:
         {
             SubFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
+            break;
+        }
+        case BinaryOperation::SqDiff:
+        {
+            SqDiffFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
+            break;
+        }
+        case BinaryOperation::Power:
+        {
+            PowerFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
             break;
         }
         default:

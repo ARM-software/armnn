@@ -141,6 +141,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 
 - PADV2
 
+- POW
+
 - PRELU
 
 - QUANTIZE
@@ -182,6 +184,8 @@ The Arm NN SDK TensorFlow Lite delegate currently supports the following operato
 - SPLIT_V
 
 - SQRT
+
+- SQUARE_DIFFERENCE
 
 - SQUEEZE
 

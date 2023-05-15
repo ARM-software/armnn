@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -206,4 +206,67 @@ LayerTestResult<T, NumDims> ElementwiseTestHelper(
             tensorHandleFactory,
             quantScale,
             quantOffset);
+}
+
+// Elementwise Binary Operations
+template<std::size_t NumDims,
+        armnn::DataType ArmnnTypeInput,
+        armnn::DataType ArmnnTypeOutput,
+        typename TInput  = armnn::ResolveType<ArmnnTypeInput>,
+        typename TOutput = armnn::ResolveType<ArmnnTypeOutput>>
+LayerTestResult<TOutput, NumDims> ElementwiseTestHelper(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        armnn::BinaryOperation op,
+        const unsigned int shape0[NumDims],
+        std::vector<TInput> values0,
+        const unsigned int shape1[NumDims],
+        std::vector<TInput> values1,
+        const unsigned int outShape[NumDims],
+        std::vector<TOutput> outValues,
+        const armnn::ITensorHandleFactory& tensorHandleFactory) {
+
+    armnn::TensorInfo inputTensorInfo0{NumDims, shape0, ArmnnTypeInput};
+    armnn::TensorInfo inputTensorInfo1{NumDims, shape1, ArmnnTypeInput};
+    armnn::TensorInfo outputTensorInfo{NumDims, outShape, ArmnnTypeOutput};
+
+    std::vector<TOutput> actualOutput(outputTensorInfo.GetNumElements());
+
+    bool isBoolean = false;
+    if (ArmnnTypeOutput == armnn::DataType::Boolean)
+    {
+        isBoolean = true;
+    }
+
+    std::unique_ptr<armnn::ITensorHandle> inputHandle0 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo0);
+    std::unique_ptr<armnn::ITensorHandle> inputHandle1 = tensorHandleFactory.CreateTensorHandle(inputTensorInfo1);
+    std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputTensorInfo);
+
+    armnn::ElementwiseBinaryQueueDescriptor data;
+    data.m_Parameters.m_Operation = op;
+    armnn::WorkloadInfo info;
+
+    AddInputToWorkload(data, info, inputTensorInfo0, inputHandle0.get());
+    AddInputToWorkload(data, info, inputTensorInfo1, inputHandle1.get());
+    AddOutputToWorkload(data, info, outputTensorInfo, outputHandle.get());
+
+    auto workload = workloadFactory.CreateWorkload(armnn::LayerType::ElementwiseBinary, data, info);
+
+    inputHandle0->Allocate();
+    inputHandle1->Allocate();
+    outputHandle->Allocate();
+
+    CopyDataToITensorHandle(inputHandle0.get(), values0.data());
+    CopyDataToITensorHandle(inputHandle1.get(), values1.data());
+
+    workload->PostAllocationConfigure();
+    ExecuteWorkload(*workload, memoryManager);
+
+    CopyDataFromITensorHandle(actualOutput.data(), outputHandle.get());
+
+    return LayerTestResult<TOutput, NumDims>(actualOutput,
+                                             outValues,
+                                             outputHandle->GetShape(),
+                                             outputTensorInfo.GetShape(),
+                                             isBoolean);
 }

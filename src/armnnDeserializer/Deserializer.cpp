@@ -581,6 +581,10 @@ armnn::BinaryOperation ToElementwiseBinaryOperation(armnnSerializer::BinaryOpera
             return armnn::BinaryOperation::Mul;
         case armnnSerializer::BinaryOperation::BinaryOperation_Sub:
             return armnn::BinaryOperation::Sub;
+        case armnnSerializer::BinaryOperation::BinaryOperation_SqDiff:
+            return armnn::BinaryOperation::SqDiff;
+        case armnnSerializer::BinaryOperation::BinaryOperation_Power:
+            return armnn::BinaryOperation::Power;
         default:
             throw armnn::InvalidArgumentException("Binary operation unknown");
     }

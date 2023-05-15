@@ -174,6 +174,56 @@ TfLiteStatus ValidateMulOperator(DelegateData& delegateData,
     return isSupported ? kTfLiteOk : kTfLiteError;
 }
 
+TfLiteStatus ValidatePowerOperator(DelegateData& delegateData,
+                                   TfLiteContext* tfLiteContext,
+                                   const armnn::TensorInfo& inputInfo1,
+                                   const armnn::TensorInfo& inputInfo2,
+                                   const armnn::TensorInfo& outputInfo)
+{
+    bool isSupported = false;
+    auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
+    {
+        FORWARD_LAYER_SUPPORT_FUNC("POWER",
+                                   tfLiteContext,
+                                   IsElementwiseBinarySupported,
+                                   delegateData.m_Backends,
+                                   isSupported,
+                                   armnn::BackendId(),
+                                   inputInfo1,
+                                   inputInfo2,
+                                   outputTensorInfo,
+                                   armnn::BinaryOperation::Power);
+    };
+
+    validateFunc(outputInfo, isSupported);
+    return isSupported ? kTfLiteOk : kTfLiteError;
+}
+
+TfLiteStatus ValidateSquaredDifferenceOperator(DelegateData& delegateData,
+                                               TfLiteContext* tfLiteContext,
+                                               const armnn::TensorInfo& inputInfo1,
+                                               const armnn::TensorInfo& inputInfo2,
+                                               const armnn::TensorInfo& outputInfo)
+{
+    bool isSupported = false;
+    auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
+    {
+        FORWARD_LAYER_SUPPORT_FUNC("SQUAREDDIFFERENCE",
+                                   tfLiteContext,
+                                   IsElementwiseBinarySupported,
+                                   delegateData.m_Backends,
+                                   isSupported,
+                                   armnn::BackendId(),
+                                   inputInfo1,
+                                   inputInfo2,
+                                   outputTensorInfo,
+                                   armnn::BinaryOperation::SqDiff);
+    };
+
+    validateFunc(outputInfo, isSupported);
+    return isSupported ? kTfLiteOk : kTfLiteError;
+}
+
 TfLiteStatus ValidateSubOperator(DelegateData& delegateData,
                                  TfLiteContext* tfLiteContext,
                                  const armnn::TensorInfo& inputInfo1,
@@ -322,6 +372,18 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
                                            inputTensorInfo0,
                                            inputTensorInfo1,
                                            outputTensorInfo);
+            case kTfLiteBuiltinPow:
+                return ValidatePowerOperator(delegateData,
+                                             tfLiteContext,
+                                             inputTensorInfo0,
+                                             inputTensorInfo1,
+                                             outputTensorInfo);
+            case kTfLiteBuiltinSquaredDifference:
+                return ValidateSquaredDifferenceOperator(delegateData,
+                                                         tfLiteContext,
+                                                         inputTensorInfo0,
+                                                         inputTensorInfo1,
+                                                         outputTensorInfo);
             case kTfLiteBuiltinSub:
                 return ValidateSubOperator(delegateData,
                                            tfLiteContext,
@@ -363,6 +425,14 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
         case kTfLiteBuiltinMul:
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
                     armnn::BinaryOperation::Mul);
+            break;
+        case kTfLiteBuiltinPow:
+            elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
+                    armnn::BinaryOperation::Power);
+            break;
+        case kTfLiteBuiltinSquaredDifference:
+            elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
+                    armnn::BinaryOperation::SqDiff);
             break;
         case kTfLiteBuiltinSub:
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(

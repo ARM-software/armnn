@@ -1602,6 +1602,22 @@ TEST_CASE("RefMinimumEndToEndTestUint8")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Minimum);
 }
+TEST_CASE("RefPowerEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Power);
+}
+TEST_CASE("RefPowerEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Power);
+}
+TEST_CASE("RefSquaredDifferenceEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::SqDiff);
+}
+TEST_CASE("RefSquaredDifferenceEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::SqDiff);
+}
 #endif
 
 }

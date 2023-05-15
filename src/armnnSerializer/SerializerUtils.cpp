@@ -123,6 +123,10 @@ armnnSerializer::BinaryOperation GetFlatBufferBinaryOperation(armnn::BinaryOpera
             return armnnSerializer::BinaryOperation::BinaryOperation_Mul;
         case armnn::BinaryOperation::Sub:
             return armnnSerializer::BinaryOperation::BinaryOperation_Sub;
+        case armnn::BinaryOperation::SqDiff:
+            return armnnSerializer::BinaryOperation::BinaryOperation_SqDiff;
+        case armnn::BinaryOperation::Power:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Power;
         default:
             throw armnn::InvalidArgumentException("Elementwise Binary operation unknown");
     }

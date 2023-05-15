@@ -1012,7 +1012,8 @@ void SerializeElementwiseBinaryTest(armnn::BinaryOperation binaryOperation)
 TEST_CASE("SerializeElementwiseBinary")
 {
     using op = armnn::BinaryOperation;
-    std::initializer_list<op> allBinaryOperations = {op::Add, op::Div, op::Maximum, op::Minimum, op::Mul, op::Sub};
+    std::initializer_list<op> allBinaryOperations =
+            {op::Add, op::Div, op::Maximum, op::Minimum, op::Mul, op::Power, op::SqDiff, op::Sub};
 
     for (auto binaryOperation : allBinaryOperations)
     {

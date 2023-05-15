@@ -280,6 +280,8 @@ if(BUILD_UNIT_TESTS)
              test/Convolution3dTest.cpp
              test/ConvolutionTestHelper.hpp
              test/DepthwiseConvolution2dTest.cpp
+             test/ElementwiseBinaryTest.cpp
+             test/ElementwiseBinaryTestHelper.hpp
              test/ElementwiseUnaryTestHelper.hpp
              test/ElementwiseUnaryTest.cpp
              test/ExpandDimsTest.cpp

@@ -163,6 +163,7 @@ private:
     void ParsePack(size_t subgraphIndex, size_t operatorIndex);
     void ParsePad(size_t subgraphIndex, size_t operatorIndex);
     void ParsePool(size_t subgraphIndex, size_t operatorIndex, armnn::PoolingAlgorithm algorithm);
+    void ParsePower(size_t subgraphIndex, size_t operatorIndex);
     void ParsePrelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseQuantize(size_t subgraphIndex, size_t operatorIndex);
     void ParseReduce(size_t subgraphIndex, size_t operatorIndex, armnn::ReduceOperation reduceOperation);
@@ -186,6 +187,7 @@ private:
     void ParseSplit(size_t subgraphIndex, size_t operatorIndex);
     void ParseSplitV(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSquaredDifference(size_t subgraphIndex, size_t operatorIndex);
     void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);
     void ParseSum(size_t subgraphIndex, size_t operatorIndex);

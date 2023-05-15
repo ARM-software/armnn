@@ -84,6 +84,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/PadTestImpl.cpp \
     test/layerTests/Pooling2dTestImpl.cpp \
     test/layerTests/Pooling3dTestImpl.cpp \
+    test/layerTests/PowerTestImpl.cpp \
     test/layerTests/RankTestImpl.cpp \
     test/layerTests/ReductionTestImpl.cpp \
     test/layerTests/ReduceProdTestImpl.cpp \
@@ -92,6 +93,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/ResizeTestImpl.cpp \
     test/layerTests/RsqrtTestImpl.cpp \
     test/layerTests/SliceTestImpl.cpp \
+    test/layerTests/SquaredDifferenceTestImpl.cpp \
     test/layerTests/QuantizeTestImpl.cpp \
     test/layerTests/SinTestImpl.cpp \
     test/layerTests/ShapeTestImpl.cpp \

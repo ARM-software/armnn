@@ -14,6 +14,8 @@
 #include "Rsqrt.hpp"
 #include "Sin.hpp"
 #include "Sqrt.hpp"
+#include "Power.hpp"
+#include "SquaredDifference.hpp"
 
 
 namespace armnn
@@ -67,6 +69,8 @@ template struct armnn::ElementwiseBinaryFunction<std::multiplies<float>>;
 template struct armnn::ElementwiseBinaryFunction<std::divides<float>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::maximum<float>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::minimum<float>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::power<float>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::squaredDifference<float>>;
 
 template struct armnn::ElementwiseBinaryFunction<std::plus<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<std::minus<int32_t>>;
@@ -74,6 +78,8 @@ template struct armnn::ElementwiseBinaryFunction<std::multiplies<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<std::divides<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::maximum<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::minimum<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::power<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::squaredDifference<int32_t>>;
 
 // Comparison
 template struct armnn::ElementwiseBinaryFunction<std::equal_to<float>>;

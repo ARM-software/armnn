@@ -141,7 +141,9 @@ enum class BinaryOperation
     Maximum = 2,
     Minimum = 3,
     Mul     = 4,
-    Sub     = 5
+    Sub     = 5,
+    SqDiff  = 6,
+    Power   = 7
 };
 
 enum class PoolingAlgorithm

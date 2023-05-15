@@ -699,6 +699,50 @@ void SubFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
+void PowerFP32Test(std::vector<armnn::BackendId>& backends)
+{
+    std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
+    std::vector<int32_t> input1Shape { 1, 1, 2, 2 };
+    std::vector<int32_t> expectedOutputShape { 1, 1, 2, 2 };
+
+    std::vector<float> input0Values = { 1, 3, 3, -7 };
+    std::vector<float> input1Values = { 1, 1, 0, 2 };
+    std::vector<float> expectedOutputValues = { 1, 3, 1, 49 };
+
+    ElementwiseBinaryTest<float>(tflite::BuiltinOperator_POW,
+                                 tflite::ActivationFunctionType_NONE,
+                                 ::tflite::TensorType_FLOAT32,
+                                 backends,
+                                 input0Shape,
+                                 input1Shape,
+                                 expectedOutputShape,
+                                 input0Values,
+                                 input1Values,
+                                 expectedOutputValues);
+}
+
+void SqDiffFP32Test(std::vector<armnn::BackendId>& backends)
+{
+    std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
+    std::vector<int32_t> input1Shape { 1, 1, 2, 2 };
+    std::vector<int32_t> expectedOutputShape { 1, 1, 2, 2 };
+
+    std::vector<float> input0Values = { 1, 3, 3, -7 };
+    std::vector<float> input1Values = { 1, -1, 0, -2 };
+    std::vector<float> expectedOutputValues = { 0, 16, 9, 25 };
+
+    ElementwiseBinaryTest<float>(tflite::BuiltinOperator_SQUARED_DIFFERENCE,
+                                 tflite::ActivationFunctionType_NONE,
+                                 ::tflite::TensorType_FLOAT32,
+                                 backends,
+                                 input0Shape,
+                                 input1Shape,
+                                 expectedOutputShape,
+                                 input0Values,
+                                 input1Values,
+                                 expectedOutputValues);
+}
+
 void SubBroadcastTest(std::vector<armnn::BackendId>& backends)
 {
     std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
@@ -1129,6 +1173,18 @@ TEST_CASE ("SUB_UINT8_CpuRef_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     SubUint8Test(backends);
+}
+
+TEST_CASE ("SqDiffFP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    SqDiffFP32Test(backends);
+}
+
+TEST_CASE ("PowerFP32_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    PowerFP32Test(backends);
 }
 
 } // TEST_SUITE("ElementwiseBinary_CpuRefTests")

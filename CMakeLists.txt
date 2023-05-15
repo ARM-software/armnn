@@ -698,6 +698,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Pack.cpp
              src/armnnTfLiteParser/test/Pad.cpp
              src/armnnTfLiteParser/test/PadV2.cpp
+             src/armnnTfLiteParser/test/Power.cpp
              src/armnnTfLiteParser/test/Prelu.cpp
              src/armnnTfLiteParser/test/Reduce.cpp
              src/armnnTfLiteParser/test/Reshape.cpp
@@ -712,6 +713,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Split.cpp
              src/armnnTfLiteParser/test/SplitV.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp
+             src/armnnTfLiteParser/test/SquaredDifference.cpp
              src/armnnTfLiteParser/test/StridedSlice.cpp
              src/armnnTfLiteParser/test/Sub.cpp
              src/armnnTfLiteParser/test/Sum.cpp
@@ -792,6 +794,7 @@ if(BUILD_UNIT_TESTS)
             src/armnnDeserializer/test/DeserializeConvolution3d.cpp
             src/armnnDeserializer/test/DeserializeDepthToSpace.cpp
             src/armnnDeserializer/test/DeserializeDepthwiseConv2d.cpp
+            src/armnnDeserializer/test/DeserializeElementWiseBinary.cpp
             src/armnnDeserializer/test/DeserializeDivision.cpp
             src/armnnDeserializer/test/DeserializeFill.cpp
             src/armnnDeserializer/test/DeserializeFloor.cpp

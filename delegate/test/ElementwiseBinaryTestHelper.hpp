@@ -124,6 +124,18 @@ std::vector<char> CreateElementwiseBinaryTfLiteModel(tflite::BuiltinOperator bin
             operatorBuiltinOptions = CreateSubOptions(flatBufferBuilder, activationType).Union();
             break;
         }
+        case BuiltinOperator_POW:
+        {
+            operatorBuiltinOptionsType = BuiltinOptions_PowOptions;
+            operatorBuiltinOptions = CreatePowOptions(flatBufferBuilder).Union();
+            break;
+        }
+        case BuiltinOperator_SQUARED_DIFFERENCE:
+        {
+            operatorBuiltinOptionsType = BuiltinOptions_SquaredDifferenceOptions;
+            operatorBuiltinOptions = CreateSquaredDifferenceOptions(flatBufferBuilder).Union();
+            break;
+        }
         case BuiltinOperator_FLOOR_DIV:
         {
             operatorBuiltinOptionsType = tflite::BuiltinOptions_FloorDivOptions;

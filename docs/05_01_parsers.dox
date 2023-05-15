@@ -162,6 +162,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - PACK
 - PAD
 - PADV2
+- POW
 - PRELU
 - QUANTIZE
 - RELU
@@ -183,6 +184,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - SPLIT_V
 - SQUEEZE
 - SQRT
+- SQUARE_DIFFERENCE
 - STRIDED_SLICE
 - SUB
 - SUM

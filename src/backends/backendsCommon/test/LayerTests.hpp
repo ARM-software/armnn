@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -51,6 +51,7 @@
 #include <backendsCommon/test/layerTests/PermuteTestImpl.hpp>
 #include <backendsCommon/test/layerTests/Pooling2dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/Pooling3dTestImpl.hpp>
+#include <backendsCommon/test/layerTests/PowerTestImpl.hpp>
 #include <backendsCommon/test/layerTests/PreluTestImpl.hpp>
 #include <backendsCommon/test/layerTests/QuantizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/RankTestImpl.hpp>
@@ -68,6 +69,7 @@
 #include <backendsCommon/test/layerTests/SpaceToDepthTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SplitterTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SqrtTestImpl.hpp>
+#include <backendsCommon/test/layerTests/SquaredDifferenceTestImpl.hpp>
 #include <backendsCommon/test/layerTests/StackTestImpl.hpp>
 #include <backendsCommon/test/layerTests/StridedSliceTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SubtractionTestImpl.hpp>

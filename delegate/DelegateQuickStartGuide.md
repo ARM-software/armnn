@@ -36,11 +36,11 @@ print(output_data)
 
 # Prepare the environment
 Pre-requisites:
- * Dynamically build Arm NN Delegate library or download the Arm NN binaries
+ * Dynamically build Arm NN Delegate library or download the Arm NN binaries (built with a particular SHA of Tensorflow 2.12.0, which is 6f692f73cb2043b4a0b0446539cd8c15b3dd9220)
  * python3 (Depends on TfLite version)
  * virtualenv
  * numpy (Depends on TfLite version)
- * tflite_runtime (>=2.5, depends on Arm NN Delegate)
+ * tflite_runtime (2.12 currently available)
 
 If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md). Otherwise, you can download the binaries [here](https://github.com/ARM-software/armnn/releases/). Set the following environment variable to the location of the .so binary files:
 
@@ -50,7 +50,7 @@ export LD_LIBRARY_PATH=<path_to_so_binary_files>
 
 We recommend creating a virtual environment for this tutorial. For the following code to work python3 is needed. Please
 also check the documentation of the TfLite version you want to use. There might be additional prerequisites for the python
-version. We will use Tensorflow Lite 2.5.0 for this guide.
+version. We will use Tensorflow Lite 2.12.0 for this guide.
 ```bash
 # Install python3 (We ended up with python3.5.3) and virtualenv
 sudo apt-get install python3-pip
@@ -74,10 +74,10 @@ mobile and embedded devices.
 The TfLite [website](https://www.tensorflow.org/lite/guide/python) shows you two methods to download the `tflite_runtime`  package. 
 In our experience, the use of the pip command works for most systems including debian. However, if you're using an older version of Tensorflow, 
 you may need to build the pip package from source. You can find more information [here](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/lite/tools/pip_package/README.md).
-But in our case, with Tensorflow Lite 2.5.0, we can install through:
+But in our case, with Tensorflow Lite 2.12.0, we can install through:
 
 ```
-pip3 install --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime==2.5.0
+pip3 install --extra-index-url https://google-coral.github.io/py-repo/ tflite_runtime==2.12.0
 ```
 
 Your virtual environment is now all setup. Copy the final python script into a python file e.g. 
@@ -91,7 +91,7 @@ python ExternalDelegatePythonTutorial.py
 ```
 The output should look similar to this:
 ```bash
-Info: Arm NN v28.0.0
+Info: Arm NN v32.1.0
 
 Info: Initialization time: 0.56 ms
 

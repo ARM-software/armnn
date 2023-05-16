@@ -110,7 +110,7 @@ unsigned int ComputeDepthwiseConv2dDepthMultiplier(armnn::DataLayout layout,
 
 /// Utility function used to setup an arm_compute::PadStrideInfo object from an ArmNN layer descriptor.
 template <typename Descriptor>
-arm_compute::PadStrideInfo BuildArmComputePadStrideInfo(const Descriptor &descriptor)
+arm_compute::PadStrideInfo BuildArmComputePadStrideInfo(const Descriptor& descriptor)
 {
     return arm_compute::PadStrideInfo(descriptor.m_StrideX,
                                       descriptor.m_StrideY,

@@ -57,21 +57,19 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
     arm_compute::TensorInfo* optionalAclBiasesInfo = nullptr;
     if (descriptor.m_BiasEnabled)
     {
-        ARMNN_ASSERT(biases.has_value());
-        // Same for bias as weights. We don't currently support non const.
-        if (!biases.value().IsConstant())
+        if(!biases.has_value())
         {
             return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                       "ArmNN NeonDepthwiseConv2dWorkload does not support non constant bias."};
+                                       "ArmNN NeonDepthwiseConvolutionWorkload has empty bias value."};
         }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 
-    arm_compute::PadStrideInfo aclPadStrideInfo = BuildArmComputePadStrideInfo(descriptor);
-    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
-        descriptor.m_DilationX, descriptor.m_DilationY);
+    const arm_compute::PadStrideInfo aclPadStrideInfo = BuildArmComputePadStrideInfo(descriptor);
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
+                                                                      descriptor.m_DilationY);
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertActivationDescriptorToAclActivationLayerInfo(
         activationDescriptor);
@@ -94,28 +92,24 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     arm_compute::ITensor& input = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ITensor& output = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     arm_compute::ITensor& weights = PolymorphicDowncast<IAclTensorHandle*>(m_Data.m_Inputs[1])->GetTensor();
-    arm_compute::ITensor* biasesPtr = nullptr;
     weights.info()->set_are_values_constant(info.m_InputTensorInfos[1].IsConstant());
+    arm_compute::ITensor* biasesPtr = nullptr;
     if (m_Data.m_Parameters.m_BiasEnabled)
     {
         biasesPtr = &PolymorphicDowncast<IAclTensorHandle *>(m_Data.m_Inputs[2])->GetTensor();
         biasesPtr->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
-        // We do not support dynamic bias
-        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
-    arm_compute::ITensorInfo* weightsInfo = weights.info();
-    arm_compute::ITensorInfo* inputInfo = input.info();
-    auto weightsShape = weightsInfo->tensor_shape();
-    auto inputShape = inputInfo->tensor_shape();
+    arm_compute::TensorShape weightsShape = weights.info()->tensor_shape();
+    arm_compute::TensorShape inputShape = input.info()->tensor_shape();
 
     // The PermuteDepthwiseConv2dWeights backend optimization has been performed,
     // converting weights to have the same data layout as input.
     unsigned int depthMultiplier =
         ComputeDepthwiseConv2dDepthMultiplier(m_Data.m_Parameters.m_DataLayout, weightsShape, inputShape);
 
-    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(
-        m_Data.m_Parameters.m_DilationX, m_Data.m_Parameters.m_DilationY);
+    const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(m_Data.m_Parameters.m_DilationX,
+                                                                      m_Data.m_Parameters.m_DilationY);
 
     uint32_t numInputs = m_Data.m_Parameters.m_BiasEnabled ? 3: 2;
     m_Data.ValidateInputsOutputs("NeonDepthwiseConvolutionWorkload", numInputs, 1);
@@ -125,7 +119,7 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     weights.info()->set_data_layout(aclDataLayout);
     output.info()->set_data_layout(aclDataLayout);
 
-    arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
+    const arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 

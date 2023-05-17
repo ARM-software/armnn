@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,6 +21,7 @@
 #include "ClDepthwiseConvolutionWorkload.hpp"
 #include "ClDequantizeWorkload.hpp"
 #include "ClDivisionWorkload.hpp"
+#include "ClElementwiseBinaryWorkload.hpp"
 #include "ClExpWorkload.hpp"
 #include "ClFillWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"

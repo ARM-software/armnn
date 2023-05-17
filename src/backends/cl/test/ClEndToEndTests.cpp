@@ -13,6 +13,7 @@
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
@@ -46,6 +47,7 @@ TEST_CASE("ClRsqrtEndToEndTestFloat32")
                                                              UnaryOperation::Rsqrt);
 }
 
+// ElementwiseBinary
 // Addition
 TEST_CASE("ClAdditionEndToEndFloat32Test")
 {
@@ -55,6 +57,23 @@ TEST_CASE("ClAdditionEndToEndFloat32Test")
 TEST_CASE("ClAdditionEndToEndUint8Test")
 {
     AdditionEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends);
+}
+
+// Power
+TEST_CASE("RefPowerEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Power);
+}
+
+// SqDiff
+TEST_CASE("RefSquaredDifferenceEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::SqDiff);
+}
+
+TEST_CASE("RefSquaredDifferenceEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends, BinaryOperation::SqDiff);
 }
 
 // Batch Mat Mul

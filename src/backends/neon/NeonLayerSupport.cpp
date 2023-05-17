@@ -39,6 +39,7 @@
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
+#include "workloads/NeonElementwiseBinaryWorkload.hpp"
 #include "workloads/NeonExpWorkload.hpp"
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
@@ -386,6 +387,15 @@ bool IsLayerTypeSupported(const LayerType& type,
                                                    infos[0],
                                                    infos[1],
                                                    infos[2],
+                                                   nullptr);
+                case BinaryOperation::Power:
+                case BinaryOperation::SqDiff:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonElementwiseBinaryWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   desc,
                                                    nullptr);
                 case BinaryOperation::Sub:
                     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonSubtractionWorkloadValidate,

@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -44,6 +44,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClDequantizeWorkload.hpp
     ClDivisionWorkload.cpp
     ClDivisionWorkload.hpp
+    ClElementwiseBinaryWorkload.cpp
+    ClElementwiseBinaryWorkload.hpp
     ClExpWorkload.cpp
     ClExpWorkload.hpp
     ClFillWorkload.cpp

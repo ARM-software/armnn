@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017,2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -44,6 +44,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonDequantizeWorkload.hpp
     NeonDetectionPostProcessWorkload.cpp
     NeonDetectionPostProcessWorkload.hpp
+    NeonElementwiseBinaryWorkload.cpp
+    NeonElementwiseBinaryWorkload.hpp
     NeonExpWorkload.cpp
     NeonExpWorkload.hpp
     NeonFillWorkload.cpp

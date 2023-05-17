@@ -334,6 +334,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
                     multiplicationQueueDescriptor.m_Outputs = descriptor.m_Outputs;
                     return std::make_unique<NeonMultiplicationWorkload>(multiplicationQueueDescriptor, info);
                 }
+                case BinaryOperation::Power:
+                case BinaryOperation::SqDiff:
+                {
+                    return std::make_unique<NeonElementwiseBinaryWorkload>(*elementwiseBinaryQueueDescriptor, info);
+                }
                 case BinaryOperation::Sub:
                 {
                     SubtractionQueueDescriptor subtractionQueueDescriptor;

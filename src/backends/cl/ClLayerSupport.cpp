@@ -37,6 +37,7 @@
 #include "workloads/ClDepthwiseConvolutionWorkload.hpp"
 #include "workloads/ClDequantizeWorkload.hpp"
 #include "workloads/ClDivisionWorkload.hpp"
+#include "workloads/ClElementwiseBinaryWorkload.hpp"
 #include "workloads/ClExpWorkload.hpp"
 #include "workloads/ClFillWorkload.hpp"
 #include "workloads/ClFloorFloatWorkload.hpp"
@@ -389,6 +390,15 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
                                                    infos[0],
                                                    infos[1],
                                                    infos[2],
+                                                   nullptr);
+                case BinaryOperation::Power:
+                case BinaryOperation::SqDiff:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClElementwiseBinaryValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   desc,
                                                    nullptr);
                 case BinaryOperation::Sub:
                     FORWARD_WORKLOAD_VALIDATE_FUNC(ClSubtractionValidate,

@@ -14,6 +14,7 @@
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
@@ -133,6 +134,8 @@ TEST_CASE("NeonGreaterBroadcastEndToEndUint8Test")
                                                                   expectedOutput);
 }
 
+// ElementwiseBinary
+// Add
 TEST_CASE("NeonAdditionEndToEndFloat32Test")
 {
     AdditionEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
@@ -143,6 +146,24 @@ TEST_CASE("NeonAdditionEndToEndUint8Test")
     AdditionEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
+// Power
+TEST_CASE("RefPowerEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Power);
+}
+
+// SqDiff
+TEST_CASE("RefSquaredDifferenceEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::SqDiff);
+}
+
+TEST_CASE("RefSquaredDifferenceEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, BinaryOperation::SqDiff);
+}
+
+// Batch Mat Mul
 TEST_CASE("NeonBatchMatMulEndToEndFloat32Test")
 {
     BatchMatMulEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
@@ -153,6 +174,7 @@ TEST_CASE("NeonBatchMatMulEndToEndInt8Test")
     BatchMatMulEndToEnd<armnn::DataType::QAsymmS8>(neonDefaultBackends);
 }
 
+// Concat
 TEST_CASE("NeonConcatEndToEndDim0Test")
 {
     ConcatDim0EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);

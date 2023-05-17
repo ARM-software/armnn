@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 ARM Ltd and Contributors. All rights reserved.
+# Copyright © 2017,2023 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -46,6 +46,7 @@ BACKEND_SOURCES := \
         workloads/ClDepthwiseConvolutionWorkload.cpp \
         workloads/ClDequantizeWorkload.cpp \
         workloads/ClDivisionWorkload.cpp \
+        workloads/ClElementwiseBinaryWorkload.cpp \
         workloads/ClExpWorkload.cpp \
         workloads/ClFillWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \

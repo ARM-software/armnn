@@ -459,6 +459,13 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
                                                                       info,
                                                                       m_CLCompileContext);
                 }
+                case BinaryOperation::Power:
+                case BinaryOperation::SqDiff:
+                {
+                    return std::make_unique<ClElementwiseBinaryWorkload>(*elementwiseBinaryQueueDescriptor,
+                                                                         info,
+                                                                         m_CLCompileContext);
+                }
                 case BinaryOperation::Sub:
                 {
                     SubtractionQueueDescriptor subtractionQueueDescriptor;

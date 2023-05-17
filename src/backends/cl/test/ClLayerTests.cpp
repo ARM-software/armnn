@@ -913,6 +913,48 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(MultiplicationBroadcast1DVectorUint8,
                                  MultiplicationBroadcast1DVectorUint8Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Multiplication5d, ClContextControlFixture, Multiplication5dTest)
 
+// SquaredDifference
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleSquaredDifference, ClContextControlFixture, SquaredDifferenceTest)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcast1Element,
+                                 ClContextControlFixture,
+                                 SquaredDiffBroadcast1ElementTest)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcast, ClContextControlFixture, SquaredDiffBroadcastTest)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDifferenceFloat16, ClContextControlFixture, SquaredDifferenceFloat16Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcast1ElementFloat16,
+                                 ClContextControlFixture,
+                                 SquaredDiffBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcastFloat16, ClContextControlFixture, SquaredDiffBroadcastFloat16Test)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDifferenceUint8, ClContextControlFixture, SquaredDifferenceUint8Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcastUint8, ClContextControlFixture, SquaredDiffBroadcastUint8Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcast1ElementUint8,
+                                 ClContextControlFixture,
+                                 SquaredDiffBroadcast1ElementUint8Test)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDifferenceInt16, ClContextControlFixture, SquaredDifferenceInt16Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcastInt16, ClContextControlFixture, SquaredDiffBroadcastInt16Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcast1ElementInt16,
+                                 ClContextControlFixture,
+                                 SquaredDiffBroadcast1ElementInt16Test)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDifferenceInt32, ClContextControlFixture, SquaredDifferenceInt32Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcastInt32, ClContextControlFixture, SquaredDiffBroadcastInt32Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SquaredDiffBroadcast1ElementInt32,
+                                 ClContextControlFixture,
+                                 SquaredDiffBroadcast1ElementInt32Test)
+
+// Power
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimplePower, ClContextControlFixture, PowerTest)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PowerBroadcast1Element, ClContextControlFixture, PowerBroadcast1ElementTest)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PowerBroadcast, ClContextControlFixture, PowerBroadcastTest)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PowerFloat16, ClContextControlFixture, PowerFloat16Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PowerBroadcast1ElementFloat16,
+                                 ClContextControlFixture,
+                                 PowerBroadcast1ElementFloat16Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(PowerBroadcastFloat16, ClContextControlFixture, PowerBroadcastFloat16Test)
+
 // Batch Norm
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchNormFloat32, ClContextControlFixture, BatchNormFloat32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchNormFloat32Nhwc, ClContextControlFixture, BatchNormFloat32NhwcTest)

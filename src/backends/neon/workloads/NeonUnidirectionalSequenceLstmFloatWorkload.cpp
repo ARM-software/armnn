@@ -517,7 +517,7 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
                                                     const LstmInputParamsInfo& paramsInfo)
 {
     TensorShape inputLayerShape = input.GetShape();
-    TensorShape outputLayerShape = outputStateIn.GetShape();
+    TensorShape outputLayerShape = output.GetShape();
 
     unsigned int maxTime = descriptor.m_TimeMajor ? inputLayerShape[0] : inputLayerShape[1];
     unsigned int batchSize = descriptor.m_TimeMajor ? inputLayerShape[1] : inputLayerShape[0];

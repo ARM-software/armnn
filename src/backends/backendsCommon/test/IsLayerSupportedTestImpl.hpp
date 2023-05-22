@@ -819,16 +819,16 @@ bool IsLayerSupportedTest(FactoryType *factory, Tag<Type>)
     armnn::TensorInfo output = MakeDummyTensorInfo<DataType>();
     previousLayer.m_Layer->GetOutputSlot(0).SetTensorInfo(output);
     // Connect all outputs of the previous layer to inputs of tested layer.
-    for (unsigned int i = 0; i < numIn; i++)
+    for (unsigned int i = 0; i < numIn; ++i)
     {
         armnn::IOutputSlot& previousLayerOutputSlot = previousLayer.m_Layer->GetOutputSlot(0);
         armnn::IInputSlot& layerInputSlot = layer.m_Layer->GetInputSlot(i);
         previousLayerOutputSlot.Connect(layerInputSlot);
     }
     // Set outputs of tested layer to a dummy tensor.
-    for (unsigned int i = 0; i < numOut; i++)
+    for (unsigned int i = 0; i < numOut; ++i)
     {
-        layer.m_Layer->GetOutputSlot(0).SetTensorInfo(output);
+        layer.m_Layer->GetOutputSlot(i).SetTensorInfo(output);
     }
 
     std::string layerName = LayerPolicy::NameStr;

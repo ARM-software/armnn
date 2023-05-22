@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="352c07ddd49842b5c3a8e5a2b5a90832bfb70091" #9564: Implement OpenCL MatMul heuristic for Arm® Mali™-G710
+DEFAULT_CLFRAMEWORKREVISION="1355ec4797cd77060af51c8b27d99ea1d25c08da" #9673: Printing out the rerun command of each failed testcase
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

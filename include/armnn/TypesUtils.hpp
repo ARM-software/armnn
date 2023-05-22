@@ -81,6 +81,8 @@ constexpr char const* GetBinaryOperationAsCString(BinaryOperation operation)
         case BinaryOperation::Maximum:  return "Maximum";
         case BinaryOperation::Minimum:  return "Minimum";
         case BinaryOperation::Mul:      return "Mul";
+        case BinaryOperation::Power:    return "Power";
+        case BinaryOperation::SqDiff:   return "SqDiff";
         case BinaryOperation::Sub:      return "Sub";
         default:                        return "Unknown";
     }
@@ -91,6 +93,7 @@ constexpr char const* GetUnaryOperationAsCString(UnaryOperation operation)
     switch (operation)
     {
         case UnaryOperation::Abs:        return "Abs";
+        case UnaryOperation::Ceil:       return "Ceil";
         case UnaryOperation::Exp:        return "Exp";
         case UnaryOperation::Sqrt:       return "Sqrt";
         case UnaryOperation::Rsqrt:      return "Rsqrt";

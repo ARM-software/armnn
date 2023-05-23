@@ -2444,8 +2444,10 @@ void TfLiteParserImpl::ParseSub(size_t subgraphIndex, size_t operatorIndex)
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-
-    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    if (options)
+    {
+        layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    }
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -2476,7 +2478,10 @@ void TfLiteParserImpl::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    if (options)
+    {
+        layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    }
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -2535,7 +2540,10 @@ void TfLiteParserImpl::ParseAdd(size_t subgraphIndex, size_t operatorIndex)
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    if (options)
+    {
+        layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    }
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
@@ -2566,7 +2574,10 @@ void TfLiteParserImpl::ParseMul(size_t subgraphIndex, size_t operatorIndex)
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
-    layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    if (options)
+    {
+        layer = AddFusedActivationLayer(layer, 0, options->fused_activation_function);
+    }
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});

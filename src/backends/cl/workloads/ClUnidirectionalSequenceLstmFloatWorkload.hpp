@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -87,9 +87,9 @@ arm_compute::Status
 ClUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
                                                   const TensorInfo& outputStateIn,
                                                   const TensorInfo& cellStateIn,
+                                                  const TensorInfo& outputStateOut,
+                                                  const TensorInfo& cellStateOut,
                                                   const TensorInfo& output,
-                                                  const Optional<TensorInfo>& hiddenStateOutput,
-                                                  const Optional<TensorInfo>& cellStateOutput,
                                                   const UnidirectionalSequenceLstmDescriptor& descriptor,
                                                   const LstmInputParamsInfo& paramsInfo);
 

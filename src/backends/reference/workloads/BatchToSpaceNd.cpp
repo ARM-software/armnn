@@ -1,85 +1,105 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "BatchToSpaceNd.hpp"
 
-#include "RefWorkloadUtils.hpp"
-
-#include <armnn/Types.hpp>
-
-#include <armnn/utility/Assert.hpp>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 using namespace armnnUtils;
 
 namespace armnn
 {
 
-inline unsigned int Offset(const TensorShape& shape, unsigned int batch, unsigned int height, unsigned int width,
-        unsigned int channels, const DataLayoutIndexed& dataLayout)
+unsigned int Offset(const TensorShape& shape,
+                    unsigned int batch,
+                    unsigned int height,
+                    unsigned int width,
+                    unsigned int channels,
+                    const DataLayoutIndexed& dataLayout)
 {
-    if (dataLayout.GetDataLayout() == DataLayout::NHWC)
+    // 3D Tensors
+    unsigned int channelDimension3D = dataLayout.GetDataLayout() == DataLayout::NCHW ? 1 : 2;
+    if (shape.GetNumDimensions() == 3)
     {
-        return ((batch * shape[dataLayout.GetHeightIndex()] + height) * shape[dataLayout.GetWidthIndex()] + width) *
-               shape[dataLayout.GetChannelsIndex()] + channels;
+        return (batch * shape[dataLayout.GetHeightIndex()] + height) * shape[channelDimension3D] + channels;
+    }
+    // 4D Tensors
+    else if (shape.GetNumDimensions() == 4)
+    {
+        if (dataLayout.GetDataLayout() == DataLayout::NHWC)
+        {
+            return ((batch * shape[dataLayout.GetHeightIndex()] + height) *
+                    shape[dataLayout.GetWidthIndex()] + width) *
+                    shape[dataLayout.GetChannelsIndex()] + channels;
+        }
+        else
+        {
+            return ((batch * shape[dataLayout.GetChannelsIndex()] + channels) *
+                    shape[dataLayout.GetHeightIndex()] + height) *
+                    shape[dataLayout.GetWidthIndex()] + width;
+        }
     }
     else
     {
-        return ((batch * shape[dataLayout.GetChannelsIndex()] + channels) *
-               shape[dataLayout.GetHeightIndex()] + height) *
-               shape[dataLayout.GetWidthIndex()] + width;
+        throw InvalidArgumentException("Tensor rank must be either 3 or 4", CHECK_LOCATION());
     }
 }
 
-void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
-                    const TensorInfo& inputTensorInfo,
-                    const TensorInfo& outputTensorInfo,
-                    const std::vector<unsigned int>& blockShape,
-                    const std::vector<std::pair<unsigned int, unsigned int>>& cropsData,
-                    Decoder<float>& inputDecoder,
-                    Encoder<float>& outputEncoder)
+void BatchToSpaceNd(const TensorInfo& inputInfo,
+                    const TensorInfo& outputInfo,
+                    const BatchToSpaceNdDescriptor& params,
+                    Decoder<float>& inputData,
+                    Encoder<float>& outputData)
 {
-    TensorShape inputShape = inputTensorInfo.GetShape();
+    unsigned int rank = inputInfo.GetNumDimensions();
+    if (rank != 3 && rank != 4 )
+    {
+        throw InvalidArgumentException("Tensor rank must be either 3 or 4, but it is " + std::to_string(rank),
+                                       CHECK_LOCATION());
+    }
 
-    ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Expected Input with 4 Dimensions");
+    DataLayoutIndexed dataLayout = params.m_DataLayout;
+    unsigned int channelDimension3D = params.m_DataLayout == DataLayout::NCHW ? 1 : 2;
 
-    TensorShape outputShape = outputTensorInfo.GetShape();
+    TensorShape inputShape = inputInfo.GetShape();
+    TensorShape outputShape = outputInfo.GetShape();
 
-    ARMNN_ASSERT_MSG(outputShape.GetNumDimensions() == 4, "Expected Output with 4 Dimensions");
-
-    const unsigned int inputBatchSize = inputShape[0];
-    const unsigned int channels = inputShape[dataLayout.GetChannelsIndex()];
-
+    const unsigned int inputBatchSize  = inputShape[0];
     const unsigned int outputBatchSize = outputShape[0];
+
+    const unsigned int channels = (rank == 3) ? inputShape[channelDimension3D]
+                                              : inputShape[dataLayout.GetChannelsIndex()];
+
+    const unsigned int inputHeight  = inputShape[dataLayout.GetHeightIndex()];
+    const unsigned int inputWidth   = (rank == 3) ? 1 : inputShape[dataLayout.GetWidthIndex()];
     const unsigned int outputHeight = outputShape[dataLayout.GetHeightIndex()];
-    const unsigned int outputWidth = outputShape[dataLayout.GetWidthIndex()];
+    const unsigned int outputWidth  = (rank == 3) ? 1 : outputShape[dataLayout.GetWidthIndex()];
 
-    ARMNN_ASSERT_MSG(blockShape.size() > 0, "BlockShape must contain 1 or more entries");
+    const unsigned int blockHeight = params.m_BlockShape[0];
+    const unsigned int blockWidth  = (rank == 3) ? 1 : params.m_BlockShape[1];
 
-    const unsigned int blockShapeHeight = blockShape[0];
-    const unsigned int blockShapeWidth = blockShape[1];
-
-    ARMNN_ASSERT_MSG(cropsData.size() > 0, "Crops must contain 1 or more entries");
-
-    const unsigned int cropsTop = cropsData[0].first;
-    const unsigned int cropsLeft = cropsData[1].first;
+    const unsigned int cropsTop  = params.m_Crops[0].first;
+    const unsigned int cropsLeft = (rank == 3) ? 0 : params.m_Crops[1].first;
 
     for (unsigned int inBatch = 0; inBatch < inputBatchSize; ++inBatch)
     {
         const unsigned int outBatch = inBatch % outputBatchSize;
         const unsigned int spatialOffset = inBatch / outputBatchSize;
 
-        for (unsigned int inH = 0; inH < inputTensorInfo.GetShape()[dataLayout.GetHeightIndex()]; ++inH) {
-            const unsigned int outH = inH * blockShapeHeight + spatialOffset / blockShapeWidth - cropsTop;
+        for (unsigned int inH = 0; inH < inputHeight; ++inH)
+        {
+            const unsigned int outH = inH * blockHeight + spatialOffset / blockWidth - cropsTop;
 
             if (outH >= outputHeight)
             {
                 continue;
             }
 
-            for (unsigned int inW = 0; inW < inputTensorInfo.GetShape()[dataLayout.GetWidthIndex()]; ++inW) {
-                const unsigned int outW = inW * blockShapeWidth + spatialOffset % blockShapeWidth - cropsLeft;
+            for (unsigned int inW = 0; inW < inputWidth; ++inW)
+            {
+                const unsigned int outW = inW * blockWidth + spatialOffset % blockWidth - cropsLeft;
 
                 if (outW >= outputWidth)
                 {
@@ -91,9 +111,9 @@ void BatchToSpaceNd(const DataLayoutIndexed& dataLayout,
                     unsigned int outOffset = Offset(outputShape, outBatch, outH, outW, c, dataLayout);
                     unsigned int inOffset = Offset(inputShape, inBatch, inH, inW, c, dataLayout);
 
-                    outputEncoder[outOffset];
-                    inputDecoder[inOffset];
-                    outputEncoder.Set(inputDecoder.Get());
+                    outputData[outOffset];
+                    inputData[inOffset];
+                    outputData.Set(inputData.Get());
                 }
             }
         }

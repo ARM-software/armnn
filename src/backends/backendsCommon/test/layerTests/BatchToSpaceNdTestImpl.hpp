@@ -279,6 +279,33 @@ LayerTestResult<T, 4> BatchToSpaceNdNhwcTest7(
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> BatchToSpaceNdNhwcTest8(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    const unsigned int inputShape[] = {4, 2, 1};
+    const unsigned int outputShape[] = {1, 8, 1};
+
+    std::vector<float> input({
+                                  1.0f,  2.0f,  3.0f,  4.0f,
+                                  5.0f,  6.0f,  7.0f,  8.0f
+                             });
+
+    std::vector<float> expectedOutput({
+                                           1.0f,  3.0f,  5.0f,  7.0f,
+                                           2.0f,  4.0f,  6.0f,  8.0f
+                                      });
+
+    std::vector<unsigned int> blockShape {4};
+    std::vector<std::pair<unsigned int, unsigned int>> crops = {{0, 0}};
+
+    return BatchToSpaceNdHelper<ArmnnType, 3, 3>(workloadFactory, memoryManager, tensorHandleFactory,
+                                                 armnn::DataLayout::NHWC, inputShape, input, blockShape,
+                                                 crops, outputShape, expectedOutput);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> BatchToSpaceNdNchwTest1(
         armnn::IWorkloadFactory &workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

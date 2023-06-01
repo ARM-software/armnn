@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,7 +7,6 @@
 #include "SpaceToBatchNd.hpp"
 
 #include "RefWorkloadUtils.hpp"
-#include <ResolveType.hpp>
 
 namespace armnn
 {
@@ -28,12 +27,12 @@ void RefSpaceToBatchNdWorkload::Execute(std::vector<ITensorHandle*> inputs, std:
     ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefSpaceToBatchNdWorkload_Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
-    std::unique_ptr<Decoder<float>> decoder = MakeDecoder<float>(inputInfo, inputs[0]->Map());
-
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
-    std::unique_ptr<Encoder<float>> encoder = MakeEncoder<float>(outputInfo, outputs[0]->Map());
 
-    SpaceToBatchNd(inputInfo, outputInfo, m_Data.m_Parameters, *decoder, *encoder);
+    std::unique_ptr<Decoder<float>> inputDecoder = MakeDecoder<float>(inputInfo, inputs[0]->Map());
+    std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(outputInfo, outputs[0]->Map());
+
+    SpaceToBatchNd(inputInfo, outputInfo, m_Data.m_Parameters, *inputDecoder, *outputEncoder);
 }
 
 } //namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2019,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,7 +10,6 @@
 #include "Encoders.hpp"
 
 #include <armnn/Descriptors.hpp>
-#include "armnn/Tensor.hpp"
 
 namespace armnn
 {

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2019,2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -9,21 +9,15 @@
 #include "Decoders.hpp"
 #include "Encoders.hpp"
 
-#include <armnn/Types.hpp>
-
-#include <armnnUtils/DataLayoutIndexed.hpp>
-
-#include <armnn/backends/Workload.hpp>
-#include <armnn/backends/WorkloadData.hpp>
+#include <armnn/Descriptors.hpp>
 
 namespace armnn
 {
 
-void BatchToSpaceNd(const armnnUtils::DataLayoutIndexed& dataLayout,
-                    const TensorInfo& inputTensorInfo,
-                    const TensorInfo& outputTensorInfo,
-                    const std::vector<unsigned int>& blockShape,
-                    const std::vector<std::pair<unsigned int, unsigned int>>& cropsData,
-                    Decoder<float>& inputDecoder,
-                    Encoder<float>& outputEncoder);
+void BatchToSpaceNd(const TensorInfo& inputInfo,
+                    const TensorInfo& outputInfo,
+                    const BatchToSpaceNdDescriptor& params,
+                    Decoder<float>& inputData,
+                    Encoder<float>& outputData);
+
 } // namespace armnn

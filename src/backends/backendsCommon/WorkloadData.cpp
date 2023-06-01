@@ -1815,47 +1815,66 @@ void SpaceToBatchNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
 
-    ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
-    ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
-
-    if (m_Parameters.m_BlockShape.size() != 2)
-    {
-        throw InvalidArgumentException(descriptorName + ": Block Shape must contain 2 spatial dimensions.");
-    }
-
     if (m_Parameters.m_BlockShape.size() != m_Parameters.m_PadList.size())
     {
         throw InvalidArgumentException(descriptorName + ": Pad List must contain the same number of "
                                        "dimensions as Block Shape.");
     }
 
-    const TensorShape& inputShape = inputTensorInfo.GetShape();
-
-    std::pair<unsigned int, unsigned int> heightPad = m_Parameters.m_PadList[0];
-    std::pair<unsigned int, unsigned int> widthPad  = m_Parameters.m_PadList[1];
-
-    DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
-
-    const unsigned int inputWidth  = inputShape[dimensionIndices.GetWidthIndex()] +
-                                     widthPad.first + widthPad.second;
-    const unsigned int inputHeight = inputShape[dimensionIndices.GetHeightIndex()] +
-                                     heightPad.first + heightPad.second;
-
-    const unsigned int numInputElements  = inputShape[0] * inputHeight * inputWidth *
-                                           inputShape[dimensionIndices.GetChannelsIndex()];
-    const unsigned int numOutputElements = outputTensorInfo.GetNumElements();
-
-    if (numOutputElements != numInputElements)
+    if (m_Parameters.m_BlockShape.size() == 2)
     {
-        throw InvalidArgumentException(descriptorName + ": Input tensor has " +
-            to_string(numInputElements) + " after padding but output tensor has " +
-            to_string(numOutputElements) + " elements.");
+        ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+        ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
+    }
+    else if (m_Parameters.m_BlockShape.size() == 1)
+    {
+        ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 3, "input");
+        ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 3, "output");
+    }
+    else
+    {
+        throw InvalidArgumentException(descriptorName + ": Invalid Block and Crops size.");
     }
 
-    if (inputHeight % m_Parameters.m_BlockShape[0] != 0 || inputWidth % m_Parameters.m_BlockShape[1] != 0)
+    // Check input + padding and output have the same number of elements
+    DataLayoutIndexed dimensionIndices(m_Parameters.m_DataLayout);
+    const unsigned int inputHeight = inputTensorInfo.GetShape()[dimensionIndices.GetHeightIndex()] +
+                                     m_Parameters.m_PadList[0].first + m_Parameters.m_PadList[0].second;
+    const unsigned int inputWidth = (inputTensorInfo.GetNumDimensions() == 3) ? 1 :
+                                    inputTensorInfo.GetShape()[dimensionIndices.GetWidthIndex()] +
+                                    m_Parameters.m_PadList[1].first + m_Parameters.m_PadList[1].second;
+
+    const int channelsIndex_int = (m_Parameters.m_DataLayout == DataLayout::NCHW) ? 1 : -1;
+    const unsigned int channelsIndex = channelsIndex_int < 0 ?
+            static_cast<unsigned int>(channelsIndex_int) + inputTensorInfo.GetNumDimensions()
+            : static_cast<unsigned int>(channelsIndex_int);
+
+    const unsigned int numInputElements = inputTensorInfo.GetShape()[0] *
+                                          inputHeight *
+                                          inputWidth *
+                                          inputTensorInfo.GetShape()[channelsIndex];
+
+    if (outputTensorInfo.GetNumElements() != numInputElements)
     {
-        throw InvalidArgumentException(descriptorName + ": Input shape after padding must be "
-                                       "divisible by Block Shape in all spatial dimensions");
+        throw InvalidArgumentException(descriptorName + ": Input tensor has " +
+                                       to_string(numInputElements) + " after padding but output tensor has " +
+                                       to_string(outputTensorInfo.GetNumElements()) + " elements.");
+    }
+
+    // In a 4D tensor, there will be 2 spatialDimensions (H and W), and the for loop will run twice.
+    // In a 3D tensor, there will be 1 spatialDimensions, and the for loop will run once.
+    unsigned int firstSpatialDimension = m_Parameters.m_DataLayout == DataLayout::NCHW ? 2 : 1;
+    for (unsigned int i = 0; i < m_Parameters.m_BlockShape.size(); ++i)
+    {
+        unsigned int spatialDimension = firstSpatialDimension + i;
+        auto inputSize = inputTensorInfo.GetShape()[spatialDimension] +
+                         m_Parameters.m_PadList[i].first +
+                         m_Parameters.m_PadList[i].second;
+        if (inputSize % m_Parameters.m_BlockShape[i] != 0)
+        {
+            throw InvalidArgumentException(descriptorName + ": Input dimension size after padding must be "
+                                        "divisible by Block Shape in dimension: " + to_string(spatialDimension) + ".");
+        }
     }
 
     std::vector<DataType> supportedTypes =
@@ -2471,6 +2490,42 @@ void BatchToSpaceNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
 
     const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
     const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    if (m_Parameters.m_BlockShape.size() != m_Parameters.m_Crops.size())
+    {
+        throw InvalidArgumentException(descriptorName + ": Crops must contain the same number of "
+                                                        "dimensions as Block Shape.");
+    }
+
+    if (m_Parameters.m_BlockShape.size() == 2)
+    {
+        ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 4, "input");
+        ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 4, "output");
+    }
+    else if (m_Parameters.m_BlockShape.size() == 1)
+    {
+        ValidateTensorNumDimensions(inputTensorInfo,  descriptorName, 3, "input");
+        ValidateTensorNumDimensions(outputTensorInfo, descriptorName, 3, "output");
+    }
+    else
+    {
+        throw InvalidArgumentException(descriptorName + ": Invalid Block and Crops size.");
+    }
+
+    // In a 4D tensor, there will be 2 spatialDimensions (H and W), and the for loop will run twice.
+    // In a 3D tensor, there will be 1 spatialDimensions, and the for loop will run once.
+    unsigned int firstSpatialDimension = m_Parameters.m_DataLayout == DataLayout::NCHW ? 2 : 1;
+    for (unsigned int i = 0; i < m_Parameters.m_BlockShape.size(); ++i)
+    {
+        unsigned int spatialDimension = firstSpatialDimension + i;
+        unsigned int cropSize = m_Parameters.m_Crops[i].first + m_Parameters.m_Crops[i].second;
+        unsigned int outputSize = inputTensorInfo.GetShape()[spatialDimension] * m_Parameters.m_BlockShape[i];
+        if (cropSize > outputSize)
+        {
+            throw InvalidArgumentException(descriptorName + ": CropSize must be less than or equal to the uncropped"
+                                           "outputSize in dimension: " + to_string(spatialDimension) + ".");
+        }
+    }
 
     std::vector<DataType> supportedTypes =
     {

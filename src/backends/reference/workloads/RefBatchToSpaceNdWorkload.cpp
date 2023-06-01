@@ -1,11 +1,11 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
-#include "BatchToSpaceNd.hpp"
-#include "Profiling.hpp"
 #include "RefBatchToSpaceNdWorkload.hpp"
+#include "BatchToSpaceNd.hpp"
+
 #include "RefWorkloadUtils.hpp"
 
 namespace armnn
@@ -32,8 +32,7 @@ void RefBatchToSpaceNdWorkload::Execute(std::vector<ITensorHandle*> inputs, std:
     std::unique_ptr<Decoder<float>> inputDecoder  = MakeDecoder<float>(inputInfo, inputs[0]->Map());
     std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(outputInfo, outputs[0]->Map());
 
-    BatchToSpaceNd(m_Data.m_Parameters.m_DataLayout, inputInfo, outputInfo, m_Data.m_Parameters.m_BlockShape,
-                   m_Data.m_Parameters.m_Crops, *inputDecoder, *outputEncoder);
+    BatchToSpaceNd(inputInfo, outputInfo, m_Data.m_Parameters, *inputDecoder, *outputEncoder);
 }
 
 

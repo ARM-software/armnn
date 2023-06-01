@@ -1,14 +1,14 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include "RefBaseWorkload.hpp"
-#include <armnn/backends/WorkloadData.hpp>
 
-namespace armnn {
+namespace armnn
+{
 
 class RefBatchToSpaceNdWorkload : public RefBaseWorkload<BatchToSpaceNdQueueDescriptor>
 {

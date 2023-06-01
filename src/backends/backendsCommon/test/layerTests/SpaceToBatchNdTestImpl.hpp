@@ -91,6 +91,11 @@ LayerTestResult<float, 4> SpaceToBatchNdPaddingNhwcFloat32Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
+LayerTestResult<float, 3> SpaceToBatchNdSimpleNhwc3DFloat32Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory);
+
 LayerTestResult<armnn::Half, 4> SpaceToBatchNdSimpleNhwcFloat16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -111,6 +116,11 @@ LayerTestResult<armnn::Half, 4> SpaceToBatchNdPaddingNhwcFloat16Test(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
+LayerTestResult<armnn::Half, 3> SpaceToBatchNdSimpleNhwc3DFloat16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory);
+
 LayerTestResult<uint8_t, 4> SpaceToBatchNdSimpleNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -130,6 +140,11 @@ LayerTestResult<uint8_t, 4> SpaceToBatchNdPaddingNhwcUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+LayerTestResult<uint8_t, 3> SpaceToBatchNdSimpleNhwc3DUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 LayerTestResult<int16_t, 4> SpaceToBatchNdSimpleUint16Test(
         armnn::IWorkloadFactory& workloadFactory,

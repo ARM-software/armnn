@@ -1,18 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "BatchToSpaceNdLayer.hpp"
 #include "LayerCloneBase.hpp"
-#include "LayerWithParameters.hpp"
-#include "BatchToSpaceNdLayer.hpp"
 
-#include <armnn/TypesUtils.hpp>
-
-#include <armnnUtils/DataLayoutIndexed.hpp>
-
-#include <armnn/backends/TensorHandle.hpp>
 #include <armnn/backends/WorkloadData.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
 
@@ -59,8 +52,6 @@ void BatchToSpaceNdLayer::ValidateTensorShapesFromInputs()
 
 std::vector<TensorShape> BatchToSpaceNdLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 1);
-
     const TensorShape& inputShape = inputShapes[0];
     TensorShape outputShape(inputShape);
 
@@ -68,29 +59,18 @@ std::vector<TensorShape> BatchToSpaceNdLayer::InferOutputShapes(const std::vecto
                                                          m_Param.m_BlockShape.end(),
                                                          1U,
                                                          std::multiplies<>());
+    outputShape[0] = (inputShape[0] / accumulatedBlockShape) < 1 ? 1 : (inputShape[0] / accumulatedBlockShape) ;
 
-    ARMNN_ASSERT(inputShape[0] % accumulatedBlockShape == 0);
-
-    outputShape[0] = inputShape[0] / accumulatedBlockShape;
-
-    DataLayoutIndexed dimensionIndices = m_Param.m_DataLayout;
-    unsigned int heightIndex = dimensionIndices.GetHeightIndex();
-    unsigned int widthIndex = dimensionIndices.GetWidthIndex();
-
-    unsigned int heightCrop = m_Param.m_Crops[0].first + m_Param.m_Crops[0].second;
-    unsigned int widthCrop = m_Param.m_Crops[1].first + m_Param.m_Crops[1].second;
-
-    unsigned int outputHeight = inputShape[heightIndex] * m_Param.m_BlockShape[0];
-    unsigned int outputWidth = inputShape[widthIndex] * m_Param.m_BlockShape[1];
-
-    ARMNN_ASSERT_MSG(heightCrop <= outputHeight,
-        "BatchToSpaceLayer: Overall height crop should be less than or equal to the uncropped output height.");
-
-    ARMNN_ASSERT_MSG(widthCrop <= outputWidth,
-        "BatchToSpaceLayer: Overall width crop should be less than or equal to the uncropped output width.");
-
-    outputShape[heightIndex] = outputHeight - heightCrop;
-    outputShape[widthIndex] = outputWidth - widthCrop;
+    // In a 4D tensor, there will be 2 spatialDimensions (H and W), and the for loop will run twice.
+    // In a 3D tensor, there will be 1 spatialDimensions, and the for loop will run once.
+    unsigned int firstSpatialDimension = m_Param.m_DataLayout == DataLayout::NCHW ? 2 : 1;
+    for (unsigned int i = 0; i < m_Param.m_BlockShape.size(); ++i)
+    {
+        unsigned int spatialDimension = firstSpatialDimension + i;
+        unsigned int cropSize = m_Param.m_Crops[i].first + m_Param.m_Crops[i].second;
+        unsigned int outputSize = inputShape[spatialDimension] * m_Param.m_BlockShape[i];
+        outputShape[spatialDimension] = outputSize - cropSize;
+    }
 
     return std::vector<TensorShape>({ outputShape });
 }

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="6c113ed1a95a08d17c2d556bd7b03c901512a34f" #9687: Prepare the basic types for the compute kernel writer (CKW)
+DEFAULT_CLFRAMEWORKREVISION="545358ea7e65abfba6db5b194264584f1e54cc96" #Fix number of dimensions changed after transpose
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

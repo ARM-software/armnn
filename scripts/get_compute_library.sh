@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="df5d9878008be9b60586df97ebfff197abb5195e" #Add CMakeLists to Compute Kernel Writer|https://review.mlplatform.org/c/ml/ComputeLibrary/+/9700
+DEFAULT_CLFRAMEWORKREVISION="48c0ed9d6298dfcc2bf37ac85c168fc7d41ee803" #9579: Fix ScaleKernel validate method. | https://review.mlplatform.org/c/ml/ComputeLibrary/+/9579
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

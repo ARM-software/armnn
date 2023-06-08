@@ -54,12 +54,10 @@ arm_compute::Status ClDepthwiseConvolutionWorkloadValidate(const TensorInfo& inp
     arm_compute::TensorInfo* optionalAclBiasesInfo = nullptr;
     if (descriptor.m_BiasEnabled)
     {
-        ARMNN_ASSERT(biases.has_value());
-        // Same for bias as weights. We don't currently support non const.
-        if (!biases.value().IsConstant())
+        if (!biases.has_value())
         {
             return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                       "ArmNN ClDepthwiseConv2dWorkload does not support non constant bias."};
+                                       "ArmNN ClDepthwiseConv2dWorkload has empty bias value."};
         }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
@@ -112,8 +110,6 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     {
         bias = &PolymorphicDowncast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
         bias->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
-        // We do not support dynamic bias
-        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     const arm_compute::Size2D aclDilationInfo = BuildArmComputeSize2D(

@@ -77,6 +77,10 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
     }
     else
     {
+        if (builder(&m_TfLiteInterpreter) != kTfLiteOk)
+        {
+            LogAndThrow("Error loading the model into the TfLiteInterpreter.");
+        }
         std::cout << "Running on TfLite without ArmNN delegate\n";
     }
 

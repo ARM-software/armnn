@@ -2436,7 +2436,8 @@ bool RefLayerSupport::IsSliceSupported(const TensorInfo& input,
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

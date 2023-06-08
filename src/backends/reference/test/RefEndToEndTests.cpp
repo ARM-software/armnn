@@ -33,6 +33,7 @@
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReverseV2EndToEndTestImpl.hpp>
+#include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
@@ -1607,6 +1608,22 @@ TEST_CASE("RefImportAndExportWorkload")
 TEST_CASE("RefExportOutputWithSeveralOutputSlotConnectionsTest")
 {
     ExportOutputWithSeveralOutputSlotConnectionsTest(defaultBackends);
+}
+
+// Slice
+TEST_CASE("RefSliceEndtoEndTestFloat32")
+{
+    SliceEndToEnd<DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefSliceEndtoEndTestInt32")
+{
+    SliceEndToEnd<DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefSliceEndtoEndTestFloat16")
+{
+    SliceEndToEndFloat16<DataType::Float16>(defaultBackends);
 }
 
 TEST_CASE("RefStridedSliceInvalidSliceEndToEndTest")

@@ -22,6 +22,7 @@
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
@@ -174,6 +175,22 @@ TEST_CASE("DequantizeEndToEndSimpleTest")
 TEST_CASE("DequantizeEndToEndOffsetTest")
 {
     DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(clDefaultBackends);
+}
+
+// Slice
+TEST_CASE("ClSliceEndtoEndTestFloat32")
+{
+    SliceEndToEnd<DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClSliceEndtoEndTestInt32")
+{
+    SliceEndToEnd<DataType::Signed32>(clDefaultBackends);
+}
+
+TEST_CASE("ClSliceEndtoEndTestFloat16")
+{
+    SliceEndToEndFloat16<DataType::Float16>(clDefaultBackends);
 }
 
 TEST_CASE("ClStridedSliceInvalidSliceEndToEndTest")

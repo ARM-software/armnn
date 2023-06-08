@@ -23,6 +23,7 @@
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
@@ -668,6 +669,22 @@ TEST_CASE("NeonReshapeEndToEndTest")
 TEST_CASE("NeonReshapeEndToEndTestFloat16")
 {
     ReshapeEndToEndFloat16<armnn::DataType::Float16>(neonDefaultBackends);
+}
+
+// Slice
+TEST_CASE("NeonSliceEndtoEndTestFloat32")
+{
+    SliceEndToEnd<DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonSliceEndtoEndTestInt32")
+{
+    SliceEndToEnd<DataType::Signed32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonSliceEndtoEndTestFloat16")
+{
+    SliceEndToEndFloat16<DataType::Float16>(neonDefaultBackends);
 }
 
 TEST_CASE("NeonStridedSliceInvalidSliceEndToEndTest")

@@ -1211,7 +1211,7 @@ where N = batches, C = channels, H = height, W = width
     </table>
 <tr>
   <td rowspan="3">ElementwiseUnaryLayer
-  <td rowspan="3" style="width:200px;"> Layer to perform Rsqrt - Exp - Neg - Log - Abs - Sin - Sqrt operations.
+  <td rowspan="3" style="width:200px;"> Layer to perform Rsqrt - Exp - Neg - Log - Abs - Sin - Sqrt - Ceil operations.
   <td rowspan="3">
       <ul>
        <li>ANEURALNETWORKS_ABS
@@ -2396,6 +2396,7 @@ where N = batches, C = channels, H = height, W = width
       <ul>
        <li>NDHWC
       </ul>
+  <td>
 <tr>
   <td rowspan="1">PreCompiledLayer
   <td rowspan="1" style="width:200px;"> Opaque layer provided by a backend which provides an executable representation of a subgraph from the original network.
@@ -3388,6 +3389,7 @@ where N = batches, C = channels, H = height, W = width
          <tr><td>FLOAT32
          <tr><td>QASYMMS8
       </table>
+<tr>
    <td>CpuAcc
      <td>
          <ul>
@@ -3402,6 +3404,7 @@ where N = batches, C = channels, H = height, W = width
          <tr><th>Weight Types
          <tr><td>FLOAT32
       </table>
+<tr>
    <td>GpuAcc
     <td>
         <ul>

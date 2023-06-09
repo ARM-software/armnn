@@ -19,9 +19,6 @@ other helpful information in each section.
  - @subpage serializer
  - @subpage deserializer
  - @subpage md_src_armnnConverter_README
- - @subpage md_tests_ImageCSVFileGenerator_README
- - @subpage md_tests_ImageTensorGenerator_README
- - @subpage md_tests_ModelAccuracyTool-Armnn_README
 **/
 }
 
@@ -36,12 +33,6 @@ namespace armnn
 @page md_python_pyarmnn_README PyArmNN
 
 @page md_src_armnnConverter_README Converter
-
-@page md_tests_ModelAccuracyTool-Armnn_README ModelAccuracyTool
-
-@page md_tests_ImageCSVFileGenerator_README ImageCSVFileGenerator
-
-@page md_tests_ImageTensorGenerator_README ImageTensorGenerator
 
 **/
 }

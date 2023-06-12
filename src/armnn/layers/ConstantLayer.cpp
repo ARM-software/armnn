@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ConstantLayer.hpp"
@@ -67,6 +67,12 @@ void ConstantLayer::ExecuteStrategy(IStrategy& strategy) const
     ManagedConstTensorHandle managedLayerOutput(m_LayerOutput);
     ConstTensor layerOutputTensor(managedLayerOutput.GetTensorInfo(), managedLayerOutput.Map());
     strategy.ExecuteStrategy(this, BaseDescriptor(), { layerOutputTensor }, GetName());
+}
+
+void ConstantLayer::SerializeLayerParameters(ParameterStringifyFunction& fn) const
+{
+    fn("DataType",GetDataTypeName(m_LayerOutput->GetTensorInfo().GetDataType()));
+    Layer::SerializeLayerParameters(fn);
 }
 
 } // namespace armnn

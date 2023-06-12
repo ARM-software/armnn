@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -40,6 +40,8 @@ public:
     void ReleaseConstantData() override {}
 
     void ExecuteStrategy(IStrategy& strategy) const override;
+
+    void SerializeLayerParameters(ParameterStringifyFunction &fn) const override;
 
     std::shared_ptr<ConstTensorHandle> m_LayerOutput;
 

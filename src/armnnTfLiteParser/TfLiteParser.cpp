@@ -901,7 +901,6 @@ armnn::TensorInfo TfLiteParserImpl::OutputTensorInfoFromInputs(size_t subgraphIn
             }
             else
             {
-                m_Model->subgraphs[subgraphIndex]->operators[operatorIndex];
                 auto inputTensorInfo = ::armnnTfLiteParser::ToTensorInfo(subgraphPtr->tensors[inputId].get());
                 m_TensorInfos.insert({ inputId, inputTensorInfo});
                 inputShapes.push_back(inputTensorInfo.GetShape());

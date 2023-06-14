@@ -1509,56 +1509,56 @@ void TfLiteParserImpl::ParseExpandDims(size_t subgraphIndex, size_t operatorInde
 
     armnn::TensorInfo inputTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 0);
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0], true);
-
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
 
+    armnn::TensorInfo axisTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 1);
+
+    BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    if (axisBufferPtr == nullptr)
+    {
+        throw ParseException(fmt::format("{}: Operation has invalid inputs. Failed to read axis.",
+                            CHECK_LOCATION().AsString()));
+    }
+
+    std::vector<int32_t> axisData(axisTensorInfo.GetNumElements());
+    ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
+    int32_t axis = axisData[0];
+
+    auto inputRank = static_cast<int32_t>(inputTensorInfo.GetShape().GetNumDimensions());
+    auto outputRank = inputRank + 1;
+    if((axis < -1 * outputRank) || (outputRank <= axis))
+    {
+        throw ParseException(fmt::format("{}: Axis {} is not within [-{}, {}) range.",
+                                         CHECK_LOCATION().AsString(), axis, outputRank, outputRank));
+    }
+
+    axis = axis < 0 ? (axis + outputRank) : axis;
+
+    std::vector<unsigned int> shape(static_cast<unsigned int>(outputRank));
+    unsigned int inputShapeIndex = 0;
+    for (unsigned int i = 0; i < static_cast<unsigned int>(outputRank); ++i)
+    {
+        if (i == static_cast<unsigned int>(axis))
+        {
+            shape[i] = 1;
+        }
+        else
+        {
+            shape[i] = inputTensorInfo.GetShape()[inputShapeIndex];
+            ++inputShapeIndex;
+        }
+    }
+
     ReshapeDescriptor reshapeDesc;
-
-    if (outputTensorInfo.GetShape().AreAllDimensionsSpecified())
-    {
-        reshapeDesc.m_TargetShape = outputTensorInfo.GetShape();
-    }
-    else
-    {
-        int32_t axis = inputs[1]->shape[0];
-
-        int32_t inputDimSize = static_cast<int32_t>(inputTensorInfo.GetShape().GetNumDimensions());
-
-        if (axis > inputDimSize || axis < 0 - (inputDimSize + 1))
-        {
-            throw ParseException("axis must be in range [0 - (inputDimSize + 1), inputDimSize] inclusive");
-        }
-
-        if(axis < 0)
-        {
-            axis = inputDimSize + axis + 1;
-        }
-
-        std::vector<unsigned int> shape(static_cast<unsigned int>(inputDimSize) + 1);
-        unsigned int inputShapeIndex = 0;
-        for (unsigned int i = 0; i < static_cast<unsigned int>(inputDimSize + 1); ++i)
-        {
-            if (i == static_cast<unsigned int>(axis))
-            {
-                shape[i] = 1;
-            }
-            else
-            {
-                shape[i] = inputTensorInfo.GetShape()[inputShapeIndex];
-                ++inputShapeIndex;
-            }
-        }
-
-        reshapeDesc.m_TargetShape = TensorShape(static_cast<unsigned int>(inputDimSize + 1), shape.data());
-    }
+    reshapeDesc.m_TargetShape = TensorShape(static_cast<unsigned int>(outputRank), shape.data());
+    outputTensorInfo.SetShape(reshapeDesc.m_TargetShape);
 
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
-
-    reshapeDesc.m_TargetShape = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0}).GetShape();
-    outputTensorInfo.SetShape(reshapeDesc.m_TargetShape);
-
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto outputTensorIds = GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex);
+    m_TensorInfos[outputTensorIds[0]] = outputTensorInfo;
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});

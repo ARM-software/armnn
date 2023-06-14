@@ -1,12 +1,10 @@
 //
-// Copyright © 2021 Arm Ltd. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ParserFlatbuffersFixture.hpp"
-#include "../TfLiteParser.hpp"
 
 #include <string>
-#include <iostream>
 
 TEST_SUITE("TensorflowLiteParser_ExpandDims")
 {
@@ -47,15 +45,12 @@ struct ExpandDimsFixture : public ParserFlatbuffersFixture
                             }
                         },
                         {
-                            "shape": [ 1 ],
-                            "type": "UINT8",
+                            "shape": [],
+                            "type": "INT32",
                             "buffer": 2,
                             "name": "expand_dims",
                             "quantization": {
-                                "min": [ 0.0 ],
-                                "max": [ 255.0 ],
-                                "scale": [ 1.0 ],
-                                "zero_point": [ 0 ],
+                                "details_type": "NONE",
                             }
                         },
                     ],
@@ -77,7 +72,7 @@ struct ExpandDimsFixture : public ParserFlatbuffersFixture
                 ]
             }
         )";
-        SetupSingleInputSingleOutput("inputTensor", "outputTensor");
+        Setup();
     }
 };
 

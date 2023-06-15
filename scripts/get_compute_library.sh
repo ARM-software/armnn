@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="08dfba38b99abcf12db39d6650e4e3758f1bd0b4" #9747: Enable conversion of F32 NumPy files to F16
+DEFAULT_CLFRAMEWORKREVISION="bec9b032ddcff449c7ad40febbcab24c23ee58a0" #9759: Add a Getting Started guide to CKW README
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

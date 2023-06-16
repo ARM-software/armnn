@@ -12,6 +12,8 @@
 
 #include <backendsCommon/WorkloadUtils.hpp>
 
+#include <arm_compute/core/MatMulInfo.h>
+
 namespace armnn
 {
 arm_compute::Status NeonBatchMatMulValidate(const TensorInfo& inputInfoX,

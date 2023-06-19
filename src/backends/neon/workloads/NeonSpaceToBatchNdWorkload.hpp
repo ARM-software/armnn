@@ -1,16 +1,15 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/Tensor.hpp>
-#include <armnn/Descriptors.hpp>
-
 #include "NeonBaseWorkload.hpp"
+#include "NeonWorkloadUtils.hpp"
 
 #include <arm_compute/runtime/NEON/functions/NESpaceToBatchLayer.h>
+#include <arm_compute/runtime/NEON/functions/NEReshapeLayer.h>
 
 namespace armnn
 {
@@ -30,6 +29,10 @@ public:
 
 private:
     mutable std::unique_ptr<arm_compute::NESpaceToBatchLayer> m_Layer;
+    mutable std::unique_ptr<arm_compute::NEReshapeLayer> m_LayerReshapeInput;
+    mutable std::unique_ptr<arm_compute::NEReshapeLayer> m_LayerReshapeOutput;
+    arm_compute::Tensor m_ReshapeInputTensor;
+    arm_compute::Tensor m_ReshapeOutputTensor;
 };
 
 } //namespace armnn

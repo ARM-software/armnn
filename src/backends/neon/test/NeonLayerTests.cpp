@@ -33,6 +33,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat324, BatchToSpaceNdNhwcTest
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat325, BatchToSpaceNdNhwcTest5<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat326, BatchToSpaceNdNhwcTest6<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat327, BatchToSpaceNdNhwcTest7<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcFloat32_3D, BatchToSpaceNdNhwcTest8<DataType::Float32>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat321, BatchToSpaceNdNchwTest1<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwFloat322, BatchToSpaceNdNchwTest2<DataType::Float32>)
@@ -49,6 +50,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt4, BatchToSpaceNdNhwcTest4<Da
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt5, BatchToSpaceNdNhwcTest5<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt6, BatchToSpaceNdNhwcTest6<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt7, BatchToSpaceNdNhwcTest7<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcInt_3D, BatchToSpaceNdNhwcTest8<DataType::QAsymmS8>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt1, BatchToSpaceNdNchwTest1<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwInt2, BatchToSpaceNdNchwTest2<DataType::QAsymmS8>)
@@ -65,6 +67,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint4, BatchToSpaceNdNhwcTest4<D
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint5, BatchToSpaceNdNhwcTest5<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint6, BatchToSpaceNdNhwcTest6<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint7, BatchToSpaceNdNhwcTest7<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNhwcUint_3D,  BatchToSpaceNdNhwcTest8<DataType::QAsymmU8>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint1, BatchToSpaceNdNchwTest1<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BatchToSpaceNdNchwUint2, BatchToSpaceNdNchwTest2<DataType::QAsymmU8>)

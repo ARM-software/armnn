@@ -145,6 +145,9 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcFloat326,
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcFloat327,
                                  ClContextControlFixture,
                                  BatchToSpaceNdNhwcTest7<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcFloat32_3D,
+                                 ClContextControlFixture,
+                                 BatchToSpaceNdNhwcTest8<DataType::Float32>)
 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNchwFloat321,
                                  ClContextControlFixture,
@@ -189,6 +192,9 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcInt6,
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcInt7,
                                  ClContextControlFixture,
                                  BatchToSpaceNdNhwcTest7<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcInt_3D,
+                                 ClContextControlFixture,
+                                 BatchToSpaceNdNhwcTest8<DataType::QAsymmS8>)
 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNchwInt1,
                                  ClContextControlFixture,
@@ -233,6 +239,9 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcUint6,
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcUint7,
                                  ClContextControlFixture,
                                  BatchToSpaceNdNhwcTest7<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNhwcUint_3D,
+                                 ClContextControlFixture,
+                                 BatchToSpaceNdNhwcTest8<DataType::QAsymmU8>)
 
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchToSpaceNdNchwUint1,
                                  ClContextControlFixture,

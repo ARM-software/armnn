@@ -1,7 +1,7 @@
 <br>
-<div align="center">
-  <img src="Arm_NN_horizontal_blue.png" class="center" alt="Arm NN Logo" width="300"/>
-</div>
+<td style="text-align: center">
+  <img src="Arm_NN_horizontal_blue.png" alt="Arm NN Logo" width="300"/>
+</td>
 
 * [Quick Start Guides](#quick-start-guides)
 * [Pre-Built Binaries](#pre-built-binaries)
@@ -152,15 +152,15 @@ If you find something that concerns you, please email terms@arm.com
 ## Third-party
 Third party tools used by Arm NN:
 
-| Tool           | License (SPDX ID) | Description                    | Version | Provenience
-|----------------|-------------------|------------------------------------------------------------------|-------------|-------------------
-| cxxopts        | MIT               | A lightweight C++ option parser library | SHA 12e496da3d486b87fa9df43edea65232ed852510 | https://github.com/jarro2783/cxxopts
-| doctest        | MIT               | Header-only C++ testing framework | 2.4.6 | https://github.com/onqtam/doctest
-| fmt            | MIT               | {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams. | 7.0.1 | https://github.com/fmtlib/fmt
-| ghc            | MIT               | A header-only single-file std::filesystem compatible helper library | 1.3.2 | https://github.com/gulrak/filesystem
-| half           | MIT               | IEEE 754 conformant 16-bit half-precision floating point library | 1.12.0 | http://half.sourceforge.net
-| mapbox/variant | BSD               | A header-only alternative to 'boost::variant' | 1.1.3 | https://github.com/mapbox/variant
-| stb            | MIT               | Image loader, resize and writer | 2.16 | https://github.com/nothings/stb
+| Tool           | License (SPDX ID) | Description                    | Version | Provenience                          |
+|----------------|-------------------|------------------------------------------------------------------|-------------|--------------------------------------|
+| cxxopts        | MIT               | A lightweight C++ option parser library | SHA 12e496da3d486b87fa9df43edea65232ed852510 | https://github.com/jarro2783/cxxopts |
+| doctest        | MIT               | Header-only C++ testing framework | 2.4.6 | https://github.com/onqtam/doctest    |
+| fmt            | MIT               | {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams. | 7.0.1 | https://github.com/fmtlib/fmt  |
+| ghc            | MIT               | A header-only single-file std::filesystem compatible helper library | 1.3.2 | https://github.com/gulrak/filesystem |
+| half           | MIT               | IEEE 754 conformant 16-bit half-precision floating point library | 1.12.0 | http://half.sourceforge.net          |
+| mapbox/variant | BSD               | A header-only alternative to 'boost::variant' | 1.1.3 | https://github.com/mapbox/variant    |
+| stb            | MIT               | Image loader, resize and writer | 2.16 | https://github.com/nothings/stb      |
 
 
 ## Build Flags

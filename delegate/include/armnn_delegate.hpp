@@ -5,4 +5,4 @@
 
 #include <armnn/delegate/classic/include/armnn_delegate.hpp>
 #pragma message("armnn/delegate/include/armnn_delegate.hpp has been deprecated, it is due for removal in"\
-                " 24.02 release. Please use public interface ")
+                " 24.02 release. Please include armnn/delegate/classic/include/armnn_delegate.hpp instead.")

@@ -4876,9 +4876,15 @@ TfLiteParserImpl::ModelPtr TfLiteParserImpl::LoadModelFromFile(const char* fileN
         std::stringstream msg;
         msg << "Cannot find the file (" << fileName << ") errorCode: " << errorCode
             << " " << CHECK_LOCATION().AsString();
-
         throw FileNotFoundException(msg.str());
     }
+    if (!fs::is_regular_file(pathToFile))
+    {
+        // Exclude non regular files.
+        throw InvalidArgumentException(fmt::format("File \"{}\" is not a regular file and cannot be loaded.",
+                                                   pathToFile.c_str()));
+    }
+
     std::ifstream file(fileName, std::ios::binary);
     std::string fileContent((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     return LoadModelFromBinary(reinterpret_cast<const uint8_t *>(fileContent.c_str()),

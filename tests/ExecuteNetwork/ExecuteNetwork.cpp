@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ExecuteNetworkProgramOptions.hpp"
 #include "ArmNNExecutor.hpp"
+#include "ExecuteNetworkProgramOptions.hpp"
 #if defined(ARMNN_TFLITE_DELEGATE) || defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
 #include "TfliteExecutor.hpp"
 #endif
+#include "FileComparisonExecutor.hpp"
 #include <armnn/Logging.hpp>
-
 
 std::unique_ptr<IExecutor> BuildExecutor(ProgramOptions& programOptions)
 {
@@ -42,7 +42,6 @@ int main(int argc, const char* argv[])
 #endif
     armnn::ConfigureLogging(true, true, level);
 
-
     // Get ExecuteNetwork parameters and runtime options from command line
     // This might throw an InvalidArgumentException if the user provided invalid inputs
     ProgramOptions programOptions;
@@ -72,15 +71,14 @@ int main(int argc, const char* argv[])
         return EXIT_FAILURE;
     }
 
-
     executor->PrintNetworkInfo();
     outputResults = executor->Execute();
 
     if (!programOptions.m_ExNetParams.m_ComparisonComputeDevices.empty() ||
-         programOptions.m_ExNetParams.m_CompareWithTflite)
+        programOptions.m_ExNetParams.m_CompareWithTflite)
     {
         ExecuteNetworkParams comparisonParams = programOptions.m_ExNetParams;
-        comparisonParams.m_ComputeDevices = programOptions.m_ExNetParams.m_ComparisonComputeDevices;
+        comparisonParams.m_ComputeDevices     = programOptions.m_ExNetParams.m_ComparisonComputeDevices;
 
         if (programOptions.m_ExNetParams.m_CompareWithTflite)
         {
@@ -98,5 +96,13 @@ int main(int argc, const char* argv[])
         comparisonExecutor->Execute();
 
         comparisonExecutor->CompareAndPrintResult(outputResults);
+    }
+
+    // If there's a file comparison specified create a FileComparisonExecutor.
+    if (!programOptions.m_ExNetParams.m_ComparisonFile.empty())
+    {
+        FileComparisonExecutor comparisonExecutor(programOptions.m_ExNetParams);
+        comparisonExecutor.Execute();
+        comparisonExecutor.CompareAndPrintResult(outputResults);
     }
 }

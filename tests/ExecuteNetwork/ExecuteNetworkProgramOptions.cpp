@@ -361,8 +361,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("C, compare-output",
                  "Perform a per byte root mean square error calculation of the inference output with an output"
-                 " file that has been previously produced by running a network through ExecuteNetwork."
-                 " See --write-outputs-to-file to produce an output file for an execution.",
+                 " file(s) that has been previously produced by running a network through ExecuteNetwork."
+                 " See --write-outputs-to-file to produce an output file(s) for an execution.",
                  cxxopts::value<std::string>(m_ExNetParams.m_ComparisonFile))
 
                 ("B, compare-output-with-backend",

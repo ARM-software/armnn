@@ -663,7 +663,8 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
             outputTensorFile,
             bindingName,
             output.second,
-            !m_Params.m_DontPrintOutputs
+            !m_Params.m_DontPrintOutputs,
+            output.second.GetDataType()
         };
 
         std::cout << bindingName << ": ";

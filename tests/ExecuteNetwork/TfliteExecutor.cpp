@@ -11,6 +11,50 @@
 #include "TfliteExecutor.hpp"
 #include "tensorflow/lite/kernels/kernel_util.h"
 
+#include <string>
+
+std::string TfLiteStatusToString(const TfLiteStatus status)
+{
+    switch (status)
+    {
+        case kTfLiteOk:
+            return "Status: Ok.";
+        // Generally referring to an error in the runtime (i.e. interpreter)
+        case kTfLiteError:
+            return "Status: Tf runtime error.";
+        // Generally referring to an error from a TfLiteDelegate itself.
+        case kTfLiteDelegateError:
+            return "Status: The loaded delegate has returned an error.";
+        // Generally referring to an error in applying a delegate due to
+        // incompatibility between runtime and delegate, e.g., this error is returned
+        // when trying to apply a TF Lite delegate onto a model graph that's already
+        // immutable.
+        case kTfLiteApplicationError:
+            return "Status: Application error. An incompatibility between the Tf runtime and the loaded delegate.";
+        // Generally referring to serialized delegate data not being found.
+        // See tflite::delegates::Serialization.
+        case kTfLiteDelegateDataNotFound:
+            return "Status: data not found.";
+        // Generally referring to data-writing issues in delegate serialization.
+        // See tflite::delegates::Serialization.
+        case kTfLiteDelegateDataWriteError:
+            return "Status: Error writing serialization data.";
+        // Generally referring to data-reading issues in delegate serialization.
+        // See tflite::delegates::Serialization.
+        case kTfLiteDelegateDataReadError:
+            return "Status: Error reading serialization data.";
+        // Generally referring to issues when the TF Lite model has ops that cannot be
+        // resolved at runtime. This could happen when the specific op is not
+        // registered or built with the TF Lite framework.
+        case kTfLiteUnresolvedOps:
+            return "Status: Model contains an operation that is not recognised by the runtime.";
+        // Generally referring to invocation cancelled by the user.
+        case kTfLiteCancelled:
+            return "Status: invocation has been cancelled by the user.";
+    }
+    return "Unknown status result.";
+}
+
 TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRuntime::CreationOptions runtimeOptions)
                              : m_Params(params)
 {
@@ -67,9 +111,11 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
                 theArmnnDelegate(armnnDelegate::TfLiteArmnnDelegateCreate(delegateOptions),
                                  armnnDelegate::TfLiteArmnnDelegateDelete);
         // Register armnn_delegate to TfLiteInterpreter
-        if (m_TfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate)) != kTfLiteOk)
+        auto result = m_TfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+        if (result != kTfLiteOk)
         {
-            LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter.");
+            LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter: " +
+                        TfLiteStatusToString(result) + ".");
         }
 #else
         LogAndThrow("Not built with Arm NN Tensorflow-Lite delegate support.");

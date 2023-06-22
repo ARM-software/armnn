@@ -848,6 +848,9 @@ if(BUILD_UNIT_TESTS)
 
     if(BUILD_TESTS)
         list(APPEND unittest_sources
+            ./tests/ExecuteNetwork/FileComparisonExecutor.hpp
+            ./tests/ExecuteNetwork/FileComparisonExecutor.cpp
+            ./tests/ExecuteNetwork/test/FileComparisonExecutorTests.cpp
             ./tests/NetworkExecutionUtils/NetworkExecutionUtils.cpp
             ./tests/NetworkExecutionUtils/test/NetworkExecutionUtilsTests.cpp)
     endif()
@@ -858,11 +861,11 @@ if(BUILD_UNIT_TESTS)
     endforeach()
 
     add_executable(UnitTests ${unittest_sources})
-    target_include_directories(UnitTests PRIVATE src/armnn)
-    target_include_directories(UnitTests PRIVATE src/armnnUtils)
-    target_include_directories(UnitTests PRIVATE src/armnnTestUtils)
-    target_include_directories(UnitTests PRIVATE src/backends)
-    target_include_directories(UnitTests PRIVATE src/profiling)
+    target_include_directories(UnitTests PRIVATE delegate/common/include
+                                                 src/armnn src/armnnUtils
+                                                 src/armnnTestUtils src/backends
+                                                 src/profiling
+                                                 tests)
 
     if(VALGRIND_FOUND)
         if(HEAP_PROFILING OR LEAK_CHECKING)

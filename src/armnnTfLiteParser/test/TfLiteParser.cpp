@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -35,6 +35,22 @@ TEST_CASE_FIXTURE(NoInputBindingsFixture, "ParseBadInputBindings")
 {
     // Should throw armnn::ParseException: No input binding found for subgraph:0 and name:inputTensor.
     CHECK_THROWS_AS((RunTest<4, armnn::DataType::QAsymmU8>(0, { }, { 0 })), armnn::ParseException);
+}
+
+TEST_CASE("ParseInvalidFileName")
+{
+    // Nullptr should throw InvalidArgumentException
+    CHECK_THROWS_AS(armnnTfLiteParser::TfLiteParserImpl::LoadModelFromFile(nullptr), armnn::InvalidArgumentException);
+    // Empty string should throw FileNotFoundException.
+    CHECK_THROWS_AS(armnnTfLiteParser::TfLiteParserImpl::LoadModelFromFile(""), armnn::FileNotFoundException);
+    // Garbage string should throw FileNotFoundException.
+    CHECK_THROWS_AS(armnnTfLiteParser::TfLiteParserImpl::LoadModelFromFile("askjfhseuirwqeuiy"),
+                    armnn::FileNotFoundException);
+    // Valid directory should throw InvalidArgumentException
+    CHECK_THROWS_AS(armnnTfLiteParser::TfLiteParserImpl::LoadModelFromFile("."), armnn::InvalidArgumentException);
+    // Valid file but not a regular file should throw InvalidArgumentException
+    CHECK_THROWS_AS(armnnTfLiteParser::TfLiteParserImpl::LoadModelFromFile("/dev/null"),
+                    armnn::InvalidArgumentException);
 }
 
 }

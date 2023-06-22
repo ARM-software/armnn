@@ -152,6 +152,8 @@ if (BUILD_ARMNN_SERIALIZER
         ExecuteNetwork/ExecuteNetworkProgramOptions.hpp
         ExecuteNetwork/ExecuteNetworkParams.cpp
         ExecuteNetwork/ExecuteNetworkParams.hpp
+        ExecuteNetwork/FileComparisonExecutor.cpp
+        ExecuteNetwork/FileComparisonExecutor.hpp
         NetworkExecutionUtils/NetworkExecutionUtils.cpp
         NetworkExecutionUtils/NetworkExecutionUtils.hpp)
 
@@ -164,10 +166,11 @@ if (BUILD_ARMNN_SERIALIZER
     endif()
 
     add_executable_ex(ExecuteNetwork ${ExecuteNetwork_sources})
-    target_include_directories(ExecuteNetwork PRIVATE ../src/armnn)
-    target_include_directories(ExecuteNetwork PRIVATE ../src/armnnUtils)
-    target_include_directories(ExecuteNetwork PRIVATE ../src/backends)
-    target_include_directories(ExecuteNetwork PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    target_include_directories(ExecuteNetwork PRIVATE ../src/armnn
+                                                      ../src/armnnUtils
+                                                      ../src/backends
+                                                      ./NetworkExecutionUtils
+                                                      ${CMAKE_CURRENT_SOURCE_DIR})
 
     if(EXECUTE_NETWORK_STATIC)
         target_link_libraries(ExecuteNetwork

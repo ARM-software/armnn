@@ -612,7 +612,10 @@ std::unique_ptr<ArmNNExecutor::IParser> ArmNNExecutor::CreateParser()
         LogAndThrow("Not built with Onnx parser support.");
 #endif
     }
-
+    if (parser == nullptr)
+    {
+        throw InvalidArgumentException("Unable to determine the model type based on the file name extension.");
+    }
     return parser;
 }
 

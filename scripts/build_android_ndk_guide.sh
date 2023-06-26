@@ -427,11 +427,8 @@ if [[ $? != 0 ]] ; then
     echo "Building Flatbuffers failed"
     exit 1
 fi
-if [[ $(lsb_release -rs) == "18.04" ]]; then
-  # We know this is necessary for 18.04 builds.
-  GetAndBuildCmake319
-  CMAKE=$WORKING_DIR/cmake/install/bin/cmake
-fi
+GetAndBuildCmake319
+CMAKE=$WORKING_DIR/cmake/install/bin/cmake
 GetArmNN
 if [[ $? != 0 ]] ; then
     echo "Cloning Arm NN failed"

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="043613fbb199e2c4fdd12c2c9a1785db9b0c45fa" #9743: Break up Utils.h a bit to reduce unused code being included everywhere
+DEFAULT_CLFRAMEWORKREVISION="c952596e70f2fe0073029f053e329a4e930ced8c" #9819: Implement FP32/FP16 MatMul NT/T kernel using the MMUL extension
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

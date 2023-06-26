@@ -50,9 +50,8 @@ arm_compute::Status ClBatchMatMulValidate(const TensorInfo& inputInfoX,
     arm_compute::MatMulInfo matMulInfo;
     matMulInfo.adj_lhs(descriptor.m_TransposeX);
     matMulInfo.adj_rhs(descriptor.m_TransposeY);
-    matMulInfo.fused_activation(activationInfo);
 
-    return arm_compute::CLMatMul::validate(&aclInputInfoX, &aclInputInfoY, &aclOutputInfo, matMulInfo);
+    return arm_compute::CLMatMul::validate(&aclInputInfoX, &aclInputInfoY, &aclOutputInfo, matMulInfo, activationInfo);
 }
 
 ClBatchMatMulWorkload::ClBatchMatMulWorkload(const BatchMatMulQueueDescriptor& descriptor,
@@ -92,9 +91,10 @@ ClBatchMatMulWorkload::ClBatchMatMulWorkload(const BatchMatMulQueueDescriptor& d
     arm_compute::MatMulInfo matMulInfo;
     matMulInfo.adj_lhs(descriptor.m_Parameters.m_TransposeX);
     matMulInfo.adj_rhs(descriptor.m_Parameters.m_TransposeY);
-    matMulInfo.fused_activation(activationInfo);
 
-    m_MatMulLayer.configure(clCompileContext, &inputX, &inputY, &output, matMulInfo);
+    arm_compute::GpuMatMulSettings settings;
+
+    m_MatMulLayer.configure(clCompileContext, &inputX, &inputY, &output, matMulInfo, settings, activationInfo);
 
     // Report Profiling Details
     WorkloadInfo detailsInfo;

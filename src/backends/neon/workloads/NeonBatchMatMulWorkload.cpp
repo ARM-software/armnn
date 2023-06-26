@@ -46,12 +46,12 @@ arm_compute::Status NeonBatchMatMulValidate(const TensorInfo& inputInfoX,
     arm_compute::MatMulInfo matMulInfo;
     matMulInfo.adj_lhs(descriptor.m_TransposeX);
     matMulInfo.adj_rhs(descriptor.m_TransposeY);
-    matMulInfo.fused_activation(activationInfo);
 
     arm_compute::CpuMatMulSettings settings;
     settings.fast_math(isFastMathEnabled);
 
-    return arm_compute::NEMatMul::validate(&aclInputInfoX, &aclInputInfoY, &aclOutputInfo, matMulInfo, settings);
+    return arm_compute::NEMatMul::validate(&aclInputInfoX, &aclInputInfoY, &aclOutputInfo, matMulInfo, settings,
+                                           activationInfo);
 }
 
 NeonBatchMatMulWorkload::NeonBatchMatMulWorkload(const BatchMatMulQueueDescriptor& descriptor,
@@ -84,12 +84,11 @@ NeonBatchMatMulWorkload::NeonBatchMatMulWorkload(const BatchMatMulQueueDescripto
     arm_compute::MatMulInfo matMulInfo;
     matMulInfo.adj_lhs(descriptor.m_Parameters.m_TransposeX);
     matMulInfo.adj_rhs(descriptor.m_Parameters.m_TransposeY);
-    matMulInfo.fused_activation(activationInfo);
 
     arm_compute::CpuMatMulSettings settings;
     settings.fast_math(isFastMathEnabled);
 
-    m_MatMulLayer.configure(&inputX, &inputY, &output, matMulInfo, settings);
+    m_MatMulLayer.configure(&inputX, &inputY, &output, matMulInfo, settings, activationInfo);
 
     // Report Profiling Details
     WorkloadInfo detailsInfo;

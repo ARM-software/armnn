@@ -120,7 +120,16 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
     armnnDelegate::DelegateOptions delegateOptions(m_ComputeDevices);
     delegateOptions.SetDynamicBackendsPath(m_DynamicBackendsPath);
     delegateOptions.SetGpuProfilingState(m_EnableProfiling);
-    delegateOptions.SetInternalProfilingParams(m_EnableProfiling, armnn::ProfilingDetailsMethod::DetailsWithEvents);
+    delegateOptions.SetInternalProfilingParams(m_EnableProfiling, armnn::ProfilingDetailsMethod::Undefined);
+
+    if (m_OutputDetailsOnlyToStdOut)
+    {
+        delegateOptions.SetInternalProfilingParams(m_EnableProfiling, armnn::ProfilingDetailsMethod::DetailsOnly);
+    }
+    else if (m_OutputDetailsToStdOut)
+    {
+        delegateOptions.SetInternalProfilingParams(m_EnableProfiling, armnn::ProfilingDetailsMethod::DetailsWithEvents);
+    }
 
     // GPU Backend options first.
     {

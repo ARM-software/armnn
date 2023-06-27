@@ -65,9 +65,16 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
     auto* permTensorDataPtr = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLiteInputTensor1));
     unsigned int numEl = TfLiteOpaqueTensorDim(tfLiteInputTensor1, 0);
 
-    ARMNN_ASSERT( numEl <= static_cast<int>(armnn::MaxNumOfTensorDimensions) );
+    if ( numEl > static_cast<int>(armnn::MaxNumOfTensorDimensions) )
+    {
+        return kTfLiteError;
+    }
+
     // Ensure only single dimension to the permutation tensor
-    ARMNN_ASSERT( TfLiteOpaqueTensorNumDims(tfLiteInputTensor1) == 1 );
+    if ( TfLiteOpaqueTensorNumDims(tfLiteInputTensor1) != 1 )
+    {
+        return kTfLiteError;
+    }
 
     armnn::TransposeDescriptor descriptor(armnn::PermutationVector(
             reinterpret_cast<const armnn::PermutationVector::ValueType *> (permTensorDataPtr),
@@ -99,7 +106,10 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
     transposeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(transposeLayer != nullptr);
     // Permutation vector given to descriptor object
-    ARMNN_ASSERT(transposeLayer->GetNumInputSlots() == 1);
+    if (transposeLayer->GetNumInputSlots() != 1)
+    {
+        return kTfLiteError;
+    }
 
     armnn::IOutputSlot& outputSlot = transposeLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);

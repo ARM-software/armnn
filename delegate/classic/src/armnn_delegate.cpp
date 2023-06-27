@@ -312,7 +312,12 @@ TfLiteStatus ArmnnSubgraph::AddOutputLayer(DelegateData& delegateData,
         armnn::IConnectableLayer* layer = delegateData.m_Network->AddOutputLayer(bindingId);
 
         auto tensorInfo = GetTensorInfoForTfLiteTensor(tensor);
-        ARMNN_ASSERT(delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)] != nullptr);
+
+        if (delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)] == nullptr)
+        {
+            return kTfLiteError;
+        }
+
         delegateData.m_OutputSlotForNode[static_cast<unsigned long>(tensorId)]->Connect(layer->GetInputSlot(0));
         outputBindings.push_back(std::make_pair(bindingId, tensorInfo));
     }

@@ -193,7 +193,10 @@ TfLiteStatus Connect(armnn::IConnectableLayer* layer,
                      TfLiteNode* tfLiteNode,
                      armnnDelegate::DelegateData& data)
 {
-    ARMNN_ASSERT(static_cast<unsigned int>(tfLiteNode->outputs->size) == layer->GetNumOutputSlots());
+    if (static_cast<unsigned int>(tfLiteNode->outputs->size) != layer->GetNumOutputSlots())
+    {
+        return kTfLiteError;
+    }
 
     // Connect the input slots
     for (unsigned int inputIndex = 0; inputIndex < layer->GetNumInputSlots(); ++inputIndex)

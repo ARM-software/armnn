@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2018-2021,2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,13 +29,26 @@ public:
                                  unsigned int batchIndex, unsigned int channelIndex,
                                  unsigned int heightIndex, unsigned int widthIndex) const
     {
-        ARMNN_ASSERT( batchIndex < shape[0] || ( shape[0] == 0 && batchIndex == 0 ) );
-        ARMNN_ASSERT( channelIndex < shape[m_ChannelsIndex] ||
-                    ( shape[m_ChannelsIndex] == 0 && channelIndex == 0) );
-        ARMNN_ASSERT( heightIndex < shape[m_HeightIndex] ||
-                    ( shape[m_HeightIndex] == 0 && heightIndex == 0) );
-        ARMNN_ASSERT( widthIndex < shape[m_WidthIndex] ||
-                    ( shape[m_WidthIndex] == 0 && widthIndex == 0) );
+        if (batchIndex >= shape[0] && !( shape[0] == 0 && batchIndex == 0))
+        {
+            throw armnn::Exception("Unable to get batch index", CHECK_LOCATION());
+        }
+        if (channelIndex >= shape[m_ChannelsIndex] &&
+                    !(shape[m_ChannelsIndex] == 0 && channelIndex == 0))
+        {
+            throw armnn::Exception("Unable to get channel index", CHECK_LOCATION());
+
+        }
+        if (heightIndex >= shape[m_HeightIndex] &&
+                    !( shape[m_HeightIndex] == 0 && heightIndex == 0))
+        {
+            throw armnn::Exception("Unable to get height index", CHECK_LOCATION());
+        }
+        if (widthIndex >= shape[m_WidthIndex] &&
+                    ( shape[m_WidthIndex] == 0 && widthIndex == 0))
+        {
+            throw armnn::Exception("Unable to get width index", CHECK_LOCATION());
+        }
 
         /// Offset the given indices appropriately depending on the data layout
         switch (m_DataLayout)

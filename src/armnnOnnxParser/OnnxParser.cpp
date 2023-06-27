@@ -500,7 +500,11 @@ std::vector<TensorInfo> OnnxParserImpl::ComputeOutputInfo(std::vector<std::strin
                                                           std::vector<TensorShape> inputShapes,
                                                           const onnx::TensorProto::DataType& dataType)
 {
-    ARMNN_ASSERT(! outNames.empty());
+    if (outNames.empty())
+    {
+        throw armnn::ParseException(fmt::format("Output names are empty {}", CHECK_LOCATION().AsString()));
+    }
+
     bool needCompute = std::any_of(outNames.begin(),
                                    outNames.end(),
                                    [this](std::string name)
@@ -516,7 +520,11 @@ std::vector<TensorInfo> OnnxParserImpl::ComputeOutputInfo(std::vector<std::strin
     DataType armnnType = DataType::Float32;
     if(needCompute) {
         inferredShapes = layer->InferOutputShapes(inputShapes);
-        ARMNN_ASSERT(inferredShapes.size() == outNames.size());
+        if (inferredShapes.size() != outNames.size())
+        {
+            throw armnn::ParseException(fmt::format("Inferred shapes does not match number of output names {}",
+                                                    CHECK_LOCATION().AsString()));
+        }
         switch (dataType) {
             case onnx::TensorProto::FLOAT: {
                 armnnType = DataType::Float32;
@@ -579,7 +587,10 @@ CreateConstTensorImpl(const T* bufferPtr,
                       armnn::TensorInfo& tensorInfo,
                       const armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
-    ARMNN_ASSERT_MSG(bufferPtr != nullptr, fmt::format("Buffer for permutation is null").c_str());
+    if (bufferPtr == nullptr)
+    {
+        throw armnn::ParseException(fmt::format("Buffer for permutation is null {}", CHECK_LOCATION().AsString()));
+    }
 
     std::unique_ptr<T[]> data(new T[tensorInfo.GetNumElements()]);
 
@@ -879,7 +890,10 @@ INetworkPtr OnnxParserImpl::CreateNetworkFromModel(onnx::ModelProto& model)
 
 void OnnxParserImpl::LoadGraph()
 {
-    ARMNN_ASSERT(m_Graph.get() != nullptr);
+    if (m_Graph.get() == nullptr)
+    {
+        throw armnn::ParseException(fmt::format("Graph pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     //Fill m_TensorsInfo with the shapes and value of every tensor
     SetupInfo(m_Graph->mutable_output());
@@ -1131,7 +1145,10 @@ void OnnxParserImpl::AddConvLayerWithDepthwiseConv(const onnx::NodeProto& node, 
         biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
     }
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({ node.output(0) }, layer,
                                         { m_TensorsInfo[node.input(0)].m_info->GetShape(),
@@ -1208,7 +1225,11 @@ void OnnxParserImpl::AddFullyConnected(const onnx::NodeProto& matmulNode, const 
 
     // Just add a FullyConnected layer, weights and biases are handled as inputs now.
     layer = m_Network->AddFullyConnectedLayer(desc, matmulNode.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     if (inputInfo.GetNumDimensions() > 2)
     {
@@ -1386,7 +1407,11 @@ void OnnxParserImpl::AddPoolingLayer(const onnx::NodeProto& node, Pooling2dDescr
     }
 
     IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({node.output(0)}, layer, {m_TensorsInfo[node.input(0)].m_info->GetShape()});
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
@@ -1447,7 +1472,12 @@ void OnnxParserImpl::CreateReshapeLayer(const std::string& inputName,
     reshapeDesc.m_TargetShape = outputTensorInfo.GetShape();
 
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
+
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     // register the input connection slots for the layer, connections are made after all layers have been created
@@ -1483,7 +1513,11 @@ void OnnxParserImpl::ParseActivation(const onnx::NodeProto& node, const armnn::A
     }
 
     IConnectableLayer* const layer = m_Network->AddActivationLayer(desc, node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({ node.output(0)}, layer, {m_TensorsInfo[node.input(0)].m_info->GetShape()});
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
@@ -1534,7 +1568,12 @@ void OnnxParserImpl::ParseAdd(const onnx::NodeProto& node)
     auto inputs = AddPrepareBroadcast(node.input(0), node.input(1));
     auto input0 = *m_TensorsInfo[inputs.first].m_info;
     auto input1 = *m_TensorsInfo[inputs.second].m_info;
-    ARMNN_ASSERT(input0.GetNumDimensions() == input1.GetNumDimensions());
+    if (input0.GetNumDimensions() != input1.GetNumDimensions())
+    {
+        throw armnn::ParseException(fmt::format("Dimension mismatch in node {} {}",
+                                                node.name(),
+                                                CHECK_LOCATION().AsString()));
+    }
 
     unsigned int numDims = input0.GetNumDimensions();
     for (unsigned int i = 0; i < numDims; i++)
@@ -1558,7 +1597,11 @@ void OnnxParserImpl::ParseAdd(const onnx::NodeProto& node)
 
 
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Add, node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({ node.output(0) }, layer,
                                         { m_TensorsInfo[inputs.first].m_info->GetShape(),
@@ -1627,7 +1670,11 @@ void OnnxParserImpl::ParseBatchNormalization(const onnx::NodeProto& node)
                                                                      biasTensor.first,
                                                                      scaleTensor.first,
                                                                      node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({node.output(0)}, layer, {m_TensorsInfo[node.input(0)].m_info->GetShape()});
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
@@ -1671,7 +1718,11 @@ void OnnxParserImpl::ParseConcat(const onnx::NodeProto& node)
     }
 
     IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({node.output(0)}, layer, inputShapes,
                                         m_TensorsInfo[node.input(0)].m_dtype);
@@ -1896,7 +1947,10 @@ void OnnxParserImpl::ParseConv(const onnx::NodeProto& node)
         tensorIndexes.emplace_back(node.input(2));
     }
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({ node.output(0) }, layer,
                                         { m_TensorsInfo[node.input(0)].m_info->GetShape(),
@@ -1967,7 +2021,11 @@ void OnnxParserImpl::ParseGather(const onnx::NodeProto& node)
     gatherDescriptor.m_Axis = static_cast<int>(ReadOptionalNodeInt64Attribute(node, "axis", 0));
 
     IConnectableLayer* layer = m_Network->AddGatherLayer(gatherDescriptor, node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     const TensorShape& inputShape = m_TensorsInfo[node.input(0)].m_info->GetShape();
     const TensorShape& indicesShape = m_TensorsInfo[node.input(1)].m_info->GetShape();
@@ -2005,7 +2063,11 @@ void OnnxParserImpl::ParseGemm(const onnx::NodeProto& node)
 
     // Just add a FullyConnected layer, weights and biases are handled as inputs now.
     layer = m_Network->AddFullyConnectedLayer(fullyConnectedDescriptor, node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     // if transA != 0, add transpose to the input0
     if (transA != 0)
@@ -2014,7 +2076,12 @@ void OnnxParserImpl::ParseGemm(const onnx::NodeProto& node)
         armnn::TransposeDescriptor transposeADescriptor;
         transposeADescriptor.m_DimMappings = { 1, 0 };
         IConnectableLayer* transALayer = m_Network->AddTransposeLayer(transposeADescriptor, transAName.c_str());
-        ARMNN_ASSERT(transALayer != nullptr);
+
+        if (!transALayer)
+        {
+            throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+        }
+
         auto transAInfo = ComputeOutputInfo({ transAName }, transALayer, { input0Shape });
         transALayer->GetOutputSlot(0).SetTensorInfo(transAInfo[0]);
         transALayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
@@ -2043,7 +2110,11 @@ void OnnxParserImpl::ParseGemm(const onnx::NodeProto& node)
             activationDescriptor.m_A = alpha;
             activationDescriptor.m_Function = ActivationFunction::Linear;
             IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
-            ARMNN_ASSERT(actLayer != nullptr);
+
+            if (!actLayer)
+            {
+                throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+            }
 
             auto actInfo = ComputeOutputInfo({ activationName }, actLayer, { weightInfo.GetShape() });
             actLayer->GetOutputSlot(0).SetTensorInfo(actInfo[0]);
@@ -2067,7 +2138,11 @@ void OnnxParserImpl::ParseGemm(const onnx::NodeProto& node)
             activationDescriptor.m_A = alpha;
             activationDescriptor.m_Function = ActivationFunction::Linear;
             IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
-            ARMNN_ASSERT(actLayer != nullptr);
+
+            if (!actLayer)
+            {
+                throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+            }
 
             auto actInfo = ComputeOutputInfo({ activationName }, actLayer, { input1Shape });
             actLayer->GetOutputSlot(0).SetTensorInfo(actInfo[0]);
@@ -2097,7 +2172,11 @@ void OnnxParserImpl::ParseGemm(const onnx::NodeProto& node)
             activationDescriptor.m_A = beta;
             activationDescriptor.m_Function = ActivationFunction::Linear;
             IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
-            ARMNN_ASSERT(actLayer != nullptr);
+
+            if (!actLayer)
+            {
+                throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+            }
 
             auto actInfo = ComputeOutputInfo({ activationName }, actLayer, { biasInfo.GetShape() });
             actLayer->GetOutputSlot(0).SetTensorInfo(actInfo[0]);
@@ -2128,7 +2207,11 @@ void OnnxParserImpl::ParseGemm(const onnx::NodeProto& node)
             activationDescriptor.m_A = beta;
             activationDescriptor.m_Function = ActivationFunction::Linear;
             IConnectableLayer* actLayer = m_Network->AddActivationLayer(activationDescriptor, activationName.c_str());
-            ARMNN_ASSERT(actLayer != nullptr);
+
+            if (!layer)
+            {
+                throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+            }
 
             auto actInfo = ComputeOutputInfo({ activationName },
                                              actLayer,
@@ -2162,7 +2245,11 @@ void OnnxParserImpl::ParseGlobalAveragePool(const onnx::NodeProto& node)
     desc.m_PoolHeight = inputShape[2];
 
     IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     auto outputInfo = ComputeOutputInfo({node.output(0)}, layer, {inputShape});
     layer->GetOutputSlot(0).SetTensorInfo(outputInfo[0]);
@@ -2189,7 +2276,11 @@ void OnnxParserImpl::ParseShape(const onnx::NodeProto& node)
     CHECK_VALID_SIZE(static_cast<size_t>(node.output_size()), 1);
 
     IConnectableLayer* layer = m_Network->AddShapeLayer(node.name().c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     TensorShape inputShape = m_TensorsInfo[node.input(0)].m_info->GetShape();
     auto outputInfo = ComputeOutputInfo({node.output(0)}, layer, {inputShape}, onnx::TensorProto::INT64);
@@ -2439,7 +2530,11 @@ void OnnxParserImpl::RegisterInputSlot(IConnectableLayer* layer,
 
 void OnnxParserImpl::RegisterInputSlots(IConnectableLayer* layer, const std::vector<std::string>& tensorIds)
 {
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
+
     if (tensorIds.size() != layer->GetNumInputSlots())
     {
         throw ParseException(
@@ -2467,7 +2562,11 @@ void OnnxParserImpl::RegisterInputSlots(IConnectableLayer* layer, const std::vec
 
 void OnnxParserImpl::RegisterOutputSlots(IConnectableLayer* layer, const std::vector<std::string>& tensorIds)
 {
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw armnn::NullPointerException(fmt::format("Layer pointer is null {}", CHECK_LOCATION().AsString()));
+    }
+
     if (tensorIds.size() != layer->GetNumOutputSlots())
     {
         throw ParseException(

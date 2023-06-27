@@ -188,14 +188,6 @@ void CheckTensor(const TfLiteParserImpl::ModelPtr& model,
                  size_t tensorIndex,
                  const CheckLocation& location)
 {
-    // not checking model, because I assume CHECK_MODEL already run
-    // and checked that. An assert would do.
-    ARMNN_ASSERT_MSG(model.get() != nullptr, "Expecting a valid model in this function");
-
-    // also subgraph index should be checked by CHECK_MODEL so
-    // I only add an assert here
-    ARMNN_ASSERT_MSG(subgraphIndex < model->subgraphs.size(), "Expecting a valid subgraph index");
-
     // the tensor index is the only one to check here
     if (tensorIndex >= model->subgraphs[subgraphIndex]->tensors.size())
     {
@@ -617,9 +609,16 @@ CreateConstTensorImpl(TfLiteParserImpl::BufferRawPtr bufferPtr,
                       armnn::Optional<armnn::PermutationVector&> permutationVector)
 {
     IgnoreUnused(tensorPtr);
-    ARMNN_ASSERT_MSG(tensorPtr != nullptr, "tensorPtr is null");
-    ARMNN_ASSERT_MSG(bufferPtr != nullptr,
-        fmt::format("Buffer for buffer:{} is null", tensorPtr->buffer).c_str());
+
+    if (!tensorPtr)
+    {
+        throw armnn::ParseException(fmt::format("Tensor pointer is null {}", CHECK_LOCATION().AsString()));
+    }
+
+    if (!bufferPtr)
+    {
+        throw armnn::ParseException(fmt::format("Buffer for buffer:{} is null", tensorPtr->buffer).c_str());
+    }
 
     std::unique_ptr<T[]> data(new T[tensorInfo.GetNumElements()]);
 
@@ -999,7 +998,11 @@ INetworkPtr TfLiteParserImpl::CreateNetworkFromModel()
         }
     }
     m_Network = INetwork::Create(networkOptions);
-    ARMNN_ASSERT(m_Model.get() != nullptr);
+
+    if (m_Model.get() == nullptr)
+    {
+        throw ParseException(fmt::format("Tflite Model pointer is null {}", CHECK_LOCATION().AsString()));
+    }
 
     if (m_Model->subgraphs.size() != 1)
     {
@@ -1101,8 +1104,6 @@ void TfLiteParserImpl::RegisterProducerOfTensor(size_t subgraphIndex,
                                                 armnn::IOutputSlot* slot)
 {
     CHECK_TENSOR(m_Model, subgraphIndex, tensorIndex);
-    ARMNN_ASSERT(m_SubgraphConnections.size() > subgraphIndex);
-    ARMNN_ASSERT(m_SubgraphConnections[subgraphIndex].size() > tensorIndex);
 
     TensorSlots & tensorSlots = m_SubgraphConnections[subgraphIndex][tensorIndex];
 
@@ -1127,8 +1128,6 @@ void TfLiteParserImpl::RegisterConsumerOfTensor(size_t subgraphIndex,
                                                 armnn::IInputSlot* slot)
 {
     CHECK_TENSOR(m_Model, subgraphIndex, tensorIndex);
-    ARMNN_ASSERT(m_SubgraphConnections.size() > subgraphIndex);
-    ARMNN_ASSERT(m_SubgraphConnections[subgraphIndex].size() > tensorIndex);
 
     TensorSlots& tensorSlots = m_SubgraphConnections[subgraphIndex][tensorIndex];
     tensorSlots.inputSlots.push_back(slot);
@@ -1198,7 +1197,12 @@ void TfLiteParserImpl::ParseUnsupportedOperator(size_t subgraphIndex, size_t ope
 
     // Add a non-executable StandInLayer as a placeholder for any unsupported operator
     IConnectableLayer* layer = m_Network->AddStandInLayer(descriptor, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     for (unsigned int i = 0u; i < numOutputs; ++i)
     {
@@ -1224,7 +1228,12 @@ void TfLiteParserImpl::ParseCast(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = fmt::format("Cast:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddCastLayer(layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1301,7 +1310,11 @@ void TfLiteParserImpl::ParseConv2D(size_t subgraphIndex, size_t operatorIndex)
         }
     }
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1381,7 +1394,12 @@ void TfLiteParserImpl::ParseConv3D(size_t subgraphIndex, size_t operatorIndex)
     }
 
     armnn::IConnectableLayer* layer = m_Network->AddConvolution3dLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1457,7 +1475,12 @@ void TfLiteParserImpl::ParseDepthwiseConv2D(size_t subgraphIndex, size_t operato
         // Add the biases input to the registration list, a constant layer will be added by SetupConstantLayers.
         tensorIndexesToRegister.emplace_back(inputTensorIndexes[2]);
     }
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1485,7 +1508,12 @@ void TfLiteParserImpl::ParseDequantize(size_t subgraphIndex, size_t operatorInde
     auto layerName = fmt::format("Dequantize:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddDequantizeLayer(layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1556,8 +1584,12 @@ void TfLiteParserImpl::ParseExpandDims(size_t subgraphIndex, size_t operatorInde
     outputTensorInfo.SetShape(reshapeDesc.m_TargetShape);
 
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
-    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto outputTensorIds = GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex);
     m_TensorInfos[outputTensorIds[0]] = outputTensorInfo;
@@ -1596,7 +1628,12 @@ void TfLiteParserImpl::ParseTranspose(size_t subgraphIndex, size_t operatorIndex
     TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
 
     IConnectableLayer* layer = m_Network->AddTransposeLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -1736,7 +1773,11 @@ void TfLiteParserImpl::ParseTransposeConv(size_t subgraphIndex, size_t operatorI
                                                           layerName.c_str());
     }
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0 , { 2, 1 });
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1780,7 +1821,12 @@ void TfLiteParserImpl::ParseBatchMatMul(size_t subgraphIndex, size_t operatorInd
                                      // Arbitrary DataLayout
 
     IConnectableLayer* layer = m_Network->AddBatchMatMulLayer(descriptor, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1831,7 +1877,12 @@ void TfLiteParserImpl::ParseBatchToSpaceND(size_t subgraphIndex, size_t operator
     TensorInfo inputTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 0);
 
     IConnectableLayer* layer = m_Network->AddBatchToSpaceNdLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -1859,7 +1910,11 @@ void TfLiteParserImpl::ParseL2Normalization(size_t subgraphIndex, size_t operato
     auto layerName = fmt::format("L2Normalization:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddL2NormalizationLayer(desc, layerName.c_str());
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -1893,7 +1948,12 @@ void TfLiteParserImpl::ParseMaximum(size_t subgraphIndex, size_t operatorIndex)
     CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Maximum, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -1923,7 +1983,12 @@ void TfLiteParserImpl::ParseMinimum(size_t subgraphIndex, size_t operatorIndex)
     CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Minimum, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -1960,7 +2025,7 @@ void TfLiteParserImpl::ParsePool(size_t subgraphIndex,
                 fmt::format("MaxPool2D:{}:{}", subgraphIndex, operatorIndex);
             break;
         default:
-            ARMNN_ASSERT_MSG(false, "Unsupported Pooling Algorithm");
+            throw ParseException(fmt::format("Unsupported Pooling Algorithm {}", CHECK_LOCATION().AsString()));
     }
 
     Pooling2dDescriptor desc;
@@ -1991,7 +2056,12 @@ void TfLiteParserImpl::ParsePool(size_t subgraphIndex,
     CHECK_VALID_SIZE(outputs.size(), 1);
 
     IConnectableLayer* layer = m_Network->AddPooling2dLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -2180,7 +2250,12 @@ void TfLiteParserImpl::ParseSpaceToBatchND(size_t subgraphIndex, size_t operator
     TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
 
     IConnectableLayer* layer = m_Network->AddSpaceToBatchNdLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -2218,7 +2293,13 @@ void TfLiteParserImpl::ParseSpaceToDepth(size_t subgraphIndex, size_t operatorIn
 
     auto layerName = fmt::format("SpaceToDepth:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSpaceToDepthLayer(descriptor, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -2292,7 +2373,12 @@ void TfLiteParserImpl::ParseShape(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = fmt::format("Shape:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddShapeLayer(layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2354,7 +2440,13 @@ void TfLiteParserImpl::ParseSqueeze(size_t subgraphIndex, size_t operatorIndex)
     m_TensorInfos[outputTensorIds[0]] = outputTensorInfo;
 
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -2431,7 +2523,12 @@ void TfLiteParserImpl::ParseStridedSlice(size_t subgraphIndex, size_t operatorIn
 
     auto layerName = fmt::format("StridedSlice:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddStridedSliceLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2461,7 +2558,12 @@ void TfLiteParserImpl::ParseSub(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Sub:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Sub, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2495,7 +2597,12 @@ void TfLiteParserImpl::ParseDiv(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Div:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Div, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2526,7 +2633,12 @@ void TfLiteParserImpl::ParseFloorDiv(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Div:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Div, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2557,7 +2669,12 @@ void TfLiteParserImpl::ParseAdd(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Add:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Add, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2591,7 +2708,12 @@ void TfLiteParserImpl::ParseMul(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Mul:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Mul, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2651,7 +2773,12 @@ void TfLiteParserImpl::ParseMean(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Mean:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddMeanLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -2751,7 +2878,13 @@ void TfLiteParserImpl::ParsePad(size_t subgraphIndex, size_t operatorIndex)
             : fmt::format("PadV2:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -2822,7 +2955,13 @@ void TfLiteParserImpl::ParseMirrorPad(size_t subgraphIndex, size_t operatorIndex
     auto layerName = fmt::format("MirrorPad:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddPadLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -2849,8 +2988,12 @@ void TfLiteParserImpl::ParsePrelu(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo alphaTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     IConnectableLayer* layer = m_Network->AddPreluLayer(layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
 
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     if (IsConstTensor(inputs[1]))
     {
@@ -2863,7 +3006,12 @@ void TfLiteParserImpl::ParsePrelu(size_t subgraphIndex, size_t operatorIndex)
         std::string constLayerName = fmt::format("Constant:{}", inputs[1]->name);
         IConnectableLayer* constLayer =
                     m_Network->AddConstantLayer(alphaTensorAndData.first, constLayerName.c_str());
-        ARMNN_ASSERT(constLayer != nullptr);
+
+        if (!constLayer)
+        {
+            throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                       operatorIndex, CHECK_LOCATION().AsString()));
+        }
 
         constLayer->GetOutputSlot(0).SetTensorInfo(alphaTensorInfo);
         constLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1));
@@ -2899,7 +3047,12 @@ void TfLiteParserImpl::ParseQuantize(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = fmt::format("Quantize:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddQuantizeLayer(layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -3215,7 +3368,13 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
     m_TensorInfos[outputTensorIds[0]] = reshapeOutputTensorInfo;
 
     IConnectableLayer* layer = m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     layer->GetOutputSlot(0).SetTensorInfo(reshapeOutputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
@@ -3289,7 +3448,13 @@ void TfLiteParserImpl::ParseResize(size_t subgraphIndex, size_t operatorIndex, R
     TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
 
     IConnectableLayer* layer = m_Network->AddResizeLayer(desc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -3408,7 +3573,13 @@ void TfLiteParserImpl::ParseConcatenation(size_t subgraphIndex, size_t operatorI
     auto layerName = fmt::format("Concatenation:{}:{}", subgraphIndex, operatorIndex);
 
     IConnectableLayer* layer = m_Network->AddConcatLayer(concatDescriptor, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -3487,7 +3658,11 @@ void TfLiteParserImpl::ParseFullyConnected(size_t subgraphIndex, size_t operator
     // Filters and biases are always passed to fully connected as inputs
     layer = m_Network->AddFullyConnectedLayer(desc, layerName.c_str());
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     unsigned int startingSlotIndex = 0;
     if (inputTensorInfo.GetNumDimensions() > 2)
@@ -3615,7 +3790,11 @@ void TfLiteParserImpl::ParseDetectionPostProcess(size_t subgraphIndex, size_t op
     IConnectableLayer* layer = m_Network->AddDetectionPostProcessLayer(desc, anchorTensorAndData,
                                                                        layerName.c_str());
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     // The model does not specify the output shapes.
     // The output shapes are calculated from the max_detection and max_classes_per_detection.
@@ -3672,7 +3851,11 @@ void TfLiteParserImpl::ParsePack(size_t subgraphIndex, size_t operatorIndex)
     auto layerName = fmt::format("Pack:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddStackLayer(desc, layerName.c_str());
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -3936,7 +4119,12 @@ void TfLiteParserImpl::ParseUnidirectionalSequenceLSTM(size_t subgraphIndex, siz
 
     auto layerName = fmt::format("UnidirectionalSequenceLSTM:{}:{}", subgraphIndex, operatorIndex);
     armnn::IConnectableLayer* layer = m_Network->AddUnidirectionalSequenceLstmLayer(desc, params);
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     // register the input connection slots for the layer, connections are made after all layers have been created
     // only the tensors for the inputs are relevant, exclude the const tensors
@@ -4029,7 +4217,12 @@ void TfLiteParserImpl::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Unpack:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorShape splitOutShape = TensorShape(static_cast<unsigned int>(unpackDimSizes.size()),
                                             unpackDimSizes.data());
@@ -4093,7 +4286,12 @@ void TfLiteParserImpl::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
 
     armnn::TensorInfo inputTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     armnn::TensorInfo axisTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
-    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
+
+    if (axisTensorInfo.GetNumElements() != 1)
+    {
+        throw ParseException(fmt::format("Axis tensor can only have 1 element {}",
+                             CHECK_LOCATION().AsString()));
+    }
 
     BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[0]->buffer);
     if (axisBufferPtr == nullptr)
@@ -4158,7 +4356,12 @@ void TfLiteParserImpl::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("Split:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[1]});
@@ -4177,8 +4380,11 @@ unsigned int ComputeWrappedIndex(int idx, unsigned int numDimsIn)
 {
     int numDims = armnn::numeric_cast<int>(numDimsIn);
     int v = idx < 0 ? numDims + idx : idx;
-    ARMNN_ASSERT(v >= 0);
-    ARMNN_ASSERT(v < numDims);
+
+    if (v < 0 || v > numDims)
+    {
+        throw ParseException(fmt::format("Unable to compute index {}", CHECK_LOCATION().AsString()));
+    }
 
     return static_cast<unsigned int>(v);
 }
@@ -4200,7 +4406,12 @@ void TfLiteParserImpl::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo inputTensorInfo = ToTensorInfo(inputTensor);
     armnn::TensorInfo splitsInfo      = ToTensorInfo(splitsTensor);
     armnn::TensorInfo axisTensorInfo  = ToTensorInfo(axisTensor);
-    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
+
+    if (axisTensorInfo.GetNumElements() != 1)
+    {
+        throw ParseException(fmt::format("Axis tensor can only have 1 element {}",
+                             CHECK_LOCATION().AsString()));
+    }
 
     // Inputs
     auto inputDimSize = inputTensorInfo.GetNumDimensions();
@@ -4324,7 +4535,12 @@ void TfLiteParserImpl::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("SplitV:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
@@ -4361,7 +4577,12 @@ void TfLiteParserImpl::ParseArgMinMax(size_t subgraphIndex, size_t operatorIndex
     armnn::TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
     armnn::TensorInfo axisTensorInfo   = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
-    ARMNN_ASSERT(axisTensorInfo.GetNumElements() == 1);
+
+    if (axisTensorInfo.GetNumElements() != 1)
+    {
+        throw ParseException(fmt::format("Axis tensor can only have 1 element {}",
+                             CHECK_LOCATION().AsString()));
+    }
 
     // Check if output tensor type is Signed32 or Signed64
     if (outputTensorInfo.GetDataType() != armnn::DataType::Signed32 &&
@@ -4406,7 +4627,13 @@ void TfLiteParserImpl::ParseArgMinMax(size_t subgraphIndex, size_t operatorIndex
     auto layerName = argMinMaxFunction == ArgMinMaxFunction::Max ? "ArgMax:{}:{}" : "ArgMin:{}:{}";
     auto layerNameFormatted = fmt::format(layerName, subgraphIndex, operatorIndex);
     IConnectableLayer *layer = m_Network->AddArgMinMaxLayer(desc, layerNameFormatted.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -4463,7 +4690,13 @@ void TfLiteParserImpl::ParseGather(size_t subgraphIndex, size_t operatorIndex)
     gatherDescriptor.m_Axis = axis;
 
     IConnectableLayer* layer = m_Network->AddGatherLayer(gatherDescriptor, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -4488,7 +4721,13 @@ void TfLiteParserImpl::ParseGatherNd(size_t subgraphIndex, size_t operatorIndex)
 
     auto layerName = fmt::format("GatherNd:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddGatherNdLayer(layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -4524,7 +4763,13 @@ void TfLiteParserImpl::ParseDepthToSpace(size_t subgraphIndex, size_t operatorIn
 
     auto layerName = fmt::format("DepthToSpace:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddDepthToSpaceLayer(descriptor, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
@@ -4649,7 +4894,12 @@ void TfLiteParserImpl::ParseLocalResponseNormalization(size_t subgraphIndex, siz
     descriptor.m_NormSize = 1 + (2 * descriptor.m_NormSize);
 
     IConnectableLayer* layer = m_Network->AddNormalizationLayer(descriptor, layerNameFormatted.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -4708,7 +4958,12 @@ void TfLiteParserImpl::ParsePower(size_t subgraphIndex, size_t operatorIndex)
     CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Power, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -4780,7 +5035,12 @@ void TfLiteParserImpl::ParseSquaredDifference(size_t subgraphIndex, size_t opera
     CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::SqDiff, layerName.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
@@ -4809,7 +5069,12 @@ void TfLiteParserImpl::ParseElementwiseUnary(size_t subgraphIndex, size_t operat
     ElementwiseUnaryDescriptor desc;
     desc.m_Operation = unaryOperation;
     IConnectableLayer* layer = m_Network->AddElementwiseUnaryLayer(desc, layerNameFormatted.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -4872,7 +5137,12 @@ void TfLiteParserImpl::ParseComparison(size_t subgraphIndex, size_t operatorInde
     ComparisonDescriptor desc;
     desc.m_Operation = comparisonOperation;
     IConnectableLayer* layer = m_Network->AddComparisonLayer(desc, layerNameFormatted.c_str());
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -5139,7 +5409,12 @@ void TfLiteParserImpl::RegisterInputSlots(size_t subgraphIndex,
                                           unsigned int startingSlotIndex)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
 
     if (tensorIndexes.size() + startingSlotIndex != layer->GetNumInputSlots())
     {
@@ -5167,7 +5442,13 @@ void TfLiteParserImpl::RegisterOutputSlots(size_t subgraphIndex,
                                            const std::vector<unsigned int>& tensorIndexes)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
-    ARMNN_ASSERT(layer != nullptr);
+
+    if (!layer)
+    {
+        throw NullPointerException(fmt::format("Layer {} pointer is null {}",
+                                   operatorIndex, CHECK_LOCATION().AsString()));
+    }
+
     if (tensorIndexes.size() != layer->GetNumOutputSlots())
     {
         throw ParseException(

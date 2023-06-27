@@ -114,14 +114,16 @@ public:
 
             if (std::find(dataTypes.begin(), dataTypes.end(), expectedInputType) == dataTypes.end())
             {
-                ARMNN_ASSERT_MSG(false, "Trying to create workload with incorrect type");
+                throw armnn::Exception("Trying to create workload with incorrect type");
             }
-            ARMNN_ASSERT_MSG(std::all_of(std::next(info.m_InputTensorInfos.begin()),
+            if (std::all_of(std::next(info.m_InputTensorInfos.begin()),
                                          info.m_InputTensorInfos.end(),
                                          [&](auto it){
                                              return it.GetDataType() == expectedInputType;
-                                         }),
-                             "Trying to create workload with incorrect type");
+                                         }) == false)
+            {
+                throw armnn::Exception("Trying to create workload with incorrect type");
+            }
         }
         armnn::DataType expectedOutputType;
 
@@ -135,19 +137,21 @@ public:
 
                 if (expectedOutputType != expectedInputType)
                 {
-                    ARMNN_ASSERT_MSG(false, "Trying to create workload with incorrect type");
+                    throw armnn::Exception( "Trying to create workload with incorrect type");
                 }
             }
             else if (std::find(dataTypes.begin(), dataTypes.end(), expectedOutputType) == dataTypes.end())
             {
-                ARMNN_ASSERT_MSG(false, "Trying to create workload with incorrect type");
+                throw armnn::Exception("Trying to create workload with incorrect type");
             }
-            ARMNN_ASSERT_MSG(std::all_of(std::next(info.m_OutputTensorInfos.begin()),
+            if (std::all_of(std::next(info.m_OutputTensorInfos.begin()),
                                          info.m_OutputTensorInfos.end(),
                                          [&](auto it){
                                              return it.GetDataType() == expectedOutputType;
-                                         }),
-                             "Trying to create workload with incorrect type");
+                                         }) == false)
+            {
+                throw armnn::Exception("Trying to create workload with incorrect type");
+            }
         }
     }
 };
@@ -160,19 +164,22 @@ public:
     MultiTypedWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
         : BaseWorkload<QueueDescriptor>(descriptor, info)
     {
-        ARMNN_ASSERT_MSG(std::all_of(info.m_InputTensorInfos.begin(),
+        if (std::all_of(info.m_InputTensorInfos.begin(),
                                      info.m_InputTensorInfos.end(),
                                      [&](auto it){
                                          return it.GetDataType() == InputDataType;
-                                     }),
-                         "Trying to create workload with incorrect type");
-
-        ARMNN_ASSERT_MSG(std::all_of(info.m_OutputTensorInfos.begin(),
+                                     }) == false)
+        {
+            throw armnn::Exception("Trying to create workload with incorrect type");
+        }
+        if (std::all_of(info.m_OutputTensorInfos.begin(),
                                      info.m_OutputTensorInfos.end(),
                                      [&](auto it){
                                          return it.GetDataType() == OutputDataType;
-                                     }),
-                         "Trying to create workload with incorrect type");
+                                     }) == false)
+        {
+            throw armnn::Exception("Trying to create workload with incorrect type");
+        }
     }
 };
 
@@ -187,16 +194,20 @@ public:
     {
         if (!info.m_InputTensorInfos.empty())
         {
-            ARMNN_ASSERT_MSG(info.m_InputTensorInfos.front().GetDataType() == DataType,
-                                 "Trying to create workload with incorrect type");
+            if (info.m_InputTensorInfos.front().GetDataType() != DataType)
+            {
+                throw armnn::Exception("Trying to create workload with incorrect type");
+            }
         }
 
-        ARMNN_ASSERT_MSG(std::all_of(info.m_OutputTensorInfos.begin(),
+        if (std::all_of(info.m_OutputTensorInfos.begin(),
                                      info.m_OutputTensorInfos.end(),
                                      [&](auto it){
                                          return it.GetDataType() == DataType;
-                                     }),
-                         "Trying to create workload with incorrect type");
+                                     }) == false)
+        {
+            throw armnn::Exception("Trying to create workload with incorrect type");
+        }
     }
 };
 

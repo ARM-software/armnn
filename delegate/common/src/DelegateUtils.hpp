@@ -109,8 +109,11 @@ unsigned int ComputeWrappedIndex(int index, unsigned int numDimensions)
 {
     int numDims = armnn::numeric_cast<int>(numDimensions);
     int wrappedIndex = index < 0 ? numDims + index : index;
-    ARMNN_ASSERT(wrappedIndex >= 0);
-    ARMNN_ASSERT(wrappedIndex < numDims);
+
+    if (wrappedIndex < 0 || wrappedIndex >= numDims)
+    {
+        throw armnn::ParseException("Unable to compute wrapped index");
+    }
 
     return static_cast<unsigned int>(wrappedIndex);
 };

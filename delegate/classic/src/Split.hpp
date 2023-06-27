@@ -44,7 +44,11 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
 
-    ARMNN_ASSERT(GetTensorInfoForTfLiteTensor(tfLiteAxisTensor).GetNumElements() == 1);
+    if (GetTensorInfoForTfLiteTensor(tfLiteAxisTensor).GetNumElements() != 1)
+    {
+        return kTfLiteError;
+    }
+
     auto* axisTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteAxisTensor);
     std::vector<int32_t> axisTensorData(axisTensorDataPtr, axisTensorDataPtr + 1);
     int32_t axis = axisTensorData[0];
@@ -183,8 +187,16 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& splitsTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteSplitsTensor);
-    ARMNN_ASSERT(splitsTensorInfo.GetNumDimensions() == 1);
-    ARMNN_ASSERT(GetTensorInfoForTfLiteTensor(tfLiteAxisTensor).GetNumElements() == 1);
+
+    if (splitsTensorInfo.GetNumDimensions() != 1)
+    {
+        return kTfLiteError;
+    }
+
+    if (GetTensorInfoForTfLiteTensor(tfLiteAxisTensor).GetNumElements() != 1)
+    {
+        return kTfLiteError;
+    }
 
     auto* axisTensorDataPtr = tflite::GetTensorData<int32_t>(&tfLiteAxisTensor);
     std::vector<int32_t> axisTensorData(axisTensorDataPtr, axisTensorDataPtr + 1);

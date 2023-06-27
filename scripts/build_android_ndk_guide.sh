@@ -422,13 +422,13 @@ if [[ $? != 0 ]] ; then
     echo "Downloading Android NDK failed"
     exit 1
 fi
+GetAndBuildCmake319
+CMAKE=$WORKING_DIR/cmake/install/bin/cmake
 GetAndBuildFlatbuffers
 if [[ $? != 0 ]] ; then
     echo "Building Flatbuffers failed"
     exit 1
 fi
-GetAndBuildCmake319
-CMAKE=$WORKING_DIR/cmake/install/bin/cmake
 GetArmNN
 if [[ $? != 0 ]] ; then
     echo "Cloning Arm NN failed"

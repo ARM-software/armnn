@@ -1,4 +1,4 @@
-/// Copyright (c) 2022 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2022-2023 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -212,6 +212,16 @@ More machine learning operators will be supported in future releases.
 @section delegateoptions Delegate Options
 
 The general list of runtime options are described in @subpage runtimeoptions
+
+@subsection opaquedelegateoptions Opaque Delegate Options
+
+In Opaque Delegate, delegate options are passed via ArmNNSettings which is a FlatBuffer of tflite::TFLiteSettings.
+
+Arm NN Settings | Possible Values | Description
+:--------------- ------------- | :----- | :----------
+backends | ["GpuAcc"/"CpuAcc"] | A comma separated list without whitespaces of backends which should be used for execution. Falls back to next backend in list if previous does not provide support for operation.
+fastmath | [true/false] | Allows the use of optimisation techniques e.g. Winograd that will reduce execution time with the possibility of a drop in accuracy.
+additional_parameters | JSON string of additional Arm NN delegate options | JSON string of additional Arm NN delegate options. The general list of runtime options are described in [Runtime options](\ref runtimeoptions).
 
 **/
 }

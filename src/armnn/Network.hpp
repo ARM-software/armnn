@@ -188,6 +188,9 @@ public:
     IConnectableLayer* AddReshapeLayer(const ReshapeDescriptor& reshapeDescriptor,
                                        const char* name = nullptr);
 
+    IConnectableLayer* AddReverseV2Layer(const ReverseV2Descriptor& ReverseV2Descriptor,
+                                         const char* name = nullptr);
+
     IConnectableLayer* AddShapeLayer(const char* name = nullptr);
 
     IConnectableLayer* AddSliceLayer(const SliceDescriptor& sliceDescriptor, const char* name = nullptr);

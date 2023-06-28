@@ -264,6 +264,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ReduceLayer.cpp \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeLayer.cpp \
+        src/armnn/layers/ReverseV2Layer.cpp \
         src/armnn/layers/ShapeLayer.cpp \
         src/armnn/layers/SliceLayer.cpp \
         src/armnn/layers/SoftmaxLayer.cpp \

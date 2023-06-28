@@ -66,6 +66,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     PreluImpl.hpp
     Reduce.cpp
     Reduce.hpp
+    ReverseV2Impl.cpp
+    ReverseV2Impl.hpp
     RefActivationWorkload.cpp
     RefActivationWorkload.hpp
     RefArgMinMaxWorkload.cpp
@@ -161,6 +163,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefReshapeWorkload.hpp
     RefResizeWorkload.cpp
     RefResizeWorkload.hpp
+    RefReverseV2Workload.cpp
+    RefReverseV2Workload.hpp
     RefShapeWorkload.hpp
     RefSliceWorkload.cpp
     RefSliceWorkload.hpp

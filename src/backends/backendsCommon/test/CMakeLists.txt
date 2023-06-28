@@ -170,6 +170,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ReshapeTestImpl.hpp
     layerTests/ResizeTestImpl.cpp
     layerTests/ResizeTestImpl.hpp
+    layerTests/ReverseV2TestImpl.cpp
+    layerTests/ReverseV2TestImpl.hpp
     layerTests/RsqrtTestImpl.cpp
     layerTests/RsqrtTestImpl.hpp
     layerTests/SinTestImpl.cpp

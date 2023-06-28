@@ -91,6 +91,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/ReduceSumTestImpl.cpp \
     test/layerTests/ReshapeTestImpl.cpp \
     test/layerTests/ResizeTestImpl.cpp \
+    test/layerTests/ReverseV2TestImpl.cpp \
     test/layerTests/RsqrtTestImpl.cpp \
     test/layerTests/SliceTestImpl.cpp \
     test/layerTests/SquaredDifferenceTestImpl.cpp \

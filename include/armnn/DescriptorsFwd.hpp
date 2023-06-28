@@ -42,6 +42,7 @@ struct QLstmDescriptor;
 struct ReshapeDescriptor;
 struct ResizeDescriptor;
 struct ReduceDescriptor;
+struct ReverseV2Descriptor;
 struct SliceDescriptor;
 struct SoftmaxDescriptor;
 struct SpaceToBatchNdDescriptor;

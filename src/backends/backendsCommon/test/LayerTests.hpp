@@ -60,6 +60,7 @@
 #include <backendsCommon/test/layerTests/ReduceSumTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ReshapeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ResizeTestImpl.hpp>
+#include <backendsCommon/test/layerTests/ReverseV2TestImpl.hpp>
 #include <backendsCommon/test/layerTests/RsqrtTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ShapeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SinTestImpl.hpp>

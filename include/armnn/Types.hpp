@@ -473,6 +473,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(GatherNd) \
     X(BatchMatMul) \
     X(ElementwiseBinary) \
+    X(ReverseV2) \
 
 // New layers should be added at last position to minimize instability.
 

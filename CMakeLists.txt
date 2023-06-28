@@ -304,6 +304,8 @@ list(APPEND armnn_sources
     src/armnn/layers/ReshapeLayer.cpp
     src/armnn/layers/ResizeLayer.hpp
     src/armnn/layers/ResizeLayer.cpp
+    src/armnn/layers/ReverseV2Layer.hpp
+    src/armnn/layers/ReverseV2Layer.cpp
     src/armnn/layers/ShapeLayer.cpp
     src/armnn/layers/ShapeLayer.hpp
     src/armnn/layers/SliceLayer.cpp

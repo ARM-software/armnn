@@ -1565,6 +1565,37 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(AlignCornersResizeNearestNeighbourUint16Nchw,
                               AlignCornersResizeNearestNeighbourTest<DataType::QSymmS16>,
                               DataLayout::NCHW)
 
+// ReverseV2
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2SimpleEmptyAxisFloat32, ReverseV2SimpleTestEmptyAxis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2SimpleEmptyTensorFloat32, ReverseV2SimpleTestEmptyTensor <DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple1DimFloat32, ReverseV2SimpleTest1Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim1AxisFloat32, ReverseV2SimpleTest2Dim1Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisFloat32, ReverseV2SimpleTest2Dim2Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple3Dim1AxisFloat32, ReverseV2SimpleTest3Dim1Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple3Dim2AxisFloat32, ReverseV2SimpleTest3Dim2Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple3Dim3AxisFloat32, ReverseV2SimpleTest3Dim3Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple4Dim1AxisFloat32, ReverseV2SimpleTest4Dim1Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple4Dim2AxisFloat32, ReverseV2SimpleTest4Dim2Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple4Dim3AxisFloat32, ReverseV2SimpleTest4Dim3Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple4Dim4AxisFloat32, ReverseV2SimpleTest4Dim4Axis<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2EvenRowOddCol2DimFloat32, ReverseV2EvenRowOddColTest2Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2EvenRowOddCol3DimFloat32, ReverseV2EvenRowOddColTest3Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2EvenRowEvenCol2DimFloat32, ReverseV2EvenRowEvenColTest2Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2EvenRowEvenCol3DimFloat32, ReverseV2EvenRowEvenColTest3Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2OddRowOddCol2DimFloat32, ReverseV2OddRowOddColTest2Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2OddRowOddCol3DimFloat32, ReverseV2OddRowOddColTest3Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2OddRowEvenCol2DimFloat32, ReverseV2OddRowEvenColTest2Dim<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2OddRowEvenCol3DimFloat32, ReverseV2OddRowEvenColTest3Dim<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2NegAxis2Dim1AxisFloat32, ReverseV2NegAxisTest2Dim1Axis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2NegAxis3Dim2AxisFloat32, ReverseV2NegAxisTest3Dim2Axis<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisFloat16, ReverseV2SimpleTest2Dim2Axis<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisQAsymmS8, ReverseV2SimpleTest2Dim2Axis<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisQAsymmU8, ReverseV2SimpleTest2Dim2Axis<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisQSymmS16, ReverseV2SimpleTest2Dim2Axis<DataType::QSymmS16>)
+
 // Fake Quantization
 ARMNN_AUTO_TEST_CASE_WITH_THF(FakeQuantization, FakeQuantizationTest)
 

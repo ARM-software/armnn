@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1204,6 +1204,21 @@ bool LayerSupportHandle::IsResizeSupported(const TensorInfo& input,
     TensorInfos infos{input, output};
 
     return m_LayerSupport->IsLayerSupported(LayerType::Resize,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported);
+}
+
+bool LayerSupportHandle::IsReverseV2Supported(const armnn::TensorInfo &input,
+                                              const armnn::TensorInfo &output,
+                                              const armnn::ReverseV2Descriptor &descriptor,
+                                              Optional<std::string &> reasonIfUnsupported)
+{
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ReverseV2,
                                             infos,
                                             descriptor,
                                             EmptyOptional(),

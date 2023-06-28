@@ -1,5 +1,5 @@
 #
-# Copyright © 2017 ARM Ltd. All rights reserved.
+# Copyright © 2017-2023 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -94,6 +94,7 @@ BACKEND_SOURCES := \
         workloads/RefReduceWorkload.cpp \
         workloads/RefReshapeWorkload.cpp \
         workloads/RefResizeWorkload.cpp \
+        workloads/RefReverseV2Workload.cpp \
         workloads/RefSliceWorkload.cpp \
         workloads/RefSoftmaxWorkload.cpp \
         workloads/RefSpaceToBatchNdWorkload.cpp \
@@ -105,6 +106,7 @@ BACKEND_SOURCES := \
         workloads/RefTransposeWorkload.cpp \
         workloads/RefUnidirectionalSequenceLstmWorkload.cpp \
         workloads/Resize.cpp \
+        workloads/ReverseV2Impl.cpp \
         workloads/Slice.cpp \
         workloads/SpaceToBatchNd.cpp \
         workloads/SpaceToDepth.cpp \

@@ -53,6 +53,7 @@
 #include "RefReduceWorkload.hpp"
 #include "RefReshapeWorkload.hpp"
 #include "RefResizeWorkload.hpp"
+#include "RefReverseV2Workload.hpp"
 #include "RefShapeWorkload.hpp"
 #include "RefSliceWorkload.hpp"
 #include "RefSplitterWorkload.hpp"

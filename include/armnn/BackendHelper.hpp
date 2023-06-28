@@ -360,6 +360,11 @@ public:
                            const ResizeDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
+    bool IsReverseV2Supported(const TensorInfo& input,
+                              const TensorInfo& output,
+                              const ReverseV2Descriptor& descriptor,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
     bool IsShapeSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());

@@ -639,6 +639,12 @@ IConnectableLayer* INetwork::AddBatchMatMulLayer(const BatchMatMulDescriptor &de
     return pNetworkImpl->AddBatchMatMulLayer(descriptor, name);
 }
 
+IConnectableLayer* INetwork::AddReverseV2Layer(const ReverseV2Descriptor &descriptor,
+                                               const char *name)
+{
+    return pNetworkImpl->AddReverseV2Layer(descriptor, name);
+}
+
 void INetwork::ExecuteStrategy(IStrategy& strategy) const
 {
     return pNetworkImpl->ExecuteStrategy(strategy);
@@ -2900,6 +2906,11 @@ IConnectableLayer* NetworkImpl::AddUnidirectionalSequenceLstmLayer(
 IConnectableLayer* NetworkImpl::AddBatchMatMulLayer(const BatchMatMulDescriptor& desc, const char* name)
 {
     return m_Graph->AddLayer<BatchMatMulLayer>(desc, name);
+}
+
+IConnectableLayer* NetworkImpl::AddReverseV2Layer(const ReverseV2Descriptor &desc, const char *name)
+{
+    return m_Graph->AddLayer<ReverseV2Layer>(desc, name);
 }
 
 IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor& preCompiledDescriptor,

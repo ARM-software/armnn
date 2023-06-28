@@ -1620,4 +1620,28 @@ struct BatchMatMulDescriptor : BaseDescriptor
         const TensorShape& tensorShape);
 };
 
+struct ReverseV2Descriptor : BaseDescriptor
+{
+    ReverseV2Descriptor()
+        : m_Axis()
+        , m_MaxDimension(4)
+    {}
+
+    ReverseV2Descriptor(std::vector<int32_t> axis)
+        : m_Axis(axis)
+        , m_MaxDimension(4)
+    {}
+
+    bool operator ==(const ReverseV2Descriptor& rhs) const
+    {
+        return m_Axis == rhs.m_Axis;
+    }
+
+    /// The indices of the dimensions to reverse
+    std::vector<int32_t> m_Axis;
+    /// The max dimension supported in the lower levels of code
+    uint32_t m_MaxDimension;
+
+};
+
 } // namespace armnn

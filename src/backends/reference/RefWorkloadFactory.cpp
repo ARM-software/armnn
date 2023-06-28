@@ -560,6 +560,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
             auto resizeQueueDescriptor = PolymorphicDowncast<const ResizeQueueDescriptor*>(&descriptor);
             return std::make_unique<RefResizeWorkload>(*resizeQueueDescriptor, info);
         }
+        case LayerType::ReverseV2:
+        {
+            auto reverseV2QueueDescriptor = PolymorphicDowncast<const ReverseV2QueueDescriptor*>(&descriptor);
+            return std::make_unique<RefReverseV2Workload>(*reverseV2QueueDescriptor, info);
+        }
         case LayerType::Shape:
         {
             auto shapeQueueDescriptor = PolymorphicDowncast<const ShapeQueueDescriptor*>(&descriptor);

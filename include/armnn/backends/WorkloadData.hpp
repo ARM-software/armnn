@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -746,6 +746,11 @@ struct ChannelShuffleQueueDescriptor : QueueDescriptorWithParameters<ChannelShuf
 };
 
 struct BatchMatMulQueueDescriptor : QueueDescriptorWithParameters<BatchMatMulDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
+struct ReverseV2QueueDescriptor : QueueDescriptorWithParameters<ReverseV2Descriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

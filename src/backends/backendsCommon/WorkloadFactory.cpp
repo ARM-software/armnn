@@ -1119,6 +1119,17 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                           reason);
             break;
         }
+        case LayerType::ReverseV2:
+        {
+            auto cLayer = PolymorphicDowncast<const ReverseV2Layer*>(&layer);
+            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+            result = layerSupportObject.IsReverseV2Supported(OverrideDataType(input, dataType),
+                                                             OverrideDataType(output, dataType),
+                                                             cLayer->GetParameters(),
+                                                             reason);
+            break;
+        }
         case LayerType::Shape:
         {
             const TensorInfo& input  = layer.GetInputSlot(0).GetTensorInfo();

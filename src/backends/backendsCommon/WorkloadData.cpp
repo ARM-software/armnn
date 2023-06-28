@@ -1640,6 +1640,72 @@ void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     }
 }
 
+void ReverseV2QueueDescriptor::Validate(const WorkloadInfo &workloadInfo) const {
+    const std::string descriptorName{"ReverseV2QueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo  = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo = workloadInfo.m_OutputTensorInfos[0];
+
+    auto inputTensorNumDimensions = inputTensorInfo.GetNumDimensions();
+    if (inputTensorNumDimensions > m_Parameters.m_MaxDimension)
+    {
+        throw InvalidArgumentException(descriptorName +
+            ": Input tensors with rank greater than " +
+            std::to_string(m_Parameters.m_MaxDimension) + " are not supported.");
+    }
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::BFloat16,
+        DataType::Float16,
+        DataType::Float32,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS16
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateTensorShapesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+    ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
+
+    if (m_Parameters.m_Axis.size() > inputTensorNumDimensions)
+    {
+        throw InvalidArgumentException(descriptorName + ": More axes specified than is on the input tensor.");
+    }
+    if (m_Parameters.m_Axis.size() > m_Parameters.m_MaxDimension)
+    {
+        throw InvalidArgumentException(descriptorName +
+            ": More than " + std::to_string(m_Parameters.m_MaxDimension) + " axes cannot be specified.");
+    }
+
+    if (! m_Parameters.m_Axis.empty())
+    {
+        // First check that we have unique axis values
+        auto checkAxis = m_Parameters.m_Axis;
+        std::sort(checkAxis.begin(), checkAxis.end());
+        auto lastUnique = std::unique(checkAxis.begin(), checkAxis.end());
+        if (lastUnique != checkAxis.end())
+        {
+            throw InvalidArgumentException(descriptorName + ": Axes values must be unique.");
+        }
+
+        // Next check that the axes values are in range: [-rank, rank]
+        const auto minmax =
+                std::minmax_element(std::begin(m_Parameters.m_Axis), std::end(m_Parameters.m_Axis));
+        if (((*minmax.first) < int32_t(-inputTensorNumDimensions)) ||
+            ((*minmax.second) >= int32_t (inputTensorNumDimensions)))
+        {
+            throw InvalidArgumentException(descriptorName +
+                ": Axes values must in range [-" + std::to_string(inputTensorNumDimensions) + "," +
+                std::to_string(inputTensorNumDimensions) + "].");
+        }
+    }
+}
+
+
 void FakeQuantizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"FakeQuantizationQueueDescriptor"};

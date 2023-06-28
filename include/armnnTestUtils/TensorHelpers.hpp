@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -86,6 +86,13 @@ armnn::PredicateResult CompareTensors(const std::vector<T>& actualData,
                       << expectedData.size()
                       << "]";
         return res;
+    }
+
+    // Support for comparison between empty tensors
+    if (actualData.size() == 0 && expectedData.size() == 0)
+    {
+        armnn::PredicateResult comparisonResult(true);
+        return comparisonResult;
     }
 
     if (actualShape.GetNumDimensions() != expectedShape.GetNumDimensions())

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,7 +42,7 @@ void ShapeLayer::ValidateTensorShapesFromInputs()
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
-    auto inferredShape = InferOutputShapes({ GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
+    auto inferredShape = InferOutputShapes({ GetInputSlot(0).GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShape.size() == 1);
 

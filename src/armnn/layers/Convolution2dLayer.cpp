@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,8 +31,8 @@ void Convolution2dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn
     //using DescriptorType = Parameters;
     const std::vector<TensorShape>& inputShapes =
     {
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape()
     };
     const TensorShape filterShape = inputShapes[1];
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
@@ -111,8 +111,8 @@ void Convolution2dLayer::ValidateTensorShapesFromInputs()
                      "Convolution2dLayer: Weights should be connected to input slot 1.");
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
-             GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-             GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
+             GetInputSlot(0).GetTensorInfo().GetShape(),
+             GetInputSlot(1).GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 

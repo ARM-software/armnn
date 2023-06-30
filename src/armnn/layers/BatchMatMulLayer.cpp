@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "BatchMatMulLayer.hpp"
@@ -99,8 +99,8 @@ void BatchMatMulLayer::ValidateTensorShapesFromInputs()
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes({
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 

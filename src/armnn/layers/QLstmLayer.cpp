@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "QLstmLayer.hpp"
@@ -177,9 +177,9 @@ void QLstmLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes(
     {
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(), // input
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape(), // previousOutputIn
-        GetInputSlot(2).GetConnection()->GetTensorInfo().GetShape()  // previousCellStateIn
+        GetInputSlot(0).GetTensorInfo().GetShape(), // input
+        GetInputSlot(1).GetTensorInfo().GetShape(), // previousOutputIn
+        GetInputSlot(2).GetTensorInfo().GetShape()  // previousCellStateIn
     });
 
     ARMNN_ASSERT(inferredShapes.size() == 3);

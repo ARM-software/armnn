@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,8 +24,8 @@ void Convolution3dLayer::SerializeLayerParameters(ParameterStringifyFunction& fn
 {
     const std::vector<TensorShape>& inputShapes =
     {
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape(),
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape(),
     };
 
     // Conv3d Filter Layout: [D,H,W,I,O]
@@ -116,8 +116,8 @@ void Convolution3dLayer::ValidateTensorShapesFromInputs()
                      "Convolution3dLayer: Weights should be connected to input slot 1.");
 
     auto inferredShapes = InferOutputShapes({
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape() });
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
 

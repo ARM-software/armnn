@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "LstmLayer.hpp"
@@ -174,9 +174,9 @@ void LstmLayer::ValidateTensorShapesFromInputs()
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes( {
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(2).GetConnection()->GetTensorInfo().GetShape()
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape(),
+        GetInputSlot(2).GetTensorInfo().GetShape()
     });
 
     ARMNN_ASSERT(inferredShapes.size() == 4);

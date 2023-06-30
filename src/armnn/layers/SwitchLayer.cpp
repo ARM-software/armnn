@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SwitchLayer.hpp"
@@ -41,8 +41,8 @@ void SwitchLayer::ValidateTensorShapesFromInputs()
 
     // Assuming first input is the Input and second input is the Constant
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()});
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape()});
 
     ARMNN_ASSERT(inferredShapes.size() == 2);
 

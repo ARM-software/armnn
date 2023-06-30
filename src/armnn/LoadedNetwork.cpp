@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -716,7 +716,7 @@ TensorInfo LoadedNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
         ARMNN_ASSERT_MSG(outputLayer->GetInputSlot(0).GetConnection(), "Input slot on Output layer must be connected");
         if (outputLayer->GetBindingId() == layerId)
         {
-            return outputLayer->GetInputSlot(0).GetConnection()->GetTensorInfo();
+            return outputLayer->GetInputSlot(0).GetTensorInfo();
         }
     }
 

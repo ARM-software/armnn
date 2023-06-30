@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SplitterLayer.hpp"
@@ -131,11 +131,13 @@ void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
                 // 2) the same TensorHandleFactory is used for input and split layer output
                 // 3) the output does not go to a Constant layer or input layer
                 // 4) if split along x or y (2 innermost dimensions) and the next layers do not require padding
+                // 5) none of the outputs have an Overridden TensorInfo
                 if (parentInfo.IsTypeSpaceMatch(info) && //(1)
                     factoryId == slot->GetTensorHandleFactoryId() && //(2)
                     GetOutputSlot(i).GetConnection(0)->GetOwningLayer().GetType() != LayerType::Constant && //(3)
                     GetOutputSlot(i).GetConnection(0)->GetOwningLayer().GetType() != LayerType::Input && //(3)
-                    canUseSubTensorOnXorY) //(4)
+                    canUseSubTensorOnXorY && //(4)
+                    !GetOutputSlot(i).GetConnection(0)->IsTensorInfoOverridden()) //(5)
                 {
                     ARMNN_NO_DEPRECATE_WARN_BEGIN
                     return factory.CreateSubTensorHandle(*inputData,

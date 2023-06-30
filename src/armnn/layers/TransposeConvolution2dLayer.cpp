@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -100,7 +100,7 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> expectedOutputShape;
     std::vector<TensorShape> outputShapeGivenAsInput;
 
-    expectedOutputShape = InferOutputShapes({GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
+    expectedOutputShape = InferOutputShapes({GetInputSlot(0).GetTensorInfo().GetShape(),
                                              m_Weight->GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(expectedOutputShape.size() == 1);

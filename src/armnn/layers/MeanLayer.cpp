@@ -50,7 +50,7 @@ void MeanLayer::ValidateTensorShapesFromInputs()
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes(
-            { GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape() });
+            { GetInputSlot(0).GetTensorInfo().GetShape() });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);
     ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);

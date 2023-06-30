@@ -52,6 +52,11 @@ Graph::Graph(const Graph& other)
                 Layer* const thisTgtLayer = otherToClonedMap[&otherTgtLayer];
 
                 InputSlot& inputSlot = thisTgtLayer->GetInputSlot(otherInputSlot->GetSlotIndex());
+
+                if (otherInputSlot->IsTensorInfoOverridden())
+                {
+                    inputSlot.SetTensorInfo(otherInputSlot->GetTensorInfo());
+                }
                 outputSlot->Connect(inputSlot);
             }
             outputSlot->SetTensorInfo(otherOutputSlot.GetTensorInfo());

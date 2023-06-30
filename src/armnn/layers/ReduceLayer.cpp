@@ -49,7 +49,7 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
-    const TensorInfo& input = GetInputSlot(0).GetConnection()->GetTensorInfo();
+    const TensorInfo& input = GetInputSlot(0).GetTensorInfo();
 
     ARMNN_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
                      "ReduceLayer: Reduce supports up to 4D input.");

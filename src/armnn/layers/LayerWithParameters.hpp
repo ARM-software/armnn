@@ -61,7 +61,7 @@ protected:
         Layer::ImmutableConstantTensors tensors;
         for (unsigned int i = 0; i < GetNumInputSlots(); ++i)
         {
-            if (GetInputSlot(i).GetConnection() && GetInputSlot(i).GetConnection()->GetTensorInfo().IsConstant())
+            if (GetInputSlot(i).GetConnection() && GetInputSlot(i).GetTensorInfo().IsConstant())
             {
                 auto &inputLayer = GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
                 if (inputLayer.GetType() == armnn::LayerType::Constant)

@@ -577,6 +577,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/FlowControl.cpp
         src/armnn/test/GraphTests.cpp
         src/armnn/test/InstrumentTests.cpp
+        src/armnn/test/LayerTests.cpp
         src/armnn/test/InferOutputTests.cpp
         src/armnn/test/InferOutputTests.hpp
         src/armnn/test/ModelAccuracyCheckerTest.cpp

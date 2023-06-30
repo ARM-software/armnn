@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -78,9 +78,22 @@ public:
     const IOutputSlot* GetConnection() const override;
     IOutputSlot* GetConnection() override;
 
+    /// Sets the TensorInfo for this InputSlot. This can be used to override the TensorInfo and if set will be returned
+    /// instead of the TensorInfo for the Connected OutputSlot.
+    void SetTensorInfo(const TensorInfo tensorInfo);
+    /// Gets the TensorInfo for this InputSlot. If the InputSlot's TensorInfo has not been set then this will get the
+    /// TensorInfo from the Connected TensorInfo.
+    const TensorInfo& GetTensorInfo() const;
+    /// Returns true if this InputSlot either has an overridden TensorInfo for this InputSlot that was set through a
+    /// call to SetTensorInfo() or is Connected to an OutputSlot that has its TensorInfo set.
+    bool IsTensorInfoSet() const;
+    /// Returns true if this InputSlot has an overridden TensorInfo that was set through a call to SetTensorInfo().
+    bool IsTensorInfoOverridden() const;
+
 private:
     Layer& m_OwningLayer;
     OutputSlot* m_Connection;
+    Optional<TensorInfo> m_OverriddenTensorInfo;
     const unsigned int m_SlotIndex;
 };
 

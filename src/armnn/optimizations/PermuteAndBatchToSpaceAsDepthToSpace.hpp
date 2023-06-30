@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019-2020,2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -23,7 +23,7 @@ public:
         // Validate base layer (the Permute) is compatible
         Layer& base = connection.GetConnectedOutputSlot()->GetOwningLayer();
         ARMNN_ASSERT(base.GetType() == LayerType::Permute || base.GetType() == LayerType::Transpose);
-        const TensorInfo& inputInfo = base.GetInputSlot(0).GetConnection()->GetTensorInfo();
+        const TensorInfo& inputInfo = base.GetInputSlot(0).GetTensorInfo();
         const TensorInfo& intermediateInfo = base.GetOutputSlot(0).GetTensorInfo();
         if (intermediateInfo.GetNumDimensions() != 4)
         {

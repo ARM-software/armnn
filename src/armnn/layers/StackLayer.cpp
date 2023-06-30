@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "StackLayer.hpp"
@@ -78,7 +78,7 @@ void StackLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inputShapes;
     for (unsigned int i = 0; i < GetNumInputSlots(); ++i)
     {
-        TensorShape inputShape = GetInputSlot(i).GetConnection()->GetTensorInfo().GetShape();
+        TensorShape inputShape = GetInputSlot(i).GetTensorInfo().GetShape();
         if (inputShape != m_Param.m_InputShape)
         {
             throw LayerValidationException("StackLayer: TensorShape set on InputSlot[" +

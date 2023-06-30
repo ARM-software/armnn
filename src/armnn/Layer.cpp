@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "Layer.hpp"
@@ -314,7 +314,7 @@ DataType Layer::GetDataType() const
 {
     if (GetNumInputSlots() > 0) // Ignore the input layer.
     {
-        return GetInputSlot(0).GetConnection()->GetTensorInfo().GetDataType();
+        return GetInputSlot(0).GetTensorInfo().GetDataType();
     }
     return GetOutputSlot(0).GetTensorInfo().GetDataType();
 }
@@ -569,6 +569,33 @@ const IConnectableLayer& InputSlot::GetOwningIConnectableLayer() const
 IConnectableLayer& InputSlot::GetOwningIConnectableLayer()
 {
     return m_OwningLayer;
+}
+
+void InputSlot::SetTensorInfo(const TensorInfo tensorInfo)
+{
+    m_OverriddenTensorInfo = Optional<TensorInfo>(tensorInfo);
+}
+
+const TensorInfo& InputSlot::GetTensorInfo() const
+{
+    if (m_OverriddenTensorInfo.has_value())
+    {
+        return m_OverriddenTensorInfo.value();
+    }
+    else
+    {
+        return GetConnection()->GetTensorInfo();
+    }
+}
+
+bool InputSlot::IsTensorInfoSet() const
+{
+    return m_OverriddenTensorInfo.has_value() || (GetConnection() && GetConnection()->IsTensorInfoSet());
+}
+
+bool InputSlot::IsTensorInfoOverridden() const
+{
+    return m_OverriddenTensorInfo.has_value();
 }
 
 } // namespace armnn

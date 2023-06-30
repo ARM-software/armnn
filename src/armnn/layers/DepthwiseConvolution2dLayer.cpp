@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -30,8 +30,8 @@ void DepthwiseConvolution2dLayer::SerializeLayerParameters(ParameterStringifyFun
 {
     const std::vector<TensorShape>& inputShapes =
     {
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape()
     };
     const TensorShape filterShape = inputShapes[1];
     unsigned int inputChannels = filterShape[1];
@@ -114,8 +114,8 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
                      "DepthwiseConvolution2dLayer: Weights data should not be null.");
 
     auto inferredShapes = InferOutputShapes({
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape()
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape()
     });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);

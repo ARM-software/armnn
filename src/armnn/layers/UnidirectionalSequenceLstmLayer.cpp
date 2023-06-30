@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "UnidirectionalSequenceLstmLayer.hpp"
@@ -176,9 +176,9 @@ void UnidirectionalSequenceLstmLayer::ValidateTensorShapesFromInputs()
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     auto inferredShapes = InferOutputShapes( {
-        GetInputSlot(0).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(1).GetConnection()->GetTensorInfo().GetShape(),
-        GetInputSlot(2).GetConnection()->GetTensorInfo().GetShape()
+        GetInputSlot(0).GetTensorInfo().GetShape(),
+        GetInputSlot(1).GetTensorInfo().GetShape(),
+        GetInputSlot(2).GetTensorInfo().GetShape()
     });
 
     ARMNN_ASSERT(inferredShapes.size() == 1);

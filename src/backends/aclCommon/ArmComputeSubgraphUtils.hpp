@@ -23,7 +23,7 @@ namespace
 
 bool checkDataTypeInputandOutput(const Layer& layer)
 {
-    auto inputInfo = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+    auto inputInfo = layer.GetInputSlot(0).GetTensorInfo();
     auto outputInfo = layer.GetOutputSlot(0).GetTensorInfo();
     bool sameDataType = (inputInfo.GetDataType() == outputInfo.GetDataType());
 

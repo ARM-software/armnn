@@ -436,6 +436,7 @@ LOCAL_SRC_FILES := \
         src/armnn/test/GraphTests.cpp \
         src/armnn/test/InferOutputTests.cpp \
         src/armnn/test/InstrumentTests.cpp \
+        src/armnn/test/LayerTests.cpp \
         src/armnnUtils/ModelAccuracyChecker.cpp \
         src/armnn/test/ModelAccuracyCheckerTest.cpp \
         src/armnn/test/NetworkTests.cpp \

@@ -176,6 +176,7 @@ private:
     void ParseResize(size_t subgraphIndex, size_t operatorIndex, armnn::ResizeMethod resizeMethod);
     void ParseResizeBilinear(size_t subgraphIndex, size_t operatorIndex);
     void ParseResizeNearestNeighbor(size_t subgraphIndex, size_t operatorIndex);
+    void ParseReverseV2(size_t subgraphIndex, size_t operatorIndex);
     void ParseRsqrt(size_t subgraphIndex, size_t operatorIndex);
     void ParseShape(size_t subgraphIndex, size_t operatorIndex);
     void ParseSin(size_t subgraphIndex, size_t operatorIndex);

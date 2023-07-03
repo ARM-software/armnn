@@ -173,6 +173,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - RESHAPE
 - RESIZE_BILINEAR
 - RESIZE_NEAREST_NEIGHBOR
+- REVERSE_V2
 - RSQRT
 - SHAPE
 - SIN

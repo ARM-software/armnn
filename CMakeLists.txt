@@ -708,6 +708,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/ReshapeDynamic.cpp
              src/armnnTfLiteParser/test/ResizeBilinear.cpp
              src/armnnTfLiteParser/test/ResizeNearestNeighbor.cpp
+             src/armnnTfLiteParser/test/ReverseV2.cpp
              src/armnnTfLiteParser/test/Quantize.cpp
              src/armnnTfLiteParser/test/Softmax.cpp
              src/armnnTfLiteParser/test/SpaceToBatchND.cpp

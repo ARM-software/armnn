@@ -6,7 +6,7 @@
 #include "FileComparisonExecutor.hpp"
 #include <NetworkExecutionUtils/NetworkExecutionUtils.hpp>
 #include <algorithm>
-#include <filesystem>
+#include <ghc/filesystem.hpp>
 #include <iterator>
 
 using namespace armnn;
@@ -166,14 +166,14 @@ void ReadData(const std::vector<char>& buffer,
  */
 Tensor ReadTensorFromFile(const std::string fileName)
 {
-    if (!std::filesystem::exists(fileName))
+    if (!ghc::filesystem::exists(fileName))
     {
         throw FileNotFoundException("The file \"" + fileName + "\" could not be found.");
     }
     // The format we are reading in is based on NetworkExecutionUtils::WriteToFile. This could potentially
     // be an enormous tensor. We'll limit what we can read in to 1Mb.
     std::uintmax_t maxFileSize = 1048576;
-    std::uintmax_t fileSize    = std::filesystem::file_size(fileName);
+    std::uintmax_t fileSize    = ghc::filesystem::file_size(fileName);
     if (fileSize > maxFileSize)
     {
         throw InvalidArgumentException("The file \"" + fileName + "\" exceeds max size of 1 Mb.");
@@ -263,7 +263,7 @@ std::vector<const void*> FileComparisonExecutor::Execute()
         std::string substr;
         getline(ss, substr, ',');
         // Check the file exist.
-        if (!std::filesystem::exists(substr))
+        if (!ghc::filesystem::exists(substr))
         {
             errorString += substr + " ";
         }

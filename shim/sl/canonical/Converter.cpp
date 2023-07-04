@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -25,7 +25,7 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
         case OperationType::ABS:
             return ConvertElementwiseUnary(operation, model, data, UnaryOperation::Abs);
         case OperationType::ADD:
-            return ConvertAdd(operation, model, data);
+            return ConvertElementwiseBinary(operation, model, data, armnn::BinaryOperation::Add);
         case OperationType::ARGMAX:
             return ConvertArgMinMax(operation, model, data, ArgMinMaxFunction::Max);
         case OperationType::ARGMIN:
@@ -49,7 +49,7 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
         case OperationType::DEQUANTIZE:
             return ConvertDequantize(operation, model, data);
         case OperationType::DIV:
-            return ConvertDiv(operation, model, data);
+            return ConvertElementwiseBinary(operation, model, data, armnn::BinaryOperation::Div);
         case OperationType::ELU:
             return ConvertElu(operation, model, data);
         case OperationType::EQUAL:
@@ -103,13 +103,13 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
         case OperationType::MAX_POOL_2D:
             return ConvertMaxPool2d(operation, model, data);
         case OperationType::MAXIMUM:
-            return ConvertMaximum(operation, model, data);
+            return ConvertElementwiseBinary(operation, model, data, armnn::BinaryOperation::Maximum);
         case OperationType::MEAN:
             return ConvertMean(operation, model, data);
         case OperationType::MINIMUM:
-            return ConvertMinimum(operation, model, data);
+            return ConvertElementwiseBinary(operation, model, data, armnn::BinaryOperation::Minimum);
         case OperationType::MUL:
-            return ConvertMul(operation, model, data);
+            return ConvertElementwiseBinary(operation, model, data, armnn::BinaryOperation::Mul);
         case OperationType::NEG:
             return ConvertElementwiseUnary(operation, model, data, UnaryOperation::Neg);
         case OperationType::NOT_EQUAL:
@@ -120,6 +120,8 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
             return ConvertPadV2(operation, model, data);
         case OperationType::PRELU:
             return ConvertPrelu(operation, model, data);
+        case OperationType::POW:
+            return ConvertElementwiseBinary(operation, model, data, BinaryOperation::Power);
         case OperationType::QUANTIZE:
             return ConvertQuantize(operation, model, data);
         case OperationType::QUANTIZED_LSTM:
@@ -132,6 +134,8 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
             return ConvertReduce(operation, model, data, armnn::ReduceOperation::Max);
         case OperationType::REDUCE_MIN:
             return ConvertReduce(operation, model, data, armnn::ReduceOperation::Min);
+        case OperationType::REDUCE_PROD:
+            return ConvertReduce(operation, model, data, armnn::ReduceOperation::Prod);
         case OperationType::REDUCE_SUM:
             return ConvertReduce(operation, model, data, armnn::ReduceOperation::Sum);
         case OperationType::RELU:
@@ -163,7 +167,7 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
         case OperationType::STRIDED_SLICE:
             return ConvertStridedSlice(operation, model, data);
         case OperationType::SUB:
-            return ConvertSub(operation, model, data);
+            return ConvertElementwiseBinary(operation, model, data, BinaryOperation::Sub);
         case OperationType::TRANSPOSE:
             return ConvertTranspose(operation, model, data);
         case OperationType::TRANSPOSE_CONV_2D:
@@ -174,80 +178,6 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
             VLOG(DRIVER) << "Operation type: " << operation.type << "is not supported in ArmnnDriver";
             return false;
     }
-}
-
-bool Converter::ConvertAdd(const Operation& operation, const Model& model, ConversionData& data)
-{
-    VLOG(DRIVER) << "Converter::ConvertAdd()";
-    LayerInputHandle input0 = ConvertToLayerInputHandle(operation, 0, model, data);
-    LayerInputHandle input1 = ConvertToLayerInputHandle(operation, 1, model, data);
-
-    if (!input0.IsValid() || !input1.IsValid())
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    // The FuseActivation parameter is always the input index 2, and it should be optional
-    ActivationFn activationFunction;
-    if (!GetOptionalInputActivation(operation, 2, activationFunction, model, data))
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    const Operand* outputOperand = GetOutputOperand(operation, 0, model);
-    if (!outputOperand)
-    {
-        return false;
-    }
-
-    const armnn::TensorInfo& inputInfo0 = input0.GetTensorInfo();
-    const armnn::TensorInfo& inputInfo1 = input1.GetTensorInfo();
-
-    const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
-
-    bool isSupported = false;
-    armnn::BackendId setBackend;
-    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
-    {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
-                                   IsAdditionSupported,
-                                   data.m_Backends,
-                                   isSupported,
-                                   setBackend,
-                                   inputInfo0,
-                                   inputInfo1,
-                                   outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
-    };
-
-    if(!IsDynamicTensor(outputInfo))
-    {
-        validateFunc(outputInfo, isSupported);
-    }
-    else
-    {
-        isSupported = AreDynamicTensorsSupported();
-    }
-
-    if (!isSupported)
-    {
-        return false;
-    }
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const startLayer = data.m_Network->AddAdditionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
-    startLayer->SetBackendId(setBackend);
-
-    bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
-    if (!isReshapeSupported)
-    {
-        return false;
-    }
-
-    return SetupAndTrackLayerOutputSlot(operation, 0, *startLayer, model,
-                                        data, nullptr, validateFunc, activationFunction);
 }
 
 bool Converter::ConvertArgMinMax(const Operation& operation,
@@ -786,7 +716,11 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
         }
     }
 
-    ARMNN_ASSERT(inputShapes.size() == inputHandles.size());
+    if (inputShapes.size() != inputHandles.size())
+    {
+        return Fail("%s: invalid model input shapes size doesn't match input handles size: %i != %i", __func__,
+                    inputShapes.size(), inputHandles.size());
+    }
 
     if (inputsHaveBeenReshaped)
     {
@@ -1508,9 +1442,13 @@ bool Converter::ConvertDequantize(const Operation& operation, const Model& model
     return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
 }
 
-bool Converter::ConvertDiv(const Operation& operation, const Model& model, ConversionData& data)
+bool Converter::ConvertElementwiseBinary(const Operation& operation,
+                                         const Model& model,
+                                         ConversionData& data,
+                                         armnn::BinaryOperation binaryOperation)
 {
-    VLOG(DRIVER) << "Converter::ConvertDiv()";
+    VLOG(DRIVER) << "Converter::ConvertElementwiseBinary()";
+    VLOG(DRIVER) << "binaryOperation = " << GetBinaryOperationAsCString(binaryOperation);
 
     LayerInputHandle input0 = ConvertToLayerInputHandle(operation, 0, model, data);
     LayerInputHandle input1 = ConvertToLayerInputHandle(operation, 1, model, data);
@@ -1520,39 +1458,38 @@ bool Converter::ConvertDiv(const Operation& operation, const Model& model, Conve
         return Fail("%s: Operation has invalid inputs", __func__);
     }
 
-    // The FuseActivation parameter is always the input index 2
-    // and it should be optional
+    // The FuseActivation parameter is always the input index 2, and it should be optional
     ActivationFn activationFunction;
     if (!GetOptionalInputActivation(operation, 2, activationFunction, model, data))
     {
-        return Fail("%s: Operation has invalid inputs", __func__);
+        return Fail("%s: Operation has invalid optional input: activation function", __func__);
     }
 
     const Operand* output = GetOutputOperand(operation, 0, model);
     if (!output)
     {
-        return Fail("%s: Could not read output 0", __func__);
+        return Fail("%s: Could not read output", __func__);
     }
 
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
+    armnn::ElementwiseBinaryDescriptor descriptor(binaryOperation);
+
     bool isSupported = false;
-    armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
     {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
         FORWARD_LAYER_SUPPORT_FUNC(__func__,
-                                   IsDivisionSupported,
+                                   IsElementwiseBinarySupported,
                                    data.m_Backends,
                                    isSupported,
-                                   setBackend,
+                                   armnn::BackendId(),
                                    input0.GetTensorInfo(),
                                    input1.GetTensorInfo(),
-                                   outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
+                                   outputInfo,
+                                   binaryOperation);
     };
 
-    if(!IsDynamicTensor(outputInfo))
+    if (!IsDynamicTensor(outputInfo))
     {
         validateFunc(outputInfo, isSupported);
     }
@@ -1566,18 +1503,18 @@ bool Converter::ConvertDiv(const Operation& operation, const Model& model, Conve
         return false;
     }
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const startLayer = data.m_Network->AddDivisionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
-    startLayer->SetBackendId(setBackend);
-
-    bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
+    armnn::IConnectableLayer* layer = data.m_Network->AddElementwiseBinaryLayer(descriptor);
+    if (!layer)
+    {
+        return Fail("%s: Could not add the ElementwiseBinaryLayer", __func__);
+    }
+    bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
     if (!isReshapeSupported)
     {
         return false;
     }
 
-    return SetupAndTrackLayerOutputSlot(operation, 0, *startLayer, model,
+    return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model,
                                         data, nullptr, validateFunc, activationFunction);
 }
 
@@ -2082,7 +2019,8 @@ bool Converter::ConvertGather(const Operation& operation, const Model& model, Co
     {
         return Fail("%s: Operation has invalid or unsupported axis operand", __func__);
     }
-    if (((axis < -inputDimensions) && (axis < 0)) || ((axis >= inputDimensions) && (axis > 0)))
+    int32_t inputDimensions_int = static_cast<int32_t>(inputDimensions);
+    if ((axis < -inputDimensions_int) || (inputDimensions_int <= axis))
     {
         return Fail("%s: Operation has invalid axis: %d. It is out of bounds [-%d, %d))", __func__, axis,
                     inputDimensions, inputDimensions);
@@ -3362,70 +3300,6 @@ bool Converter::ConvertMaxPool2d(const Operation& operation, const Model& model,
     return ConvertPooling2d(operation, __func__, PoolingAlgorithm::Max, model, data);
 }
 
-bool Converter::ConvertMaximum(const Operation& operation, const Model& model, ConversionData& data)
-{
-    VLOG(DRIVER) << "Converter::ConvertMaximum()";
-
-    LayerInputHandle input0 = ConvertToLayerInputHandle(operation, 0, model, data);
-    LayerInputHandle input1 = ConvertToLayerInputHandle(operation, 1, model, data);
-
-    if (!input0.IsValid() || !input1.IsValid())
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    const Operand* outputOperand = GetOutputOperand(operation, 0, model);
-    if (!outputOperand)
-    {
-        return Fail("%s: Could not read output", __func__);
-    }
-
-    const TensorInfo& outInfo = GetTensorInfoForOperand(*outputOperand);
-
-    bool isSupported = false;
-    armnn::BackendId setBackend;
-    auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
-    {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
-                                   IsMaximumSupported,
-                                   data.m_Backends,
-                                   isSupported,
-                                   setBackend,
-                                   input0.GetTensorInfo(),
-                                   input1.GetTensorInfo(),
-                                   outInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
-    };
-
-    if(IsDynamicTensor(outInfo))
-    {
-        isSupported = AreDynamicTensorsSupported();
-    }
-    else
-    {
-        validateFunc(outInfo, isSupported);
-    }
-
-    if (!isSupported)
-    {
-        return false;
-    }
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer* layer = data.m_Network->AddMaximumLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
-    layer->SetBackendId(setBackend);
-    assert(layer != nullptr);
-    bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
-    if (!isReshapeSupported)
-    {
-        return false;
-    }
-
-    return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
-}
-
 bool Converter::ConvertMean(const Operation& operation, const Model& model, ConversionData& data)
 {
     VLOG(DRIVER) << "Converter::ConvertMean()";
@@ -3510,144 +3384,6 @@ bool Converter::ConvertMean(const Operation& operation, const Model& model, Conv
     input.Connect(layer->GetInputSlot(0));
 
     return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
-}
-
-bool Converter::ConvertMinimum(const Operation& operation, const Model& model, ConversionData& data)
-{
-    VLOG(DRIVER) << "Converter::ConvertMinimum()";
-
-    LayerInputHandle input0 = ConvertToLayerInputHandle(operation, 0, model, data);
-    LayerInputHandle input1 = ConvertToLayerInputHandle(operation, 1, model, data);
-
-    if (!input0.IsValid() || !input1.IsValid())
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    const Operand* output = GetOutputOperand(operation, 0, model);
-    if (!output)
-    {
-        return Fail("%s: Could not read output 0", __func__);
-    }
-
-    const TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
-
-    bool isSupported = false;
-    armnn::BackendId setBackend;
-    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
-    {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
-                                   IsMinimumSupported,
-                                   data.m_Backends,
-                                   isSupported,
-                                   setBackend,
-                                   input0.GetTensorInfo(),
-                                   input1.GetTensorInfo(),
-                                   outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
-    };
-
-    if(IsDynamicTensor(outputInfo))
-    {
-        isSupported = AreDynamicTensorsSupported();
-    }
-    else
-    {
-        validateFunc(outputInfo, isSupported);
-    }
-
-    if (!isSupported)
-    {
-        return false;
-    }
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    IConnectableLayer* const layer = data.m_Network->AddMinimumLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
-    layer->SetBackendId(setBackend);
-    assert(layer != nullptr);
-    bool isReshapeSupported = BroadcastTensor(input0, input1, layer, data);
-    if (!isReshapeSupported)
-    {
-        return false;
-    }
-
-    return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
-}
-
-bool Converter::ConvertMul(const Operation& operation, const Model& model, ConversionData& data)
-{
-    VLOG(DRIVER) << "Converter::ConvertMul()";
-
-    LayerInputHandle input0 = ConvertToLayerInputHandle(operation, 0, model, data);
-    LayerInputHandle input1 = ConvertToLayerInputHandle(operation, 1, model, data);
-
-    if (!input0.IsValid() || !input1.IsValid())
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    // The FuseActivation parameter is always the input index 2
-    // and it should be optional
-    ActivationFn activationFunction;
-    if (!GetOptionalInputActivation(operation, 2, activationFunction, model, data))
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    const Operand* outputOperand = GetOutputOperand(operation, 0, model);
-
-    if (outputOperand == nullptr)
-    {
-        return false;
-    }
-
-    const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
-
-    bool isSupported = false;
-    armnn::BackendId setBackend;
-    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
-    {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
-                                   IsMultiplicationSupported,
-                                   data.m_Backends,
-                                   isSupported,
-                                   setBackend,
-                                   input0.GetTensorInfo(),
-                                   input1.GetTensorInfo(),
-                                   outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
-    };
-
-    if(!IsDynamicTensor(outputInfo))
-    {
-        validateFunc(outputInfo, isSupported);
-    }
-    else
-    {
-        isSupported = AreDynamicTensorsSupported();
-    }
-
-    if (!isSupported)
-    {
-        return false;
-    }
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const startLayer = data.m_Network->AddMultiplicationLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
-    startLayer->SetBackendId(setBackend);
-
-    bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
-    if (!isReshapeSupported)
-    {
-        return false;
-    }
-
-    return SetupAndTrackLayerOutputSlot(operation, 0, *startLayer, model,
-                                        data, nullptr, validateFunc, activationFunction);
 }
 
 bool Converter::ConvertPad(const Operation& operation, const Model& model, ConversionData& data)
@@ -5326,78 +5062,6 @@ bool Converter::ConvertSoftmax(const Operation& operation, const Model& model, C
     input.Connect(layer->GetInputSlot(0));
 
     return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
-}
-
-bool Converter::ConvertSub(const Operation& operation, const Model& model, ConversionData& data)
-{
-    VLOG(DRIVER) << "Converter::ConvertSub()";
-
-    LayerInputHandle input0 = ConvertToLayerInputHandle(operation, 0, model, data);
-    LayerInputHandle input1 = ConvertToLayerInputHandle(operation, 1, model, data);
-
-    if (!input0.IsValid() || !input1.IsValid())
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    // The FuseActivation parameter is always the input index 2
-    // and it should be optional
-    ActivationFn activationFunction;
-    if (!GetOptionalInputActivation(operation, 2, activationFunction, model, data))
-    {
-        return Fail("%s: Operation has invalid inputs", __func__);
-    }
-
-    const Operand* output = GetOutputOperand(operation, 0, model);
-    if (!output)
-    {
-        return Fail("%s: Could not read output 0", __func__);
-    }
-
-    const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
-
-    bool isSupported = false;
-    armnn::BackendId setBackend;
-    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
-    {
-        ARMNN_NO_DEPRECATE_WARN_BEGIN
-        FORWARD_LAYER_SUPPORT_FUNC(__func__,
-                                   IsSubtractionSupported,
-                                   data.m_Backends,
-                                   isSupported,
-                                   setBackend,
-                                   input0.GetTensorInfo(),
-                                   input1.GetTensorInfo(),
-                                   outputInfo);
-        ARMNN_NO_DEPRECATE_WARN_END
-    };
-
-    if(IsDynamicTensor(outputInfo))
-    {
-        isSupported = AreDynamicTensorsSupported();
-    }
-    else
-    {
-        validateFunc(outputInfo, isSupported);
-    }
-
-    if (!isSupported)
-    {
-        return false;
-    }
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    armnn::IConnectableLayer* const startLayer = data.m_Network->AddSubtractionLayer();
-    ARMNN_NO_DEPRECATE_WARN_END
-    startLayer->SetBackendId(setBackend);
-
-    bool isReshapeSupported = BroadcastTensor(input0, input1, startLayer, data);
-    if (!isReshapeSupported)
-    {
-        return false;
-    }
-    return SetupAndTrackLayerOutputSlot(operation, 0, *startLayer, model,
-                                        data, nullptr, validateFunc, activationFunction);
 }
 
 bool Converter::ConvertTanH(const Operation& operation, const Model& model, ConversionData& data)

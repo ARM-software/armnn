@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,8 +31,6 @@ public:
     static bool ConvertOperation(const Operation& operation, const Model& model, ConversionData& data);
 
 private:
-    static bool ConvertAdd(const Operation& operation, const Model& model, ConversionData& data);
-
     static bool ConvertArgMinMax(const Operation& operation,
                                  const Model& model,
                                  ConversionData& data,
@@ -61,12 +59,15 @@ private:
 
     static bool ConvertDequantize(const Operation& operation, const Model& model, ConversionData& data);
 
-    static bool ConvertDiv(const Operation& operation, const Model& model, ConversionData& data);
-
     static bool ConvertElementwiseUnary(const Operation& operation,
                                         const Model& model,
                                         ConversionData& data,
                                         armnn::UnaryOperation unaryOperation);
+
+    static bool ConvertElementwiseBinary(const Operation& operation,
+                                         const Model& model,
+                                         ConversionData& data,
+                                         armnn::BinaryOperation binaryOperation);
 
     static bool ConvertElu(const Operation& operation, const Model& model, ConversionData& data);
 
@@ -107,13 +108,7 @@ private:
 
     static bool ConvertMaxPool2d(const Operation& operation, const Model& model, ConversionData& data);
 
-    static bool ConvertMaximum(const Operation& operation, const Model& model, ConversionData& data);
-
     static bool ConvertMean(const Operation& operation, const Model& model, ConversionData& data);
-
-    static bool ConvertMinimum(const Operation& operation, const Model& model, ConversionData& data);
-
-    static bool ConvertMul(const Operation& operation, const Model& model, ConversionData& data);
 
     static bool ConvertPad(const Operation& operation, const Model& model, ConversionData& data);
 
@@ -153,8 +148,6 @@ private:
     static bool ConvertSqueeze(const Operation& operation, const Model& model, ConversionData& data);
 
     static bool ConvertStridedSlice(const Operation& operation, const Model& model, ConversionData& data);
-
-    static bool ConvertSub(const Operation& operation, const Model& model, ConversionData& data);
 
     static bool ConvertTanH(const Operation& operation, const Model& model, ConversionData& data);
 

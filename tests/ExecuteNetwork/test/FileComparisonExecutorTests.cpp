@@ -5,12 +5,13 @@
 
 #include <ExecuteNetwork/FileComparisonExecutor.hpp>
 #include <doctest/doctest.h>
-#include <filesystem>
 #include <fstream>
+#include <ghc/filesystem.hpp>
+
 namespace
 {
 
-namespace fs = std::filesystem;
+namespace fs = ghc::filesystem;
 
 TEST_SUITE("FileComparisonExecutorTests")
 {
@@ -34,7 +35,7 @@ TEST_SUITE("FileComparisonExecutorTests")
 
     TEST_CASE("ComparisonFileIsEmpty")
     {
-        std::filesystem::path fileName = fs::temp_directory_path().append("ComparisonFileIsEmpty.tmp");
+        ghc::filesystem::path fileName = fs::temp_directory_path().append("ComparisonFileIsEmpty.tmp");
         std::fstream tmpFile;
         tmpFile.open(fileName, std::ios::out);
         ExecuteNetworkParams params;
@@ -44,12 +45,12 @@ TEST_SUITE("FileComparisonExecutorTests")
         // can't read a header.
         CHECK_THROWS_AS(classToTest.Execute(), armnn::ParseException);
         tmpFile.close();
-        std::filesystem::remove(fileName);
+        ghc::filesystem::remove(fileName);
     }
 
     TEST_CASE("ComparisonFileHasValidHeaderAndData")
     {
-        std::filesystem::path fileName = fs::temp_directory_path().append("ComparisonFileHasValidHeaderAndData.tmp");
+        ghc::filesystem::path fileName = fs::temp_directory_path().append("ComparisonFileHasValidHeaderAndData.tmp");
         std::fstream tmpFile;
         tmpFile.open(fileName, std::ios::out);
         // Write a valid header.
@@ -60,7 +61,7 @@ TEST_SUITE("FileComparisonExecutorTests")
         FileComparisonExecutor classToTest(params);
         // The read in tensor should consist of 1 float.
         std::vector<const void*> results = classToTest.Execute();
-        std::filesystem::remove(fileName);
+        ghc::filesystem::remove(fileName);
         // Should be one tensor in the data.
         CHECK_EQ(1, results.size());
         // We expect there to be 1 element of value 1.1f.

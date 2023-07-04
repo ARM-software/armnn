@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -455,7 +455,7 @@ void SanitizeBiasQuantizationScale(armnn::TensorInfo& biasInfo,
 // 4D Tensor Permutations
 const armnn::PermutationVector IdentityPermutation4D({ 0U, 1U, 2U, 3U });
 const armnn::PermutationVector IdentityPermutation3D({ 0U, 1U, 2U });
-const armnn::PermutationVector SwapDim1And2({ 0U, 2U, 1U, 3U });
+const armnn::PermutationVector SwapDim2And3({ 0U, 1U, 3U, 2U });
 
 // 3D Permutation Vectors
 const armnn::PermutationVector RotateTensorLeft({ 1U, 2U, 0U });
@@ -603,8 +603,8 @@ bool CreateConcatPermutationParameters(const unsigned int numberOfDimensions,
     // or along dimension 0 or 2 for a 3-D tensor.
     if (numberOfDimensions == 4 && concatDimension == 2)
     {
-        concatDimension = 1;
-        permutationPair = std::make_pair(SwapDim1And2, SwapDim1And2);
+        concatDimension = 3;
+        permutationPair = std::make_pair(SwapDim2And3, SwapDim2And3);
         needPermute = true;
     }
     else if (numberOfDimensions == 3 && concatDimension == 1)

@@ -2782,11 +2782,26 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>FLOAT32
     </table>
 <tr>
+   <td>GpuAcc
+   <td>
+       <ul>
+        <li>NHWC
+        <li>NCHW
+       </ul>
+   <td>
+     <table>
+     <tr><th>
+     <tr><td>QASYMMU8
+     <tr><td>QASYMMS8
+     <tr><td>FLOAT16
+     <tr><td>FLOAT32
+     </table>
+<tr>
   <td rowspan="3">ReverseV2Layer
-  <td rowspan="3" style="width:200px;"> Layer to perform ReverseV2 operations.
+  <td rowspan="3" style="width:200px;"> Layer to perform reverse of a tensor.
   <td rowspan="3">
       <ul>
-       <li>N/A
+       <li>NA
       </ul>
    <td>CpuRef
      <td>
@@ -2807,36 +2822,23 @@ where N = batches, C = channels, H = height, W = width
   <td>CpuAcc
   <td>
       <ul>
-       <li>N/A
-      </ul>
-  <td>
-      <ul>
-       <li>N/A
-      </ul>
-<tr>
-  <td>GpuAcc
-  <td>
-      <ul>
-       <li>N/A
-      </ul>
-  <td>
-      <ul>
-       <li>N/A
-      </ul>
-<tr>
-  <td>GpuAcc
-  <td>
-      <ul>
-       <li>NHWC
-       <li>NCHW
+       <li>All
       </ul>
   <td>
     <table>
     <tr><th>
-    <tr><td>QASYMMU8
-    <tr><td>QASYMMS8
-    <tr><td>FLOAT16
-    <tr><td>FLOAT32
+    <tr><td>All
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>All
     </table>
 <tr>
   <td rowspan="3">RsqrtLayer

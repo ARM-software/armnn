@@ -263,6 +263,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_ReshapeLayer]                = &DeserializerImpl::ParseReshape;
     m_ParserFunctions[Layer_ResizeBilinearLayer]         = &DeserializerImpl::ParseResizeBilinear;
     m_ParserFunctions[Layer_ResizeLayer]                 = &DeserializerImpl::ParseResize;
+    m_ParserFunctions[Layer_ReverseV2Layer]              = &DeserializerImpl::ParseReverseV2;
     m_ParserFunctions[Layer_RsqrtLayer]                  = &DeserializerImpl::ParseRsqrt;
     m_ParserFunctions[Layer_ShapeLayer]                  = &DeserializerImpl::ParseShape;
     m_ParserFunctions[Layer_SliceLayer]                  = &DeserializerImpl::ParseSlice;
@@ -396,6 +397,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_ResizeBilinearLayer()->base();
         case Layer::Layer_ResizeLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ResizeLayer()->base();
+        case Layer::Layer_ReverseV2Layer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ReverseV2Layer()->base();
         case Layer::Layer_RsqrtLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_RsqrtLayer()->base();
         case Layer::Layer_ShapeLayer:
@@ -2734,6 +2737,32 @@ void IDeserializer::DeserializerImpl::ParseResize(GraphPtr graph, unsigned int l
     RegisterOutputSlots(graph, layerIndex, layer);
 }
 
+void IDeserializer::DeserializerImpl::ParseReverseV2(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+
+    TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_ReverseV2Layer()->descriptor();
+    auto flatBufferAxis = flatBufferDescriptor->axis();
+
+    armnn::ReverseV2Descriptor descriptor;
+    descriptor.m_Axis =
+        std::vector<int32_t>(flatBufferAxis->begin(), flatBufferAxis->end());
+
+    auto layerName = GetLayerName(graph, layerIndex);
+    IConnectableLayer* layer = m_Network->AddReverseV2Layer(descriptor, layerName.c_str());
+
+    armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
 
 /// @Note The ResizeBiliniar operation was deprecated and removed in favor of the Resize operation.
 ///       This function is kept for backwards compatibility.

@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2021-2023 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -68,6 +68,7 @@ The Arm NN SDK Serializer currently supports the following layers:
 - Reduce
 - Reshape
 - Resize
+- ReverseV2
 - Shape
 - Slice
 - Softmax
@@ -161,6 +162,7 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 - Reshape
 - Resize
 - ResizeBilinear
+- ReverseV2
 - Slice
 - Softmax
 - SpaceToBatchNd

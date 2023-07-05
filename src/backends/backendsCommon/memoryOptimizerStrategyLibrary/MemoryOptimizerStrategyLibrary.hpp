@@ -33,7 +33,7 @@ static std::map<std::string, std::unique_ptr<IMemoryOptimizerStrategyFactory>>& 
 
 } // anonymous namespace
 
-std::unique_ptr<IMemoryOptimizerStrategy> GetMemoryOptimizerStrategy(const std::string& strategyName)
+inline std::unique_ptr<IMemoryOptimizerStrategy> GetMemoryOptimizerStrategy(const std::string& strategyName)
 {
      const auto& strategyFactoryMap = GetStrategyFactories();
      auto strategyFactory = strategyFactoryMap.find(strategyName);
@@ -44,7 +44,7 @@ std::unique_ptr<IMemoryOptimizerStrategy> GetMemoryOptimizerStrategy(const std::
     return nullptr;
 }
 
-const std::vector<std::string> GetMemoryOptimizerStrategyNames()
+inline const std::vector<std::string> GetMemoryOptimizerStrategyNames()
 {
     const auto& strategyFactoryMap = GetStrategyFactories();
     std::vector<std::string> strategyNames;

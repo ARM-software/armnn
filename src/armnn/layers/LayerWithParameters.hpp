@@ -72,17 +72,8 @@ protected:
                 }
             }
         }
-        if (tensors.empty())
-        {
-            const std::string warningMessage{"GetConnectedConstantAsInputTensors() called on Layer with no "
-                                             "connected Constants as Input Tensors."};
-            ARMNN_LOG(warning) << warningMessage;
-        }
         return tensors;
     }
 };
-
-
-
 
 } // namespace

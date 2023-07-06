@@ -179,23 +179,9 @@ void ValidateTensorQuantizationSpace(const TensorInfo& first,
 
 //---------------------------------------------------------------
 void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
-                                    const TensorInfo& inputTensorInfo,
                                     const TensorInfo& weightsTensorInfo,
                                     const std::string& descName)
 {
-    // Helper lambda function to validate a single bias quantization scale value
-    auto VerifyBiasQuantizationScale = [&descName](float biasScale, float expectedScale) -> void
-    {
-        constexpr float tolerance = 0.0001f;
-        if (std::abs(biasScale - expectedScale) > tolerance)
-        {
-            // Print the float values with extra precision to see very small differences
-            ARMNN_LOG(warning) << std::setprecision(6) << descName << ": Expected " << expectedScale <<
-                " for bias quantization scale (product of input and weight scales), but got " <<
-                biasScale << ". Using scale provided.";
-        }
-    };
-
     if (biasTensor.GetQuantizationOffset() != 0)
     {
         throw InvalidArgumentException(descName + ": Expected zero quantization offset for bias tensor but got " +
@@ -216,18 +202,6 @@ void ValidateBiasTensorQuantization(const TensorInfo& biasTensor,
                 << ", biases=" << biasScales.size();
             throw InvalidArgumentException(msg.str(), CHECK_LOCATION());
         }
-
-        for (size_t i = 0ul; i < biasScales.size(); ++i)
-        {
-            const float expectedScale = inputTensorInfo.GetQuantizationScale() * weightScales[i];
-            VerifyBiasQuantizationScale(biasScales[i], expectedScale);
-        }
-    }
-    else
-    {
-        // Validate per-tensor quantization scale
-        const float expectedScale = inputTensorInfo.GetQuantizationScale() * weightsTensorInfo.GetQuantizationScale();
-        VerifyBiasQuantizationScale(biasTensor.GetQuantizationScale(), expectedScale);
     }
 }
 
@@ -1086,7 +1060,7 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     {
         TensorInfo biasTensorInfo = workloadInfo.m_InputTensorInfos[2];
         // Validates type and quantization values.
-        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
+        ValidateBiasTensorQuantization(biasTensorInfo, weightTensorInfo, descriptorName);
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
         ValidateTensorNumDimensions(biasTensorInfo, descriptorName, 1, "bias");
     }
@@ -1299,7 +1273,7 @@ void Convolution2dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
         const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
 
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
-        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
+        ValidateBiasTensorQuantization(biasTensorInfo, weightTensorInfo, descriptorName);
     }
 
     if (m_Parameters.m_StrideX <= 0 || m_Parameters.m_StrideY <= 0  )
@@ -1374,7 +1348,7 @@ void Convolution3dQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
         const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
 
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
-        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
+        ValidateBiasTensorQuantization(biasTensorInfo, weightTensorInfo, descriptorName);
     }
 
     if (m_Parameters.m_StrideX <= 0 || m_Parameters.m_StrideY <= 0 || m_Parameters.m_StrideZ <= 0 )
@@ -1487,7 +1461,7 @@ void DepthwiseConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
         optionalBiasTensorInfo = MakeOptional<TensorInfo>(workloadInfo.m_InputTensorInfos[2]);
         const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
 
-        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
+        ValidateBiasTensorQuantization(biasTensorInfo, weightTensorInfo, descriptorName);
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
     }
     ValidatePerAxisQuantization(inputTensorInfo,
@@ -3105,7 +3079,7 @@ void TransposeConvolution2dQueueDescriptor::Validate(const WorkloadInfo& workloa
         const TensorInfo& biasTensorInfo = optionalBiasTensorInfo.value();
 
         ValidateTensorDataType(biasTensorInfo, GetBiasDataType(inputTensorInfo.GetDataType()), descriptorName, "bias");
-        ValidateBiasTensorQuantization(biasTensorInfo, inputTensorInfo, weightTensorInfo, descriptorName);
+        ValidateBiasTensorQuantization(biasTensorInfo, weightTensorInfo, descriptorName);
     }
 
     ValidatePerAxisQuantization(inputTensorInfo,
@@ -3621,10 +3595,10 @@ void QuantizedLstmQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) co
                                  "inputGateBias", "outputGateBias");
 
     // Validate bias tensor quantization info
-    ValidateBiasTensorQuantization(inputGateBiasInfo, inputInfo, inputToInputWeightsInfo, descriptorName);
-    ValidateBiasTensorQuantization(forgetGateBiasInfo, inputInfo, inputToInputWeightsInfo, descriptorName);
-    ValidateBiasTensorQuantization(cellBiasInfo, inputInfo, inputToInputWeightsInfo, descriptorName);
-    ValidateBiasTensorQuantization(outputGateBiasInfo, inputInfo, inputToInputWeightsInfo, descriptorName);
+    ValidateBiasTensorQuantization(inputGateBiasInfo, inputToInputWeightsInfo, descriptorName);
+    ValidateBiasTensorQuantization(forgetGateBiasInfo, inputToInputWeightsInfo, descriptorName);
+    ValidateBiasTensorQuantization(cellBiasInfo, inputToInputWeightsInfo, descriptorName);
+    ValidateBiasTensorQuantization(outputGateBiasInfo, inputToInputWeightsInfo, descriptorName);
 }
 
 void AbsQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

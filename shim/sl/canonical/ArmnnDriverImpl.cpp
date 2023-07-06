@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -400,6 +400,11 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModelFromCache(
     pread(*dataCacheHandle[0], hashValue.data(), hashValue.size(), 0);
 
     // Read the model
+    if (cachedDataSize < hashValue.size())
+    {
+        return NN_ERROR(ErrorStatus::GENERAL_FAILURE)
+                << "ArmnnDriverImpl::prepareModelFromCache(): cachedDataSize is less than hashValue!";
+    }
     std::vector<uint8_t> dataCacheData(cachedDataSize - hashValue.size());
     pread(*dataCacheHandle[0], dataCacheData.data(), dataCacheData.size(), hashValue.size());
     auto calculatedHashValue = Hash(dataCacheData);

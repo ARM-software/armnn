@@ -24,6 +24,7 @@
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/SubgraphUtilsTest.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeEndToEndTestImpl.hpp>
 
@@ -60,18 +61,18 @@ TEST_CASE("ClAdditionEndToEndUint8Test")
 }
 
 // Power
-TEST_CASE("RefPowerEndToEndTestFloat32")
+TEST_CASE("ClPowerEndToEndTestFloat32")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Power);
 }
 
 // SqDiff
-TEST_CASE("RefSquaredDifferenceEndToEndTestFloat32")
+TEST_CASE("ClSquaredDifferenceEndToEndTestFloat32")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::SqDiff);
 }
 
-TEST_CASE("RefSquaredDifferenceEndToEndTestUint8")
+TEST_CASE("ClSquaredDifferenceEndToEndTestUint8")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends, BinaryOperation::SqDiff);
 }

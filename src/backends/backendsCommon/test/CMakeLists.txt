@@ -59,6 +59,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
     StridedSliceAsyncEndToEndTest.hpp
+    SubgraphUtilsTest.hpp
     SubtractionEndToEndTestImpl.hpp
     TransposeEndToEndTestImpl.hpp
     TensorCopyUtils.hpp

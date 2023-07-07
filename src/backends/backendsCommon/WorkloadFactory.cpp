@@ -1122,7 +1122,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
         case LayerType::ReverseV2:
         {
             auto cLayer = PolymorphicDowncast<const ReverseV2Layer*>(&layer);
-            const TensorInfo& input  = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& input  = layer.GetInputSlot(0).GetTensorInfo();
             const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
             result = layerSupportObject.IsReverseV2Supported(OverrideDataType(input, dataType),
                                                              OverrideDataType(output, dataType),
@@ -1413,9 +1413,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             // All inputs.
             const TensorInfo& input = OverrideDataType(layer.GetInputSlot(0).GetTensorInfo(),
                                                        dataType);
-            const TensorInfo& outputStateIn = OverrideDataType(layer.GetInputSlot(1).GetConnection()->GetTensorInfo(),
+            const TensorInfo& outputStateIn = OverrideDataType(layer.GetInputSlot(1).GetTensorInfo(),
                                                                dataType);
-            const TensorInfo& cellStateIn = OverrideDataType(layer.GetInputSlot(2).GetConnection()->GetTensorInfo(),
+            const TensorInfo& cellStateIn = OverrideDataType(layer.GetInputSlot(2).GetTensorInfo(),
                                                              dataType);
             // Outputs
             const TensorInfo& outputStateOut = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);

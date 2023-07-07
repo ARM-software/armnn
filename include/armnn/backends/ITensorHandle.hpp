@@ -1,11 +1,12 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
 #include <armnn/MemorySources.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/Tensor.hpp>
 
 namespace armnn
 {
@@ -91,6 +92,14 @@ public:
     /// Unimport externally allocated memory
     virtual void Unimport()
     {};
+
+    /// Returns a decorated version of this TensorHandle allowing us to override the TensorInfo for it
+    /// \param tensorInfo the overidden TensorInfo.
+    virtual std::shared_ptr<ITensorHandle> DecorateTensorHandle(const TensorInfo& tensorInfo)
+    {
+        IgnoreUnused(tensorInfo);
+        return nullptr;
+    }
 };
 
 }

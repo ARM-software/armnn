@@ -1156,6 +1156,13 @@ void IDeserializer::DeserializerImpl::RegisterInputSlots(GraphPtr graph,
             auto fbInputSlot = baseLayer->inputSlots()->Get(i);
             auto fbConnection = fbInputSlot->connection();
             armnn::IInputSlot* inputSlot = &(layer->GetInputSlot(fbInputSlot->index()));
+
+            // If the slot has an Overridden tensorInfo then extract it
+            if (fbInputSlot->isOverridden())
+            {
+                armnn::TensorInfo overriddenTensorInfo = ToTensorInfo(fbInputSlot->overriddenTensorInfo());
+                inputSlot->SetTensorInfo(overriddenTensorInfo);
+            }
             RegisterInputSlotOfConnection(fbConnection->sourceLayerIndex(), fbConnection->outputSlotIndex(), inputSlot);
         }
     }

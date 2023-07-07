@@ -35,6 +35,7 @@
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
+#include <backendsCommon/test/SubgraphUtilsTest.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeEndToEndTestImpl.hpp>
 
@@ -1618,6 +1619,22 @@ TEST_CASE("RefSquaredDifferenceEndToEndTestUint8")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::SqDiff);
 }
+
 #endif
 
+// Backend Optimization Tests
+TEST_CASE("RefReshapeRemovalSimpleCaseEndToEnd")
+{
+    ReshapeRemovalEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefReshapeRemovalNCHWFirstEndToEnd")
+{
+    ReshapeRemovalNCHWEndToEnd<armnn::DataType::Float32>(defaultBackends, true, true);
+}
+
+TEST_CASE("RefReshapeRemovalNCHWSecondEndToEnd")
+{
+    ReshapeRemovalNCHWEndToEnd<armnn::DataType::Float32>(defaultBackends, true, false);
+}
 }

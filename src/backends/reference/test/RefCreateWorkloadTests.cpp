@@ -1314,4 +1314,52 @@ TEST_CASE("ReplaceFunctionsfromUint8toFloat16ActivationWorkload")
     RefCreateActivationWorkloadReplaceFunctionsTest<armnn::DataType::QAsymmU8>();
 }
 
+bool TestRefTensorHandleInfo(armnn::RefTensorHandle* handle, const armnn::TensorInfo& expectedInfo)
+{
+    const TensorInfo handleInfo = handle->GetTensorInfo();
+    const TensorInfo expectedAclInfo = expectedInfo;
+
+    if (handleInfo.GetDataType() != expectedAclInfo.GetDataType())
+    {
+        return false;
+    }
+
+    if (handleInfo.GetNumDimensions() != expectedAclInfo.GetNumDimensions())
+    {
+        return false;
+    }
+
+    for (unsigned int d = 0; d < expectedAclInfo.GetNumDimensions(); ++d)
+    {
+        if (handleInfo.GetShape()[d] != expectedAclInfo.GetShape()[d])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+TEST_CASE("RefCreateSplitterWorkload")
+{
+    Graph graph;
+    RefWorkloadFactory factory = GetFactory();
+
+    auto workload = CreateSplitterWorkloadTest<RefSplitterWorkload, DataType::Float32>(factory, graph);
+
+    // Checks that outputs are as we expect them (see definition of CreateSplitterWorkloadTest).
+    SplitterQueueDescriptor queueDescriptor = workload->GetData();
+    auto inputHandle = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Inputs[0]);
+    CHECK(TestRefTensorHandleInfo(inputHandle, TensorInfo({5, 7, 7}, DataType::Float32)));
+
+    auto outputHandle0 = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[0]);
+    CHECK(TestRefTensorHandleInfo(outputHandle0, TensorInfo({1, 7, 7}, DataType::Float32)));
+
+    auto outputHandle1 = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[1]);
+    CHECK(TestRefTensorHandleInfo(outputHandle1, TensorInfo({2, 7, 7}, DataType::Float32)));
+
+    auto outputHandle2 = PolymorphicDowncast<RefTensorHandle*>(queueDescriptor.m_Outputs[2]);
+    CHECK(TestRefTensorHandleInfo(outputHandle2, TensorInfo({2, 7, 7}, DataType::Float32)));
+}
+
 }

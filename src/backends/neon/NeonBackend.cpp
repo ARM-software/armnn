@@ -505,9 +505,39 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                 untouched.erase(baseLayer->GetGuid());
             }
         }
+
+        // Remove Reshape where possible
+        if (base.GetType() == LayerType::Reshape)
+        {
+            ReshapeLayer* baseLayer = PolymorphicDowncast<ReshapeLayer*>(&base);
+            Layer& parentLayer = baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
+
+            // Cannot currently remove the Reshape if it's connected to any layer that has an NCHW layout
+            if (IsNCHW(parentLayer))
+            {
+                continue;
+            }
+            bool isNCHW = false;
+
+            for (unsigned int i = 0; i < baseLayer->GetOutputSlot(0).GetNumConnections(); ++i)
+            {
+                Layer& nextLayer = baseLayer->GetOutputSlot(0).GetConnection(i)->GetOwningLayer();
+
+                if (IsNCHW(nextLayer))
+                {
+                    isNCHW = true;
+                    break;
+                }
+            }
+            if (isNCHW)
+            {
+                continue;
+            }
+            RemoveReshapeLayer(baseLayer, untouched, optimizationViews);
+        }
     }
 
-    if (optimizationViews.GetSubstitutions().empty())
+    if (optimizationViews.GetSubstitutions().empty() && optimizationViews.GetDeletedSubgraphs().empty())
     {
         optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
     }

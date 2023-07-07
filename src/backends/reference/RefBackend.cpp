@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,8 +15,6 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <backendsCommon/DefaultAllocator.hpp>
 #include <backendsCommon/SubgraphUtils.hpp>
-
-#include <Optimizer.hpp>
 
 namespace armnn
 {
@@ -116,9 +114,16 @@ OptimizationViews RefBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                 }
             }
         }
+
+        // Remove Reshape where possible
+        if (base.GetType() == LayerType::Reshape)
+        {
+            ReshapeLayer* baseLayer = PolymorphicDowncast<ReshapeLayer*>(&base);
+            RemoveReshapeLayer(baseLayer, untouched, optimizationViews);
+        }
     }
 
-    if (optimizationViews.GetSubstitutions().empty())
+    if (optimizationViews.GetSubstitutions().empty() && optimizationViews.GetDeletedSubgraphs().empty())
     {
         optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
     }

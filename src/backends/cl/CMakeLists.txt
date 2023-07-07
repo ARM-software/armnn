@@ -39,6 +39,7 @@ if(ARMCOMPUTECL)
         ClLayerSupport.cpp
         ClLayerSupport.hpp
         ClRegistryInitializer.cpp
+        ClTensorHandle.cpp
         ClTensorHandle.hpp
         ClTensorHandleFactory.cpp
         ClTensorHandleFactory.hpp

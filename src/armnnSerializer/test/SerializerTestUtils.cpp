@@ -49,7 +49,7 @@ void LayerVerifierBase::VerifyNameAndConnections(const armnn::IConnectableLayer*
         const armnn::IOutputSlot* connectedOutput = layer->GetInputSlot(i).GetConnection();
         CHECK(connectedOutput);
 
-        const armnn::TensorInfo& connectedInfo = connectedOutput->GetTensorInfo();
+        const armnn::TensorInfo& connectedInfo = layer->GetInputSlot(i).GetTensorInfo();
         CHECK(connectedInfo.GetShape() == m_InputTensorInfos[i].GetShape());
         CHECK(GetDataTypeName(connectedInfo.GetDataType()) == GetDataTypeName(m_InputTensorInfos[i].GetDataType()));
 

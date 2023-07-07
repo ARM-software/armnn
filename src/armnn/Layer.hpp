@@ -80,15 +80,15 @@ public:
 
     /// Sets the TensorInfo for this InputSlot. This can be used to override the TensorInfo and if set will be returned
     /// instead of the TensorInfo for the Connected OutputSlot.
-    void SetTensorInfo(const TensorInfo tensorInfo);
+    void SetTensorInfo(const TensorInfo tensorInfo) override;
     /// Gets the TensorInfo for this InputSlot. If the InputSlot's TensorInfo has not been set then this will get the
     /// TensorInfo from the Connected TensorInfo.
-    const TensorInfo& GetTensorInfo() const;
+    const TensorInfo& GetTensorInfo() const override;
     /// Returns true if this InputSlot either has an overridden TensorInfo for this InputSlot that was set through a
     /// call to SetTensorInfo() or is Connected to an OutputSlot that has its TensorInfo set.
-    bool IsTensorInfoSet() const;
+    bool IsTensorInfoSet() const override;
     /// Returns true if this InputSlot has an overridden TensorInfo that was set through a call to SetTensorInfo().
-    bool IsTensorInfoOverridden() const;
+    bool IsTensorInfoOverridden() const override;
 
 private:
     Layer& m_OwningLayer;

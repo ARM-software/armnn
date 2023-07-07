@@ -508,12 +508,22 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
         if (subgraphInputSlot->GetConnection())
         {
             IOutputSlot* connectedOutputSlot = subgraphInputSlot->GetConnection();
+            InputSlot* inputSlot = PolymorphicDowncast<InputSlot*>(subgraphInputSlot);
+            bool isOverridden = inputSlot->IsTensorInfoOverridden();
+
             ARMNN_ASSERT(connectedOutputSlot);
             connectedOutputSlot->Disconnect(*subgraphInputSlot);
 
             IInputSlot* substituteInputSlot = substituteSubgraphInputSlots.at(inputSlotIdx);
             ARMNN_ASSERT(substituteInputSlot);
             connectedOutputSlot->Connect(*substituteInputSlot);
+
+            if (isOverridden)
+            {
+                TensorInfo overridden = inputSlot->GetTensorInfo();
+                InputSlot* newInputSlot = PolymorphicDowncast<InputSlot*>(substituteInputSlot);
+                newInputSlot->SetTensorInfo(overridden);
+            }
         }
     }
 

@@ -1974,12 +1974,16 @@ std::vector<fb::Offset<serializer::InputSlot>>
 
         // Get the Connection for the InputSlot
         const IOutputSlot* connection = inputSlot.GetConnection();
+        bool isOverridden = inputSlot.IsTensorInfoOverridden();
+
+        flatbuffers::Offset<TensorInfo> overriddenTensorInfo = CreateTensorInfo(inputSlot.GetTensorInfo());
 
         // Create FlatBuffer Connection
         serializer::Connection conn(GetSerializedId(inputSlot.GetConnection()->GetOwningLayerGuid()),
                                     connection->CalculateIndexOnOwner());
         // Create FlatBuffer InputSlot
-        inputSlots.push_back(serializer::CreateInputSlot(m_flatBufferBuilder, slotIndex, &conn));
+        inputSlots.push_back(serializer::CreateInputSlot(m_flatBufferBuilder, slotIndex, &conn, isOverridden,
+                                                         overriddenTensorInfo));
     }
     return inputSlots;
 }

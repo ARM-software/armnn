@@ -106,6 +106,8 @@ table ConstTensor {
 table InputSlot {
     index:uint;
     connection:Connection;
+    isOverridden:bool;
+    overriddenTensorInfo:TensorInfo;
 }
 
 table OutputSlot {

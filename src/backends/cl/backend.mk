@@ -23,6 +23,7 @@ BACKEND_SOURCES := \
         ClImportTensorHandleFactory.cpp \
         ClLayerSupport.cpp \
         ClRegistryInitializer.cpp \
+        ClTensorHandle.cpp \
         ClTensorHandleFactory.cpp \
         ClWorkloadFactory.cpp \
         OpenClTimer.cpp \

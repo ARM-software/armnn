@@ -455,6 +455,7 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                     replacementLayer->m_Gamma    = std::move(baseLayer->m_Gamma);
                                     replacementLayer->m_Mean     = std::move(baseLayer->m_Mean);
                                     replacementLayer->m_Variance = std::move(baseLayer->m_Variance);
+
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -476,6 +477,7 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                      activationLayer,
                                                                      activationDesc,
                                                                      name);
+
                                     untouched.erase(baseLayer->GetGuid());
                                     untouched.erase(activationLayer->GetGuid());
                                 }
@@ -623,6 +625,8 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                                            activationDesc,
                                                                                            BinaryOperation::Sub,
                                                                                            name);
+                                        untouched.erase(baseLayer->GetGuid());
+                                        untouched.erase(activationLayer->GetGuid());
                                     }
                                 }
                                 // No fusion available for other BinaryOperations
@@ -678,7 +682,7 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
         }
     }
 
-    if (optimizationViews.GetSubstitutions().empty())
+    if (optimizationViews.GetSubstitutions().empty() && optimizationViews.GetDeletedSubgraphs().empty())
     {
         optimizationViews.AddUntouchedSubgraph(SubgraphView(subgraph));
     }

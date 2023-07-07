@@ -259,7 +259,20 @@ void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector) const
         // The graph must be well-formed at this point.
         ARMNN_ASSERT(inputSlot.GetConnection());
         const OutputHandler& outputHandler = inputSlot.GetConnectedOutputSlot()->GetOutputHandler();
-        dataCollector.Push(outputHandler.GetData(), outputHandler.GetTensorInfo());
+
+        if (inputSlot.IsTensorInfoOverridden() && outputHandler.GetData())
+        {
+            auto handler = outputHandler.GetData()->DecorateTensorHandle(inputSlot.GetTensorInfo());
+
+            if (handler)
+            {
+                // Add overridden TensorHandle
+                dataCollector.Push(handler.get(), inputSlot.GetTensorInfo());
+                continue;
+            }
+        }
+        // Add default TensorHandle
+        dataCollector.Push(outputHandler.GetData(), inputSlot.GetTensorInfo());
     }
 }
 

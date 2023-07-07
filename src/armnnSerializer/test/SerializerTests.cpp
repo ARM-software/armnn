@@ -3008,4 +3008,34 @@ TEST_CASE("SerializeDeserializeNonLinearNetwork")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+TEST_CASE("SerializeOverriddenSlot")
+{
+    const std::string layerName("subtraction");
+    const armnn::TensorInfo info({ 1, 4 }, armnn::DataType::Float32);
+    const armnn::TensorInfo incompatibleInfo({ 4, 1 }, armnn::DataType::Float32);
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer0 = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const inputLayer1 = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const subtractionLayer = network->AddElementwiseBinaryLayer(armnn::BinaryOperation::Sub,
+                                                                                          layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer0->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(0));
+    inputLayer1->GetOutputSlot(0).Connect(subtractionLayer->GetInputSlot(1));
+    subtractionLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer0->GetOutputSlot(0).SetTensorInfo(info);
+    inputLayer1->GetOutputSlot(0).SetTensorInfo(incompatibleInfo);
+    subtractionLayer->GetInputSlot(1).SetTensorInfo(info);
+    subtractionLayer->GetOutputSlot(0).SetTensorInfo(info);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBase verifier(layerName, {info, info}, {info});
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+
 }

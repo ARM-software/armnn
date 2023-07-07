@@ -16,6 +16,7 @@ if(ARMCOMPUTENEON)
         NeonLayerSupport.hpp
         NeonRegistryInitializer.cpp
         NeonTensorHandle.hpp
+        NeonTensorHandle.cpp
         NeonTensorHandleFactory.cpp
         NeonTensorHandleFactory.hpp
         NeonTimer.hpp

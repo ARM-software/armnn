@@ -120,7 +120,7 @@ void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
                     // 3) the input does not come from a Constant layer or input layer
                     // 4) the input is only read by this concat layer
                     // 5) if concat along x or y (2 innermost dimensions) and the previous layers do not require padding
-                    // 6) the input does not have an Overridden TensorInfo
+                    // 6) neither the inputs nor the output have an Overridden TensorInfo
                     if (slot &&
                         parentInfo.IsTypeSpaceMatch(info) && //(1)
                         factoryId == slot->GetTensorHandleFactoryId() && //(2)
@@ -128,6 +128,7 @@ void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
                         slot->GetOwningLayer().GetType() != LayerType::Input && //(3)
                         slot->GetNumConnections() == 1 &&
                         canUseSubTensorOnXorY && //(5)
+                        !GetOutputSlot(0).GetConnection(0)->IsTensorInfoOverridden() && //(6)
                         !currentLayer->GetInputSlot(i).IsTensorInfoOverridden()) //(6)
                     {
                         ARMNN_NO_DEPRECATE_WARN_BEGIN

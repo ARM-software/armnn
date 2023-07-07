@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,6 +11,24 @@
 
 void Connect(armnn::IConnectableLayer* from, armnn::IConnectableLayer* to, const armnn::TensorInfo& tensorInfo,
              unsigned int fromIndex = 0, unsigned int toIndex = 0);
+
+class LayerNameAndTypeCheck
+{
+public:
+    LayerNameAndTypeCheck(armnn::LayerType layerType, const char* name)
+    : m_layerType(layerType)
+    , m_name(name)
+    {}
+
+    bool operator()(const armnn::Layer* const layer)
+    {
+        return (layer->GetNameStr() == m_name &&
+                layer->GetType() == m_layerType);
+    }
+private:
+    armnn::LayerType m_layerType;
+    const char* m_name;
+};
 
 template <typename LayerT>
 bool IsLayerOfType(const armnn::Layer* const layer)

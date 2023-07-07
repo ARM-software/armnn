@@ -1310,6 +1310,28 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                     });
             }
 
+            // Remove deleted sub-graphs
+            for (auto& deletedSubgraph : optimizationViews.GetDeletedSubgraphs())
+            {
+                for (auto& l : deletedSubgraph.GetIConnectableLayers())
+                {
+                    Layer* deletedLayer = PolymorphicDowncast<Layer*>(l);
+                    for (unsigned int in = deletedLayer->GetNumInputSlots(); in > 0; --in)
+                    {
+                        auto inputSlot = deletedLayer->GetInputSlot(in -1);
+                        OutputSlot* parentOut = inputSlot.GetConnectedOutputSlot();
+                        parentOut->Disconnect(inputSlot);
+                        for (unsigned int out = deletedLayer->GetOutputSlot(in -1).GetNumConnections(); out > 0; --out)
+                        {
+                            InputSlot *childIn = deletedLayer->GetOutputSlot(in - 1).GetConnection(out -1);
+                            deletedLayer->GetOutputSlot(in - 1).Disconnect(*childIn);
+                            parentOut->Connect(*childIn);
+                        }
+                    }
+                    optGraph.EraseLayer(deletedLayer);
+                }
+            }
+
             if (!optimizationViews.GetFailedSubgraphs().empty())
             {
                 std::stringstream warningMsg;

@@ -499,7 +499,7 @@ ArmNNExecutor::IOInfo ArmNNExecutor::GetIOInfo(armnn::IOptimizedNetwork* optNet)
                 case armnn::LayerType::Output:
                 {
                     m_IOInfo.m_OutputNames.emplace_back(name);
-                    m_IOInfo.m_OutputInfoMap[name] = {id, layer->GetInputSlot(0).GetConnection()->GetTensorInfo()};
+                    m_IOInfo.m_OutputInfoMap[name] = {id, layer->GetInputSlot(0).GetTensorInfo()};
                     break;
                 }
                 default: {}
@@ -689,6 +689,7 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
                 break;
             }
             case armnn::DataType::QAsymmU8:
+            case armnn::DataType::Boolean:
             {
                 PrintTensor<uint8_t>(outputWriteInfo, "%d ");
                 break;
@@ -696,7 +697,6 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
             case armnn::DataType::Float16:
             case armnn::DataType::QSymmS16:
             case armnn::DataType::BFloat16:
-            case armnn::DataType::Boolean:
             case armnn::DataType::Signed64:
             default:
             {

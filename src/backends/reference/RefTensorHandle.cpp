@@ -1,29 +1,40 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
 #include "RefTensorHandle.hpp"
 
 namespace armnn
 {
 
-RefTensorHandle::RefTensorHandle(const TensorInfo &tensorInfo, std::shared_ptr<RefMemoryManager> &memoryManager):
+RefTensorHandle::RefTensorHandle(const TensorInfo& tensorInfo, std::shared_ptr<RefMemoryManager>& memoryManager):
     m_TensorInfo(tensorInfo),
     m_MemoryManager(memoryManager),
     m_Pool(nullptr),
     m_UnmanagedMemory(nullptr),
-    m_ImportedMemory(nullptr)
+    m_ImportedMemory(nullptr),
+    m_Decorated()
 {
-
 }
 
 RefTensorHandle::RefTensorHandle(const TensorInfo& tensorInfo)
                                  : m_TensorInfo(tensorInfo),
                                    m_Pool(nullptr),
                                    m_UnmanagedMemory(nullptr),
-                                   m_ImportedMemory(nullptr)
+                                   m_ImportedMemory(nullptr),
+                                   m_Decorated()
 {
+}
 
+RefTensorHandle::RefTensorHandle(const TensorInfo& tensorInfo, const RefTensorHandle& parent)
+        : m_TensorInfo(tensorInfo),
+          m_MemoryManager(parent.m_MemoryManager),
+          m_Pool(parent.m_Pool),
+          m_UnmanagedMemory(parent.m_UnmanagedMemory),
+          m_ImportedMemory(parent.m_ImportedMemory),
+          m_Decorated()
+{
 }
 
 RefTensorHandle::~RefTensorHandle()
@@ -138,5 +149,53 @@ bool RefTensorHandle::CanBeImported(void *memory, MemorySource source)
     }
     return false;
 }
+
+std::shared_ptr<ITensorHandle> RefTensorHandle::DecorateTensorHandle(const TensorInfo& tensorInfo)
+{
+    auto decorated = std::make_shared<RefTensorHandleDecorator>(tensorInfo, *this);
+    m_Decorated.emplace_back(decorated);
+    return decorated;
+}
+
+RefTensorHandleDecorator::RefTensorHandleDecorator(const TensorInfo& tensorInfo, const RefTensorHandle& parent)
+: RefTensorHandle(tensorInfo)
+, m_TensorInfo(tensorInfo)
+, m_Parent(parent)
+{
+}
+
+void RefTensorHandleDecorator::Manage()
+{
+}
+
+void RefTensorHandleDecorator::Allocate()
+{
+}
+
+const void* RefTensorHandleDecorator::Map(bool unused) const
+{
+    return m_Parent.Map(unused);
+}
+
+MemorySourceFlags RefTensorHandleDecorator::GetImportFlags() const
+{
+    return static_cast<MemorySourceFlags>(MemorySource::Malloc);
+}
+
+bool RefTensorHandleDecorator::Import(void*, MemorySource )
+{
+    return false;
+}
+
+bool RefTensorHandleDecorator::CanBeImported(void* , MemorySource)
+{
+    return false;
+}
+
+std::shared_ptr<ITensorHandle> RefTensorHandleDecorator::DecorateTensorHandle(const TensorInfo&)
+{
+    return nullptr;
+}
+
 
 }

@@ -31,6 +31,18 @@ public:
     virtual IConnectableLayer& GetOwningIConnectableLayer() = 0;
     virtual unsigned int GetSlotIndex() const = 0;
 
+    /// Sets the TensorInfo for this InputSlot. This can be used to override the TensorInfo and if set will be returned
+    /// instead of the TensorInfo for the Connected OutputSlot.
+    virtual void SetTensorInfo(const TensorInfo tensorInfo) = 0;
+    /// Gets the TensorInfo for this InputSlot. If the InputSlot's TensorInfo has not been set then this will get the
+    /// TensorInfo from the Connected TensorInfo.
+    virtual const TensorInfo& GetTensorInfo() const = 0;
+    /// Returns true if this InputSlot either has an overridden TensorInfo for this InputSlot that was set through a
+    /// call to SetTensorInfo() or is Connected to an OutputSlot that has its TensorInfo set.
+    virtual bool IsTensorInfoSet() const = 0;
+    /// Returns true if this InputSlot has an overridden TensorInfo that was set through a call to SetTensorInfo().
+    virtual bool IsTensorInfoOverridden() const = 0;
+
 protected:
    /// Not user deletable.
     ~IInputSlot() {}

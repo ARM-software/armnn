@@ -25,6 +25,7 @@
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/SubgraphUtilsTest.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeEndToEndTestImpl.hpp>
 
@@ -147,18 +148,18 @@ TEST_CASE("NeonAdditionEndToEndUint8Test")
 }
 
 // Power
-TEST_CASE("RefPowerEndToEndTestFloat32")
+TEST_CASE("NeonPowerEndToEndTestFloat32")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Power);
 }
 
 // SqDiff
-TEST_CASE("RefSquaredDifferenceEndToEndTestFloat32")
+TEST_CASE("NeonSquaredDifferenceEndToEndTestFloat32")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::SqDiff);
 }
 
-TEST_CASE("RefSquaredDifferenceEndToEndTestUint8")
+TEST_CASE("NeonSquaredDifferenceEndToEndTestUint8")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, BinaryOperation::SqDiff);
 }
@@ -848,6 +849,21 @@ inline void QuantizeData(uint8_t* quant, const float* dequant, const TensorInfo&
 TEST_CASE("NeonQLstmEndToEndTest")
 {
     QLstmEndToEnd(neonDefaultBackends);
+}
+
+TEST_CASE("NeonReshapeRemovalSimpleCaseEndToEnd")
+{
+    ReshapeRemovalEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonReshapeRemovalNCHWFirstEndToEnd")
+{
+    ReshapeRemovalNCHWEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, false, true);
+}
+
+TEST_CASE("NeonReshapeRemovalNCHWSecondEndToEnd")
+{
+    ReshapeRemovalNCHWEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, false, false);
 }
 
 }

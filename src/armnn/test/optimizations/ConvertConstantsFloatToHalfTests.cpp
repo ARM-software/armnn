@@ -63,7 +63,6 @@ TEST_CASE("ConvertConstantsFloatToHalfTest")
     CHECK(data[3] == Half(4.0f));
 }
 
-
 TEST_CASE("ConvertConstantsFloatToHalfTest_constant")
 {
     armnn::Graph graph;
@@ -80,7 +79,7 @@ TEST_CASE("ConvertConstantsFloatToHalfTest_constant")
     auto output  = graph.AddLayer<armnn::OutputLayer>(1, "Output");
 
     float expectedWeightsData[] = { 1.0f, 2.0f, 3.0f, 4.0f };
-    float expectedBiasesData[]  = { 2.0f, 2.0f };
+    float expectedBiasesData[]  = { 0.0f, 2.0f };
 
     const armnn::TensorInfo inputInfo  ({ 1, 2, 2, 3 }, armnn::DataType::Float16);
     const armnn::TensorInfo outputInfo ({ 1, 2, 2, 3 }, armnn::DataType::Float16);
@@ -124,9 +123,58 @@ TEST_CASE("ConvertConstantsFloatToHalfTest_constant")
 
     // Check whether bias data matches expected fp16 data
     const Half* biasData = biases->m_LayerOutput->GetConstTensor<Half>();
-    CHECK(biasData[0] == Half(2.0f));
+    CHECK(biasData[0] == Half(0.0f));
     CHECK(biasData[1] == Half(2.0f));
 }
 
+TEST_CASE("ConvertConstantsFloatToHalfInfinityTest")
+{
+    armnn::Graph graph;
+
+    const armnn::TensorInfo info({ 1, 1, 1, 2 }, armnn::DataType::Float16);
+
+    // Create const tensor from fp32 data
+    unsigned int dims[] = { 4, 1, 1, 1 };
+    std::vector<float> floatWeights{ std::numeric_limits<float>::infinity(),
+                                     -std::numeric_limits<float>::infinity(),
+                                     std::numeric_limits<float>::max(),
+                                     std::numeric_limits<float>::lowest() };
+    armnn::TensorInfo weightsInfo = armnn::TensorInfo(4, dims, armnn::DataType::Float32, 0.0f, 0, true);
+    armnn::ConstTensor weights(weightsInfo, floatWeights);
+
+    // Create simple test network
+    auto input = graph.AddLayer<armnn::InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(info);
+
+    auto fc      = graph.AddLayer<armnn::FullyConnectedLayer>(armnn::FullyConnectedDescriptor(), "fc");
+    fc->GetOutputSlot().SetTensorInfo(info);
+
+    auto weightsLayer = graph.AddLayer<armnn::ConstantLayer>("weights");
+    weightsLayer->m_LayerOutput = std::make_unique<armnn::ScopedTensorHandle>(weights);
+    weightsLayer->GetOutputSlot().SetTensorInfo(weightsInfo);
+
+    auto output = graph.AddLayer<armnn::OutputLayer>(1, "output");
+
+    // Connect up the layers
+    input->GetOutputSlot().Connect(fc->GetInputSlot(0));
+    weightsLayer->GetOutputSlot().Connect(fc->GetInputSlot(1));
+    fc->GetOutputSlot().Connect(output->GetInputSlot(0));
+
+    // Check tensor data type before conversion
+    CHECK(weightsLayer->m_LayerOutput->GetTensorInfo().GetDataType() == armnn::DataType::Float32);
+
+    // Run the optimizer
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(ConvertConstantsFloatToHalf()));
+
+    // Check tensor data type after conversion
+    CHECK(weightsLayer->m_LayerOutput->GetTensorInfo().GetDataType() == armnn::DataType::Float16);
+
+    // Check whether data matches expected fp16 data
+    const Half* data = weightsLayer->m_LayerOutput->GetConstTensor<Half>();
+    CHECK(data[0] == std::numeric_limits<armnn::Half>::max());
+    CHECK(data[1] == std::numeric_limits<armnn::Half>::lowest());
+    CHECK(data[2] == std::numeric_limits<armnn::Half>::max());
+    CHECK(data[3] == std::numeric_limits<armnn::Half>::lowest());
+}
 
 }

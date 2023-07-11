@@ -25,6 +25,11 @@ void FloatingPointConverter::ConvertFloat32To16(const float* srcFloat32Buffer,
     for (size_t i = 0; i < numElements; i++)
     {
         pHalf[i] = armnn::Half(srcFloat32Buffer[i]);
+        if (isinf(pHalf[i]))
+        {
+            // If the value of converted Fp16 is infinity, round to the closest finite Fp16 value.
+            pHalf[i] = copysign(std::numeric_limits<armnn::Half>::max(), pHalf[i]);
+        }
     }
 }
 

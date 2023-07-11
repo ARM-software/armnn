@@ -188,6 +188,7 @@ private:
     void ParseSplit(size_t subgraphIndex, size_t operatorIndex);
     void ParseSplitV(size_t subgraphIndex, size_t operatorIndex);
     void ParseSqueeze(size_t subgraphIndex, size_t operatorIndex);
+    void ParseSquare(size_t subgraphIndex, size_t operatorIndex);
     void ParseSquaredDifference(size_t subgraphIndex, size_t operatorIndex);
     void ParseStridedSlice(size_t subgraphIndex, size_t operatorIndex);
     void ParseSub(size_t subgraphIndex, size_t operatorIndex);

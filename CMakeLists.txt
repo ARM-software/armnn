@@ -717,6 +717,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/Split.cpp
              src/armnnTfLiteParser/test/SplitV.cpp
              src/armnnTfLiteParser/test/Squeeze.cpp
+             src/armnnTfLiteParser/test/Square.cpp
              src/armnnTfLiteParser/test/SquaredDifference.cpp
              src/armnnTfLiteParser/test/StridedSlice.cpp
              src/armnnTfLiteParser/test/Sub.cpp

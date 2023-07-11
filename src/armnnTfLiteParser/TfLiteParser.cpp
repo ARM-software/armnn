@@ -820,6 +820,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT]                   = &TfLiteParserImpl::ParseSplit;
     m_ParserFunctions[tflite::BuiltinOperator_SPLIT_V]                 = &TfLiteParserImpl::ParseSplitV;
     m_ParserFunctions[tflite::BuiltinOperator_SQUEEZE]                 = &TfLiteParserImpl::ParseSqueeze;
+    m_ParserFunctions[tflite::BuiltinOperator_SQUARE]                  = &TfLiteParserImpl::ParseSquare;
     m_ParserFunctions[tflite::BuiltinOperator_SQUARED_DIFFERENCE]      = &TfLiteParserImpl::ParseSquaredDifference;
     m_ParserFunctions[tflite::BuiltinOperator_STRIDED_SLICE]           = &TfLiteParserImpl::ParseStridedSlice;
     m_ParserFunctions[tflite::BuiltinOperator_SUB]                     = &TfLiteParserImpl::ParseSub;
@@ -4701,6 +4702,33 @@ void TfLiteParserImpl::ParseSin(size_t subgraphIndex, size_t operatorIndex)
 void TfLiteParserImpl::ParseSqrt(size_t subgraphIndex, size_t operatorIndex)
 {
     ParseElementwiseUnary(subgraphIndex, operatorIndex, armnn::UnaryOperation::Sqrt);
+}
+
+void TfLiteParserImpl::ParseSquare(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    armnn::TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
+
+    auto layerName = fmt::format("Square:{}:{}", subgraphIndex, operatorIndex);
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Mul, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 0});
+    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[0]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
 }
 
 void TfLiteParserImpl::ParseSquaredDifference(size_t subgraphIndex, size_t operatorIndex)

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="5ff480265a110ea1f2ce24491e082f52348b0f92" #9828: Port operations to CKW prototype
+DEFAULT_CLFRAMEWORKREVISION="2e0714d4bb6795e34bcdcdaf812e9863dea2f43f" #9943: Fix failing CTS tests by disabling matmul when weights conversion is required
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

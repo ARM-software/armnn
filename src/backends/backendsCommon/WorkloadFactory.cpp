@@ -1352,6 +1352,19 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                          reason);
             break;
         }
+        case LayerType::Tile:
+        {
+            auto cLayer = PolymorphicDowncast<const TileLayer*>(&layer);
+            const TensorInfo& input  = layer.GetInputSlot(0).GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject.IsTileSupported(OverrideDataType(input, dataType),
+                                                        OverrideDataType(output, dataType),
+                                                        cLayer->GetParameters(),
+                                                        reason);
+
+            break;
+        }
         case LayerType::Transpose:
         {
             auto cLayer = PolymorphicDowncast<const TransposeLayer*>(&layer);

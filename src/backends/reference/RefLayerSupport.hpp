@@ -354,6 +354,11 @@ public:
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
+    bool IsTileSupported(const TensorInfo& input,
+                         const TensorInfo& output,
+                         const TileDescriptor& descriptor,
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     bool IsTransposeConvolution2dSupported(
         const TensorInfo& input,
         const TensorInfo& output,

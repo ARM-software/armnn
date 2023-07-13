@@ -102,6 +102,7 @@ BACKEND_SOURCES := \
         workloads/RefStackWorkload.cpp \
         workloads/RefStridedSliceWorkload.cpp \
         workloads/RefSplitterWorkload.cpp \
+        workloads/RefTileWorkload.cpp \
         workloads/RefTransposeConvolution2dWorkload.cpp \
         workloads/RefTransposeWorkload.cpp \
         workloads/RefUnidirectionalSequenceLstmWorkload.cpp \
@@ -115,6 +116,7 @@ BACKEND_SOURCES := \
         workloads/StringMapping.cpp \
         workloads/Softmax.cpp \
         workloads/Splitter.cpp \
+        workloads/Tile.cpp \
         workloads/TransposeConvolution2d.cpp
 else
 

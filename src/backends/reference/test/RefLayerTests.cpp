@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1595,6 +1595,42 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisFloat16, ReverseV2SimpleTe
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisQAsymmS8, ReverseV2SimpleTest2Dim2Axis<DataType::QAsymmS8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisQAsymmU8, ReverseV2SimpleTest2Dim2Axis<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisQSymmS16, ReverseV2SimpleTest2Dim2Axis<DataType::QSymmS16>)
+
+// Tile
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestFloat32, Tile1dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestFloat32, Tile2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestFloat32, Tile3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestFloat32, Tile4dTest<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestFloat16, Tile1dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestFloat16, Tile2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestFloat16, Tile3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestFloat16, Tile4dTest<DataType::Float16>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestQAsymmS8, Tile1dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestQAsymmS8, Tile2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestQAsymmS8, Tile3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestQAsymmS8, Tile4dTest<DataType::QAsymmS8>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestQAsymmU8, Tile1dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestQAsymmU8, Tile2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestQAsymmU8, Tile3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestQAsymmU8, Tile4dTest<DataType::QAsymmU8>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestQSymmS8, Tile1dTest<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestQSymmS8, Tile2dTest<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestQSymmS8, Tile3dTest<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestQSymmS8, Tile4dTest<DataType::QSymmS8>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestQSymmS16, Tile1dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestQSymmS16, Tile2dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestQSymmS16, Tile3dTest<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestQSymmS16, Tile4dTest<DataType::QSymmS16>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestSigned32, Tile1dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestSigned32, Tile2dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestSigned32, Tile3dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestSigned32, Tile4dTest<DataType::Signed32>)
 
 // Fake Quantization
 ARMNN_AUTO_TEST_CASE_WITH_THF(FakeQuantization, FakeQuantizationTest)

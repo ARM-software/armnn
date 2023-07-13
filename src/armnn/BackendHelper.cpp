@@ -1409,6 +1409,21 @@ bool LayerSupportHandle::IsSwitchSupported(const TensorInfo& input0,
                                             reasonIfUnsupported);
 }
 
+bool LayerSupportHandle::IsTileSupported(const TensorInfo& input,
+                                         const TensorInfo& output,
+                                         const armnn::TileDescriptor &descriptor,
+                                         Optional<std::string&> reasonIfUnsupported)
+{
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Tile,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported);
+}
+
 bool LayerSupportHandle::IsTransposeConvolution2dSupported(
         const TensorInfo& input,
         const TensorInfo& output,

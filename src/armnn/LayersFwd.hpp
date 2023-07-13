@@ -76,6 +76,7 @@
 #include "layers/StridedSliceLayer.hpp"
 #include "layers/SubtractionLayer.hpp"
 #include "layers/SwitchLayer.hpp"
+#include "layers/TileLayer.hpp"
 #include "layers/TransposeConvolution2dLayer.hpp"
 #include "layers/TransposeLayer.hpp"
 #include "layers/UnidirectionalSequenceLstmLayer.hpp"
@@ -178,6 +179,7 @@ DECLARE_LAYER(StandIn)
 DECLARE_LAYER(StridedSlice)
 DECLARE_LAYER(Subtraction)
 DECLARE_LAYER(Switch)
+DECLARE_LAYER(Tile)
 DECLARE_LAYER(Transpose)
 DECLARE_LAYER(TransposeConvolution2d)
 DECLARE_LAYER(UnidirectionalSequenceLstm)

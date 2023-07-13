@@ -1620,4 +1620,23 @@ struct BatchMatMulDescriptor : BaseDescriptor
         const TensorShape& tensorShape);
 };
 
+struct TileDescriptor : BaseDescriptor
+{
+    TileDescriptor()
+        : m_Multiples()
+    {}
+
+    explicit TileDescriptor(std::vector<uint32_t> multiples)
+        : m_Multiples(std::move(multiples))
+    {}
+
+    bool operator ==(const TileDescriptor& rhs) const
+    {
+        return m_Multiples == rhs.m_Multiples;
+    }
+
+    /// The vector to multiply the input shape by
+    std::vector<uint32_t> m_Multiples;
+};
+
 } // namespace armnn

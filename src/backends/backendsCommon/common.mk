@@ -106,6 +106,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/StackTestImpl.cpp \
     test/layerTests/StridedSliceTestImpl.cpp \
     test/layerTests/SubtractionTestImpl.cpp \
+    test/layerTests/TileTestImpl.cpp \
     test/layerTests/TransposeConvolution2dTestImpl.cpp \
     test/layerTests/UnidirectionalSequenceLstmTestImpl.cpp \
     memoryOptimizerStrategyLibrary/test/ConstMemoryStrategyTests.cpp \

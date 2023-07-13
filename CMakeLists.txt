@@ -328,6 +328,8 @@ list(APPEND armnn_sources
     src/armnn/layers/SubtractionLayer.hpp
     src/armnn/layers/SwitchLayer.cpp
     src/armnn/layers/SwitchLayer.hpp
+    src/armnn/layers/TileLayer.cpp
+    src/armnn/layers/TileLayer.hpp
     src/armnn/layers/TransposeConvolution2dLayer.cpp
     src/armnn/layers/TransposeConvolution2dLayer.hpp
     src/armnn/layers/TransposeLayer.hpp

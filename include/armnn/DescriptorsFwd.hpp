@@ -49,6 +49,7 @@ struct SpaceToDepthDescriptor;
 struct StackDescriptor;
 struct StandInDescriptor;
 struct StridedSliceDescriptor;
+struct TileDescriptor;
 struct TransposeConvolution2dDescriptor;
 struct TransposeDescriptor;
 struct ViewsDescriptor;

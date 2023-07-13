@@ -3311,6 +3311,50 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>FLOAT32
     </table>
 <tr>
+  <td rowspan="3">TileLayer
+  <td rowspan="3" style="width:200px;"> Layer to construct a tensor by repeating in tiles a given tensor.
+  <td rowspan="3">
+      <ul>
+       <li>ANEURALNETWORKS_TILE
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>None
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>None
+    </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>None
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>None
+    </table>
+<tr>
   <td rowspan="3">TransposeConvolution2dLayer
   <td rowspan="3" style="width:200px;"> Layer to perform 2D transpose convolution (deconvolution) operation.
   <td rowspan="3">

@@ -402,6 +402,11 @@ bool RefLayerSupport::IsLayerSupported(const LayerType& type,
                                            reasonIfUnsupported);
         case LayerType::Subtraction:
             return IsSubtractionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+        case LayerType::Tile:
+            return IsTileSupported(infos[0],
+                                   infos[1],
+                                   *(PolymorphicDowncast<const TileDescriptor*>(&descriptor)),
+                                   reasonIfUnsupported);
         case LayerType::Transpose:
             return IsTransposeSupported(infos[0],
                                         infos[1],
@@ -2689,6 +2694,35 @@ bool RefLayerSupport::IsPreluSupported(const TensorInfo& input,
 
     supported &= CheckSupportRule(ShapesAreBroadcastCompatible(input, alpha, output), reasonIfUnsupported,
                                   "PReLU: shapes are not suitable for implicit broadcast");
+
+    return supported;
+}
+
+bool RefLayerSupport::IsTileSupported(const TensorInfo& input,
+                                      const TensorInfo& output,
+                                      const TileDescriptor& descriptor,
+                                      Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+
+    bool supported = true;
+
+    std::array<DataType, 7> supportedTypes
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS8,
+        DataType::QSymmS16,
+        DataType::Signed32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                  "Tile: input type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "Tile: output type not supported");
 
     return supported;
 }

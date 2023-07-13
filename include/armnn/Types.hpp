@@ -474,6 +474,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(BatchMatMul) \
     X(ElementwiseBinary) \
     X(ReverseV2) \
+    X(Tile) \
 
 // New layers should be added at last position to minimize instability.
 
@@ -485,7 +486,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = ElementwiseBinary
+    LastLayer = Tile
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

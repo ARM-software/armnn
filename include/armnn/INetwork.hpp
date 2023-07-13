@@ -740,7 +740,7 @@ public:
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddGatherLayer(const GatherDescriptor& descriptor,
-                                              const char* name = nullptr);
+                                      const char* name = nullptr);
 
     /// Add GatherNd layer to the network.
     /// @param name - Optional name for the layer.
@@ -764,23 +764,23 @@ public:
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
-                                                              const ConstTensor& weights,
-                                                              const Optional<ConstTensor>& biases,
-                                                              const char* name = nullptr);
+                                                      const ConstTensor& weights,
+                                                      const Optional<ConstTensor>& biases,
+                                                      const char* name = nullptr);
 
     /// Adds a transpose layer to the network.
     /// @param transposeDescriptor - TransposeDescriptor to configure the transpose.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddTransposeLayer(const TransposeDescriptor& transposeDescriptor,
-                                                 const char* name = nullptr);
+                                         const char* name = nullptr);
 
     /// Adds a stack layer to the network.
     /// @param descriptor - Description of the stack layer.
     /// @param name - Optional name for the layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddStackLayer(const StackDescriptor& descriptor,
-                                             const char* name = nullptr);
+                                     const char* name = nullptr);
 
     /// Add a stand-in layer for a type unknown to the Arm NN framework.
     /// Note: Due to the nature of this layer, no validation can be performed by the framework.
@@ -789,14 +789,14 @@ public:
     /// @descriptor - Descriptor for the StandIn layer.
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddStandInLayer(const StandInDescriptor& descriptor,
-                                               const char* name = nullptr);
+                                       const char* name = nullptr);
 
     /// Add a QuantizedLstm layer to the network
     /// @param params - The weights and biases for the Quantized LSTM cell
     /// @param name - Optional name for the layer
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddQuantizedLstmLayer(const QuantizedLstmInputParams& params,
-                                                     const char* name = nullptr);
+                                             const char* name = nullptr);
 
     /// Add a QLstm layer to the network
     /// @param descriptor - Parameters for the QLstm operation
@@ -804,8 +804,8 @@ public:
     /// @param name - Optional name for the layer
     /// @return - Interface for configuring the layer.
     IConnectableLayer* AddQLstmLayer(const QLstmDescriptor& descriptor,
-                                             const LstmInputParams& params,
-                                             const char* name = nullptr);
+                                     const LstmInputParams& params,
+                                     const char* name = nullptr);
 
     /// Adds a Logical Binary layer to the network.
     /// @param descriptor - Description of the Logical Binary layer.
@@ -841,6 +841,13 @@ public:
     /// @param name - Optional name for the layer
     /// @return - Interface for configuring the layer
     IConnectableLayer* AddReverseV2Layer(const char* name = nullptr);
+
+    /// Add a Tile layer to the network
+    /// @param descriptor - Parameters for the Tile operation
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer
+    IConnectableLayer* AddTileLayer(const TileDescriptor& descriptor,
+                                    const char* name = nullptr);
 
     void ExecuteStrategy(IStrategy& strategy) const;
 

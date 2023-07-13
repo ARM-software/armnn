@@ -180,6 +180,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefStackWorkload.hpp
     RefStridedSliceWorkload.cpp
     RefStridedSliceWorkload.hpp
+    RefTileWorkload.cpp
+    RefTileWorkload.hpp
     RefTransposeConvolution2dWorkload.cpp
     RefTransposeConvolution2dWorkload.hpp
     RefTransposeWorkload.cpp
@@ -209,6 +211,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     StridedSlice.cpp
     StringMapping.cpp
     StringMapping.hpp
+    Tile.cpp
+    Tile.hpp
     TensorBufferArrayView.hpp
     TransposeConvolution2d.cpp
     TransposeConvolution2d.hpp

@@ -276,6 +276,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/StridedSliceLayer.cpp \
         src/armnn/layers/SubtractionLayer.cpp \
         src/armnn/layers/SwitchLayer.cpp \
+        src/armnn/layers/TileLayer.cpp \
         src/armnn/layers/TransposeConvolution2dLayer.cpp \
         src/armnn/layers/TransposeLayer.cpp \
         src/armnn/layers/UnidirectionalSequenceLstmLayer.cpp \

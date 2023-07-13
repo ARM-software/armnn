@@ -755,4 +755,9 @@ struct ReverseV2QueueDescriptor : QueueDescriptor
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct TileQueueDescriptor : QueueDescriptorWithParameters<TileDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

@@ -220,6 +220,9 @@ public:
 
     IConnectableLayer* AddSwitchLayer(const char* name = nullptr);
 
+    IConnectableLayer* AddTileLayer(const TileDescriptor& tileDescriptor,
+                                    const char* name = nullptr);
+
     IConnectableLayer* AddTransposeConvolution2dLayer(const TransposeConvolution2dDescriptor& descriptor,
                                                       const ConstTensor& weights,
                                                       const Optional<ConstTensor>& biases,

@@ -618,6 +618,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
                 return std::make_unique<RefSubtractionWorkload<float>>(*subtractionQueueDescriptor, info);
             }
         }
+        case LayerType::Tile:
+        {
+            auto tileQueueDescriptor = PolymorphicDowncast<const TileQueueDescriptor*>(&descriptor);
+            return std::make_unique<RefTileWorkload>(*tileQueueDescriptor, info);
+        }
         case LayerType::Transpose:
         {
             auto transposeQueueDescriptor = PolymorphicDowncast<const TransposeQueueDescriptor*>(&descriptor);

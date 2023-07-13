@@ -62,6 +62,7 @@
 #include "RefStackWorkload.hpp"
 #include "RefStridedSliceWorkload.hpp"
 #include "RefSpaceToDepthWorkload.hpp"
+#include "RefTileWorkload.hpp"
 #include "RefTransposeConvolution2dWorkload.hpp"
 #include "RefTransposeWorkload.hpp"
 #include "RefUnidirectionalSequenceLstmWorkload.hpp"

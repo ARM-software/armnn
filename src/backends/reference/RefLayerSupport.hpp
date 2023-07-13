@@ -299,9 +299,9 @@ public:
                            const ResizeDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override;
 
-    bool IsReverseV2Supported(const TensorInfo& input,
+    bool IsReverseV2Supported(const TensorInfo& input0,
+                              const TensorInfo& input1,
                               const TensorInfo& output,
-                              const ReverseV2Descriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     bool IsShapeSupported(const TensorInfo& input,

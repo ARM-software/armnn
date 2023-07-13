@@ -1211,16 +1211,16 @@ bool LayerSupportHandle::IsResizeSupported(const TensorInfo& input,
                                             reasonIfUnsupported);
 }
 
-bool LayerSupportHandle::IsReverseV2Supported(const armnn::TensorInfo &input,
+bool LayerSupportHandle::IsReverseV2Supported(const armnn::TensorInfo &input0,
+                                              const armnn::TensorInfo &input1,
                                               const armnn::TensorInfo &output,
-                                              const armnn::ReverseV2Descriptor &descriptor,
                                               Optional<std::string &> reasonIfUnsupported)
 {
-    TensorInfos infos{input, output};
+    TensorInfos infos{input0, input1, output};
 
     return m_LayerSupport->IsLayerSupported(LayerType::ReverseV2,
                                             infos,
-                                            descriptor,
+                                            BaseDescriptor(),
                                             EmptyOptional(),
                                             EmptyOptional(),
                                             reasonIfUnsupported);

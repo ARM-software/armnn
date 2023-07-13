@@ -3294,46 +3294,13 @@ void TfLiteParserImpl::ParseReverseV2(size_t subgraphIndex, size_t operatorIndex
     TensorInfo axisTensorInfo = ToTensorInfo(inputs[1]);
     TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
 
-    std::vector<int32_t> axisTensorData(axisTensorInfo.GetNumElements());
-
-    BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
-    ::memcpy(axisTensorData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
-
-    ReverseV2Descriptor descriptor(axisTensorData);
-
-    auto inputRank = static_cast<int32_t>(inputTensorInfo.GetNumDimensions());
-    std::vector<bool> dimFlag(inputRank, false);
-
-    for (auto axis : axisTensorData)
-    {
-        if (axis < -inputRank || axis >= inputRank)
-        {
-            throw ParseException(
-                fmt::format("Operation has invalid axis: {} It is out of bounds [ -{}, {} ) {}",
-                            axis,
-                            inputRank, inputRank,
-                            CHECK_LOCATION().AsString()));
-        }
-
-        auto posAxis = axis < 0 ? axis + inputRank : axis;
-
-        if (dimFlag[posAxis])
-        {
-            throw ParseException(
-                fmt::format("Operation has repeated axis: {} {}",
-                            axis,
-                            CHECK_LOCATION().AsString()));
-        }
-        dimFlag[posAxis] = true;
-    }
-
-    IConnectableLayer* layer = m_Network->AddReverseV2Layer(descriptor, layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddReverseV2Layer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
-    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});

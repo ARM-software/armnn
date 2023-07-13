@@ -750,7 +750,7 @@ struct BatchMatMulQueueDescriptor : QueueDescriptorWithParameters<BatchMatMulDes
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
-struct ReverseV2QueueDescriptor : QueueDescriptorWithParameters<ReverseV2Descriptor>
+struct ReverseV2QueueDescriptor : QueueDescriptor
 {
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

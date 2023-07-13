@@ -12,7 +12,6 @@ struct ReverseV2Fixture : public ParserFlatbuffersFixture
     explicit ReverseV2Fixture(const std::string& inputShape,
                               const std::string& outputShape,
                               const std::string& axisShape,
-                              const std::string& axisData,
                               const std::string& dataType = "FLOAT32",
                               const std::string& scale = "1.0",
                               const std::string& offset = "0")
@@ -75,8 +74,8 @@ struct ReverseV2Fixture : public ParserFlatbuffersFixture
                 } ],
                 "buffers" : [
                     { },
-                    { "data": )" + axisData + R"(, },
                     { },
+                    { }
                 ]
             }
         )";
@@ -86,15 +85,30 @@ struct ReverseV2Fixture : public ParserFlatbuffersFixture
 
 struct SimpleReverseV2Fixture : public ReverseV2Fixture
 {
-    SimpleReverseV2Fixture() : ReverseV2Fixture("[ 2, 2, 2 ]", "[ 2, 2, 2 ]", "[ 2 ]", "[ 0,0,0,0, 1,0,0,0 ]") {}
+    SimpleReverseV2Fixture() : ReverseV2Fixture("[ 2, 2, 2 ]", "[ 2, 2, 2 ]", "[ 2 ]" ) {}
 };
 
 TEST_CASE_FIXTURE(SimpleReverseV2Fixture, "ParseReverseV2")
 {
-    RunTest<3, armnn::DataType::Float32>
+    RunTest<3, armnn::DataType::Float32, armnn::DataType::Signed32, armnn::DataType::Float32>
         (0,
         {{ "inputTensor",  { 1, 2, 3, 4, 5, 6, 7, 8 }}},
+        {{ "axis",  { 0, 1 }}},
         {{ "outputTensor", { 7, 8, 5, 6, 3, 4, 1, 2 }}});
+}
+
+struct SimpleReverseV2FixtureNegativeAxis : public ReverseV2Fixture
+{
+    SimpleReverseV2FixtureNegativeAxis() : ReverseV2Fixture("[ 2, 2, 2 ]", "[ 2, 2, 2 ]", "[ 1 ]" ) {}
+};
+
+TEST_CASE_FIXTURE(SimpleReverseV2FixtureNegativeAxis, "ParseReverseV2")
+{
+    RunTest<3, armnn::DataType::Float32, armnn::DataType::Signed32, armnn::DataType::Float32>
+        (0,
+        {{ "inputTensor",  { 1, 2, 3, 4, 5, 6, 7, 8 }}},
+        {{ "axis",  { -1 }}},
+        {{ "outputTensor", { 2, 1, 4, 3, 6, 5, 8, 7  }}});
 }
 
 }

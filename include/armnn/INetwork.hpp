@@ -838,11 +838,9 @@ public:
                                            const char* name = nullptr);
 
     /// Add a ReverseV2 layer to the network
-    /// @param descriptor - Parameters for the ReverseV2 operation
     /// @param name - Optional name for the layer
     /// @return - Interface for configuring the layer
-    IConnectableLayer* AddReverseV2Layer(const ReverseV2Descriptor& descriptor,
-                                         const char* name = nullptr);
+    IConnectableLayer* AddReverseV2Layer(const char* name = nullptr);
 
     void ExecuteStrategy(IStrategy& strategy) const;
 

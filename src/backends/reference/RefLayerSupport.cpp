@@ -344,7 +344,7 @@ bool RefLayerSupport::IsLayerSupported(const LayerType& type,
         case LayerType::ReverseV2:
             return IsReverseV2Supported(infos[0],
                                         infos[1],
-                                        *(PolymorphicDowncast<const ReverseV2Descriptor*>(&descriptor)),
+                                        infos[2],
                                         reasonIfUnsupported);
         case LayerType::Reduce:
             return IsReduceSupported(infos[0],
@@ -2361,12 +2361,11 @@ bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
     return supported;
 }
 
-bool RefLayerSupport::IsReverseV2Supported(const TensorInfo& input,
+bool RefLayerSupport::IsReverseV2Supported(const TensorInfo& input0,
+                                           const TensorInfo& input1,
                                            const TensorInfo& output,
-                                           const ReverseV2Descriptor& descriptor,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
-    IgnoreUnused(descriptor);
     bool supported = true;
     // ReverseV2 is data type agnostic so it can support all the types in the Reference backend
     std::array<DataType,6> supportedTypes =
@@ -2379,14 +2378,22 @@ bool RefLayerSupport::IsReverseV2Supported(const TensorInfo& input,
         DataType::QSymmS16
     };
 
-    supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
-                                  "Reference ReverseV2: input type not supported");
+    supported &= CheckSupportRule(TypeAnyOf(input0, supportedTypes), reasonIfUnsupported,
+                                  "Reference ReverseV2: input0 type not supported");
 
     supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
                                   "Reference ReverseV2: output type not supported");
 
-    supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
-                                  "Reference ReverseV2: input and output types not matching");
+    supported &= CheckSupportRule(TypesAreEqual(input0, output), reasonIfUnsupported,
+                                  "Reference ReverseV2: input0 and output types not matching");
+
+    std::array<DataType,6> input2SupportedTypes =
+    {
+        DataType::Signed32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(input1, input2SupportedTypes), reasonIfUnsupported,
+                                  "Reference ReverseV2: input1 type not supported");
 
     return supported;
 }

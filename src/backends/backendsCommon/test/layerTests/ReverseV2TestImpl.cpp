@@ -23,23 +23,25 @@ namespace
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory,
-        armnn::ReverseV2Descriptor descriptor,
         const std::vector<T>& input,
+        const std::vector<int>& axis,
         const std::vector<T>& outputExpected,
         const armnn::TensorInfo& inputInfo,
+        const armnn::TensorInfo& axisInfo,
         const armnn::TensorInfo& outputInfo)
     {
         LayerTestResult<T, NumDims> result(outputInfo);
         std::vector<T> outputActual(outputInfo.GetNumElements());
 
         std::unique_ptr<armnn::ITensorHandle> inputHandle = tensorHandleFactory.CreateTensorHandle(inputInfo);
+        std::unique_ptr<armnn::ITensorHandle> axisHandle = tensorHandleFactory.CreateTensorHandle(axisInfo);
         std::unique_ptr<armnn::ITensorHandle> outputHandle = tensorHandleFactory.CreateTensorHandle(outputInfo);
 
         armnn::ReverseV2QueueDescriptor queueDescriptor;
-        queueDescriptor.m_Parameters = std::move(descriptor);
         armnn::WorkloadInfo workloadInfo;
 
         AddInputToWorkload(queueDescriptor, workloadInfo, inputInfo, inputHandle.get());
+        AddInputToWorkload(queueDescriptor, workloadInfo, axisInfo, axisHandle.get());
         AddOutputToWorkload(queueDescriptor, workloadInfo, outputInfo, outputHandle.get());
 
         // Don't execute if ReverseV2 is not supported, as an exception will be raised.
@@ -47,9 +49,9 @@ namespace
         std::string reasonIfUnsupported;
         armnn::LayerSupportHandle handle = armnn::GetILayerSupportByBackendId(backend);
         result.m_Supported = handle.IsReverseV2Supported(inputInfo,
-                                                           outputInfo,
-                                                           queueDescriptor.m_Parameters,
-                                                           reasonIfUnsupported);
+                                                         axisInfo,
+                                                         outputInfo,
+                                                         reasonIfUnsupported);
         if (!result.m_Supported)
         {
             return result;
@@ -58,9 +60,11 @@ namespace
         auto workload = workloadFactory.CreateWorkload(armnn::LayerType::ReverseV2, queueDescriptor, workloadInfo);
 
         inputHandle->Allocate();
+        axisHandle->Allocate();
         outputHandle->Allocate();
 
         CopyDataToITensorHandle(inputHandle.get(), input.data());
+        CopyDataToITensorHandle(axisHandle.get(), axis.data());
 
         workload->PostAllocationConfigure();
         ExecuteWorkload(*workload, memoryManager);
@@ -80,19 +84,21 @@ LayerTestResult<T, 2> ReverseV2SimpleTestEmptyAxis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor. No axes set so output is the same as input
-    auto descriptor = armnn::ReverseV2Descriptor();
+    // Simple test with no axes set so output is the same as input
 
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2,2}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2,2}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2,
         3, 4
     }, qScale, qOffset);
+
+    std::vector<int> axis = armnnUtils::QuantizedVector<int>({}, qScale, qOffset);
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         1, 2,
@@ -102,10 +108,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTestEmptyAxis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                                 memoryManager,
                                                 tensorHandleFactory,
-                                                descriptor,
                                                 input,
+                                                axis,
                                                 outputExpected,
                                                 inputInfo,
+                                                axisInfo,
                                                 outputInfo);
 }
 
@@ -115,26 +122,27 @@ LayerTestResult<T, 2> ReverseV2SimpleTestEmptyTensor(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor. Empty tensor set so output is the same as input
-    auto descriptor = armnn::ReverseV2Descriptor();
+    // Simple test with empty input tensor
 
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({0}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({0}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({0}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({}, qScale, qOffset);
-
+    std::vector<int> axis = armnnUtils::QuantizedVector<int>({}, qScale, qOffset);
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({}, qScale, qOffset);
 
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -144,18 +152,19 @@ LayerTestResult<T, 2> ReverseV2SimpleTest1Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {0});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({4}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2,
         3, 4
     }, qScale, qOffset);
+
+    std::vector<int> axis = {0};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3,
@@ -165,10 +174,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest1Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -178,18 +188,19 @@ LayerTestResult<T, 2> ReverseV2SimpleTest2Dim1Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2,2}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2,2}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2,
         3, 4
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         2, 1,
@@ -199,10 +210,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest2Dim1Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -212,18 +224,19 @@ LayerTestResult<T, 2> ReverseV2SimpleTest2Dim2Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1, 0});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2,2}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({2}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2,2}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2,
         3, 4
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1,0};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3,
@@ -233,10 +246,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest2Dim2Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -246,12 +260,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim1Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 3, 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 3, 4}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -262,6 +275,8 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim1Axis(
         17, 18, 19, 20,
         21, 22, 23, 24
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         9, 10, 11, 12,
@@ -275,10 +290,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim1Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -288,12 +304,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim2Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {0, 1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 3, 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({2}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 3, 4}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -304,6 +319,8 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim2Axis(
         17, 18, 19, 20,
         21, 22, 23, 24
     }, qScale, qOffset);
+
+    std::vector<int> axis = {0, 1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         21, 22, 23, 24,
@@ -317,10 +334,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim2Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -330,14 +348,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim3Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1, 0, 2});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 3, 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({3}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 3, 4}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -348,6 +363,8 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim3Axis(
         17, 18, 19, 20,
         21, 22, 23, 24
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1, 0, 2};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         24, 23, 22, 21,
@@ -361,10 +378,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest3Dim3Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -374,14 +392,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim1Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {0});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -394,6 +409,8 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim1Axis(
         19, 20, 21,
         22, 23, 24
     }, qScale, qOffset);
+
+    std::vector<int> axis = {0};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         13, 14, 15,
@@ -409,10 +426,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim1Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -422,14 +440,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim2Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {0, 1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({2}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -442,6 +457,8 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim2Axis(
         19, 20, 21,
         22, 23, 24
     }, qScale, qOffset);
+
+    std::vector<int> axis = {0, 1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         19, 20, 21,
@@ -457,10 +474,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim2Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -470,14 +488,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim3Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {0, 1, 2});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({3}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -490,6 +505,8 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim3Axis(
         19, 20, 21,
         22, 23, 24
     }, qScale, qOffset);
+
+    std::vector<int> axis = {0, 1, 2};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         22, 23, 24,
@@ -505,10 +522,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim3Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -518,14 +536,11 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim4Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {0, 1, 2, 3});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({4}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 2, 2, 3}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -539,24 +554,27 @@ LayerTestResult<T, 2> ReverseV2SimpleTest4Dim4Axis(
         22, 23, 24
     }, qScale, qOffset);
 
+    std::vector<int> axis = {0, 1, 2, 3};
+
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
-                                                                           24, 23, 22,
-                                                                           21, 20, 19,
-                                                                           18, 17, 16,
-                                                                           15, 14, 13,
-                                                                           12, 11, 10,
-                                                                           9, 8, 7,
-                                                                           6, 5, 4,
-                                                                           3, 2, 1
-                                                                   }, qScale, qOffset);
+       24, 23, 22,
+       21, 20, 19,
+       18, 17, 16,
+       15, 14, 13,
+       12, 11, 10,
+       9, 8, 7,
+       6, 5, 4,
+       3, 2, 1
+    }, qScale, qOffset);
 
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -566,19 +584,19 @@ LayerTestResult<T, 2> ReverseV2EvenRowOddColTest2Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor. No axes set so output is the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 3}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2, 3,
         4, 5, 6
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         3, 2, 1,
@@ -588,10 +606,11 @@ LayerTestResult<T, 2> ReverseV2EvenRowOddColTest2Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -601,20 +620,19 @@ LayerTestResult<T, 2> ReverseV2EvenRowOddColTest3Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 3, 1}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 3, 1}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2, 3,
         4, 5, 6
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         3, 2, 1,
@@ -624,10 +642,11 @@ LayerTestResult<T, 2> ReverseV2EvenRowOddColTest3Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -637,20 +656,19 @@ LayerTestResult<T, 2> ReverseV2EvenRowEvenColTest2Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 4}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2, 3, 4,
         5, 6, 7, 8
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3, 2, 1,
@@ -660,10 +678,11 @@ LayerTestResult<T, 2> ReverseV2EvenRowEvenColTest2Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -673,20 +692,19 @@ LayerTestResult<T, 2> ReverseV2EvenRowEvenColTest3Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 4, 1}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 4, 1}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2, 3, 4,
         5, 6, 7, 8
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3, 2, 1,
@@ -696,10 +714,11 @@ LayerTestResult<T, 2> ReverseV2EvenRowEvenColTest3Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -709,14 +728,11 @@ LayerTestResult<T, 2> ReverseV2OddRowOddColTest2Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({3, 3}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({3, 3}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -724,6 +740,8 @@ LayerTestResult<T, 2> ReverseV2OddRowOddColTest2Dim(
         4, 5, 6,
         7, 8, 9
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         3, 2, 1,
@@ -734,10 +752,11 @@ LayerTestResult<T, 2> ReverseV2OddRowOddColTest2Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -747,14 +766,11 @@ LayerTestResult<T, 2> ReverseV2OddRowOddColTest3Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({3, 3, 1}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({3, 3, 1}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -762,6 +778,8 @@ LayerTestResult<T, 2> ReverseV2OddRowOddColTest3Dim(
         4, 5, 6,
         7, 8, 9
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         3, 2, 1,
@@ -772,10 +790,11 @@ LayerTestResult<T, 2> ReverseV2OddRowOddColTest3Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -785,14 +804,11 @@ LayerTestResult<T, 2> ReverseV2OddRowEvenColTest2Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({3, 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({3, 4}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -800,6 +816,8 @@ LayerTestResult<T, 2> ReverseV2OddRowEvenColTest2Dim(
         5, 6, 7, 8,
         9, 10, 11, 12
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3, 2, 1,
@@ -810,10 +828,11 @@ LayerTestResult<T, 2> ReverseV2OddRowEvenColTest2Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -823,14 +842,11 @@ LayerTestResult<T, 2> ReverseV2OddRowEvenColTest3Dim(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({3, 4, 1}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({3, 4, 1}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
@@ -838,6 +854,8 @@ LayerTestResult<T, 2> ReverseV2OddRowEvenColTest3Dim(
         5, 6, 7, 8,
         9, 10, 11, 12
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3, 2, 1,
@@ -848,10 +866,11 @@ LayerTestResult<T, 2> ReverseV2OddRowEvenColTest3Dim(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -861,20 +880,19 @@ LayerTestResult<T, 2> ReverseV2NegAxisTest2Dim1Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {-1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 4}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({1}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 4}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2, 3, 4,
         5, 6, 7, 8,
     }, qScale, qOffset);
+
+    std::vector<int> axis = {-1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3, 2, 1,
@@ -884,10 +902,11 @@ LayerTestResult<T, 2> ReverseV2NegAxisTest2Dim1Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 
@@ -897,20 +916,19 @@ LayerTestResult<T, 2> ReverseV2NegAxisTest3Dim2Axis(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    // Simple test with default descriptor.  No axes set so output is
-    // the same as input
-    auto descriptor = armnn::ReverseV2Descriptor(std::vector<int> {1, -1});
-
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorInfo inputInfo({2, 4, 1}, ArmnnType, qScale, qOffset);
+    armnn::TensorInfo axisInfo({2}, armnn::DataType::Signed32, qScale, qOffset);
     armnn::TensorInfo outputInfo({2, 4, 1}, ArmnnType, qScale, qOffset);
 
     std::vector<T> input = armnnUtils::QuantizedVector<T>({
         1, 2, 3, 4,
         5, 6, 7, 8,
     }, qScale, qOffset);
+
+    std::vector<int> axis = {1, -1};
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         4, 3, 2, 1,
@@ -920,10 +938,11 @@ LayerTestResult<T, 2> ReverseV2NegAxisTest3Dim2Axis(
     return ReverseV2TestImpl<ArmnnType, T, 2>(workloadFactory,
                                               memoryManager,
                                               tensorHandleFactory,
-                                              descriptor,
                                               input,
+                                              axis,
                                               outputExpected,
                                               inputInfo,
+                                              axisInfo,
                                               outputInfo);
 }
 

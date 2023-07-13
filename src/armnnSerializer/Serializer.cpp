@@ -1036,20 +1036,14 @@ void SerializerStrategy::SerializeResizeLayer(const armnn::IConnectableLayer* la
 }
 
 void SerializerStrategy::SerializeReverseV2Layer(const armnn::IConnectableLayer* layer,
-                                              const armnn::ReverseV2Descriptor& reverseV2Descriptor,
-                                              const char* name)
+                                                 const char* name)
 {
     IgnoreUnused(name);
 
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_ReverseV2);
 
-    auto flatBufferDescriptor =
-        CreateReverseV2Descriptor(m_flatBufferBuilder,
-                                  m_flatBufferBuilder.CreateVector(reverseV2Descriptor.m_Axis));
-
     auto flatBufferLayer = serializer::CreateReverseV2Layer(m_flatBufferBuilder,
-                                                            flatBufferBaseLayer,
-                                                            flatBufferDescriptor);
+                                                            flatBufferBaseLayer);
 
     CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_ReverseV2Layer);
 }
@@ -2357,9 +2351,7 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
         }
         case armnn::LayerType::ReverseV2:
         {
-            const armnn::ReverseV2Descriptor& layerDescriptor =
-                    static_cast<const armnn::ReverseV2Descriptor&>(descriptor);
-            SerializeReverseV2Layer(layer, layerDescriptor, name);
+            SerializeReverseV2Layer(layer, name);
             break;
         }
         case armnn::LayerType::Shape:

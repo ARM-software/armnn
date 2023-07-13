@@ -984,11 +984,6 @@ table ResizeDescriptor {
 
 table ReverseV2Layer {
     base:LayerBase;
-    descriptor:ReverseV2Descriptor;
-}
-
-table ReverseV2Descriptor {
-    axis:[int];
 }
 
 table StackLayer {

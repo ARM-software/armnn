@@ -13,9 +13,10 @@
 namespace armnn
 {
 
-void ReverseV2(const ReverseV2Descriptor& params,
-               const TensorInfo& inputInfo,
+void ReverseV2(const TensorInfo& inputInfo,
+               const TensorInfo& axisInfo,
                Decoder<float>& inputDecoder,
+               Decoder<int>& axisDecoder,
                Encoder<float>& outputEncoder);
 
 } // namespace armnn

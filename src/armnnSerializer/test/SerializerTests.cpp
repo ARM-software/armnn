@@ -2457,26 +2457,27 @@ TEST_CASE("SerializeReverseV2")
 {
     const std::string layerName("reverseV2");
     const armnn::TensorInfo inputInfo  = armnn::TensorInfo({2, 3, 4}, armnn::DataType::Float32);
+    const armnn::TensorInfo axisInfo   = armnn::TensorInfo({3}, armnn::DataType::Signed32, 0.0f, 0, true);
     const armnn::TensorInfo outputInfo = armnn::TensorInfo({2, 3, 4}, armnn::DataType::Float32);
-
-    armnn::ReverseV2Descriptor desc;
-    desc.m_Axis = {1, 0, 2};
 
     armnn::INetworkPtr network = armnn::INetwork::Create();
     armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
-    armnn::IConnectableLayer* const reverseV2Layer = network->AddReverseV2Layer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const axisLayer = network->AddInputLayer(1);
+    armnn::IConnectableLayer* const reverseV2Layer = network->AddReverseV2Layer(layerName.c_str());
     armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
 
     inputLayer->GetOutputSlot(0).Connect(reverseV2Layer->GetInputSlot(0));
+    axisLayer->GetOutputSlot(0).Connect(reverseV2Layer->GetInputSlot(1));
     reverseV2Layer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
 
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    axisLayer->GetOutputSlot(0).SetTensorInfo(axisInfo);
     reverseV2Layer->GetOutputSlot(0).SetTensorInfo(outputInfo);
 
     armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
     CHECK(deserializedNetwork);
 
-    LayerVerifierBaseWithDescriptor<armnn::ReverseV2Descriptor> verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    LayerVerifierBase verifier(layerName, {inputInfo, axisInfo}, {outputInfo});
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 

@@ -290,7 +290,6 @@ private:
                               const char* name = nullptr);
 
     void SerializeReverseV2Layer(const armnn::IConnectableLayer* layer,
-                                 const armnn::ReverseV2Descriptor& reverseV2Descriptor,
                                  const char* name = nullptr);
 
     void SerializeSliceLayer(const armnn::IConnectableLayer* layer,

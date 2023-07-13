@@ -2749,20 +2749,13 @@ void IDeserializer::DeserializerImpl::ParseReverseV2(GraphPtr graph, unsigned in
     CHECK_LAYERS(graph, 0, layerIndex);
 
     TensorRawPtrVector inputs = GetInputs(graph, layerIndex);
-    CHECK_VALID_SIZE(inputs.size(), 1);
+    CHECK_VALID_SIZE(inputs.size(), 2);
 
     TensorRawPtrVector outputs = GetOutputs(graph, layerIndex);
     CHECK_VALID_SIZE(outputs.size(), 1);
 
-    auto flatBufferDescriptor = graph->layers()->Get(layerIndex)->layer_as_ReverseV2Layer()->descriptor();
-    auto flatBufferAxis = flatBufferDescriptor->axis();
-
-    armnn::ReverseV2Descriptor descriptor;
-    descriptor.m_Axis =
-        std::vector<int32_t>(flatBufferAxis->begin(), flatBufferAxis->end());
-
     auto layerName = GetLayerName(graph, layerIndex);
-    IConnectableLayer* layer = m_Network->AddReverseV2Layer(descriptor, layerName.c_str());
+    IConnectableLayer* layer = m_Network->AddReverseV2Layer(layerName.c_str());
 
     armnn::TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);

@@ -30,6 +30,7 @@
 #include "Redefine.hpp"
 #include "Reduce.hpp"
 #include "Resize.hpp"
+#include "ReverseV2.hpp"
 #include "Round.hpp"
 #include "Shape.hpp"
 #include "Slice.hpp"
@@ -1032,6 +1033,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                        tfLiteNode,
                                        nodeIndex,
                                        kTfLiteBuiltinResizeBilinear);
+        case kTfLiteBuiltinReverseV2:
+            return VisitReverseV2Operator(delegateData,
+                                          tfLiteContext,
+                                          tfLiteNode,
+                                          nodeIndex,
+                                          kTfLiteBuiltinReverseV2);
         case kTfLiteBuiltinRsqrt:
             return VisitElementwiseUnaryOperator(delegateData,
                                                  tfLiteContext,

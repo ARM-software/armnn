@@ -34,6 +34,7 @@ list(APPEND armnnClassicDelegateObject_sources
         src/Redefine.hpp
         src/Reduce.hpp
         src/Resize.hpp
+        src/ReverseV2.hpp
         src/Round.hpp
         src/Shape.hpp
         src/SharedFunctions.hpp

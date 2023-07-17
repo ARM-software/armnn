@@ -182,6 +182,8 @@ if(BUILD_UNIT_TESTS)
         test/ReshapeTest.cpp
         test/ResizeTest.cpp
         test/ResizeTestHelper.hpp
+        test/ReverseV2Test.cpp
+        test/ReverseV2TestHelper.hpp
         test/RoundTest.cpp
         test/RoundTestHelper.hpp
         test/SoftmaxTest.cpp

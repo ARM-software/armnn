@@ -48,8 +48,7 @@ void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
         // Get outputHandler of previous layer
         const OutputHandler& outputHandler = GetInputSlots()[0].GetConnectedOutputSlot()->GetOutputHandler();
         const OutputSlot* slot = GetInputSlots()[0].GetConnectedOutputSlot();
-
-        const TensorInfo& parentInfo = outputHandler.GetTensorInfo();
+        const TensorInfo& parentInfo = GetInputSlot(0).GetTensorInfo();
 
         ITensorHandle* inputData = outputHandler.GetData();
 

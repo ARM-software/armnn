@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 import os
 
-version_info = (32, 1, 0)
+version_info = (33, 0, 0)
 
 __dev_version_env = os.getenv("PYARMNN_DEV_VER", "")
 

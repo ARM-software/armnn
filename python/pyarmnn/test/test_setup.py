@@ -87,15 +87,15 @@ def test_gcc_serch_path():
 
 
 def test_armnn_version():
-    check_armnn_version('32.0.0', '32.0.0')
+    check_armnn_version('33.0.0', '33.0.0')
 
 
 def test_incorrect_armnn_version():
     with pytest.raises(AssertionError) as err:
-        check_armnn_version('32.0.0', '32.1.0')
+        check_armnn_version('32.1.0', '33.0.0')
 
-    assert 'Expected ArmNN version is 32.1.0 but installed ArmNN version is 32.0.0' in str(err.value)
+    assert 'Expected ArmNN version is 33.0.0 but installed ArmNN version is 32.1.0' in str(err.value)
 
 
 def test_armnn_version_patch_does_not_matter():
-    check_armnn_version('32.0.0', '32.0.1')
+    check_armnn_version('32.0.0', '33.0.1')

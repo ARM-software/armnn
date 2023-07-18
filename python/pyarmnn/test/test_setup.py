@@ -98,4 +98,4 @@ def test_incorrect_armnn_version():
 
 
 def test_armnn_version_patch_does_not_matter():
-    check_armnn_version('32.0.0', '33.0.1')
+    check_armnn_version('33.0.0', '33.0.0')

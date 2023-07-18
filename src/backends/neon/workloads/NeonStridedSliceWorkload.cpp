@@ -20,8 +20,10 @@ arm_compute::Status NeonStridedSliceWorkloadValidate(const TensorInfo& input,
                                                      const TensorInfo& output,
                                                      const StridedSliceDescriptor& descriptor)
 {
-    const arm_compute::TensorInfo aclInput = armcomputetensorutils::BuildArmComputeTensorInfo(input);
-    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
+    const arm_compute::TensorInfo aclInput = armcomputetensorutils::BuildArmComputeTensorInfo(input,
+                                                                                              descriptor.m_DataLayout);
+    const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output,
+                                                                                               descriptor.m_DataLayout);
 
     arm_compute::Coordinates starts;
     arm_compute::Coordinates ends;

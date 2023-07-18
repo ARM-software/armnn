@@ -54,8 +54,8 @@ TEST_CASE("SerializeToDot")
         "    edge [fontsize=8 fontcolor=\"blue\" fontname=\"arial-bold\"];\n"
         "    " << inputId << " [label=\"{Input|Guid : " << inputId << "\\lLayerType : Input\\l"
                              "BackendID : CpuRef\\l}\"];\n"
-        "    " << addId << " [label=\"{ElementwiseBinary|Guid : " << addId << "\\lLayerType : ElementwiseBinary\\l"
-                           "BackendID : CpuRef\\l}\"];\n"
+        "    " << addId << " [label=\"{ElementwiseBinary|BinaryOperation : Add\\lGuid : " << addId <<
+                           "\\lLayerType : ElementwiseBinary\\lBackendID : CpuRef\\l}\"];\n"
         "    " << outputId << " [label=\"{Output|Guid : " << outputId << "\\lLayerType : Output\\l"
                               "BackendID : CpuRef\\l}\"];\n"
         "    " << inputId << " -> " << addId << " [label=< [4] >];\n"

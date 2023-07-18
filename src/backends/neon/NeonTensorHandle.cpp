@@ -29,17 +29,17 @@ NeonTensorDecorator::NeonTensorDecorator(arm_compute::ITensor *parent, const Ten
     m_Original = parent;
 }
 
-arm_compute::ITensorInfo *NeonTensorDecorator::info() const
+arm_compute::ITensorInfo* NeonTensorDecorator::info() const
 {
     return &m_TensorInfo;
 }
 
-arm_compute::ITensorInfo *NeonTensorDecorator::info()
+arm_compute::ITensorInfo* NeonTensorDecorator::info()
 {
     return &m_TensorInfo;
 }
 
-uint8_t *NeonTensorDecorator::buffer() const
+uint8_t* NeonTensorDecorator::buffer() const
 {
     return m_Original->buffer();
 }

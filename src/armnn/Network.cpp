@@ -1322,7 +1322,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                         parentOut->Disconnect(inputSlot);
                         for (unsigned int out = deletedLayer->GetOutputSlot(in -1).GetNumConnections(); out > 0; --out)
                         {
-                            InputSlot *childIn = deletedLayer->GetOutputSlot(in - 1).GetConnection(out -1);
+                            InputSlot* childIn = deletedLayer->GetOutputSlot(in - 1).GetConnection(out -1);
                             deletedLayer->GetOutputSlot(in - 1).Disconnect(*childIn);
                             parentOut->Connect(*childIn);
                         }

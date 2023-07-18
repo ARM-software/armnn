@@ -75,6 +75,11 @@ template <> struct StringifyLayerParameters<DepthwiseConvolution2dDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const DepthwiseConvolution2dDescriptor& desc);
 };
 
+template <> struct StringifyLayerParameters<ElementwiseBinaryDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const ElementwiseBinaryDescriptor& desc);
+};
+
 template <> struct StringifyLayerParameters<ElementwiseUnaryDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const ElementwiseUnaryDescriptor& desc);

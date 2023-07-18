@@ -187,6 +187,12 @@ void StringifyLayerParameters<DepthwiseConvolution2dDescriptor>::Serialize(
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
 }
 
+void StringifyLayerParameters<ElementwiseBinaryDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                                      const ElementwiseBinaryDescriptor& desc)
+{
+    fn("BinaryOperation", GetBinaryOperationAsCString(desc.m_Operation));
+}
+
 void StringifyLayerParameters<ElementwiseUnaryDescriptor>::Serialize(ParameterStringifyFunction& fn,
                                                                      const ElementwiseUnaryDescriptor& desc)
 {

@@ -64,7 +64,7 @@ bool OptimizationViews::Validate(const armnn::SubgraphView& originalSubgraph) co
         for (auto& substitution : m_SuccesfulOptimizations)
         {
             bool validSubstitution = true;
-            const SubgraphView &replacement = substitution.m_ReplacementSubgraph;
+            const SubgraphView& replacement = substitution.m_ReplacementSubgraph;
             const SubgraphView& old = substitution.m_SubstitutableSubgraph;
             validSubstitution &= replacement.GetIInputSlots().size() == old.GetIInputSlots().size();
             validSubstitution &= replacement.GetIOutputSlots().size() == old.GetIOutputSlots().size();

@@ -518,7 +518,7 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
             }
             // Cannot remove a Reshape if it's connected to a SplitterLayer through a Tensor that has more than
             // 4 dimensions
-            if (ConnectedToSplitterWithMoreThan4Dims(baseLayer))
+            if (ConnectedToLayerType(baseLayer, LayerType::Splitter, 4))
             {
                 continue;
             }

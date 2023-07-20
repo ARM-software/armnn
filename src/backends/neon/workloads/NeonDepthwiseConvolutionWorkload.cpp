@@ -62,6 +62,12 @@ arm_compute::Status NeonDepthwiseConvolutionWorkloadValidate(const TensorInfo& i
             return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
                                        "ArmNN NeonDepthwiseConvolutionWorkload has empty bias value."};
         }
+        // There's currently a problem with non const bias, so we'll explicitly block it here.
+        if (!biases.value().IsConstant())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                        "ArmNN NeonDepthwiseConvolutionWorkload does not support non constant bias."};
+        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -98,6 +104,8 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
     {
         biasesPtr = &PolymorphicDowncast<IAclTensorHandle *>(m_Data.m_Inputs[2])->GetTensor();
         biasesPtr->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
+        // We assume here that NeonDepthwiseConvolutionWorkloadValidate has been called before the constructor.
+        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     arm_compute::TensorShape weightsShape = weights.info()->tensor_shape();

@@ -1656,7 +1656,9 @@ void ReverseV2QueueDescriptor::Validate(const WorkloadInfo &workloadInfo) const
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS8,
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);

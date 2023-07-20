@@ -32,6 +32,7 @@
 #include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReverseV2EndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
@@ -1320,6 +1321,42 @@ TEST_CASE("RefResizeNearestNeighborEndToEndUint8NhwcTest")
 TEST_CASE("RefResizeNearestNeighborEndToEndInt16NhwcTest")
 {
     ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+// ReverseV2
+TEST_CASE("RefReverseV2EndToEndFloat16Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::Float16>(defaultBackends);
+}
+
+TEST_CASE("RefReverseV2EndToEndFloat32Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefReverseV2EndToEndQAsymmS8Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefReverseV2EndToEndQAsymmU8Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("RefReverseV2EndToEndQSymmS8Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::QSymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefReverseV2EndToEndQSymmS16Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefReverseV2EndToEndSigned32Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::Signed32>(defaultBackends);
 }
 
 // InstanceNormalization

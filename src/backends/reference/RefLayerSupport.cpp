@@ -2373,14 +2373,16 @@ bool RefLayerSupport::IsReverseV2Supported(const TensorInfo& input0,
 {
     bool supported = true;
     // ReverseV2 is data type agnostic so it can support all the types in the Reference backend
-    std::array<DataType,6> supportedTypes =
+    std::array<DataType,8> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS8,
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input0, supportedTypes), reasonIfUnsupported,

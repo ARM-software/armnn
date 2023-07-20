@@ -46,6 +46,12 @@ arm_compute::Status ClConvolution2dWorkloadValidate(const TensorInfo& input,
             return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
                                        "ArmNN ClConvolution2dWorkload has empty bias value."};
         }
+        // There's currently a problem with non const bias, so we'll explicitly block it here.
+        if (!biases.value().IsConstant())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                       "ArmNN ClDepthwiseConv2dWorkload does not support non constant bias."};
+        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;
@@ -92,7 +98,8 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
     {
         arm_compute::ICLTensor& bias = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
         bias.info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
-
+        // We assume here that NeonConvolution2dWorkloadValidate has been called before the constructor.
+        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
         m_BiasProxy = std::make_unique<ICLTensorProxy>(&bias);
     }
 

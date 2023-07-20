@@ -1,7 +1,7 @@
 <br>
-<td style="text-align: center">
+<div align="center">
   <img src="Arm_NN_horizontal_blue.png" alt="Arm NN Logo" width="300"/>
-</td>
+</div>
 
 * [Quick Start Guides](#quick-start-guides)
 * [Pre-Built Binaries](#pre-built-binaries)

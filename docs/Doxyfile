@@ -1,4 +1,4 @@
-# Doxyfile 1.8.12
+# Doxyfile 1.8.17
 
 # Copyright (c) 2018, 2020-2023 ARM Ltd and Contributors. All rights reserved.
 #
@@ -814,7 +814,6 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = ./docs/01_00_quick_start.dox \
-                         ./docs/01_01_delegate_start_guide.dox \
                          ./docs/02_operator_list.dox \
                          ./docs/03_build_guides.dox \
                          ./docs/04_contributor.dox \
@@ -834,8 +833,10 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./src/armnnConverter/README.md \
                          ./src/backends/README.md \
                          ./src/dynamic/README.md \
-                         ./delegate/include \
-                         ./delegate/src/armnn_external_delegate.cpp \
+                         ./delegate/classic/include \
+                         ./delegate/opaque/include \
+                         ./delegate/classic/src/armnn_external_delegate.cpp \
+                         ./delegate/opaque/src/armnn_external_delegate.cpp \
                          ./delegate/BuildGuideNative.md \
                          ./delegate/DelegateQuickStartGuide.md \
                          ./shim/ \
@@ -844,9 +845,8 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./shim/sl/canonical/ \
                          ./README.md \
                          ./InstallationViaAptRepository.md \
-                         ./ContributorGuide.md \
+                         ./CONTRIBUTING.md \
                          ./BuildGuideAndroidNDK.md \
-                         ./BuildGuideCrossCompilation.md \
                          ./samples/examples.dox
 
 # This tag can be used to specify the character encoding of the source files
@@ -949,7 +949,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             = docs/
+IMAGE_PATH             = ./docs/
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

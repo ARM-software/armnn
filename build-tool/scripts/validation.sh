@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -20,14 +20,21 @@ if [ "$target_arch" == "" ]; then
   exit 1
 fi
 
-if [ "$target_arch" != "aarch64" ] && [ "$target_arch" != "x86_64" ]; then
-  echo "$name: --target-arch is not valid. Valid options are: aarch64, x86_64"
+if [ "$target_arch" != "aarch64" ] && [ "$target_arch" != "android64" ] && [ "$target_arch" != "x86_64" ]; then
+  echo "$name: --target-arch is not valid. Valid options are: aarch64, android64, x86_64"
   exit 1
 fi
 
 if [ "$HOST_ARCH" == "aarch64" ]; then
   if [ "$target_arch" != "aarch64" ]; then
     echo "$name: aarch64 is the only supported --target_arch when host is aarch64"
+    exit 1
+  fi
+fi
+
+if [ "$target_arch" == "android64" ]; then
+  if [ "$HOST_ARCH" != "x86_64" ]; then
+    echo "$name: --target_arch android64 is only supported when host is x86_64"
     exit 1
   fi
 fi

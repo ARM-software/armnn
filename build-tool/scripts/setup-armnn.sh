@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -34,6 +34,18 @@ download_and_extract()
   echo -e "\n***** $1 downloaded *****"
 }
 
+download_androidndk()
+{
+  cd "$SOURCE_DIR"
+  echo -e "\n***** Downloading Android NDK *****\n"
+  wget https://dl.google.com/android/repository/android-ndk-r25-linux.zip
+  echo -e "\n***** Extracting archive *****"
+  unzip android-ndk-r25-linux.zip
+  echo -e "\n***** Removing archive *****"
+  rm android-ndk-r25-linux.zip
+  echo -e "\n***** Android NDK downloaded *****"
+}
+
 download_protobuf()
 {
   download_and_extract \
@@ -57,6 +69,10 @@ build_protobuf()
       cmake_flags+="$AARCH64_COMPILER_FLAGS"
       additional_cmds+="--host=aarch64-linux "
     fi
+    if [ "$TARGET_ARCH" == "android64" ]; then
+      additional_cmds+="--host=aarch64-linux-android "
+      cmake_flags+="$ANDROID64_COMPILER_FLAGS"
+    fi
   else
     target_arch="$HOST_ARCH"
     mkdir -p "$PROTOBUF_BUILD_HOST"
@@ -70,9 +86,26 @@ build_protobuf()
   # Cleanup any previous cmake files, except actual builds which we keep
   find . -mindepth 1 -name "*_build" -prune -o -exec rm -rf {} +
 
-  eval "$cmake_flags" \
-  "$PROTOBUF_SRC"/configure --prefix="$build_dir" "$additional_cmds"
-  make install -j "$NUM_THREADS"
+  if [ "$native_build" -eq 0 ] && [ "$TARGET_ARCH" == "android64" ]; then
+      eval "$cmake_flags"
+      cmake -DCMAKE_ANDROID_NDK="$NDK_SRC"  \
+            -DCMAKE_SYSTEM_NAME=Android \
+            -DCMAKE_SYSTEM_VERSION="$ANDROID_API_VERSION" \
+            -DCMAKE_ANDROID_ARCH_ABI="$ANDROID_ARM_ARCH" \
+            -DCMAKE_CXX_FLAGS=--std=c++14 \
+            -Dprotobuf_BUILD_TESTS=OFF \
+            -Dprotobuf_BUILD_SHARED_LIBS=ON \
+            -Dprotobuf_WITH_ZLIB=OFF \
+            -DCMAKE_BUILD_TYPE=Release \
+            $PROTOBUF_SRC/cmake/
+      make libprotobuf -j "$NUM_THREADS"
+      cmake -DCMAKE_INSTALL_PREFIX=$PROTOBUF_BUILD_TARGET -DCOMPONENT=libprotobuf -P cmake_install.cmake
+      cmake -DCMAKE_INSTALL_PREFIX=$PROTOBUF_BUILD_TARGET -DCOMPONENT=protobuf-headers -P cmake_install.cmake
+  else
+      eval "$cmake_flags" \
+      "$PROTOBUF_SRC"/configure --prefix="$build_dir" "$additional_cmds"
+      make install -j "$NUM_THREADS"
+  fi
 
   echo -e "\n***** Protobuf built for $target_arch ***** "
 }
@@ -95,7 +128,7 @@ build_flatbuffers()
 
   if [ "$native_build" -eq 0 ]; then
     mkdir -p "$FLATBUFFERS_BUILD_TARGET"
-    if [ "$TARGET_ARCH" == "aarch64" ]; then
+    if [ "$TARGET_ARCH" == "aarch64" ] || [ "$TARGET_ARCH" == "android64" ]; then
       cmake_flags+="$AARCH64_COMPILER_FLAGS"
     fi
   else
@@ -112,11 +145,25 @@ build_flatbuffers()
   # Cleanup any previous cmake files, except actual builds which we keep
   find . -mindepth 1 -name "*_build" -prune -o -exec rm -rf {} +
 
-  eval "$cmake_flags" \
-  cmake -DFLATBUFFERS_BUILD_FLATC="$native_build" \
-        -DCMAKE_INSTALL_PREFIX:PATH="$build_dir" \
-        -DFLATBUFFERS_BUILD_TESTS=0 \
-	      "$FLATBUFFERS_SRC"
+  if [ "$native_build" -eq 0 ] && [ "$TARGET_ARCH" == "android64" ]; then
+    eval "$cmake_flags" \
+    cmake -DCMAKE_ANDROID_NDK="$NDK_SRC" \
+          -DCMAKE_SYSTEM_NAME=Android \
+          -DCMAKE_SYSTEM_VERSION="$ANDROID_API_VERSION" \
+          -DCMAKE_ANDROID_ARCH_ABI="$ANDROID_ARM_ARCH" \
+          -DCMAKE_CXX_FLAGS=--std=c++14 \
+          -DFLATBUFFERS_BUILD_FLATC=0 \
+          -DCMAKE_INSTALL_PREFIX:PATH="$build_dir" \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DFLATBUFFERS_BUILD_TESTS=0 \
+          "$FLATBUFFERS_SRC"
+  else
+    eval "$cmake_flags" \
+    cmake -DFLATBUFFERS_BUILD_FLATC="$native_build" \
+          -DCMAKE_INSTALL_PREFIX:PATH="$build_dir" \
+          -DFLATBUFFERS_BUILD_TESTS=0 \
+          "$FLATBUFFERS_SRC"
+  fi
   make all install -j "$NUM_THREADS"
 
   echo -e "\n***** Built flatbuffers for $target_arch *****"
@@ -150,6 +197,14 @@ build_tflite()
 
       if [ "$NATIVE_BUILD" -eq 0 ]; then
         cmake_flags+="ARMCC_FLAGS='-funsafe-math-optimizations' "
+      fi
+      ;;
+    "android64")
+      cmake_flags+="$AARCH64_COMPILER_FLAGS"
+      if [ "$NATIVE_BUILD" -eq 0 ]; then
+        target_arch_cmd="-DCMAKE_TOOLCHAIN_FILE=$NDK_SRC/build/cmake/android.toolchain.cmake \
+                         -DANDROID_ABI=$ANDROID_ARM_ARCH \
+                         -DANDROID_PLATFORM=$ANDROID_API_VERSION"
       fi
       ;;
   esac
@@ -225,7 +280,7 @@ setup-armnn.sh [OPTION]...
     setup dependencies for the Arm NN ONNX parser
   --all
     setup dependencies for all Arm NN components listed above
-  --target-arch=[aarch64|x86_64]
+  --target-arch=[aarch64|android64|x86_64]
     specify a target architecture (mandatory)
   --num-threads=<INTEGER>
     specify number of threads/cores to build dependencies with (optional: defaults to number of online CPU cores on host)
@@ -357,6 +412,10 @@ sleep 10
 
 mkdir -p "$SOURCE_DIR"
 mkdir -p "$BUILD_DIR"
+
+if [ "$TARGET_ARCH" == "android64" ]; then
+  download_androidndk
+fi
 
 if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] ||  [ "$flag_tflite_parser" -eq 1 ]; then
   download_flatbuffers

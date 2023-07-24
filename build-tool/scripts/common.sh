@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -38,6 +38,17 @@ fi
 
 AARCH64_COMPILER_FLAGS+="CC=/usr/bin/aarch64-linux-gnu-gcc CXX=/usr/bin/aarch64-linux-gnu-g++ "
 
+# NDK
+NDK_VERSION=25
+NDK_SRC="$SOURCE_DIR"/android-ndk-r"$NDK_VERSION"
+
+# ANDROID
+ANDROID_API_VERSION=30
+ANDROID_ARM_ARCH="arm64-v8a"
+ANDROID64_x86_TOOLCHAIN+="$NDK_SRC/toolchains/llvm/prebuilt/linux-x86_64"
+ANDROID64_COMPILER_FLAGS+="CC="$ANDROID64_x86_TOOLCHAIN"/bin/aarch64-linux-android"$ANDROID_API_VERSION"-clang \
+                           CXX="$ANDROID64_x86_TOOLCHAIN"/bin/aarch64-linux-android"$ANDROID_API_VERSION"-clang++ "
+
 # Flatbuffers
 FLATBUFFERS_VERSION=2.0.6
 FLATBUFFERS_SRC="$SOURCE_DIR"/flatbuffers-"$FLATBUFFERS_VERSION"
@@ -64,6 +75,7 @@ PROTOBUF_BUILD_HOST="$PROTOBUF_BUILD_ROOT"/"$HOST_ARCH"_build
 PROTOCOL_COMPILER_HOST="$PROTOBUF_BUILD_HOST"/bin/protoc
 PROTOBUF_BUILD_TARGET="$PROTOBUF_BUILD_ROOT"/"$TARGET_ARCH"_build
 PROTOBUF_LIBRARY_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so.23.0.0
+PROTOBUF_ANDROID_LIB_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so
 
 # ONNX
 ONNX_VERSION=1.6.0

@@ -42,6 +42,11 @@ build_acl()
       acl_arch="arch=arm64-v8a"
       ;;
 
+    "android64")
+      compile_flags+="$AARCH64_COMPILER_FLAGS"
+      acl_arch="arch=arm64-v8a"
+      ;;
+
     "x86_64")
       acl_arch="arch=x86_64"
       ;;
@@ -56,13 +61,23 @@ build_acl()
 
   mkdir -p "$ACL_BUILD_TARGET"
 
-  eval "$compile_flags" \
-  scons "$native_flag" \
+  if [ "$TARGET_ARCH" == "android64" ]; then
+    eval "$compile_flags" \
+    scons toolchain_prefix=llvm- \
+      compiler_prefix=aarch64-linux-android$ANDROID_API_VERSION- \
+      "$acl_arch" \
+      "$acl_params" \
+      "$extra_cxx_flags" \
+      os=android -j "$NUM_THREADS"
+  else
+    eval "$compile_flags" \
+    scons "$native_flag" \
         "$acl_arch" \
         "$acl_params" \
         build_dir="$ACL_BUILD_TARGET" \
         "$extra_cxx_flags" \
         -j "$NUM_THREADS"
+  fi
 
   echo -e "\n***** Built ACL for $TARGET_ARCH *****"
 
@@ -79,12 +94,25 @@ build_armnn()
     build_type="Debug"
   fi
 
+  local cmake_flags=""
   local compile_flags=""
+  local android_cmake_args=""
 
   case "$TARGET_ARCH" in
     "aarch64")
       compile_flags+="$AARCH64_COMPILER_FLAGS"
       ;;
+    "android64")
+      compile_flags+="$ANDROID64_COMPILER_FLAGS"
+      cmake_flags+="CXXFLAGS='-fPIE -fPIC'"
+      android_cmake_args+="-DCMAKE_ANDROID_NDK=$NDK_SRC \
+                           -DNDK_VERSION=r$NDK_VERSION \
+                           -DCMAKE_SYSTEM_NAME=Android \
+                           -DCMAKE_SYSTEM_VERSION=$ANDROID_API_VERSION \
+                           -DCMAKE_ANDROID_ARCH_ABI=$ANDROID_ARM_ARCH \
+                           -DCMAKE_SYSROOT=$ANDROID64_x86_TOOLCHAIN/sysroot \
+                           -DCMAKE_EXE_LINKER_FLAGS='-pie -llog'"
+    ;;
   esac
 
   if [ "$flag_clean" -eq 1 ]; then
@@ -95,7 +123,8 @@ build_armnn()
   echo -e "\n***** Building Arm NN for $TARGET_ARCH *****"
 
   eval "$compile_flags" \
-  cmake -DCMAKE_BUILD_TYPE="$build_type" \
+  cmake "$android_cmake_args" \
+        -DCMAKE_BUILD_TYPE="$build_type" \
         -DBUILD_CLASSIC_DELEGATE="$flag_tflite_classic_delegate" \
         -DBUILD_OPAQUE_DELEGATE="$flag_tflite_opaque_delegate" \
         -DBUILD_TF_LITE_PARSER="$flag_tflite_parser" \
@@ -107,14 +136,14 @@ build_armnn()
         -DARMCOMPUTE_ROOT="$ACL_SRC" \
         -DARMCOMPUTE_BUILD_DIR="$ACL_BUILD_TARGET" \
         -DTENSORFLOW_ROOT="$TENSORFLOW_SRC" \
-        -DTF_LITE_SCHEMA_INCLUDE_PATH="$TFLITE_BUILD_ROOT" \
+        -DTFLITE_ROOT_DIR="$TFLITE_SRC" \
+        -DTF_LITE_GENERATED_PATH="$TFLITE_SRC"/schema \
+        -DTF_LITE_SCHEMA_INCLUDE_PATH="$TFLITE_SRC"/schema \
         -DTFLITE_LIB_ROOT="$TFLITE_BUILD_TARGET" \
         -DFLATBUFFERS_ROOT="$FLATBUFFERS_BUILD_TARGET" \
         -DFLATC_DIR="$FLATBUFFERS_BUILD_HOST" \
         -DONNX_GENERATED_SOURCES="$ONNX_BUILD_TARGET" \
-        -DPROTOBUF_ROOT="$PROTOBUF_BUILD_HOST" \
-        -DPROTOBUF_LIBRARY_DEBUG="$PROTOBUF_LIBRARY_TARGET" \
-        -DPROTOBUF_LIBRARY_RELEASE="$PROTOBUF_LIBRARY_TARGET" \
+        -DPROTOBUF_ROOT="$PROTOBUF_BUILD_TARGET" \
         "$armnn_cmake_args" \
         "$ARMNN_SRC"
 
@@ -124,9 +153,13 @@ build_armnn()
   if [ "$flag_onnx_parser" -eq 1 ]; then
     cd "$ARMNN_BUILD_TARGET"
     rm -f libprotobuf.so libprotobuf.so.23 libprotobuf.so.23.0.0
-    cp "$PROTOBUF_LIBRARY_TARGET" .
-    ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
-    ln -s libprotobuf.so.23.0.0 ./libprotobuf.so
+    if [ "$TARGET_ARCH" != "android64" ]; then
+      cp "$PROTOBUF_LIBRARY_TARGET" .
+      ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
+      ln -s libprotobuf.so.23.0.0 ./libprotobuf.so
+    else
+      cp "$PROTOBUF_ANDROID_LIB_TARGET" .
+    fi
   fi
 
   # Copy Arm NN include directory into build output
@@ -205,7 +238,7 @@ build-armnn.sh [OPTION]...
     build the Arm NN ONNX parser component
   --all
     build all Arm NN components listed above
-  --target-arch=[aarch64|x86_64]
+  --target-arch=[aarch64|android64|x86_64]
     specify a target architecture (mandatory)
   --neon-backend
     build Arm NN with the NEON backend (CPU acceleration from ACL)

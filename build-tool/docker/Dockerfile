@@ -1,12 +1,12 @@
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 # Default build type is 'production'. Use 'dev' if supplying custom Arm NN / ACL repos from host
 ARG BUILD_TYPE=production
 
-ARG UBUNTU_VERSION=18.04
+ARG UBUNTU_VERSION=20.04
 FROM ubuntu:${UBUNTU_VERSION} AS build-production
 
 ENV DEBIAN_FRONTEND noninteractive

@@ -1552,7 +1552,11 @@ void CreateSampleDynamicBackendTestImpl()
     WorkloadInfo workloadInfo
     {
         { inputInfo, inputInfo },
-        { outputInfo }
+        { outputInfo },
+        EmptyOptional(),
+        EmptyOptional(),
+        EmptyOptional(),
+        "Name"
     };
 
     // Create a addition workload

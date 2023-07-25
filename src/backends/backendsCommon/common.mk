@@ -115,5 +115,6 @@ COMMON_TEST_SOURCES := \
 
 ifeq ($(ARMNN_REF_ENABLED),1)
 COMMON_TEST_SOURCES += \
+    test/mockBackend/MockImportBackend.cpp \
     test/WorkloadDataValidation.cpp
 endif # ARMNN_REF_ENABLED == 1

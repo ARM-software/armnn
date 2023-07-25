@@ -21,19 +21,6 @@
 namespace armnn
 {
 
-// add new capabilities here..
-const BackendCapabilities gpuAccCapabilities("GpuAcc",
-                                             {
-                                                     {"NonConstWeights", true},
-                                                     {"AsyncExecution", false},
-                                                     {"ProtectedContentAllocation", true},
-                                                     {"ConstantTensorsAsInputs", true},
-                                                     {"PreImportIOTensors", false},
-                                                     {"ExternallyManagedMemory", true},
-                                                     {"MultiAxisPacking", false},
-                                                     {"SingleAxisPacking", true}
-                                             });
-
 class ClBackend : public IBackendInternal
 {
 public:
@@ -90,10 +77,7 @@ public:
 
     std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
 
-    BackendCapabilities GetCapabilities() const override
-    {
-        return gpuAccCapabilities;
-    };
+    BackendCapabilities GetCapabilities() const override;
 
     virtual bool UseCustomMemoryAllocator(std::shared_ptr<ICustomAllocator> allocator,
                                           armnn::Optional<std::string&> errMsg) override

@@ -350,6 +350,8 @@ struct OptimizerOptionsOpaqueImpl
     }
 
     /// Reduces all Fp32 operators in the model to Fp16 for faster processing.
+    /// If the first preferred backend does not have Fp16 support, this option will be disabled.
+    /// If the value of converted Fp16 is infinity, round to the closest finite Fp16 value.
     /// @Note This feature works best if all operators of the model are in Fp32. ArmNN will add conversion layers
     ///       between layers that weren't in Fp32 in the first place or if the operator is not supported in Fp16.
     ///       The overhead of these conversions can lead to a slower overall performance if too many conversions are

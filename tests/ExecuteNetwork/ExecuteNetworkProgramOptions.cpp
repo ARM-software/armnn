@@ -410,7 +410,9 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("fp16-turbo-mode",
                  "If this option is enabled, FP32 layers, "
-                 "weights and biases will be converted to FP16 where the backend supports it",
+                 "weights and biases will be converted to FP16 where the backend supports it. "
+                 "If the first preferred backend does not have FP16 support, this option will be disabled. "
+                 "If the value of converted FP16 is infinity, round to the closest finite FP16 value.",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableFp16TurboMode)
                          ->default_value("false")->implicit_value("true"))
 

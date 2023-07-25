@@ -11,6 +11,7 @@
 
 #include <cl/ClWorkloadFactory.hpp>
 #include <cl/ClBackendContext.hpp>
+#include <arm_compute/core/CL/CLKernelLibrary.h>
 
 #include <armnnUtils/Filesystem.hpp>
 
@@ -94,15 +95,28 @@ TEST_CASE("FP16TurboModeTestOnGpuAcc")
 
     const armnn::Graph& graph = GetGraphForTesting(optimizedNet.get());
 
-    // Tests that all layers are present in the graph.
-    CHECK(graph.GetNumLayers() == 5);
+    if(arm_compute::CLKernelLibrary::get().fp16_supported())
+    {
+        // Tests that all layers are present in the graph.
+        CHECK(graph.GetNumLayers() == 5);
 
-    // Tests that the vertices exist and have correct names.
-    CHECK(GraphHasNamedLayer(graph, "input layer"));
-    CHECK(GraphHasNamedLayer(graph, "convert_fp32_to_fp16-0-input layer"));
-    CHECK(GraphHasNamedLayer(graph, "activation layer"));
-    CHECK(GraphHasNamedLayer(graph, "convert_fp16_to_fp32-0-output layer"));
-    CHECK(GraphHasNamedLayer(graph, "output layer"));
+        // Tests that the vertices exist and have correct names.
+        CHECK(GraphHasNamedLayer(graph, "input layer"));
+        CHECK(GraphHasNamedLayer(graph, "convert_fp32_to_fp16-0-input layer"));
+        CHECK(GraphHasNamedLayer(graph, "activation layer"));
+        CHECK(GraphHasNamedLayer(graph, "convert_fp16_to_fp32-0-output layer"));
+        CHECK(GraphHasNamedLayer(graph, "output layer"));
+    }
+    else
+    {
+        // Tests that all layers except for conversion layers are present in the graph.
+        CHECK(graph.GetNumLayers() == 3);
+
+        // Tests that the vertices exist and have correct names.
+        CHECK(GraphHasNamedLayer(graph, "input layer"));
+        CHECK(GraphHasNamedLayer(graph, "activation layer"));
+        CHECK(GraphHasNamedLayer(graph, "output layer"));
+    }
 }
 
 TEST_CASE("FastMathEnabledTestOnGpuAcc")

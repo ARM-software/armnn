@@ -6,6 +6,8 @@
 
 #include <armnn/backends/IBackendInternal.hpp>
 
+#include <arm_compute/core/CPP/CPPTypes.h>
+
 namespace armnn
 {
 
@@ -19,7 +21,8 @@ const BackendCapabilities cpuAccCapabilities("CpuAcc",
                                                      {"PreImportIOTensors", false},
                                                      {"ExternallyManagedMemory", true},
                                                      {"MultiAxisPacking", false},
-                                                     {"SingleAxisPacking", true}
+                                                     {"SingleAxisPacking", true},
+                                                     {"HasFp16", arm_compute::CPUInfo::get().has_fp16()}
                                              });
 
 

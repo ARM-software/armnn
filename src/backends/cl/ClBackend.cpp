@@ -273,6 +273,23 @@ std::unique_ptr<ICustomAllocator> ClBackend::GetDefaultAllocator() const
     return std::make_unique<ClBackendDefaultAllocator>();
 }
 
+BackendCapabilities ClBackend::GetCapabilities() const
+{
+    // add new capabilities here..
+    return BackendCapabilities ("GpuAcc",
+                                                 {
+                                                     {"NonConstWeights", true},
+                                                     {"AsyncExecution", false},
+                                                     {"ProtectedContentAllocation", true},
+                                                     {"ConstantTensorsAsInputs", true},
+                                                     {"PreImportIOTensors", false},
+                                                     {"ExternallyManagedMemory", true},
+                                                     {"MultiAxisPacking", false},
+                                                     {"SingleAxisPacking", true},
+                                                     {"HasFp16", arm_compute::CLKernelLibrary::get().fp16_supported()}
+                                                 });
+}
+
 OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                   const ModelOptions& modelOptions) const
 {

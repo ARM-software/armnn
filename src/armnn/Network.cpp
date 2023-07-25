@@ -37,6 +37,7 @@
 #include <algorithm>
 #include <memory>
 #include <vector>
+#include <armnn/ArmNN.hpp>
 
 namespace armnn
 {
@@ -837,14 +838,18 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
     // need to set the compute device on the layer
     // before we can check if it is supported
     layer->SetBackendId(backend);
+    std::string currentReasonIfUnsupported;
 
     // To run FP16 operations on CpuAcc we need at least v8.2 architecture. If the available architecture 
     // is older than v8.2, we can check if the operator is supported by changing operator inputs & outputs
     // to be FP32 and inserting convert layers around the FP32 operator.
-    bool isLayerSupported = IWorkloadFactory::IsLayerSupported(*layer, EmptyOptional(), reasonIfUnsupported);
+    bool isLayerSupported = IWorkloadFactory::IsLayerSupported(*layer, EmptyOptional(), currentReasonIfUnsupported);
+    reasonIfUnsupported += currentReasonIfUnsupported;
+    // This string matches the error message that is produced by acl when attempting to run FP16 kernels on
+    // a cpu or build that does not have fp16 support. We use this to check if we should add
+    // conversion layers or not.
     std::string checkStr = "This CPU architecture does not support F16 data type, you need v8.2 or above";
-    if (!isLayerSupported ||
-        reasonIfUnsupported.find(checkStr) != std::string::npos)
+    if (!isLayerSupported || currentReasonIfUnsupported.find(checkStr) != std::string::npos)
     {
         if (dataTypeIn == DataType::Float16 || dataTypeOut == DataType::Float16)
         {
@@ -992,6 +997,51 @@ inline std::vector<DataType> GetLayerInOutDatatype(const Layer* layer)
     DataType dataTypeOut = layer->GetNumOutputSlots() == 0 ? DataType::Float32 :
                            layer->GetOutputSlot(0).GetTensorInfo().GetDataType();
     return {dataTypeIn, dataTypeOut};
+}
+
+bool CheckFp16Support(BackendsMap& backends,
+                      const std::vector<BackendId>& availablePreferredBackends)
+{
+    bool hasFp16 = false;
+    // Check if the first preferred backend has FP16 support
+    auto firstBackend = availablePreferredBackends[0];
+    auto backendObjPtr = backends.find(firstBackend)->second.get();
+    ARMNN_ASSERT(backendObjPtr);
+    auto hasFp16Capability = BackendOptions::BackendOption{"HasFp16", true};
+    auto backendCapabilities = backendObjPtr->GetCapabilities();
+
+    if (HasMatchingCapability(hasFp16Capability, backendCapabilities))
+    {
+        // First preferred backend has FP16 support. Enable reduce FP32 to FP16 when fp16-turbo-mode is enabled.
+        hasFp16 = true;
+        ARMNN_LOG(debug) << "The first available preferred backend: " << firstBackend
+                         << ", has FP16 support.";
+    }
+    else
+    {
+        ARMNN_LOG(warning) << "The first available preferred backend: " << firstBackend
+                           << ", does not have FP16 support. "
+                           << "The FP16 turbo mode option will be disable. It will run using FP32.";
+    }
+
+    // Check if the rest of the available preferred backends have FP16 support
+    for (size_t i = 1; i < availablePreferredBackends.size(); ++i)
+    {
+        auto backend = availablePreferredBackends[i];
+        backendObjPtr = backends.find(backend)->second.get();
+        backendCapabilities = backendObjPtr->GetCapabilities();
+        if (!HasMatchingCapability(hasFp16Capability, backendCapabilities))
+        {
+            ARMNN_LOG(warning) << "Next preferred backend: " << backend << ", does not have FP16 support. "
+                               << "It will run using FP32 when falling back to this backend.";
+        }
+        else
+        {
+            ARMNN_LOG(debug) << "Next preferred backend:  " << backend << ", has FP16 support.";
+        }
+    }
+
+    return hasFp16;
 }
 
 // Refactor to allow passing the IConnectableLayer* rather than Layer Iterator
@@ -1913,16 +1963,10 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat16()));
 
 
-    if (options.GetReduceFp32ToFp16())
-    {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToFp16");
-        Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
-        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
-    }
-
     // Initialize backend settings
     BackendSettings backendSettings(backendPreferences, deviceSpec);
-    if (backendSettings.GetAvailablePreferredBackends().empty())
+    auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
+    if (availablePreferredBackends.empty())
     {
         std::stringstream failureMsg;
         failureMsg << "None of the preferred backends " << backendPreferences
@@ -1934,6 +1978,17 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     // Create a map to temporarily hold initialized backend objects
     TensorHandleFactoryRegistry tensorHandleFactoryRegistry;
     BackendsMap backends = CreateSupportedBackends(tensorHandleFactoryRegistry, backendSettings);
+
+    if (options.GetReduceFp32ToFp16())
+    {
+        bool hasFp16 = CheckFp16Support(backends, availablePreferredBackends);
+        if (hasFp16)
+        {
+            ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToFp16");
+            Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
+            Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
+        }
+    }
 
     // Assign an available backend to each layer
     Graph::Iterator firstLayer = optGraph.begin();

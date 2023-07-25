@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -48,14 +48,14 @@ ClMinimumWorkload::ClMinimumWorkload(const MinimumQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMinimumWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMinimumWorkload_configure");
         m_MinimumLayer.configure(clCompileContext, &input0, &input1, &output);
     }
 }
 
 void ClMinimumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClMinimumWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMinimumWorkload_Execute");
     RunClFunction(m_MinimumLayer, CHECK_LOCATION());
 }
 

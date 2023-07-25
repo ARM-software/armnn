@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,7 +43,7 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
     arm_compute::PixelValue pixelValue = GetPixelValue(input.info(), descriptor.m_Parameters.m_PadValue);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPadWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPadWorkload_configure");
         m_Layer.configure(clCompileContext,
                           &input,
                           &output,
@@ -55,7 +55,7 @@ ClPadWorkload::ClPadWorkload(const PadQueueDescriptor& descriptor,
 
 void ClPadWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClPadWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPadWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

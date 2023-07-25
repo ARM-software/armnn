@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -39,7 +39,7 @@ void RefCastWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefCastWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefCastWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefCastWorkload_Execute");
 
     TensorInfo inputTensorInfo(GetTensorInfo(inputs[0]));
     TensorInfo outputTensorInfo(GetTensorInfo(outputs[0]));

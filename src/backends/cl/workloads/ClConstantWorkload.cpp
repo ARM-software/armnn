@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -51,7 +51,7 @@ ClConstantWorkload::ClConstantWorkload(const ConstantQueueDescriptor& descriptor
 
 void ClConstantWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConstantWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClConstantWorkload_Execute");
 
     // The intermediate tensor held by the corresponding layer output handler can be initialised with the given data
     // on the first inference, then reused for subsequent inferences.

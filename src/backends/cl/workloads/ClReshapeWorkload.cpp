@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,14 +32,14 @@ ClReshapeWorkload::ClReshapeWorkload(const ReshapeQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClReshapeWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClReshapeWorkload_configure");
         m_Layer.configure(clCompileContext, &input, &output);
     }
 }
 
 void ClReshapeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClReshapeWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClReshapeWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

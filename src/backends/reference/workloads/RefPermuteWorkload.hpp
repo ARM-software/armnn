@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,12 +16,6 @@ template <armnn::DataType DataType>
 class RefPermuteWorkload : public TypedWorkload<PermuteQueueDescriptor, DataType>
 {
 public:
-    static const std::string& GetName()
-    {
-        static const std::string name = std::string("RefPermute") + GetDataTypeName(DataType) + "Workload";
-        return name;
-    }
-
     using TypedWorkload<PermuteQueueDescriptor, DataType>::m_Data;
     using TypedWorkload<PermuteQueueDescriptor, DataType>::TypedWorkload;
     void Execute() const override;

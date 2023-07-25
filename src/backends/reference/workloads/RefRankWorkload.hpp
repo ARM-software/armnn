@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -25,12 +25,13 @@ public:
     void ExecuteAsync(ExecutionData& executionData)  override
     {
         WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
+        Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
     }
 
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
     {
+        ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefRankWorkload_Execute");
         const int32_t rank = static_cast<int32_t>(GetTensorInfo(inputs[0]).GetNumDimensions());
 
         std::memcpy(outputs[0]->Map(), &rank, sizeof(int32_t));

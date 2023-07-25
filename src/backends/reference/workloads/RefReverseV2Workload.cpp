@@ -29,7 +29,7 @@ namespace armnn
 
     void RefReverseV2Workload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefReverseV2Workload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefReverseV2Workload_Execute");
 
         const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
         const TensorInfo& axisInfo = GetTensorInfo(inputs[1]);

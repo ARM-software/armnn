@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,12 +22,6 @@ arm_compute::Status NeonTransposeWorkloadValidate(const TensorInfo& input, const
 class NeonTransposeWorkload : public NeonBaseWorkload<TransposeQueueDescriptor>
 {
 public:
-    static const std::string& GetName()
-    {
-        static const std::string name = std::string("NeonTransposeWorkload");
-        return name;
-    }
-
     NeonTransposeWorkload(const TransposeQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
 

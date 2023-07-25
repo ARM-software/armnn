@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,6 +57,8 @@ void RefUnidirectionalSequenceLstmWorkload::ExecuteAsync(ExecutionData& executio
 void RefUnidirectionalSequenceLstmWorkload::Execute(std::vector<ITensorHandle*> inputs,
                                                     std::vector<ITensorHandle*> outputs) const
 {
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefUnidirectionalSequenceLstmWorkload_Execute");
+
     TensorInfo inputInfo = GetTensorInfo(inputs[0]);
     const TensorInfo& outputStateInfo = GetTensorInfo(inputs[1]);
     const TensorInfo& cellStateInfo = GetTensorInfo(inputs[2]);

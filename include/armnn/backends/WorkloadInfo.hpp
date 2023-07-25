@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -20,6 +20,7 @@ struct WorkloadInfo
     Optional<TensorInfo> m_WeightsTensorInfo = EmptyOptional();
     Optional<TensorInfo> m_BiasTensorInfo = EmptyOptional();
     Optional<std::string> m_ConvolutionMethod = EmptyOptional();
+    std::string m_Name;
 };
 
 struct MemoryInfo

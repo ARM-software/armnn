@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -48,14 +48,14 @@ ClMaximumWorkload::ClMaximumWorkload(const MaximumQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMaximumWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMaximumWorkload_configure");
         m_MaximumLayer.configure(clCompileContext, &input0, &input1, &output);
     }
 }
 
 void ClMaximumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClMaximumWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMaximumWorkload_Execute");
     RunClFunction(m_MaximumLayer, CHECK_LOCATION());
 }
 

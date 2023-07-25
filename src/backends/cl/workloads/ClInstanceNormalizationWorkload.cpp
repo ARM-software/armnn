@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -51,7 +51,7 @@ ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
     output.info()->set_data_layout(aclDataLayout);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClInstanceNormalizationWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClInstanceNormalizationWorkload_configure");
         m_Layer.configure(clCompileContext,
                           &input,
                           &output,
@@ -63,7 +63,7 @@ ClInstanceNormalizationWorkload::ClInstanceNormalizationWorkload(
 
 void ClInstanceNormalizationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClInstanceNormalizationWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClInstanceNormalizationWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

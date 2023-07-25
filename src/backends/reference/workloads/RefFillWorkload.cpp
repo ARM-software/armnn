@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,7 +27,7 @@ void RefFillWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefFillWorkload::Execute(std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefFillWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefFillWorkload_Execute");
 
     const TensorInfo &outputTensorInfo = GetTensorInfo(outputs[0]);
 

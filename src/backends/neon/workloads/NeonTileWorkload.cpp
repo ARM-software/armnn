@@ -40,7 +40,7 @@ NeonTileWorkload::NeonTileWorkload(const armnn::TileQueueDescriptor& descriptor,
 
 void NeonTileWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonTileWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonTileWorkload_Execute");
     m_Layer.run();
 }
 } //namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -52,14 +52,14 @@ ClSliceWorkload::ClSliceWorkload(const SliceQueueDescriptor& descriptor,
     std::tie(starts, ends) = SetClSliceData(m_Data.m_Parameters.m_Begin, m_Data.m_Parameters.m_Size);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSliceWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSliceWorkload_configure");
         m_SliceFunction.configure(clCompileContext, &input, &output, starts, ends);
     }
 }
 
 void ClSliceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSliceWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSliceWorkload_Execute");
     RunClFunction(m_SliceFunction, CHECK_LOCATION());
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -113,7 +113,7 @@ NeonConvolution3dWorkload::NeonConvolution3dWorkload(const Convolution3dQueueDes
 
 void NeonConvolution3dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConvolution3dWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonConvolution3dWorkload_Execute");
     m_ConvolutionLayer->run();
 }
 

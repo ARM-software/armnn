@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -34,14 +34,14 @@ ClNegWorkload::ClNegWorkload(const ElementwiseUnaryQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClNegWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClNegWorkload_configure");
         m_NegLayer.configure(clCompileContext, &input, &output);
     }
 }
 
 void ClNegWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClNegWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClNegWorkload_Execute");
     RunClFunction(m_NegLayer, CHECK_LOCATION());
 }
 

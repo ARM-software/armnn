@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,7 +43,7 @@ template <typename Functor, typename ParentDescriptor, typename armnn::StringMap
 void RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::Execute(
         std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, StringMapping::Instance().Get(DebugString));
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID(StringMapping::Instance().Get(DebugString));
     const TensorInfo& inputInfo0 = GetTensorInfo(inputs[0]);
     const TensorInfo& inputInfo1 = GetTensorInfo(inputs[1]);
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);

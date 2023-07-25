@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,14 +32,14 @@ ClSubtractionWorkload::ClSubtractionWorkload(const SubtractionQueueDescriptor& d
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSubtractionWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSubtractionWorkload_configure");
         m_Layer.configure(clCompileContext, &input0, &input1, &output, g_AclConvertPolicy, activationInfo);
     }
 }
 
 void ClSubtractionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSubtractionWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSubtractionWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

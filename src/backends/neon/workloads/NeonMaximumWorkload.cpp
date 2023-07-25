@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -39,7 +39,7 @@ NeonMaximumWorkload::NeonMaximumWorkload(const MaximumQueueDescriptor& descripto
 
 void NeonMaximumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonMaximumWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonMaximumWorkload_Execute");
     m_MaxLayer.run();
 }
 

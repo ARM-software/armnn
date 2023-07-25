@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,7 @@ void RefFakeQuantizationFloat32Workload::ExecuteAsync(ExecutionData& executionDa
 void RefFakeQuantizationFloat32Workload::Execute(std::vector<ITensorHandle*> inputs,
                                                  std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefFakeQuantizationFloat32Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefFakeQuantizationFloat32Workload_Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 

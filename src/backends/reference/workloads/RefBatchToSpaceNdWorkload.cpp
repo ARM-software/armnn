@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,7 +24,7 @@ void RefBatchToSpaceNdWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefBatchToSpaceNdWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefBatchToSpaceNdWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefBatchToSpaceNdWorkload_Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);

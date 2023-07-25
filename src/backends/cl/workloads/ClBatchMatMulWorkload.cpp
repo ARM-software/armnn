@@ -108,7 +108,7 @@ ClBatchMatMulWorkload::ClBatchMatMulWorkload(const BatchMatMulQueueDescriptor& d
 
 void ClBatchMatMulWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClBatchMatMulWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClBatchMatMulWorkload_Execute");
     RunClFunction(m_MatMulLayer, CHECK_LOCATION());
 }
 } //namespace armnn

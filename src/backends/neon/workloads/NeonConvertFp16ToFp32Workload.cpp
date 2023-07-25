@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -50,7 +50,7 @@ NeonConvertFp16ToFp32Workload::NeonConvertFp16ToFp32Workload(const ConvertFp16To
 
 void NeonConvertFp16ToFp32Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConvertFp16ToFp32Workload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonConvertFp16ToFp32Workload_Execute");
 
     if (m_Cast)
     {

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -53,7 +53,7 @@ NeonConstantWorkload::NeonConstantWorkload(const ConstantQueueDescriptor& descri
 
 void NeonConstantWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConstantWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonConstantWorkload_Execute");
 
     using namespace armcomputetensorutils;
 

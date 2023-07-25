@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -56,7 +56,7 @@ namespace armnn
                                                                                       fpMixedPrecision);
 
         {
-            ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPooling3dWorkload_configure");
+            ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPooling3dWorkload_configure");
             // Run the layer.
             m_PoolingLayer.configure(clCompileContext, &input, &output, layerInfo);
         }
@@ -64,7 +64,7 @@ namespace armnn
 
     void ClPooling3dWorkload::Execute() const
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClPooling3dWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPooling3dWorkload_Execute");
         RunClFunction(m_PoolingLayer, CHECK_LOCATION());
     }
 

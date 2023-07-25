@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -71,7 +71,7 @@ ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descrip
     int aclAxis = armnn::numeric_cast<int>(CalcAclAxis(numDims, unsignedAxis));
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClArgMinMaxWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClArgMinMaxWorkload_configure");
         if (m_Data.m_Parameters.m_Function == ArgMinMaxFunction::Max)
         {
             m_ArgMinMaxLayer.configure(clCompileContext,
@@ -93,7 +93,7 @@ ClArgMinMaxWorkload::ClArgMinMaxWorkload(const ArgMinMaxQueueDescriptor& descrip
 
 void ClArgMinMaxWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClArgMinMaxWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClArgMinMaxWorkload_Execute");
     RunClFunction(m_ArgMinMaxLayer, CHECK_LOCATION());
 }
 

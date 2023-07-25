@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,14 +40,14 @@ ClQuantizeWorkload::ClQuantizeWorkload(const QuantizeQueueDescriptor& descriptor
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClQuantizeWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClQuantizeWorkload_configure");
         m_Layer.configure(clCompileContext, &input, &output);
     }
 }
 
 void ClQuantizeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClQuantizeWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClQuantizeWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

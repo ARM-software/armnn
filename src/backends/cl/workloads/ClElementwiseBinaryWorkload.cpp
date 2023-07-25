@@ -29,7 +29,7 @@ ClElementwiseBinaryWorkload::ClElementwiseBinaryWorkload(const ElementwiseBinary
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClElementwiseBinaryWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClElementwiseBinaryWorkload_configure");
 
         switch (descriptor.m_Parameters.m_Operation)
         {
@@ -56,7 +56,7 @@ void ClElementwiseBinaryWorkload::Execute() const
 {
     if (m_ElementwiseBinaryLayer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClElementwiseBinaryWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClElementwiseBinaryWorkload_Execute");
         m_ElementwiseBinaryLayer->run();
     }
 }

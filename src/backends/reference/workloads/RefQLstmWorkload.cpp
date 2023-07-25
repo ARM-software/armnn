@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -56,6 +56,8 @@ void RefQLstmWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefQLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefQLstmWorkload_Execute");
+
     // This is a porting of the QLSTM::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs)
     // method in the Android code base
     // Note: this implementation wraps the arithmetic functions of the LSTM cell in Quantize/Dequantize ops, so all

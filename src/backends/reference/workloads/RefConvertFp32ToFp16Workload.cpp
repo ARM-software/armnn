@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,7 +28,7 @@ void RefConvertFp32ToFp16Workload::ExecuteAsync(ExecutionData& executionData)
 void RefConvertFp32ToFp16Workload::Execute(std::vector<ITensorHandle*> inputs,
                                            std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefConvertFp32ToFp16Workload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefConvertFp32ToFp16Workload_Execute");
 
     const float* const input = reinterpret_cast<const float*>(inputs[0]->Map());
     Half*  const output = reinterpret_cast<Half*>(outputs[0]->Map());

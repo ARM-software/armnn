@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,7 +57,7 @@ void RefComparisonWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefComparisonWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefComparisonWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefComparisonWorkload_Execute");
 
     const TensorInfo& inputInfo0 = GetTensorInfo(inputs[0]);
     const TensorInfo& inputInfo1 = GetTensorInfo(inputs[1]);

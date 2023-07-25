@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -87,14 +87,14 @@ ClChannelShuffleWorkload::ClChannelShuffleWorkload(const ChannelShuffleQueueDesc
     output.info()->set_data_layout(aclDataLayout);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClChannelShuffleWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClChannelShuffleWorkload_configure");
         m_ChannelShuffleLayer.configure(clCompileContext, &input, &output, descriptor.m_Parameters.m_NumGroups);
     }
 }
 
 void ClChannelShuffleWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClChannelShuffleWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClChannelShuffleWorkload_Execute");
     RunClFunction(m_ChannelShuffleLayer, CHECK_LOCATION());
 }
 

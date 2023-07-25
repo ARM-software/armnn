@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -48,7 +48,7 @@ NeonPermuteWorkload::NeonPermuteWorkload(const PermuteQueueDescriptor& descripto
 
 void NeonPermuteWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID(GetName() + "_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonPermuteWorkload_Execute");
     m_PermuteFunction.run();
 }
 

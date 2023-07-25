@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,8 +24,7 @@ void RefDepthToSpaceWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefDepthToSpaceWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefDepthToSpaceWorkload_Execute");
-
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefDepthToSpaceWorkload_Execute");
     const TensorInfo inputInfo = GetTensorInfo(inputs[0]);
 
     DepthToSpace(inputInfo,

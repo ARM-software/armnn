@@ -483,7 +483,7 @@ NeonUnidirectionalSequenceLstmFloatWorkload::NeonUnidirectionalSequenceLstmFloat
 
 void NeonUnidirectionalSequenceLstmFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonUnidirectionalSequenceLstmFloatWorkload_Execute", GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonUnidirectionalSequenceLstmFloatWorkload_Execute");
     if (m_Permute1)
     {
         m_Permute1->run();

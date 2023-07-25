@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -30,7 +30,7 @@ void RefLogSoftmaxWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefLogSoftmaxWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefLogSoftmaxWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefLogSoftmaxWorkload_Execute");
 
     const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);

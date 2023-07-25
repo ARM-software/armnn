@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -74,7 +74,7 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor,
                                                  : arm_compute::SamplingPolicy::TOP_LEFT;
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClResizeWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClResizeWorkload_configure");
         m_ResizeLayer.configure(clCompileContext,
                                 &input,
                                 &output,
@@ -90,7 +90,7 @@ ClResizeWorkload::ClResizeWorkload(const ResizeQueueDescriptor& descriptor,
 
 void ClResizeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClResizeWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClResizeWorkload_Execute");
     RunClFunction(m_ResizeLayer, CHECK_LOCATION());
 }
 

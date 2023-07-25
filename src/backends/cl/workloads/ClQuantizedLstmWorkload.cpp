@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -110,7 +110,7 @@ ClQuantizedLstmWorkload::ClQuantizedLstmWorkload(const QuantizedLstmQueueDescrip
     arm_compute::ICLTensor& outputStateOutTensor      = static_cast<IClTensorHandle*>(m_Data.m_Outputs[1])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClQuantizedLstmWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClQuantizedLstmWorkload_configure");
         m_QuantizedLstmLayer.configure(clCompileContext, &inputTensor, m_InputToInputWeightsTensor.get(),
                                        m_InputToForgetWeightsTensor.get(),
                                        m_InputToCellWeightsTensor.get(), m_InputToOutputWeightsTensor.get(),
@@ -141,7 +141,7 @@ ClQuantizedLstmWorkload::ClQuantizedLstmWorkload(const QuantizedLstmQueueDescrip
 
 void ClQuantizedLstmWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClQuantizedLstmWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClQuantizedLstmWorkload_Execute");
     RunClFunction(m_QuantizedLstmLayer, CHECK_LOCATION());
 }
 

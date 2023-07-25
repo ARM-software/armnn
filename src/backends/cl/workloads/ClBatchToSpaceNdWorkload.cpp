@@ -154,7 +154,7 @@ ClBatchToSpaceNdWorkload::ClBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDesc
     const arm_compute::CropInfo cropInfo = BuildArmComputeCropInfo(descriptor.m_Parameters);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClBatchToSpaceNdWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClBatchToSpaceNdWorkload_configure");
         m_Layer.configure(clCompileContext,
                           (rank == 3) ? &m_ReshapeInputTensor : &input,
                           blockWidth,
@@ -166,7 +166,7 @@ ClBatchToSpaceNdWorkload::ClBatchToSpaceNdWorkload(const BatchToSpaceNdQueueDesc
 
 void ClBatchToSpaceNdWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClBatchToSpaceNdWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClBatchToSpaceNdWorkload_Execute");
     if (m_LayerReshapeInput)
     {
         m_LayerReshapeInput->run();

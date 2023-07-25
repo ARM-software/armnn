@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -48,14 +48,14 @@ ClMeanWorkload::ClMeanWorkload(const MeanQueueDescriptor& descriptor,
                                                                           m_Data.m_Parameters.m_Axis);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMeanWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMeanWorkload_configure");
         m_Layer.configure(clCompileContext, &input, coords, m_Data.m_Parameters.m_KeepDims, &output);
     }
 }
 
 void ClMeanWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClMeanWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMeanWorkload_Execute");
     m_Layer.run();
 }
 

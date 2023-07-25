@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -128,7 +128,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
     m_DepthwiseConvolutionLayer = std::make_unique<arm_compute::CLDepthwiseConvolutionLayer>();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClDepthwiseConvolutionWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClDepthwiseConvolutionWorkload_configure");
         static_cast<arm_compute::CLDepthwiseConvolutionLayer*>(m_DepthwiseConvolutionLayer.get())->configure(
                 clCompileContext,
                 &input,
@@ -163,7 +163,7 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
 
 void ClDepthwiseConvolutionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClDepthwiseConvolutionWorkload_Execute", GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClDepthwiseConvolutionWorkload_Execute");
     ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
     RunClFunction(*m_DepthwiseConvolutionLayer, CHECK_LOCATION());

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,14 +32,14 @@ ClFillWorkload::ClFillWorkload(const FillQueueDescriptor& descriptor,
     arm_compute::PixelValue pixelValue = GetPixelValue(output.info(), descriptor.m_Parameters.m_Value);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClFillWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClFillWorkload_configure");
         m_Layer.configure(clCompileContext, &output, pixelValue);
     }
 }
 
 void ClFillWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClFillWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClFillWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

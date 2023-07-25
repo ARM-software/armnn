@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -53,14 +53,14 @@ ClSqrtWorkload::ClSqrtWorkload(const ElementwiseUnaryQueueDescriptor& descriptor
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSqrtWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSqrtWorkload_configure");
         m_SqrtLayer.configure(clCompileContext, &input, &output, activationLayerInfo);
     }
 }
 
 void ClSqrtWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSqrtWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSqrtWorkload_Execute");
     RunClFunction(m_SqrtLayer, CHECK_LOCATION());
 }
 

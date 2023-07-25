@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -30,14 +30,14 @@ ClConvertFp32ToFp16Workload::ClConvertFp32ToFp16Workload(
     m_OutputProxy = std::make_unique<ICLTensorProxy>(&output);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvertFp32ToFp16Workload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClConvertFp32ToFp16Workload_configure");
         m_Layer.configure(clCompileContext, m_InputProxy.get(), m_OutputProxy.get(), g_AclConvertPolicy, 0);
     }
 }
 
 void ClConvertFp32ToFp16Workload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConvertFp32ToFp16Workload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClConvertFp32ToFp16Workload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

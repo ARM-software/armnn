@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -47,7 +47,7 @@ NeonTransposeWorkload::NeonTransposeWorkload(const TransposeQueueDescriptor& des
 
 void NeonTransposeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID(GetName() + "_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonTransposeWorkload_Execute");
     m_PermuteFunction.run();
 }
 

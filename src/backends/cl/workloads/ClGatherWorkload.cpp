@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,14 +46,14 @@ ClGatherWorkload::ClGatherWorkload(const GatherQueueDescriptor& descriptor,
     int aclAxis = ComputeAclAxis(descriptor.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClGatherWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClGatherWorkload_configure");
         m_Layer.configure(clCompileContext, &input, &indices, &output, aclAxis);
     }
 };
 
 void ClGatherWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClGatherWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClGatherWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 } // namespace armnn

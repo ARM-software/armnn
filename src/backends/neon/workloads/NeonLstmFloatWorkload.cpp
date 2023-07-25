@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -246,7 +246,7 @@ NeonLstmFloatWorkload::NeonLstmFloatWorkload(const LstmQueueDescriptor& descript
 
 void NeonLstmFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonLstmFloatWorkload_Execute", GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonLstmFloatWorkload_Execute");
     m_LstmLayer.run();
 }
 

@@ -102,7 +102,7 @@ NeonBatchMatMulWorkload::NeonBatchMatMulWorkload(const BatchMatMulQueueDescripto
 
 void NeonBatchMatMulWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonBatchMatMulWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonBatchMatMulWorkload_Execute");
     m_MatMulLayer.run();
 }
 } //namespace armnn

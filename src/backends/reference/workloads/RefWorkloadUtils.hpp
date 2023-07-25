@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,6 +18,12 @@
 
 namespace armnn
 {
+/// Creates a profiling event that uses GetGuid() and GetName() from the calling class
+#define ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID(label) \
+ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuRef, \
+                                              this->GetGuid(), \
+                                              this->GetName() + "_" + label, \
+                                              armnn::WallClockTimer())
 
 ////////////////////////////////////////////
 /// float32 helpers

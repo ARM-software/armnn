@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,7 @@ void RefDebugWorkload<DataType>::Execute(std::vector<ITensorHandle*> inputs) con
 {
     using T = ResolveType<DataType>;
 
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, GetName() + "_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 

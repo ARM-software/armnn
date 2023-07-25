@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -40,6 +40,9 @@ public:
 
     // Replace input tensor handle with the given TensorHandle
     virtual void ReplaceInputTensorHandle(ITensorHandle* /*input*/, unsigned int /*slot*/) = 0;
+
+    // Returns the name of the workload
+    virtual const std::string& GetName() const = 0;
 
     // Replace output tensor handle with the given TensorHandle
     virtual void ReplaceOutputTensorHandle(ITensorHandle* /*output*/, unsigned int /*slot*/) = 0;

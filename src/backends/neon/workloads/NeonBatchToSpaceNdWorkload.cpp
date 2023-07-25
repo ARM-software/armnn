@@ -161,7 +161,7 @@ NeonBatchToSpaceNdWorkload::NeonBatchToSpaceNdWorkload(const BatchToSpaceNdQueue
 
 void NeonBatchToSpaceNdWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonBatchToSpaceNdWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonBatchToSpaceNdWorkload_Execute");
     if (m_LayerReshapeInput)
     {
         m_LayerReshapeInput->run();

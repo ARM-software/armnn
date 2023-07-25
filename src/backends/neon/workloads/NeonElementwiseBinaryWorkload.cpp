@@ -85,7 +85,7 @@ NeonElementwiseBinaryWorkload::NeonElementwiseBinaryWorkload(const ElementwiseBi
 
 void NeonElementwiseBinaryWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonElementwiseBinaryWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonElementwiseBinaryWorkload_Execute");
     m_ElementwiseBinaryLayer->run();
 }
 

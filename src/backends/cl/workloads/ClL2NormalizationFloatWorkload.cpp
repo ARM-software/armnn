@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -49,14 +49,14 @@ ClL2NormalizationFloatWorkload::ClL2NormalizationFloatWorkload(const L2Normaliza
     int axis = (m_Data.m_Parameters.m_DataLayout == DataLayout::NCHW) ? 2 : 0;
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClL2NormalizationFloatWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClL2NormalizationFloatWorkload_configure");
         m_Layer.configure(clCompileContext, &input, &output, axis, m_Data.m_Parameters.m_Eps);
     }
 }
 
 void ClL2NormalizationFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClL2NormalizationFloatWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClL2NormalizationFloatWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -56,7 +56,7 @@ ClPooling2dWorkload::ClPooling2dWorkload(
     arm_compute::PoolingLayerInfo layerInfo = BuildArmComputePoolingLayerInfo(m_Data.m_Parameters, fpMixedPrecision);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPooling2dWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPooling2dWorkload_configure");
         // Run the layer.
         m_PoolingLayer.configure(clCompileContext, &input, &output, layerInfo);
     }
@@ -64,7 +64,7 @@ ClPooling2dWorkload::ClPooling2dWorkload(
 
 void ClPooling2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClPooling2dWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPooling2dWorkload_Execute");
     RunClFunction(m_PoolingLayer, CHECK_LOCATION());
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -87,7 +87,7 @@ NeonChannelShuffleWorkload::NeonChannelShuffleWorkload(const ChannelShuffleQueue
 
 void NeonChannelShuffleWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonChannelShuffleWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonChannelShuffleWorkload_Execute");
     m_ChannelShuffleLayer.run();
 }
 

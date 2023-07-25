@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -99,7 +99,7 @@ void NeonConcatWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonConcatWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonConcatWorkload_Execute");
         m_Layer->run();
     }
 }

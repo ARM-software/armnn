@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,12 +22,6 @@ arm_compute::Status NeonPermuteWorkloadValidate(const TensorInfo& input, const T
 class NeonPermuteWorkload : public NeonBaseWorkload<PermuteQueueDescriptor>
 {
 public:
-    static const std::string& GetName()
-    {
-        static const std::string name = std::string("NeonPermuteWorkload");
-        return name;
-    }
-
     NeonPermuteWorkload(const PermuteQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
 

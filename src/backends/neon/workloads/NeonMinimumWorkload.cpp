@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,7 @@ NeonMinimumWorkload::NeonMinimumWorkload(const MinimumQueueDescriptor& descripto
 
 void NeonMinimumWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonMinimumWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonMinimumWorkload_Execute");
     m_MinLayer.run();
 }
 

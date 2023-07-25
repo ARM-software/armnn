@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -186,7 +186,7 @@ ClGatherNdWorkload::ClGatherNdWorkload(const GatherNdQueueDescriptor& descriptor
     BuildArmComputeTensor(m_OutputGather, outputGather_Info);
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_OutputGather);
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClGatherNdWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClGatherNdWorkload_configure");
         auto aclAxis = ComputeAclAxis(0, paramsInfo);
         m_GatherLayer.configure(clCompileContext, &input, &m_FlattenedIndices, &m_OutputGather, aclAxis);
     }
@@ -197,7 +197,7 @@ ClGatherNdWorkload::ClGatherNdWorkload(const GatherNdQueueDescriptor& descriptor
 
 void ClGatherNdWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClGatherNdWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClGatherNdWorkload_Execute");
     RunClFunction(m_MulLayer, CHECK_LOCATION());
     RunClFunction(m_ReduceSumLayer, CHECK_LOCATION());
     RunClFunction(m_GatherLayer, CHECK_LOCATION());

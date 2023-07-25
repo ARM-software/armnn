@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,7 +20,7 @@ public:
     : TypedWorkload<DebugQueueDescriptor, DataType>(descriptor, info)
     , m_Callback(nullptr) {}
 
-    static const std::string& GetName()
+    virtual const std::string& GetName() const override
     {
         static const std::string name = std::string("RefDebug") + GetDataTypeName(DataType) + "Workload";
         return name;
@@ -39,7 +39,7 @@ private:
     DebugCallbackFunction m_Callback;
 };
 
-using RefDebugBFloat16Workload   = RefDebugWorkload<DataType::BFloat16>;
+using RefDebugBFloat16Workload  = RefDebugWorkload<DataType::BFloat16>;
 using RefDebugFloat16Workload   = RefDebugWorkload<DataType::Float16>;
 using RefDebugFloat32Workload   = RefDebugWorkload<DataType::Float32>;
 using RefDebugQAsymmU8Workload  = RefDebugWorkload<DataType::QAsymmU8>;

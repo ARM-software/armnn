@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -34,14 +34,14 @@ ClAbsWorkload::ClAbsWorkload(const AbsQueueDescriptor& descriptor,
     arm_compute::ICLTensor& input  = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Inputs[0])->GetTensor();
     arm_compute::ICLTensor& output = PolymorphicDowncast<ClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClAbsWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClAbsWorkload_configure");
         m_AbsLayer.configure(clCompileContext, &input, &output);
     }
 }
 
 void ClAbsWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClAbsWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClAbsWorkload_Execute");
     RunClFunction(m_AbsLayer, CHECK_LOCATION());
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,14 +31,14 @@ ClAdditionWorkload::ClAdditionWorkload(const AdditionQueueDescriptor& descriptor
 
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClAdditionWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClAdditionWorkload_configure");
         m_Layer.configure(clCompileContext, &input0, &input1, &output, g_AclConvertPolicy, activationInfo);
     }
 }
 
 void ClAdditionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClAdditionWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClAdditionWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

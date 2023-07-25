@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -103,7 +103,7 @@ ClSplitterWorkload::ClSplitterWorkload(const SplitterQueueDescriptor& descriptor
     unsigned int aclAxis = CalcAclAxis(descriptor.m_Parameters.GetNumDimensions(), *splitAxis.begin());
     auto layer = std::make_unique<arm_compute::CLSplit>();
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSplitterWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSplitterWorkload_configure");
         layer->configure(&input, aclOutputs, aclAxis);
     }
 
@@ -117,7 +117,7 @@ void ClSplitterWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSplitterWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSplitterWorkload_Execute");
         m_Layer->run();
     }
 }

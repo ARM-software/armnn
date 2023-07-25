@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -52,6 +52,8 @@ void RefLstmWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefLstmWorkload_Execute");
+
     // This is a porting of the LSTM::Eval() method in the Android code base
     // Refer to: android/frameworks/ml/nn/common/operations/LSTM.cpp
 

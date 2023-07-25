@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -45,14 +45,14 @@ ClDivisionWorkload::ClDivisionWorkload(const DivisionQueueDescriptor& descriptor
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClDivisionWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClDivisionWorkload_configure");
         m_ArithmeticDivision.configure(clCompileContext, &input0, &input1, &output, activationInfo);
     }
 }
 
 void ClDivisionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClDivisionWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClDivisionWorkload_Execute");
     RunClFunction(m_ArithmeticDivision, CHECK_LOCATION());
 }
 

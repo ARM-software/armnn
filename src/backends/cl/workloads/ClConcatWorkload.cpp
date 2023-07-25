@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ClConcatWorkload.hpp"
@@ -89,7 +89,7 @@ ClConcatWorkload::ClConcatWorkload(const ConcatQueueDescriptor& descriptor,
     auto layer = std::make_unique<arm_compute::CLConcatenateLayer>();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConcatWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClConcatWorkload_configure");
         // Configure input and output tensors
         size_t aclAxis = CalcAxis(descriptor.m_Parameters);
         layer->configure(clCompileContext, aclInputs, &output, aclAxis);
@@ -104,7 +104,7 @@ void ClConcatWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConcatWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClConcatWorkload_Execute");
         m_Layer->run();
     }
 }

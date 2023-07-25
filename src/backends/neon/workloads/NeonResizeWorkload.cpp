@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -89,7 +89,7 @@ NeonResizeWorkload::NeonResizeWorkload(const ResizeQueueDescriptor& descriptor,
 
 void NeonResizeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonResizeWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonResizeWorkload_Execute");
     m_ResizeLayer.run();
 }
 

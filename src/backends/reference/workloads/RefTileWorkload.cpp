@@ -28,7 +28,7 @@ namespace armnn
 
     void RefTileWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefTileWorkload_Execute");
+        ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefTileWorkload_Execute");
 
         const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
 

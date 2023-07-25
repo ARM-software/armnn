@@ -119,7 +119,7 @@ void RefElementwiseBinaryWorkload::ExecuteAsync(ExecutionData& executionData)
 void RefElementwiseBinaryWorkload::Execute(std::vector<ITensorHandle*> inputs,
                                            std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefElementwiseBinaryWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefElementwiseBinaryWorkload_Execute");
 
     if (GetTensorInfo(inputs[0]).GetDataType() == DataType::Signed32)
     {

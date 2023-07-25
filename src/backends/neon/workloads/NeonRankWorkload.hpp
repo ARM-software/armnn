@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,6 +19,8 @@ public:
     using NeonBaseWorkload<RankQueueDescriptor>::NeonBaseWorkload;
     virtual void Execute() const override
     {
+        ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonRankWorkload_Execute");
+
         const NeonTensorHandle* neonTensorHandle = PolymorphicDowncast<const NeonTensorHandle*>(m_Data.m_Inputs[0]);
         const int32_t rank = static_cast<int32_t>(neonTensorHandle->GetShape().GetNumDimensions());
 

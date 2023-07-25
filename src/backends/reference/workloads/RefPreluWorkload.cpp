@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,8 +31,7 @@ void RefPreluWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefPreluWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefPreluWorkload_Execute");
-
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefPreluWorkload_Execute");
     const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
     const TensorInfo& alphaInfo  = GetTensorInfo(inputs[1]);
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);

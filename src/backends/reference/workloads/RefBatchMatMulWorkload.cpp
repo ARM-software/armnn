@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,7 +29,7 @@ void RefBatchMatMulWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefBatchMatMulWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefBatchMatMulWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefBatchMatMulWorkload_Execute");
 
     const TensorInfo& inputXInfo = GetTensorInfo(inputs[0]);
     const TensorInfo& inputYInfo = GetTensorInfo(inputs[1]);

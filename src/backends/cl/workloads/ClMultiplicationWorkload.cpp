@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -63,7 +63,7 @@ ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDesc
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClMultiplicationWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMultiplicationWorkload_configure");
         // Construct
         m_PixelWiseMultiplication.configure(clCompileContext,
                                             &input0,
@@ -78,7 +78,7 @@ ClMultiplicationWorkload::ClMultiplicationWorkload(const MultiplicationQueueDesc
 
 void ClMultiplicationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClMultiplicationWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClMultiplicationWorkload_Execute");
     RunClFunction(m_PixelWiseMultiplication, CHECK_LOCATION());
 }
 

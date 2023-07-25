@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -86,7 +86,7 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
     output.info()->set_data_layout(aclDataLayout);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClStridedSliceWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClStridedSliceWorkload_configure");
         m_StridedSliceLayer.configure(clCompileContext,
                                       &input,
                                       &output,
@@ -101,7 +101,7 @@ ClStridedSliceWorkload::ClStridedSliceWorkload(const StridedSliceQueueDescriptor
 
 void ClStridedSliceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClStridedSliceWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClStridedSliceWorkload_Execute");
     RunClFunction(m_StridedSliceLayer, CHECK_LOCATION());
 }
 

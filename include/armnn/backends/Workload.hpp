@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -36,9 +36,15 @@ public:
 
     BaseWorkload(const QueueDescriptor& descriptor, const WorkloadInfo& info)
         : m_Data(descriptor),
-          m_Guid(arm::pipe::IProfilingService::GetNextGuid())
+          m_Guid(arm::pipe::IProfilingService::GetNextGuid()),
+          m_Name(info.m_Name)
     {
         m_Data.Validate(info);
+    }
+
+    virtual const std::string& GetName() const override
+    {
+        return m_Name;
     }
 
     void ExecuteAsync(ExecutionData& executionData) override
@@ -82,6 +88,7 @@ public:
 protected:
     QueueDescriptor m_Data;
     const arm::pipe::ProfilingGuid m_Guid;
+    const std::string m_Name;
 
 private:
 #if !defined(ARMNN_DISABLE_THREADS)

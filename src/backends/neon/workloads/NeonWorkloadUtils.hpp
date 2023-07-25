@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -24,7 +24,15 @@
 #define ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID(name, guid) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, \
                                                   guid, \
-                                                  name, \
+                                                  GetName() + "_" + name, \
+                                                  armnn::NeonTimer(), \
+                                                  armnn::WallClockTimer())
+
+/// Creates a profiling event that uses GetGuid() and GetName() from the calling class
+#define ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID(label) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::CpuAcc, \
+                                                  this->GetGuid(), \
+                                                  this->GetName() + "_" + label, \
                                                   armnn::NeonTimer(), \
                                                   armnn::WallClockTimer())
 

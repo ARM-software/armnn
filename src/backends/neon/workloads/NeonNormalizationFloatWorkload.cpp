@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -106,7 +106,7 @@ NeonNormalizationFloatWorkload::NeonNormalizationFloatWorkload(const Normalizati
 
 void NeonNormalizationFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonNormalizationFloatWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonNormalizationFloatWorkload_Execute");
     m_NormalizationLayer->run();
 }
 

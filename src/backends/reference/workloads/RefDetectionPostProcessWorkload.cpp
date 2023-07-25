@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,7 @@ void RefDetectionPostProcessWorkload::ExecuteAsync(ExecutionData& executionData)
 void RefDetectionPostProcessWorkload::Execute(std::vector<ITensorHandle*> inputs,
                                               std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefDetectionPostProcessWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefDetectionPostProcessWorkload_Execute");
 
     const TensorInfo& boxEncodingsInfo = GetTensorInfo(inputs[0]);
     const TensorInfo& scoresInfo       = GetTensorInfo(inputs[1]);

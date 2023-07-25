@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,7 +44,7 @@ NeonDequantizeWorkload::NeonDequantizeWorkload(const DequantizeQueueDescriptor& 
 
 void NeonDequantizeWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonDequantizeWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonDequantizeWorkload_Execute");
     m_Layer->run();
 }
 

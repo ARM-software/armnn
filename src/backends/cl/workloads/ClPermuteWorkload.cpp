@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,7 +46,7 @@ ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
     const armnn::PermutationVector& mappings = m_Data.m_Parameters.m_DimMappings;
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPermuteWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPermuteWorkload_configure");
         // Run the layer.
         m_PermuteFunction.configure(clCompileContext, &input, &output, BuildArmComputePermutationVector(mappings));
     }
@@ -54,7 +54,7 @@ ClPermuteWorkload::ClPermuteWorkload(const PermuteQueueDescriptor& descriptor,
 
 void ClPermuteWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID(GetName() + "_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPermuteWorkload_Execute");
     RunClFunction(m_PermuteFunction, CHECK_LOCATION());
 }
 

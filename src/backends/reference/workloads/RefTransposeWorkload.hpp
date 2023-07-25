@@ -16,12 +16,6 @@ template <armnn::DataType DataType>
 class RefTransposeWorkload : public TypedWorkload<TransposeQueueDescriptor, DataType>
 {
 public:
-    static const std::string& GetName()
-    {
-        static const std::string name = std::string("RefTranspose") + GetDataTypeName(DataType) + "Workload";
-        return name;
-    }
-
     using TypedWorkload<TransposeQueueDescriptor, DataType>::m_Data;
     using TypedWorkload<TransposeQueueDescriptor, DataType>::TypedWorkload;
     void Execute() const override;

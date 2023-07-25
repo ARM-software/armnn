@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -110,7 +110,7 @@ NeonDetectionPostProcessWorkload::NeonDetectionPostProcessWorkload(
 
 void NeonDetectionPostProcessWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonDetectionPostProcessWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonDetectionPostProcessWorkload_Execute");
     m_Func.run();
 }
 

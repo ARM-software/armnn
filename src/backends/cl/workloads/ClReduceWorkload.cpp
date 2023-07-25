@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -61,7 +61,7 @@ ClReduceWorkload::ClReduceWorkload(const ReduceQueueDescriptor& descriptor, cons
                                                                           info.m_InputTensorInfos[0].GetNumDimensions(),
                                                                           m_Data.m_Parameters.m_vAxis);
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClReduceWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClReduceWorkload_configure");
         m_Layer.configure(&input,
                           &output,
                           static_cast<unsigned int>(coords[0]),
@@ -72,7 +72,7 @@ ClReduceWorkload::ClReduceWorkload(const ReduceQueueDescriptor& descriptor, cons
 
 void ClReduceWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClReduceWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClReduceWorkload_Execute");
     m_Layer.run();
 }
 

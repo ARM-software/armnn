@@ -164,7 +164,7 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDesc
                                                                     descriptor.m_Parameters.m_PadList[0].second);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClSpaceToBatchNdWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSpaceToBatchNdWorkload_configure");
         m_Layer.configure(clCompileContext,
                           rank == 3 ? &m_ReshapeInputTensor : &input,
                           blockWidth,
@@ -177,7 +177,7 @@ ClSpaceToBatchNdWorkload::ClSpaceToBatchNdWorkload(const SpaceToBatchNdQueueDesc
 
 void ClSpaceToBatchNdWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClSpaceToBatchNdWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClSpaceToBatchNdWorkload_Execute");
     if (m_LayerReshapeInput)
     {
         m_LayerReshapeInput->run();

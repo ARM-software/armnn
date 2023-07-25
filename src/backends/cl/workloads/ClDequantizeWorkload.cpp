@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,7 +42,7 @@ ClDequantizeWorkload::ClDequantizeWorkload(const DequantizeQueueDescriptor& desc
 
     m_Layer.reset(new arm_compute::CLDequantizationLayer());
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClDequantizeWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClDequantizeWorkload_configure");
         m_Layer->configure(clCompileContext, &input, &output);
     }
     m_Layer->prepare();
@@ -52,7 +52,7 @@ void ClDequantizeWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClDequantizeWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClDequantizeWorkload_Execute");
         m_Layer->run();
     }
 }

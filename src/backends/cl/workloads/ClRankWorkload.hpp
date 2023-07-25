@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,6 +19,8 @@ public:
     using ClBaseWorkload<RankQueueDescriptor>::ClBaseWorkload;
     virtual void Execute() const override
     {
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClRankWorkload_Execute");
+
         const ClTensorHandle* clTensorHandle = PolymorphicDowncast<const ClTensorHandle*>(m_Data.m_Inputs[0]);
         const int32_t rank = static_cast<int32_t>(clTensorHandle->GetShape().GetNumDimensions());
 

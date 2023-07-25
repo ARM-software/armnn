@@ -24,7 +24,7 @@ void RefSpaceToBatchNdWorkload::ExecuteAsync(ExecutionData& executionData)
 
 void RefSpaceToBatchNdWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefSpaceToBatchNdWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefSpaceToBatchNdWorkload_Execute");
 
     const TensorInfo& inputInfo = GetTensorInfo(inputs[0]);
     const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);

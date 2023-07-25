@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -32,7 +32,7 @@ void RefPermuteWorkload<DataType>::Execute(std::vector<ITensorHandle*> inputs,
 {
     using T = ResolveType<DataType>;
 
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, GetName() + "_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefPermuteWorkload_Execute");
 
     const ITensorHandle*     src      = inputs[0];
     ITensorHandle*           dst      = outputs[0];

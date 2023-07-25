@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -189,7 +189,7 @@ NeonGatherNdWorkload::NeonGatherNdWorkload(const GatherNdQueueDescriptor& descri
 
 void NeonGatherNdWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonGatherNdWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonGatherNdWorkload_Execute");
     m_MulLayer.run();
     m_ReduceSumLayer.run();
     m_GatherLayer.run();

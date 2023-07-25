@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -101,7 +101,7 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClTransposeConvolution2dWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClTransposeConvolution2dWorkload_configure");
         m_Layer.configure(clCompileContext, &input, m_WeightsTensor.get(), m_BiasesTensor.get(), &output,
                           padStrideInfo);
     }
@@ -119,7 +119,7 @@ ClTransposeConvolution2dWorkload::ClTransposeConvolution2dWorkload(
 
 void ClTransposeConvolution2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClTransposeConvolution2dWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClTransposeConvolution2dWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

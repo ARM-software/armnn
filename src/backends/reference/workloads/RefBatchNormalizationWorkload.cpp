@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,7 +36,7 @@ void RefBatchNormalizationWorkload::ExecuteAsync(ExecutionData& executionData)
 void RefBatchNormalizationWorkload::Execute(std::vector<ITensorHandle*> inputs,
                                             std::vector<ITensorHandle*> outputs) const
 {
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::CpuRef, "RefBatchNormalizationWorkload_Execute");
+    ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefBatchNormalizationWorkload_Execute");
 
     std::unique_ptr<Decoder<float>> meanDecoder     = MakeDecoder<float>(m_Mean->GetTensorInfo(),
                                                                          m_Mean->Map(true));

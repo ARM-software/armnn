@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "NeonTransposeConvolution2dWorkload.hpp"
@@ -112,7 +112,7 @@ NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
 
 void NeonTransposeConvolution2dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonTransposeConvolution2dWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonTransposeConvolution2dWorkload_Execute");
     m_Layer->run();
 }
 

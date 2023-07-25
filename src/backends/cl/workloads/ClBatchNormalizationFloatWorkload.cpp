@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -87,7 +87,7 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
     const arm_compute::ActivationLayerInfo activationInfo = ConvertAdditionalInfoToAclActivationLayerInfo(descriptor);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClBatchNormalizationFloatWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClBatchNormalizationFloatWorkload_configure");
         m_Layer.configure(clCompileContext,
                           &input,
                           &output,
@@ -112,7 +112,7 @@ ClBatchNormalizationFloatWorkload::ClBatchNormalizationFloatWorkload(
 
 void ClBatchNormalizationFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClBatchNormalizationFloatWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClBatchNormalizationFloatWorkload_Execute");
     RunClFunction(m_Layer, CHECK_LOCATION());
 }
 

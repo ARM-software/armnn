@@ -411,6 +411,7 @@ protected:
         WorkloadInfo info;
         CollectQueueDescriptorInputs(descriptor, info);
         CollectQueueDescriptorOutputs(descriptor, info);
+        info.m_Name = GetName();
         return info;
     }
 

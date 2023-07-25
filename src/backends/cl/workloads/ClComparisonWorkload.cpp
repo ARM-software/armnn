@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -59,14 +59,14 @@ ClComparisonWorkload::ClComparisonWorkload(const ComparisonQueueDescriptor& desc
     const arm_compute::ComparisonOperation comparisonOperation = ConvertComparisonOperationToAcl(m_Data.m_Parameters);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClComparisonWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClComparisonWorkload_configure");
         m_ComparisonLayer.configure(clCompileContext, &input0, &input1, &output, comparisonOperation);
     }
 }
 
 void ClComparisonWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClComparisonWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClComparisonWorkload_Execute");
     RunClFunction(m_ComparisonLayer, CHECK_LOCATION());
 }
 

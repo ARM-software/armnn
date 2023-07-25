@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ClStackWorkload.hpp"
@@ -67,7 +67,7 @@ ClStackWorkload::ClStackWorkload(const StackQueueDescriptor& descriptor,
     m_Layer.reset(new arm_compute::CLStackLayer());
     int aclAxis = CalcAxis(descriptor.m_Parameters.m_Axis, descriptor.m_Parameters.m_InputShape.GetNumDimensions());
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClStackWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClStackWorkload_configure");
         m_Layer->configure(clCompileContext, aclInputs, aclAxis, &output);
     }
 }
@@ -76,7 +76,7 @@ void ClStackWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClStackWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClStackWorkload_Execute");
         m_Layer->run();
     }
 }

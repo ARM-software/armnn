@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -46,14 +46,14 @@ ClLogSoftmaxWorkload::ClLogSoftmaxWorkload(const LogSoftmaxQueueDescriptor& desc
     int aclAxis = ComputeAclAxis(m_Data.m_Parameters.m_Axis, info.m_InputTensorInfos[0]);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClLogSoftmaxWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClLogSoftmaxWorkload_configure");
         m_LogSoftmaxLayer.configure(clCompileContext, &input, &output, m_Data.m_Parameters.m_Beta, aclAxis);
     }
 }
 
 void ClLogSoftmaxWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLogSoftmaxWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClLogSoftmaxWorkload_Execute");
     RunClFunction(m_LogSoftmaxLayer, CHECK_LOCATION());
 }
 

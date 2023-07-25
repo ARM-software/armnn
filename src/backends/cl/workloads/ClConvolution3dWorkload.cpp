@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -88,7 +88,7 @@ ClConvolution3dWorkload::ClConvolution3dWorkload(const Convolution3dQueueDescrip
                                                                     isFastMathEnabled);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClConvolution3dWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClConvolution3dWorkload_configure");
         m_ConvolutionLayer.configure(clCompileContext,
                                      &input,
                                      &weights,
@@ -115,7 +115,7 @@ ClConvolution3dWorkload::ClConvolution3dWorkload(const Convolution3dQueueDescrip
 
 void ClConvolution3dWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClConvolution3dWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClConvolution3dWorkload_Execute");
     RunClFunction(m_ConvolutionLayer, CHECK_LOCATION());
 }
 

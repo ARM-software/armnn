@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -159,7 +159,7 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
                                         m_Data.m_Parameters.m_OutputIntermediateScale);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClQLstmWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClQLstmWorkload_configure");
         // QLSTM CL configure
         m_QLstmLayer.configure(clCompileContext,
                                &input,
@@ -240,7 +240,7 @@ ClQLstmWorkload::ClQLstmWorkload(const QLstmQueueDescriptor& descriptor,
 
 void ClQLstmWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClQuantizedLstmWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClQuantizedLstmWorkload_Execute");
     m_QLstmLayer.run();
 }
 

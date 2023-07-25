@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -77,7 +77,7 @@ NeonMultiplicationWorkload::NeonMultiplicationWorkload(const MultiplicationQueue
 
 void NeonMultiplicationWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonMultiplicationWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonMultiplicationWorkload_Execute");
     m_PixelWiseMultiplication->run();
 }
 

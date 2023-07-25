@@ -481,7 +481,7 @@ ClUnidirectionalSequenceLstmFloatWorkload::ClUnidirectionalSequenceLstmFloatWork
 
 void ClUnidirectionalSequenceLstmFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClUnidirectionalSequenceLstmFloatWorkload_Execute", GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClUnidirectionalSequenceLstmFloatWorkload_Execute");
     if (m_Permute1)
     {
         m_Permute1->run();

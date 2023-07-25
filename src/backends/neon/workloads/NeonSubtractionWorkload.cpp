@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,7 +57,7 @@ NeonSubtractionWorkload::NeonSubtractionWorkload(const SubtractionQueueDescripto
 
 void NeonSubtractionWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonSubtractionWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonSubtractionWorkload_Execute");
     m_SubLayer->run();
 }
 

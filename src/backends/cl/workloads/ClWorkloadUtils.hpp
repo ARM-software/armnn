@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -28,7 +28,15 @@
 #define ARMNN_SCOPED_PROFILING_EVENT_CL_GUID(name, guid) \
     ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::GpuAcc, \
                                                   guid, \
-                                                  name, \
+                                                  GetName() + "_" + name, \
+                                                  armnn::OpenClTimer(), \
+                                                  armnn::WallClockTimer())
+
+/// Creates a profiling event that uses GetGuid() and GetName() from the calling class
+#define ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID(label) \
+    ARMNN_SCOPED_PROFILING_EVENT_WITH_INSTRUMENTS(armnn::Compute::GpuAcc, \
+                                                  this->GetGuid(), \
+                                                  this->GetName() + "_" + label, \
                                                   armnn::OpenClTimer(), \
                                                   armnn::WallClockTimer())
 

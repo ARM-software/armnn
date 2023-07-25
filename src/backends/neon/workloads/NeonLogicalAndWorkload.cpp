@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -50,7 +50,7 @@ NeonLogicalAndWorkload::NeonLogicalAndWorkload(const LogicalBinaryQueueDescripto
 
 void NeonLogicalAndWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonLogicalAndWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonLogicalAndWorkload_Execute");
     m_LogicalAndLayer.run();
 }
 

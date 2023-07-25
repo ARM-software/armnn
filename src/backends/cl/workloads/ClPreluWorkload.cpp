@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,14 +38,14 @@ ClPreluWorkload::ClPreluWorkload(const PreluQueueDescriptor& descriptor,
     arm_compute::ICLTensor& output = static_cast<IClTensorHandle*>(m_Data.m_Outputs[0])->GetTensor();
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClPreluWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPreluWorkload_configure");
         m_PreluLayer.configure(clCompileContext, &input, &alpha, &output);
     }
 }
 
 void ClPreluWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClPreluWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClPreluWorkload_Execute");
     RunClFunction(m_PreluLayer, CHECK_LOCATION());
 }
 

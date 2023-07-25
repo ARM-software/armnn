@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -77,7 +77,7 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
                                                                         activationInfo);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClFullyConnectedWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClFullyConnectedWorkload_configure");
         m_FullyConnectedLayer.configure(clCompileContext,
                                         &input,
                                         &weights,
@@ -106,7 +106,7 @@ ClFullyConnectedWorkload::ClFullyConnectedWorkload(
 
 void ClFullyConnectedWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClFullyConnectedWorkload_Execute", this->GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClFullyConnectedWorkload_Execute");
     RunClFunction(m_FullyConnectedLayer, CHECK_LOCATION());
 }
 

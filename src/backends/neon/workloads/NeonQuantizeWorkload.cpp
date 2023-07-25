@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,7 +43,7 @@ void NeonQuantizeWorkload::Execute() const
 {
     if (m_Layer)
     {
-        ARMNN_SCOPED_PROFILING_EVENT_NEON_GUID("NeonQuantizeWorkload_Execute", this->GetGuid());
+        ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonQuantizeWorkload_Execute");
         m_Layer->run();
     }
 }

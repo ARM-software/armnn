@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -168,7 +168,7 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor& descriptor,
         ConvertLstmActivationFuncToAclLayerInfo(m_Data.m_Parameters.m_ActivationFunc);
 
     {
-        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "ClLstmFloatWorkload_configure");
+        ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClLstmFloatWorkload_configure");
         m_LstmLayer.configure(clCompileContext, &input, m_InputToForgetWeightsTensor.get(),
                               m_InputToCellWeightsTensor.get(), m_InputToOutputWeightsTensor.get(),
                               m_RecurrentToForgetWeightsTensor.get(), m_RecurrentToCellWeightsTensor.get(),
@@ -237,7 +237,7 @@ ClLstmFloatWorkload::ClLstmFloatWorkload(const LstmQueueDescriptor& descriptor,
 
 void ClLstmFloatWorkload::Execute() const
 {
-    ARMNN_SCOPED_PROFILING_EVENT_CL_GUID("ClLstmFloatWorkload_Execute", GetGuid());
+    ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClLstmFloatWorkload_Execute");
     RunClFunction(m_LstmLayer, CHECK_LOCATION());
 }
 

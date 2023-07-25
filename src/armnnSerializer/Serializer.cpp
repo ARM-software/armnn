@@ -1440,6 +1440,27 @@ void SerializerStrategy::SerializeSwitchLayer(const armnn::IConnectableLayer* la
     CreateAnyLayer(fbSwitchLayer.o, serializer::Layer::Layer_SwitchLayer);
 }
 
+void SerializerStrategy::SerializeTileLayer(const armnn::IConnectableLayer* layer,
+                                            const armnn::TileDescriptor& descriptor,
+                                            const char* name)
+{
+    IgnoreUnused(name);
+
+    // Create FlatBuffer BaseLayer
+    auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Tile);
+
+    auto flatBufferDesc = serializer::CreateTileDescriptor(m_flatBufferBuilder,
+                                                           m_flatBufferBuilder.CreateVector(descriptor.m_Multiples));
+
+    // Create the FlatBuffer TileLayer
+    auto flatBufferLayer = serializer::CreateTileLayer(m_flatBufferBuilder,
+                                                       flatBufferBaseLayer,
+                                                       flatBufferDesc);
+
+    // Add the AnyLayer to the FlatBufferLayers
+    CreateAnyLayer(flatBufferLayer.o, serializer::Layer::Layer_TileLayer);
+}
+
 void SerializerStrategy::SerializeTransposeConvolution2dLayer(
     const armnn::IConnectableLayer* layer,
     const armnn::TransposeConvolution2dDescriptor& descriptor,
@@ -2423,6 +2444,13 @@ void SerializerStrategy::ExecuteStrategy(const armnn::IConnectableLayer* layer,
         case armnn::LayerType::Switch:
         {
             SerializeSwitchLayer(layer, name);
+            break;
+        }
+        case armnn::LayerType::Tile:
+        {
+            const armnn::TileDescriptor& layerDescriptor =
+                    static_cast<const armnn::TileDescriptor&>(descriptor);
+            SerializeTileLayer(layer, layerDescriptor, name);
             break;
         }
         case armnn::LayerType::Transpose:

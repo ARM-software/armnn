@@ -276,6 +276,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_StridedSliceLayer]           = &DeserializerImpl::ParseStridedSlice;
     m_ParserFunctions[Layer_SubtractionLayer]            = &DeserializerImpl::ParseSubtraction;
     m_ParserFunctions[Layer_SwitchLayer]                 = &DeserializerImpl::ParseSwitch;
+    m_ParserFunctions[Layer_TileLayer]                   = &DeserializerImpl::ParseTile;
     m_ParserFunctions[Layer_TransposeConvolution2dLayer] = &DeserializerImpl::ParseTransposeConvolution2d;
     m_ParserFunctions[Layer_TransposeLayer]              = &DeserializerImpl::ParseTranspose;
     m_ParserFunctions[Layer_UnidirectionalSequenceLstmLayer] = &DeserializerImpl::ParseUnidirectionalSequenceLstm;
@@ -423,6 +424,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_SubtractionLayer()->base();
         case Layer::Layer_SwitchLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_SwitchLayer()->base();
+        case Layer::Layer_TileLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_TileLayer()->base();
         case Layer::Layer_TransposeConvolution2dLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_TransposeConvolution2dLayer()->base();
         case Layer::Layer_TransposeLayer:
@@ -3631,6 +3634,33 @@ void IDeserializer::DeserializerImpl::ParseSwitch(GraphPtr graph, unsigned int l
 
     armnn::TensorInfo output1TensorInfo = ToTensorInfo(outputs[1]);
     layer->GetOutputSlot(1).SetTensorInfo(output1TensorInfo);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseTile(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 1);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto TileLayer             = graph->layers()->Get(layerIndex)->layer_as_TileLayer();
+    auto layerName             = GetLayerName(graph, layerIndex);
+    auto flatBufferDescriptor  = TileLayer->descriptor();
+    auto flatBufferMultiples   = flatBufferDescriptor->m_Multiples();
+
+    armnn::TileDescriptor tileDescriptor;
+    tileDescriptor.m_Multiples = std::vector<unsigned int>(flatBufferMultiples->begin(), flatBufferMultiples->end());
+
+    IConnectableLayer* layer = m_Network->AddTileLayer(tileDescriptor, layerName.c_str());
+
+    armnn::TensorInfo output0TensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(output0TensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

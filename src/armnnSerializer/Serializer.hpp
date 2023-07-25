@@ -337,6 +337,10 @@ private:
     void SerializeSwitchLayer(const armnn::IConnectableLayer* layer,
                               const char* name = nullptr);
 
+    void SerializeTileLayer(const armnn::IConnectableLayer* layer,
+                            const armnn::TileDescriptor& descriptor,
+                            const char* name);
+
     void SerializeTransposeConvolution2dLayer(const armnn::IConnectableLayer* layer,
                                               const armnn::TransposeConvolution2dDescriptor& descriptor,
                                               const std::vector<armnn::ConstTensor>& constants,

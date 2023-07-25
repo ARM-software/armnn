@@ -187,6 +187,7 @@ enum LayerType : uint {
     BatchMatMul = 68,
     ElementwiseBinary = 69,
     ReverseV2 = 70,
+    Tile = 71,
 }
 
 // Base layer table to be used as part of other layers
@@ -1053,6 +1054,15 @@ table BatchMatMulLayer {
     descriptor:BatchMatMulDescriptor;
 }
 
+table TileDescriptor {
+   m_Multiples:[uint];
+}
+
+table TileLayer {
+    base:LayerBase;
+    descriptor:TileDescriptor;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -1125,6 +1135,7 @@ union Layer {
     BatchMatMulLayer,
     ElementwiseBinaryLayer,
     ReverseV2Layer,
+    TileLayer,
 }
 
 table AnyLayer {

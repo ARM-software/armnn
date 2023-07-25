@@ -3038,5 +3038,30 @@ TEST_CASE("SerializeOverriddenSlot")
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 
+TEST_CASE("SerializeTile")
+{
+    const std::string layerName("Tile");
+    const armnn::TensorInfo inputInfo  = armnn::TensorInfo({ 2, 3 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo = armnn::TensorInfo({ 4, 6 }, armnn::DataType::Float32);
+
+    armnn::TileDescriptor desc = armnn::TileDescriptor(std::vector<uint32_t>{ 2, 2 });
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const tileLayer = network->AddTileLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(tileLayer->GetInputSlot(0));
+    tileLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    tileLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBaseWithDescriptor<armnn::TileDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
 
 }

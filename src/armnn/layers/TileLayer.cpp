@@ -33,24 +33,25 @@ std::vector<TensorShape> TileLayer::InferOutputShapes(const std::vector<TensorSh
 {
     ARMNN_ASSERT(inputShapes.size() == 1);
     const TensorShape& inputShape = inputShapes[0];
-    const std::vector<uint32_t> multipleShape = m_Param.m_Multiples;
 
-    std::vector<unsigned int> dimSizes;
+    uint32_t numberOfDimensions = inputShape.GetNumDimensions();
+    std::vector<unsigned int> dimensionSizes;
+    dimensionSizes.reserve(numberOfDimensions);
 
     // Check input shape and multiples have same length and multiply them together to get output shape
-    if(inputShape.GetNumDimensions() == multipleShape.size())
+    if(numberOfDimensions == m_Param.m_Multiples.size())
     {
-        for(uint32_t i = 0; i < inputShape.GetNumDimensions(); ++i)
+        for(uint32_t i = 0; i < numberOfDimensions; ++i)
         {
-            dimSizes.insert(dimSizes.begin(), inputShape[i] * multipleShape[i]);
+            dimensionSizes.emplace_back(inputShape[i] * m_Param.m_Multiples[i]);
         }
     }
     else
     {
-        throw LayerValidationException("TileLayer: input rank and length of multiples are different.");
+        throw LayerValidationException("TileLayer: input rank and multiples length are different.");
     }
 
-    return std::vector<TensorShape>({TensorShape({inputShape.GetNumElements(), dimSizes.data()})});
+    return std::vector<TensorShape>({TensorShape({numberOfDimensions, dimensionSizes.data()})});
 }
 
 void TileLayer::ValidateTensorShapesFromInputs()

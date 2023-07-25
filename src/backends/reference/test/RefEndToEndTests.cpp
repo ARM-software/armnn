@@ -36,6 +36,7 @@
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
+#include <backendsCommon/test/TileEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeEndToEndTestImpl.hpp>
 
@@ -1178,6 +1179,42 @@ TEST_CASE("RefSplitter4dDim2EndToEndUint8Test")
 TEST_CASE("RefSplitter4dDim3EndToEndUint8Test")
 {
     Splitter4dDim3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Tile
+TEST_CASE("RefTileEndToEndFloat32")
+{
+    TileEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefTileEndToEndFloat16")
+{
+    TileEndToEnd<armnn::DataType::Float16>(defaultBackends);
+}
+
+TEST_CASE("RefTileEndToEndQAsymmS8")
+{
+    TileEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefTileEndToEndQAsymmU8")
+{
+    TileEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("RefTileEndToEndQSymmS8")
+{
+    TileEndToEnd<armnn::DataType::QSymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefTileEndToEndQSymmS16")
+{
+    TileEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefTileEndToEndSigned32")
+{
+    TileEndToEnd<armnn::DataType::Signed32>(defaultBackends);
 }
 
 // TransposeConvolution2d

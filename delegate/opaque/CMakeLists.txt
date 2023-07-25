@@ -41,6 +41,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/SpaceDepth.hpp
         src/Split.hpp
         src/StridedSlice.hpp
+        src/Tile.hpp
         src/Transpose.hpp
         src/UnidirectionalSequenceLstm.hpp
         src/Unpack.hpp)

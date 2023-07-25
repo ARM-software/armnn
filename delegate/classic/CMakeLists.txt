@@ -44,6 +44,7 @@ list(APPEND armnnClassicDelegateObject_sources
         src/SpaceDepth.hpp
         src/Split.hpp
         src/Unpack.hpp
+        src/Tile.hpp
         src/Transpose.hpp)
 
 add_library(armnnClassicDelegateObject OBJECT ${armnnClassicDelegateObject_sources})

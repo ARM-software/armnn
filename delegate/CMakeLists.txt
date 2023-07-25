@@ -201,6 +201,8 @@ if(BUILD_UNIT_TESTS)
         test/SplitTestHelper.hpp
         test/TestUtils.hpp
         test/TestUtils.cpp
+        test/TileTest.cpp
+        test/TileTestHelper.hpp
         test/TransposeConvolution2dTest.cpp
         test/TransposeTest.cpp
         test/TransposeTestHelper.hpp

@@ -39,6 +39,7 @@
 #include "Softmax.hpp"
 #include "SpaceDepth.hpp"
 #include "Split.hpp"
+#include "Tile.hpp"
 #include "Transpose.hpp"
 #include "UnidirectionalSequenceLstm.hpp"
 #include "Unpack.hpp"
@@ -1064,6 +1065,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                            tfLiteNode,
                                            nodeIndex,
                                            kTfLiteBuiltinTanh);
+        case kTfLiteBuiltinTile:
+            return VisitTileOperator(delegateData,
+                                     tfLiteContext,
+                                     tfLiteNode,
+                                     nodeIndex,
+                                     kTfLiteBuiltinTile);
         case kTfLiteBuiltinUnidirectionalSequenceLstm:
             return VisitUnidirectionalSequenceLstmOperator(delegateData,
                                                            tfLiteContext,

@@ -724,6 +724,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/StridedSlice.cpp
              src/armnnTfLiteParser/test/Sub.cpp
              src/armnnTfLiteParser/test/Sum.cpp
+             src/armnnTfLiteParser/test/Tile.cpp
              src/armnnTfLiteParser/test/TransposeConv.cpp
              src/armnnTfLiteParser/test/Transpose.cpp
              src/armnnTfLiteParser/test/Unpack.cpp

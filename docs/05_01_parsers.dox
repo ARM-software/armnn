@@ -191,6 +191,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - SUB
 - SUM
 - TANH
+- TILE
 - TRANSPOSE
 - TRANSPOSE_CONV
 - UNIDIRECTIONAL_SEQUENCE_LSTM

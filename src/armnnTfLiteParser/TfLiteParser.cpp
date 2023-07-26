@@ -826,6 +826,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_SUB]                     = &TfLiteParserImpl::ParseSub;
     m_ParserFunctions[tflite::BuiltinOperator_SUM]                     = &TfLiteParserImpl::ParseSum;
     m_ParserFunctions[tflite::BuiltinOperator_TANH]                    = &TfLiteParserImpl::ParseTanH;
+    m_ParserFunctions[tflite::BuiltinOperator_TILE]                    = &TfLiteParserImpl::ParseTile;
     m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE]               = &TfLiteParserImpl::ParseTranspose;
     m_ParserFunctions[tflite::BuiltinOperator_TRANSPOSE_CONV]          = &TfLiteParserImpl::ParseTransposeConv;
     m_ParserFunctions[tflite::BuiltinOperator_UNIDIRECTIONAL_SEQUENCE_LSTM]
@@ -3301,6 +3302,48 @@ void TfLiteParserImpl::ParseReverseV2(size_t subgraphIndex, size_t operatorIndex
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0], inputTensorIndexes[1]});
+
+    auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});
+}
+
+void TfLiteParserImpl::ParseTile(size_t subgraphIndex, size_t operatorIndex)
+{
+    CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
+
+    auto inputs = GetInputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(inputs.size(), 2);
+
+    auto outputs = GetOutputs(m_Model, subgraphIndex, operatorIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    TensorInfo inputTensorInfo = ToTensorInfo(inputs[0]);
+    TensorInfo multiplesTensorInfo = ToTensorInfo(inputs[1]);
+    TensorInfo outputTensorInfo = ToTensorInfo(outputs[0]);
+
+    auto layerName = fmt::format("Tile:{}:{}", subgraphIndex, operatorIndex);
+
+    TileDescriptor descriptor;
+
+    BufferRawPtr multiplesBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    if (multiplesBufferPtr != nullptr)
+    {
+        std::vector<int32_t> multiplesData(multiplesTensorInfo.GetNumElements());
+       ::memcpy(multiplesData.data(), multiplesBufferPtr->data.data(), multiplesTensorInfo.GetNumBytes());
+        descriptor.m_Multiples.assign(multiplesData.begin(), multiplesData.end());
+    }
+    else
+    {
+        ARMNN_THROW_PARSE_EXCEPTION("For Tile layer, Multiples data was not found in the buffer.");
+    }
+
+    IConnectableLayer* layer = m_Network->AddTileLayer(descriptor, layerName.c_str());
+    ARMNN_ASSERT(layer != nullptr);
+
+    layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));
+    RegisterInputSlots(subgraphIndex, operatorIndex, layer, {inputTensorIndexes[0]});
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));
     RegisterOutputSlots(subgraphIndex, operatorIndex, layer, {outputTensorIndexes[0]});

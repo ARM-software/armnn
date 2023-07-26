@@ -133,6 +133,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonStridedSliceWorkload.hpp
     NeonSubtractionWorkload.cpp
     NeonSubtractionWorkload.hpp
+    NeonTileWorkload.cpp
+    NeonTileWorkload.hpp
     NeonTransposeConvolution2dWorkload.cpp
     NeonTransposeConvolution2dWorkload.hpp
     NeonTransposeWorkload.cpp

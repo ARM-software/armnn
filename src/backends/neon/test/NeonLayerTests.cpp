@@ -1436,6 +1436,24 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput4DAxis3,   StackOutput4DAxis3Float32Tes
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput3DInputs3, StackOutput3DInputs3Float32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput5D,        StackOutput5DFloat32Test)
 
+//Tile
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestFloat32, Tile1dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestFloat32, Tile2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestFloat32, Tile3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestFloat32, Tile4dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestFloat16, Tile1dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestFloat16, Tile2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestFloat16, Tile3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestFloat16, Tile4dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestInt8, Tile1dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestInt8, Tile2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestInt8, Tile3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestInt8, Tile4dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestUint8, Tile1dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestUint8, Tile2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestUint8, Tile3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestUint8, Tile4dTest<DataType::QAsymmU8>)
+
 // Transpose
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleTransposeFloat32, SimpleTransposeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(TransposeFloat32ValueSet1Test, TransposeValueSet1Test<DataType::Float32>)

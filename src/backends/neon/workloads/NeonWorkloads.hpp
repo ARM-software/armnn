@@ -69,6 +69,7 @@
 #include "NeonStackWorkload.hpp"
 #include "NeonStridedSliceWorkload.hpp"
 #include "NeonSubtractionWorkload.hpp"
+#include "NeonTileWorkload.hpp"
 #include "NeonTransposeConvolution2dWorkload.hpp"
 #include "NeonTransposeWorkload.hpp"
 #include "NeonUnidirectionalSequenceLstmFloatWorkload.hpp"

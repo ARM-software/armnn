@@ -26,6 +26,7 @@
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
+#include <backendsCommon/test/TileEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeEndToEndTestImpl.hpp>
 
@@ -417,6 +418,36 @@ TEST_CASE("NeonSplitter4dDim2EndToEndUint8Test")
 TEST_CASE("NeonSplitter4dDim3EndToEndUint8Test")
 {
     Splitter4dDim3EndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
+}
+
+// Tile
+TEST_CASE("NeonTileEndToEndFloat32")
+{
+    TileEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+}
+TEST_CASE("NeonTileEndToEndFloat16")
+{
+    TileEndToEnd<armnn::DataType::Float16>(neonDefaultBackends);
+}
+TEST_CASE("NeonTileEndToEndQAsymmS8")
+{
+    TileEndToEnd<armnn::DataType::QAsymmS8>(neonDefaultBackends);
+}
+TEST_CASE("NeonTileEndToEndQAsymmU8")
+{
+    TileEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
+}
+TEST_CASE("NeonTileEndToEndQSymmS8")
+{
+    TileEndToEnd<armnn::DataType::QSymmS8>(neonDefaultBackends);
+}
+TEST_CASE("NeonTileEndToEndQSymmS16")
+{
+    TileEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends);
+}
+TEST_CASE("NeonTileEndToEndSigned32")
+{
+    TileEndToEnd<armnn::DataType::Signed32>(neonDefaultBackends);
 }
 
 TEST_CASE("NeonQuantizedLstmEndToEndTest")

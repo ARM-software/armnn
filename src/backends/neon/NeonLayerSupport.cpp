@@ -81,6 +81,7 @@
 #include "workloads/NeonStackWorkload.hpp"
 #include "workloads/NeonStridedSliceWorkload.hpp"
 #include "workloads/NeonSubtractionWorkload.hpp"
+#include "workloads/NeonTileWorkload.hpp"
 #include "workloads/NeonTransposeConvolution2dWorkload.hpp"
 #include "workloads/NeonTransposeWorkload.hpp"
 #include "workloads/NeonUnidirectionalSequenceLstmFloatWorkload.hpp"
@@ -622,6 +623,11 @@ bool IsLayerTypeSupported(const LayerType& type,
                                                    reasonIfUnsupported);
         case LayerType::Subtraction:
             return support.IsSubtractionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
+        case LayerType::Tile:
+            return support.IsTileSupported(infos[0],
+                                           infos[1],
+                                           *(PolymorphicDowncast<const TileDescriptor*>(&descriptor)),
+                                           reasonIfUnsupported);
         case LayerType::Transpose:
             return support.IsTransposeSupported(infos[0],
                                                 infos[1],
@@ -1593,6 +1599,18 @@ bool NeonLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
                                    input1,
                                    output,
                                    nullptr);
+}
+
+bool NeonLayerSupport::IsTileSupported(const TensorInfo& input,
+                                       const TensorInfo& output,
+                                       const TileDescriptor& descriptor,
+                                       Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonTileWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool NeonLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,

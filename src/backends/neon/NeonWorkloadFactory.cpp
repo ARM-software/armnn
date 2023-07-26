@@ -617,6 +617,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
             auto subtractionQueueDescriptor = PolymorphicDowncast<const SubtractionQueueDescriptor*>(&descriptor);
             return std::make_unique<NeonSubtractionWorkload>(*subtractionQueueDescriptor, info);
         }
+        case LayerType::Tile:
+        {
+            auto tileQueueDescriptor = PolymorphicDowncast<const TileQueueDescriptor*>(&descriptor);
+            return std::make_unique<NeonTileWorkload>(*tileQueueDescriptor, info);
+        }
         case LayerType::Transpose :
         {
             auto transposeQueueDescriptor = PolymorphicDowncast<const TransposeQueueDescriptor*>(&descriptor);

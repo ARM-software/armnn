@@ -53,7 +53,6 @@ void TileFloat32Test(std::vector<armnn::BackendId>& backends)
                      expectedOutputShape);
 }
 
-#if defined(TILE_GPUACC)
 TEST_SUITE("TileTests_GpuAccTests")
 {
 
@@ -64,7 +63,6 @@ TEST_SUITE("TileTests_GpuAccTests")
     }
 
 } // TEST_SUITE("Tile_Float32_GpuAcc_Test")
-#endif
 
 TEST_SUITE("TileTests_CpuAccTests")
 {

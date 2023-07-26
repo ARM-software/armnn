@@ -81,6 +81,7 @@
 #include "workloads/ClStackWorkload.hpp"
 #include "workloads/ClStridedSliceWorkload.hpp"
 #include "workloads/ClSubtractionWorkload.hpp"
+#include "workloads/ClTileWorkload.hpp"
 #include "workloads/ClTransposeConvolution2dWorkload.hpp"
 #include "workloads/ClTransposeWorkload.hpp"
 #include "workloads/ClUnidirectionalSequenceLstmFloatWorkload.hpp"
@@ -627,6 +628,11 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
             ARMNN_NO_DEPRECATE_WARN_BEGIN
             return IsSubtractionSupported(infos[0], infos[1], infos[2], reasonIfUnsupported);
             ARMNN_NO_DEPRECATE_WARN_END
+        case LayerType::Tile:
+            return IsTileSupported(infos[0],
+                                   infos[1],
+                                   *(PolymorphicDowncast<const TileDescriptor*>(&descriptor)),
+                                   reasonIfUnsupported);
         case LayerType::Transpose:
             return IsTransposeSupported(infos[0],
                                         infos[1],
@@ -1525,6 +1531,18 @@ bool ClLayerSupport::IsSubtractionSupported(const TensorInfo& input0,
                                    input1,
                                    output,
                                    nullptr);
+}
+
+bool ClLayerSupport::IsTileSupported(const TensorInfo& input,
+                                     const TensorInfo& output,
+                                     const TileDescriptor& descriptor,
+                                     Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClTileWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsTransposeConvolution2dSupported(const TensorInfo& input,

@@ -131,6 +131,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClStridedSliceWorkload.hpp
     ClSubtractionWorkload.cpp
     ClSubtractionWorkload.hpp
+    ClTileWorkload.cpp
+    ClTileWorkload.hpp
     ClTransposeConvolution2dWorkload.cpp
     ClTransposeConvolution2dWorkload.hpp
     ClTransposeWorkload.cpp

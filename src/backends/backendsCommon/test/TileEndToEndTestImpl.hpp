@@ -32,25 +32,25 @@ void TileEndToEnd(const std::vector<BackendId>& backends)
     int32_t qOffset = 0;
     bool    qConst  = true;
 
-    const TensorShape inputTensorShape =  { 2, 3 };
-    const TensorShape outputTensorShape = { 4, 6 };
+    const TensorShape inputTensorShape =  { 6 };
+    const TensorShape outputTensorShape = { 30 };
 
     TensorInfo inputInfo  (inputTensorShape, ArmnnType, qScale, qOffset, qConst);
     TensorInfo outputInfo (outputTensorShape, ArmnnType,qScale, qOffset);
 
     std::vector<T> inputData = armnnUtils::QuantizedVector<T>({
-        0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f
+        65, 144, 91, 161, 56, 73
     }, qScale, qOffset);
 
     std::vector<T> expectedOutputData = armnnUtils::QuantizedVector<T>({
-        0.f, 1.f, 2.f, 0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f, 3.f, 4.f, 5.f,
-        0.f, 1.f, 2.f, 0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f, 3.f, 4.f, 5.f
+        65, 144, 91, 161, 56, 73,
+        65, 144, 91, 161, 56, 73,
+        65, 144, 91, 161, 56, 73,
+        65, 144, 91, 161, 56, 73,
+        65, 144, 91, 161, 56, 73
     }, qScale, qOffset);
 
-    auto descriptor = armnn::TileDescriptor(std::vector<uint32_t>{ 2, 2 });
+    auto descriptor = armnn::TileDescriptor(std::vector<uint32_t>{ 5 });
     INetworkPtr network = CreateTileNetwork(descriptor, inputInfo, outputInfo);
 
     std::map<int, std::vector<T>> inputTensor          = { { 0, inputData  } };

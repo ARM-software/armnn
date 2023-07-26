@@ -343,6 +343,11 @@ public:
                                            const Optional<TensorInfo>& biases,
                                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    bool IsTileSupported(const TensorInfo& input,
+                         const TensorInfo& output,
+                         const TileDescriptor& descriptor,
+                         Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
     bool IsTransposeSupported(const TensorInfo& input,
                               const TensorInfo& output,
                               const TransposeDescriptor& descriptor,

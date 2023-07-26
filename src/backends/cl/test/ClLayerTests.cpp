@@ -2033,6 +2033,24 @@ ARMNN_AUTO_TEST_FIXTURE(DequantizeSimpleInt16, ClContextControlFixture, Dequanti
 ARMNN_AUTO_TEST_FIXTURE(DequantizeSimpleUint8ToFp16, ClContextControlFixture, DequantizeSimpleUint8ToFp16Test)
 ARMNN_AUTO_TEST_FIXTURE(DequantizeSimpleInt16ToFp16, ClContextControlFixture, DequantizeSimpleInt16ToFp16Test)
 
+//Tile
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile1dTestFloat32, ClContextControlFixture, Tile1dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile2dTestFloat32, ClContextControlFixture, Tile2dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile3dTestFloat32, ClContextControlFixture, Tile3dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile4dTestFloat32, ClContextControlFixture, Tile4dTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile1dTestFloat16, ClContextControlFixture, Tile1dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile2dTestFloat16, ClContextControlFixture, Tile2dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile3dTestFloat16, ClContextControlFixture, Tile3dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile4dTestFloat16, ClContextControlFixture, Tile4dTest<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile1dTestInt8, ClContextControlFixture, Tile1dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile2dTestInt8, ClContextControlFixture, Tile2dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile3dTestInt8, ClContextControlFixture, Tile3dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile4dTestInt8, ClContextControlFixture, Tile4dTest<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile1dTestUint8, ClContextControlFixture, Tile1dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile2dTestUint8, ClContextControlFixture, Tile2dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile3dTestUint8, ClContextControlFixture, Tile3dTest<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile4dTestUint8, ClContextControlFixture, Tile4dTest<DataType::QAsymmU8>)
+
 // Transpose
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
     SimpleTransposeFloat32, ClContextControlFixture, SimpleTransposeTest<DataType::Float32>)

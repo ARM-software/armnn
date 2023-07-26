@@ -110,13 +110,13 @@ LayerTestResult<T, 2> Tile2dTest(armnn::IWorkloadFactory& workloadFactory,
                                  const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
                                  const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::TileDescriptor(std::vector<uint32_t>{ 2, 2 });
+    auto descriptor = armnn::TileDescriptor(std::vector<uint32_t>{ 2, 5 });
 
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
     armnn::TensorShape inputShape  = { 2, 3 };
-    armnn::TensorShape outputShape = { 4, 6 };
+    armnn::TensorShape outputShape = { 4, 15 };
 
     armnn::TensorInfo inputInfo(inputShape, ArmnnType);
     armnn::TensorInfo outputInfo(outputShape, ArmnnType);
@@ -130,11 +130,11 @@ LayerTestResult<T, 2> Tile2dTest(armnn::IWorkloadFactory& workloadFactory,
 
     std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(
     {
-        0.f, 1.f, 2.f, 0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f, 3.f, 4.f, 5.f,
+        0.f, 1.f, 2.f, 0.f, 1.f, 2.f, 0.f, 1.f, 2.f, 0.f, 1.f, 2.f, 0.f, 1.f, 2.f,
+        3.f, 4.f, 5.f, 3.f, 4.f, 5.f, 3.f, 4.f, 5.f, 3.f, 4.f, 5.f, 3.f, 4.f, 5.f,
 
-        0.f, 1.f, 2.f, 0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f, 3.f, 4.f, 5.f
+        0.f, 1.f, 2.f, 0.f, 1.f, 2.f, 0.f, 1.f, 2.f, 0.f, 1.f, 2.f, 0.f, 1.f, 2.f,
+        3.f, 4.f, 5.f, 3.f, 4.f, 5.f, 3.f, 4.f, 5.f, 3.f, 4.f, 5.f, 3.f, 4.f, 5.f
     }, qScale, qOffset);
 
     return TileTestImpl<T, 2>(workloadFactory,
@@ -152,37 +152,49 @@ LayerTestResult<T, 3> Tile3dTest(armnn::IWorkloadFactory& workloadFactory,
                                  const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
                                  const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    auto descriptor = armnn::TileDescriptor(std::vector<uint32_t>{ 1, 2, 1 });
+    auto descriptor = armnn::TileDescriptor(std::vector<uint32_t>{ 1, 5, 5 });
 
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
-    armnn::TensorShape inputShape  = { 2, 2, 3 };
-    armnn::TensorShape outputShape = { 2, 4, 3 };
+    armnn::TensorShape inputShape  = { 2, 2, 2 };
+    armnn::TensorShape outputShape = { 2, 10, 10 };
 
     armnn::TensorInfo inputInfo(inputShape, ArmnnType);
     armnn::TensorInfo outputInfo(outputShape, ArmnnType);
     std::vector<T> input = armnnUtils::QuantizedVector<T>(
     {
-        0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f,
+        1.1f, 2.12f,
+        3.3f, 4.12234f,
 
-        6.f,  7.f,  8.f,
-        9.f, 10.f, 11.f
+        1.1f, 2.12f,
+        3.3f, 4.12234f,
     }, qScale, qOffset);
 
 
     std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(
     {
-        0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f,
-        0.f, 1.f, 2.f,
-        3.f, 4.f, 5.f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
 
-        6.f,  7.f,  8.f,
-        9.f, 10.f, 11.f,
-        6.f,  7.f,  8.f,
-        9.f, 10.f, 11.f
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f,
+        1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f, 1.1f, 2.12f,
+        3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f, 3.3f, 4.12234f
     }, qScale, qOffset);
 
     return TileTestImpl<T, 3>(workloadFactory,

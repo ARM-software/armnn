@@ -90,6 +90,7 @@ BACKEND_SOURCES := \
         workloads/ClStackWorkload.cpp \
         workloads/ClStridedSliceWorkload.cpp \
         workloads/ClSubtractionWorkload.cpp \
+        workloads/ClTileWorkload.cpp \
         workloads/ClTransposeConvolution2dWorkload.cpp \
         workloads/ClTransposeWorkload.cpp \
         workloads/ClUnidirectionalSequenceLstmFloatWorkload.cpp

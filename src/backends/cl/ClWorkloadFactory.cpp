@@ -755,6 +755,11 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
             auto subtractionQueueDescriptor = PolymorphicDowncast<const SubtractionQueueDescriptor*>(&descriptor);
             return MakeWorkload<ClSubtractionWorkload>(*subtractionQueueDescriptor, info, m_CLCompileContext);
         }
+        case LayerType::Tile:
+        {
+            auto tileQueueDescriptor = PolymorphicDowncast<const TileQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClTileWorkload>(*tileQueueDescriptor, info, m_CLCompileContext);
+        }
         case LayerType::Transpose :
         {
             auto transposeQueueDescriptor = PolymorphicDowncast<const TransposeQueueDescriptor*>(&descriptor);

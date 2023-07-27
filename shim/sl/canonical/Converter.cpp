@@ -170,6 +170,8 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
             return ConvertStridedSlice(operation, model, data);
         case OperationType::SUB:
             return ConvertElementwiseBinary(operation, model, data, BinaryOperation::Sub);
+        case OperationType::TILE:
+            return ConvertTile(operation, model, data);
         case OperationType::TRANSPOSE:
             return ConvertTranspose(operation, model, data);
         case OperationType::TRANSPOSE_CONV_2D:
@@ -5133,6 +5135,74 @@ bool Converter::ConvertTanH(const Operation& operation, const Model& model, Conv
     desc.m_B = 1.0f; // set to 1.0f for unity scaling
 
     return ConvertToActivation(operation, __func__, desc, model, data);
+}
+
+bool Converter::ConvertTile(const Operation& operation, const Model& model, ConversionData& data)
+{
+    VLOG(DRIVER) << "Converter::ConvertTile()";
+
+    LayerInputHandle input = ConvertToLayerInputHandle(operation, 0, model, data);
+    if (!input.IsValid())
+    {
+        return Fail("%s: Operation has invalid inputs", __func__);
+    }
+    const armnn::TensorInfo& inputInfo = input.GetTensorInfo();
+
+    const Operand* outputOperand = GetOutputOperand(operation, 0, model);
+    if (!outputOperand)
+    {
+        return Fail("%s: Operation has no outputs", __func__);
+    }
+    const TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
+
+    const Operand* multiplesOperand = GetInputOperand(operation, 1, model);
+    if (!multiplesOperand)
+    {
+        return Fail("%s: Could not read input 1", __func__);
+    }
+    std::vector<int32_t> multiples;
+    if (!GetTensorInt32Values(*multiplesOperand, multiples, model, data))
+    {
+        return Fail("%s: Input 1 has invalid values", __func__);
+    }
+
+    TileDescriptor descriptor;
+    descriptor.m_Multiples.assign(multiples.begin(), multiples.end());
+
+    bool isSupported = false;
+    armnn::BackendId setBackend;
+    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
+    {
+        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+                                   IsTileSupported,
+                                   data.m_Backends,
+                                   isSupported,
+                                   setBackend,
+                                   inputInfo,
+                                   outputInfo,
+                                   descriptor);
+    };
+
+    if(IsDynamicTensor(outputInfo))
+    {
+        isSupported = AreDynamicTensorsSupported();
+    }
+    else
+    {
+        validateFunc(outputInfo, isSupported);
+    }
+
+    if (!isSupported)
+    {
+        return false;
+    }
+
+    IConnectableLayer* const layer = data.m_Network->AddTileLayer(descriptor);
+    layer->SetBackendId(setBackend);
+    assert(layer != nullptr);
+    input.Connect(layer->GetInputSlot(0));
+
+    return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
 }
 
 bool Converter::ConvertTransposeConv2d(const Operation& operation, const Model& model, ConversionData& data)

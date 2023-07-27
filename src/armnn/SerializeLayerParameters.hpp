@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd. All rights reserved.
+// Copyright © 2017,2022-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -187,6 +187,11 @@ template <> struct StringifyLayerParameters<StridedSliceDescriptor>
 template <> struct StringifyLayerParameters<SoftmaxDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const SoftmaxDescriptor& desc);
+};
+
+template <> struct StringifyLayerParameters<TileDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const TileDescriptor& desc);
 };
 
 template <> struct StringifyLayerParameters<TransposeConvolution2dDescriptor>

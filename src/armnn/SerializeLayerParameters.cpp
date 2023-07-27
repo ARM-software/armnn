@@ -558,6 +558,23 @@ void StringifyLayerParameters<StridedSliceDescriptor>::Serialize(ParameterString
     fn("DataLayout", GetDataLayoutName(desc.m_DataLayout));
 }
 
+void StringifyLayerParameters<TileDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                         const TileDescriptor& desc)
+{
+    std::stringstream ss;
+    int count = 0;
+    for (auto&& var : desc.m_Multiples)
+    {
+        if (count > 0)
+        {
+            ss << ",";
+        }
+        ss << var;
+        ++count;
+    }
+    fn("Multiples", ss.str());
+}
+
 void StringifyLayerParameters<TransposeConvolution2dDescriptor>::Serialize(
     ParameterStringifyFunction& fn,
     const TransposeConvolution2dDescriptor& desc)

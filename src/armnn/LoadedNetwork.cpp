@@ -451,8 +451,12 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                 m_InputWorkloadSlotPairs[bindingId].emplace_back(WorkloadIndices{
                         armnn::numeric_cast<unsigned int>(workloadIndex), inputSlot->GetSlotIndex()});
 
-                auto workload = m_WorkloadQueue[m_InputWorkloadSlotPairs[bindingId].back().m_WorkloadIndex].get();
-                supportsReplacement &= workload->SupportsTensorHandleReplacement();
+                // Avoid if input is connected directly to an output
+                if (inputSlot->GetOwningLayer().GetType() != LayerType::Output)
+                {
+                    auto workload = m_WorkloadQueue[m_InputWorkloadSlotPairs[bindingId].back().m_WorkloadIndex].get();
+                    supportsReplacement &= workload->SupportsTensorHandleReplacement();
+                }
             }
 
             ITensorHandleFactory::FactoryId factoryId = layer->GetOutputSlot(0).GetTensorHandleFactoryId();
@@ -482,44 +486,49 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
             const auto outputSlot = layer->GetInputSlot(0).GetConnectedOutputSlot();
             auto& indices = m_OutputWorkloadSlotPairs[bindingId];
 
-            auto workloadIndex = std::distance(order.begin(), order.GetPosInGraph(outputSlot->GetOwningLayer()));
-            workloadIndex -= noOfInputs;
-
-            indices.m_OutputSlotIndices = WorkloadIndices{numeric_cast<unsigned int>(workloadIndex),
-                                                          outputSlot->CalculateIndexOnOwner()};
-
-            bool supportsReplacement = true;
-            auto outputWorkload = m_WorkloadQueue[indices.m_OutputSlotIndices.m_WorkloadIndex].get();
-            supportsReplacement &= outputWorkload->SupportsTensorHandleReplacement();
-
-            for (auto &inputSlot: outputSlot->GetConnections())
+            // Avoid if output is connected directly to an input
+            if (outputSlot->GetOwningLayer().GetType() != LayerType::Input)
             {
-                if(inputSlot->GetOwningLayer().GetType() != LayerType::Output)
+                auto workloadIndex = std::distance(order.begin(), order.GetPosInGraph(outputSlot->GetOwningLayer()));
+                workloadIndex -= noOfInputs;
+
+                indices.m_OutputSlotIndices = WorkloadIndices{numeric_cast<unsigned int>(workloadIndex),
+                                                              outputSlot->CalculateIndexOnOwner()};
+
+                bool supportsReplacement = true;
+                auto outputWorkload = m_WorkloadQueue[indices.m_OutputSlotIndices.m_WorkloadIndex].get();
+                supportsReplacement &= outputWorkload->SupportsTensorHandleReplacement();
+
+                for (auto &inputSlot: outputSlot->GetConnections())
                 {
-                    auto inWorkloadIndex = std::distance(order.begin(),
-                                                         order.GetPosInGraph(inputSlot->GetOwningLayer()));
-                    inWorkloadIndex -= noOfInputs;
-                    indices.m_InputSlotIndices.emplace_back(WorkloadIndices{numeric_cast<unsigned int>(inWorkloadIndex),
-                                                            inputSlot->GetSlotIndex()});
-                    auto inputWorkload = m_WorkloadQueue[indices.m_InputSlotIndices.back().m_WorkloadIndex].get();
-                    supportsReplacement &= inputWorkload->SupportsTensorHandleReplacement();
+                    if (inputSlot->GetOwningLayer().GetType() != LayerType::Output)
+                    {
+                        auto inWorkloadIndex = std::distance(order.begin(),
+                                                             order.GetPosInGraph(inputSlot->GetOwningLayer()));
+                        inWorkloadIndex -= noOfInputs;
+                        indices.m_InputSlotIndices.emplace_back(
+                                WorkloadIndices{numeric_cast<unsigned int>(inWorkloadIndex),
+                                                inputSlot->GetSlotIndex()});
+                        auto inputWorkload = m_WorkloadQueue[indices.m_InputSlotIndices.back().m_WorkloadIndex].get();
+                        supportsReplacement &= inputWorkload->SupportsTensorHandleReplacement();
+                    }
                 }
-            }
 
-            ITensorHandleFactory::FactoryId factoryId = outputSlot->GetTensorHandleFactoryId();
-            // Get matching import factory Id
-            ITensorHandleFactory::FactoryId importFactoryId =
-                    m_TensorHandleFactoryRegistry.GetMatchingImportFactoryId(factoryId);
-            ITensorHandleFactory *importFactory = m_TensorHandleFactoryRegistry.GetFactory(importFactoryId);
+                ITensorHandleFactory::FactoryId factoryId = outputSlot->GetTensorHandleFactoryId();
+                // Get matching import factory Id
+                ITensorHandleFactory::FactoryId importFactoryId =
+                        m_TensorHandleFactoryRegistry.GetMatchingImportFactoryId(factoryId);
+                ITensorHandleFactory *importFactory = m_TensorHandleFactoryRegistry.GetFactory(importFactoryId);
 
-            if (supportsReplacement && importFactory)
-            {
-                m_PreImportedOutputHandles.emplace_back(
-                        bindingId, importFactory->CreateTensorHandle(outputSlot->GetTensorInfo(), false));
-            }
-            else
-            {
-                m_PreImportedOutputHandles.emplace_back(bindingId, nullptr);
+                if (supportsReplacement && importFactory)
+                {
+                    m_PreImportedOutputHandles.emplace_back(
+                            bindingId, importFactory->CreateTensorHandle(outputSlot->GetTensorInfo(), false));
+                }
+                else
+                {
+                    m_PreImportedOutputHandles.emplace_back(bindingId, nullptr);
+                }
             }
         }
     }

@@ -4,13 +4,13 @@ This directory contains the Arm NN Support Library for the Android Neural Networ
 
 # Passing parameters to the support library runtime.
 
-The support library inherits it's parameters from the Arm NN Android Neural Networks driver. Parameters are passed to it through an environment variable, ARMNN_SL_OPTIONS. A full list of parameters are available ./canonical/DriverOptions.cpp.
+The support library inherits its parameters from the Arm NN Android Neural Networks driver. Parameters are passed to it through an environment variable, ARMNN_SL_OPTIONS. A full list of parameters are available ./canonical/DriverOptions.cpp.
 
 # Sample usage
 
 ## Running NeuralNetworksSupportLibraryTest
 
-This test suite takes as it's first argument the path to a shared object implementation of the support library. Any library dependencies should be resolvable through the LD_LIBRARY_PATH mechanism. Setting ARMNN_SL_OPTIONS will pass parameters to the Arm NN Support Library Neural Networks driver.
+This test suite takes as its first argument the path to a shared object implementation of the support library. Any library dependencies should be resolvable through the LD_LIBRARY_PATH mechanism. Setting ARMNN_SL_OPTIONS will pass parameters to the Arm NN Support Library Neural Networks driver.
 
 Here we assume that Bash is the current shell and specify "-v" to enable verbose logging and "-c CpuAcc" to direct that the Neon(TM) accelerator be used.
 ~~~

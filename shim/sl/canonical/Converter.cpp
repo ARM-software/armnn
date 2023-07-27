@@ -150,6 +150,8 @@ bool Converter::ConvertOperation(const Operation& operation, const Model& model,
             return ConvertResize(operation, model, data, ResizeMethod::Bilinear);
         case OperationType::RESIZE_NEAREST_NEIGHBOR:
             return ConvertResize(operation, model, data, ResizeMethod::NearestNeighbor);
+        case OperationType::REVERSE:
+            return ConvertReverseV2(operation, model, data);
         case OperationType::RSQRT:
             return ConvertElementwiseUnary(operation, model, data, UnaryOperation::Rsqrt);
         case OperationType::SIN:
@@ -4785,6 +4787,63 @@ bool Converter::ConvertResize(const Operation& operation,
     layer->SetBackendId(setBackend);
     assert(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
+
+    return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
+}
+
+bool Converter::ConvertReverseV2(const Operation& operation, const Model& model, ConversionData& data)
+{
+    VLOG(DRIVER) << "Converter::ConvertReverseV2()";
+
+    LayerInputHandle input0 = ConvertToLayerInputHandle(operation, 0, model, data);
+    LayerInputHandle input1 = ConvertToLayerInputHandle(operation, 1, model, data);
+    if (!input0.IsValid() || !input1.IsValid())
+    {
+        return Fail("%s: Operation has invalid inputs", __func__);
+    }
+    const armnn::TensorInfo& inputInfo0 = input0.GetTensorInfo();
+    const armnn::TensorInfo& inputInfo1 = input1.GetTensorInfo();
+
+    const Operand* outputOperand = GetOutputOperand(operation, 0, model);
+    if (!outputOperand)
+    {
+        return Fail("%s: Could not read output 0", __func__);
+    }
+    const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*outputOperand);
+
+    bool isSupported = false;
+    armnn::BackendId setBackend;
+    auto validateFunc = [&](const armnn::TensorInfo& outputInfo, bool& isSupported)
+    {
+        FORWARD_LAYER_SUPPORT_FUNC(__func__,
+                                   IsReverseV2Supported,
+                                   data.m_Backends,
+                                   isSupported,
+                                   setBackend,
+                                   inputInfo0,
+                                   inputInfo1,
+                                   outputInfo);
+    };
+
+    if(!IsDynamicTensor(outputInfo))
+    {
+        validateFunc(outputInfo, isSupported);
+    }
+    else
+    {
+        isSupported = AreDynamicTensorsSupported();
+    }
+
+    if (!isSupported)
+    {
+        return false;
+    }
+
+    armnn::IConnectableLayer* const layer = data.m_Network->AddReverseV2Layer();
+    layer->SetBackendId(setBackend);
+    assert(layer != nullptr);
+    input0.Connect(layer->GetInputSlot(0));
+    input1.Connect(layer->GetInputSlot(1));
 
     return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
 }

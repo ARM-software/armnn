@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -48,20 +48,13 @@ struct INetworkProperties
                        bool profilingEnabled = false,
                        ProfilingDetailsMethod detailsMethod = ProfilingDetailsMethod::Undefined,
                        bool externalMemoryManagementEnabled = false)
-        : m_ImportEnabled(inputSource != MemorySource::Undefined),
-          m_ExportEnabled(outputSource != MemorySource::Undefined),
-          m_AsyncEnabled(asyncEnabled),
+        : m_AsyncEnabled(asyncEnabled),
           m_ProfilingEnabled(profilingEnabled),
           m_OutputNetworkDetailsMethod(detailsMethod),
           m_InputSource(inputSource),
           m_OutputSource(outputSource),
           m_ExternalMemoryManagementEnabled(externalMemoryManagementEnabled)
     {}
-
-    /// Deprecated and will be removed in future release.
-    const bool m_ImportEnabled;
-    /// Deprecated and will be removed in future release.
-    const bool m_ExportEnabled;
 
     const bool m_AsyncEnabled;
 

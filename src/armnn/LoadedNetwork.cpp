@@ -314,7 +314,8 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     // to false when creating TensorHandles
                     layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
                                                workloadFactory,
-                                               !supportsExternalManager && !m_NetworkProperties.m_ImportEnabled);
+                                               !supportsExternalManager &&
+                                               (m_NetworkProperties.m_InputSource == MemorySource::Undefined));
                     break;
                 }
                 case LayerType::Constant:
@@ -332,7 +333,8 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                     {
                         layer->CreateTensorHandles(m_TensorHandleFactoryRegistry,
                                                    workloadFactory,
-                                                   !supportsExternalManager && !m_NetworkProperties.m_ExportEnabled);
+                                                   !supportsExternalManager &&
+                                                   (m_NetworkProperties.m_OutputSource == MemorySource::Undefined));
                     }
                     else
                     {
@@ -1067,7 +1069,7 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
 
     MemorySourceFlags importFlags = outputTensorHandle->GetImportFlags();
     bool needMemCopy = true;
-    if (m_NetworkProperties.m_ImportEnabled)  // Try import the input tensor
+    if ((m_NetworkProperties.m_InputSource != MemorySource::Undefined))  // Try import the input tensor
     {
         if(CheckFlag(importFlags, m_NetworkProperties.m_InputSource))
         {
@@ -1136,9 +1138,9 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     // b) The tensor has zero padding
     // c) There is only one connection to the OutputSlot and it is to an OutputLayer.
     // d) The output pointer is allocated via malloc. (Other types will be supported in a later release)
-    // e) m_IsExportEnabled must be set to true
+    // e) m_NetworkProperties.m_OutputSource != MemorySource::Undefined
     bool needMemCopy = true;
-    if (m_NetworkProperties.m_ExportEnabled &&
+    if (m_NetworkProperties.m_OutputSource != MemorySource::Undefined &&
         (layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetNumConnections() == 1))
     {
         if(layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer().GetType() != LayerType::Input)
@@ -1313,7 +1315,7 @@ bool LoadedNetwork::Execute(std::unique_ptr<TimelineUtilityMethods>& timelineUti
 
 void LoadedNetwork::EnqueueInput(const ConstTensor& inputTensor, ITensorHandle* inputTensorHandle)
 {
-    if (m_NetworkProperties.m_ImportEnabled)  // Try import the input tensor
+    if (m_NetworkProperties.m_InputSource != MemorySource::Undefined)  // Try import the input tensor
     {
         MemorySourceFlags importFlags = inputTensorHandle->GetImportFlags();
         if (CheckFlag(importFlags, m_NetworkProperties.m_InputSource) )
@@ -1874,7 +1876,7 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
     }
     {
         ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "PrepareOutputs");
-        if (m_NetworkProperties.m_ExportEnabled)
+        if (m_NetworkProperties.m_OutputSource != MemorySource::Undefined)
         {
             for (auto pair: outputTensors)
             {
@@ -1938,7 +1940,7 @@ Status LoadedNetwork::Execute(const InputTensors& inputTensors,
         throw;
     }
 
-    if (!m_NetworkProperties.m_ExportEnabled)
+    if (m_NetworkProperties.m_OutputSource == MemorySource::Undefined)
     {
         for (auto pair: outputTensors)
         {
@@ -2024,7 +2026,7 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
             // Input layers/workloads will not be executed so the descriptor is not added to workingMemDescriptors
             // However we will still need to manage the tensorHandle
             isInputLayer = true;
-            isMemoryManaged = !m_NetworkProperties.m_ImportEnabled;
+            isMemoryManaged = m_NetworkProperties.m_InputSource == MemorySource::Undefined;
         }
         else if (layer->GetType() == LayerType::Output)
         {
@@ -2044,7 +2046,7 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
                     {
                         isConnectedToOutputLayer = true;
                         // If Export is enabled disable memory management, so we can export, otherwise we do a copy
-                        isMemoryManaged = !m_NetworkProperties.m_ExportEnabled;
+                        isMemoryManaged = m_NetworkProperties.m_OutputSource == MemorySource::Undefined;
                     }
                     else
                     {

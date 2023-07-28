@@ -46,7 +46,7 @@ public:
     bool IsAdditionSupported(const TensorInfo& input0,
                              const TensorInfo& input1,
                              const TensorInfo& output,
-                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const override
+                             Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const
     {
         IgnoreUnused(input0);
         IgnoreUnused(input1);
@@ -56,7 +56,7 @@ public:
     }
 
     bool IsInputSupported(const TensorInfo& input,
-                          Optional<std::string&> reasonIfUnsupported) const override
+                          Optional<std::string&> reasonIfUnsupported) const
     {
         IgnoreUnused(input);
         IgnoreUnused(reasonIfUnsupported);
@@ -64,7 +64,7 @@ public:
     }
 
     bool IsOutputSupported(const TensorInfo& output,
-                           Optional<std::string&> reasonIfUnsupported) const override
+                           Optional<std::string&> reasonIfUnsupported) const
     {
         IgnoreUnused(output);
         IgnoreUnused(reasonIfUnsupported);

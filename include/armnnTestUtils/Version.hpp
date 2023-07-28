@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,7 +10,7 @@
 #define STRINGIFY_MACRO(s) #s
 
 // ArmnnTestUtils version components
-#define ARMNN_TEST_UTILS_MAJOR_VERSION 2
+#define ARMNN_TEST_UTILS_MAJOR_VERSION 3
 #define ARMNN_TEST_UTILS_MINOR_VERSION 0
 #define ARMNN_TEST_UTILS_PATCH_VERSION 0
 

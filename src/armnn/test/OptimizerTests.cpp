@@ -166,13 +166,13 @@ public:
     }
 
     bool IsInputSupported(const TensorInfo& /*input*/,
-                          Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+                          Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
     {
         return true;
     }
 
     bool IsOutputSupported(const TensorInfo& /*input*/,
-                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
     {
         return true;
     }
@@ -180,7 +180,7 @@ public:
     bool IsActivationSupported(const TensorInfo& /*input0*/,
                                const TensorInfo& /*output*/,
                                const ActivationDescriptor& /*descriptor*/,
-                               Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+                               Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
     {
         return true;
     }

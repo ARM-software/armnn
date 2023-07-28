@@ -331,13 +331,13 @@ public:
     }
 
     bool IsInputSupported(const TensorInfo& /*input*/,
-                          Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+                          Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
     {
         return true;
     }
 
     bool IsOutputSupported(const TensorInfo& /*input*/,
-                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
     {
         return true;
     }
@@ -345,7 +345,7 @@ public:
     bool IsAdditionSupported(const TensorInfo& /*input0*/,
                              const TensorInfo& /*input1*/,
                              const TensorInfo& /*output*/,
-                             Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+                             Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
     {
         return true;
     }
@@ -355,7 +355,7 @@ public:
                                   const Convolution2dDescriptor& /*descriptor*/,
                                   const TensorInfo& /*weights*/,
                                   const Optional<TensorInfo>& /*biases*/,
-                                  Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const override
+                                  Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
     {
         return true;
     }

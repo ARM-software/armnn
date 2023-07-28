@@ -18,7 +18,6 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
-#include <armnn/LayerSupport.hpp>
 
 // armnnUtils:
 #include <armnnUtils/Permute.hpp>

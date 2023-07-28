@@ -396,6 +396,21 @@ public:
 
     %feature("docstring",
         "
+        Adds a Batch Matrix Multiplication layer to the network.
+
+        Args:
+            desc (BatchMatMulDescriptor): Parameters for the BatchMatMul layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddBatchMatMulLayer;
+    armnn::IConnectableLayer* AddBatchMatMulLayer(const armnn::BatchMatMulDescriptor& desc,
+        const char* name = nullptr);
+
+
+    %feature("docstring",
+        "
         Adds a Batch Normalization layer to the network.
 
         Args:
@@ -592,6 +607,20 @@ public:
             IConnectableLayer: Interface for configuring the layer.
         ") AddDivisionLayer;
     armnn::IConnectableLayer* AddDivisionLayer(const char* name = nullptr);
+
+    %feature("docstring",
+        "
+        Adds an Elementwise Binary layer to the network. Type of binary operation to use is decided by elementwiseBinaryDescriptor. Binary operations supported are (Add, Div, Maximum, Minimum, Mul, Sub, SqDiff, Power)
+
+        Args:
+            elementwiseBinaryDescriptor (ElementwiseBinaryDescriptor): ElementwiseBinaryDescriptor to configure the choice of binary operation added to the network.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddElementwiseBinaryLayer;
+    armnn::IConnectableLayer* AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseBinaryDescriptor,
+                                                       const char* name = nullptr);
 
     %feature("docstring",
         "
@@ -943,6 +972,18 @@ public:
 
     %feature("docstring",
         "
+        Adds a ReverseV2 layer to the network.
+
+        Args:
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddReverseV2Layer;
+    armnn::IConnectableLayer* AddReverseV2Layer(const char* name = nullptr);
+
+    %feature("docstring",
+        "
         Adds a Shape layer to the network.
 
         Args:
@@ -1119,6 +1160,20 @@ public:
         ") AddLogicalBinaryLayer;
     armnn::IConnectableLayer* AddLogicalBinaryLayer(const armnn::LogicalBinaryDescriptor& logicalBinaryDescriptor,
                                                     const char* name = nullptr);
+
+    %feature("docstring",
+        "
+        Adds a Tile layer to the network.
+
+        Args:
+            tileDescriptor (TileDescriptor): Description of the tile layer.
+            name (str): Optional name for the layer.
+
+        Returns:
+            IConnectableLayer: Interface for configuring the layer.
+        ") AddTileLayer;
+    armnn::IConnectableLayer* AddTileLayer(const armnn::TileDescriptor& tileDescriptor,
+                                                const char* name = nullptr);
 
     %feature("docstring",
         "

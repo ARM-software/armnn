@@ -88,73 +88,49 @@ public:
     /// Move-assignment operator.
     SubgraphView& operator=(SubgraphView&& other);
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIInputSlots() returning"
-                                      " public IInputSlots", "23.08")
-    const InputSlots& GetInputSlots() const;
     const IInputSlots& GetIInputSlots() const;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIOutputSlots() returning"
-                                      " public IOutputSlots", "23.08")
-    const OutputSlots& GetOutputSlots() const;
     const IOutputSlots& GetIOutputSlots() const;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIConnectableLayers() "
-                                      "returning public IConnectableLayers", "23.08")
-    const Layers& GetLayers() const;
     const IConnectableLayers& GetIConnectableLayers() const;
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIInputSlot() returning public "
-                                      "IInputSlot", "23.08")
-    const InputSlot* GetInputSlot(unsigned int index) const;
     const IInputSlot* GetIInputSlot(unsigned int index) const;
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIInputSlot() returning public "
-                                      "IInputSlot", "23.08")
-    InputSlot* GetInputSlot(unsigned int index);
     IInputSlot* GetIInputSlot(unsigned int index);
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIOutputSlot() returning"
-                                      " public IOutputSlot", "23.08")
-    const OutputSlot* GetOutputSlot(unsigned int index) const;
     const IOutputSlot* GetIOutputSlot(unsigned int index) const;
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("This function has been deprecated, please use GetIOutputSlot() returning"
-                                      " public IOutputSlot", "23.08")
+
     OutputSlot* GetOutputSlot(unsigned int index);
     IOutputSlot* GetIOutputSlot(unsigned int index);
 
     unsigned int GetNumInputSlots() const;
     unsigned int GetNumOutputSlots() const;
 
-    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "IConnectableLayerIterator, until that occurs in 23.08; please use "
-                                     "beginIConnectable() returning public IConnectableLayerIterator", "23.08")
-    Iterator begin();
+    IConnectableLayerIterator begin();
+    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be removed; please use "
+                                     "begin() returning public IConnectableIterator", "24.05")
     IConnectableLayerIterator beginIConnectable();
-    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "IConnectableLayerIterator, until that occurs in 23.08; please use "
-                                     "endIConnectable() returning public IConnectableLayerIterator", "23.08")
-    Iterator end();
+    IConnectableLayerIterator end();//
+    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be removed; please use "
+                                     "end() returning public IConnectableLayerIterator", "24.05")
     IConnectableLayerIterator endIConnectable();
+    ConstIConnectableIterator begin() const;
 
-    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
-                                     "beginIConnectable() returning public ConstIConnectableIterator", "23.08")
-    ConstIterator begin() const;
+    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be removed; please use "
+                                     "begin() returning public ConstIConnectableIterator", "24.05")
     ConstIConnectableIterator beginIConnectable() const;
-    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
-                                     "endIConnectable() returning public ConstIConnectableIterator", "23.08")
-    ConstIterator end() const;
+    ConstIConnectableIterator end() const;
+    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be removed; please use "
+                                     "end() returning public ConstIConnectableIterator", "24.05")
     ConstIConnectableIterator endIConnectable() const;
 
-    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
-                                     "cbeginIConnectable() returning public ConstIConnectableIterator", "23.08")
-    ConstIterator cbegin() const;
+    ConstIConnectableIterator cbegin() const;
+    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be removed; please use "
+                                     "cbegin() returning public ConstIterator", "24.05")
     ConstIConnectableIterator cbeginIConnectable() const;
-    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be changed to return an "
-                                     "ConstIConnectableIterator, until that occurs in 23.08; please use "
-                                     "cendIConnectable() returning public ConstIConnectableIterator", "23.08")
-    ConstIterator cend() const;
+
+    ConstIConnectableIterator cend() const;
+    ARMNN_DEPRECATED_MSG_CHANGE_DATE("This function is deprecated and will be removed; please use "
+                                     "cend() returning public ConstIConnectableIterator", "24.05")
     ConstIConnectableIterator cendIConnectable() const;
 
     void Clear();

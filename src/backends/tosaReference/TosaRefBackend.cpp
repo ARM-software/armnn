@@ -92,8 +92,8 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
     std::vector<TosaSerializationOperator*> operators;
     std::vector<TosaSerializationTensor*> tensors;
 
-    auto it = subgraph.endIConnectable();
-    while (it != subgraph.beginIConnectable())
+    auto it = subgraph.end();
+    while (it != subgraph.begin())
     {
         --it;
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));

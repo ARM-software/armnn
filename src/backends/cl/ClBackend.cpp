@@ -295,18 +295,18 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
 {
     OptimizationViews optimizationViews(modelOptions);
 
-    auto it = subgraph.endIConnectable();
+    auto it = subgraph.end();
     bool isFastMathEnabled = false;
     std::map<LayerGuid, Layer*> untouched;
 
-    while (it != subgraph.beginIConnectable())
+    while (it != subgraph.begin())
     {
         --it;
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));
         untouched.insert({base.GetGuid(), &base});
     }
 
-    it = subgraph.endIConnectable();
+    it = subgraph.end();
 #if defined(ARMCOMPUTECL_ENABLED)
     IBackendInternal::IBackendSpecificModelContextPtr modelContextPtr = CreateBackendSpecificModelContext(modelOptions);
 
@@ -319,7 +319,7 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
         }
     }
 #endif
-    while (it != subgraph.beginIConnectable())
+    while (it != subgraph.begin())
     {
         --it;
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));

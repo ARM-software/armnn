@@ -1270,8 +1270,8 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                   SubgraphView& subgraph,
                                   Optional<std::vector<std::string>&> errMessages)
 {
-    SubgraphView::IConnectableLayerIterator firstLayer = subgraph.beginIConnectable();
-    SubgraphView::IConnectableLayerIterator lastLayer  = subgraph.endIConnectable();
+    SubgraphView::IConnectableLayerIterator firstLayer = subgraph.begin();
+    SubgraphView::IConnectableLayerIterator lastLayer  = subgraph.end();
     return AssignBackends(optNetObjPtr,
                           backendSettings,
                           firstLayer,

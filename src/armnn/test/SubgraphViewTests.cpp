@@ -193,41 +193,27 @@ TEST_CASE("SubgraphViewIterators")
 
     SubgraphView subgraph{layer};
 
-    // cbeginIConnectable() and cendIConnectable()
+    // cbegin() and cend()
     bool found = false;
-    if (std::find(subgraph.cbeginIConnectable(), subgraph.cendIConnectable(), layer)
-        != subgraph.cendIConnectable())
+    if (std::find(subgraph.cbegin(), subgraph.cend(), layer)
+        != subgraph.cend())
     {
         found = true;
     }
     CHECK(found);
     found = false;
 
-    // beginIConnectable() and endIConnectable()
-    if (std::find(subgraph.beginIConnectable(), subgraph.endIConnectable(), layer)
-        != subgraph.endIConnectable())
+    // begin() and end()
+    if (std::find(subgraph.begin(), subgraph.end(), layer)
+        != subgraph.end())
     {
         found = true;
-    }
-    CHECK(found);
-    found = false;
-
-    // GetIConnectableLayers returns IConnectableLayers initialized when calling constructor given IConnectableLayers
-    const SubgraphView::IConnectableLayers& subgraphLayers = subgraph.GetIConnectableLayers();
-    for (auto& iConnectableLayer : subgraphLayers)
-    {
-        if (std::string(iConnectableLayer->GetName()) == "input")
-        {
-            found = true;
-        }
     }
     CHECK(found);
     found = false;
 
     // Test GetLayers returns layers initialized when calling constructor given IConnectableLayers
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    const SubgraphView::Layers& subgraphLayersOld = subgraph.GetLayers();
-    ARMNN_NO_DEPRECATE_WARN_END
+    const SubgraphView::IConnectableLayers& subgraphLayersOld = subgraph.GetIConnectableLayers();
     for (auto& layerOld : subgraphLayersOld)
     {
         if (std::string(layerOld->GetName()) == "input")
@@ -260,19 +246,9 @@ TEST_CASE("SubgraphViewSlots")
                                                                             CreateIInputsFrom({convLayer1}, {1, 2}),
                                                                             CreateIOutputsFrom({convLayer2}));
 
-    // Test that both old and new are initialized
+    // Test initialized
     CHECK(subgraph->GetIInputSlots().size() == 1);
     CHECK(subgraph->GetIOutputSlots().size() == 1);
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    CHECK(subgraph->GetInputSlots().size() == 1);
-    CHECK(subgraph->GetOutputSlots().size() == 1);
-
-    // Check old and new pointing to same address
-    CHECK(subgraph->GetOutputSlot(0) == subgraph->GetIOutputSlot(0));
-    CHECK(subgraph->GetInputSlot(0) == subgraph->GetIInputSlot(0));
-    ARMNN_NO_DEPRECATE_WARN_END
-
 }
 
 TEST_CASE("SubgraphViewConstructors")
@@ -304,23 +280,11 @@ TEST_CASE("SubgraphViewConstructors")
     CHECK(subgraph->GetIInputSlots() == subgraph2.GetIInputSlots());
     CHECK(subgraph->GetIOutputSlots() == subgraph2.GetIOutputSlots());
 
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    CHECK(subgraph->GetLayers() == subgraph2.GetLayers());
-    CHECK(subgraph->GetInputSlots() == subgraph2.GetInputSlots());
-    CHECK(subgraph->GetOutputSlots() == subgraph2.GetOutputSlots());
-    ARMNN_NO_DEPRECATE_WARN_END
-
     // Move Constructor
     SubgraphView subgraph3(std::move(subgraph2));
     CHECK(subgraph->GetIConnectableLayers() == subgraph3.GetIConnectableLayers());
     CHECK(subgraph->GetIInputSlots() == subgraph3.GetIInputSlots());
     CHECK(subgraph->GetIOutputSlots() == subgraph3.GetIOutputSlots());
-
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    CHECK(subgraph->GetLayers() == subgraph3.GetLayers());
-    CHECK(subgraph->GetInputSlots() == subgraph3.GetInputSlots());
-    CHECK(subgraph->GetOutputSlots() == subgraph3.GetOutputSlots());
-    ARMNN_NO_DEPRECATE_WARN_END
 
     // Clear
     subgraph.get()->Clear();
@@ -1517,8 +1481,8 @@ TEST_CASE("Random")
             for (auto& subgraph : subgraphs)
             {
                 std::string name = std::to_string(i++);
-                if (std::find(subgraph->cbeginIConnectable(), subgraph->cendIConnectable(), layer)
-                    != subgraph->cendIConnectable())
+                if (std::find(subgraph->cbegin(), subgraph->cend(), layer)
+                    != subgraph->cend())
                 {
                     layerToSubgraph[layer] = subgraph.get();
                     break;
@@ -2082,14 +2046,14 @@ TEST_CASE("SubgraphViewPartialWorkingCopySubstituteSubgraph")
     auto workingCopy = view->GetWorkingCopy();
 
     // First (and only) layer in the subgraph is the Activation
-    CHECK(std::string((*workingCopy.beginIConnectable())->GetName()) == "Activation");
+    CHECK(std::string((*workingCopy.begin())->GetName()) == "Activation");
 
     // Substitute the "Activation" layer for an equivalent layer
     auto activation2 = graph.AddLayer<ActivationLayer>(ActivationDescriptor{}, "Activation2");
-    SubgraphView pattern(*workingCopy.beginIConnectable());
+    SubgraphView pattern(*workingCopy.begin());
     workingCopy.SubstituteSubgraph(pattern, activation2);
 
-    CHECK(std::string((*workingCopy.beginIConnectable())->GetName()) == "Activation2");
+    CHECK(std::string((*workingCopy.begin())->GetName()) == "Activation2");
 }
 
 // Workaround function used to get the original OutputSlot connected to the InputSlot of a SubgraphView

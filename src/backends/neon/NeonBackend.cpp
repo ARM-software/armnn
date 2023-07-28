@@ -144,18 +144,18 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
 {
     OptimizationViews optimizationViews(modelOptions);
 
-    auto it = subgraph.endIConnectable();
+    auto it = subgraph.end();
     std::map<LayerGuid, Layer*> untouched;
 
-    while (it != subgraph.beginIConnectable())
+    while (it != subgraph.begin())
     {
         --it;
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));
         untouched.insert({base.GetGuid(), &base});
     }
 
-    it = subgraph.endIConnectable();
-    while (it != subgraph.beginIConnectable())
+    it = subgraph.end();
+    while (it != subgraph.begin())
     {
         --it;
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));

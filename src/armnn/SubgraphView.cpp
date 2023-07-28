@@ -230,19 +230,9 @@ void SubgraphView::CheckSubgraph()
                               "Sub-graphs cannot contain null or duplicate IConnectableLayers");
 }
 
-const SubgraphView::InputSlots& SubgraphView::GetInputSlots() const
-{
-    return m_InputSlots;
-}
-
 const SubgraphView::IInputSlots& SubgraphView::GetIInputSlots() const
 {
     return m_IInputSlots;
-}
-
-const SubgraphView::OutputSlots& SubgraphView::GetOutputSlots() const
-{
-    return m_OutputSlots;
 }
 
 const SubgraphView::IOutputSlots& SubgraphView::GetIOutputSlots() const
@@ -250,29 +240,14 @@ const SubgraphView::IOutputSlots& SubgraphView::GetIOutputSlots() const
     return m_IOutputSlots;
 }
 
-const InputSlot* SubgraphView::GetInputSlot(unsigned int index) const
-{
-    return m_InputSlots.at(index);
-}
-
 const IInputSlot* SubgraphView::GetIInputSlot(unsigned int index) const
 {
     return m_IInputSlots.at(index);
 }
 
-InputSlot* SubgraphView::GetInputSlot(unsigned int index)
-{
-    return m_InputSlots.at(index);
-}
-
 IInputSlot* SubgraphView::GetIInputSlot(unsigned int index)
 {
     return m_IInputSlots.at(index);
-}
-
-const OutputSlot* SubgraphView::GetOutputSlot(unsigned int index) const
-{
-    return m_OutputSlots.at(index);
 }
 
 const IOutputSlot* SubgraphView::GetIOutputSlot(unsigned int index) const
@@ -300,24 +275,19 @@ unsigned int SubgraphView::GetNumOutputSlots() const
     return armnn::numeric_cast<unsigned int>(m_IOutputSlots.size());
 }
 
-const SubgraphView::Layers& SubgraphView::GetLayers() const
-{
-    return m_Layers;
-}
-
 const SubgraphView::IConnectableLayers& SubgraphView::GetIConnectableLayers() const
 {
     return m_IConnectableLayers;
 }
 
-SubgraphView::Iterator SubgraphView::begin()
+SubgraphView::IConnectableLayerIterator SubgraphView::begin()
 {
-    return m_Layers.begin();
+    return m_IConnectableLayers.begin();
 }
 
-SubgraphView::Iterator SubgraphView::end()
+SubgraphView::IConnectableLayerIterator SubgraphView::end()
 {
-    return m_Layers.end();
+    return m_IConnectableLayers.end();
 }
 
 // IConnectable Duplication to maintain backwards compatibility
@@ -331,14 +301,14 @@ SubgraphView::IConnectableLayerIterator SubgraphView::endIConnectable()
     return m_IConnectableLayers.end();
 }
 
-SubgraphView::ConstIterator SubgraphView::begin() const
+SubgraphView::ConstIConnectableIterator SubgraphView::begin() const
 {
-    return m_Layers.begin();
+    return m_IConnectableLayers.begin();
 }
 
-SubgraphView::ConstIterator SubgraphView::end() const
+SubgraphView::ConstIConnectableIterator SubgraphView::end() const
 {
-    return m_Layers.end();
+    return m_IConnectableLayers.end();
 }
 
 // IConnectable Duplication to maintain backwards compatibility
@@ -352,31 +322,25 @@ SubgraphView::ConstIConnectableIterator SubgraphView::endIConnectable() const
     return m_IConnectableLayers.end();
 }
 
-SubgraphView::ConstIterator SubgraphView::cbegin() const
+SubgraphView::ConstIConnectableIterator SubgraphView::cbegin() const
 {
-    // Ignore deprecated call as this is internal to SubgraphView
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return begin();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
-SubgraphView::ConstIterator SubgraphView::cend() const
+SubgraphView::ConstIConnectableIterator SubgraphView::cend() const
 {
-    // Ignore deprecated call as this is internal to SubgraphView
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
     return end();
-    ARMNN_NO_DEPRECATE_WARN_END
 }
 
 // IConnectable Duplication to maintain backwards compatibility
 SubgraphView::ConstIConnectableIterator SubgraphView::cbeginIConnectable() const
 {
-    return beginIConnectable();
+    return begin();
 }
 
 SubgraphView::ConstIConnectableIterator SubgraphView::cendIConnectable() const
 {
-    return endIConnectable();
+    return end();
 }
 
 void SubgraphView::Clear()

@@ -435,7 +435,7 @@ public:
     /// @param name - Optional name for the layer.
     /// @param desc - Descriptor for the elementwiseBinary operations.
     /// @return - Interface for configuring the layer.
-    IConnectableLayer* AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseUnaryDescriptor,
+    IConnectableLayer* AddElementwiseBinaryLayer(const ElementwiseBinaryDescriptor& elementwiseBinaryDescriptor,
                                                  const char* name = nullptr);
 
     /// Add an ElementwiseUnary layer to the network.

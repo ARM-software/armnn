@@ -2389,19 +2389,41 @@ void TfLiteParserImpl::ParseStridedSlice(size_t subgraphIndex, size_t operatorIn
     BufferRawPtr beginBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
 
     std::vector<int> begin(beginTensorInfo.GetNumElements());
-    ::memcpy(begin.data(), beginBufferPtr->data.data(), beginTensorInfo.GetNumBytes());
+    if (beginBufferPtr->data.data() != nullptr)
+    {
+        ::memcpy(begin.data(), beginBufferPtr->data.data(), beginTensorInfo.GetNumBytes());
+    }
+    else
+    {
+        throw ParseException("ParseStridedSlice: Invalid input - the begin vector is null");
+    }
 
     armnn::TensorInfo endTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 2);
     BufferRawPtr endBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
 
     std::vector<int> end(endTensorInfo.GetNumElements());
-    ::memcpy(end.data(), endBufferPtr->data.data(), endTensorInfo.GetNumBytes());
+    if (endBufferPtr->data.data() != nullptr)
+    {
+        ::memcpy(end.data(), endBufferPtr->data.data(), endTensorInfo.GetNumBytes());
+    }
+    else
+    {
+        throw ParseException("ParseStridedSlice: Invalid input - the end vector is null");
+    }
 
     armnn::TensorInfo strideTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 3);
     BufferRawPtr strideBufferPtr = GetBuffer(m_Model, inputs[3]->buffer);
 
     std::vector<int> stride(strideTensorInfo.GetNumElements());
-    ::memcpy(stride.data(), strideBufferPtr->data.data(), strideTensorInfo.GetNumBytes());
+
+    if (strideBufferPtr->data.data() != nullptr)
+    {
+        ::memcpy(stride.data(), strideBufferPtr->data.data(), strideTensorInfo.GetNumBytes());
+    }
+    else
+    {
+        throw ParseException("ParseStridedSlice: Invalid input - the stride vector is null");
+    }
 
     desc.m_Begin = begin;
     desc.m_End = end;

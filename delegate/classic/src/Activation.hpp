@@ -101,6 +101,14 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
             activationDesc.m_Function = armnn::ActivationFunction::HardSwish;
             break;
         }
+        case kTfLiteBuiltinLeakyRelu:
+        {
+            // Get the alpha param from builtin data
+            auto* leakyReluParameters = reinterpret_cast<TfLiteLeakyReluParams*>(tfLiteNode->builtin_data);
+            activationDesc.m_Function = armnn::ActivationFunction::LeakyReLu;
+            activationDesc.m_A = leakyReluParameters->alpha;
+            break;
+        }
         default:
         {
             return kTfLiteError;

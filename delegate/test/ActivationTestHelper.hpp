@@ -23,7 +23,8 @@ namespace
 
 std::vector<char> CreateActivationTfLiteModel(tflite::BuiltinOperator activationOperatorCode,
                                               tflite::TensorType tensorType,
-                                              const std::vector <int32_t>& tensorShape)
+                                              const std::vector <int32_t>& tensorShape,
+                                              float alpha = 0)
 {
     using namespace tflite;
     flatbuffers::FlatBufferBuilder flatBufferBuilder;
@@ -42,11 +43,24 @@ std::vector<char> CreateActivationTfLiteModel(tflite::BuiltinOperator activation
     // create operator
     const std::vector<int> operatorInputs{0};
     const std::vector<int> operatorOutputs{1};
+
+    // builtin options
+    tflite::BuiltinOptions operatorBuiltinOptionsType = tflite::BuiltinOptions_NONE;
+    flatbuffers::Offset<void> operatorBuiltinOption = 0;
+
+    if (activationOperatorCode == tflite::BuiltinOperator_LEAKY_RELU)
+    {
+        operatorBuiltinOptionsType = tflite::BuiltinOptions_LeakyReluOptions;
+        operatorBuiltinOption = CreateLeakyReluOptions(flatBufferBuilder, alpha).Union();
+    }
+
     flatbuffers::Offset <Operator> unaryOperator =
         CreateOperator(flatBufferBuilder,
                        0,
                        flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
-                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()));
+                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
+                       operatorBuiltinOptionsType,
+                       operatorBuiltinOption);
 
     const std::vector<int> subgraphInputs{0};
     const std::vector<int> subgraphOutputs{1};
@@ -78,13 +92,15 @@ std::vector<char> CreateActivationTfLiteModel(tflite::BuiltinOperator activation
 void ActivationTest(tflite::BuiltinOperator activationOperatorCode,
                     std::vector<armnn::BackendId>& backends,
                     std::vector<float>& inputValues,
-                    std::vector<float>& expectedOutputValues)
+                    std::vector<float>& expectedOutputValues,
+                    float alpha = 0)
 {
     using namespace delegateTestInterpreter;
     std::vector<int32_t> inputShape  { { 4, 1, 4} };
     std::vector<char> modelBuffer = CreateActivationTfLiteModel(activationOperatorCode,
                                                                 ::tflite::TensorType_FLOAT32,
-                                                                inputShape);
+                                                                inputShape,
+                                                                alpha);
 
     // Setup interpreter with just TFLite Runtime.
     auto tfLiteInterpreter = DelegateTestInterpreter(modelBuffer);

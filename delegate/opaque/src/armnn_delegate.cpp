@@ -828,6 +828,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                           tfLiteNode,
                                           nodeIndex,
                                           kTfLiteBuiltinL2Pool2d);
+        case kTfLiteBuiltinLeakyRelu:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinLeakyRelu);
         case kTfLiteBuiltinLess:
             return VisitComparisonOperator(delegateData,
                                            tfLiteContext,

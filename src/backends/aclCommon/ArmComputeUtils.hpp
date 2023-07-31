@@ -11,7 +11,7 @@
 #include <armnn/backends/WorkloadData.hpp>
 
 #include <arm_compute/runtime/FunctionDescriptors.h>
-#include <arm_compute/core/FullyConnectedLayerInfo.h>
+#include <arm_compute/function_info/FullyConnectedLayerInfo.h>
 
 #if defined(ARMCOMPUTENEON_ENABLED)
 #include "neon/workloads/NeonReduceWorkload.hpp"

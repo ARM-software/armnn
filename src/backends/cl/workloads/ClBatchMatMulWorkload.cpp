@@ -16,7 +16,7 @@
 
 #include <cl/ClTensorHandle.hpp>
 
-#include <arm_compute/core/MatMulInfo.h>
+#include <arm_compute/function_info/MatMulInfo.h>
 
 namespace armnn
 {

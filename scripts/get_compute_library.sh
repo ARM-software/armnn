@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="0b23e0e6402cb18ddf621d36454cadbb73959518" #9972: Add TensorOperand and declare tensor argument
+DEFAULT_CLFRAMEWORKREVISION="16b37527906c68885f81a8db35f9d6040d73efec" #9999: Port ElementwiseBinary to CKW part 2
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

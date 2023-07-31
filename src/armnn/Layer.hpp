@@ -10,7 +10,7 @@
 #include <OutputHandler.hpp>
 #include <backendsCommon/TensorHandleFactoryRegistry.hpp>
 #include <backendsCommon/WorkloadDataCollector.hpp>
-#include <backendsCommon/WorkloadInfo.hpp>
+#include <armnn/backends/WorkloadInfo.hpp>
 #include "InternalTypes.hpp"
 #include "SerializeLayerParameters.hpp"
 #include "DllExport.hpp"

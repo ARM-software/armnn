@@ -6,19 +6,14 @@
 if(NOT DISABLE_DYNAMIC_BACKENDS)
 list(APPEND armnnBackendsCommon_sources
     DynamicBackend.cpp
-    DynamicBackend.hpp
     DynamicBackendUtils.cpp
     DynamicBackendUtils.hpp
 )
 endif()
 
 list(APPEND armnnBackendsCommon_sources
-    IBackendContext.hpp
     IBackendInternal.cpp
-    IMemoryManager.hpp
-    ITensorHandle.hpp
     ITensorHandleFactory.cpp
-    ITensorHandleFactory.hpp
     LayerSupportBase.cpp
     LayerSupportBase.hpp
     LayerSupportRules.hpp
@@ -33,7 +28,6 @@ list(APPEND armnnBackendsCommon_sources
     MemSyncWorkload.cpp
     MemSyncWorkload.hpp
     OptimizationViews.cpp
-    OptimizationViews.hpp
     TensorHandle.cpp
     TensorHandleFactoryRegistry.cpp
     TensorHandleFactoryRegistry.hpp
@@ -43,7 +37,6 @@ list(APPEND armnnBackendsCommon_sources
     WorkloadData.cpp
     WorkloadFactory.cpp
     WorkloadFactoryBase.hpp
-    WorkloadInfo.hpp
     WorkloadUtils.cpp
     WorkloadUtils.hpp
 )

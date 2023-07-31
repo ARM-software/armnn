@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -17,7 +17,7 @@
 #include <armnn/utility/NumericCast.hpp>
 
 #include <armnn/BackendHelper.hpp>
-#include <backendsCommon/WorkloadInfo.hpp>
+#include <armnn/backends/WorkloadInfo.hpp>
 
 #include <armnnTestUtils/TensorCopyUtils.hpp>
 #include <armnnTestUtils/WorkloadTestUtils.hpp>

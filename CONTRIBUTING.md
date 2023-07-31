@@ -62,4 +62,4 @@ Contributions to Arm NN go through testing at the Arm CI system. All unit, integ
 
 ## Communications
 
-We encourage all Arm NN developers to subscribe to the [Arm NN developer mailing list](https://lists.linaro.org/mailman/listinfo/armnn-dev).
+We encourage all Arm NN developers to subscribe to the [Arm NN developer mailing list](https://lists.linaro.org/mailman3/lists/armnn-dev.lists.linaro.org/).

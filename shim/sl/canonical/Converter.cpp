@@ -1162,7 +1162,7 @@ bool Converter::ConvertDepthToSpace(const Operation& operation, const Model& mod
     GetInputScalar(operation, 1, OperandType::INT32, descriptor.m_BlockSize, model, data);
     if (descriptor.m_BlockSize <= 1)
     {
-        return Fail("%s: Block size must be at least 1 in all dimensions");
+        return Fail("%s: Block size must be at least 1 in all dimensions", __func__);
     }
 
     descriptor.m_DataLayout = armnn::DataLayout::NHWC;
@@ -4493,7 +4493,7 @@ bool Converter::ConvertReLu(const Operation& operation, const Model& model, Conv
     LayerInputHandle input = ConvertToLayerInputHandle(operation, 0, model, data);
     if (!input.IsValid())
     {
-        return Fail("%s: Input 0 is invalid", "operationName");
+        return Fail("%s: Input 0 is invalid", "operationName", __func__);
     }
 
     const Operand* outputOperand = GetOutputOperand(operation, 0, model);
@@ -4997,7 +4997,7 @@ bool Converter::ConvertSpaceToDepth(const Operation& operation, const Model& mod
 
     if (desc.m_BlockSize <= 1)
     {
-        return Fail("%s: Block size must be at least 1 in all dimensions");
+        return Fail("%s: Block size must be at least 1 in all dimensions", __func__);
     }
 
     desc.m_DataLayout = OptionalDataLayout(operation, 2, model, data);

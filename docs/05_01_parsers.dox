@@ -8,7 +8,7 @@ namespace armnn
 /**
 @page parsers Parsers
 
-@tableofcontents
+
 Execute models from different machine learning platforms efficiently with our parsers. Simply choose a parser according
 to the model you want to run e.g. If you've got a model in onnx format (<model_name>.onnx) use our onnx-parser.
 

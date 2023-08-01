@@ -7,7 +7,6 @@ namespace armnn
 {
 /**
 @page buildguides Build Guides
-@tableofcontents
 
 This page links all guides to build and/or install Arm NN tools hosted in our repository.
 You can find additional tutorials on

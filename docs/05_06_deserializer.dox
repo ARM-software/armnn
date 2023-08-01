@@ -1,0 +1,159 @@
+/// Copyright (c) 2021-2023 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+
+@page deserializer Deserializer
+
+The `armnnDeserializer` is a library for loading neural networks defined by Arm NN FlatBuffers files
+into the Arm NN runtime.
+
+@section deserializersupport Supported Layers
+
+The Arm NN SDK Deserialize parser currently supports the following layers:
+
+- Abs
+
+- Activation
+
+- Addition
+
+- ArgMinMax
+
+- BatchMatMul
+
+- BatchToSpaceNd
+
+- BatchNormalization
+
+- Cast
+
+- ChannelShuffle
+
+- Concat
+
+- Comparison
+
+- Constant
+
+- Convolution2d
+
+- DepthToSpace
+
+- DepthwiseConvolution2d
+
+- Dequantize
+
+- DetectionPostProcess
+
+- Division
+
+- ElementwiseUnary
+
+- Fill
+
+- Floor
+
+- FullyConnected
+
+- Gather
+
+- GatherNd
+
+- Input
+
+- InstanceNormalization
+
+- L2Normalization
+
+- Logical
+
+- LogSoftmax
+
+- Lstm
+
+- Maximum
+
+- Mean
+
+- Merge
+
+- Minimum
+
+- Multiplication
+
+- Normalization
+
+- Output
+
+- Pad
+
+- Permute
+
+- Pooling2d
+
+- Pooling3d
+
+- Prelu
+
+- Quantize
+
+- QLstm
+
+- QuantizedLstm
+
+- Rank
+
+- Reduce
+
+- Reshape
+
+- Resize
+
+- ResizeBilinear
+
+- ReverseV2
+
+- Slice
+
+- Softmax
+
+- SpaceToBatchNd
+
+- SpaceToDepth
+
+- Splitter
+
+- Stack
+
+- StandIn
+
+- StridedSlice
+
+- Subtraction
+
+- Switch
+
+- Transpose
+
+- TransposeConvolution2d
+
+- UnidirectionalSequenceLstm
+
+More machine learning layers will be supported in future releases.
+
+@section deserializersupportdeprecated Deprecated layers
+
+Some layers have been deprecated and replaced by others layers. In order to maintain backward compatibility, serializations of these deprecated layers will deserialize to the layers that have replaced them, as follows:
+
+- Equal will deserialize as Comparison
+- Merger will deserialize as Concat
+- Greater will deserialize as Comparison
+- ResizeBilinear will deserialize as Resize
+
+**/
+}

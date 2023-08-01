@@ -8,7 +8,6 @@ namespace armnn
 /**
 
 @page contribguides Contribution Guides
-@tableofcontents
 
 This is a collection of guides that should help you contribute code to Arm NN. Before you get started, please
 take a look into our /ref md_Contributor_Guide section.

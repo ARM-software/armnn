@@ -8,7 +8,6 @@ namespace armnn
 /**
 @page operator_list Arm NN Operators
 
-@tableofcontents
 
 @section S5_1_operator_list Arm NN Operators
 

@@ -7,7 +7,6 @@ namespace armnn
 {
 /**
 @page delegate TfLite Delegate
-@tableofcontents
 
 
 @section delegateintro About the delegate
@@ -22,14 +21,12 @@ words, every TfLite model can be executed and every operation in your model that
 That is the reason why the armnnDelegate is our recommended way to accelerate TfLite models.
 
 If you need help building the armnnDelegate, please take a look at our [build guide](delegate/BuildGuideNative.md).
-An example how to setup TfLite to integrate the armnnDelegate can be found in this
-guide: [Integrate the delegate into python](delegate/IntegrateDelegateIntoPython.md)
 
 
 @section delegatesupport Supported Operators
 This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK currently supports.
 
-@subsection delegatefullysupported Fully supported
+@section delegatefullysupported Fully supported
 
 The Arm NN SDK TensorFlow Lite delegate currently supports the following operators:
 

@@ -11,14 +11,15 @@ namespace armnn
 On this page you can find all software components contained in the Arm NN repository. You will find links to how-to guides and
 other helpful information in each section.
 
- - @subpage delegate
+ - @subpage md_src_armnnConverter_README
+ - @subpage deserializer
  - @subpage supportlibrary
- - @subpage runtimeoptions
  - @subpage parsers
  - @subpage md_python_pyarmnn_README
+ - @subpage runtimeoptions
  - @subpage serializer
- - @subpage deserializer
- - @subpage md_src_armnnConverter_README
+ - @subpage delegate
+ 
 **/
 }
 

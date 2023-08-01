@@ -7,21 +7,175 @@ namespace armnn
 {
 /**
 @page supportlibrary NNAPI Support Library
-@tableofcontents
 
 
 @section supportlibraryintro About the NNAPI Support Library
 
 If you need help building the Arm NN NNAPI Support Library, please take a look at our [build guide](shim/BuildGuideShimSupportLibrary.md).
 
-
-@section slsupport Supported Operators
-This reference guide provides a list of TensorFlow Lite operators the Arm NN SDK currently supports.
-
-
 @section sloptions Support Library Options
 
 The general list of runtime options are described in @subpage runtimeoptions
+
+@section slfullysupported Supported Operators
+
+The NNAPI Support Library currently supports the following operators:
+
+- ABS
+
+- ADD
+
+- ARGMAX
+
+- ARGMIN
+
+- AVERAGE_POOL_2D
+
+- BATCH_MATMUL
+
+- BATCH_TO_SPACE_ND
+
+- CAST
+
+- CONCATENATION
+
+- CONV_2D
+
+- DEPTH_TO_SPACE
+
+- DEPTHWISE_CONV_2D
+
+- DEQUANTIZE
+
+- DIV
+
+- ELU
+
+- EQUAL
+
+- EXP
+
+- EXPAND_DIMS
+
+- FILL
+
+- FLOOR
+
+- FULLY_CONNECTED
+
+- GATHER
+
+- GREATER
+
+- GREATER_EQUAL
+
+- GROUPED_CONV_2D
+
+- HARD_SWISH
+
+- INSTANCE_NORMALIZATION
+
+- L2_NORMALIZATION
+
+- L2_POOL_2D
+
+- LESS
+
+- LESS_EQUAL
+
+- LOCAL_RESPONSE_NORMALIZATION
+
+- LOG
+
+- LOGICAL_AND
+
+- LOGICAL_NOT
+
+- LOGICAL_OR
+
+- LOGISTIC
+
+- LOG_SOFTMAX
+
+- LSTM
+
+- MAX_POOL_2D
+
+- MAXIMUM
+
+- MEAN
+
+- MINIMUM
+
+- MUL
+
+- NEG
+
+- NOT_EQUAL
+
+- PAD
+
+- PADV2
+
+- PRELU
+
+- POW
+
+- QUANTIZE
+
+- QUANTIZED_LSTM
+
+- QUANTIZED_16BIT_LSTM
+
+- RANK
+
+- REDUCE_MAX
+
+- REDUCE_MIN
+
+- REDUCE_PROD
+
+- REDUCE_SUM
+
+- RELU
+
+- RELU1
+
+- RELU6
+
+- RESHAPE
+
+- RESIZE_BILINEAR
+
+- RESIZE_NEAREST_NEIGHBOR
+
+- REVERSE
+
+- RSQRT
+
+- SIN
+
+- SOFTMAX
+
+- SPACE_TO_BATCH_ND
+
+- SPACE_TO_DEPTH
+
+- SQRT
+
+- SQUEEZE
+
+- STRIDED_SLICE
+
+- SUB
+
+- TILE
+
+- TRANSPOSE
+
+- TRANSPOSE_CONV_2D
+
+- TANH
 
 **/
 }

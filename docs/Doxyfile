@@ -819,10 +819,11 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./docs/04_contributor.dox \
                          ./docs/05_00_software_components.dox \
                          ./docs/05_01_parsers.dox \
-                         ./docs/05_02_deserializer_serializer.dox \
+                         ./docs/05_02_serializer.dox \
                          ./docs/05_03_delegate.dox \
                          ./docs/05_04_supportlibrary.dox \
                          ./docs/05_05_runtimeoptions.dox \
+                         ./docs/05_06_deserializer.dox \
                          ./docs/FAQ.md \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \

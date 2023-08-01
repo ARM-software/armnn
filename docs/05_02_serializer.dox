@@ -1,0 +1,162 @@
+/// Copyright (c) 2021-2023 ARM Limited and Contributors. All rights reserved.
+///
+/// SPDX-License-Identifier: MIT
+///
+
+namespace armnn
+{
+/**
+@page serializer Serializer
+
+The `armnnSerializer` is a library for serializing an Arm NN network to a stream.
+
+@section serializersupport Supported Layers
+
+This reference guide provides a list of layers which can be serialized by the Arm NN SDK.
+
+The Arm NN SDK Serializer currently supports the following layers:
+
+- Activation
+
+- Addition
+
+- ArgMinMax
+
+- BatchMatMul
+
+- BatchToSpaceNd
+
+- BatchNormalization
+
+- Cast
+
+- ChannelShuffle
+
+- Comparison
+
+- Concat
+
+- Constant
+
+- Convolution2d
+
+- Convolution3d
+
+- DepthToSpace
+
+- DepthwiseConvolution2d
+
+- Dequantize
+
+- DetectionPostProcess
+
+- Division
+
+- ElementwiseUnary
+
+- Fill
+
+- Floor
+
+- FullyConnected
+
+- Gather
+
+- GatherNd
+
+- Input
+
+- InstanceNormalization
+
+- L2Normalization
+
+- Logical
+
+- LogSoftmax
+
+- Lstm
+
+- Maximum
+
+- Mean
+
+- Merge
+
+- Minimum
+
+- Multiplication
+
+- Normalization
+
+- Output
+
+- Pad (Constant, Symmetric, Reflect)
+
+- Permute
+
+- Pooling2d
+
+- Pooling3d
+
+- Prelu
+
+- QLstm
+
+- Quantize
+
+- QuantizedLstm
+
+- Rank
+
+- Reduce
+
+- Reshape
+
+- Resize
+
+- ReverseV2
+
+- Shape
+
+- Slice
+
+- Softmax
+
+- SpaceToBatchNd
+
+- SpaceToDepth
+
+- Splitter
+
+- Stack
+
+- StandIn
+
+- StridedSlice
+
+- Subtraction
+
+- Switch
+
+- Transpose
+
+- TransposeConvolution2d
+
+- UnidirectionalSequenceLstm
+
+
+More machine learning layers will be supported in future releases.
+
+@section serializersupportdeprecated Deprecated layers
+
+Some layers have been deprecated and replaced by others layers. In order to maintain backward compatibility, serializations of these deprecated layers will deserialize to the layers that have replaced them, as follows:
+
+- Abs will deserialize as ElementwiseUnary
+- Equal will deserialize as Comparison
+- Greater will deserialize as Comparison
+- Merger will deserialize as Concat
+- ResizeBilinear will deserialize as Resize
+- Rsqrt will deserialize as ElementwiseUnary
+
+**/
+}

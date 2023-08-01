@@ -7,7 +7,6 @@ namespace armnn
 {
 /**
 @page runtimeoptions Runtime options for Arm NN
-@tableofcontents
 
 Across all software interfaces to Arm NN there are a set of common
 configuration parameters. These parameters control how a model is loaded or

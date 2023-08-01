@@ -134,16 +134,6 @@ struct BatchMatMulDescriptor
     DataLayout m_DataLayoutX;
     DataLayout m_DataLayoutY;
 
-    static std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int>> GetAxesToMul(
-            const BatchMatMulDescriptor& desc,
-            const armnn::TensorShape& tensorXShape,
-            const armnn::TensorShape& tensorYShape);
-
-    static std::pair<std::vector<unsigned int>, std::vector<unsigned int>> GetAxesNotMul(
-            const BatchMatMulDescriptor& desc,
-            const armnn::TensorShape& inputXShape,
-            const armnn::TensorShape& inputYShape);
-
     %feature("docstring",
      "
      Static helper to get the two axes (for each input) for multiplication

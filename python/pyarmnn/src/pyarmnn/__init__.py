@@ -1,10 +1,12 @@
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020,2023 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 import inspect
 import sys
 import logging
 
 from ._generated.pyarmnn_version import GetVersion, GetMajorVersion, GetMinorVersion
+
+print("WARNING: PyArmNN is deprecated. To use ArmNN on python, please use the tflite delegate. Expected to be removed in release 24.05.")
 
 # Parsers
 

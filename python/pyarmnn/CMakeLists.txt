@@ -1,5 +1,6 @@
 #
 # Copyright 2020 NXP
+# Copyright © 2023 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 set(SETUP_PY_IN         "${CMAKE_CURRENT_SOURCE_DIR}/setup.py")
@@ -7,6 +8,8 @@ set(SETUP_PY            "${CMAKE_CURRENT_BINARY_DIR}/setup.py")
 set(SWIG_GENERATE_IN    "${CMAKE_CURRENT_SOURCE_DIR}/swig_generate.py")
 set(SWIG_GENERATE       "${CMAKE_CURRENT_BINARY_DIR}/swig_generate.py")
 set(OUT_WRAP            "${CMAKE_CURRENT_BINARY_DIR}/pyarmnn.wrap.timestamp")
+
+message(WARNING "PyArmNN is deprecated. To use ArmNN on python, please use the tflite delegate. Expected to be removed in release 24.05.")
 
 configure_file(${SETUP_PY_IN} ${SETUP_PY} COPYONLY)
 configure_file(${SWIG_GENERATE_IN} ${SWIG_GENERATE} COPYONLY)

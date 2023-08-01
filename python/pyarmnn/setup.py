@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright © 2020 Arm Ltd. All rights reserved.
+# Copyright © 2020, 2023 Arm Ltd. All rights reserved.
 # Copyright © 2020 NXP and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 """Python bindings for Arm NN
@@ -265,6 +265,7 @@ class LazyArmnnFinderExtension(Extension):
 
 
 if __name__ == '__main__':
+    print("WARNING: PyArmNN is deprecated. To use ArmNN on python, please use the tflite delegate. Expected to be removed in release 24.05.")
     # mandatory extensions
     pyarmnn_module = LazyArmnnFinderExtension('pyarmnn._generated._pyarmnn',
                                               sources=['src/pyarmnn/_generated/armnn_wrap.cpp'],

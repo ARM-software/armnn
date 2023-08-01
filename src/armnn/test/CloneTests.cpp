@@ -44,7 +44,7 @@ public:
     }
 
     std::unique_ptr<armnn::IWorkload> CreatePreCompiled(const armnn::PreCompiledQueueDescriptor& descriptor,
-                                                        const armnn::WorkloadInfo&) const override
+                                                        const armnn::WorkloadInfo&) const
     {
         CHECK(descriptor.m_PreCompiledObject == m_Ptr);
         return nullptr;

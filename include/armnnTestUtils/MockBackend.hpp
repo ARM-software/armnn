@@ -120,33 +120,8 @@ public:
         return std::make_unique<MockTensorHandle>(tensorInfo, static_cast<unsigned int>(MemorySource::Malloc));
     };
 
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE(
-        "Use ABI stable "
-        "CreateWorkload(LayerType, const QueueDescriptor&, const WorkloadInfo& info) instead.",
-        "23.08")
-    std::unique_ptr<IWorkload> CreateInput(const InputQueueDescriptor& descriptor,
-                                           const WorkloadInfo& info) const override
-    {
-        if (info.m_InputTensorInfos.empty())
-        {
-            throw InvalidArgumentException("MockWorkloadFactory::CreateInput: Input cannot be zero length");
-        }
-        if (info.m_OutputTensorInfos.empty())
-        {
-            throw InvalidArgumentException("MockWorkloadFactory::CreateInput: Output cannot be zero length");
-        }
-
-        if (info.m_InputTensorInfos[0].GetNumBytes() != info.m_OutputTensorInfos[0].GetNumBytes())
-        {
-            throw InvalidArgumentException(
-                "MockWorkloadFactory::CreateInput: data input and output differ in byte count.");
-        }
-
-        return std::make_unique<CopyMemGenericWorkload>(descriptor, info);
-    };
-
     std::unique_ptr<IWorkload>
-        CreateWorkload(LayerType type, const QueueDescriptor& descriptor, const WorkloadInfo& info) const override;
+    CreateWorkload(LayerType type, const QueueDescriptor& descriptor, const WorkloadInfo& info) const override;
 
 private:
     mutable std::shared_ptr<MockMemoryManager> m_MemoryManager;

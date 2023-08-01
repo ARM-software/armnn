@@ -74,6 +74,16 @@ bool HasCapability(const std::string& name, const armnn::BackendId& backend)
 
 bool HasCapability(const BackendOptions::BackendOption& capability, const BackendCapabilities& capabilities)
 {
+    return HasMatchingCapability(capability, capabilities);
+}
+
+bool HasCapability(const BackendOptions::BackendOption& backendOption, const armnn::BackendId& backend)
+{
+    return HasMatchingCapability(backendOption, backend);
+}
+
+bool HasMatchingCapability(const BackendOptions::BackendOption& capability, const BackendCapabilities& capabilities)
+{
     for (size_t i=0; i < capabilities.GetOptionCount(); i++)
     {
         const auto& backendCapability = capabilities.GetOption(i);
@@ -104,7 +114,7 @@ bool HasCapability(const BackendOptions::BackendOption& capability, const Backen
     return false;
 }
 
-bool HasCapability(const BackendOptions::BackendOption& backendOption, const armnn::BackendId& backend)
+bool HasMatchingCapability(const BackendOptions::BackendOption& backendOption, const armnn::BackendId& backend)
 {
     auto const& backendRegistry = armnn::BackendRegistryInstance();
     if (backendRegistry.IsBackendRegistered(backend))
@@ -112,7 +122,7 @@ bool HasCapability(const BackendOptions::BackendOption& backendOption, const arm
         auto factoryFunc = backendRegistry.GetFactory(backend);
         auto backendObject = factoryFunc();
         auto capabilities = backendObject->GetCapabilities();
-        return HasCapability(backendOption, capabilities);
+        return HasMatchingCapability(backendOption, capabilities);
     }
     return false;
 }

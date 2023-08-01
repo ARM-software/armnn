@@ -139,8 +139,8 @@ void CapabilityTestHelper(BackendCapabilities &capabilities,
     {
         CHECK_MESSAGE(armnn::HasCapability(pair.first, capabilities),
                         pair.first << " capability was not been found");
-        CHECK_MESSAGE(armnn::HasCapability(BackendOptions::BackendOption{pair.first, pair.second}, capabilities),
-                        pair.first << " capability set incorrectly");
+        CHECK_MESSAGE(armnn::HasMatchingCapability(BackendOptions::BackendOption{pair.first, pair.second},
+                                                   capabilities), pair.first << " capability set incorrectly");
     }
 }
 #endif
@@ -153,20 +153,20 @@ TEST_CASE("Ref_Backends_Unknown_Capability_Test")
     auto refCapabilities = refBackend->GetCapabilities();
 
     armnn::BackendOptions::BackendOption AsyncExecutionFalse{"AsyncExecution", false};
-    CHECK(!armnn::HasCapability(AsyncExecutionFalse, refCapabilities));
+    CHECK(!armnn::HasMatchingCapability(AsyncExecutionFalse, refCapabilities));
 
     armnn::BackendOptions::BackendOption AsyncExecutionInt{"AsyncExecution", 50};
-    CHECK(!armnn::HasCapability(AsyncExecutionFalse, refCapabilities));
+    CHECK(!armnn::HasMatchingCapability(AsyncExecutionFalse, refCapabilities));
 
     armnn::BackendOptions::BackendOption AsyncExecutionFloat{"AsyncExecution", 0.0f};
-    CHECK(!armnn::HasCapability(AsyncExecutionFloat, refCapabilities));
+    CHECK(!armnn::HasMatchingCapability(AsyncExecutionFloat, refCapabilities));
 
     armnn::BackendOptions::BackendOption AsyncExecutionString{"AsyncExecution", "true"};
-    CHECK(!armnn::HasCapability(AsyncExecutionString, refCapabilities));
+    CHECK(!armnn::HasMatchingCapability(AsyncExecutionString, refCapabilities));
 
     CHECK(!armnn::HasCapability("Telekinesis", refCapabilities));
     armnn::BackendOptions::BackendOption unknownCapability{"Telekinesis", true};
-    CHECK(!armnn::HasCapability(unknownCapability, refCapabilities));
+    CHECK(!armnn::HasMatchingCapability(unknownCapability, refCapabilities));
 }
 
 TEST_CASE ("Ref_Backends_Capability_Test")

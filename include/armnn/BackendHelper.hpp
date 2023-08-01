@@ -466,10 +466,18 @@ bool HasCapability(const std::string& name,const BackendCapabilities& capabiliti
 bool HasCapability(const std::string& name, const armnn::BackendId& backend);
 
 /// Convenience function to check if a given capability matches a  capability in a BackendCapabilities struct
+ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use HasMatchingCapability instead.", "24.05")
 bool HasCapability(const BackendOptions::BackendOption& capability, const BackendCapabilities& capabilities);
 
 /// Convenience function to check if a given capability matches a  capability in a backend
+ARMNN_DEPRECATED_MSG_REMOVAL_DATE("Use HasMatchingCapability instead.", "24.05")
 bool HasCapability(const BackendOptions::BackendOption& backendOption, const armnn::BackendId& backend);
+
+/// Convenience function to check if a given capability matches a  capability in a BackendCapabilities struct
+bool HasMatchingCapability(const BackendOptions::BackendOption& capability, const BackendCapabilities& capabilities);
+
+/// Convenience function to check if a given capability matches a  capability in a backend
+bool HasMatchingCapability(const BackendOptions::BackendOption& backendOption, const armnn::BackendId& backend);
 
 /// Returns a BackendCapability if the backend lists the capability
 /// The BackendCapability must then be inspected to check whether or not that BackendCapability is supported

@@ -255,14 +255,15 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
             // If we're doing async execution verify that the backend supports it and ExternallyManagedMemory.
             if (networkProperties.m_AsyncEnabled)
             {
-                if (!HasCapability(BackendOptions::BackendOption{"AsyncExecution", true}, backend->GetCapabilities()))
+                if (!HasMatchingCapability(BackendOptions::BackendOption{"AsyncExecution", true},
+                                                                         backend->GetCapabilities()))
                 {
                     std::string er = backend->GetId();
                     er += " does not support AsyncExecution";
                     throw BackendCapabilityException(er);
                 }
-                if (!HasCapability(BackendOptions::BackendOption{"ExternallyManagedMemory", true},
-                backend->GetCapabilities()))
+                if (!HasMatchingCapability(BackendOptions::BackendOption{"ExternallyManagedMemory", true},
+                                                                         backend->GetCapabilities()))
                 {
                     std::string er = backend->GetId();
                     er += " does not support ExternallyManagedMemory\n";
@@ -1508,7 +1509,8 @@ std::vector<ImportedInputId> LoadedNetwork::ImportInputs(const InputTensors& inp
             }
 
             auto& backend = m_Backends.at(layer->GetBackendId());
-            if (!HasCapability(BackendOptions::BackendOption{"PreImportIOTensors", true}, backend->GetCapabilities()))
+            if (!HasMatchingCapability(BackendOptions::BackendOption{"PreImportIOTensors", true},
+                                                                     backend->GetCapabilities()))
             {
                 std::string er = backend->GetId();
                 er += " does not have PreImportIOTensors capability";
@@ -1641,7 +1643,8 @@ std::vector<ImportedOutputId> LoadedNetwork::ImportOutputs(const OutputTensors& 
         }
 
         auto& backend = m_Backends.at(layer->GetBackendId());
-        if (!HasCapability(BackendOptions::BackendOption{"PreImportIOTensors", true}, backend->GetCapabilities()))
+        if (!HasMatchingCapability(BackendOptions::BackendOption{"PreImportIOTensors", true},
+                                                                 backend->GetCapabilities()))
         {
             std::string er = backend->GetId();
             er += " does not have PreImportIOTensors capability";

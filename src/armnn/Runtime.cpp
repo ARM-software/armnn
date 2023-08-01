@@ -371,7 +371,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                 // check if backend supports ProtectedMode
                 using BackendCapability = BackendOptions::BackendOption;
                 BackendCapability protectedContentCapability {"ProtectedContentAllocation", true};
-                if (!HasCapability(protectedContentCapability, id))
+                if (!HasMatchingCapability(protectedContentCapability, id))
                 {
                     // Protected Content Allocation is not supported by the backend
                     // backend should not be registered
@@ -480,7 +480,7 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
                         using BackendCapability = BackendOptions::BackendOption;
                         auto strategyType = GetMemBlockStrategyTypeName(strategy->GetMemBlockStrategyType());
                         BackendCapability memOptimizeStrategyCapability {strategyType, true};
-                        if (HasCapability(memOptimizeStrategyCapability, id))
+                        if (HasMatchingCapability(memOptimizeStrategyCapability, id))
                         {
                             BackendRegistryInstance().RegisterMemoryOptimizerStrategy(id, strategy);
 

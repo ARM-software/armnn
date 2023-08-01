@@ -443,7 +443,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteOpaqueTensor(const TfLiteOpaqueTensor* t
             std::vector<unsigned int> safeShape = { 1 };
             bool dimensionsSpecificity[1] = { true };
 
-            armnn::TensorShape tensorShape(armnn::numeric_cast<unsigned int>(safeShape.size()),
+            armnn::TensorShape tensorShape(safeShape.size(),
                                            safeShape.data(),
                                            dimensionsSpecificity);
             ret = armnn::TensorInfo(tensorShape, type);
@@ -461,25 +461,25 @@ armnn::TensorInfo GetTensorInfoForTfLiteOpaqueTensor(const TfLiteOpaqueTensor* t
     }
     else
     {
-        std::vector<unsigned int> tensorDims(static_cast<unsigned int>(tensorDimensionSize));
-        bool dimensionsSpecificity[5] = { true, true, true, true, true };
+        std::vector<unsigned int> tensorDims(tensorDimensionSize);
+        std::vector<unsigned char> dimensionsSpecificity(tensorDimensionSize, true);
 
         for (int32_t i = 0; i < tensorDimensionSize; ++i)
         {
             int32_t dim = TfLiteOpaqueTensorDim(tfLiteTensor, i);
 
-            if (dim == 0)
+            if (dim <= 0)
             {
                 dimensionsSpecificity[i] = false;
             }
             tensorDims[i] = static_cast<unsigned int>(dim);
         }
 
-        armnn::TensorShape tensorShape(static_cast<unsigned int>(tensorDimensionSize),
+        armnn::TensorShape tensorShape(tensorDimensionSize,
                                        tensorDims.data(),
-                                       dimensionsSpecificity);
+                                       reinterpret_cast<const bool *>(dimensionsSpecificity.data()));
 
-        if(IsConstantTensor(tfLiteTensor))
+        if (IsConstantTensor(tfLiteTensor))
         {
             ret = armnn::TensorInfo(tensorShape, type);
             ret.SetConstant(true);

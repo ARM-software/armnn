@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -152,7 +152,7 @@ armnn::TensorInfo GetTensorInfoForOperand(const Operand& operand)
         }
         else
         {
-            bool dimensionsSpecificity[5] = { true, true, true, true, true };
+            std::vector<unsigned char> dimensionsSpecificity(operand.dimensions.size(), true);
             int count = 0;
             std::for_each(operand.dimensions.data(),
                           operand.dimensions.data() +  operand.dimensions.size(),
@@ -165,7 +165,9 @@ armnn::TensorInfo GetTensorInfoForOperand(const Operand& operand)
                               count++;
                           });
 
-            TensorShape tensorShape(operand.dimensions.size(), operand.dimensions.data(), dimensionsSpecificity);
+            TensorShape tensorShape(operand.dimensions.size(),
+                                    operand.dimensions.data(),
+                                    reinterpret_cast<const bool *>(dimensionsSpecificity.data()));
             ret = TensorInfo(tensorShape, type);
         }
     }

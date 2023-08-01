@@ -190,7 +190,6 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddActivationLayer',
     'AddAdditionLayer',
     'AddArgMinMaxLayer',
-    'AddBatchMatMulLayer',
     'AddBatchNormalizationLayer',
     'AddBatchToSpaceNdLayer',
     'AddCastLayer',
@@ -205,7 +204,6 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddDequantizeLayer',
     'AddDetectionPostProcessLayer',
     'AddDivisionLayer',
-    'AddElementWiseBinaryLayer',
     'AddElementwiseUnaryLayer',
     'AddFloorLayer',
     'AddFillLayer',
@@ -236,7 +234,6 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddReduceLayer',
     'AddReshapeLayer',
     'AddResizeLayer',
-    'AddReverseV2Layer',
     'AddShapeLayer',
     'AddSliceLayer',
     'AddSoftmaxLayer',
@@ -248,7 +245,6 @@ def test_serialize_to_dot_mode_readonly(network_file, get_runtime, tmpdir):
     'AddStridedSliceLayer',
     'AddSubtractionLayer',
     'AddSwitchLayer',
-    'AddTileLayer',
     'AddTransposeConvolution2dLayer',
     'AddTransposeLayer'
 ])

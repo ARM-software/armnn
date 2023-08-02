@@ -63,7 +63,8 @@ TfLiteStatus VisitL2NormalizationOperator(DelegateData& delegateData,
     }
 
     // Add a L2Normalization layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddL2NormalizationLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::L2Normalization, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddL2NormalizationLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -71,7 +72,7 @@ TfLiteStatus VisitL2NormalizationOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }
@@ -142,7 +143,8 @@ TfLiteStatus VisitLocalResponseNormalizationOperator(DelegateData& delegateData,
     }
 
     // Add a Normalization layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddNormalizationLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::Normalization, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddNormalizationLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -150,7 +152,7 @@ TfLiteStatus VisitLocalResponseNormalizationOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

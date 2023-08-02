@@ -70,7 +70,8 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* dequantizeLayer = delegateData.m_Network->AddDequantizeLayer();
+    auto layerName = GetLayerName(armnn::LayerType::Dequantize, nodeIndex);
+    armnn::IConnectableLayer* dequantizeLayer = delegateData.m_Network->AddDequantizeLayer(layerName.c_str());
     dequantizeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(dequantizeLayer != nullptr);
 
@@ -80,7 +81,8 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     auto inputsTensorsProcess = ProcessInputs(dequantizeLayer,
                                               delegateData,
                                               tfLiteContext,
-                                              tfLiteNode);
+                                              tfLiteNode,
+                                              nodeIndex);
     if (inputsTensorsProcess == kTfLiteError)
     {
         return inputsTensorsProcess;
@@ -152,7 +154,8 @@ TfLiteStatus VisitQuantizeOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* quantizeLayer = delegateData.m_Network->AddQuantizeLayer();
+    auto layerName = GetLayerName(armnn::LayerType::Quantize, nodeIndex);
+    armnn::IConnectableLayer* quantizeLayer = delegateData.m_Network->AddQuantizeLayer(layerName.c_str());
     quantizeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(quantizeLayer != nullptr);
 
@@ -160,7 +163,7 @@ TfLiteStatus VisitQuantizeOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(quantizeLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(quantizeLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

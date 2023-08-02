@@ -148,7 +148,7 @@ TfLiteStatus VisitTileOperator(DelegateData& delegateData,
                                     tileDescriptor);
     }
 
-    std::string layerName("Tile");
+    auto layerName = GetLayerName(armnn::LayerType::Tile, nodeIndex);
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddTileLayer(tileDescriptor, layerName.c_str());
 
     if (layer == nullptr)
@@ -158,7 +158,7 @@ TfLiteStatus VisitTileOperator(DelegateData& delegateData,
 
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
-    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk)
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

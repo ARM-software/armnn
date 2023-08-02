@@ -64,7 +64,8 @@ TfLiteStatus VisitCastOperator(DelegateData& delegateData,
     }
 
     // Add a Cast layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddCastLayer();
+    auto layerName = GetLayerName(armnn::LayerType::Cast, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddCastLayer(layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -72,7 +73,7 @@ TfLiteStatus VisitCastOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }
@@ -206,7 +207,8 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddReshapeLayer(reshapeDesc);
+    auto layerName = GetLayerName(armnn::LayerType::Reshape, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -214,7 +216,7 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }
@@ -291,7 +293,8 @@ TfLiteStatus VisitSqueezeOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddReshapeLayer(reshapeDesc);
+    auto layerName = GetLayerName(armnn::LayerType::Reshape, nodeIndex, "Squeeze");
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -299,7 +302,7 @@ TfLiteStatus VisitSqueezeOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk)
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }
@@ -396,7 +399,8 @@ TfLiteStatus VisitExpandDimsOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddReshapeLayer(reshapeDesc);
+    auto layerName = GetLayerName(armnn::LayerType::Reshape, nodeIndex, "ExpandDims");
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddReshapeLayer(reshapeDesc, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -405,7 +409,7 @@ TfLiteStatus VisitExpandDimsOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk)
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

@@ -117,7 +117,9 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* comparisonLayer = delegateData.m_Network->AddComparisonLayer(descriptor);
+    auto layerName = GetLayerName(descriptor.m_Operation, nodeIndex);
+    armnn::IConnectableLayer* comparisonLayer = delegateData.m_Network->AddComparisonLayer(descriptor,
+                                                                                           layerName.c_str());
     comparisonLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(comparisonLayer != nullptr);
 
@@ -125,7 +127,7 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(comparisonLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(comparisonLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

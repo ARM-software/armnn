@@ -171,10 +171,8 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     };
 
-    std::string splitterLayerName("Unpack Splitter");
-
-    armnn::IConnectableLayer* splitterLayer = delegateData.m_Network->AddSplitterLayer(splitDesc,
-                                                                                       splitterLayerName.c_str());
+    auto layerName = GetLayerName(armnn::LayerType::Splitter, nodeIndex, "Unpack");
+    armnn::IConnectableLayer* splitterLayer = delegateData.m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
     splitterLayer->SetBackendId(setBackendSplit);
     ARMNN_ASSERT(splitterLayer != nullptr);
 
@@ -189,9 +187,9 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     // Create reshape to remove the unpacked dimension for unpack operator of each output from Splitter.
     for (unsigned int outputIndex = 0; outputIndex < splitterLayer->GetNumOutputSlots(); ++outputIndex)
     {
-        std::string reshapeLayerName("Unpack Reshape");
+        auto reshapeName = GetLayerName(armnn::LayerType::Reshape, nodeIndex, "Unpack");
         armnn::IConnectableLayer* reshapeLayer = delegateData.m_Network->AddReshapeLayer(reshapeDescriptor,
-                                                                                         reshapeLayerName.c_str());
+                                                                                         reshapeName.c_str());
         reshapeLayer->SetBackendId(setBackendReshape);
         ARMNN_ASSERT(reshapeLayer != nullptr);
 

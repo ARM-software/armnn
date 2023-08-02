@@ -64,12 +64,13 @@ TfLiteStatus VisitSpaceToDepthOperator(DelegateData& delegateData,
     }
 
     // Add a SpaceToDepth layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddSpaceToDepthLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::SpaceToDepth, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddSpaceToDepthLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }
@@ -132,7 +133,8 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
     }
 
     // Add a DepthToSpace layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthToSpaceLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::DepthToSpace, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthToSpaceLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -140,7 +142,7 @@ TfLiteStatus VisitDepthToSpaceOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

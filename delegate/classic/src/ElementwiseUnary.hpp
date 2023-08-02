@@ -71,7 +71,8 @@ TfLiteStatus VisitElementwiseUnaryOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddElementwiseUnaryLayer(descriptor);
+    auto layerName = GetLayerName(descriptor.m_Operation, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddElementwiseUnaryLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -79,7 +80,7 @@ TfLiteStatus VisitElementwiseUnaryOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

@@ -91,7 +91,8 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* transposeLayer = delegateData.m_Network->AddTransposeLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::Transpose, nodeIndex);
+    armnn::IConnectableLayer* transposeLayer = delegateData.m_Network->AddTransposeLayer(descriptor, layerName.c_str());
     transposeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(transposeLayer != nullptr);
     ARMNN_ASSERT(transposeLayer->GetNumInputSlots() == 1);     // permutation vector given to descriptor object
@@ -100,7 +101,7 @@ TfLiteStatus VisitTransposeOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(transposeLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(transposeLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

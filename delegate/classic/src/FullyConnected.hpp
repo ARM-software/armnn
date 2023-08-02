@@ -166,7 +166,8 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::FullyConnected, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -176,7 +177,9 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         auto weightsTensor = CreateConstTensor(&tfLiteWeightsTensor,
                                                weightsTensorInfo);
 
-        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(weightsTensor);
+        auto weightsName = GetLayerName(armnn::LayerType::Constant, nodeIndex, "Weights");
+        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(weightsTensor,
+                                                                                          weightsName.c_str());
 
         weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
         weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsTensorInfo);
@@ -190,7 +193,9 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
             auto biasTensor = CreateConstTensor(&tfLiteBiasTensor,
                                                 biasTensorInfo);
 
-            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
+            auto biasName = GetLayerName(armnn::LayerType::FullyConnected, nodeIndex, "Bias");
+            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor,
+                                                                                           biasName.c_str());
             ARMNN_ASSERT(biasLayer != nullptr);
 
             biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
@@ -199,13 +204,14 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     }
 
     // The data input can also be constant, so we must check that this is also allocated to an input slot
-    if(inputTensorInfo.IsConstant())
+    if (inputTensorInfo.IsConstant())
     {
         auto input =
                 CreateConstTensor(&tfLiteContext->tensors[tfLiteNode->inputs->data[0]],
                                   inputTensorInfo);
 
-        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        auto constantName = GetLayerName(armnn::LayerType::Constant, nodeIndex, "Input");
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input, constantName.c_str());
         inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
         inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
@@ -219,7 +225,9 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         // Add reshape to flatten to 2D [batch_size, input_size]
         armnn::ReshapeDescriptor reshapeDescriptor;
         reshapeDescriptor.m_TargetShape = reshapedTensorInfo.GetShape();
-        reshapeLayer = delegateData.m_Network->AddReshapeLayer(reshapeDescriptor);
+
+        auto reshapeName = GetLayerName(armnn::LayerType::Reshape, nodeIndex, "Input");
+        reshapeLayer = delegateData.m_Network->AddReshapeLayer(reshapeDescriptor, reshapeName.c_str());
         ARMNN_ASSERT(reshapeLayer != nullptr);
 
         reshapeLayer->GetOutputSlot(0).SetTensorInfo(reshapedTensorInfo);
@@ -251,7 +259,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     if (outputTensorInfo.GetNumDimensions() > 2)
     {
         layer = AddReshapeLayer(tfLiteContext, tfLiteNode, layer, reshapedOutputTensorInfo, outputTensorInfo,
-                                delegateData);
+                                delegateData, nodeIndex);
         if (!layer)
         {
             TF_LITE_MAYBE_KERNEL_LOG(
@@ -270,7 +278,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     }
 
     // Check and Create Activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData, nodeIndex);
 }
 
 } // namespace armnnDelegate

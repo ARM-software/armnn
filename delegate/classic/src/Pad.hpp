@@ -166,7 +166,8 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* padLayer = delegateData.m_Network->AddPadLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::Pad, nodeIndex);
+    armnn::IConnectableLayer* padLayer = delegateData.m_Network->AddPadLayer(descriptor, layerName.c_str());
     padLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(padLayer != nullptr);
 

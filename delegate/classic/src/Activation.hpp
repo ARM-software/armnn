@@ -122,14 +122,16 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
                                           outputTensorInfo,
                                           activationDesc);
     }
-    armnn::IConnectableLayer* activationLayer = delegateData.m_Network->AddActivationLayer(activationDesc);
+    auto layerName = GetLayerName(activationDesc.m_Function, nodeIndex);
+    armnn::IConnectableLayer* activationLayer = delegateData.m_Network->AddActivationLayer(activationDesc,
+                                                                                           layerName.c_str());
     ARMNN_ASSERT(activationLayer != nullptr);
 
     armnn::IOutputSlot& outputSlot = activationLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(activationLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(activationLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

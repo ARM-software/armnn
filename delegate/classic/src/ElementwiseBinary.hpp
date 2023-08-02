@@ -250,11 +250,13 @@ TfLiteStatus ValidateSubOperator(DelegateData& delegateData,
 }
 
 std::pair<armnn::IConnectableLayer*, armnn::IConnectableLayer*> AddFloorDivLayer(
-    DelegateData& delegateData,
-    const armnn::TensorInfo& outputTensorInfo)
+        DelegateData& delegateData,
+        const armnn::TensorInfo& outputTensorInfo,
+        int nodeIndex)
 {
+    auto divName = GetLayerName(armnn::BinaryOperation::Div, nodeIndex);
     armnn::IConnectableLayer* divisionLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-            armnn::BinaryOperation::Div);
+            armnn::BinaryOperation::Div, divName.c_str());
     // if the output of the div is Signed32 the Floor layer is not required
     if (armnn::DataType::Signed32 == outputTensorInfo.GetDataType())
     {
@@ -262,7 +264,8 @@ std::pair<armnn::IConnectableLayer*, armnn::IConnectableLayer*> AddFloorDivLayer
     }
     armnn::IOutputSlot& outputSlot = divisionLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
-    armnn::IConnectableLayer* floorLayer = delegateData.m_Network->AddFloorLayer();
+    auto floorName = GetLayerName(armnn::LayerType::Floor, nodeIndex);
+    armnn::IConnectableLayer* floorLayer = delegateData.m_Network->AddFloorLayer(floorName.c_str());
     outputSlot.Connect(floorLayer->GetInputSlot(0));
     return std::make_pair(divisionLayer, floorLayer);
 }
@@ -397,46 +400,55 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
 
     armnn::IConnectableLayer* elementwiseBinaryLayer = nullptr;
     MultiLayerFacade multiLayer;
+    std::string layerName;
     switch(elementwiseBinaryOperatorCode)
     {
         case kTfLiteBuiltinAdd:
+            layerName = GetLayerName(armnn::BinaryOperation::Add, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::Add);
+                    armnn::BinaryOperation::Add, layerName.c_str());
             break;
         case kTfLiteBuiltinDiv:
+            layerName = GetLayerName(armnn::BinaryOperation::Div, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::Div);
+                    armnn::BinaryOperation::Div, layerName.c_str());
             break;
         case kTfLiteBuiltinFloorDiv:
             {
-                auto layers = AddFloorDivLayer(delegateData, outputTensorInfo);
+                auto layers = AddFloorDivLayer(delegateData, outputTensorInfo, nodeIndex);
                 multiLayer.AssignValues(layers.first, layers.second);
                 elementwiseBinaryLayer = &multiLayer;
             }
             break;
         case kTfLiteBuiltinMaximum:
+            layerName = GetLayerName(armnn::BinaryOperation::Maximum, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::Maximum);
+                    armnn::BinaryOperation::Maximum, layerName.c_str());
             break;
         case kTfLiteBuiltinMinimum:
+            layerName = GetLayerName(armnn::BinaryOperation::Minimum, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::Minimum);
+                    armnn::BinaryOperation::Minimum, layerName.c_str());
             break;
         case kTfLiteBuiltinMul:
+            layerName = GetLayerName(armnn::BinaryOperation::Mul, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::Mul);
+                    armnn::BinaryOperation::Mul, layerName.c_str());
             break;
         case kTfLiteBuiltinPow:
+            layerName = GetLayerName(armnn::BinaryOperation::Power, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::Power);
+                    armnn::BinaryOperation::Power, layerName.c_str());
             break;
         case kTfLiteBuiltinSquaredDifference:
+            layerName = GetLayerName(armnn::BinaryOperation::SqDiff, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::SqDiff);
+                    armnn::BinaryOperation::SqDiff, layerName.c_str());
             break;
         case kTfLiteBuiltinSub:
+            layerName = GetLayerName(armnn::BinaryOperation::Sub, nodeIndex);
             elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-                    armnn::BinaryOperation::Sub);
+                    armnn::BinaryOperation::Sub, layerName.c_str());
             break;
         default:
             return kTfLiteError;
@@ -448,7 +460,8 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
     auto inputsTensorsProcess = ProcessInputs(elementwiseBinaryLayer,
                                               delegateData,
                                               tfLiteContext,
-                                              tfLiteNode);
+                                              tfLiteNode,
+                                              nodeIndex);
     if (inputsTensorsProcess == kTfLiteError)
     {
         return inputsTensorsProcess;
@@ -465,7 +478,8 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
         return kTfLiteOk;
     }
     // Check and Create Activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, elementwiseBinaryLayer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, elementwiseBinaryLayer, 0, delegateData,
+                           nodeIndex);
 }
 
 } // namespace armnnDelegate

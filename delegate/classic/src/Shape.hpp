@@ -42,7 +42,7 @@ TfLiteStatus VisitShapeOperator(DelegateData& delegateData,
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
 
     auto* shapeParameters = reinterpret_cast<TfLiteShapeParams*>(tfLiteNode->builtin_data);
-    if ( shapeParameters->out_type != kTfLiteInt32 && shapeParameters->out_type != kTfLiteInt64 )
+    if (shapeParameters->out_type != kTfLiteInt32 && shapeParameters->out_type != kTfLiteInt64)
     {
         TF_LITE_MAYBE_KERNEL_LOG(
             tfLiteContext,
@@ -75,7 +75,8 @@ TfLiteStatus VisitShapeOperator(DelegateData& delegateData,
     }
 
     // Add a Shape layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddShapeLayer();
+    auto layerName = GetLayerName(armnn::LayerType::Shape, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddShapeLayer(layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -83,7 +84,7 @@ TfLiteStatus VisitShapeOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

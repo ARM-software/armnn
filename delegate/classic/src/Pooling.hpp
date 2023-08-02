@@ -117,7 +117,8 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* poolingLayer = delegateData.m_Network->AddPooling2dLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::Pooling2d, nodeIndex);
+    armnn::IConnectableLayer* poolingLayer = delegateData.m_Network->AddPooling2dLayer(descriptor, layerName.c_str());
     poolingLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(poolingLayer != nullptr);
 
@@ -125,18 +126,18 @@ TfLiteStatus VisitPooling2dOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(poolingLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(poolingLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }
 
-    if(Connect(poolingLayer, tfLiteNode, delegateData) != kTfLiteOk)
+    if (Connect(poolingLayer, tfLiteNode, delegateData) != kTfLiteOk)
     {
         return kTfLiteError;
     }
 
     // Check and create activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData, nodeIndex);
 }
 
 TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
@@ -302,6 +303,7 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
     }
 
     // Create the Layer
+    auto layerName = GetLayerName(armnn::LayerType::Pooling3d, nodeIndex);
     armnn::IConnectableLayer* poolingLayer = delegateData.m_Network->AddPooling3dLayer(descriptor);
     poolingLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(poolingLayer != nullptr);
@@ -311,17 +313,17 @@ TfLiteStatus VisitPooling3dOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(poolingLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(poolingLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }
 
-    if(Connect(poolingLayer, tfLiteNode, delegateData) != kTfLiteOk)
+    if (Connect(poolingLayer, tfLiteNode, delegateData) != kTfLiteOk)
     {
         return kTfLiteError;
     }
 
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, poolingLayer, 0, delegateData, nodeIndex);
 }
 
 } // namespace armnnDelegate

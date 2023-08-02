@@ -64,7 +64,8 @@ TfLiteStatus VisitGatherNdOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddGatherNdLayer();
+    auto layerName = GetLayerName(armnn::LayerType::GatherNd, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddGatherNdLayer(layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
@@ -72,7 +73,8 @@ TfLiteStatus VisitGatherNdOperator(DelegateData& delegateData,
     auto inputsTensorsProcess = ProcessInputs(layer,
                                               delegateData,
                                               tfLiteContext,
-                                              tfLiteNode);
+                                              tfLiteNode,
+                                              nodeIndex);
     if (inputsTensorsProcess == kTfLiteError)
     {
         return inputsTensorsProcess;

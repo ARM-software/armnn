@@ -92,7 +92,8 @@ TfLiteStatus VisitFillOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFillLayer(descriptor);
+    auto layerName = GetLayerName(armnn::LayerType::Fill, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFillLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -102,7 +103,8 @@ TfLiteStatus VisitFillOperator(DelegateData& delegateData,
     auto inputsTensorsProcess = ProcessInputs(layer,
                                               delegateData,
                                               tfLiteContext,
-                                              tfLiteNode);
+                                              tfLiteNode,
+                                              nodeIndex);
     if (inputsTensorsProcess == kTfLiteError)
     {
         return inputsTensorsProcess;

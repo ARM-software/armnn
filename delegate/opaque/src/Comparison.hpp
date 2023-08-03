@@ -10,7 +10,7 @@
 namespace armnnOpaqueDelegate
 {
 
-std::string GetLayerName(armnn::ComparisonOperation comparisonOperation)
+std::string GetOperationName(armnn::ComparisonOperation comparisonOperation)
 {
     std::string layerName = "COMPARISON";
     switch (comparisonOperation)
@@ -123,11 +123,13 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
 
     if (!delegateData.m_Network)
     {
-        validateFunc(outputTensorInfo, isSupported, GetLayerName(comparisonOperation));
+        validateFunc(outputTensorInfo, isSupported, GetOperationName(comparisonOperation));
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* comparisonLayer = delegateData.m_Network->AddComparisonLayer(descriptor);
+    auto layerName = GetName(descriptor.m_Operation, nodeIndex);
+    armnn::IConnectableLayer* comparisonLayer = delegateData.m_Network->AddComparisonLayer(descriptor,
+                                                                                           layerName.c_str());
     comparisonLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(comparisonLayer != nullptr);
 
@@ -135,7 +137,7 @@ TfLiteStatus VisitComparisonOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(comparisonLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(comparisonLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

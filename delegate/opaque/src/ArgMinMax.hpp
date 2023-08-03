@@ -144,7 +144,8 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
     }
 
     // Add an ArgMinMax layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddArgMinMaxLayer(desc);
+    auto layerName = GetName(desc.m_Function, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddArgMinMaxLayer(desc, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -152,7 +153,7 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

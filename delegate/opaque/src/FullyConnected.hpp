@@ -186,7 +186,8 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor);
+    auto layerName = GetName(armnn::LayerType::FullyConnected, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFullyConnectedLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -270,7 +271,8 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
                                 layer,
                                 reshapedOutputTensorInfo,
                                 outputTensorInfo,
-                                delegateData);
+                                delegateData,
+                                nodeIndex);
         if (!layer)
         {
             TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
@@ -289,7 +291,7 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     }
 
     // Check and Create Activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData, nodeIndex);
 }
 
 } // namespace armnnOpaqueDelegate

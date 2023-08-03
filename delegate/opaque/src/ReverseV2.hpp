@@ -127,8 +127,6 @@ TfLiteStatus VisitReverseV2Operator(DelegateData& delegateData,
         }
     }
 
-    std::string layerName("ReverseV2");
-
     // Get axis tensor data
     auto axisTensorNumValues = static_cast<unsigned int>(TfLiteOpaqueTensorDim(tfLiteAxisTensor,0));
 
@@ -155,13 +153,14 @@ TfLiteStatus VisitReverseV2Operator(DelegateData& delegateData,
                                          outputTensorInfo);
     }
 
+    auto layerName = GetName(armnn::LayerType::ReverseV2, nodeIndex);
     armnn::IConnectableLayer* reverseV2Layer = delegateData.m_Network->AddReverseV2Layer(layerName.c_str());
 
     armnn::IOutputSlot& outputSlot = reverseV2Layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(reverseV2Layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(reverseV2Layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

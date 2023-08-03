@@ -320,7 +320,10 @@ TfLiteStatus VisitUnidirectionalSequenceLstmOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddUnidirectionalSequenceLstmLayer(desc, params);
+    auto layerName = GetName(armnn::LayerType::UnidirectionalSequenceLstm, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddUnidirectionalSequenceLstmLayer(desc,
+                                                                                                 params,
+                                                                                                 layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 

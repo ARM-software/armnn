@@ -140,7 +140,9 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     }
 
     // Setup layer and connect.
-    armnn::IConnectableLayer* concatenationLayer = delegateData.m_Network->AddConcatLayer(concatDescriptor);
+    auto layerName = GetName(armnn::LayerType::Concat, nodeIndex);
+    armnn::IConnectableLayer* concatenationLayer = delegateData.m_Network->AddConcatLayer(concatDescriptor,
+                                                                                          layerName.c_str());
     concatenationLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(concatenationLayer != nullptr);
 
@@ -148,7 +150,8 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     auto inputsTensorsProcess = ProcessInputs(concatenationLayer,
                                               delegateData,
                                               tfLiteContext,
-                                              tfLiteNode);
+                                              tfLiteNode,
+                                              nodeIndex);
     if (inputsTensorsProcess == kTfLiteError)
     {
         return inputsTensorsProcess;
@@ -168,7 +171,7 @@ TfLiteStatus VisitConcatenationOperator(DelegateData& delegateData,
     }
 
     // Check and Create activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, concatenationLayer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, concatenationLayer, 0, delegateData, nodeIndex);
 }
 
 TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
@@ -272,7 +275,8 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
     }
 
     // Setup layer and connect.
-    armnn::IConnectableLayer* meanLayer = delegateData.m_Network->AddMeanLayer(desc);
+    auto layerName = GetName(armnn::LayerType::Mean, nodeIndex);
+    armnn::IConnectableLayer* meanLayer = delegateData.m_Network->AddMeanLayer(desc, layerName.c_str());
     meanLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(meanLayer != nullptr);
 
@@ -280,7 +284,7 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(meanLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(meanLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

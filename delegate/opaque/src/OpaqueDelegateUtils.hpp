@@ -10,6 +10,7 @@
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/BackendHelper.hpp>
+#include <armnn/TypesUtils.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
@@ -23,8 +24,44 @@
 #include <tensorflow/lite/minimal_logging.h>
 #include <tensorflow/lite/kernels/kernel_util.h>
 
+#include <fmt/format.h>
+
 namespace
 {
+std::string GetName(armnn::ActivationFunction function, int nodeIndex)
+{
+    return fmt::format("{}:{}", GetActivationFunctionAsCString(function), nodeIndex);
+}
+
+std::string GetName(armnn::ArgMinMaxFunction function, int nodeIndex)
+{
+    return fmt::format("{}:{}", GetArgMinMaxFunctionAsCString(function), nodeIndex);
+}
+
+std::string GetName(armnn::BinaryOperation opType, int nodeIndex)
+{
+    return fmt::format("{}:{}", GetBinaryOperationAsCString(opType), nodeIndex);
+}
+
+std::string GetName(armnn::ComparisonOperation layerType, int nodeIndex)
+{
+    return fmt::format("{}:{}", GetComparisonOperationAsCString(layerType), nodeIndex);
+}
+
+std::string GetName(armnn::LogicalBinaryOperation operation, int nodeIndex)
+{
+    return fmt::format("{}:{}", GetLogicalBinaryOperationAsCString(operation), nodeIndex);
+}
+
+std::string GetName(armnn::UnaryOperation opType, int nodeIndex)
+{
+    return fmt::format("{}:{}", GetUnaryOperationAsCString(opType), nodeIndex);
+}
+
+std::string GetName(armnn::LayerType layerType, int nodeIndex, std::string subname = "")
+{
+    return fmt::format("{}{}:{}", GetLayerTypeAsCString(layerType), subname, nodeIndex);
+}
 
 // Macro to call an Is<layer_name>Supported function and log caller name together with reason for lack of support
 #define FORWARD_LAYER_OPAQUE_SUPPORT_FUNC(opName, tfLiteContext, func, backends, supported, setBackend, ...) \
@@ -225,7 +262,8 @@ TfLiteStatus FusedActivation(TfLiteOpaqueContext* tfLiteContext,
                              TfLiteFusedActivation activationType,
                              armnn::IConnectableLayer* prevLayer,
                              unsigned int outputSlotIndex,
-                             armnnOpaqueDelegate::DelegateData& data)
+                             armnnOpaqueDelegate::DelegateData& data,
+                             int nodeIndex)
 {
     const armnn::TensorInfo& activationOutputInfo = prevLayer->GetOutputSlot(outputSlotIndex).GetTensorInfo();
 
@@ -288,7 +326,8 @@ TfLiteStatus FusedActivation(TfLiteOpaqueContext* tfLiteContext,
     {
         return kTfLiteError;
     }
-    armnn::IConnectableLayer* activationLayer = data.m_Network->AddActivationLayer(activationDesc);
+    auto layerName = GetName(activationDesc.m_Function, nodeIndex);
+    armnn::IConnectableLayer* activationLayer = data.m_Network->AddActivationLayer(activationDesc, layerName.c_str());
     activationLayer->SetBackendId(setBackend);
 
     ARMNN_ASSERT(activationLayer != nullptr);
@@ -322,7 +361,8 @@ armnn::IConnectableLayer* AddReshapeLayer(TfLiteOpaqueContext* tfLiteContext,
                                           armnn::IConnectableLayer* prevLayer,
                                           armnn::TensorInfo reshapedOutputTensorInfo,
                                           armnn::TensorInfo outputTensorInfo,
-                                          armnnOpaqueDelegate::DelegateData& data)
+                                          armnnOpaqueDelegate::DelegateData& data,
+                                          int nodeIndex)
 {
     armnn::ReshapeDescriptor desc;
     desc.m_TargetShape = outputTensorInfo.GetShape();
@@ -344,7 +384,8 @@ armnn::IConnectableLayer* AddReshapeLayer(TfLiteOpaqueContext* tfLiteContext,
         return nullptr;
     }
 
-    armnn::IConnectableLayer* reshapeLayer = data.m_Network->AddReshapeLayer(desc);
+    auto layerName = GetName(armnn::LayerType::Reshape, nodeIndex);
+    armnn::IConnectableLayer* reshapeLayer = data.m_Network->AddReshapeLayer(desc, layerName.c_str());
     reshapeLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(reshapeLayer != nullptr);
 
@@ -570,7 +611,8 @@ bool IsOptionalOperandPresent(TfLiteOpaqueNode* tfLiteNode, const int operandInd
 TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
                            armnnOpaqueDelegate::DelegateData& delegateData,
                            TfLiteOpaqueContext* tfLiteContext,
-                           TfLiteOpaqueNode* tfLiteNode)
+                           TfLiteOpaqueNode* tfLiteNode,
+                           int nodeIndex)
 {
     // Get array of input indices, inputIndexArray is set from the TfLiteOpaqueNodeInputs function
     // This function turns inputIndexArray into an int array of indices. These indices point to the index of the
@@ -610,7 +652,9 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
 
             auto constantInput = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
 
-            armnn::IConnectableLayer* constantLayer = delegateData.m_Network->AddConstantLayer(constantInput);
+            auto layerName = GetName(armnn::LayerType::Constant, nodeIndex);
+            armnn::IConnectableLayer* constantLayer = delegateData.m_Network->AddConstantLayer(constantInput,
+                                                                                               layerName.c_str());
             constantLayer->SetBackendId(setBackend);
             armnn::IOutputSlot& outputSlot = constantLayer->GetOutputSlot(0);
             outputSlot.SetTensorInfo(inputTensorInfo);

@@ -153,7 +153,8 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
     }
 
     // Add a StridedSlice layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddStridedSliceLayer(descriptor);
+    auto layerName = GetName(armnn::LayerType::StridedSlice, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddStridedSliceLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -161,7 +162,7 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

@@ -102,7 +102,8 @@ TfLiteStatus VisitBatchMatMulOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddBatchMatMulLayer(descriptor);
+    auto layerName = GetName(armnn::LayerType::BatchMatMul, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddBatchMatMulLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -110,7 +111,7 @@ TfLiteStatus VisitBatchMatMulOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

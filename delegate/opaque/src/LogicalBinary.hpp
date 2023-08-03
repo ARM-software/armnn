@@ -119,7 +119,9 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* logicalBinaryLayer = delegateData.m_Network->AddLogicalBinaryLayer(desc);
+    auto layerName = GetName(desc.m_Operation, nodeIndex);
+    armnn::IConnectableLayer* logicalBinaryLayer = delegateData.m_Network->AddLogicalBinaryLayer(desc,
+                                                                                                 layerName.c_str());
     logicalBinaryLayer->SetBackendId(setBackend);
     ARMNN_ASSERT(logicalBinaryLayer != nullptr);
 
@@ -129,7 +131,8 @@ TfLiteStatus VisitLogicalBinaryOperator(DelegateData& delegateData,
     auto inputsTensorsProcess = ProcessInputs(logicalBinaryLayer,
                                               delegateData,
                                               tfLiteContext,
-                                              tfLiteNode);
+                                              tfLiteNode,
+                                              nodeIndex);
     if (inputsTensorsProcess == kTfLiteError)
     {
         return inputsTensorsProcess;

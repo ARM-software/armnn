@@ -72,14 +72,15 @@ TfLiteStatus VisitFloorOperator(DelegateData& delegateData,
     }
 
     // Add a Floor layer
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFloorLayer();
+    auto layerName = GetName(armnn::LayerType::Floor, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddFloorLayer(layerName.c_str());
     ARMNN_ASSERT(layer != nullptr);
 
     armnn::IOutputSlot& outputSlot = layer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

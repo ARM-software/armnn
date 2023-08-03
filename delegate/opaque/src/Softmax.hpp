@@ -125,6 +125,8 @@ TfLiteStatus VisitSoftmaxOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* softmaxLayer = nullptr;
+    auto layerName = GetName(armnn::LayerType::Softmax, nodeIndex);
+
     switch(tfliteSoftmaxOperatorCode)
     {
         case kTfLiteBuiltinSoftmax:
@@ -132,13 +134,13 @@ TfLiteStatus VisitSoftmaxOperator(DelegateData& delegateData,
             armnn::SoftmaxDescriptor descriptor;
             auto* nodeParameters = reinterpret_cast<TfLiteSoftmaxParams*>(TfLiteOpaqueNodeGetBuiltinData(tfLiteNode));
             descriptor.m_Beta = nodeParameters->beta;
-            softmaxLayer = delegateData.m_Network->AddSoftmaxLayer(descriptor);
+            softmaxLayer = delegateData.m_Network->AddSoftmaxLayer(descriptor, layerName.c_str());
             break;
         }
         case kTfLiteBuiltinLogSoftmax:
         {
             armnn::LogSoftmaxDescriptor descriptor;
-            softmaxLayer = delegateData.m_Network->AddLogSoftmaxLayer(descriptor);
+            softmaxLayer = delegateData.m_Network->AddLogSoftmaxLayer(descriptor, layerName.c_str());
             break;
         }
         default:
@@ -150,7 +152,7 @@ TfLiteStatus VisitSoftmaxOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(softmaxLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(softmaxLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

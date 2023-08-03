@@ -6,7 +6,6 @@
 #pragma once
 
 #include <OpaqueDelegateUtils.hpp>
-#include <fmt/format.h>
 
 namespace armnnOpaqueDelegate
 {
@@ -169,9 +168,9 @@ TfLiteStatus VisitSliceOperator(DelegateData& delegateData,
         validateFunc(outputTensorInfo, isSupported);
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
-    auto layerName = fmt::format("Slice:{}", nodeIndex);
 
     // Add a Slice layer
+    auto layerName = GetName(armnn::LayerType::Slice, nodeIndex);
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddSliceLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
@@ -180,7 +179,7 @@ TfLiteStatus VisitSliceOperator(DelegateData& delegateData,
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(layer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(layer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

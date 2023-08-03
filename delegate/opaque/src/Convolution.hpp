@@ -154,14 +154,16 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     }
 
     // Set up filter and biases
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddConvolution2dLayer(descriptor);
+    auto layerName = GetName(armnn::LayerType::Convolution2d, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddConvolution2dLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
 
     if(filterTensorInfo.IsConstant())
     {
         auto filter = CreateConstTensor(tfLiteFilterTensor, filterTensorInfo);
 
-        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
+        auto filterName = GetName(armnn::LayerType::Constant, nodeIndex, "Filter");
+        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter, filterName.c_str());
         weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
         weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
     }
@@ -171,7 +173,10 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
         if (biasTensorInfo.IsConstant())
         {
             auto biasTensor = CreateConstTensor(tfLiteBiasTensor, biasTensorInfo);
-            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
+
+            auto biasName = GetName(armnn::LayerType::Constant, nodeIndex, "Bias");
+            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor,
+                                                                                           biasName.c_str());
             ARMNN_ASSERT(biasLayer != nullptr);
             biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
             biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensorInfo);
@@ -183,7 +188,8 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     {
         auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
 
-        armnn::IConnectableLayer* inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        auto inputName = GetName(armnn::LayerType::Constant, nodeIndex, "Input");
+        armnn::IConnectableLayer* inputLayer = delegateData.m_Network->AddConstantLayer(input, inputName.c_str());
         inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
         inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
@@ -205,7 +211,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     }
 
     // Check and Create activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData, nodeIndex);
 }
 
 TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
@@ -348,7 +354,9 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthwiseConvolution2dLayer(descriptor);
+    auto layerName = GetName(armnn::LayerType::DepthwiseConvolution2d, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthwiseConvolution2dLayer(descriptor,
+                                                                                             layerName.c_str());
     layer->SetBackendId(setBackend);
 
     if(filterTensorInfo.IsConstant())
@@ -356,7 +364,8 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         // For depthwise the weights layout is the same as for tflite [1, H, W, I*M]. No permutation required.
         auto filter = CreateConstTensor(tfLiteFilterTensor, filterTensorInfo);
 
-        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
+        auto filterName = GetName(armnn::LayerType::Constant, nodeIndex, "Filter");
+        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter, filterName.c_str());
         weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
         weightsLayer->GetOutputSlot(0).SetTensorInfo(filterTensorInfo);
     }
@@ -367,7 +376,9 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         {
             auto biasTensor = CreateConstTensor(tfLiteBiasTensor, biasTensorInfo);
 
-            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
+            auto biasName = GetName(armnn::LayerType::Constant, nodeIndex, "Bias");
+            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor,
+                                                                                           biasName.c_str());
             ARMNN_ASSERT(biasLayer != nullptr);
             biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
             biasLayer->GetOutputSlot(0).SetTensorInfo(biasTensorInfo);
@@ -379,7 +390,8 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     {
         auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
 
-        armnn::IConnectableLayer* inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        auto inputName = GetName(armnn::LayerType::Constant, nodeIndex, "Input");
+        armnn::IConnectableLayer* inputLayer = delegateData.m_Network->AddConstantLayer(input, inputName.c_str());
         inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
         inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
@@ -400,7 +412,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         return kTfLiteOk;
     }
     // Check and create activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData, nodeIndex);
 }
 
 TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
@@ -552,7 +564,8 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer =  delegateData.m_Network->AddConvolution3dLayer(descriptor);
+    auto layerName = GetName(armnn::LayerType::Convolution3d, nodeIndex);
+    armnn::IConnectableLayer* layer =  delegateData.m_Network->AddConvolution3dLayer(descriptor, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -563,7 +576,8 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
         auto filter = CreateConstTensor(tfLiteFilterTensor,
                                         filterTensorInfo);
 
-        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter);
+        auto filterName = GetName(armnn::LayerType::Constant, nodeIndex, "Filter");
+        armnn::IConnectableLayer* weightsLayer = delegateData.m_Network->AddConstantLayer(filter, filterName.c_str());
         ARMNN_ASSERT(weightsLayer != nullptr);
 
         weightsLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(1u));
@@ -576,7 +590,9 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
         {
             auto biasTensor = CreateConstTensor(tfLiteBiasTensor, biasTensorInfo);
 
-            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor);
+            auto biasName = GetName(armnn::LayerType::Constant, nodeIndex, "Bias");
+            armnn::IConnectableLayer* biasLayer = delegateData.m_Network->AddConstantLayer(biasTensor,
+                                                                                           biasName.c_str());
             ARMNN_ASSERT(biasLayer != nullptr);
 
             biasLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(2u));
@@ -589,7 +605,8 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     {
         auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
 
-        armnn::IConnectableLayer* inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        auto inputName = GetName(armnn::LayerType::Constant, nodeIndex, "Input");
+        armnn::IConnectableLayer* inputLayer = delegateData.m_Network->AddConstantLayer(input, inputName.c_str());
         inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
         inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }
@@ -609,7 +626,7 @@ TfLiteStatus VisitConv3dOperator(DelegateData& delegateData,
     }
 
     // Check and create activation
-    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData);
+    return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData, nodeIndex);
 }
 
 
@@ -781,9 +798,11 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
+    auto layerName = GetName(armnn::LayerType::TransposeConvolution2d, nodeIndex);
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddTransposeConvolution2dLayer(descriptor,
                                                                                              filterTensor,
-                                                                                             armnn::EmptyOptional());
+                                                                                             armnn::EmptyOptional(),
+                                                                                             layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -792,7 +811,8 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     {
         auto input = CreateConstTensor(tfLiteInputTensor, inputTensorInfo);
 
-        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input);
+        auto inputName = GetName(armnn::LayerType::Constant, nodeIndex, "Input");
+        armnn::IConnectableLayer *inputLayer = delegateData.m_Network->AddConstantLayer(input, inputName.c_str());
         inputLayer->GetOutputSlot(0).Connect(layer->GetInputSlot(0u));
         inputLayer->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     }

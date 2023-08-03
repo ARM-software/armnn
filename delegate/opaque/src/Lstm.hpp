@@ -266,7 +266,8 @@ TfLiteStatus VisitLstmOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddLstmLayer(desc, params);
+    auto layerName = GetName(armnn::LayerType::Lstm, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddLstmLayer(desc, params, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 

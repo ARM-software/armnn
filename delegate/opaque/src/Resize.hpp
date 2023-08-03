@@ -203,13 +203,16 @@ TfLiteStatus VisitResizeOperator(DelegateData& delegateData,
 
 
     armnn::IConnectableLayer* resizeLayer = nullptr;
+    layerName += ":";
+    layerName += nodeIndex;
+
     resizeLayer = delegateData.m_Network->AddResizeLayer(desc, layerName.c_str());
 
     armnn::IOutputSlot& outputSlot = resizeLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
 
     // try to connect the Constant Inputs if there are any
-    if(ProcessInputs(resizeLayer,delegateData, tfLiteContext, tfLiteNode) != kTfLiteOk )
+    if (ProcessInputs(resizeLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
     {
         return kTfLiteError;
     }

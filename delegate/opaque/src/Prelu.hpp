@@ -98,7 +98,8 @@ TfLiteStatus VisitPreluOperator(DelegateData& delegateData,
                                      outputTensorInfo);
     }
 
-    armnn::IConnectableLayer* preluLayer = delegateData.m_Network->AddPreluLayer();
+    auto layerName = GetName(armnn::LayerType::Prelu, nodeIndex);
+    armnn::IConnectableLayer* preluLayer = delegateData.m_Network->AddPreluLayer(layerName.c_str());
     ARMNN_ASSERT(preluLayer != nullptr);
 
     bool isConstantAlpha = IsConstantTensor(tfLiteAlphaTensor);
@@ -108,7 +109,9 @@ TfLiteStatus VisitPreluOperator(DelegateData& delegateData,
     {
         auto constAlphaTensor = armnn::ConstTensor(alphaTensorInfo, TfLiteOpaqueTensorData(tfLiteAlphaTensor));
 
-        armnn::IConnectableLayer* constLayer = delegateData.m_Network->AddConstantLayer(constAlphaTensor);
+        auto alphaName = GetName(armnn::LayerType::Constant, nodeIndex, "Alpha");
+        armnn::IConnectableLayer* constLayer = delegateData.m_Network->AddConstantLayer(constAlphaTensor,
+                                                                                        alphaName.c_str());
         ARMNN_ASSERT(constLayer != nullptr);
 
         constLayer->GetOutputSlot(0).SetTensorInfo(alphaTensorInfo);

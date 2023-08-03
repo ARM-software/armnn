@@ -121,7 +121,8 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
     }
 
     // The TfLite Pack operator is equivalent to the ArmNN Stack operator
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddStackLayer(desc);
+    auto layerName = GetName(armnn::LayerType::Stack, nodeIndex);
+    armnn::IConnectableLayer* layer = delegateData.m_Network->AddStackLayer(desc, layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 
@@ -129,7 +130,8 @@ TfLiteStatus VisitPackOperator(DelegateData& delegateData,
     auto inputsTensorsProcess = ProcessInputs(layer,
                                               delegateData,
                                               tfLiteContext,
-                                              tfLiteNode);
+                                              tfLiteNode,
+                                              nodeIndex);
     if (inputsTensorsProcess == kTfLiteError)
     {
         return inputsTensorsProcess;

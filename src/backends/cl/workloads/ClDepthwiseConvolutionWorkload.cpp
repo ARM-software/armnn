@@ -147,12 +147,6 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
 
     detailsInfo.m_InputTensorInfos = info.m_InputTensorInfos;
     detailsInfo.m_OutputTensorInfos = info.m_OutputTensorInfos;
-    detailsInfo.m_WeightsTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[1]);
-
-    if (descriptor.m_Parameters.m_BiasEnabled)
-    {
-        detailsInfo.m_BiasTensorInfo = armnn::Optional<armnn::TensorInfo>(info.m_InputTensorInfos[2]);
-    }
 
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClDepthwiseConvolutionWorkload_Construct",

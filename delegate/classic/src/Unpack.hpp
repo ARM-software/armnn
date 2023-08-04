@@ -96,6 +96,8 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
     unpackDimSizes[unpackAxis] /= unpackNum;
 
     armnn::SplitterDescriptor splitDesc(unpackNum, static_cast<unsigned int>(unpackDimSizes.size()));
+    splitDesc.SetAxis(unpackAxis);
+
     for (unsigned int j = 0; j < unpackNum; ++j)
     {
         // Set the size of the views.

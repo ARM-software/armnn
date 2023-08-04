@@ -104,7 +104,7 @@ bool NeonTensorHandleFactory::SupportsInPlaceComputation() const
 
 bool NeonTensorHandleFactory::SupportsSubTensors() const
 {
-    return true;
+    return false;
 }
 
 MemorySourceFlags NeonTensorHandleFactory::GetExportFlags() const

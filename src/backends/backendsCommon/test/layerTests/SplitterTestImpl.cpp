@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2020,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -199,10 +199,28 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
 
     // Do the first split
     armnn::SplitterQueueDescriptor data;
+    data.m_Parameters = armnn::SplitterDescriptor(2, 3);
+
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, inputTensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, outputTensorInfo1, outputHandle1.get());
     AddOutputToWorkload(data, info, outputTensorInfo2, outputHandle2.get());
+
+    data.m_Parameters.SetViewSize(0, 0, outputChannels1);
+    data.m_Parameters.SetViewSize(0, 1, outputHeight1);
+    data.m_Parameters.SetViewSize(0, 2, outputWidth1);
+
+    data.m_Parameters.SetViewSize(1, 0, outputChannels2);
+    data.m_Parameters.SetViewSize(1, 1, outputHeight2);
+    data.m_Parameters.SetViewSize(1, 2, outputWidth2);
+
+    data.m_Parameters.SetViewOriginCoord(0, 0, 0);
+    data.m_Parameters.SetViewOriginCoord(0, 1, 0);
+    data.m_Parameters.SetViewOriginCoord(0, 2, 0);
+
+    data.m_Parameters.SetViewOriginCoord(1, 0, 1);
+    data.m_Parameters.SetViewOriginCoord(1, 1, 0);
+    data.m_Parameters.SetViewOriginCoord(1, 2, 0);
 
     data.m_ViewOrigins.push_back(window1);
     data.m_ViewOrigins.push_back(window2);
@@ -224,10 +242,28 @@ std::vector<LayerTestResult<T,3>> SplitterTestCommon(
 
     // Do the second split.
     armnn::SplitterQueueDescriptor data2;
+    data2.m_Parameters = armnn::SplitterDescriptor(2, 3);
+
     armnn::WorkloadInfo info2;
     AddInputToWorkload(data2, info2, outputTensorInfo2, outputHandle2.get());
     AddOutputToWorkload(data2, info2, outputTensorInfo3, outputHandle3.get());
     AddOutputToWorkload(data2, info2, outputTensorInfo4, outputHandle4.get());
+
+    data2.m_Parameters.SetViewSize(0, 0, outputChannels1);
+    data2.m_Parameters.SetViewSize(0, 1, outputHeight1);
+    data2.m_Parameters.SetViewSize(0, 2, outputWidth1);
+
+    data2.m_Parameters.SetViewSize(1, 0, outputChannels2);
+    data2.m_Parameters.SetViewSize(1, 1, outputHeight2);
+    data2.m_Parameters.SetViewSize(1, 2, outputWidth1);
+
+    data2.m_Parameters.SetViewOriginCoord(0, 0, 0);
+    data2.m_Parameters.SetViewOriginCoord(0, 1, 0);
+    data2.m_Parameters.SetViewOriginCoord(0, 2, 0);
+
+    data2.m_Parameters.SetViewOriginCoord(1, 0, 1);
+    data2.m_Parameters.SetViewOriginCoord(1, 1, 0);
+    data2.m_Parameters.SetViewOriginCoord(1, 2, 0);
 
     data2.m_ViewOrigins.push_back(window3);
     data2.m_ViewOrigins.push_back(window4);
@@ -306,6 +342,17 @@ LayerTestResult<T, 3> CopyViaSplitterTestImpl(
     armnn::WorkloadInfo info;
     AddInputToWorkload(data, info, tensorInfo, inputHandle.get());
     AddOutputToWorkload(data, info, tensorInfo, outputHandle.get());
+
+    data.m_Parameters = armnn::SplitterDescriptor(1, 3);
+    data.m_Parameters.SetAxis(0);
+
+    data.m_Parameters.SetViewSize(0, 0, 3);
+    data.m_Parameters.SetViewSize(0, 1, 6);
+    data.m_Parameters.SetViewSize(0, 2, 5);
+
+    data.m_Parameters.SetViewOriginCoord(0, 0, 0);
+    data.m_Parameters.SetViewOriginCoord(0, 1, 0);
+    data.m_Parameters.SetViewOriginCoord(0, 2, 0);
 
     data.m_ViewOrigins.push_back(window);
 

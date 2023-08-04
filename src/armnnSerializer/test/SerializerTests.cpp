@@ -2644,6 +2644,7 @@ TEST_CASE("SerializeSplitter")
             desc.SetViewSize(g, dimIdx, splitterDimSizes[dimIdx]);
         }
     }
+    desc.SetAxis(1);
 
     const std::string layerName("splitter");
     const armnn::TensorInfo inputInfo(numDimensions, inputShape, armnn::DataType::Float32);

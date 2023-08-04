@@ -1306,7 +1306,9 @@ void SerializerStrategy::SerializeSplitterLayer(const armnn::IConnectableLayer* 
     // Create FlatBuffer ViewsDescriptor
     auto flatBufferViewsDescriptor = CreateViewsDescriptor(m_flatBufferBuilder,
                                                            flatBufferOriginDescriptor,
-                                                           m_flatBufferBuilder.CreateVector(flatBufferViewSizes));
+                                                           m_flatBufferBuilder.CreateVector(flatBufferViewSizes),
+                                                           viewsDescriptor.HasAxis(),
+                                                           viewsDescriptor.GetAxis());
 
     // Create FlatBuffer BaseLayer
     auto flatBufferBaseLayer = CreateLayerBase(layer, serializer::LayerType::LayerType_Splitter);

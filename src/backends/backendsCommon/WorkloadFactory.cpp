@@ -1611,20 +1611,4 @@ bool IWorkloadFactory::IsLayerSupported(const BackendId& backendId,
                                          modelOptions);
 }
 
-/// Backends should implement their own CreateWorkload function with a switch statement.
-/// The case for the switch should be the LayerType and based on that they will call their
-/// specific workload creation functionality.
-std::unique_ptr<IWorkload> IWorkloadFactory::CreateWorkload(LayerType type,
-                                                            const QueueDescriptor& descriptor,
-                                                            const WorkloadInfo& info) const
-{
-    IgnoreUnused(descriptor);
-    IgnoreUnused(info);
-    switch(type)
-    {
-        default:
-            return std::unique_ptr<IWorkload>();
-    }
-}
-
 } // namepsace armnn

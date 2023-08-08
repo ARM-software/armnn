@@ -64,16 +64,20 @@ public:
     virtual std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                               DataLayout dataLayout,
                                                               const bool IsMemoryManaged = true) const = 0;
+
+    /// Backends should implement their own CreateWorkload function with a switch statement.
+    /// The case for the switch should be the LayerType and based on that they will call their
+    /// specific workload creation functionality.
     virtual std::unique_ptr<IWorkload> CreateWorkload(LayerType type,
                                                       const QueueDescriptor& descriptor,
-                                                      const WorkloadInfo& info) const;
+                                                      const WorkloadInfo& info) const = 0;
 
 private:
     static bool IsLayerConfigurationSupported(const BackendId& backendId,
-                                       const IConnectableLayer& connectableLayer,
-                                       Optional<DataType> dataType,
-                                       std::string& outReasonIfUnsupported,
-                                       const ModelOptions& modelOptions = {});
+                                              const IConnectableLayer& connectableLayer,
+                                              Optional<DataType> dataType,
+                                              std::string& outReasonIfUnsupported,
+                                              const ModelOptions& modelOptions = {});
 };
 
 } // namespace armnn

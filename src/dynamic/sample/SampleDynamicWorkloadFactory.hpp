@@ -52,14 +52,18 @@ public:
 
     std::unique_ptr<armnn::IWorkload> CreateAddition(
             const armnn::AdditionQueueDescriptor& descriptor,
-            const armnn::WorkloadInfo& info) const override;
+            const armnn::WorkloadInfo& info) const;
 
 
     std::unique_ptr<armnn::IWorkload> CreateInput(const armnn::InputQueueDescriptor& descriptor,
-                                                  const armnn::WorkloadInfo& info) const override;
+                                                  const armnn::WorkloadInfo& info) const;
 
     std::unique_ptr<armnn::IWorkload> CreateOutput(const armnn::OutputQueueDescriptor& descriptor,
-                                                   const armnn::WorkloadInfo& info) const override;
+                                                   const armnn::WorkloadInfo& info) const;
+
+    std::unique_ptr<armnn::IWorkload> CreateWorkload(armnn::LayerType type,
+                                                    const armnn::QueueDescriptor& descriptor,
+                                                    const armnn::WorkloadInfo& info) const override;
 
 private:
     mutable std::shared_ptr<SampleMemoryManager> m_MemoryManager;

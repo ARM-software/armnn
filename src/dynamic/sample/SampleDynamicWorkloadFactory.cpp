@@ -5,6 +5,7 @@
 
 #include <armnn/backends/MemCopyWorkload.hpp>
 #include <armnn/backends/TensorHandle.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include "SampleDynamicAdditionWorkload.hpp"
 #include "SampleDynamicBackend.hpp"
@@ -75,6 +76,35 @@ std::unique_ptr<armnn::IWorkload> SampleDynamicWorkloadFactory::CreateOutput(
         const armnn::WorkloadInfo& info) const
 {
     return std::make_unique<armnn::CopyMemGenericWorkload>(descriptor, info);
+}
+
+std::unique_ptr<armnn::IWorkload> SampleDynamicWorkloadFactory::CreateWorkload(
+        armnn::LayerType type,
+        const armnn::QueueDescriptor& descriptor,
+        const armnn::WorkloadInfo& info) const
+{
+    using namespace armnn;
+    using namespace sdb;
+    switch(type)
+    {
+        case LayerType::Addition:
+        {
+            auto additionQueueDescriptor = PolymorphicDowncast<const AdditionQueueDescriptor*>(&descriptor);
+            return std::make_unique<SampleDynamicAdditionWorkload>(*additionQueueDescriptor, info);
+        }
+        case LayerType::Input:
+        {
+            auto inputQueueDescriptor = PolymorphicDowncast<const InputQueueDescriptor*>(&descriptor);
+            return std::make_unique<CopyMemGenericWorkload>(*inputQueueDescriptor, info);
+        }
+        case LayerType::Output:
+        {
+            auto outputQueueDescriptor = PolymorphicDowncast<const OutputQueueDescriptor*>(&descriptor);
+            return std::make_unique<CopyMemGenericWorkload>(*outputQueueDescriptor, info);
+        }
+        default:
+            return nullptr;
+    }
 }
 
 } // namespace sdb

@@ -16,20 +16,20 @@ public:
     bool IsAdditionSupported(const armnn::TensorInfo& input0,
                              const armnn::TensorInfo& input1,
                              const armnn::TensorInfo& output,
-                             armnn::Optional<std::string&> reasonIfUnsupported = armnn::EmptyOptional()) const override;
+                             armnn::Optional<std::string&> reasonIfUnsupported = armnn::EmptyOptional()) const;
 
     bool IsInputSupported(const armnn::TensorInfo& input,
-                          armnn::Optional<std::string&> reasonIfUnsupported) const override;
+                          armnn::Optional<std::string&> reasonIfUnsupported) const;
 
     bool IsOutputSupported(const armnn::TensorInfo& output,
-                           armnn::Optional<std::string&> reasonIfUnsupported) const override;
+                           armnn::Optional<std::string&> reasonIfUnsupported) const;
 
     bool IsLayerSupported(const armnn::LayerType& type,
                           const std::vector<armnn::TensorInfo>& infos,
                           const armnn::BaseDescriptor& descriptor,
                           const armnn::Optional<armnn::LstmInputParamsInfo>& lstmParamsInfo,
                           const armnn::Optional<armnn::QuantizedLstmInputParamsInfo>& quantizedLstmParamsInfo,
-                          armnn::Optional<std::string&> reasonIfUnsupported = armnn::EmptyOptional()) const override;
+                          armnn::Optional<std::string&> reasonIfUnsupported = armnn::EmptyOptional()) const;
 };
 
 } // namespace sdb

@@ -1467,10 +1467,10 @@ void CreateReferenceDynamicBackendTestImpl()
     {
         { inputInfo, weightInfo },
         { outputInfo },
+        "Name",
         EmptyOptional(),
         EmptyOptional(),
-        EmptyOptional(),
-        "Name"
+        EmptyOptional()
     };
     convolution2dQueueDescriptor.m_Inputs.push_back(nullptr);
 
@@ -1553,10 +1553,10 @@ void CreateSampleDynamicBackendTestImpl()
     {
         { inputInfo, inputInfo },
         { outputInfo },
+        "Name",
         EmptyOptional(),
         EmptyOptional(),
-        EmptyOptional(),
-        "Name"
+        EmptyOptional()
     };
 
     // Create a addition workload

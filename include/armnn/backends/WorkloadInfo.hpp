@@ -17,10 +17,10 @@ struct WorkloadInfo
 {
     std::vector<TensorInfo> m_InputTensorInfos;
     std::vector<TensorInfo> m_OutputTensorInfos;
+    std::string m_Name;
     Optional<TensorInfo> m_WeightsTensorInfo = EmptyOptional();
     Optional<TensorInfo> m_BiasTensorInfo = EmptyOptional();
     Optional<std::string> m_ConvolutionMethod = EmptyOptional();
-    std::string m_Name;
 };
 
 struct MemoryInfo

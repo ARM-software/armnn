@@ -774,6 +774,8 @@ table OriginsDescriptor {
 table ViewsDescriptor {
    origins:OriginsDescriptor;
    viewSizes:[UintVector];
+   hasAxis:bool;
+   axis:int;
 }
 
 table SplitterLayer {

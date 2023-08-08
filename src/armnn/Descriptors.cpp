@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "armnn/Descriptors.hpp"
@@ -361,6 +361,24 @@ void swap(ViewsDescriptor& first, ViewsDescriptor& second)
     using std::swap;
     swap(first.m_Origins, second.m_Origins);
     swap(first.m_ViewSizes, second.m_ViewSizes);
+}
+
+void ViewsDescriptor::SetAxis(int32_t axis)
+{
+    m_Axis = axis;
+    m_IsAxisSet = true;
+}
+
+/// Get the axis value.
+int32_t ViewsDescriptor::GetAxis() const
+{
+    return m_Axis;
+}
+
+/// Returns true if an axis has been set.
+bool ViewsDescriptor::HasAxis() const
+{
+    return m_IsAxisSet;
 }
 
 int StridedSliceDescriptor::GetStartForAxis(const TensorShape& inputShape,

@@ -276,9 +276,21 @@ struct ViewsDescriptor : BaseDescriptor
 
     /// Swap the ViewsDescriptor value first and second.
     friend void swap(ViewsDescriptor& first, ViewsDescriptor& second);
+
+    /// Set the axis value.
+    void SetAxis(int32_t axis);
+
+    /// Get the axis value.
+    int32_t GetAxis() const;
+
+    /// Returns true if an axis has been set.
+    bool HasAxis() const;
+
 private:
     OriginsDescriptor m_Origins;
     uint32_t**        m_ViewSizes;
+    bool              m_IsAxisSet = false;
+    int32_t           m_Axis = 0;
 };
 
 

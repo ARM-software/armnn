@@ -636,6 +636,10 @@ void StringifyLayerParameters<ViewsDescriptor>::Serialize(ParameterStringifyFunc
         }
         value << "]";
         fn(key.str(), value.str());
+        if (desc.HasAxis())
+        {
+            fn("Axis", std::to_string(desc.GetAxis()));
+        }
     }
     StringifyLayerParameters<OriginsDescriptor>::Serialize(fn, desc.GetOrigins());
 }

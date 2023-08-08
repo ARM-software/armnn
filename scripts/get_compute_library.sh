@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_05" # Release 23.05
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION=""0c19f59279a88384074635bf273a99001602ed21 #Fix CL Tile operator
+#DEFAULT_CLFRAMEWORKREVISION=""0c19f59279a88384074635bf273a99001602ed21 #Fix CL Tile operator
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

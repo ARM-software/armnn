@@ -182,7 +182,7 @@ private:
         m_HasValue = true;
     }
 
-    alignas(alignof(T)) unsigned char m_Storage[sizeof(T)];
+    alignas(alignof(T)) unsigned char m_Storage[sizeof(T)] = {};
 };
 
 ///

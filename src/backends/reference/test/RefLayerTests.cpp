@@ -2800,6 +2800,8 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajorSin
                               UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleBatchTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatch,
                               UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleTime,
+                              UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleTimeTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32,
                               UnidirectionalSequenceLstmLayerFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(UnidirectionalSequenceLstmLayerFloat32TimeMajor,

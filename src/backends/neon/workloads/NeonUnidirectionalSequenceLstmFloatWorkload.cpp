@@ -603,7 +603,8 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
             statusSplit = arm_compute::NESplit::validate(&aclPermuteOutInfo,
                                                          splitterOutputsTensorInfosPtr,
                                                          aclAxisSplit);
-        } else
+        }
+        else
         {
             statusSplit = arm_compute::NESplit::validate(&aclInputInfo, splitterOutputsTensorInfosPtr, aclAxisSplit);
         }
@@ -740,7 +741,7 @@ NeonUnidirectionalSequenceLstmFloatWorkloadValidate(const TensorInfo& input,
         // Set input of LSTM to be first input ITensor.
         // Set output of LSTM to be final output ITensor.
         // LSTM input/output cannot be > 2 dimensions so need to resize its TensorInfo.
-        if (maxTime == 1 && !descriptor.m_TimeMajor)
+        if (maxTime == 1 && descriptor.m_TimeMajor)
         {
             TensorShape inputShape = GetTensorShape(aclInputInfo.tensor_shape(), 1U);
             TensorShape outputShape = GetTensorShape(aclOutputInfo.tensor_shape(), 1U);

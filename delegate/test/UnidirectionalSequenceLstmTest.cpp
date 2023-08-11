@@ -157,10 +157,12 @@ void UnidirectionalSequenceLstmTest(std::vector<armnn::BackendId>& backends)
                                               isTimeMajor);
 }
 
-void UnidirectionalSequenceLstmTimeMajorTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmTimeMajorTestImpl(std::vector<armnn::BackendId>& backends,
+                                                 int32_t timeSize,
+                                                 std::vector<float>& inputValues,
+                                                 std::vector<float>& expectedOutputValues)
 {
     int32_t batchSize = 3;
-    int32_t timeSize = 2;
     int32_t inputSize = 3;
     int32_t outputSize = 4;
     // cellSize and outputSize have the same size when there is no projection.
@@ -243,16 +245,6 @@ void UnidirectionalSequenceLstmTimeMajorTest(std::vector<armnn::BackendId>& back
     bool hasOutputLayerNormWeights = false;
     std::vector<float> outputLayerNormWeights;
 
-    std::vector<float> inputValues = { 1., 2., 3., 4., 5., 4.,
-                                       3., 2., 1., 2., 3., 4.,
-                                       5., 4., 3., 2., 1., 2. };
-    std::vector<float> expectedOutputValues = { 0.135658f, 0.124673f, 0.021209f, -0.0530204f,
-                                                0.106138f, 0.0404792f, 0.0151644f, -0.00675166f,
-                                                -0.0128514f, 0.0644884f, 0.0709072f, -0.0454045f,
-                                                0.162886f, 0.166494f, 0.0277046f, -0.0369807f,
-                                                0.111716f, 0.043119f, 0.0762981f, -0.0122854f,
-                                                0.104397f, 0.2144f, 0.119192f, -0.0839058f };
-
     tflite::ActivationFunctionType activationFunction = tflite::ActivationFunctionType_TANH;
     float clippingThresCell = 10.f;
     float clippingThresProj = 0.f;
@@ -303,7 +295,45 @@ void UnidirectionalSequenceLstmTimeMajorTest(std::vector<armnn::BackendId>& back
                                               activationFunction,
                                               clippingThresCell,
                                               clippingThresProj,
-                                              isTimeMajor);
+                                              isTimeMajor);}
+
+void UnidirectionalSequenceLstmTimeMajorTest(std::vector<armnn::BackendId>& backends)
+{
+    int32_t timeSize = 2;
+
+    std::vector<float> inputValues = { 1., 2., 3., 4., 5., 4.,
+                                       3., 2., 1., 2., 3., 4.,
+                                       5., 4., 3., 2., 1., 2. };
+
+    std::vector<float> expectedOutputValues = { 0.135658f, 0.124673f, 0.021209f, -0.0530204f,
+                                                0.106138f, 0.0404792f, 0.0151644f, -0.00675166f,
+                                                -0.0128514f, 0.0644884f, 0.0709072f, -0.0454045f,
+                                                0.162886f, 0.166494f, 0.0277046f, -0.0369807f,
+                                                0.111716f, 0.043119f, 0.0762981f, -0.0122854f,
+                                                0.104397f, 0.2144f, 0.119192f, -0.0839058f };
+
+    UnidirectionalSequenceLstmTimeMajorTestImpl(backends,
+                                                timeSize,
+                                                inputValues,
+                                                expectedOutputValues);
+}
+
+void UnidirectionalSequenceLstmTimeMajorSingleTimeTest(std::vector<armnn::BackendId>& backends)
+{
+    int32_t timeSize = 1;
+
+    std::vector<float> inputValues = { 1., 2., 3.,
+                                       4., 5., 6.,
+                                       7., 8., 9. };
+
+    std::vector<float> expectedOutputValues = { 0.13565768f, 0.12467254f, 0.02120903f, -0.05302038f,
+                                                0.1053334f, 0.08508634f, 0.00667238f, -0.00356043f,
+                                                0.05638668f, 0.02924093f, 0.00119751f, -0.00017249f };
+
+    UnidirectionalSequenceLstmTimeMajorTestImpl(backends,
+                                                timeSize,
+                                                inputValues,
+                                                expectedOutputValues);
 }
 
 void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest(std::vector<armnn::BackendId>& backends)
@@ -1409,6 +1439,12 @@ TEST_CASE ("UnidirectionalSequenceLstmTimeMajorTest_CpuRef_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmTimeMajorTest(backends);
+}
+
+TEST_CASE ("UnidirectionalSequenceLstmTimeMajorSingleTimeTest_CpuRef_Test")
+{
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    UnidirectionalSequenceLstmTimeMajorSingleTimeTest(backends);
 }
 
 TEST_CASE ("UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest_CpuRef_Test")

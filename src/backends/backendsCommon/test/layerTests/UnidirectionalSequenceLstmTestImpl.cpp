@@ -224,7 +224,8 @@ LayerTestResult<T, 3> UnidirectionalSequenceLstmLayerFloat32TestImpl(
     const armnn::TensorShape& outputExpectedShape,
     float qScale = 1.0f,
     int32_t qOffset = 0,
-    armnn::DataType constantDataType = armnn::DataType::Float32) {
+    armnn::DataType constantDataType = armnn::DataType::Float32)
+{
     IgnoreUnused(memoryManager);
     unsigned int batchSize = armnn::numeric_cast<unsigned int>(inputShape[0]);
     unsigned int timeSize = armnn::numeric_cast<unsigned int>(inputShape[1]);
@@ -413,7 +414,8 @@ UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl(
     const armnn::TensorShape& outputExpectedShape,
     float qScale = 1.0f,
     int32_t qOffset = 0,
-    armnn::DataType constantDataType = armnn::DataType::Float32) {
+    armnn::DataType constantDataType = armnn::DataType::Float32)
+{
     IgnoreUnused(memoryManager);
     unsigned int batchSize = armnn::numeric_cast<unsigned int>(inputShape[1]);
     unsigned int timeSize = armnn::numeric_cast<unsigned int>(inputShape[0]);
@@ -613,7 +615,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleB
 LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory) {
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
     armnn::TensorInfo inputInfo({3, 1, 3}, armnn::DataType::Float32);
     std::vector<float> input = { 1., 2., 3., 4., 5., 4., 3., 2., 1. };
 
@@ -626,10 +629,32 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32BatchMajorSingle
         input, expectedOutput, inputInfo.GetShape(), outputInfo.GetShape());
 }
 
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleTimeTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputInfo({ 1, 3, 3 }, armnn::DataType::Float32);
+    std::vector<float> input = { 1., 2., 3.,
+                                 4., 5., 6.,
+                                 7., 8., 9. };
+
+    armnn::TensorInfo outputInfo({ 1, 3, 4 }, armnn::DataType::Float32);
+    std::vector<float> expectedOutput =
+                          { 0.13565768f, 0.12467254f, 0.02120903f, -0.05302038f,
+                            0.1053334f, 0.08508634f, 0.00667238f, -0.00356043f,
+                            0.05638668f, 0.02924093f, 0.00119751f, -0.00017249f      };
+
+    return UnidirectionalSequenceLstmLayerFloat32TimeMajorTestImpl<armnn::DataType::Float32>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        input, expectedOutput, inputInfo.GetShape(), outputInfo.GetShape());
+}
+
 LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory) {
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
     armnn::TensorInfo inputInfo({3, 2, 3}, armnn::DataType::Float32);
     std::vector<float> input = { 1., 2., 3., 4., 5., 4.,
                                  3., 2., 1., 2., 3., 4.,
@@ -650,7 +675,8 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32Test(
 LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory) {
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
     armnn::TensorInfo inputInfo({2, 3, 3}, armnn::DataType::Float32);
     std::vector<float> input = { 1., 2., 3., 4., 5., 4.,
                                  3., 2., 1., 2., 3., 4.,

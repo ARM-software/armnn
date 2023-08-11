@@ -226,7 +226,7 @@ TfLiteStatus VisitUnidirectionalSequenceLstmOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
 
-    unsigned int batchSize  = inputTensorInfo.GetShape()[0];
+    unsigned int batchSize  = desc.m_TimeMajor ? inputTensorInfo.GetShape()[1] : inputTensorInfo.GetShape()[0];
     unsigned int outputSize = outputTensorInfo.GetShape()[2];
     unsigned int numUnits   = cellStateInInfo.GetShape()[1];
 

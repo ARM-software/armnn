@@ -81,6 +81,7 @@ void RefUnidirectionalSequenceLstmWorkload::Execute(std::vector<ITensorHandle*> 
         outputShape = armnnUtils::Permuted(outputInfo.GetShape(), mappings);
         outputInfo.SetShape(outputShape);
     }
+    // As it is permuted to time major, maxTime is inputShape[0].
     unsigned int maxTime = inputShape[0];
     unsigned int batchSize = inputShape[1];
     unsigned int outputSize = outputShape[2];

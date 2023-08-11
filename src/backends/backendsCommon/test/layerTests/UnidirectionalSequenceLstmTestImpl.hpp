@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,6 +16,11 @@ LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleB
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32BatchMajorSingleBatchTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+LayerTestResult<float, 3> UnidirectionalSequenceLstmLayerFloat32TimeMajorSingleTimeTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);

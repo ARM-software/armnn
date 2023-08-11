@@ -4049,7 +4049,7 @@ void TfLiteParserImpl::ParseUnidirectionalSequenceLSTM(size_t subgraphIndex, siz
         desc.m_HiddenStateScale = hiddentensor->GetInfo().GetQuantizationScale();
         desc.m_HiddenStateZeroPoint = hiddentensor->GetInfo().GetQuantizationOffset();
     }
-    unsigned int batchSize  = inputTensorInfo.GetShape()[0];
+    unsigned int batchSize  = desc.m_TimeMajor ? inputTensorInfo.GetShape()[1] : inputTensorInfo.GetShape()[0];
     unsigned int outputSize = outputTensorInfo.GetShape()[2];
     unsigned int numUnits   = cellStateInInfo.GetShape()[1];
 

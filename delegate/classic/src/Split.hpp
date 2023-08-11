@@ -107,8 +107,6 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     splitterDimSizes[splitDim] /= numSplits;
 
     armnn::SplitterDescriptor splitDescriptor(numSplits, inputDimSize);
-    splitDescriptor.SetAxis(axis);
-
     for (unsigned int j = 0; j < numSplits; ++j)
     {
         // Set the size of the views.
@@ -303,8 +301,6 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
     }
 
     armnn::SplitterDescriptor splitDescriptor(numSplits, inputDimSize);
-    splitDescriptor.SetAxis(axis);
-
     unsigned int accumSplit = 0;
     for (unsigned int j = 0; j < numSplits; ++j)
     {

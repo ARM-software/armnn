@@ -216,16 +216,12 @@ void OriginsDescriptor::ReorderOrigins(unsigned int*  newOrdering, unsigned int 
 ViewsDescriptor::ViewsDescriptor()
 : m_Origins()
 , m_ViewSizes(nullptr)
-, m_IsAxisSet(false)
-, m_Axis(0)
 {}
 
 ViewsDescriptor::ViewsDescriptor(uint32_t numViews, uint32_t numDimensions /*= 4*/)
     : m_Origins(numViews, numDimensions)
     , m_ViewSizes(numViews > 0 && numDimensions > 0 ?
                       new uint32_t *[numViews]() : nullptr)
-    , m_IsAxisSet(false)
-    , m_Axis(0)
 {
     if (m_ViewSizes)
     {
@@ -240,8 +236,6 @@ ViewsDescriptor::ViewsDescriptor(const ViewsDescriptor& other)
     : m_Origins(other.m_Origins)
     , m_ViewSizes(other.GetNumViews() > 0 && other.GetNumDimensions() > 0 ?
                       new uint32_t *[other.GetNumViews()]() : nullptr)
-    , m_IsAxisSet(other.m_IsAxisSet)
-    , m_Axis(other.m_Axis)
 {
     if (m_ViewSizes)
     {
@@ -367,8 +361,6 @@ void swap(ViewsDescriptor& first, ViewsDescriptor& second)
     using std::swap;
     swap(first.m_Origins, second.m_Origins);
     swap(first.m_ViewSizes, second.m_ViewSizes);
-    swap(first.m_IsAxisSet, second.m_IsAxisSet);
-    swap(first.m_Axis, second.m_Axis);
 }
 
 void ViewsDescriptor::SetAxis(int32_t axis)

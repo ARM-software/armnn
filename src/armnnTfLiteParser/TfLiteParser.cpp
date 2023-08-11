@@ -4213,7 +4213,7 @@ void TfLiteParserImpl::ParseUnpack(size_t subgraphIndex, size_t operatorIndex)
         }
         splitDesc.SetViewOriginCoord(j, unpackAxis, unpackDimSizes[unpackAxis] * j);
     }
-    splitDesc.SetAxis(unpackAxis);
+
     auto layerName = fmt::format("Unpack:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
 
@@ -4352,10 +4352,7 @@ void TfLiteParserImpl::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
         }
         splitDesc.SetViewOriginCoord(j, splitDim, splitterDimSizes[splitDim] * j);
     }
-    if (axisTensorInfo.GetNumElements() == 1)
-    {
-        splitDesc.SetAxis(axis);
-    }
+
     auto layerName = fmt::format("Split:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());
 
@@ -4534,7 +4531,6 @@ void TfLiteParserImpl::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
         splitDesc.SetViewOriginCoord(j, splitDim, accumSplit);
         accumSplit += splitSize;
     }
-    splitDesc.SetAxis(axis);
 
     auto layerName = fmt::format("SplitV:{}:{}", subgraphIndex, operatorIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(splitDesc, layerName.c_str());

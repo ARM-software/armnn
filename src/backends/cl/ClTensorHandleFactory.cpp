@@ -103,7 +103,7 @@ const FactoryId& ClTensorHandleFactory::GetId() const
 
 bool ClTensorHandleFactory::SupportsSubTensors() const
 {
-    return false;
+    return true;
 }
 
 MemorySourceFlags ClTensorHandleFactory::GetExportFlags() const

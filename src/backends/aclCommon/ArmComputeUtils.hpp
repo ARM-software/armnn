@@ -9,7 +9,6 @@
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/backends/WorkloadData.hpp>
-#include <armnnUtils/TensorUtils.hpp>
 
 #include <arm_compute/runtime/FunctionDescriptors.h>
 #include <arm_compute/function_info/FullyConnectedLayerInfo.h>
@@ -248,20 +247,13 @@ inline std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& 
     unsigned int numDimensions = desc.GetNumDimensions();
     std::set<unsigned int> splitAxis;
 
-    if (desc.HasAxis())
+    for (unsigned int i = 0; i < numSplit; ++i)
     {
-        splitAxis.insert(armnnUtils::GetUnsignedAxis(desc.GetNumDimensions(), desc.GetAxis()));
-    }
-    else
-    {
-        for (unsigned int i = 0; i < numSplit; ++i)
+        for (unsigned int dimIdx = 0; dimIdx < numDimensions; ++dimIdx)
         {
-            for (unsigned int dimIdx = 0; dimIdx < numDimensions; ++dimIdx)
+            if (desc.GetViewSizes(i)[dimIdx] != input[dimIdx])
             {
-                if (desc.GetViewSizes(i)[dimIdx] != input[dimIdx])
-                {
-                    splitAxis.insert(dimIdx);
-                }
+                splitAxis.insert(dimIdx);
             }
         }
     }

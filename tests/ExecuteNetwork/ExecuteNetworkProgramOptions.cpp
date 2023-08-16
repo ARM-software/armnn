@@ -351,6 +351,12 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "Perform an per byte root mean square error calculation of the output of the inference with"
                  " the tflite ref model.",
                  cxxopts::value<bool>(m_ExNetParams.m_CompareWithTflite)->default_value("false")
+                         ->implicit_value("true"))
+
+                ("serialize-to-armnn",
+                 "Serialize the loaded network to an .armnn file. This option will also serialize the optimized network"
+                 " in dot format. This option only works with the TfLite parser. An inference will NOT be executed.",
+                 cxxopts::value<bool>(m_ExNetParams.m_SerializeToArmNN)->default_value("false")
                          ->implicit_value("true"));
 
         m_CxxOptions.add_options("d) Optimization")

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -67,6 +67,7 @@ struct ExecuteNetworkParams
     std::string                       m_ComparisonFile;
     std::vector<armnn::BackendId>     m_ComparisonComputeDevices;
     bool                              m_CompareWithTflite;
+    bool                              m_SerializeToArmNN;
     // Ensures that the parameters for ExecuteNetwork fit together
     void ValidateParams();
 

@@ -25,6 +25,7 @@ struct ElementwiseUnaryDescriptor;
 struct FakeQuantizationDescriptor;
 struct FillDescriptor;
 struct FullyConnectedDescriptor;
+struct FusedDescriptor;
 struct GatherDescriptor;
 struct InstanceNormalizationDescriptor;
 struct L2NormalizationDescriptor;

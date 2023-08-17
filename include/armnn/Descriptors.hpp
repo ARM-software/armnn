@@ -940,6 +940,27 @@ struct FillDescriptor : BaseDescriptor
     float m_Value;
 };
 
+/// A FusedDescriptor for the FusedLayer.
+struct FusedDescriptor : BaseDescriptor
+{
+    FusedDescriptor(unsigned int numInputSlots = 4u,
+                    unsigned int numOutputSlots = 2u,
+                    FusedKernelType fusedType = FusedKernelType::AddMulAdd)
+        : m_NumInputSlots(numInputSlots), m_NumOutputSlots(numOutputSlots), m_FusedKernelType(fusedType)
+    {}
+
+    bool operator ==(const FusedDescriptor& rhs) const
+    {
+        return m_NumInputSlots  == rhs.m_NumInputSlots &&
+               m_NumOutputSlots == rhs.m_NumOutputSlots &&
+               m_FusedKernelType == rhs.m_FusedKernelType;
+    }
+
+    unsigned int m_NumInputSlots;
+    unsigned int m_NumOutputSlots;
+    FusedKernelType m_FusedKernelType;
+};
+
 /// A GatherDescriptor for the GatherLayer.
 struct GatherDescriptor : BaseDescriptor
 {

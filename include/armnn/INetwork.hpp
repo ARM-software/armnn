@@ -477,6 +477,14 @@ public:
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const char* name = nullptr);
 
+    /// Adds a Fused layer to the network.
+    /// Method use is for backend users.
+    /// @param fusedDescriptor - FusedDescriptor contains parameters for the Fused layer.
+    /// @param name - Optional name for the layer.
+    /// @return - Interface for configuring the layer.
+    IConnectableLayer* AddFusedLayer(const FusedDescriptor& fusedDescriptor,
+                                     const char* name = nullptr);
+
     /// Adds a permute layer to the network.
     /// @param permuteDescriptor - PermuteDescriptor to configure the permute.
     /// @param name - Optional name for the layer.

@@ -1724,6 +1724,13 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvertFp16ToFp32, SimpleConvertFp16ToFp32Te
 // Convert from Float32 to Float16
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Test)
 
+// AddMulAdd
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd2OutputsFloat32, AddMulAddTest<DataType::Float32>, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd2OutputsUint8, AddMulAddTest<DataType::QAsymmU8>, true)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd1OutputFloat32, AddMulAddTest<DataType::Float32>, false)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd1OutputUint8, AddMulAddTest<DataType::QAsymmU8>, false)
+
 #if defined(ARMNNREF_ENABLED)
 
 // The ARMNN_COMPARE_REF_AUTO_TEST_CASE and the ARMNN_COMPARE_REF_FIXTURE_TEST_CASE test units are not available

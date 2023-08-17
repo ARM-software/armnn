@@ -115,6 +115,15 @@ constexpr char const* GetLogicalBinaryOperationAsCString(LogicalBinaryOperation 
     }
 }
 
+constexpr char const* GetFusedTypeAsCString(FusedKernelType type)
+{
+    switch (type)
+    {
+        case FusedKernelType::AddMulAdd:   return "AddMulAdd";
+        default:                           return "Unknown";
+    }
+}
+
 constexpr char const* GetPoolingAlgorithmAsCString(PoolingAlgorithm pooling)
 {
     switch (pooling)

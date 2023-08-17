@@ -682,7 +682,7 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
         default:
             // layers not supported in cl by default:
             // debug, detectionpostprocess, fakequantization,
-            // precompiled, standin, switch, pooling3d
+            // precompiled, standin, switch, pooling3d, fused
             return false;
     }
 }

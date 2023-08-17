@@ -194,6 +194,11 @@ public:
                                    const FullyConnectedDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
+    bool IsFusedSupported(const std::vector<std::reference_wrapper<TensorInfo>>& inputs,
+                          const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                          const FusedDescriptor& descriptor,
+                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
     bool IsGatherSupported(const TensorInfo& input0,
                            const TensorInfo& input1,
                            const TensorInfo& output,

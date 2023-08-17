@@ -525,6 +525,36 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                reason);
             break;
         }
+        case LayerType::Fused:
+        {
+            auto cLayer = PolymorphicDowncast<const FusedLayer*>(&layer);
+
+            // Get vector of all outputs.
+            auto getOutTensorInfo = [&dataType](const OutputSlot& slot)
+            {
+                return OverrideDataType(slot.GetTensorInfo(), dataType);
+            };
+            auto beginOutputs = MakeTransformIterator(layer.GetOutputSlots().begin(), getOutTensorInfo);
+            auto endOutputs = MakeTransformIterator(layer.GetOutputSlots().end(), getOutTensorInfo);
+            std::vector<TensorInfo> outputs(beginOutputs, endOutputs);
+            const std::vector<std::reference_wrapper<TensorInfo>> outputPtrs(outputs.begin(), outputs.end());
+
+            // Get vector of all inputs.
+            auto getInputTensorInfo = [&dataType](const InputSlot& slot)
+            {
+                return OverrideDataType(slot.GetTensorInfo(), dataType);
+            };
+            auto beginInputs = MakeTransformIterator(layer.GetInputSlots().begin(), getInputTensorInfo);
+            auto endInputs = MakeTransformIterator(layer.GetInputSlots().end(), getInputTensorInfo);
+            std::vector<TensorInfo> inputs(beginInputs, endInputs);
+            const std::vector<std::reference_wrapper<TensorInfo>> inputPtrs(inputs.begin(), inputs.end());
+
+            result = layerSupportObject.IsFusedSupported(inputPtrs,
+                                                         outputPtrs,
+                                                         cLayer->GetParameters(),
+                                                         reason);
+            break;
+        }
         case LayerType::Gather:
         {
             const TensorInfo& input0 = layer.GetInputSlot(0).GetTensorInfo();

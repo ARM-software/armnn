@@ -335,6 +335,12 @@ IConnectableLayer* INetwork::AddFullyConnectedLayer(const FullyConnectedDescript
     return pNetworkImpl->AddFullyConnectedLayer(fullyConnectedDescriptor, name);
 }
 
+IConnectableLayer* INetwork::AddFusedLayer(const FusedDescriptor& fusedDescriptor,
+                                           const char* name)
+{
+    return pNetworkImpl->AddFusedLayer(fusedDescriptor, name);
+}
+
 IConnectableLayer* INetwork::AddPermuteLayer(const PermuteDescriptor& permuteDescriptor,
                                              const char* name)
 {
@@ -2193,6 +2199,12 @@ IConnectableLayer* NetworkImpl::AddFullyConnectedLayer(const FullyConnectedDescr
                                                        const char* name)
 {
     return m_Graph->AddLayer<FullyConnectedLayer>(fullyConnectedDescriptor, name);
+}
+
+IConnectableLayer* NetworkImpl::AddFusedLayer(const FusedDescriptor& fusedDescriptor,
+                                              const char* name)
+{
+    return m_Graph->AddLayer<FusedLayer>(fusedDescriptor, name);
 }
 
 IConnectableLayer* NetworkImpl::AddConcatLayer(const ConcatDescriptor& concatDescriptor,

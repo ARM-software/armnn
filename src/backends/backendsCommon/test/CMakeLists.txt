@@ -71,6 +71,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ActivationTestImpl.hpp
     layerTests/AdditionTestImpl.cpp
     layerTests/AdditionTestImpl.hpp
+    layerTests/AddMulAddTestImpl.hpp
     layerTests/ArgMinMaxTestImpl.cpp
     layerTests/ArgMinMaxTestImpl.hpp
     layerTests/BatchMatMulTestImpl.cpp

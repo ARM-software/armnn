@@ -33,6 +33,7 @@
 #include "layers/FillLayer.hpp"
 #include "layers/FloorLayer.hpp"
 #include "layers/FullyConnectedLayer.hpp"
+#include "layers/FusedLayer.hpp"
 #include "layers/GatherLayer.hpp"
 #include "layers/GatherNdLayer.hpp"
 #include "layers/InputLayer.hpp"
@@ -136,6 +137,7 @@ DECLARE_LAYER(FakeQuantization)
 DECLARE_LAYER(Fill)
 DECLARE_LAYER(Floor)
 DECLARE_LAYER(FullyConnected)
+DECLARE_LAYER(Fused)
 DECLARE_LAYER(Gather)
 DECLARE_LAYER(GatherNd)
 DECLARE_LAYER(Input)

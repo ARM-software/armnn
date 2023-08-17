@@ -748,6 +748,30 @@ bool LayerSupportHandle::IsFullyConnectedSupported(const TensorInfo& input,
                                             reasonIfUnsupported);
 }
 
+bool LayerSupportHandle::IsFusedSupported(const std::vector<std::reference_wrapper<TensorInfo>>& inputs,
+                                          const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                                          const FusedDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported)
+{
+    TensorInfos infos;
+    infos.reserve(inputs.size() + outputs.size());
+    for (TensorInfo inInfo : inputs)
+    {
+        infos.emplace_back(inInfo);
+    }
+    for (TensorInfo outInfo : outputs)
+    {
+        infos.emplace_back(outInfo);
+    }
+
+    return m_LayerSupport->IsLayerSupported(LayerType::Fused,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported);
+}
+
 bool LayerSupportHandle::IsGatherSupported(const TensorInfo& input0,
                                            const TensorInfo& input1,
                                            const TensorInfo& output,

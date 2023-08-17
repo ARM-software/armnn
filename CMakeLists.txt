@@ -240,6 +240,8 @@ list(APPEND armnn_sources
     src/armnn/layers/FloorLayer.cpp
     src/armnn/layers/FullyConnectedLayer.hpp
     src/armnn/layers/FullyConnectedLayer.cpp
+    src/armnn/layers/FusedLayer.hpp
+    src/armnn/layers/FusedLayer.cpp
     src/armnn/layers/GatherLayer.cpp
     src/armnn/layers/GatherLayer.hpp
     src/armnn/layers/GatherNdLayer.cpp

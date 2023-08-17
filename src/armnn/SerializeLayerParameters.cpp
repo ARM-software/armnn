@@ -325,6 +325,15 @@ void StringifyLayerParameters<PreCompiledDescriptor>::Serialize(ParameterStringi
     fn("NumOutputSlots", std::to_string(desc.m_NumOutputSlots));
 }
 
+void StringifyLayerParameters<FusedDescriptor>::Serialize(ParameterStringifyFunction& fn,
+                                                          const FusedDescriptor& desc)
+{
+    fn("NumInputSlots", std::to_string(desc.m_NumInputSlots));
+    fn("NumOutputSlots", std::to_string(desc.m_NumOutputSlots));
+    fn("PaddingMode", GetFusedTypeAsCString(desc.m_FusedKernelType));
+
+}
+
 void StringifyLayerParameters<Pooling2dDescriptor>::Serialize(ParameterStringifyFunction& fn,
                                                               const Pooling2dDescriptor& desc)
 {

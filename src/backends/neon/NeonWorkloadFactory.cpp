@@ -400,6 +400,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
                                                                 info,
                                                                 m_MemoryManager->GetIntraLayerManager());
         }
+        case LayerType::Fused :
+        {
+            auto fusedQueueDescriptor = PolymorphicDowncast<const FusedQueueDescriptor*>(&descriptor);
+            return std::make_unique<NeonFusedWorkload>(*fusedQueueDescriptor, info);
+        }
         case LayerType::Gather :
         {
             auto gatherQueueDescriptor = PolymorphicDowncast<const GatherQueueDescriptor*>(&descriptor);

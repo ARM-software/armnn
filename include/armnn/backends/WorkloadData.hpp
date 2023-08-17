@@ -182,6 +182,11 @@ struct FullyConnectedQueueDescriptor : QueueDescriptorWithParameters<FullyConnec
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct FusedQueueDescriptor : QueueDescriptorWithParameters<FusedDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 // Permute layer workload data.
 struct PermuteQueueDescriptor : QueueDescriptorWithParameters<PermuteDescriptor>
 {

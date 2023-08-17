@@ -149,6 +149,11 @@ template <> struct StringifyLayerParameters<PreCompiledDescriptor>
     static void Serialize(ParameterStringifyFunction& fn, const PreCompiledDescriptor& desc);
 };
 
+template <> struct StringifyLayerParameters<FusedDescriptor>
+{
+    static void Serialize(ParameterStringifyFunction& fn, const FusedDescriptor& desc);
+};
+
 template <> struct StringifyLayerParameters<ReduceDescriptor>
 {
     static void Serialize(ParameterStringifyFunction& fn, const ReduceDescriptor& desc);

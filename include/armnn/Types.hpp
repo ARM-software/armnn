@@ -262,6 +262,11 @@ enum class MemBlockStrategyType
     MultiAxisPacking  = 1
 };
 
+enum class FusedKernelType
+{
+    AddMulAdd  = 0
+};
+
 /// Each backend should implement an IBackend.
 class IBackend
 {
@@ -475,6 +480,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(ElementwiseBinary) \
     X(ReverseV2) \
     X(Tile) \
+    X(Fused) \
 
 // New layers should be added at last position to minimize instability.
 
@@ -486,7 +492,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = Tile
+    LastLayer = Fused
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

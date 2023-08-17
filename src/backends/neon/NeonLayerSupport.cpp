@@ -4,7 +4,6 @@
 //
 
 #include "NeonLayerSupport.hpp"
-#include "NeonBackendId.hpp"
 #include "NeonBackendModelContext.hpp"
 
 #include <armnn/Exceptions.hpp>
@@ -12,7 +11,6 @@
 #include <armnn/Types.hpp>
 #include <armnn/BackendRegistry.hpp>
 
-#include <InternalTypes.hpp>
 #include <LayerSupportCommon.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
@@ -39,8 +37,13 @@
 #include "workloads/NeonDepthToSpaceWorkload.hpp"
 #include "workloads/NeonDepthwiseConvolutionWorkload.hpp"
 #include "workloads/NeonDequantizeWorkload.hpp"
+#include "workloads/NeonDivisionWorkload.hpp"
 #include "workloads/NeonElementwiseBinaryWorkload.hpp"
 #include "workloads/NeonExpWorkload.hpp"
+#include "workloads/NeonFullyConnectedWorkload.hpp"
+#include "workloads/NeonFusedWorkload.hpp"
+#include "workloads/NeonGatherWorkload.hpp"
+#include "workloads/NeonGatherNdWorkload.hpp"
 #include "workloads/NeonInstanceNormalizationWorkload.hpp"
 #include "workloads/NeonL2NormalizationFloatWorkload.hpp"
 #include "workloads/NeonLogWorkload.hpp"
@@ -53,12 +56,8 @@
 #include "workloads/NeonMeanWorkload.hpp"
 #include "workloads/NeonMinimumWorkload.hpp"
 #include "workloads/NeonMultiplicationWorkload.hpp"
-#include "workloads/NeonDivisionWorkload.hpp"
 #include "workloads/NeonNegWorkload.hpp"
 #include "workloads/NeonNormalizationFloatWorkload.hpp"
-#include "workloads/NeonFullyConnectedWorkload.hpp"
-#include "workloads/NeonGatherWorkload.hpp"
-#include "workloads/NeonGatherNdWorkload.hpp"
 #include "workloads/NeonPadWorkload.hpp"
 #include "workloads/NeonPermuteWorkload.hpp"
 #include "workloads/NeonPooling2dWorkload.hpp"
@@ -128,13 +127,13 @@ bool IsSupportedForDataTypeNeon(Optional<std::string&> reasonIfUnsupported,
 {
     return IsNeonBackendSupported(reasonIfUnsupported) &&
         IsSupportedForDataTypeGeneric(reasonIfUnsupported,
-                                         dataType,
-                                         floatFuncPtr,
-                                         floatFuncPtr,
-                                         uint8FuncPtr,
-                                         &FalseFunc<>,
-                                         &FalseFunc<>,
-                                         std::forward<Params>(params)...);
+                                      dataType,
+                                      floatFuncPtr,
+                                      floatFuncPtr,
+                                      uint8FuncPtr,
+                                      &FalseFunc<>,
+                                      &FalseFunc<>,
+                                      std::forward<Params>(params)...);
 }
 
 #if defined(ARMCOMPUTENEON_ENABLED)
@@ -430,6 +429,22 @@ bool IsLayerTypeSupported(const LayerType& type,
                                                      *(PolymorphicDowncast<const
                                                          FullyConnectedDescriptor*>(&descriptor)),
                                                      reasonIfUnsupported);
+        case LayerType::Fused:
+        {
+            auto fusedDescriptor = *(PolymorphicDowncast<const FusedDescriptor*>(&descriptor));
+            if (fusedDescriptor.m_NumInputSlots + fusedDescriptor.m_NumOutputSlots != infos.size())
+            {
+                throw InvalidArgumentException("Invalid number of FusedLayer TensorInfos.");
+            }
+
+            std::vector<TensorInfo> inputInfos(infos.begin(), infos.begin() + fusedDescriptor.m_NumInputSlots);
+            std::vector<TensorInfo> outputInfos(infos.begin() + fusedDescriptor.m_NumInputSlots, infos.end());
+
+            return support.IsFusedSupported({inputInfos.begin(), inputInfos.end()},
+                                            {outputInfos.begin(), outputInfos.end()},
+                                            fusedDescriptor,
+                                            reasonIfUnsupported);
+        }
         case LayerType::Gather:
             return support.IsGatherSupported(infos[0],
                                              infos[1],
@@ -1151,6 +1166,19 @@ bool NeonLayerSupport::IsFullyConnectedSupported(const TensorInfo& input,
                                    output,
                                    weights,
                                    biases,
+                                   descriptor,
+                                   nullptr);
+}
+
+bool NeonLayerSupport::IsFusedSupported(const std::vector<std::reference_wrapper<TensorInfo>>& inputs,
+                                        const std::vector<std::reference_wrapper<TensorInfo>>& outputs,
+                                        const FusedDescriptor& descriptor,
+                                        Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonFusedWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   inputs,
+                                   outputs,
                                    descriptor,
                                    nullptr);
 }

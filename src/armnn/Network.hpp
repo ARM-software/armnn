@@ -113,6 +113,9 @@ public:
     IConnectableLayer* AddFullyConnectedLayer(const FullyConnectedDescriptor& fullyConnectedDescriptor,
                                               const char* name = nullptr);
 
+    IConnectableLayer* AddFusedLayer(const FusedDescriptor& fusedDescriptor,
+                                     const char* name = nullptr);
+
     IConnectableLayer* AddGatherLayer(const GatherDescriptor& gatherDescriptor,
                                       const char* name = nullptr);
 

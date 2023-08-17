@@ -1093,6 +1093,11 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
     }
 }
 
+void FusedQueueDescriptor::Validate(const WorkloadInfo& /*workloadInfo*/) const
+{
+    // This is internally generated, so it should not need validation.
+}
+
 void NormalizationQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 {
     const std::string descriptorName{"NormalizationQueueDescriptor"};
@@ -3003,7 +3008,7 @@ void SwitchQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
 
 void PreCompiledQueueDescriptor::Validate(const WorkloadInfo& /*workloadInfo*/) const
 {
-    // This is internally generated so it should not need validation.
+    // This is internally generated, so it should not need validation.
 }
 
 void PreluQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const

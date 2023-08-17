@@ -30,6 +30,7 @@
 #include "NeonFillWorkload.hpp"
 #include "NeonFloorFloatWorkload.hpp"
 #include "NeonFullyConnectedWorkload.hpp"
+#include "NeonFusedWorkload.hpp"
 #include "NeonGatherWorkload.hpp"
 #include "NeonGatherNdWorkload.hpp"
 #include "NeonInstanceNormalizationWorkload.hpp"

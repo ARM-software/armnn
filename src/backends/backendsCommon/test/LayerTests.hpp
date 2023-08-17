@@ -8,6 +8,7 @@
 #include <backendsCommon/test/layerTests/AbsTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ActivationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/AdditionTestImpl.hpp>
+#include <backendsCommon/test/layerTests/AddMulAddTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ArgMinMaxTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchMatMulTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchNormalizationTestImpl.hpp>

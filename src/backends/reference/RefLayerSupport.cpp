@@ -539,8 +539,8 @@ bool RefLayerSupport::IsLayerSupported(const LayerType& type,
                                                               quantizedLstmInputParamsInfo.value(),
                                                               reasonIfUnsupported);
         default:
-            // layers not supported in neon by default:
-            // precompiled, standin, switch
+            // layers not supported in reference by default:
+            // precompiled, standin, switch, fused
             return false;
     }
 }

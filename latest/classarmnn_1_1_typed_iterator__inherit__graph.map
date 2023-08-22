@@ -1,0 +1,40 @@
+<map id="TypedIterator&lt; T, Base &gt;" name="TypedIterator&lt; T, Base &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="109,536,296,563"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="554,29,722,70"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="554,103,722,145"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="555,169,721,210"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="554,234,722,275"/>
+<area shape="rect" id="node12" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="535,299,741,341"/>
+<area shape="rect" id="node15" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="554,365,722,406"/>
+<area shape="rect" id="node17" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="546,430,730,471"/>
+<area shape="rect" id="node19" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="535,495,741,537"/>
+<area shape="rect" id="node21" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="560,561,716,602"/>
+<area shape="rect" id="node23" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="543,626,733,667"/>
+<area shape="rect" id="node25" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="535,691,741,733"/>
+<area shape="rect" id="node28" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="535,757,741,798"/>
+<area shape="rect" id="node30" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="539,822,737,863"/>
+<area shape="rect" id="node33" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="543,887,733,929"/>
+<area shape="rect" id="node35" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="527,953,749,994"/>
+<area shape="rect" id="node37" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="561,1018,715,1059"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,536,60,563"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_int32_encoder.html" title=" " alt="" coords="826,27,933,53"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_q_a_symm_s8_encoder.html" title=" " alt="" coords="804,77,955,104"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_q_symm_s8_encoder.html" title=" " alt="" coords="808,128,951,155"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_boolean_encoder.html" title=" " alt="" coords="816,179,943,205"/>
+<area shape="rect" id="node11" href="$classarmnn_1_1_q_symm16_encoder.html" title=" " alt="" coords="808,231,951,257"/>
+<area shape="rect" id="node13" href="$classarmnn_1_1_int32_decoder.html" title=" " alt="" coords="825,281,934,308"/>
+<area shape="rect" id="node14" href="$classarmnn_1_1_scaled_int32_decoder.html" title=" " alt="" coords="803,332,955,359"/>
+<area shape="rect" id="node16" href="$classarmnn_1_1_q_a_symm8_encoder.html" title=" " alt="" coords="808,383,951,409"/>
+<area shape="rect" id="node18" href="$classarmnn_1_1_int32_to_int32t_encoder.html" title=" " alt="" coords="800,437,959,464"/>
+<area shape="rect" id="node20" href="$classarmnn_1_1_boolean_decoder_bool.html" title=" " alt="" coords="800,503,959,529"/>
+<area shape="rect" id="node22" href="$classarmnn_1_1_float32_encoder.html" title=" " alt="" coords="818,561,941,588"/>
+<area shape="rect" id="node24" href="$classarmnn_1_1_float16_decoder.html" title=" " alt="" coords="817,612,942,639"/>
+<area shape="rect" id="node26" href="$classarmnn_1_1_boolean_decoder.html" title=" " alt="" coords="815,663,944,689"/>
+<area shape="rect" id="node27" href="$classarmnn_1_1_q_a_symm8_decoder.html" title=" " alt="" coords="807,713,952,740"/>
+<area shape="rect" id="node29" href="$classarmnn_1_1_q_symm16_decoder.html" title=" " alt="" coords="807,764,951,791"/>
+<area shape="rect" id="node31" href="$classarmnn_1_1_q_a_symm_s8_decoder.html" title=" " alt="" coords="803,815,956,841"/>
+<area shape="rect" id="node32" href="$classarmnn_1_1_q_symm_s8_decoder.html" title=" " alt="" coords="807,865,951,892"/>
+<area shape="rect" id="node34" href="$classarmnn_1_1_float32_decoder.html" title=" " alt="" coords="817,916,942,943"/>
+<area shape="rect" id="node36" href="$classarmnn_1_1_int32_to_int32t_decoder.html" title=" " alt="" coords="799,967,960,993"/>
+<area shape="rect" id="node38" href="$classarmnn_1_1_float16_encoder.html" title=" " alt="" coords="818,1025,941,1052"/>
+</map>

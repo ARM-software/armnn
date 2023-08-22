@@ -1,0 +1,9 @@
+<map id="RefMeanWorkload" name="RefMeanWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="233,351,375,377"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="189,260,419,301"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="5,171,296,197"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="137,5,223,32"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="53,81,307,108"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="331,81,586,108"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="321,171,597,197"/>
+</map>

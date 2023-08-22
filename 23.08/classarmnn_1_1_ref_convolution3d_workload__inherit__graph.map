@@ -1,0 +1,9 @@
+<map id="RefConvolution3dWorkload" name="RefConvolution3dWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="189,365,388,392"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="165,275,412,316"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="40,171,264,212"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="109,5,196,32"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="25,81,280,108"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="304,81,558,108"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="290,178,566,205"/>
+</map>

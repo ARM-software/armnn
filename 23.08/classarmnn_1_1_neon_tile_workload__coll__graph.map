@@ -1,0 +1,12 @@
+<map id="NeonTileWorkload" name="NeonTileWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="102,441,243,468"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="33,365,312,392"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="5,193,92,219"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="45,276,300,303"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_tile_queue_descriptor.html" title=" " alt="" coords="325,276,479,303"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="285,185,519,227"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="182,5,313,32"/>
+<area shape="rect" id="node9" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="285,81,519,123"/>
+<area shape="rect" id="node7" href="$structarmnn_1_1_tile_descriptor.html" title=" " alt="" coords="544,89,657,115"/>
+<area shape="rect" id="node8" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="540,5,661,32"/>
+</map>

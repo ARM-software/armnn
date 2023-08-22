@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,122,112,149"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1optimizations_1_1_convert_constants.html" title=" " alt="" coords="160,5,381,47"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="457,37,637,79"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_optimize_for_type_impl_3_01_layer_00_01_wrapped_01_4.html" title="Specialization that calls Wrapped::Run() for any layer type." alt="" coords="467,103,627,144"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="231,183,311,210"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="713,353,989,424"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_optimize_for_type.html" title=" " alt="" coords="745,37,957,79"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="460,169,635,225"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_optimize_for_connection_impl.html" title="Wrapper Optimization class that calls Wrapped::Run for every connection BaseType &#45;&gt; ChildType." alt="" coords="446,249,649,305"/>
+<area shape="rect" id="node11" href="$classarmnn_1_1_optimize_for_exclusive_connection_impl.html" title="Wrapper Optimization class that calls Wrapped::Run for every connection BaseType &#45;&gt; ChildType." alt="" coords="429,329,665,385"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1037,368,1288,409"/>
+</map>

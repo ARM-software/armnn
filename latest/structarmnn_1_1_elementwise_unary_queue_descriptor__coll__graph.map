@@ -1,0 +1,8 @@
+<map id="ElementwiseUnaryQueueDescriptor" name="ElementwiseUnaryQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="985,47,1240,73"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="693,39,936,81"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="185,39,420,81"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_elementwise_unary_descriptor.html" title="A ElementwiseUnaryDescriptor for the ElementwiseUnaryLayer." alt="" coords="197,105,409,132"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="10,105,131,132"/>
+</map>

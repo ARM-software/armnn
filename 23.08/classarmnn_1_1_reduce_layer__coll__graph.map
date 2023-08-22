@@ -1,0 +1,9 @@
+<map id="ReduceLayer" name="ReduceLayer">
+<area shape="rect" id="node1" title="This layer represents a reduction operation." alt="" coords="101,352,207,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="71,261,237,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="47,81,106,108"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="75,157,238,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="5,5,148,32"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_reduce_descriptor.html" title="A ReduceDescriptor for the REDUCE operators." alt="" coords="265,165,403,191"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="273,81,395,108"/>
+</map>

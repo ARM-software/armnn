@@ -1,0 +1,6 @@
+<map id="UnmapWorkload" name="UnmapWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="49,261,180,288"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="5,171,224,212"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="66,5,153,32"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="131,81,386,108"/>
+</map>

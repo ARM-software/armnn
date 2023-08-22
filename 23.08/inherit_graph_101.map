@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classarmnn_1_1_instrument.html" title=" " alt="" coords="5,56,99,83"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_neon_timer.html" title=" " alt="" coords="161,5,256,32"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_open_cl_timer.html" title="OpenClTimer instrument that times all OpenCl kernels executed between calls to Start() and Stop()." alt="" coords="155,56,262,83"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_wall_clock_timer.html" title=" " alt="" coords="147,107,271,133"/>
+</map>

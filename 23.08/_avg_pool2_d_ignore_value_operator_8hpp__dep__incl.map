@@ -1,0 +1,8 @@
+<map id="src/backends/tosaCommon/operatorMappings/AvgPool2DIgnoreValueOperator.hpp" name="src/backends/tosaCommon/operatorMappings/AvgPool2DIgnoreValueOperator.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="200,5,459,61"/>
+<area shape="rect" id="node2" href="$_tosa_common_operators_8hpp.html" title=" " alt="" coords="211,109,447,165"/>
+<area shape="rect" id="node3" href="$_tosa_mappings_8hpp.html" title=" " alt="" coords="231,213,428,255"/>
+<area shape="rect" id="node4" href="$_tosa_mappings_8cpp.html" title=" " alt="" coords="5,303,203,344"/>
+<area shape="rect" id="node5" href="$_tosa_ref_backend_8cpp.html" title=" " alt="" coords="227,303,431,344"/>
+<area shape="rect" id="node6" href="$_tosa_ref_layer_support_8cpp.html" title=" " alt="" coords="455,303,659,344"/>
+</map>

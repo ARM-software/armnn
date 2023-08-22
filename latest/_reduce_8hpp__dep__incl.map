@@ -1,0 +1,6 @@
+<map id="src/backends/reference/workloads/Reduce.hpp" name="src/backends/reference/workloads/Reduce.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="237,5,410,47"/>
+<area shape="rect" id="node2" href="$_reduce_8cpp.html" title=" " alt="" coords="5,95,177,136"/>
+<area shape="rect" id="node3" href="$_ref_mean_workload_8cpp.html" title=" " alt="" coords="202,95,445,136"/>
+<area shape="rect" id="node4" href="$_ref_reduce_workload_8cpp.html" title=" " alt="" coords="469,95,724,136"/>
+</map>

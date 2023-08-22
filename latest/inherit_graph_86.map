@@ -1,0 +1,130 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="5,1949,148,1976"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="196,1949,255,1976"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_abs_layer.html" title=" " alt="" coords="403,5,485,32"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_bindable_layer.html" title=" " alt="" coords="387,56,501,83"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_cast_layer.html" title="This layer represents a cast operation." alt="" coords="401,107,487,133"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_constant_layer.html" title="A layer that the constant data can be bound to." alt="" coords="386,157,502,184"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_convert_fp16_to_fp32_layer.html" title="This layer converts data type Float 16 to Float 32." alt="" coords="351,208,537,235"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_convert_fp32_to_fp16_layer.html" title="This layer converts data type Float 32 to Float 16." alt="" coords="351,259,537,285"/>
+<area shape="rect" id="node11" href="$classarmnn_1_1_debug_layer.html" title="This layer visualizes the data flowing through the network." alt="" coords="394,309,494,336"/>
+<area shape="rect" id="node12" href="$classarmnn_1_1_dequantize_layer.html" title="This layer dequantizes the input tensor." alt="" coords="378,360,510,387"/>
+<area shape="rect" id="node13" href="$classarmnn_1_1_elementwise_base_layer.html" title="NOTE: this is an abstract class to encapsulate the element wise operations, it does not implement: st..." alt="" coords="357,411,531,437"/>
+<area shape="rect" id="node20" href="$classarmnn_1_1_floor_layer.html" title="This layer represents a floor operation." alt="" coords="399,461,489,488"/>
+<area shape="rect" id="node21" href="$classarmnn_1_1_gather_nd_layer.html" title="This layer represents a GatherNd operator." alt="" coords="384,512,504,539"/>
+<area shape="rect" id="node22" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,563,525,605"/>
+<area shape="rect" id="node23" href="$classarmnn_1_1_map_layer.html" title="This layer represents a memory copy operation." alt="" coords="401,629,487,656"/>
+<area shape="rect" id="node24" href="$classarmnn_1_1_mem_copy_layer.html" title="This layer represents a memory copy operation." alt="" coords="382,680,506,707"/>
+<area shape="rect" id="node25" href="$classarmnn_1_1_mem_import_layer.html" title="This layer represents a memory import operation." alt="" coords="377,731,511,757"/>
+<area shape="rect" id="node26" href="$classarmnn_1_1_merge_layer.html" title="This layer dequantizes the input tensor." alt="" coords="395,781,493,808"/>
+<area shape="rect" id="node27" href="$classarmnn_1_1_prelu_layer.html" title=" " alt="" coords="399,832,489,859"/>
+<area shape="rect" id="node28" href="$classarmnn_1_1_quantized_lstm_layer.html" title="This layer represents a QuantizedLstm operation." alt="" coords="366,883,522,909"/>
+<area shape="rect" id="node29" href="$classarmnn_1_1_quantize_layer.html" title=" " alt="" coords="386,933,502,960"/>
+<area shape="rect" id="node30" href="$classarmnn_1_1_rank_layer.html" title=" " alt="" coords="399,984,489,1011"/>
+<area shape="rect" id="node31" href="$classarmnn_1_1_reverse_v2_layer.html" title="This layer represents a ReverseV2 operation." alt="" coords="380,1035,508,1061"/>
+<area shape="rect" id="node32" href="$classarmnn_1_1_rsqrt_layer.html" title=" " alt="" coords="398,1085,490,1112"/>
+<area shape="rect" id="node33" href="$classarmnn_1_1_shape_layer.html" title=" " alt="" coords="395,1136,493,1163"/>
+<area shape="rect" id="node34" href="$classarmnn_1_1_switch_layer.html" title="This layer calculates both true and false outputs for input." alt="" coords="393,1187,495,1213"/>
+<area shape="rect" id="node35" href="$classarmnn_1_1_unmap_layer.html" title="This layer represents a memory copy operation." alt="" coords="391,1237,497,1264"/>
+<area shape="rect" id="node36" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="351,1289,537,1330"/>
+<area shape="rect" id="node38" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="347,1354,541,1395"/>
+<area shape="rect" id="node40" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="341,1419,547,1461"/>
+<area shape="rect" id="node42" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="320,1485,568,1526"/>
+<area shape="rect" id="node44" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="331,1550,557,1591"/>
+<area shape="rect" id="node46" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="335,1615,553,1657"/>
+<area shape="rect" id="node48" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="345,1681,543,1722"/>
+<area shape="rect" id="node50" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="337,1746,551,1787"/>
+<area shape="rect" id="node52" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="337,1811,551,1853"/>
+<area shape="rect" id="node54" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="339,1877,549,1918"/>
+<area shape="rect" id="node56" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="303,1942,585,1983"/>
+<area shape="rect" id="node58" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="314,2007,574,2049"/>
+<area shape="rect" id="node60" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="321,2073,567,2114"/>
+<area shape="rect" id="node62" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="323,2138,565,2179"/>
+<area shape="rect" id="node64" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="329,2203,559,2245"/>
+<area shape="rect" id="node66" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,2269,525,2310"/>
+<area shape="rect" id="node68" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="335,2334,553,2375"/>
+<area shape="rect" id="node70" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,2399,525,2441"/>
+<area shape="rect" id="node72" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="311,2465,577,2506"/>
+<area shape="rect" id="node74" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="331,2530,557,2571"/>
+<area shape="rect" id="node76" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="341,2595,547,2637"/>
+<area shape="rect" id="node78" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="346,2661,542,2702"/>
+<area shape="rect" id="node80" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,2726,525,2767"/>
+<area shape="rect" id="node83" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,2791,525,2833"/>
+<area shape="rect" id="node85" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="339,2857,549,2898"/>
+<area shape="rect" id="node87" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="361,2922,527,2963"/>
+<area shape="rect" id="node89" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,2987,525,3029"/>
+<area shape="rect" id="node91" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="357,3053,531,3094"/>
+<area shape="rect" id="node93" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="353,3118,535,3159"/>
+<area shape="rect" id="node95" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="353,3183,535,3225"/>
+<area shape="rect" id="node97" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="343,3249,545,3290"/>
+<area shape="rect" id="node99" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,3314,525,3355"/>
+<area shape="rect" id="node101" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="361,3379,527,3421"/>
+<area shape="rect" id="node103" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="357,3445,531,3486"/>
+<area shape="rect" id="node105" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,3510,525,3551"/>
+<area shape="rect" id="node107" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,3575,525,3617"/>
+<area shape="rect" id="node109" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="357,3641,531,3682"/>
+<area shape="rect" id="node111" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="331,3706,557,3747"/>
+<area shape="rect" id="node113" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="339,3771,549,3813"/>
+<area shape="rect" id="node115" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,3837,525,3878"/>
+<area shape="rect" id="node117" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="360,3902,528,3943"/>
+<area shape="rect" id="node119" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="346,3967,542,4009"/>
+<area shape="rect" id="node121" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,4033,525,4074"/>
+<area shape="rect" id="node123" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="305,4098,583,4139"/>
+<area shape="rect" id="node125" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="352,4163,536,4205"/>
+<area shape="rect" id="node127" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="363,4229,525,4270"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_input_layer.html" title="A layer user&#45;provided data can be bound to (e.g. inputs, outputs)." alt="" coords="699,31,789,57"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_output_layer.html" title="A layer user&#45;provided data can be bound to (e.g. inputs, outputs)." alt="" coords="693,81,795,108"/>
+<area shape="rect" id="node14" href="$classarmnn_1_1_addition_layer.html" title="This layer represents an addition operation." alt="" coords="688,284,800,311"/>
+<area shape="rect" id="node15" href="$classarmnn_1_1_division_layer.html" title="This layer represents a division operation." alt="" coords="689,335,799,361"/>
+<area shape="rect" id="node16" href="$classarmnn_1_1_maximum_layer.html" title="This layer represents a maximum operation." alt="" coords="682,385,806,412"/>
+<area shape="rect" id="node17" href="$classarmnn_1_1_minimum_layer.html" title="This layer represents a minimum operation." alt="" coords="684,436,804,463"/>
+<area shape="rect" id="node18" href="$classarmnn_1_1_multiplication_layer.html" title="This layer represents a multiplication operation." alt="" coords="671,487,817,513"/>
+<area shape="rect" id="node19" href="$classarmnn_1_1_subtraction_layer.html" title="This layer represents a subtraction operation." alt="" coords="678,537,810,564"/>
+<area shape="rect" id="node37" href="$classarmnn_1_1_activation_layer.html" title="This layer represents an activation operation with the specified activation function." alt="" coords="682,1296,806,1323"/>
+<area shape="rect" id="node39" href="$classarmnn_1_1_arg_min_max_layer.html" title="This layer represents a ArgMinMax operation." alt="" coords="678,1361,810,1388"/>
+<area shape="rect" id="node41" href="$classarmnn_1_1_batch_mat_mul_layer.html" title=" " alt="" coords="672,1427,816,1453"/>
+<area shape="rect" id="node43" href="$classarmnn_1_1_batch_normalization_layer.html" title="This layer represents a batch normalization operation." alt="" coords="651,1492,837,1519"/>
+<area shape="rect" id="node45" href="$classarmnn_1_1_batch_to_space_nd_layer.html" title="This layer represents a BatchToSpaceNd operation." alt="" coords="661,1557,827,1584"/>
+<area shape="rect" id="node47" href="$classarmnn_1_1_channel_shuffle_layer.html" title=" " alt="" coords="666,1623,822,1649"/>
+<area shape="rect" id="node49" href="$classarmnn_1_1_comparison_layer.html" title="This layer represents a comparison operation." alt="" coords="676,1688,812,1715"/>
+<area shape="rect" id="node51" href="$classarmnn_1_1_convolution2d_layer.html" title="This layer represents a convolution 2d operation." alt="" coords="668,1753,820,1780"/>
+<area shape="rect" id="node53" href="$classarmnn_1_1_convolution3d_layer.html" title="This layer represents a convolution 3d operation." alt="" coords="668,1819,820,1845"/>
+<area shape="rect" id="node55" href="$classarmnn_1_1_depth_to_space_layer.html" title="This layer represents a DepthToSpace operation." alt="" coords="669,1884,819,1911"/>
+<area shape="rect" id="node57" href="$classarmnn_1_1_depthwise_convolution2d_layer.html" title="This layer represents a depthwise convolution 2d operation." alt="" coords="633,1949,855,1976"/>
+<area shape="rect" id="node59" href="$classarmnn_1_1_detection_post_process_layer.html" title="This layer represents a detection postprocess operator." alt="" coords="645,2015,843,2041"/>
+<area shape="rect" id="node61" href="$classarmnn_1_1_elementwise_binary_layer.html" title="This layer represents a elementwiseBinary operation." alt="" coords="652,2080,836,2107"/>
+<area shape="rect" id="node63" href="$classarmnn_1_1_elementwise_unary_layer.html" title="This layer represents a elementwiseUnary operation." alt="" coords="653,2145,835,2172"/>
+<area shape="rect" id="node65" href="$classarmnn_1_1_fake_quantization_layer.html" title="This layer represents a fake quantization operation." alt="" coords="659,2211,829,2237"/>
+<area shape="rect" id="node67" href="$classarmnn_1_1_fill_layer.html" title="This layer represents a fill operation." alt="" coords="705,2276,783,2303"/>
+<area shape="rect" id="node69" href="$classarmnn_1_1_fully_connected_layer.html" title="This layer represents a fully connected operation." alt="" coords="665,2341,823,2368"/>
+<area shape="rect" id="node71" href="$classarmnn_1_1_gather_layer.html" title="This layer represents a Gather operator." alt="" coords="693,2407,795,2433"/>
+<area shape="rect" id="node73" href="$classarmnn_1_1_instance_normalization_layer.html" title="This layer represents an instance normalization operation." alt="" coords="641,2472,847,2499"/>
+<area shape="rect" id="node75" href="$classarmnn_1_1_l2_normalization_layer.html" title="This layer represents a L2 normalization operation." alt="" coords="661,2537,827,2564"/>
+<area shape="rect" id="node77" href="$classarmnn_1_1_logical_binary_layer.html" title="This layer represents a Logical Binary operation." alt="" coords="671,2599,817,2625"/>
+<area shape="rect" id="node79" href="$classarmnn_1_1_log_softmax_layer.html" title="This layer represents a log softmax operation." alt="" coords="677,2649,811,2676"/>
+<area shape="rect" id="node81" href="$classarmnn_1_1_lstm_layer.html" title="This layer represents a LSTM operation." alt="" coords="699,2700,789,2727"/>
+<area shape="rect" id="node82" href="$classarmnn_1_1_unidirectional_sequence_lstm_layer.html" title="This layer represents a LSTM operation." alt="" coords="640,2751,848,2793"/>
+<area shape="rect" id="node84" href="$classarmnn_1_1_mean_layer.html" title="This layer represents a mean operation." alt="" coords="697,2817,791,2844"/>
+<area shape="rect" id="node86" href="$classarmnn_1_1_normalization_layer.html" title="This layer represents a normalization operation." alt="" coords="669,2868,819,2895"/>
+<area shape="rect" id="node88" href="$classarmnn_1_1_concat_layer.html" title="This layer represents a merge operation." alt="" coords="693,2929,795,2956"/>
+<area shape="rect" id="node90" href="$classarmnn_1_1_pad_layer.html" title="This layer represents a pad operation." alt="" coords="703,2995,785,3021"/>
+<area shape="rect" id="node92" href="$classarmnn_1_1_permute_layer.html" title="This layer represents a permutation operation." alt="" coords="687,3060,801,3087"/>
+<area shape="rect" id="node94" href="$classarmnn_1_1_pooling2d_layer.html" title="This layer represents a pooling 2d operation." alt="" coords="683,3125,805,3152"/>
+<area shape="rect" id="node96" href="$classarmnn_1_1_pooling3d_layer.html" title="This layer represents a pooling 3d operation." alt="" coords="683,3191,805,3217"/>
+<area shape="rect" id="node98" href="$classarmnn_1_1_pre_compiled_layer.html" title=" " alt="" coords="673,3256,815,3283"/>
+<area shape="rect" id="node100" href="$classarmnn_1_1_q_lstm_layer.html" title="This layer represents a QLstm operation." alt="" coords="694,3321,794,3348"/>
+<area shape="rect" id="node102" href="$classarmnn_1_1_reduce_layer.html" title="This layer represents a reduction operation." alt="" coords="691,3387,797,3413"/>
+<area shape="rect" id="node104" href="$classarmnn_1_1_reshape_layer.html" title="This layer represents a reshape operation." alt="" coords="687,3452,801,3479"/>
+<area shape="rect" id="node106" href="$classarmnn_1_1_resize_layer.html" title="This layer represents a resize operation." alt="" coords="693,3517,795,3544"/>
+<area shape="rect" id="node108" href="$classarmnn_1_1_slice_layer.html" title=" " alt="" coords="699,3583,789,3609"/>
+<area shape="rect" id="node110" href="$classarmnn_1_1_softmax_layer.html" title="This layer represents a softmax operation." alt="" coords="688,3648,800,3675"/>
+<area shape="rect" id="node112" href="$classarmnn_1_1_space_to_batch_nd_layer.html" title="This layer represents a SpaceToBatchNd operation." alt="" coords="661,3713,827,3740"/>
+<area shape="rect" id="node114" href="$classarmnn_1_1_space_to_depth_layer.html" title="This layer represents a SpaceToDepth operation." alt="" coords="669,3779,819,3805"/>
+<area shape="rect" id="node116" href="$classarmnn_1_1_stack_layer.html" title="This layer represents a stack operation." alt="" coords="697,3844,791,3871"/>
+<area shape="rect" id="node118" href="$classarmnn_1_1_stand_in_layer.html" title="This layer represents an unknown operation in the input graph." alt="" coords="691,3909,797,3936"/>
+<area shape="rect" id="node120" href="$classarmnn_1_1_strided_slice_layer.html" title="This layer represents a strided slice operation." alt="" coords="677,3975,811,4001"/>
+<area shape="rect" id="node122" href="$classarmnn_1_1_tile_layer.html" title=" " alt="" coords="703,4040,785,4067"/>
+<area shape="rect" id="node124" href="$classarmnn_1_1_transpose_convolution2d_layer.html" title="This layer represents a 2D transpose convolution operation." alt="" coords="635,4105,853,4132"/>
+<area shape="rect" id="node126" href="$classarmnn_1_1_transpose_layer.html" title="This layer represents a transpose operation." alt="" coords="683,4171,805,4197"/>
+<area shape="rect" id="node128" href="$classarmnn_1_1_splitter_layer.html" title="This layer represents a split operation." alt="" coords="691,4236,797,4263"/>
+</map>

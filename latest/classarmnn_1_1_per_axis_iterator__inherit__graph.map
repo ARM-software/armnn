@@ -1,0 +1,10 @@
+<map id="PerAxisIterator&lt; T, Base &gt;" name="PerAxisIterator&lt; T, Base &gt;">
+<area shape="rect" id="node1" title="PerAxisIterator for per&#45;axis quantization." alt="" coords="109,71,256,113"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="489,6,657,47"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="469,71,676,113"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="473,137,672,178"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,79,60,105"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_q_symm8_per_axis_encoder.html" title=" " alt="" coords="735,13,917,40"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_scaled_int32_per_axis_decoder.html" title=" " alt="" coords="725,79,927,105"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_q_symm8_per_axis_decoder.html" title=" " alt="" coords="733,144,919,171"/>
+</map>

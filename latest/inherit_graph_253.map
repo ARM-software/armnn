@@ -1,0 +1,25 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classarmnn_1_1_optional_base.html" title="OptionalBase is the common functionality between reference and non&#45;reference optional types." alt="" coords="5,513,115,539"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_optional_reference_switch.html" title="The default implementation is the non&#45;reference case." alt="" coords="191,5,377,47"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_optional_reference_switch_3_01true_00_01_t_01_4.html" title="This is the special case for reference types." alt="" coords="191,71,377,112"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="169,137,399,222"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="163,247,405,317"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="181,341,387,412"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="181,436,387,507"/>
+<area shape="rect" id="node12" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="167,531,401,631"/>
+<area shape="rect" id="node14" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="187,655,381,711"/>
+<area shape="rect" id="node16" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="191,736,377,807"/>
+<area shape="rect" id="node18" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="169,831,399,917"/>
+<area shape="rect" id="node20" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="191,941,377,997"/>
+<area shape="rect" id="node22" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="175,1021,393,1077"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="502,159,666,200"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="507,261,661,303"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="472,363,696,390"/>
+<area shape="rect" id="node11" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="472,458,696,485"/>
+<area shape="rect" id="node13" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="453,560,715,601"/>
+<area shape="rect" id="node15" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="508,670,660,697"/>
+<area shape="rect" id="node17" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="498,758,670,785"/>
+<area shape="rect" id="node19" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="486,853,682,895"/>
+<area shape="rect" id="node21" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="527,955,641,982"/>
+<area shape="rect" id="node23" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="509,1028,659,1069"/>
+</map>

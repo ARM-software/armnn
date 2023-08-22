@@ -1,0 +1,10 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classarmnn_1_1_i_tensor_handle_factory.html" title=" " alt="" coords="5,157,167,184"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_cl_import_tensor_handle_factory.html" title="This factory creates ClImportTensorHandles that refer to imported memory tensors." alt="" coords="217,5,430,32"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_cl_tensor_handle_factory.html" title=" " alt="" coords="238,56,409,83"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_mock_tensor_handle_factory.html" title=" " alt="" coords="227,107,419,133"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_neon_tensor_handle_factory.html" title=" " alt="" coords="228,157,419,184"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_ref_tensor_handle_factory.html" title=" " alt="" coords="234,208,413,235"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_tosa_ref_tensor_handle_factory.html" title=" " alt="" coords="219,259,427,285"/>
+<area shape="rect" id="node8" href="$classsdb_1_1_sample_dynamic_tensor_handle_factory.html" title=" " alt="" coords="215,310,432,351"/>
+</map>

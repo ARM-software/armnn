@@ -1,0 +1,7 @@
+<map id="BindableLayer" name="BindableLayer">
+<area shape="rect" id="node1" title=" " alt="" coords="53,155,168,181"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_input_layer.html" title="A layer user&#45;provided data can be bound to (e.g. inputs, outputs)." alt="" coords="5,229,96,256"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_output_layer.html" title="A layer user&#45;provided data can be bound to (e.g. inputs, outputs)." alt="" coords="121,229,223,256"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="81,80,140,107"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="39,5,182,32"/>
+</map>

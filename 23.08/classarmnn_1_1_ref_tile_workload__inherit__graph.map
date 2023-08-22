@@ -1,0 +1,9 @@
+<map id="RefTileWorkload" name="RefTileWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="229,351,359,377"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="185,260,403,301"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="5,171,284,197"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="124,5,211,32"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="40,81,295,108"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="319,81,573,108"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="308,171,584,197"/>
+</map>

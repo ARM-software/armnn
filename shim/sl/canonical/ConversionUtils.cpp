@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -133,7 +133,8 @@ const armnn::ConstTensor* ConstTensorPin::GetConstTensorPtr() const
 
 bool IsWeightsValid(const Operation& operation,
                     uint32_t inputIndex,
-                    const Model& model)
+                    const Model& model,
+                    const bool isOptional = true)
 {
     const Operand* operand = GetInputOperand(operation, inputIndex, model);
     if (!operand)
@@ -141,7 +142,11 @@ bool IsWeightsValid(const Operation& operation,
         Fail("%s: failed to get input operand %i", __func__, inputIndex);
         return false;
     }
-
+    // If the operand is not an optional operand it cannot have a NO_VALUE lifetime
+    if (!isOptional && operand->lifetime == OperandLifeTime::NO_VALUE)
+    {
+        return false;
+    }
     if (operand->lifetime    != OperandLifeTime::CONSTANT_COPY
         && operand->lifetime != OperandLifeTime::CONSTANT_REFERENCE
         && operand->lifetime != OperandLifeTime::NO_VALUE)

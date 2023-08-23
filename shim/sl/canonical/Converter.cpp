@@ -999,7 +999,7 @@ bool Converter::ConvertConv2d(const Operation& operation, const Model& model, Co
     // filter's height and width indices to match the input's height and width indices so we permute it to OIHW if
     // the DataLayout is NCHW
 
-    if (!IsWeightsValid(operation, 1, model) && desc.m_DataLayout == DataLayout::NCHW)
+    if (!IsWeightsValid(operation, 1, model, false) && desc.m_DataLayout == DataLayout::NCHW)
     {
         return Fail("%s: Operation has unsupported weights OperandLifeTime", __func__);
     }
@@ -1229,13 +1229,14 @@ bool Converter::ConvertDepthwiseConv2d(const Operation& operation, const Model& 
     const armnn::TensorInfo& outputInfo = GetTensorInfoForOperand(*output);
 
     // ArmNN does not currently support non-fixed weights or bias
+    if (!IsWeightsValid(operation, 1, model, false))
+    {
+        return Fail("%s: This Operation has unsupported weights OperandLifeTime", __func__);
+    }
+
     // Find the shape of the weights tensor. In AndroidNN this will be [ 1, H, W, I * M ]
     const Operand* weightsOperand = GetInputOperand(operation, 1, model);
 
-    if (!weightsOperand)
-    {
-        return Fail("%s: Could not read weights", __func__);
-    }
     // Basic sanity check on the weights shape.
     // ANEURALNETWORKS_DEPTHWISE_CONV_2D specifies a 4-D tensor, of shape
     // [1, filter_height, filter_width, depth_out]

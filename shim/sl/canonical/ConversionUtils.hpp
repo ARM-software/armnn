@@ -705,7 +705,7 @@ inline bool IsOperandConstant(const Operand& operand)
            lifetime == OperandLifeTime::NO_VALUE;
 }
 
-bool IsWeightsValid(const Operation& operation, uint32_t inputIndex, const Model& model);
+bool IsWeightsValid(const Operation& operation, uint32_t inputIndex, const Model& model, const bool IsOptional);
 
 ConstTensorPin ConvertOperandToConstTensorPin(const Operand& operand,
                                               const Model& model,

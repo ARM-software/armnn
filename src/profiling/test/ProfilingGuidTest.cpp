@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -128,7 +128,7 @@ TEST_CASE("DynamicGuidGeneratorTest")
 {
     ProfilingGuidGenerator generator;
 
-    for (unsigned int i = 0; i < 100; ++i)
+    for (uint64_t i = 0; i < 100; ++i)
     {
         ProfilingDynamicGuid guid = generator.NextGuid();
         CheckDynamicGuid(guid, i);
@@ -157,7 +157,8 @@ TEST_CASE("ProfilingGuidThreadTest")
     });
 
     uint64_t guid = profilingGuidGenerator.NextGuid();
-    CHECK(guid == 3000u);
+    uint64_t expected = 3000U;
+    CHECK(guid == expected);
 }
 
 }

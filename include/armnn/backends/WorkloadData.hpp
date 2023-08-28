@@ -765,4 +765,9 @@ struct TileQueueDescriptor : QueueDescriptorWithParameters<TileDescriptor>
     void Validate(const WorkloadInfo& workloadInfo) const;
 };
 
+struct BroadcastToQueueDescriptor : QueueDescriptorWithParameters<BroadcastToDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
 } // namespace armnn

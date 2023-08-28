@@ -4417,4 +4417,30 @@ void TileQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 }
 
+void BroadcastToQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string& descriptorName{"BroadcastToQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 1);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo     = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& outputTensorInfo    = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS8,
+        DataType::QSymmS16,
+        DataType::Signed32,
+        DataType::Signed64
+    };
+
+    ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
+}
+
 } // namespace armnn

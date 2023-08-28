@@ -73,6 +73,12 @@ public:
                                    const BatchToSpaceNdDescriptor& descriptor,
                                    Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
+
+    bool IsBroadcastToSupported(const TensorInfo& input,
+                                const TensorInfo& output,
+                                const BroadcastToDescriptor& descriptor,
+                                Optional<std::string&> reasonIfUnsupported);
+
     bool IsCastSupported(const TensorInfo& input,
                          const TensorInfo& output,
                          Optional<std::string&> reasonIfUnsupported = EmptyOptional());

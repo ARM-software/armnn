@@ -657,6 +657,12 @@ IConnectableLayer* INetwork::AddTileLayer(const TileDescriptor &descriptor,
     return pNetworkImpl->AddTileLayer(descriptor, name);
 }
 
+IConnectableLayer* INetwork::AddBroadcastToLayer(const BroadcastToDescriptor& descriptor,
+                                                 const char* name)
+{
+    return pNetworkImpl->AddBroadcastToLayer(descriptor, name);
+}
+
 void INetwork::ExecuteStrategy(IStrategy& strategy) const
 {
     return pNetworkImpl->ExecuteStrategy(strategy);
@@ -1929,8 +1935,10 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         optGraph.InferTensorInfos();
     }
 
-    // Perform AddBroadcastReshapeLayer optimisation
+    // Perform BroadcastToOptimizationLayer and then AddBroadcastReshapeLayer optimisation
     using namespace optimizations;
+    Optimizer::Pass(optGraph, MakeOptimizations(BroadcastToOptimizationLayer()));
+
     Optimizer::Pass(optGraph, MakeOptimizations(AddBroadcastReshapeLayer()));
 
     if(options.GetShapeInferenceMethod() == ShapeInferenceMethod::ValidateOnly)
@@ -1961,6 +1969,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FoldPadIntoConvolution2d(),
                                                 FoldPadIntoDepthwiseConvolution2d(),
                                                 FoldPadIntoPooling2d(),
+                                                BroadcastToOptimizationLayer(),
                                                 PermuteAndBatchToSpaceAsDepthToSpace(),
                                                 TransposeAndBatchToSpaceAsDepthToSpace(),
                                                 FuseBatchNormIntoConvolution2DFloat32(),
@@ -3043,6 +3052,11 @@ IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor&
     }
 
     return layer;
+}
+
+IConnectableLayer* NetworkImpl::AddBroadcastToLayer(const BroadcastToDescriptor &desc, const char *name)
+{
+    return m_Graph->AddLayer<BroadcastToLayer>(desc, name);
 }
 
 void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const

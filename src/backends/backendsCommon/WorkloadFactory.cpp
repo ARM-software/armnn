@@ -183,6 +183,18 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                                   reason);
             break;
         }
+        case LayerType::BroadcastTo:
+        {
+            auto cLayer = PolymorphicDowncast<const BroadcastToLayer*>(&layer);
+            const TensorInfo& input = layer.GetInputSlot(0).GetConnection()->GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject.IsBroadcastToSupported(OverrideDataType(input, dataType),
+                                                               OverrideDataType(output, dataType),
+                                                               cLayer->GetParameters(),
+                                                               reason);
+            break;
+        }
         case LayerType::Cast:
         {
             const TensorInfo& input = layer.GetInputSlot(0).GetTensorInfo();

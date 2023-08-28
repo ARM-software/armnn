@@ -179,6 +179,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
                      = PolymorphicDowncast<const BatchToSpaceNdQueueDescriptor*>(&descriptor);
             return std::make_unique<RefBatchToSpaceNdWorkload>(*batchToSpaceNdQueueDescriptor, info);
         }
+        case LayerType::BroadcastTo:
+        {
+            auto broadcastToQueueDescriptor = PolymorphicDowncast<const BroadcastToQueueDescriptor*>(&descriptor);
+            return std::make_unique<RefBroadcastToWorkload>(*broadcastToQueueDescriptor, info);
+        }
         case LayerType::Cast :
         {
             auto castQueueDescriptor = PolymorphicDowncast<const CastQueueDescriptor*>(&descriptor);

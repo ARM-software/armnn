@@ -481,6 +481,7 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(ReverseV2) \
     X(Tile) \
     X(Fused) \
+    X(BroadcastTo) \
 
 // New layers should be added at last position to minimize instability.
 
@@ -492,7 +493,7 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = Fused
+    LastLayer = BroadcastTo
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

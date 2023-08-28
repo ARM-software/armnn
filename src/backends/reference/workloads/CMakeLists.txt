@@ -79,6 +79,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefBatchNormalizationWorkload.hpp
     RefBatchToSpaceNdWorkload.cpp
     RefBatchToSpaceNdWorkload.hpp
+    RefBroadcastToWorkload.cpp
+    RefBroadcastToWorkload.hpp
     RefCastWorkload.cpp
     RefCastWorkload.hpp
     RefChannelShuffleWorkload.cpp

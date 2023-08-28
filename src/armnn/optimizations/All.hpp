@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -10,6 +10,7 @@
 #include "ConvertConstDequantisationLayersToConstLayers.hpp"
 #include "ConvertConstPermuteLayersToConstLayers.hpp"
 #include "ConvertFp32NetworkToFp16.hpp"
+#include "DeleteBroadcastTo.hpp"
 #include "FoldPadIntoLayer2d.hpp"
 #include "FuseBatchNorm.hpp"
 #include "MovePermuteUp.hpp"

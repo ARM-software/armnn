@@ -1656,4 +1656,23 @@ struct TileDescriptor : BaseDescriptor
     std::vector<uint32_t> m_Multiples;
 };
 
+struct BroadcastToDescriptor : BaseDescriptor
+{
+    BroadcastToDescriptor()
+        : m_BroadcastToShape()
+    {}
+
+    explicit BroadcastToDescriptor(const TensorShape& shape)
+        : m_BroadcastToShape(shape)
+    {}
+
+    bool operator ==(const BroadcastToDescriptor& rhs) const
+    {
+        return m_BroadcastToShape == rhs.m_BroadcastToShape;
+    }
+
+    /// Target shape value.
+    TensorShape m_BroadcastToShape;
+};
+
 } // namespace armnn

@@ -63,6 +63,9 @@ public:
     IConnectableLayer* AddBatchToSpaceNdLayer(const BatchToSpaceNdDescriptor& batchToSpaceNdDescriptor,
                                               const char* name = nullptr);
 
+    IConnectableLayer* AddBroadcastToLayer(const BroadcastToDescriptor& descriptor,
+                                           const char* name = nullptr);
+
     IConnectableLayer* AddCastLayer(const char* name = nullptr);
 
     IConnectableLayer* AddChannelShuffleLayer(const ChannelShuffleDescriptor& channelShuffleDescriptor,

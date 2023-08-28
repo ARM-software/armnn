@@ -10,6 +10,7 @@
 #include <backendsCommon/test/ArgMinMaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchToSpaceNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp>
+#include <backendsCommon/test/BroadcastToEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ChannelShuffleEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ComparisonEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ConcatEndToEndTestImpl.hpp>
@@ -1727,5 +1728,16 @@ TEST_CASE("RefReshapeRemovalNCHWFirstEndToEnd")
 TEST_CASE("RefReshapeRemovalNCHWSecondEndToEnd")
 {
     ReshapeRemovalNCHWEndToEnd<armnn::DataType::Float32>(defaultBackends, true, false);
+}
+
+// BroadcastTo
+TEST_CASE("RefBroadcastToEndToEndFloat32")
+{
+    BroadcastToEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefBroadcastToEndToEndWithElementWiseBinaryFloat32")
+{
+    BroadcastToEndToEndElementWiseBinary<armnn::DataType::Float32>(defaultBackends);
 }
 }

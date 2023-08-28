@@ -53,6 +53,7 @@ BACKEND_SOURCES := \
         workloads/RefBatchMatMulWorkload.cpp \
         workloads/RefBatchNormalizationWorkload.cpp \
         workloads/RefBatchToSpaceNdWorkload.cpp \
+        workloads/RefBroadcastToWorkload.cpp \
         workloads/RefCastWorkload.cpp \
         workloads/RefChannelShuffleWorkload.cpp \
         workloads/RefComparisonWorkload.cpp \

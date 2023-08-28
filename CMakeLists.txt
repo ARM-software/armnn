@@ -198,6 +198,8 @@ list(APPEND armnn_sources
     src/armnn/layers/BatchNormalizationLayer.cpp
     src/armnn/layers/BatchToSpaceNdLayer.hpp
     src/armnn/layers/BatchToSpaceNdLayer.cpp
+    src/armnn/layers/BroadcastToLayer.hpp
+    src/armnn/layers/BroadcastToLayer.cpp
     src/armnn/layers/CastLayer.hpp
     src/armnn/layers/CastLayer.cpp
     src/armnn/layers/ChannelShuffleLayer.hpp
@@ -421,6 +423,7 @@ list(APPEND armnn_sources
     src/armnn/optimizations/PermuteAndBatchToSpaceAsDepthToSpace.hpp
     src/armnn/optimizations/PermuteAsReshape.hpp
     src/armnn/optimizations/SquashEqualSiblings.hpp
+    src/armnn/optimizations/DeleteBroadcastTo.hpp
     third-party/cxxopts/cxxopts.hpp
     third-party/ghc/filesystem.hpp
     third-party/half/half.hpp
@@ -591,6 +594,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp
         src/armnn/test/optimizations/AddBroadcastReshapeLayerTests.cpp
+        src/armnn/test/optimizations/BroadcastToTests.cpp
         src/armnn/test/optimizations/ConvertConstDequantisationLayersToConstLayersTest.cpp
         src/armnn/test/optimizations/ConvertConstPermuteLayersToConstLayersTest.cpp
         src/armnn/test/optimizations/ConvertConstantsFloatToHalfTests.cpp

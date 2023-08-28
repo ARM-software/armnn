@@ -10,6 +10,7 @@
 #include "RefBatchMatMulWorkload.hpp"
 #include "RefBatchNormalizationWorkload.hpp"
 #include "RefBatchToSpaceNdWorkload.hpp"
+#include "RefBroadcastToWorkload.hpp"
 #include "RefCastWorkload.hpp"
 #include "RefChannelShuffleWorkload.hpp"
 #include "RefComparisonWorkload.hpp"

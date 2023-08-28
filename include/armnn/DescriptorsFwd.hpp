@@ -14,6 +14,7 @@ struct ArgMinMaxDescriptor;
 struct BatchMatMulDescriptor;
 struct BatchNormalizationDescriptor;
 struct BatchToSpaceNdDescriptor;
+struct BroadcastToDescriptor;
 struct ChannelShuffleDescriptor;
 struct ComparisonDescriptor;
 struct Convolution2dDescriptor;

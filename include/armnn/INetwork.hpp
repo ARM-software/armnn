@@ -857,6 +857,13 @@ public:
     IConnectableLayer* AddTileLayer(const TileDescriptor& descriptor,
                                     const char* name = nullptr);
 
+    /// Add a BroadcastTo layer to the network
+    /// @param descriptor - Parameters for the BroadcastTo operation
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer
+    IConnectableLayer* AddBroadcastToLayer(const BroadcastToDescriptor& descriptor,
+                                           const char* name = nullptr);
+
     void ExecuteStrategy(IStrategy& strategy) const;
 
 protected:

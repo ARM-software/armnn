@@ -10,6 +10,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     BackendIdTests.cpp
     BackendProfilingTests.cpp
     BackendRegistryTests.cpp
+    BroadcastToEndToEndTestImpl.hpp
     ChannelShuffleEndToEndTestImpl.hpp
     ComparisonEndToEndTestImpl.hpp
     CompatibilityTests.cpp
@@ -79,6 +80,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/BatchNormalizationTestImpl.cpp
     layerTests/BatchNormalizationTestImpl.hpp
     layerTests/BatchToSpaceNdTestImpl.hpp
+    layerTests/BroadcastToTestImpl.cpp
+    layerTests/BroadcastToTestImpl.hpp
     layerTests/CastTestImpl.cpp
     layerTests/CastTestImpl.hpp
     layerTests/ChannelShuffleTestImpl.cpp

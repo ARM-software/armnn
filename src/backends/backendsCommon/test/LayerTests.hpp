@@ -13,6 +13,7 @@
 #include <backendsCommon/test/layerTests/BatchMatMulTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchNormalizationTestImpl.hpp>
 #include <backendsCommon/test/layerTests/BatchToSpaceNdTestImpl.hpp>
+#include <backendsCommon/test/layerTests/BroadcastToTestImpl.hpp>
 #include <backendsCommon/test/layerTests/CastTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ChannelShuffleTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ComparisonTestImpl.hpp>
@@ -79,3 +80,4 @@
 #include <backendsCommon/test/layerTests/TransposeConvolution2dTestImpl.hpp>
 #include <backendsCommon/test/layerTests/TransposeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/UnidirectionalSequenceLstmTestImpl.hpp>
+

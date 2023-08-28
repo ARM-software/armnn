@@ -94,7 +94,7 @@ void ElementwiseUnarySimpleEndToEnd(const std::vector<BackendId>& backends,
     std::map<int, std::vector<TInput>> inputTensorData    = {{ 0, qInputData }};
     std::map<int, std::vector<TInput>> expectedOutputData = {{ 0, qExpectedOutput }};
 
-    EndToEndLayerTestImpl<ArmnnInType, ArmnnInType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnInType, ArmnnInType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

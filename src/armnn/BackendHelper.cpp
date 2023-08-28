@@ -246,6 +246,22 @@ bool LayerSupportHandle::IsBatchToSpaceNdSupported(const TensorInfo& input,
                                             reasonIfUnsupported);
 }
 
+
+bool LayerSupportHandle::IsBroadcastToSupported(const TensorInfo& input,
+                                                const TensorInfo& output,
+                                                const armnn::BroadcastToDescriptor& descriptor,
+                                                Optional<std::string&> reasonIfUnsupported)
+{
+    TensorInfos infos{input, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::BroadcastTo,
+                                            infos,
+                                            descriptor,
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported.value());
+}
+
 bool LayerSupportHandle::IsCastSupported(const TensorInfo& input,
                                          const TensorInfo& output,
                                          Optional<std::string&> reasonIfUnsupported)

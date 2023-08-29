@@ -63,13 +63,22 @@ namespace
         axisHandle->Allocate();
         outputHandle->Allocate();
 
-        CopyDataToITensorHandle(inputHandle.get(), input.data());
-        CopyDataToITensorHandle(axisHandle.get(), axis.data());
+        if (input.data() != nullptr)
+        {
+            CopyDataToITensorHandle(inputHandle.get(), input.data());
+        }
+        if (axis.data() != nullptr)
+        {
+            CopyDataToITensorHandle(axisHandle.get(), axis.data());
+        }
 
         workload->PostAllocationConfigure();
         ExecuteWorkload(*workload, memoryManager);
 
-        CopyDataFromITensorHandle(outputActual.data(), outputHandle.get());
+        if (outputActual.data() != nullptr)
+        {
+            CopyDataFromITensorHandle(outputActual.data(), outputHandle.get());
+        }
 
         return LayerTestResult<T, NumDims>(outputActual,
                                            outputExpected,
@@ -98,7 +107,7 @@ LayerTestResult<T, 2> ReverseV2SimpleTestEmptyAxis(
         3, 4
     }, qScale, qOffset);
 
-    std::vector<int> axis = armnnUtils::QuantizedVector<int>({}, qScale, qOffset);
+    std::vector<int> axis = armnnUtils::QuantizedVector<int>({1, 1}, qScale, qOffset);
 
     std::vector<T> outputExpected = armnnUtils::QuantizedVector<T>({
         1, 2,

@@ -93,6 +93,15 @@ void StridedSlice(const TensorInfo& inputInfo,
                   void* outputData,
                   unsigned int dataTypeSize)
 {
+    if (inputData == nullptr)
+    {
+        throw armnn::InvalidArgumentException("Slice: Null inputData pointer");
+    }
+    if (outputData == nullptr)
+    {
+        throw armnn::InvalidArgumentException("Slice: Null outputData pointer");
+    }
+
     const unsigned char* input = reinterpret_cast<const unsigned char*>(inputData);
     unsigned char* output = reinterpret_cast<unsigned char*>(outputData);
 

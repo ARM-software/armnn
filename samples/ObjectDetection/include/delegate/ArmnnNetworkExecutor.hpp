@@ -151,18 +151,24 @@ ArmnnNetworkExecutor<Tout>::ArmnnNetworkExecutor(std::string& modelPath,
 }
 
 template<typename Tout>
-void ArmnnNetworkExecutor<Tout>::PrepareTensors(const void *inputData, const size_t dataBytes)
+void ArmnnNetworkExecutor<Tout>::PrepareTensors(const void* inputData, const size_t dataBytes)
 {
     size_t inputTensorSize = m_interpreter->input_tensor(0)->bytes;
     auto * inputTensorPtr = m_interpreter->input_tensor(0)->data.raw;
     assert(inputTensorSize >= dataBytes);
+    if (inputData == nullptr)
+    {
+        const std::string errorMessage{"ArmnnNetworkExecutor: input data pointer is null"};
+        ARMNN_LOG(error) << errorMessage;
+        throw armnn::Exception(errorMessage);
+    }
     if (inputTensorPtr != nullptr)
     {
        memcpy(inputTensorPtr, inputData, inputTensorSize);
     }
     else
     {
-        const std::string errorMessage{"ArmnnNetworkExecutor: input tensor is null"};
+        const std::string errorMessage{"ArmnnNetworkExecutor: input tensor pointer is null"};
         ARMNN_LOG(error) << errorMessage;
         throw armnn::Exception(errorMessage);
     }

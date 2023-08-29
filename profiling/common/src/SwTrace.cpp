@@ -33,7 +33,10 @@ SwTraceMessage ReadSwTraceMessage(const unsigned char* packetBuffer,
                                   unsigned int& offset,
                                   const unsigned int& packetLength)
 {
-    ARM_PIPE_ASSERT(packetBuffer);
+    if (packetBuffer == nullptr)
+    {
+        throw ProfilingException("SwTrace.cpp: Attempting to read a null buffer");
+    }
 
     unsigned int uint32_t_size = sizeof(uint32_t);
 

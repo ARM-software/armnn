@@ -9,7 +9,6 @@
 
 #include "Half.hpp"
 
-#include <cassert>
 #include <cstring>
 
 namespace
@@ -23,7 +22,13 @@ public:
     PermuteLoop(const armnn::TensorShape& dstShape, const armnn::PermutationVector& mappings)
         : m_DstShape(dstShape)
     {
-        assert(dstShape.GetNumDimensions() == mappings.GetSize());
+        if (dstShape.GetNumDimensions() != mappings.GetSize())
+        {
+            std::stringstream msg;
+            msg << "Permute: Number of shape dimensions (" << dstShape.GetNumDimensions() <<
+                ") does not match the size of the mappings (" << mappings.GetSize() << ")";
+            throw armnn::InvalidArgumentException(msg.str());
+        }
 
         const size_type numDims = dstShape.GetNumDimensions();
 
@@ -42,9 +47,18 @@ public:
 
     void Unroll(const void* srcData, void* dstData, size_t dataTypeSize)
     {
-        assert(srcData);
-        assert(dstData);
-        assert(dataTypeSize > 0);
+        if (srcData == nullptr)
+        {
+            throw armnn::InvalidArgumentException("Permute: Source Data pointer is null");
+        }
+        if (dstData == nullptr)
+        {
+            throw armnn::InvalidArgumentException("Permute: Destination Data pointer is null");
+        }
+        if (dataTypeSize == 0)
+        {
+            throw armnn::InvalidArgumentException("Permute: dataTypeSize is zero");
+        }
 
         const unsigned char* srcDataPtr = reinterpret_cast<const unsigned char*>(srcData);
         unsigned char* dstDataPtr       = reinterpret_cast<unsigned char*>(dstData);
@@ -61,13 +75,26 @@ private:
                 const unsigned char* srcEnd, unsigned char* dstEnd,
                 size_t dataTypeSize)
     {
-        assert(srcData);
-        assert(dstData);
-        assert(srcEnd);
-        assert(dstEnd);
-        assert(srcData < srcEnd);
-        assert(dstData < dstEnd);
-        assert(dataTypeSize > 0);
+        if (srcData == nullptr)
+        {
+            throw armnn::InvalidArgumentException("Permute: Source Data pointer is null");
+        }
+        if (dstData == nullptr)
+        {
+            throw armnn::InvalidArgumentException("Permute: Destination Data pointer is null");
+        }
+        if (srcEnd == nullptr)
+        {
+            throw armnn::InvalidArgumentException("Permute: Source End pointer is null");
+        }
+        if (dstEnd == nullptr)
+        {
+            throw armnn::InvalidArgumentException("Permute: Destination End pointer is null");
+        }
+        if (dataTypeSize == 0)
+        {
+            throw armnn::Exception("Permute: dataTypeSize is zero");
+        }
 
         if (dimension >= m_DstShape.GetNumDimensions())
         {
@@ -98,7 +125,13 @@ namespace armnnUtils
 armnn::TensorShape Permuted(const armnn::TensorShape& srcShape,
                             const armnn::PermutationVector& mappings)
 {
-    assert(srcShape.GetNumDimensions() == mappings.GetSize());
+    if (srcShape.GetNumDimensions() != mappings.GetSize())
+    {
+        std::stringstream msg;
+        msg << "Permute: Number of shape dimensions (" << srcShape.GetNumDimensions() <<
+               ") does not match the size of the mappings (" << mappings.GetSize() << ")";
+        throw armnn::InvalidArgumentException(msg.str());
+    }
 
     const unsigned int numDims = mappings.GetSize();
     unsigned int outDims[armnn::MaxNumOfTensorDimensions];

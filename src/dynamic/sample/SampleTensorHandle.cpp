@@ -136,15 +136,29 @@ bool SampleTensorHandle::Import(void* memory, armnn::MemorySource source)
 
 void SampleTensorHandle::CopyOutTo(void* dest) const
 {
-    const void *src = GetPointer();
-    ARMNN_ASSERT(src);
+    const void* src = GetPointer();
+    if (dest == nullptr)
+    {
+        throw armnn::Exception("SampleTensorHandle:CopyOutTo: Destination Ptr is null");
+    }
+    if (src == nullptr)
+    {
+        throw armnn::Exception("SampleTensorHandle:CopyOutTo: Source Ptr is null");
+    }
     memcpy(dest, src, m_TensorInfo.GetNumBytes());
 }
 
 void SampleTensorHandle::CopyInFrom(const void* src)
 {
-    void *dest = GetPointer();
-    ARMNN_ASSERT(dest);
+    void* dest = GetPointer();
+    if (src == nullptr)
+    {
+        throw armnn::Exception("SampleTensorHandle:CopyInFrom: Source Ptr is null");
+    }
+    if (dest == nullptr)
+    {
+        throw armnn::Exception("SampleTensorHandle:CopyInFrom: Destination Ptr is null");
+    }
     memcpy(dest, src, m_TensorInfo.GetNumBytes());
 }
 

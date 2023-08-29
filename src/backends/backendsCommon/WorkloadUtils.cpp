@@ -18,8 +18,14 @@ namespace armnn
 armnn::ConstTensor PermuteTensor(const ConstTensorHandle* tensor,
                                  const PermutationVector& permutationVector, void* permuteBuffer)
 {
-    ARMNN_ASSERT_MSG(tensor, "Invalid input tensor");
-    ARMNN_ASSERT_MSG(permuteBuffer, "Invalid permute buffer");
+    if (tensor == nullptr)
+    {
+        throw armnn::InvalidArgumentException("WorkloadUtils: PermuteTensor: Null input tensor pointer");
+    }
+    if (permuteBuffer == nullptr)
+    {
+        throw armnn::InvalidArgumentException("WorkloadUtils: PermuteTensor: Null permute buffer pointer");
+    }
 
     TensorInfo tensorInfo = tensor->GetTensorInfo();
 
@@ -231,8 +237,14 @@ armnn::ConstTensor ConvertWeightTensorFromArmnnToAcl(const ConstTensorHandle* we
                                                      DataLayout dataLayout,
                                                      void* permuteBuffer)
 {
-    ARMNN_ASSERT_MSG(weightTensor, "Invalid input tensor");
-    ARMNN_ASSERT_MSG(permuteBuffer, "Invalid permute buffer");
+    if (weightTensor == nullptr)
+    {
+        throw armnn::InvalidArgumentException("WorkloadUtils: PermuteTensor: Null input tensor pointer");
+    }
+    if (permuteBuffer == nullptr)
+    {
+        throw armnn::InvalidArgumentException("WorkloadUtils: PermuteTensor: Null permute buffer pointer");
+    }
 
     auto multiplier    = weightTensor->GetTensorInfo().GetShape()[0];
     auto inputChannels = weightTensor->GetTensorInfo().GetShape()[1];

@@ -207,6 +207,12 @@ bool BasePipeServer::SendPacket(uint32_t packetFamily, uint32_t packetId, const 
     // And the rest of the data if there is any.
     if (dataLength > 0)
     {
+        if (data == nullptr)
+        {
+            throw ProfilingException(
+                "basePipeServer: SendPacket: Attempting to send a non-zero length data packet with a null data pointer"
+                );
+        }
         memcpy((packet.data() + 8), data, dataLength);
     }
     EchoPacket(PacketDirection::Sending, packet.data(), packet.size());

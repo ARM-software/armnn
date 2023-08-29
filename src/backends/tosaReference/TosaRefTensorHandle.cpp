@@ -100,16 +100,30 @@ void* TosaRefTensorHandle::GetPointer() const
 
 void TosaRefTensorHandle::CopyOutTo(void* dest) const
 {
-    const void *src = GetPointer();
-    ARMNN_ASSERT(src);
-    memcpy(dest, src, m_TensorInfo.GetNumBytes());
+    const void* src = GetPointer();
+    if (src == nullptr)
+    {
+        throw NullPointerException("TosaRefTensorHandle::CopyOutTo called with a null src pointer");
+    }
+    if (dest == nullptr)
+    {
+        throw NullPointerException("TosaRefTensorHandle::CopyOutTo called with a null dest pointer");
+    }
+    memcpy(dest, src, GetTensorInfo().GetNumBytes());
 }
 
 void TosaRefTensorHandle::CopyInFrom(const void* src)
 {
-    void *dest = GetPointer();
-    ARMNN_ASSERT(dest);
-    memcpy(dest, src, m_TensorInfo.GetNumBytes());
+    void* dest = GetPointer();
+    if (dest == nullptr)
+    {
+        throw NullPointerException("TosaRefTensorHandle::CopyInFrom called with a null dest pointer");
+    }
+    if (src == nullptr)
+    {
+        throw NullPointerException("TosaRefTensorHandle::CopyInFrom called with a null src pointer");
+    }
+    memcpy(dest, src, GetTensorInfo().GetNumBytes());
 }
 
 bool TosaRefTensorHandle::Import(void* memory, MemorySource source)

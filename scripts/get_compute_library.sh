@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8490dc7d2a372af9e6d7aae95e904773ac0d144c" #Revert "Changes to enable FP16 in armv8a multi_isa"
+DEFAULT_CLFRAMEWORKREVISION="d5f9a1cf9f0340f3e6bf9ff00156fc2adb1fdca9" #10192: Implement indirect load for buffer and CLImage
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

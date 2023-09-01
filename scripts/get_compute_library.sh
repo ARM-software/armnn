@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="d5f9a1cf9f0340f3e6bf9ff00156fc2adb1fdca9" #10192: Implement indirect load for buffer and CLImage
+DEFAULT_CLFRAMEWORKREVISION="2e6d659267d10d6f46f89aac91b52f6b7c211316" #10172: Port ClTemplatePool2d to ckw
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

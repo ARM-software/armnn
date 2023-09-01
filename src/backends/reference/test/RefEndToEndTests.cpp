@@ -1736,8 +1736,27 @@ TEST_CASE("RefBroadcastToEndToEndFloat32")
     BroadcastToEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
-TEST_CASE("RefBroadcastToEndToEndWithElementWiseBinaryFloat32")
+TEST_CASE("RefBroadcastToEndToEndWithMultiplicationFloat32")
 {
-    BroadcastToEndToEndElementWiseBinary<armnn::DataType::Float32>(defaultBackends);
+    BroadcastToEndToEndElementWiseBinary<armnn::DataType::Float32>(defaultBackends,
+                                                                   BinaryOperation::Mul);
+}
+
+TEST_CASE("RefBroadcastToEndToEndWithDivisionFloat32")
+{
+    BroadcastToEndToEndElementWiseBinary<armnn::DataType::Float32>(defaultBackends,
+                                                                   BinaryOperation::Div);
+}
+
+TEST_CASE("RefBroadcastToEndToEndWithAdditionFloat32")
+{
+    BroadcastToEndToEndElementWiseBinary<armnn::DataType::Float32>(defaultBackends,
+                                                                   BinaryOperation::Add);
+}
+
+TEST_CASE("RefBroadcastToEndToEndWithSubtractionFloat32")
+{
+    BroadcastToEndToEndElementWiseBinary<armnn::DataType::Float32>(defaultBackends,
+                                                                   BinaryOperation::Sub);
 }
 }

@@ -20,11 +20,14 @@ public:
     {
         if(layer.GetType() == LayerType::BroadcastTo)
         {
+            TensorInfo info = layer.GetOutputSlot(0).GetTensorInfo();
             Layer& next = layer.GetOutputSlot(0).GetConnection(0)->GetOwningLayer();
             if (next.GetType() == LayerType::ElementwiseBinary)
             {
                 Layer& connectedLayer = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayer();
+                auto tensorInfo = connectedLayer.GetOutputSlot().GetTensorInfo();
                 layer.GetOutputSlot().MoveAllConnections(connectedLayer.GetOutputSlot());
+                connectedLayer.GetOutputSlot().GetOutputHandler().SetTensorInfo(tensorInfo);
             }
         }
     }

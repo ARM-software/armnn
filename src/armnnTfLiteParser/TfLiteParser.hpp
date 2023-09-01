@@ -117,6 +117,7 @@ private:
     void ParseAveragePool2D(size_t subgraphIndex, size_t operatorIndex);
     void ParseBatchMatMul(size_t subgraphIndex, size_t operatorIndex);
     void ParseBatchToSpaceND(size_t subgraphIndex, size_t operatorIndex);
+    void ParseBroadcastTo(size_t subgraphIndex, size_t operatorIndex);
     void ParseCast(size_t subgraphIndex, size_t operatorIndex);
     void ParseCeil(size_t subgraphIndex, size_t operatorIndex);
     void ParseComparison(size_t subgraphIndex, size_t operatorIndex, armnn::ComparisonOperation comparisonOperation);

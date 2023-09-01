@@ -6,7 +6,6 @@
 #include "BroadcastToLayer.hpp"
 
 #include "LayerCloneBase.hpp"
-
 #include <armnn/TypesUtils.hpp>
 #include <armnn/backends/WorkloadData.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>

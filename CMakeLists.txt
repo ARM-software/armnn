@@ -682,6 +682,7 @@ if(BUILD_UNIT_TESTS)
              src/armnnTfLiteParser/test/AvgPool2D.cpp
              src/armnnTfLiteParser/test/BatchMatMul.cpp
              src/armnnTfLiteParser/test/BatchToSpaceND.cpp
+             src/armnnTfLiteParser/test/BroadcastTo.cpp
              src/armnnTfLiteParser/test/Cast.cpp
              src/armnnTfLiteParser/test/Comparison.cpp
              src/armnnTfLiteParser/test/Concatenation.cpp

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2e6d659267d10d6f46f89aac91b52f6b7c211316" #10172: Port ClTemplatePool2d to ckw
+DEFAULT_CLFRAMEWORKREVISION="324ba7a98aaa4375629ee023cce70ea9601efe10" #10220: Pool3d changes to enable fp16 in armv8a multi_isa builds
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

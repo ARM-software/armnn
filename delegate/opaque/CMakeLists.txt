@@ -92,7 +92,7 @@ target_include_directories(flatbuffer_headers_opaque
         INTERFACE 
             $<BUILD_INTERFACE:${Flatbuffers_INCLUDE_DIR}>
             $<INSTALL_INTERFACE:include/flatbuffer_headers_opaque>)
-target_compile_options(flatbuffer_headers_opaque INTERFACE -Wno-sign-conversion)
+target_compile_options(flatbuffer_headers_opaque INTERFACE -Wno-sign-conversion -Wno-sign-compare)
 
 target_link_libraries(armnnOpaqueDelegateObject PUBLIC flatbuffer_headers_opaque)
 

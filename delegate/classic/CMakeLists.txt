@@ -93,7 +93,7 @@ target_include_directories(flatbuffer_headers
         INTERFACE
             $<BUILD_INTERFACE:${Flatbuffers_INCLUDE_DIR}>
             $<INSTALL_INTERFACE:include/flatbuffer_headers>)
-target_compile_options(flatbuffer_headers INTERFACE -Wno-sign-conversion)
+target_compile_options(flatbuffer_headers INTERFACE -Wno-sign-conversion -Wno-sign-compare)
 
 target_link_libraries(armnnClassicDelegateObject PUBLIC flatbuffer_headers)
 

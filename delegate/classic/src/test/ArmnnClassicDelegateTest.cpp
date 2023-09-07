@@ -31,9 +31,13 @@ TEST_CASE ("ArmnnDelegate Registered")
     tfLiteInterpreter->SetTensorParametersReadWrite(1, kTfLiteFloat32, "input2", {1,2,2,1}, TfLiteQuantization());
     tfLiteInterpreter->SetTensorParametersReadWrite(2, kTfLiteFloat32, "output", {1,2,2,1}, TfLiteQuantization());
 
+    TfLiteAddParams* addParams = reinterpret_cast<TfLiteAddParams*>(malloc(sizeof(TfLiteAddParams)));
+    addParams->activation = kTfLiteActNone;
+    addParams->pot_scale_int16 = false;
+
     tflite::ops::builtin::BuiltinOpResolver opResolver;
     const TfLiteRegistration* opRegister = opResolver.FindOp(BuiltinOperator_ADD, 1);
-    tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, nullptr, opRegister);
+    tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, addParams, opRegister);
 
     // Create the Armnn Delegate
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
@@ -69,9 +73,13 @@ TEST_CASE ("ArmnnDelegateOptimizerOptionsRegistered")
     tfLiteInterpreter->SetTensorParametersReadWrite(1, kTfLiteFloat32, "input2", {1,2,2,1}, TfLiteQuantization());
     tfLiteInterpreter->SetTensorParametersReadWrite(2, kTfLiteFloat32, "output", {1,2,2,1}, TfLiteQuantization());
 
+    TfLiteAddParams* addParams = reinterpret_cast<TfLiteAddParams*>(malloc(sizeof(TfLiteAddParams)));
+    addParams->activation = kTfLiteActNone;
+    addParams->pot_scale_int16 = false;
+
     tflite::ops::builtin::BuiltinOpResolver opResolver;
     const TfLiteRegistration* opRegister = opResolver.FindOp(BuiltinOperator_ADD, 1);
-    tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, nullptr, opRegister);
+    tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, addParams, opRegister);
 
     // Create the Armnn Delegate
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };

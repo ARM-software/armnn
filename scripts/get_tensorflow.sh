@@ -8,7 +8,7 @@
 CMD=$( basename "$0" )
 
 # Revision or tag that Arm NN has been tested with:
-DEFAULT_TENSORFLOW_REVISION=6f692f73cb2043b4a0b0446539cd8c15b3dd9220 # r2.12 + PR #60015 to fix Cmake build.
+DEFAULT_TENSORFLOW_REVISION=v2.14.0-rc1 # r2.14 branch
 
 Usage() {
     echo "Gets the revision or tag of TensorFlow that this version of Arm NN has been" 

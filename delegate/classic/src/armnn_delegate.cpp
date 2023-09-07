@@ -124,6 +124,8 @@ TfLiteStatus DoPrepare(TfLiteContext* tfLiteContext, TfLiteDelegate* tfLiteDeleg
         .custom_name = "TfLiteArmNnDelegate",
         .version = 1,
         .registration_external = nullptr,
+        .async_kernel = nullptr,
+        .inplace_operator = 0
     };
 
     const TfLiteStatus status =

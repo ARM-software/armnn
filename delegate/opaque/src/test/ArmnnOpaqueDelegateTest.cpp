@@ -7,10 +7,6 @@
 #include <doctest/doctest.h>
 
 #include <opaque/include/armnn_delegate.hpp>
-#include <opaque/include/Version.hpp>
-
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/experimental/acceleration/configuration/delegate_registry.h>
 
 namespace armnnOpaqueDelegate
 {

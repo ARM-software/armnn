@@ -26,6 +26,9 @@ if (TfLite_LIB MATCHES .a$)
                  PATH ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/strings)
     find_library(TfLite_abseil_synchronization_LIB "libabsl_synchronization.a"
                  PATH ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/synchronization)
+    # Required for building TensorFlow in Debug
+    find_library(TfLite_abseil_graphCycle_internal_LIB "libabsl_graphcycles_internal.a"
+                 PATH ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/synchronization)
 
 
     find_library(TfLite_farmhash_LIB "libfarmhash.a"
@@ -111,7 +114,7 @@ if (TfLite_LIB MATCHES .a$)
                                       TfLite_ruy_pack_avx2_fma_LIB TfLite_ruy_pack_avx512_LIB TfLite_ruy_pack_avx_LIB TfLite_ruy_prepacked_cache_LIB
                                       TfLite_ruy_prepare_packed_matrices_LIB TfLite_ruy_system_aligned_alloc_LIB TfLite_ruy_threadpool_LIB
                                       TfLite_ruy_trmul_LIB TfLite_ruy_tune_LIB TfLite_ruy_wait_LIB TfLite_ruy_profiler_LIB TfLite_cpuinfo_LIB
-                                      TfLite_abseil_synchronization_LIB TfLite_pthread_pool_LIB)
+                                      TfLite_abseil_synchronization_LIB TfLite_abseil_graphCycle_internal_LIB TfLite_pthread_pool_LIB)
     # Set external variables for usage in CMakeLists.txt
     if (TFLITE_FOUND)
         # WARNING! The order of these libraries is critical. Moving them
@@ -126,7 +129,7 @@ if (TfLite_LIB MATCHES .a$)
                                      ${TfLite_ruy_pack_avx2_fma_LIB} ${TfLite_ruy_pack_avx512_LIB} ${TfLite_ruy_pack_avx_LIB} ${TfLite_ruy_prepacked_cache_LIB}
                                      ${TfLite_ruy_prepare_packed_matrices_LIB} ${TfLite_ruy_system_aligned_alloc_LIB}
                                      ${TfLite_ruy_tune_LIB} ${TfLite_ruy_wait_LIB} ${TfLite_ruy_profiler_LIB}
-                                     ${TfLite_cpuinfo_LIB} ${TfLite_abseil_synchronization_LIB} ${TfLite_pthread_pool_LIB})
+                                     ${TfLite_cpuinfo_LIB} ${TfLite_abseil_synchronization_LIB} ${TfLite_abseil_graphCycle_internal_LIB} ${TfLite_pthread_pool_LIB})
     endif ()
 elseif (TfLite_LIB MATCHES .so$)
     message("-- Dynamic tensorflow lite library found, using for ArmNN build")

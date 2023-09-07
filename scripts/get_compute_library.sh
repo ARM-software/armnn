@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c85edf1a5a3ad0e6906c0e90c18cc0080d71501d" #Make zip and combine variadic | https://review.mlplatform.org/c/ml/ComputeLibrary/+/10227
+DEFAULT_CLFRAMEWORKREVISION="45e5b5a4c6aa0e8dadf3c1d08031807eb0a1523b" #10239: Changes to BoundingBoxTransform to enable fp16 in armv8a multi_isa builds
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

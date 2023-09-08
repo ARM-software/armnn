@@ -13,6 +13,7 @@ list(APPEND armnnOpaqueDelegateObject_sources
         src/armnn_external_delegate.cpp
         src/BatchMatMul.hpp
         src/BatchSpace.hpp
+        src/BroadcastTo.hpp
         src/Comparison.hpp
         src/Control.hpp
         src/Convolution.hpp

@@ -134,6 +134,8 @@ if(BUILD_UNIT_TESTS)
         test/BatchMatMulTestHelper.hpp
         test/BatchSpaceTest.cpp
         test/BatchSpaceTestHelper.hpp
+        test/BroadcastToTest.cpp
+        test/BroadcastToTestHelper.hpp
         test/CastTest.cpp
         test/CastTestHelper.hpp
         test/ComparisonTest.cpp

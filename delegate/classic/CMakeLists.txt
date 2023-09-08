@@ -13,6 +13,7 @@ list(APPEND armnnClassicDelegateObject_sources
         src/ArgMinMax.hpp
         src/BatchMatMul.hpp
         src/BatchSpace.hpp
+        src/BroadcastTo.hpp
         src/ClassicDelegateUtils.hpp
         src/Comparison.hpp
         src/Convolution.hpp

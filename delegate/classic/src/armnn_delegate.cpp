@@ -11,6 +11,7 @@
 #include "ArgMinMax.hpp"
 #include "BatchMatMul.hpp"
 #include "BatchSpace.hpp"
+#include "BroadcastTo.hpp"
 #include "Comparison.hpp"
 #include "Convolution.hpp"
 #include "Control.hpp"
@@ -603,6 +604,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                                tfLiteNode,
                                                nodeIndex,
                                                kTfLiteBuiltinBatchToSpaceNd);
+        case kTfLiteBuiltinBroadcastTo:
+            return VisitBroadcastToOperator(delegateData,
+                                            tfLiteContext,
+                                            tfLiteNode,
+                                            nodeIndex,
+                                            kTfLiteBuiltinBroadcastTo);
         case kTfLiteBuiltinCast:
             return VisitCastOperator(delegateData,
                                      tfLiteContext,

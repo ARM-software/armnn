@@ -49,7 +49,7 @@ std::vector<char> CreateReduceTfLiteModel(tflite::BuiltinOperator reduceOperator
 
     flatbuffers::Offset<tflite::QuantizationParameters> quantizationParameters;
 
-    if (kTfLiteNoQuantizationForQuantized)
+    if (kTfLiteNoQuantizationForQuantized && reduceOperatorCode == BuiltinOperator_REDUCE_PROD)
     {
         if ((quantScale == 1 || quantScale == 0) && quantOffset == 0)
         {

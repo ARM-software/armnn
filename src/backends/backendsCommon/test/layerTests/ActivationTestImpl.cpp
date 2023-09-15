@@ -1218,6 +1218,71 @@ LayerTestResult<int16_t, 4> HardSwishInt16Test(
 
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> GeluTestCommon(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory,
+        float qScale,
+        int32_t qOffset)
+{
+    std::vector<float> inputData =
+    {
+         -0.1f, -0.2f, -0.3f, -0.4f,
+          0.1f,  0.2f,  0.3f,  0.4f,
+         -1.0f, -2.0f, -3.0f, -4.0f,
+          1.0f,  2.0f,  3.0f,  4.0f
+    };
+    // Calculate output values for input.
+    auto f = [](float x)
+    {
+        // gelu(x) = x * 1/2 * (1 + erf(x / sqrt(2))),
+        // where erf is Gaussian error function
+        auto result = x * (0.5f * (1.0f + erff(static_cast<float>(x / std::sqrt(2)))));
+        return result;
+    };
+    std::vector<float> expectedOutput(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), expectedOutput.begin(), f);
+
+    return SimpleActivationTest<ArmnnType>(workloadFactory,
+                                           memoryManager,
+                                           tensorHandleFactory,
+                                           armnn::ActivationFunction::Gelu,
+                                           0.f,
+                                           0.f,
+                                           qScale,
+                                           qOffset,
+                                           inputData,
+                                           qScale,
+                                           qOffset,
+                                           expectedOutput);
+}
+
+LayerTestResult<float, 4> GeluTest(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return GeluTestCommon<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
+}
+
+LayerTestResult<uint8_t, 4> GeluUint8Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return GeluTestCommon<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 64);
+}
+
+LayerTestResult<int16_t, 4> GeluInt16Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return GeluTestCommon<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory, 0.1f, 0);
+}
+
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> CompareActivationTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,

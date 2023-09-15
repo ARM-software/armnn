@@ -82,6 +82,13 @@ float Activation(float in,
             output = in * (std::min(std::max((in + 3),0.0f),6.0f)) / 6;
             break;
         }
+        case ActivationFunction::Gelu:
+        {
+            // gelu(x) = x * 1/2 * (1 + erf(x / sqrt(2))),
+            // where erf is Gaussian error function
+            output = in * (0.5f * (1.0f + erff(static_cast<float>(in / std::sqrt(2)))));
+            break;
+        }
         default:
         {
             throw InvalidArgumentException("Unsupported activation function");

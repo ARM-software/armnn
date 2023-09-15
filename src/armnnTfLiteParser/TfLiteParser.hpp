@@ -141,6 +141,7 @@ private:
     void ParseFullyConnected(size_t subgraphIndex, size_t operatorIndex);
     void ParseGather(size_t subgraphIndex, size_t operatorIndex);
     void ParseGatherNd(size_t subgraphIndex, size_t operatorIndex);
+    void ParseGelu(size_t subgraphIndex, size_t operatorIndex);
     void ParseGreater(size_t subgraphIndex, size_t operatorIndex);
     void ParseGreaterOrEqual(size_t subgraphIndex, size_t operatorIndex);
     void ParseHardSwish(size_t subgraphIndex, size_t operatorIndex);

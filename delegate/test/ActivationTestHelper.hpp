@@ -73,7 +73,11 @@ std::vector<char> CreateActivationTfLiteModel(tflite::BuiltinOperator activation
 
     flatbuffers::Offset <flatbuffers::String> modelDescription =
         flatBufferBuilder.CreateString("ArmnnDelegate: Activation Operator Model");
-    flatbuffers::Offset <OperatorCode> operatorCode = CreateOperatorCode(flatBufferBuilder, activationOperatorCode);
+    flatbuffers::Offset <OperatorCode> operatorCode = CreateOperatorCode(flatBufferBuilder,
+                                                                         activationOperatorCode,
+                                                                         0,
+                                                                         1,
+                                                                         activationOperatorCode);
 
     flatbuffers::Offset <Model> flatbufferModel =
         CreateModel(flatBufferBuilder,

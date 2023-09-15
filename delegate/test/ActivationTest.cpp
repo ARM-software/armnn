@@ -196,6 +196,33 @@ void ActivationLeakyReLuTest(std::vector<armnn::BackendId>& backends)
                    alpha);
 }
 
+void ActivationGeluTest(std::vector<armnn::BackendId>& backends)
+{
+    std::vector<float> inputData =
+    {
+        -0.1f, -0.2f, -0.3f, -0.4f,
+         0.1f,  0.2f,  0.3f,  0.4f,
+        -1.0f, -2.0f, -3.0f, -4.0f,
+         1.0f,  2.0f,  3.0f,  4.0f
+    };
+
+    // Calculate output values for input.
+    auto f = [](float x)
+    {
+        // gelu(x) = x * 1/2 * (1 + erf(x / sqrt(2))),
+        // where erf is Gaussian error function
+        auto result = x * (0.5f * (1.0f + erff(static_cast<float>(x / std::sqrt(2)))));
+        return result;
+    };
+    std::vector<float> outputExpectedData(inputData.size());
+    std::transform(inputData.begin(), inputData.end(), outputExpectedData.begin(), f);
+
+    ActivationTest(tflite::BuiltinOperator_GELU,
+                   backends,
+                   inputData,
+                   outputExpectedData);
+}
+
 TEST_SUITE("Activation_CpuRefTests")
 {
 
@@ -239,6 +266,12 @@ TEST_CASE ("Activation_LeakyRelu_CpuRef_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     ActivationLeakyReLuTest(backends);
+}
+
+TEST_CASE ("Activation_Gelu_CpuRef_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    ActivationGeluTest(backends);
 }
 
 }
@@ -288,6 +321,12 @@ TEST_CASE ("Activation_LeakyRelu_CpuAcc_Test")
     ActivationLeakyReLuTest(backends);
 }
 
+TEST_CASE ("Activation_Gelu_CpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
+    ActivationGeluTest(backends);
+}
+
 }
 
 TEST_SUITE("Activation_GpuAccTests")
@@ -333,6 +372,12 @@ TEST_CASE ("Activation_LeakyRelu_GpuAcc_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
     ActivationLeakyReLuTest(backends);
+}
+
+TEST_CASE ("Activation_Gelu_GpuAcc_Test")
+{
+    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
+    ActivationGeluTest(backends);
 }
 
 }

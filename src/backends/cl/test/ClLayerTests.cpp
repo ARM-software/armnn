@@ -73,6 +73,9 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tanh, ClContextControlFixture, TanhTest)
 // Elu Activation
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Elu, ClContextControlFixture, EluTest)
 
+// Gelu Activation
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Gelu, ClContextControlFixture, GeluTest)
+
 // Batch Mat Mul
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(BatchMatMul2DSimpleFloat32,
                                  ClContextControlFixture,

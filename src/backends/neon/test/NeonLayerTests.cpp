@@ -722,6 +722,9 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Tanh, TanhTest)
 // Elu Activation
 ARMNN_AUTO_TEST_CASE_WITH_THF(Elu, EluTest)
 
+// Gelu Activation
+ARMNN_AUTO_TEST_CASE_WITH_THF(Gelu, GeluTest)
+
 // Softmax
 // Moved to NeonLayerTests_NDK_Bug.cpp
 //ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSoftmaxBeta1, SimpleSoftmaxTest, 1.0f)

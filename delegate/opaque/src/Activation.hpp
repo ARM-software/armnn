@@ -24,6 +24,9 @@ std::string GetLayerName(armnn::ActivationFunction activationFunction)
         case armnn::ActivationFunction::Elu:
             layerName += " ELU";
             break;
+        case armnn::ActivationFunction::Gelu:
+            layerName += " GELU";
+            break;
         case armnn::ActivationFunction::HardSwish:
             layerName += " HARD_SWISH";
             break;
@@ -173,6 +176,11 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
                 reinterpret_cast<TfLiteLeakyReluParams*>(TfLiteOpaqueNodeGetBuiltinData(tfLiteNode));
             activationDesc.m_Function = armnn::ActivationFunction::LeakyReLu;
             activationDesc.m_A = leakyReluParameters->alpha;
+            break;
+        }
+        case kTfLiteBuiltinGelu:
+        {
+            activationDesc.m_Function = armnn::ActivationFunction::Gelu;
             break;
         }
         default:

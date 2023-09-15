@@ -109,6 +109,11 @@ TfLiteStatus VisitActivationOperator(DelegateData& delegateData,
             activationDesc.m_A = leakyReluParameters->alpha;
             break;
         }
+        case kTfLiteBuiltinGelu:
+        {
+            activationDesc.m_Function = armnn::ActivationFunction::Gelu;
+            break;
+        }
         default:
         {
             return kTfLiteError;

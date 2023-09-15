@@ -502,6 +502,8 @@ armnn::ActivationFunction ToActivationFunction(armnnSerializer::ActivationFuncti
             return armnn::ActivationFunction::Elu;
         case armnnSerializer::ActivationFunction_HardSwish:
             return armnn::ActivationFunction::HardSwish;
+        case armnnSerializer::ActivationFunction_Gelu:
+            return armnn::ActivationFunction::Gelu;
         default:
             return armnn::ActivationFunction::Sigmoid;
     }

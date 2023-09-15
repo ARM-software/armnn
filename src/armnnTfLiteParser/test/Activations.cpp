@@ -130,4 +130,16 @@ TEST_CASE_FIXTURE(HardSwishFixture, "ParseHardSwish")
                                          { -0.0f, -0.0f, -0.04833334f, 0.84f, 1.90666667f, 3.0f, 4.0f });
 }
 
+struct GeluFixture : ActivationFixture
+{
+    GeluFixture() : ActivationFixture("GELU", "FLOAT32") {}
+};
+
+TEST_CASE_FIXTURE(GeluFixture, "ParseGelu")
+{
+    RunTest<2, armnn::DataType::Float32>(0,
+         { -4.0f,           -3.0f,           -2.9f,           1.2f,        2.2f,        3.0f,       4.0f },
+         {-0.000126361847f, -0.00404950976f, -0.00541083235f, 1.06191647f, 2.16941237f, 2.9959507f, 3.99987364f });
+}
+
 }

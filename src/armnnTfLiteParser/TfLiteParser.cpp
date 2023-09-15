@@ -771,6 +771,7 @@ TfLiteParserImpl::TfLiteParserImpl(const Optional<ITfLiteParser::TfLiteParserOpt
     m_ParserFunctions[tflite::BuiltinOperator_FLOOR_DIV]               = &TfLiteParserImpl::ParseFloorDiv;
     m_ParserFunctions[tflite::BuiltinOperator_FULLY_CONNECTED]         = &TfLiteParserImpl::ParseFullyConnected;
     m_ParserFunctions[tflite::BuiltinOperator_GATHER]                  = &TfLiteParserImpl::ParseGather;
+    m_ParserFunctions[tflite::BuiltinOperator_GELU]                    = &TfLiteParserImpl::ParseGelu;
     m_ParserFunctions[tflite::BuiltinOperator_GATHER_ND]               = &TfLiteParserImpl::ParseGatherNd;
     m_ParserFunctions[tflite::BuiltinOperator_GREATER]                 = &TfLiteParserImpl::ParseGreater;
     m_ParserFunctions[tflite::BuiltinOperator_GREATER_EQUAL]           = &TfLiteParserImpl::ParseGreaterOrEqual;
@@ -3159,6 +3160,11 @@ void TfLiteParserImpl::ParseHardSwish(size_t subgraphIndex, size_t operatorIndex
     ParseActivation(subgraphIndex, operatorIndex, ActivationFunction::HardSwish);
 }
 
+void TfLiteParserImpl::ParseGelu(size_t subgraphIndex, size_t operatorIndex)
+{
+    ParseActivation(subgraphIndex,operatorIndex,ActivationFunction::Gelu);
+}
+
 void TfLiteParserImpl::ParseActivation(size_t subgraphIndex, size_t operatorIndex, ActivationFunction activationType)
 {
     CHECK_MODEL(m_Model, subgraphIndex, operatorIndex);
@@ -3217,6 +3223,11 @@ void TfLiteParserImpl::ParseActivation(size_t subgraphIndex, size_t operatorInde
         case ActivationFunction::HardSwish:
         {
             layerName += fmt::format("HARDSWISH:{}:{}", subgraphIndex, operatorIndex);
+            break;
+        }
+        case ActivationFunction::Gelu:
+        {
+            layerName += fmt::format("GELU:{}:{}", subgraphIndex, operatorIndex);
             break;
         }
         default:

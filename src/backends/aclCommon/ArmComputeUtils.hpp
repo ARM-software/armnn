@@ -77,6 +77,7 @@ ConvertActivationFunctionToAclActivationFunction(ActivationFunction armnnFunctio
         case ActivationFunction::TanH:          return AclActivationFunction::TANH;
         case ActivationFunction::Elu:           return AclActivationFunction::ELU;
         case ActivationFunction::HardSwish:     return AclActivationFunction::HARD_SWISH;
+        case ActivationFunction::Gelu:          return AclActivationFunction::GELU;
         default:                                throw InvalidArgumentException("Unsupported activation function");
     }
 }

@@ -96,7 +96,8 @@ enum class ActivationFunction
     Sqrt        = 8,
     Square      = 9,
     Elu         = 10,
-    HardSwish   = 11
+    HardSwish   = 11,
+    Gelu        = 12
 };
 
 enum class ArgMinMaxFunction

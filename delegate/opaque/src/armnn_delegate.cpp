@@ -808,6 +808,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                          tfLiteNode,
                                          nodeIndex,
                                          kTfLiteBuiltinGatherNd);
+        case kTfLiteBuiltinGelu:
+            return VisitActivationOperator(delegateData,
+                                           tfLiteContext,
+                                           tfLiteNode,
+                                           nodeIndex,
+                                           kTfLiteBuiltinGelu);
         case kTfLiteBuiltinGreater:
             return VisitComparisonOperator(delegateData,
                                            tfLiteContext,

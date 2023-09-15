@@ -44,6 +44,7 @@ constexpr char const* GetActivationFunctionAsCString(ActivationFunction activati
         case ActivationFunction::Square:        return "Square";
         case ActivationFunction::Elu:           return "Elu";
         case ActivationFunction::HardSwish:     return "HardSwish";
+        case ActivationFunction::Gelu:          return "Gelu";
         default:                                return "Unknown";
     }
 }

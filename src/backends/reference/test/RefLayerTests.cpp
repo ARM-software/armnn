@@ -770,10 +770,16 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(TanhInt16, TanhInt16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Elu, EluTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(EluUint8, EluUint8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(EluInt16, EluInt16Test)
+
 // HardSwish Activation
 ARMNN_AUTO_TEST_CASE_WITH_THF(HardSwish, HardSwishTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(HardSwishUint8, HardSwishUint8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(HardSwishInt16, HardSwishInt16Test)
+
+// Gelu Activation
+ARMNN_AUTO_TEST_CASE_WITH_THF(Gelu, GeluTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GeluUint8, GeluUint8Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GeluInt16, GeluInt16Test)
 
 // Fully Connected
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFullyConnected, FullyConnectedFloat32Test, false, false)

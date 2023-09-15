@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="3912f47b5849c2c7c4e68ff922869decf22fe303" #10241: Meanstddevnorm changes to enable fp16 in armv8a multi_isa builds
+DEFAULT_CLFRAMEWORKREVISION="e87fa660e188007391f0584a56c8970665780684" #10273: Add skeleton of ClMatMulLowpNativeMMULKernel
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

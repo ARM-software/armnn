@@ -9,6 +9,7 @@
 
 #include <armnn/ArmNN.hpp>
 #include <armnn/BackendHelper.hpp>
+#include <armnn/Exceptions.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
@@ -23,6 +24,7 @@
 #include <armnnUtils/FloatingPointComparison.hpp>
 
 #include <log/log.h>
+#include <sstream>
 #include <vector>
 
 inline const android::nn::Model::Subgraph& getMainModel(const android::nn::Model& model) { return model.main; }
@@ -233,7 +235,10 @@ armnn::IConnectableLayer& AddReshapeLayer(armnn::INetwork& network,
     reshapeDescriptor.m_TargetShape = reshapeInfo.GetShape();
 
     armnn::IConnectableLayer* reshapeLayer = network.AddReshapeLayer(reshapeDescriptor);
-    ARMNN_ASSERT(reshapeLayer != nullptr);
+    if (reshapeLayer == nullptr)
+    {
+        throw armnn::Exception("failed to add reshape layer to network");
+    }
 
     // Attach the input layer to the reshape layer
     inputLayer.Connect(reshapeLayer->GetInputSlot(0));
@@ -280,7 +285,10 @@ bool BroadcastTensor(LayerInputHandle& input0,
                      armnn::IConnectableLayer* startLayer,
                      ConversionData& data)
 {
-    ARMNN_ASSERT(startLayer != nullptr);
+    if (startLayer == nullptr)
+    {
+        throw armnn::InvalidArgumentException("BroadcastTensor: startLayer pointer handed in is null");
+    }
 
     const armnn::TensorInfo& inputInfo0 = input0.GetTensorInfo();
     const armnn::TensorInfo& inputInfo1 = input1.GetTensorInfo();
@@ -337,7 +345,11 @@ bool BroadcastTensor(LayerInputHandle& input0,
         return false;
     }
 
-    ARMNN_ASSERT(data.m_Network != nullptr);
+    if (data.m_Network == nullptr)
+    {
+        throw armnn::InvalidArgumentException(
+            "BroadcastTensor: the conversion data handed in has a null network pointer");
+    }
     armnn::IConnectableLayer& reshapeLayer = AddReshapeLayer(*data.m_Network, smallInputHandle, reshapedInfo);
     reshapeLayer.SetBackendId(setBackend);
 
@@ -468,7 +480,10 @@ armnn::IConnectableLayer& AddTransposeLayer(armnn::INetwork& network, OSlot& inp
     // Add swizzle layer
     armnn::IConnectableLayer* const layer = network.AddTransposeLayer(mappings);
 
-    ARMNN_ASSERT(layer != nullptr);
+    if (layer == nullptr)
+    {
+        throw armnn::Exception("failed to add transpose layer to network");
+    }
 
     // Connect input to swizzle layer
     input.Connect(layer->GetInputSlot(0));
@@ -596,7 +611,11 @@ bool CreateConcatPermutationParameters(const unsigned int numberOfDimensions,
                                        std::pair<armnn::PermutationVector, armnn::PermutationVector> & permutationPair)
 {
     bool needPermute = false;
-    ARMNN_ASSERT(numberOfDimensions >= 3);
+    if (numberOfDimensions < 3)
+    {
+        throw armnn::InvalidArgumentException(
+            "CreateConcatPermutationParameters: numberOfDimensions handed in cannot be less than three");
+    }
 
     // ArmNN uses Compute Library subtensors to perform concatenation
     // This only works when concatenating along dimension 0, 1 or 3 for a 4-D tensor,
@@ -655,7 +674,14 @@ inline const Operand* GetInputOperand(const Operation& operation,
     }
 
     // Model should have been validated beforehand
-    ARMNN_ASSERT(operation.inputs[inputIndex] < getMainModel(model).operands.size());
+    if (!(operation.inputs[inputIndex] < getMainModel(model).operands.size()))
+    {
+        std::ostringstream os;
+        os << "GetInputOperand: inputIndex [" << inputIndex << "]";
+        os << " is too large. The number of main model operands is [";
+        os <<  getMainModel(model).operands.size() << "]";
+        throw armnn::InvalidArgumentException(os.str());
+    }
     return &getMainModel(model).operands[operation.inputs[inputIndex]];
 }
 
@@ -670,7 +696,14 @@ inline const Operand* GetOutputOperand(const Operation& operation,
     }
 
     // Model should have been validated beforehand
-    ARMNN_ASSERT(operation.outputs[outputIndex] < getMainModel(model).operands.size());
+    if (!(operation.outputs[outputIndex] < getMainModel(model).operands.size()))
+    {
+        std::ostringstream os;
+        os << "GetOutputOperand: outputIndex [" << outputIndex << "]";
+        os << " is too large. The number of main model operands is [";
+        os <<  getMainModel(model).operands.size() << "]";
+        throw armnn::InvalidArgumentException(os.str());
+    }
 
     return &getMainModel(model).operands[operation.outputs[outputIndex]];
 }

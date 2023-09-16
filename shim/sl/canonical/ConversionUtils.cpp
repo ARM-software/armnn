@@ -4,6 +4,7 @@
 //
 
 #include "ConversionUtils.hpp"
+#include <armnn/Exceptions.hpp>
 #include <armnnUtils/Permute.hpp>
 
 ///
@@ -31,7 +32,10 @@ bool LayerInputHandle::IsValid() const
 
 void LayerInputHandle::Connect(armnn::IInputSlot& inputSlot)
 {
-    ARMNN_ASSERT(IsValid());
+    if (!IsValid())
+    {
+        throw armnn::Exception("cannot invoke Connect on an invalid LayerInputHandle");
+    }
     if (m_OutputSlot)
     {
         m_OutputSlot->Connect(inputSlot);
@@ -40,7 +44,10 @@ void LayerInputHandle::Connect(armnn::IInputSlot& inputSlot)
 
 void LayerInputHandle::Disconnect(armnn::IInputSlot& inputSlot)
 {
-    ARMNN_ASSERT(IsValid());
+    if (!IsValid())
+    {
+        throw armnn::Exception("cannot invoke Disconnect on an invalid LayerInputHandle");
+    }
     if (m_OutputSlot)
     {
         m_OutputSlot->Disconnect(inputSlot);
@@ -643,8 +650,11 @@ bool ConvertToActivation(const Operation& operation,
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddActivationLayer(activationDesc);
+    if (layer == nullptr)
+    {
+        throw armnn::NullPointerException("failed to add activation layer to network");
+    }
     layer->SetBackendId(setBackend);
-    ARMNN_ASSERT(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
     return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);
@@ -692,7 +702,10 @@ DequantizeResult DequantizeIfRequired(size_t operand_index,
         }
 
         const Operand* operand = GetInputOperand(operationIt, 0, model);
-        ARMNN_ASSERT(operand);
+        if (operand == nullptr)
+        {
+            throw armnn::Exception("failed to get input operand 0");
+        }
 
         if (!IsQSymm8(*operand))
         {
@@ -716,7 +729,10 @@ DequantizeResult DequantizeIfRequired(size_t operand_index,
         for (size_t i = 0; i < dequantizedBufferLength; ++i)
         {
             float* dstPtr = dequantizedBuffer.get();
-            ARMNN_ASSERT(dstPtr);
+            if (dstPtr == nullptr)
+            {
+                throw armnn::NullPointerException("dequantizedBuffer unique pointer is null");
+            }
             *dstPtr++ = quantizedBuffer[i] * quantizationScale;
         }
 
@@ -892,7 +908,10 @@ armnn::IConnectableLayer* ProcessActivation(const armnn::TensorInfo& tensorInfo,
                                             armnn::IConnectableLayer* prevLayer,
                                             ConversionData& data)
 {
-    ARMNN_ASSERT(prevLayer->GetNumOutputSlots() == 1);
+    if (prevLayer->GetNumOutputSlots() != 1)
+    {
+        throw armnn::Exception("ProcessActivation: previous layer does not have a single output slot");
+    }
 
     prevLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
 

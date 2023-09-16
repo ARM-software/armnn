@@ -366,7 +366,10 @@ void DumpJsonProfilingIfRequired(bool gpuProfilingEnabled,
         return;
     }
 
-    ARMNN_ASSERT(profiler);
+    if (profiler == nullptr)
+    {
+        throw armnn::InvalidArgumentException("DumpJsonProfilingIfRequired: pointer to profiler handed in is null");
+    }
 
     // Set the name of the output profiling file.
     fs::path dumpPath = dumpDir;
@@ -499,7 +502,7 @@ bool IsDynamicTensor(const armnn::TensorInfo& tensorInfo)
     return !tensorInfo.GetShape().AreAllDimensionsSpecified();
 }
 
-bool AreDynamicTensorsSupported() 
+bool AreDynamicTensorsSupported()
 {
     return true;
 }

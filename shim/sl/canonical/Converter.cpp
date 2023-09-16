@@ -5,6 +5,7 @@
 
 #include "Converter.hpp"
 #include <half/half.hpp>
+#include <armnn/Exceptions.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 
 namespace armnn_driver
@@ -890,7 +891,11 @@ bool Converter::ConvertConcatenation(const Operation& operation, const Model& mo
         if (isDynamicTensor)
         {
             // Infer the output shapes of concat if outputs are type 1 dynamic
-            ARMNN_ASSERT(layer->GetOutputSlot(0).IsTensorInfoSet());
+            if (!layer->GetOutputSlot(0).IsTensorInfoSet())
+            {
+                throw armnn::Exception(
+                    "tensor info is not set on output slot, cannot process dynamic tensor after input reshape");
+            }
             if (!ValidateConcatOutputShape(inputShapes,
                                            layer->GetOutputSlot(0).GetTensorInfo().GetShape(),
                                            concatDim))
@@ -4534,8 +4539,11 @@ bool Converter::ConvertReLu(const Operation& operation, const Model& model, Conv
     }
 
     armnn::IConnectableLayer* layer = data.m_Network->AddActivationLayer(desc);
+    if (layer == nullptr)
+    {
+        throw armnn::NullPointerException("failed to add Activation Layer to network");
+    }
     layer->SetBackendId(setBackend);
-    ARMNN_ASSERT(layer != nullptr);
     input.Connect(layer->GetInputSlot(0));
 
     return SetupAndTrackLayerOutputSlot(operation, 0, *layer, model, data, nullptr, validateFunc);

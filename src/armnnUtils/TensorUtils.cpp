@@ -5,6 +5,8 @@
 
 #include <armnnUtils/TensorUtils.hpp>
 
+#include <armnn/Exceptions.hpp>
+
 #include <armnn/backends/ITensorHandle.hpp>
 #include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
@@ -208,8 +210,21 @@ unsigned int GetNumElementsBetween(const TensorShape& shape,
                                    const unsigned int firstAxisInclusive,
                                    const unsigned int lastAxisExclusive)
 {
-    ARMNN_ASSERT(firstAxisInclusive <= lastAxisExclusive);
-    ARMNN_ASSERT(lastAxisExclusive <= shape.GetNumDimensions());
+    if (firstAxisInclusive > lastAxisExclusive)
+    {
+        throw armnn::InvalidArgumentException(fmt::format(
+            "GetNumElementsBetween: firstAxisInclusive [{}D] is greater than lastAxisExclusive [{}D]",
+            firstAxisInclusive,
+            lastAxisExclusive));
+    }
+    if (lastAxisExclusive > shape.GetNumDimensions())
+    {
+        throw armnn::InvalidArgumentException(fmt::format(
+            "{}: lastAxisExclusive [{}D] is greater than the number of dimensions of the tensor shape [{}D]"
+            "GetNumElementsBetween",
+            lastAxisExclusive,
+            shape.GetNumDimensions()));
+    }
     unsigned int count = 1;
     for (unsigned int i = firstAxisInclusive; i < lastAxisExclusive; i++)
     {
@@ -220,10 +235,22 @@ unsigned int GetNumElementsBetween(const TensorShape& shape,
 
 unsigned int GetUnsignedAxis(const unsigned int inputDimension, const int axis)
 {
-    ARMNN_ASSERT_MSG(axis < armnn::numeric_cast<int>(inputDimension),
-                     "Required axis index greater than number of dimensions.");
-    ARMNN_ASSERT_MSG(axis >= -armnn::numeric_cast<int>(inputDimension),
-                     "Required axis index lower than negative of the number of dimensions");
+    if (axis >= armnn::numeric_cast<int>(inputDimension))
+    {
+        throw armnn::InvalidArgumentException(fmt::format(
+            "{}: axis index [{}] is not less than the number of dimensions [{}D]",
+            "GetUnsignedAxis",
+            axis,
+            inputDimension));
+    }
+    if (axis < -armnn::numeric_cast<int>(inputDimension))
+    {
+        throw armnn::InvalidArgumentException(fmt::format(
+            "{}: axis index [{}] lower than the negative of the number of dimensions [{}]",
+            "GetUnsignedAxis",
+            axis,
+            -armnn::numeric_cast<int>(inputDimension)));
+    }
 
     unsigned int uAxis = axis < 0  ?
                          inputDimension - armnn::numeric_cast<unsigned int>(abs(axis))
@@ -234,7 +261,14 @@ unsigned int GetUnsignedAxis(const unsigned int inputDimension, const int axis)
 unsigned int GetNumElementsAfter(const armnn::TensorShape& shape, unsigned int axis)
 {
     unsigned int numDim = shape.GetNumDimensions();
-    ARMNN_ASSERT(axis <= numDim - 1);
+    if (axis >= numDim)
+    {
+        throw armnn::InvalidArgumentException(fmt::format(
+            "{}: axis index [{}D] indexes beyond the number of dimesions of the tensor shape [{}D]",
+            "GetNumElementsAfter",
+            axis,
+            numDim));
+    }
     unsigned int count = 1;
     for (unsigned int i = axis+1; i < numDim; i++)
     {

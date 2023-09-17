@@ -751,7 +751,7 @@ armnn::TensorInfo ToTensorInfo(TensorRawPtr tensorPtr)
                              type,
                              quantizationScale,
                              quantizationOffset);
-    
+
     return result;
 }
 
@@ -892,8 +892,11 @@ GraphPtr IDeserializer::DeserializerImpl::LoadGraphFromBinary(const uint8_t* bin
 
 INetworkPtr IDeserializer::DeserializerImpl::CreateNetworkFromGraph(GraphPtr graph)
 {
+    if (graph == nullptr)
+    {
+        throw armnn::InvalidArgumentException("CreateNetworkFromGraph: graph pointer is null");
+    }
     m_Network = INetwork::Create();
-    ARMNN_ASSERT(graph != nullptr);
     unsigned int layerIndex = 0;
     for (AnyLayer const* layer : *graph->layers())
     {
@@ -1049,7 +1052,10 @@ void IDeserializer::DeserializerImpl::SetupInputLayers(GraphPtr graph)
 
         // GetBindingLayerInfo expect the index to be index in the vector not index property on each layer base
         LayerBindingId bindingId = GetBindingLayerInfo(graph, inputLayerIndex);
-        ARMNN_ASSERT_MSG(baseLayer->layerName()->c_str(), "Input has no name.");
+        if (baseLayer->layerName()->c_str() == nullptr)
+        {
+            throw ParseException(fmt::format("Input with layer index [{0}] has no name", inputLayerIndex));
+        }
 
         IConnectableLayer* inputLayer =
             m_Network->AddInputLayer(bindingId, baseLayer->layerName()->c_str());
@@ -1088,7 +1094,10 @@ void IDeserializer::DeserializerImpl::SetupOutputLayers(GraphPtr graph)
 
         // GetBindingLayerInfo expect the index to be index in the vector not index property on each layer base
         LayerBindingId bindingId = GetBindingLayerInfo(graph, outputLayerIndex);
-        ARMNN_ASSERT_MSG(baseLayer->layerName()->c_str(), "Output has no name.");
+        if (baseLayer->layerName()->c_str() == nullptr)
+        {
+            throw ParseException(fmt::format("Output with layer index [{0}] has no name", outputLayerIndex));
+        }
 
         IConnectableLayer* outputLayer =
             m_Network->AddOutputLayer(bindingId, baseLayer->layerName()->c_str());
@@ -1110,8 +1119,12 @@ void IDeserializer::DeserializerImpl::RegisterOutputSlots(GraphPtr graph,
                                        uint32_t layerIndex,
                                        IConnectableLayer* layer)
 {
+    if (layer == nullptr)
+    {
+        throw ParseException(fmt::format(
+            "RegisterOutputSlots: pointer to layer with index [{0}] is null", layerIndex));
+    }
     CHECK_LAYERS(graph, 0, layerIndex);
-    ARMNN_ASSERT(layer != nullptr);
     LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
     if (baseLayer->outputSlots()->size() != layer->GetNumOutputSlots())
     {
@@ -1137,8 +1150,12 @@ void IDeserializer::DeserializerImpl::RegisterInputSlots(GraphPtr graph,
                                                          armnn::IConnectableLayer* layer,
                                                          std::vector<unsigned int> ignoreSlots)
 {
+    if (layer == nullptr)
+    {
+        throw ParseException(fmt::format(
+            "RegisterInputSlots: pointer to layer with index [{0}] is null", layerIndex));
+    }
     CHECK_LAYERS(graph, 0, layerIndex);
-    ARMNN_ASSERT(layer != nullptr);
     LayerBaseRawPtr baseLayer = GetBaseLayer(graph, layerIndex);
 
     if (baseLayer->inputSlots()->size() != (layer->GetNumInputSlots() - ignoreSlots.size()))
@@ -2364,7 +2381,7 @@ armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPooling2dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported pooling algorithm");
+            throw ParseException("Unsupported pooling algorithm");
         }
     }
 
@@ -2382,7 +2399,7 @@ armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPooling2dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported output shape rounding");
+            throw ParseException("Unsupported output shape rounding");
         }
     }
 
@@ -2400,7 +2417,7 @@ armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPooling2dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported padding method");
+            throw ParseException("Unsupported padding method");
         }
     }
 
@@ -2418,7 +2435,7 @@ armnn::Pooling2dDescriptor IDeserializer::DeserializerImpl::GetPooling2dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported data layout");
+            throw ParseException("Unsupported data layout");
         }
     }
 
@@ -2459,7 +2476,7 @@ armnn::Pooling3dDescriptor IDeserializer::DeserializerImpl::GetPooling3dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported pooling algorithm");
+            throw ParseException("Unsupported pooling algorithm");
         }
     }
 
@@ -2477,7 +2494,7 @@ armnn::Pooling3dDescriptor IDeserializer::DeserializerImpl::GetPooling3dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported output shape rounding");
+            throw ParseException("Unsupported output shape rounding");
         }
     }
 
@@ -2495,7 +2512,7 @@ armnn::Pooling3dDescriptor IDeserializer::DeserializerImpl::GetPooling3dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported padding method");
+            throw ParseException("Unsupported padding method");
         }
     }
 
@@ -2513,7 +2530,7 @@ armnn::Pooling3dDescriptor IDeserializer::DeserializerImpl::GetPooling3dDescript
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported data layout");
+            throw ParseException("Unsupported data layout");
         }
     }
 
@@ -2933,7 +2950,7 @@ armnn::NormalizationDescriptor IDeserializer::DeserializerImpl::GetNormalization
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported normalization channel type");
+            throw ParseException("Unsupported normalization channel type");
         }
     }
 
@@ -2951,7 +2968,7 @@ armnn::NormalizationDescriptor IDeserializer::DeserializerImpl::GetNormalization
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported normalization method type");
+            throw ParseException("Unsupported normalization method type");
         }
     }
 
@@ -2969,7 +2986,7 @@ armnn::NormalizationDescriptor IDeserializer::DeserializerImpl::GetNormalization
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported data layout");
+            throw ParseException("Unsupported data layout");
         }
     }
 

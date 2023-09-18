@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="e87fa660e188007391f0584a56c8970665780684" #10273: Add skeleton of ClMatMulLowpNativeMMULKernel
+DEFAULT_CLFRAMEWORKREVISION="40a9d3ea62d7dfed3fb42b5bc5c2ee5272fd89bf" #10319: Remove deprecated support for BF16 in CpuCast
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

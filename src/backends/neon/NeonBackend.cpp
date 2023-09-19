@@ -164,7 +164,8 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
         if ((base.GetType() == LayerType::DepthwiseConvolution2d || base.GetType() == LayerType::Convolution2d
              || base.GetType() == LayerType::BatchNormalization || base.GetType() == LayerType::FullyConnected
              || base.GetType() == LayerType::Addition || base.GetType() == LayerType::Multiplication
-             || base.GetType() == LayerType::Subtraction || base.GetType() == LayerType::Division)
+             || base.GetType() == LayerType::Subtraction || base.GetType() == LayerType::Division
+             || base.GetType() == LayerType::ElementwiseBinary)
             && (base.GetAdditionalInformation<ActivationDescriptor>() == nullptr))
         {
             for (auto output = base.BeginOutputSlots(); output != base.EndOutputSlots(); ++output)

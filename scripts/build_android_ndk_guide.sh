@@ -109,14 +109,14 @@ function GetAndBuildCmake319 {
 function GetAndBuildFlatbuffers {
     cd $WORKING_DIR
 
-    if [[ ! -d flatbuffers-2.0.6 ]]; then
+    if [[ ! -d flatbuffers-23.5.26 ]]; then
         echo "+++ Getting Flatbuffers"
-        wget https://github.com/google/flatbuffers/archive/v2.0.6.tar.gz
-        tar xf v2.0.6.tar.gz
+        wget https://github.com/google/flatbuffers/archive/v23.5.26.tar.gz
+        tar xf v23.5.26.tar.gz
     fi
     #Build FlatBuffers
     echo "+++ Building x86 Flatbuffers library"
-    cd $WORKING_DIR/flatbuffers-2.0.6
+    cd $WORKING_DIR/flatbuffers-23.5.26
 
     rm -f CMakeCache.txt
 
@@ -134,7 +134,7 @@ function GetAndBuildFlatbuffers {
     make all install -j16
 
     echo "+++ Building Android Flatbuffers library"
-    cd $WORKING_DIR/flatbuffers-2.0.6
+    cd $WORKING_DIR/flatbuffers-23.5.26
 
     rm -f CMakeCache.txt
 
@@ -215,7 +215,7 @@ function GetAndBuildComputeLibrary {
 }
 
 function GetAndBuildTFLite {
-    TENSORFLOW_REVISION="6f692f73cb2043b4a0b0446539cd8c15b3dd9220" # TF r2.12 + PR #60015 to fix Cmake build.
+    TENSORFLOW_REVISION="tags/v2.14.0-rc1" # TF 2.14 rc1
     TFLITE_ROOT_DIR=${WORKING_DIR}/tensorflow/tensorflow/lite
 
     cd $WORKING_DIR

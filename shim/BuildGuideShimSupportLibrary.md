@@ -18,7 +18,7 @@ This work is currently in an experimental phase.
 The following are required to build the Arm NN support library
 * Android NDK r25
   * Detailed setup can be found in [BuildGuideAndroidNDK.md](../BuildGuideAndroidNDK.md)
-* Flatbuffer version 2.0.6
+* Flatbuffer version 23.5.26
   * Detailed setup can be found in [BuildGuideCrossCompilation.md](../BuildGuideCrossCompilation.md)
 
 The following is required to build the Arm NN shim

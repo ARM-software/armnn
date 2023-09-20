@@ -24,7 +24,7 @@ Arm NN outperforms generic ML libraries due to **Arm architecture-specific optim
 utilizes the [Ethos-N NPU Driver](https://github.com/ARM-software/ethos-n-driver-stack). For Arm Cortex-M acceleration,
 please see [CMSIS-NN](https://github.com/ARM-software/CMSIS_5).
 
-Arm NN is written using portable **C++14** and built using [CMake](https://cmake.org/) - enabling builds for a wide
+Arm NN is written using portable **C++17** and built using [CMake](https://cmake.org/) - enabling builds for a wide
 variety of target platforms, from a wide variety of host environments. **Python** developers can interface with Arm NN
 through the use of our **Arm NN TF Lite Delegate**.
 

@@ -161,6 +161,53 @@ SubgraphView::IOutputSlots CreateIOutputsFrom(const std::vector<armnn::IConnecta
     return result;
 }
 
+// Type used to hold the slot numbers to create the lists from. There should
+// be a SlotList for each layer in the layers list
+typedef std::vector<int> SlotList;
+
+template<typename ILayerType>
+SubgraphView::IInputSlots CreateIInputsFromSlotLists(const std::vector<ILayerType*>& layers,
+                                                     const std::vector<SlotList>& layersSlotLists)
+{
+    ARMNN_THROW_INVALIDARG_IF_FALSE(layersSlotLists.size() == layers.size());
+
+    SubgraphView::IInputSlots result;
+
+    for (unsigned int layerIdx = 0; layerIdx < layers.size(); ++layerIdx)
+    {
+        const SlotList& slotList = layersSlotLists[layerIdx];
+        for (unsigned int slotIdx = 0 ; slotIdx < layers[layerIdx]->GetNumInputSlots(); ++slotIdx)
+        {
+            if (std::find(slotList.begin(), slotList.end(), slotIdx) != slotList.end())
+            {
+                result.push_back(&(layers[layerIdx]->GetInputSlot(slotIdx)));
+            }
+        }
+    }
+    return result;
+}
+
+template<typename ILayerType>
+SubgraphView::IOutputSlots CreateIOutputsFromSlotLists(const std::vector<ILayerType*>& layers,
+                                                       const std::vector<SlotList>& layersSlotLists)
+{
+    ARMNN_THROW_INVALIDARG_IF_FALSE(layersSlotLists.size() == layers.size());
+
+    SubgraphView::IOutputSlots result;
+    for (unsigned int layerIdx = 0; layerIdx < layers.size(); ++layerIdx)
+    {
+        const SlotList& slotList = layersSlotLists[layerIdx];
+        for (unsigned int slotIdx = 0; slotIdx < layers[layerIdx]->GetNumOutputSlots(); ++slotIdx)
+        {
+            bool foundIt = std::find(slotList.begin(), slotList.end(), slotIdx) != slotList.end();
+            if (foundIt)
+            {
+                result.push_back(&(layers[layerIdx]->GetOutputSlot(slotIdx)));
+            }
+        }
+    }
+    return result;
+}
 }
 
 inline bool IsNCHW(armnn::Layer& layer)
@@ -306,6 +353,119 @@ LayerType* FoldPadIntoAveragePool2d(OptimizationViews& optimizationViews,
                  padLayer);
 
     return replacementLayer;
+}
+
+//
+// Layer sequence detection such as add + mul + add ( + optional activation )
+//
+
+inline bool IsSequenceLayerType(Layer& layer, LayerType type)
+{
+    return layer.GetType() == type;
+}
+
+inline bool IsSequenceLayerType(Layer& layer, BinaryOperation type)
+{
+    return (layer.GetType() == LayerType::ElementwiseBinary) &&
+            (PolymorphicDowncast<ElementwiseBinaryLayer*>(&layer)->GetParameters().m_Operation == type);
+}
+
+// Detect a layer sequence and activation if specified. The activation must be at the end of the sequence.
+template<typename TYPE>
+bool IsLayerSequence(Layer& currentLayer,
+                     TYPE first,
+                     TYPE second,
+                     TYPE third,
+                     Layer* layerList[4],
+                     bool handleValidActivates,
+                     const std::vector<ActivationFunction>& validActivates)
+{
+    auto PreviousLayer = [](Layer& layer)
+    {
+        return &layer.GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
+    };
+
+    auto NextLayer = [](Layer& layer)
+    {
+        return &layer.GetOutputSlot(0).GetConnection(0)->GetOwningLayer();
+    };
+
+    auto LayerIncomingConnectionDataType = [](Layer& layer)
+    {
+        return layer.GetInputSlot(0).GetTensorInfo().GetDataType();
+    };
+
+    bool result = false;
+
+    // Match in reverse so there is only 1 connection to check
+    if (IsSequenceLayerType(currentLayer, third))
+    {
+        // Save DataType of third layer
+        DataType dataType = LayerIncomingConnectionDataType(currentLayer);
+
+        // Save third layer
+        layerList[2] = &currentLayer;
+
+        // Check the layers that proceed this one for the requested grouping
+        Layer *prevLayer = PreviousLayer(currentLayer);
+        if (prevLayer && IsSequenceLayerType(*prevLayer, second))
+        {
+            bool dataTypesMatch = (dataType == LayerIncomingConnectionDataType(*prevLayer));
+            if (! dataTypesMatch)
+            {
+                return result;
+            }
+
+            layerList[1] = prevLayer;
+            prevLayer = PreviousLayer(*prevLayer);
+            if (prevLayer && IsSequenceLayerType(*prevLayer, first))
+            {
+                dataTypesMatch = (dataType == LayerIncomingConnectionDataType(*prevLayer));
+                if (! dataTypesMatch)
+                {
+                    return result;
+                }
+
+                layerList[0] = prevLayer;
+
+                // Detected the first 3 layers if we get to this point so now
+                // check to see if we have a valid activation. If there is no activation
+                // then the sequence still matches.
+                if (handleValidActivates)
+                {
+                    Layer *nextLayer = NextLayer(currentLayer);
+                    if (nextLayer)
+                    {
+                        if (IsSequenceLayerType(*nextLayer, LayerType::Activation))
+                        {
+                            // This layer is an activation, so it must be a valid type for the sequence
+                            ActivationFunction activationFunction =
+                                    PolymorphicDowncast<ActivationLayer*>(nextLayer)->GetParameters().m_Function;
+                            long count = std::count(validActivates.cbegin(),
+                                                    validActivates.cend(),
+                                                    activationFunction);
+                            if (count > 0)
+                            {
+                                layerList[3] = nextLayer;
+                                result = true;
+                            }
+                        }
+                        else
+                        {
+                            // Next layer is not an activation so sequence still matches
+                            result = true;
+                        }
+                    }
+                }
+                else
+                {
+                    result = true;
+                }
+            }
+        }
+    }
+
+    return result;
 }
 
 } // namespace armnn

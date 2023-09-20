@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -201,3 +201,13 @@ void ConditionalThrowIfNotEqual(const std::string& message,
 } // namespace armnn
 
 #define CHECK_LOCATION() armnn::CheckLocation(__func__, __FILE__, __LINE__)
+
+// Use to throw rather than assert
+#define ARMNN_THROW_MSG_IF_FALSE(_cond, _except, _str) \
+    do { if (!(static_cast<bool>(_cond))) {throw _except(_str);} } while(0)
+#define ARMNN_THROW_IF_FALSE(_cond, _except) \
+    ARMNN_THROW_MSG_IF_FALSE(_cond, _except, #_cond)
+#define ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(_cond, _str) \
+    ARMNN_THROW_MSG_IF_FALSE(_cond, armnn::InvalidArgumentException, _str)
+#define ARMNN_THROW_INVALIDARG_IF_FALSE(_cond) \
+    ARMNN_THROW_MSG_IF_FALSE(_cond, armnn::InvalidArgumentException, #_cond)

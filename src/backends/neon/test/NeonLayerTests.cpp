@@ -1726,9 +1726,11 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleConvertFp32ToFp16, SimpleConvertFp32ToFp16Te
 
 // AddMulAdd
 ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd2OutputsFloat32, AddMulAddTest<DataType::Float32>, true)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd2OutputsInt8, AddMulAddTest<DataType::QAsymmS8>, true)
 ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd2OutputsUint8, AddMulAddTest<DataType::QAsymmU8>, true)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd1OutputFloat32, AddMulAddTest<DataType::Float32>, false)
+ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd1OutputInt8, AddMulAddTest<DataType::QAsymmS8>, false)
 ARMNN_AUTO_TEST_CASE_WITH_THF(AddMulAdd1OutputUint8, AddMulAddTest<DataType::QAsymmU8>, false)
 
 #if defined(ARMNNREF_ENABLED)

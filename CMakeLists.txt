@@ -597,6 +597,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/ObservableTest.cpp
         src/armnn/test/OptimizerTests.cpp
         src/armnn/test/optimizations/AddBroadcastReshapeLayerTests.cpp
+        src/armnn/test/optimizations/AddMulAddTests.cpp
         src/armnn/test/optimizations/BroadcastToTests.cpp
         src/armnn/test/optimizations/ConvertConstDequantisationLayersToConstLayersTest.cpp
         src/armnn/test/optimizations/ConvertConstPermuteLayersToConstLayersTest.cpp

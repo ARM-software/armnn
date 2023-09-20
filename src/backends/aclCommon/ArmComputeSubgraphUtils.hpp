@@ -356,4 +356,25 @@ void ReplaceLayers(OptimizationViews& optimizationViews,
     optimizationViews.AddSubstitution({substitutionSubgraph, replacementSubgraph});
 }
 
+//
+// Substitute a multi-layer subgraph with one new layer
+//
+template<typename LayerType>
+void ReplaceMultipleLayers(OptimizationViews& optimizationViews,
+                           std::vector<IConnectableLayer*>& originalLayers,
+                           LayerType* baseLayer,
+                           const std::vector<SlotList> inputLayersSlotLists,
+                           const std::vector<SlotList> outputLayersSlotLists)
+{
+    std::list<IConnectableLayer*> originalLayerList(originalLayers.begin(), originalLayers.end());
+
+    SubgraphView substitutionSubgraph(
+            std::move(originalLayerList),
+            CreateIInputsFromSlotLists<armnn::IConnectableLayer>(originalLayers, inputLayersSlotLists),
+            CreateIOutputsFromSlotLists<armnn::IConnectableLayer>(originalLayers, outputLayersSlotLists));
+    SubgraphView replacementSubgraph(baseLayer);
+
+    optimizationViews.AddSubstitution({substitutionSubgraph, replacementSubgraph});
+}
+
 } // namespace armnn

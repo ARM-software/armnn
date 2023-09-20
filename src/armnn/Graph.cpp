@@ -65,7 +65,7 @@ Graph::Graph(const Graph& other)
     }
 }
 
-Status Graph::Print() const
+Status Graph::Print(bool extended) const
 {
     if (m_Layers.empty())
     {
@@ -80,8 +80,15 @@ Status Graph::Print() const
         auto numInputSlots = it->GetNumInputSlots();
         auto numOutputSlots = it->GetNumOutputSlots();
 
+        std::string guid;
+        if (extended)
+        {
+            guid += ":";
+            guid += std::to_string(it->GetGuid());
+        }
         ARMNN_LOG(info) << it->GetName() << ":" << GetLayerTypeAsCString(it->GetType())
                                 << ":" << it->GetBackendId().Get()
+                                << guid
                                 << " has " << numInputSlots << " input slots"
                                 << " and " << numOutputSlots << " output slots.";
 
@@ -97,6 +104,13 @@ Status Graph::Print() const
                 message << inputTensorShape[dim] << ",";
             }
             message << " ]";
+            if (extended)
+            {
+                message << " Scale: " << i.GetConnectedOutputSlot()->GetTensorInfo().GetQuantizationScale();
+                message << " Offset: " << i.GetConnectedOutputSlot()->GetTensorInfo().GetQuantizationOffset();
+                message <<  " The input slot is connected to: ";
+                message << i.GetConnectedOutputSlot()->GetOwningIConnectableLayer().GetGuid();
+            }
             ARMNN_LOG(info) << message.str();
         }
 
@@ -113,6 +127,13 @@ Status Graph::Print() const
                 message << outputTensorShape[dim] << ",";
             }
             message << " ]";
+            if (extended)
+            {
+                message << " Scale: " << layer->GetOutputSlots()[i].GetTensorInfo().GetQuantizationScale();
+                message << " Offset: " << layer->GetOutputSlots()[i].GetTensorInfo().GetQuantizationOffset();
+                message <<  " The output slot is connected to: ";
+                message << layer->GetOutputSlots()[i].GetConnection(0)->GetOwningIConnectableLayer().GetGuid();
+            }
             ARMNN_LOG(info) << message.str();
         }
         ARMNN_LOG(info) << "\n";

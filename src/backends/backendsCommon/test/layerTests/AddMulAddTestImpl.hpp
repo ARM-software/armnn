@@ -39,18 +39,18 @@ std::vector<LayerTestResult<T,4>> AddMulAddTest(armnn::IWorkloadFactory& workloa
     if (IsQuantizedType<T>())
     {
         input0TensorInfo.SetQuantizationScale(0.25f);
-        input0TensorInfo.SetQuantizationOffset(128);
+        input0TensorInfo.SetQuantizationOffset(10);
         input1TensorInfo.SetQuantizationScale(0.25f);
-        input1TensorInfo.SetQuantizationOffset(128);
+        input1TensorInfo.SetQuantizationOffset(11);
         mulInput1TensorInfo.SetQuantizationScale(0.25f);
-        mulInput1TensorInfo.SetQuantizationOffset(128);
+        mulInput1TensorInfo.SetQuantizationOffset(12);
         addInput1TensorInfo.SetQuantizationScale(0.25f);
-        addInput1TensorInfo.SetQuantizationOffset(128);
+        addInput1TensorInfo.SetQuantizationOffset(13);
 
         output0TensorInfo.SetQuantizationScale(0.5f);
-        output0TensorInfo.SetQuantizationOffset(120);
+        output0TensorInfo.SetQuantizationOffset(14);
         output1TensorInfo.SetQuantizationScale(0.5f);
-        output1TensorInfo.SetQuantizationOffset(120);
+        output1TensorInfo.SetQuantizationOffset(15);
     }
 
     std::vector<float> input0Data
@@ -134,6 +134,12 @@ std::vector<LayerTestResult<T,4>> AddMulAddTest(armnn::IWorkloadFactory& workloa
     AddInputToWorkload (fusedQueueDescriptor, info, input1TensorInfo, input1Handle.get());
     AddInputToWorkload (fusedQueueDescriptor, info, mulInput1TensorInfo, mulInput1Handle.get());
     AddInputToWorkload (fusedQueueDescriptor, info, addInput1TensorInfo, addInput1Handle.get());
+    if (addOutput)
+    {
+        AddOutputToWorkload(fusedQueueDescriptor, info, output0TensorInfo, output0Handle.get());
+    }
+    AddOutputToWorkload(fusedQueueDescriptor, info, output1TensorInfo, output1Handle.get());
+
     if (addOutput)
     {
         AddOutputToWorkload(fusedQueueDescriptor, info, output0TensorInfo, output0Handle.get());

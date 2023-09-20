@@ -9,6 +9,7 @@
 #include "NeonWorkloadFactory.hpp"
 #include "NeonLayerSupport.hpp"
 #include "NeonTensorHandleFactory.hpp"
+#include "NeonBackendOptimizationUtils.hpp"
 
 #include <armnn/BackendRegistry.hpp>
 #include <armnn/Descriptors.hpp>
@@ -28,6 +29,7 @@
 #include <neon/workloads/NeonDepthwiseConvolutionWorkload.hpp>
 #include <neon/workloads/NeonDivisionWorkload.hpp>
 #include <neon/workloads/NeonFullyConnectedWorkload.hpp>
+#include <neon/workloads/NeonFusedWorkload.hpp>
 #include <neon/workloads/NeonMultiplicationWorkload.hpp>
 #include <neon/workloads/NeonReduceWorkload.hpp>
 #include <neon/workloads/NeonSubtractionWorkload.hpp>
@@ -523,6 +525,86 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                 continue;
             }
             RemoveReshapeLayer(baseLayer, untouched, optimizationViews);
+        }
+
+        // Replace Add/Mul/Add where possible
+        Layer* layerList[4] = {nullptr, nullptr, nullptr, nullptr};
+        const std::vector<ActivationFunction> validActivates = { ActivationFunction::ReLu,
+                                                                 ActivationFunction::BoundedReLu };
+        if (IsLayerSequence<BinaryOperation>(base,
+                                             BinaryOperation::Add, BinaryOperation::Mul, BinaryOperation::Add,
+                                             layerList,
+                                             true,  // handleValidActivates
+                                             validActivates))
+        {
+            bool fuseReLu = false;
+            unsigned int numInputs = 0;
+            unsigned int numOutputs = 0;
+            std::vector<TensorInfo> inputInfos;
+            std::vector<TensorInfo> outputInfos;
+            const ActivationDescriptor* activationDescriptor = nullptr;
+
+            if (BuildAddMulAddTensorInfoLists<Layer>(layerList,
+                                                     numInputs,
+                                                     numOutputs,
+                                                     inputInfos,
+                                                     outputInfos,
+                                                     activationDescriptor,
+                                                     fuseReLu))
+            {
+                // Create the new Add/Mul/Add layer and set the Relu activation function
+                FusedDescriptor fusedDescriptor(numInputs, numOutputs, FusedKernelType::AddMulAdd);
+                arm_compute::Status status = NeonFusedWorkloadValidate({inputInfos.begin(), inputInfos.end()},
+                                                                       {outputInfos.begin(), outputInfos.end()},
+                                                                       fusedDescriptor,
+                                                                       activationDescriptor);
+                if (status)
+                {
+                    std::string fusedName;
+                    GetFusedName(layerList, fusedName);
+
+                    IConnectableLayer* addMulAddLayer =
+                            optimizationViews.GetINetwork()->AddFusedLayer(fusedDescriptor, fusedName.c_str());
+
+                    if (fuseReLu)
+                    {
+                        FusedLayer* addMulAddFusedLayer = PolymorphicDowncast<FusedLayer*>(addMulAddLayer);
+                        addMulAddFusedLayer->SetAdditionalInfoForObject(
+                                std::make_shared<ActivationDescriptor>(*activationDescriptor));
+                    }
+
+                    // Update the graph
+                    std::vector<IConnectableLayer*> originalLayers;
+                    for (unsigned int layerIdx = 0; layerIdx < 4; ++layerIdx)
+                    {
+                        if (layerList[layerIdx])
+                        {
+                            originalLayers.push_back(layerList[layerIdx]);
+                        }
+                    }
+
+                    std::vector<SlotList> inputLayersSlotLists, outputLayersSlotLists;
+                    BuildAddMulAddSlotLists<SlotList>(fuseReLu,
+                                                      outputInfos.size() > 1,
+                                                      inputLayersSlotLists,
+                                                      outputLayersSlotLists);
+
+                    ReplaceMultipleLayers<FusedLayer>(optimizationViews,
+                                                      originalLayers,
+                                                      PolymorphicDowncast<FusedLayer*>(addMulAddLayer),
+                                                      inputLayersSlotLists,
+                                                      outputLayersSlotLists);
+
+                    // Remove unused layers
+                    for (unsigned int layerIdx = 0; layerIdx < 4; ++layerIdx)
+                    {
+                        if (layerList[layerIdx])
+                        {
+                            untouched.erase(layerList[layerIdx]->GetGuid());
+                        }
+                    }
+                }
+            }
         }
     }
 

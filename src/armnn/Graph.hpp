@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -140,7 +140,7 @@ public:
         });
     }
 
-    Status Print() const;
+    Status Print(bool extended = false) const;
 
     Status SerializeToDot(std::ostream& stream);
 

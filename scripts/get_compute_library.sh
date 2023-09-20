@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="500e10b3222e726cfc5d484f924d5eb98016a754" #10298: Add CL command buffer class
+DEFAULT_CLFRAMEWORKREVISION="e071b5e31004b29afefaa96907032bfd2b4e5a43" #Fix the validation issue in AddMulAdd fused kernel
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

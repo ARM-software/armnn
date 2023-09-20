@@ -190,8 +190,8 @@ download_armnn()
 
   rm -rf "$ARMNN_SRC"
 
-  # Latest release branch of Arm NN is checked out by default
-  git clone https://github.com/ARM-software/armnn.git armnn
+  # Main branch of Arm NN is checked out
+  git clone --branch main https://github.com/ARM-software/armnn.git armnn
 
   cd "$ARMNN_SRC"
   local armnn_branch="$(git rev-parse --abbrev-ref HEAD)"

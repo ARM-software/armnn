@@ -47,5 +47,6 @@ using RefDebugQAsymmS8Workload  = RefDebugWorkload<DataType::QAsymmS8>;
 using RefDebugQSymmS16Workload  = RefDebugWorkload<DataType::QSymmS16>;
 using RefDebugQSymmS8Workload   = RefDebugWorkload<DataType::QSymmS8>;
 using RefDebugSigned32Workload  = RefDebugWorkload<DataType::Signed32>;
+using RefDebugSigned64Workload  = RefDebugWorkload<DataType::Signed64>;
 
 } // namespace armnn

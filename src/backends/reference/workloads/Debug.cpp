@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -160,6 +160,13 @@ template void Debug<int16_t>(const TensorInfo& inputInfo,
 
 template void Debug<int32_t>(const TensorInfo& inputInfo,
                              const int32_t* inputData,
+                             LayerGuid guid,
+                             const std::string& layerName,
+                             unsigned int slotIndex,
+                             bool outputsToFile);
+
+template void Debug<int64_t>(const TensorInfo& inputInfo,
+                             const int64_t* inputData,
                              LayerGuid guid,
                              const std::string& layerName,
                              unsigned int slotIndex,

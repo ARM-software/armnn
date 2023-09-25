@@ -45,6 +45,10 @@ bool IsDataType(const WorkloadInfo& info)
     }
     return false;
 }
+bool IsSigned64(const WorkloadInfo& info)
+{
+    return IsDataType<DataType::Signed64>(info);
+}
 bool IsSigned32(const WorkloadInfo& info)
 {
     return IsDataType<DataType::Signed32>(info);
@@ -262,6 +266,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
             if (IsSigned32(info))
             {
                 return std::make_unique<RefDebugSigned32Workload>(*debugQueueDescriptor, info);
+            }
+            if (IsSigned64(info))
+            {
+                return std::make_unique<RefDebugSigned64Workload>(*debugQueueDescriptor, info);
             }
             return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymmU8Workload>(*debugQueueDescriptor, info);
         }

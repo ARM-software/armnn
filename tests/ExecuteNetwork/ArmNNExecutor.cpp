@@ -682,6 +682,11 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
                 PrintTensor<int>(outputWriteInfo, "%d ");
                 break;
             }
+            case armnn::DataType::Signed64:
+            {
+                PrintTensor<int64_t>(outputWriteInfo, "%ld ");
+                break;
+            }
             case armnn::DataType::QSymmS8:
             case armnn::DataType::QAsymmS8:
             {
@@ -697,7 +702,6 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
             case armnn::DataType::Float16:
             case armnn::DataType::QSymmS16:
             case armnn::DataType::BFloat16:
-            case armnn::DataType::Signed64:
             default:
             {
                 LogAndThrow("Unexpected DataType");

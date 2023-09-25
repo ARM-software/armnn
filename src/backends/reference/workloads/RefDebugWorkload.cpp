@@ -65,5 +65,6 @@ template class RefDebugWorkload<DataType::QAsymmS8>;
 template class RefDebugWorkload<DataType::QSymmS16>;
 template class RefDebugWorkload<DataType::QSymmS8>;
 template class RefDebugWorkload<DataType::Signed32>;
+template class RefDebugWorkload<DataType::Signed64>;
 
 } // namespace armnn

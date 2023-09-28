@@ -215,7 +215,7 @@ function GetAndBuildComputeLibrary {
 }
 
 function GetAndBuildTFLite {
-    TENSORFLOW_REVISION="tags/v2.14.0-rc1" # TF 2.14 rc1
+    TENSORFLOW_REVISION="tags/v2.14.0" # TF 2.14.0
     TFLITE_ROOT_DIR=${WORKING_DIR}/tensorflow/tensorflow/lite
 
     cd $WORKING_DIR

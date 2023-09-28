@@ -112,7 +112,7 @@ Example for Tensorflow Lite native compilation
 sudo apt install build-essential
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/tensorflow
-git checkout v2.14.0-rc1
+git checkout v2.14.0
 mkdir build && cd build
 cmake ../lite -DTFLITE_ENABLE_XNNPACK=OFF
 make

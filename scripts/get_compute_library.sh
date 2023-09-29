@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="bdcb4c148ee2fdeaaddf4cf1e57bbb0de02bb894" #10335: Implement tflite compliant reverse for CPU
+DEFAULT_CLFRAMEWORKREVISION="6e56bf3b58719772111236d3b0030fbb5e8d2e16" #10399: Revise clang-format configuration
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -37,6 +37,7 @@ TosaSerializationBasicBlock* ConvertConstantToTosaOperator(const Layer* layer,
     auto* outputTensor0 = new TosaSerializationTensor(outputName, outputShape0, outputDType0, uint8Data);
 
     return new TosaSerializationBasicBlock(blockName,       // name
+                                           mainName,        // region name
                                            {op},            // operators
                                            {outputTensor0}, // tensors
                                            {},              // inputs

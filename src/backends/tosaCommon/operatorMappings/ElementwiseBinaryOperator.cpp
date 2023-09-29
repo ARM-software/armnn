@@ -95,6 +95,7 @@ TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer*
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to Tosa mappings
     return new TosaSerializationBasicBlock(blockName, // name
+                                           mainName, // region name
                                            {op}, // operators
                                            tensors, // tensors
                                            {input0Name, input1Name}, // inputs

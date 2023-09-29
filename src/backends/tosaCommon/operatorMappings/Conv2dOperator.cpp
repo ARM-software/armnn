@@ -114,7 +114,7 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                static_cast<int>(conv2dDescriptor->m_StrideX)};
     std::vector<int> dilation = {static_cast<int>(conv2dDescriptor->m_DilationY),
                                  static_cast<int>(conv2dDescriptor->m_DilationX)};
-    TosaConvAttribute attribute(pad, stride, dilation, 0, 0, ArmNNToDType(inputs[0]->GetDataType()));
+    TosaConvAttribute attribute(pad, stride, dilation, 0, 0);
 
     auto* op = new TosaSerializationOperator(Op_CONV2D,
                                              Attribute_ConvAttribute,
@@ -126,6 +126,7 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName,     // name
+                                           mainName,      // region name
                                            operators,     // operators
                                            tensors,       // tensors
                                            inputNames,    // inputs

@@ -103,13 +103,20 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
 
     TosaSerializationHandler handler;
 
-    // Add mappings to main block as the TOSA Reference Model requires the graph to be in one block called main.
+    // Add all mappings to main block.
     auto* block = new TosaSerializationBasicBlock("main",
+                                                  "main",
                                                   mappings->GetOperators(),
                                                   mappings->GetTensors(),
                                                   mappings->GetInputs(),
                                                   mappings->GetOutputs());
-    handler.GetBlocks().emplace_back(block);
+
+    std::vector<TosaSerializationBasicBlock*> blocks;
+    blocks.emplace_back(block);
+
+    // Add blocks to the main region.
+    auto* region = new TosaSerializationRegion("main", blocks);
+    handler.GetRegions().emplace_back(region);
 
     GraphStatus status;
     TosaReference::IModelRunner runner;

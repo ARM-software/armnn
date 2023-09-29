@@ -143,7 +143,7 @@ TosaSerializationBasicBlock* ConvertTransposeConv2dToTosaOperator(const Layer* l
         }
     }
 
-    TosaTransposeConvAttribute attribute(pad, stride, outputShape, 0, 0, ArmNNToDType(inputs[0]->GetDataType()));
+    TosaTransposeConvAttribute attribute(pad, stride, outputShape, 0, 0);
 
     auto* op = new TosaSerializationOperator(Op_TRANSPOSE_CONV2D,
                                              Attribute_TransposeConvAttribute,
@@ -155,6 +155,7 @@ TosaSerializationBasicBlock* ConvertTransposeConv2dToTosaOperator(const Layer* l
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName,                            // name
+                                           mainName,                             // region name
                                            operators,                            // operators
                                            tensors,                              // tensors
                                            {input0Name, input1Name, input2Name}, // inputs

@@ -137,10 +137,15 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
         tensors.insert(tensors.end(), blockTensors.begin(), blockTensors.end());
     }
 
-    // Add all mappings to main block, the TOSA Reference Model requires the full graph to be in one block called main.
-    auto* block = new TosaSerializationBasicBlock("main", operators, tensors, graphInputs, graphOutputs);
+    // Add all mappings to main block.
+    auto* block = new TosaSerializationBasicBlock("main", "main", operators, tensors, graphInputs, graphOutputs);
 
-    handler.get()->GetBlocks().push_back(block);
+    std::vector<TosaSerializationBasicBlock*> blocks;
+    blocks.emplace_back(block);
+
+    // Add blocks to the main region.
+    auto* region = new TosaSerializationRegion("main", blocks);
+    handler->GetRegions().emplace_back(region);
 
     auto compiledBlob =
             std::make_unique<PreCompiledObjectPtr>(handler.release(), DeleteAsType<TosaSerializationHandler>);

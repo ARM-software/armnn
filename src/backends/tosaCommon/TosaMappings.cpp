@@ -12,7 +12,7 @@ TosaSerializationBasicBlock* CreateEmptyTosaSerializationBasicBlock()
 {
     // Empty basic block when no TOSA mapping implemented/exists
     auto* op = new TosaSerializationOperator(Op_UNKNOWN, Attribute_NONE, nullptr, {}, {});
-    return new TosaSerializationBasicBlock("", {op}, {}, {}, {});
+    return new TosaSerializationBasicBlock("", "", {op}, {}, {}, {});
 }
 
 TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,

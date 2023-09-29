@@ -111,6 +111,7 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName, // name
+                                           mainName, // region name
                                            {opPad, opPool}, // operators
                                            tensors, // tensors
                                            {padInputName}, // inputs

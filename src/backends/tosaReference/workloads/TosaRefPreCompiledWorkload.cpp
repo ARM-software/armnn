@@ -20,13 +20,12 @@ TosaRefPreCompiledWorkload::TosaRefPreCompiledWorkload(const PreCompiledQueueDes
                 "TosaRefPreCompiledWorkload requires a valid pre-compiled object (TosaSerializationHandler).");
     }
 }
-
 void TosaRefPreCompiledWorkload::Execute() const
 {
     tosa::TosaSerializationHandler* handler = static_cast<tosa::TosaSerializationHandler*>(m_Data.m_PreCompiledObject);
 
-    std::vector<std::string> inputNames = handler->GetInputs();
-    std::vector<std::string> outputNames = handler->GetOutputs();
+    std::vector<std::string> inputNames = handler->GetMainRegion()->GetBlocks()[0]->GetInputs();
+    std::vector<std::string> outputNames = handler->GetMainRegion()->GetBlocks()[0]->GetOutputs();
 
     TosaReference::IModelRunner runner;
     GraphStatus status;

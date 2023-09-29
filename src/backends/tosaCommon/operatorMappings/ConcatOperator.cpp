@@ -74,6 +74,7 @@ TosaSerializationBasicBlock* ConvertConcatToTosaOperator(const Layer* layer,
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName,     // name
+                                           mainName,      // region name
                                            {op},          // operators
                                            tensors,       // tensors
                                            inputNames,    // inputs

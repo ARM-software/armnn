@@ -16,14 +16,17 @@
 using namespace armnn;
 using namespace tosa;
 
+const std::string mainName = "main";
+
 // Function to return Tosa datatype from input ArmNN datatype.
 inline DType ArmNNToDType(const DataType& type)
 {
     switch (type)
     {
         case DataType::Float16:
-        case DataType::BFloat16:
             return DType_FP16;
+        case DataType::BFloat16:
+            return DType_BF16;
         case DataType::Float32:
             return DType_FP32;
         case DataType::QAsymmU8:
@@ -126,6 +129,8 @@ inline std::string TosaDTypeToString(DType tosaDType)
             return "DType_UINT16";
         case DType_FP16:
             return "DType_FP16";
+        case DType_BF16:
+            return "DType_BF16";
     }
     return "";
 }
@@ -273,6 +278,10 @@ inline std::string TosaOpToString(Op tosaOp)
             return "Op_COND_IF";
         case Op_WHILE_LOOP:
             return "Op_WHILE_LOOP";
+        case Op_FFT2D:
+            return "Op_FFT2D";
+        case Op_RFFT2D:
+            return "Op_RFFT2D";
     }
     return "";
 }

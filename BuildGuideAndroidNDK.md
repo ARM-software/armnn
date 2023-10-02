@@ -170,7 +170,7 @@ First clone Tensorflow manually and check out the version Arm NN was tested with
 cd $WORKING_DIR
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-git fetch && git checkout v2.14.0-rc1
+git fetch && git checkout v2.14.0
 ```
 Or use the script that Arm NN provides:
 ```bash

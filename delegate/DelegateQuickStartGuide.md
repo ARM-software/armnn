@@ -36,11 +36,11 @@ print(output_data)
 
 # Prepare the environment
 Pre-requisites:
- * Dynamically build Arm NN Delegate library or download the Arm NN binaries (built with a particular SHA of Tensorflow v2.14.0-rc1, which is dd01672d9a99ac372cc77a2a84faf0aedaefa36c)
+ * Dynamically build Arm NN Delegate library or download the Arm NN binaries (built with a particular SHA of Tensorflow v2.14.0, which is 4dacf3f368eb7965e9b5c3bbdd5193986081c3b2)
  * python3 (Depends on TfLite version)
  * virtualenv
  * numpy (Depends on TfLite version)
- * tflite_runtime (v2.14.0-rc1 currently available)
+ * tflite_runtime (v2.14.0 currently available)
 
 If you haven't built the delegate yet then take a look at the [build guide](./BuildGuideNative.md). Otherwise, you can download the binaries [here](https://github.com/ARM-software/armnn/releases/). Set the following environment variable to the location of the .so binary files:
 

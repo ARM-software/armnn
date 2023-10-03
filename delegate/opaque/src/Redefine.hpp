@@ -201,6 +201,19 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
         return kTfLiteError;
     }
 
+    // Check the target shape to check if there is zero in the shape.
+    if (std::find(targetShape.begin(), targetShape.end(), 0) != targetShape.end() &&
+        inputTensorInfo0.GetNumElements() != 0)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Input to reshape is a tensor with elements, "
+                "but the requested shape has 0. "
+                "operator #%d node #%d: ",
+                operatorCode, nodeIndex);
+        return kTfLiteError;
+    }
+
     // Use the data to create the required tensor shape.
     if (CreateOutputTensorShape(inputTensorInfo0, targetShape, reshapeDesc) != kTfLiteOk)
     {

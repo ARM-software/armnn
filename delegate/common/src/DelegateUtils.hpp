@@ -186,7 +186,16 @@ TfLiteStatus CreateOutputTensorShape(const armnn::TensorInfo& inputTensorInfo,
                         std::accumulate(targetShape.begin(), targetShape.end(), -1, std::multiplies<int32_t>()));
 
         auto stretchIndex = static_cast<size_t>(std::distance(targetShape.begin(), stretchDim));
-        outputDims[stretchIndex] = inputTensorInfo.GetNumElements() / targetNumElements;
+
+        if (targetNumElements == 0)
+        {
+            // To handle the edge case that input and output both have zero elements
+            outputDims[stretchIndex] = 0;
+        }
+        else
+        {
+            outputDims[stretchIndex] = inputTensorInfo.GetNumElements() / targetNumElements;
+        }
     }
 
     armnn::TensorShape outputShape = armnn::TensorShape(static_cast<unsigned int>(outputDims.size()),

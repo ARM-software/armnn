@@ -480,13 +480,6 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
             ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
         }
     }
-    else
-    {
-        auto quantizationParameters = tfLiteTensor.params;
-        ret.SetQuantizationScale(quantizationParameters.scale);
-        ret.SetQuantizationOffset(quantizationParameters.zero_point);
-    }
-
     return ret;
 }
 

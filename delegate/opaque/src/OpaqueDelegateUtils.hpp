@@ -553,13 +553,6 @@ armnn::TensorInfo GetTensorInfoForTfLiteOpaqueTensor(const TfLiteOpaqueTensor* t
             ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
         }
     }
-    else
-    {
-        auto quantizationParameters = TfLiteOpaqueTensorGetQuantizationParams(tfLiteTensor);
-        ret.SetQuantizationScale(quantizationParameters.scale);
-        ret.SetQuantizationOffset(quantizationParameters.zero_point);
-    }
-
     return ret;
 }
 

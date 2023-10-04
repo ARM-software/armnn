@@ -437,7 +437,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
         std::vector<unsigned char> dimensionsSpecificity(tensorDimensionSize, true);
         for (int i = 0; i < tensorDimensionSize; ++i) {
             auto dim = tfLiteTensor.dims->data[i];
-            if (dim <= 0)
+            if (dim < 0)
             {
                 dimensionsSpecificity[i] = false;
             }

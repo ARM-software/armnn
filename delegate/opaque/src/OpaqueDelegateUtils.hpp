@@ -509,7 +509,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteOpaqueTensor(const TfLiteOpaqueTensor* t
         {
             int32_t dim = TfLiteOpaqueTensorDim(tfLiteTensor, i);
 
-            if (dim <= 0)
+            if (dim < 0)
             {
                 dimensionsSpecificity[i] = false;
             }

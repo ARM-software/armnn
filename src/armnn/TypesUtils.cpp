@@ -32,8 +32,14 @@ QuantizedType armnn::Quantize(float value, float scale, int32_t offset)
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
     constexpr QuantizedType max = std::numeric_limits<QuantizedType>::max();
     constexpr QuantizedType min = std::numeric_limits<QuantizedType>::lowest();
-    ARMNN_ASSERT(scale != 0.f);
-    ARMNN_ASSERT(!std::isnan(value));
+    if (scale == 0.f)
+    {
+        throw armnn::InvalidArgumentException("Quantize: Scale cannot be 0.f");
+    }
+    if (std::isnan(value))
+    {
+        throw armnn::InvalidArgumentException("Quantize: Value is NaN");
+    }
 
     float clampedValue = std::min(std::max((static_cast<float>(offset) + static_cast<float>(round(value/scale))),
                                             static_cast<float>(min)), static_cast<float>(max));
@@ -46,8 +52,14 @@ template <typename QuantizedType>
 float armnn::Dequantize(QuantizedType value, float scale, int32_t offset)
 {
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
-    ARMNN_ASSERT(scale != 0.f);
-    ARMNN_ASSERT(!IsNan(value));
+    if (scale == 0.f)
+    {
+        throw armnn::InvalidArgumentException("Dequantize: Scale cannot be 0.f");
+    }
+    if (std::isnan(value))
+    {
+        throw armnn::InvalidArgumentException("Dequantize: Value is NaN");
+    }
     return (armnn::numeric_cast<float>(value - offset)) * scale;
 }
 

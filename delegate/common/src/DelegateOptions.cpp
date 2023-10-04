@@ -16,9 +16,9 @@ struct DelegateOptionsImpl
     DelegateOptionsImpl() = default;
 
     explicit DelegateOptionsImpl(armnn::Compute computeDevice,
-                        const std::vector<armnn::BackendOptions>& backendOptions,
-                        const armnn::Optional<armnn::LogSeverity> logSeverityLevel)
-                        : m_Backends({computeDevice}), m_RuntimeOptions(), m_LoggingSeverity(logSeverityLevel)
+                                 const std::vector<armnn::BackendOptions>& backendOptions,
+                                 const armnn::Optional<armnn::LogSeverity> logSeverityLevel)
+            : m_Backends({computeDevice}), m_RuntimeOptions(), m_LoggingSeverity(logSeverityLevel)
     {
         m_RuntimeOptions.m_BackendOptions = backendOptions;
     }
@@ -145,6 +145,10 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
     armnn::OptimizerOptionsOpaque optimizerOptions;
     bool internalProfilingState = false;
     armnn::ProfilingDetailsMethod internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
+
+    bool GpuAccFound = false;
+    bool CpuAccFound = false;
+
     for (size_t i = 0; i < num_options; ++i)
     {
         // Process backends
@@ -160,6 +164,8 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
                 pch = strtok (NULL, ",");
             }
             SetBackends(backends);
+            GpuAccFound = std::count(GetBackends().begin(), GetBackends().end(), "GpuAcc");
+            CpuAccFound = std::count(GetBackends().begin(), GetBackends().end(), "CpuAcc");
         }
             // Process dynamic-backends-path
         else if (std::string(options_keys[i]) == std::string("dynamic-backends-path"))
@@ -174,21 +180,45 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
             // Process GPU backend options
         else if (std::string(options_keys[i]) == std::string("gpu-tuning-level"))
         {
-            armnn::BackendOptions option("GpuAcc", {{"TuningLevel",
-                                                     atoi(options_values[i])}});
-            runtimeOptions.m_BackendOptions.push_back(option);
+            if (GpuAccFound)
+            {
+                armnn::BackendOptions option("GpuAcc", {{"TuningLevel",
+                                                         atoi(options_values[i])}});
+                runtimeOptions.m_BackendOptions.push_back(option);
+            }
+            else
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: TuningLevel is enabled, but no backends that accept this option are set.";
+            }
         }
         else if (std::string(options_keys[i]) == std::string("gpu-mlgo-tuning-file"))
         {
-            armnn::BackendOptions option("GpuAcc", {{"MLGOTuningFilePath",
-                                                     std::string(options_values[i])}});
-            optimizerOptions.AddModelOption(option);
+            if (GpuAccFound)
+            {
+                armnn::BackendOptions option("GpuAcc", {{"MLGOTuningFilePath",
+                                                         std::string(options_values[i])}});
+                optimizerOptions.AddModelOption(option);
+            }
+            else
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: MLGOTuningFilePath is enabled, but no backends that accept this option are set.";
+            }
         }
         else if (std::string(options_keys[i]) == std::string("gpu-tuning-file"))
         {
-            armnn::BackendOptions option("GpuAcc", {{"TuningFile",
-                                                     std::string(options_values[i])}});
-            runtimeOptions.m_BackendOptions.push_back(option);
+            if (GpuAccFound)
+            {
+                armnn::BackendOptions option("GpuAcc", {{"TuningFile",
+                                                         std::string(options_values[i])}});
+                runtimeOptions.m_BackendOptions.push_back(option);
+            }
+            else
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: TuningFile is enabled, but no backends that accept this option are set.";
+            }
         }
         else if (std::string(options_keys[i]) == std::string("gpu-enable-profiling"))
         {
@@ -196,40 +226,82 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         }
         else if (std::string(options_keys[i]) == std::string("gpu-kernel-profiling-enabled"))
         {
-            armnn::BackendOptions option("GpuAcc", {{"KernelProfilingEnabled",
-                                                     armnn::stringUtils::StringToBool(options_values[i])}});
-            runtimeOptions.m_BackendOptions.push_back(option);
+            if (GpuAccFound)
+            {
+                armnn::BackendOptions option("GpuAcc", {{"KernelProfilingEnabled",
+                                                         armnn::stringUtils::StringToBool(options_values[i])}});
+                runtimeOptions.m_BackendOptions.push_back(option);
+            }
+            else
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: KernelProfilingEnabled is enabled, but no backends that accept this option are set.";
+            }
         }
         else if (std::string(options_keys[i]) == std::string("save-cached-network"))
         {
-            armnn::BackendOptions option("GpuAcc", {{"SaveCachedNetwork",
-                                                     armnn::stringUtils::StringToBool(options_values[i])}});
-            optimizerOptions.AddModelOption(option);
+            if (GpuAccFound)
+            {
+                armnn::BackendOptions option("GpuAcc", {{"SaveCachedNetwork",
+                                                         armnn::stringUtils::StringToBool(options_values[i])}});
+                optimizerOptions.AddModelOption(option);
+            }
+            else
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: SaveCachedNetwork is enabled, but no backends that accept this option are set.";
+            }
         }
         else if (std::string(options_keys[i]) == std::string("cached-network-filepath"))
         {
-            armnn::BackendOptions option("GpuAcc", {{"CachedNetworkFilePath",
-                                                     std::string(options_values[i])}});
-            optimizerOptions.AddModelOption(option);
+            if (GpuAccFound)
+            {
+                armnn::BackendOptions option("GpuAcc", {{"CachedNetworkFilePath",
+                                                         std::string(options_values[i])}});
+                optimizerOptions.AddModelOption(option);
+            }
+            else
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: CachedNetworkFilePath is enabled, but no backends that accept this option are set.";
+            }
         }
             // Process GPU & CPU backend options
         else if (std::string(options_keys[i]) == std::string("enable-fast-math"))
         {
-            armnn::BackendOptions modelOptionGpu("GpuAcc", {{"FastMathEnabled",
-                                                 armnn::stringUtils::StringToBool(options_values[i])}});
-            optimizerOptions.AddModelOption(modelOptionGpu);
-
-            armnn::BackendOptions modelOptionCpu("CpuAcc", {{"FastMathEnabled",
-                                                 armnn::stringUtils::StringToBool(options_values[i])}});
-            optimizerOptions.AddModelOption(modelOptionCpu);
+            if (GpuAccFound)
+            {
+                armnn::BackendOptions modelOptionGpu("GpuAcc", {{"FastMathEnabled",
+                                                                 armnn::stringUtils::StringToBool(options_values[i])}});
+                optimizerOptions.AddModelOption(modelOptionGpu);
+            }
+            if (CpuAccFound)
+            {
+                armnn::BackendOptions modelOptionCpu("CpuAcc", {{"FastMathEnabled",
+                                                                 armnn::stringUtils::StringToBool(options_values[i])}});
+                optimizerOptions.AddModelOption(modelOptionCpu);
+            }
+            if (!GpuAccFound and !CpuAccFound)
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: Fastmath is enabled, but no backends that accept this option are set.";
+            }
         }
             // Process CPU backend options
         else if (std::string(options_keys[i]) == std::string("number-of-threads"))
         {
-            unsigned int numberOfThreads = armnn::numeric_cast<unsigned int>(atoi(options_values[i]));
-            armnn::BackendOptions modelOption("CpuAcc",
-                                              {{"NumberOfThreads", numberOfThreads}});
-            optimizerOptions.AddModelOption(modelOption);
+            if (CpuAccFound)
+            {
+                unsigned int numberOfThreads = armnn::numeric_cast<unsigned int>(atoi(options_values[i]));
+                armnn::BackendOptions modelOption("CpuAcc",
+                                                  {{"NumberOfThreads", numberOfThreads}});
+                optimizerOptions.AddModelOption(modelOption);
+            }
+            else
+            {
+                ARMNN_LOG(warning) <<
+                "WARNING: NumberOfThreads is enabled, but no backends that accept this option are set.";
+            }
         }
             // Process reduce-fp32-to-fp16 option
         else if (std::string(options_keys[i]) == std::string("reduce-fp32-to-fp16"))
@@ -244,20 +316,19 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
             // Infer output-shape
         else if (std::string(options_keys[i]) == std::string("infer-output-shape"))
         {
-            armnn::BackendOptions backendOption("ShapeInferenceMethod",
+            if (armnn::stringUtils::StringToBool(options_values[i]))
             {
-                { "InferAndValidate", armnn::stringUtils::StringToBool(options_values[i]) }
-            });
-            optimizerOptions.AddModelOption(backendOption);
+                optimizerOptions.SetShapeInferenceMethod(armnn::ShapeInferenceMethod::InferAndValidate);
+            }
+            else
+            {
+                optimizerOptions.SetShapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly);
+            }
         }
             // Allow expanded dims
         else if (std::string(options_keys[i]) == std::string("allow-expanded-dims"))
         {
-            armnn::BackendOptions backendOption("AllowExpandedDims",
-            {
-                { "AllowExpandedDims", armnn::stringUtils::StringToBool(options_values[i]) }
-            });
-            optimizerOptions.AddModelOption(backendOption);
+            optimizerOptions.SetAllowExpandedDims(armnn::stringUtils::StringToBool(options_values[i]));
         }
             // Process memory-import
         else if (std::string(options_keys[i]) == std::string("memory-import"))
@@ -290,14 +361,12 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
             // Process enable-external-profiling
         else if (std::string(options_keys[i]) == std::string("enable-external-profiling"))
         {
-            runtimeOptions.m_ProfilingOptions.m_EnableProfiling =
-                armnn::stringUtils::StringToBool(options_values[i]);
+            runtimeOptions.m_ProfilingOptions.m_EnableProfiling = armnn::stringUtils::StringToBool(options_values[i]);
         }
         // Process timeline-profiling
         else if (std::string(options_keys[i]) == std::string("timeline-profiling"))
         {
-            runtimeOptions.m_ProfilingOptions.m_TimelineEnabled =
-                armnn::stringUtils::StringToBool(options_values[i]);
+            runtimeOptions.m_ProfilingOptions.m_TimelineEnabled = armnn::stringUtils::StringToBool(options_values[i]);
         }
         // Process outgoing-capture-file
         else if (std::string(options_keys[i]) == std::string("outgoing-capture-file"))
@@ -312,14 +381,12 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         // Process file-only-external-profiling
         else if (std::string(options_keys[i]) == std::string("file-only-external-profiling"))
         {
-            runtimeOptions.m_ProfilingOptions.m_FileOnly =
-                    armnn::stringUtils::StringToBool(options_values[i]);
+            runtimeOptions.m_ProfilingOptions.m_FileOnly = armnn::stringUtils::StringToBool(options_values[i]);
         }
         // Process counter-capture-period
         else if (std::string(options_keys[i]) == std::string("counter-capture-period"))
         {
-            runtimeOptions.m_ProfilingOptions.m_CapturePeriod =
-                    static_cast<uint32_t>(std::stoul(options_values[i]));
+            runtimeOptions.m_ProfilingOptions.m_CapturePeriod = static_cast<uint32_t>(std::stoul(options_values[i]));
         }
         // Process profiling-file-format
         else if (std::string(options_keys[i]) == std::string("profiling-file-format"))
@@ -339,8 +406,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         }
         else
         {
-            throw armnn::Exception("Unknown option for the ArmNN Delegate given: " +
-                std::string(options_keys[i]));
+            throw armnn::Exception("Unknown option for the ArmNN Delegate given: " +  std::string(options_keys[i]));
         }
     }
 

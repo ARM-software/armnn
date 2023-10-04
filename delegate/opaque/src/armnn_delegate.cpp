@@ -55,6 +55,7 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
+#include <regex>
 
 namespace armnnOpaqueDelegate
 {
@@ -62,6 +63,69 @@ namespace armnnOpaqueDelegate
 static auto* g_delegate_plugin_ArmnnDelegatePlugin_ =
     new tflite::delegates::DelegatePluginRegistry::Register("armnn_delegate",
                                                             ArmnnDelegatePlugin::New);
+
+armnnDelegate::DelegateOptions ParseArmNNSettings(const tflite::TFLiteSettings* tfLiteSettings)
+{
+    const tflite::ArmNNSettings* settings = tfLiteSettings->armnn_settings();
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(settings, 
+                                        "The passed TFLiteSettings did not contain a valid ArmNNSettings");
+
+    // Extract settings fields
+    bool fastmath = settings->fastmath();
+    std::string backends_str = (settings->backends()) ? settings->backends()->str() : "";
+    const ::flatbuffers::String* additional_parameters = settings->additional_parameters();
+
+    // Build additional parameters string
+    std::string additional_parameters_str;
+    if (additional_parameters)
+    {
+        additional_parameters_str = additional_parameters->str();
+
+        // Apply a regex to remove spaces around the = and , signs
+        std::regex regex_equals_str("[ ]*=[ ]*");
+        std::regex regex_comma_str("[ ]*,[ ]*");
+        additional_parameters_str = std::regex_replace(additional_parameters_str, regex_equals_str, "=");
+        additional_parameters_str = std::regex_replace(additional_parameters_str, regex_comma_str, ",");
+    }
+
+    // Build a std::pair list of option names and values
+    std::vector<std::pair<std::string, std::string>> options;
+    options.emplace_back(std::pair<std::string, std::string>("backends", backends_str));
+    options.emplace_back(std::pair<std::string, std::string>("enable-fast-math", (fastmath) ? "true" : "false"));
+
+    std::stringstream additional_parameters_ss(additional_parameters_str);
+    while (additional_parameters_ss.good())
+    {
+        std::string option_str;
+        getline( additional_parameters_ss, option_str, ',' );
+        size_t n = option_str.find("=");
+        if (n != std::string::npos)
+        {
+            std::string name  = option_str.substr(0, n);
+            std::string value = option_str.substr(n + 1, std::string::npos);
+            options.emplace_back(std::pair<std::string, std::string>(name, value));
+        }
+    }
+
+    // Build the key and value lists to pass into the constructor of the DelegateOptions
+    size_t num_options = options.size();
+    std::unique_ptr<const char*> options_keys   = std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*> options_values = std::unique_ptr<const char*>(new const char*[num_options + 1]);
+
+    for (size_t i=0; i<num_options; ++i)
+    {
+        options_keys.get()[i]   = options[i].first.c_str();
+        options_values.get()[i] = options[i].second.c_str();
+    }
+
+    // Finally call the constructor
+    armnnDelegate::DelegateOptions delegateOptions = armnnDelegate::DelegateOptions(options_keys.get(),
+                                                                                    options_values.get(),
+                                                                                    num_options,
+                                                                                    nullptr);
+
+    return delegateOptions;
+}
 
 ArmnnOpaqueDelegate::ArmnnOpaqueDelegate(armnnDelegate::DelegateOptions options)
     : m_Options(std::move(options))

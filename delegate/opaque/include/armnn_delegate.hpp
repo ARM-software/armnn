@@ -42,6 +42,8 @@ void TfLiteArmnnOpaqueDelegateDelete(TfLiteOpaqueDelegate* tfLiteDelegate);
 
 TfLiteStatus DoPrepare(TfLiteOpaqueContext* context, TfLiteOpaqueDelegate* delegate, void* data);
 
+armnnDelegate::DelegateOptions ParseArmNNSettings(const tflite::TFLiteSettings* tflite_settings);
+
 /// ArmNN Opaque Delegate
 class ArmnnOpaqueDelegate
 {

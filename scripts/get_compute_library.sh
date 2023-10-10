@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="a23b4686a091a7960a4b336d0fe53f15db4ae538" #Optimize CLTranspose operator
+DEFAULT_CLFRAMEWORKREVISION="1434155d8d937c5a07af67439f8241064f841ad8" #Change heuristics for FP16 Deconv
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

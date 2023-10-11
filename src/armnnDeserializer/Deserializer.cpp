@@ -3263,6 +3263,11 @@ void IDeserializer::DeserializerImpl::ParseSplitter(GraphPtr graph, unsigned int
         }
     }
 
+    if (flatBufferViewsDescriptor->hasAxis())
+    {
+        viewsDescriptor.SetAxis(flatBufferViewsDescriptor->axis());
+    }
+
     auto layerName = GetLayerName(graph, layerIndex);
     IConnectableLayer* layer = m_Network->AddSplitterLayer(viewsDescriptor, layerName.c_str());
 

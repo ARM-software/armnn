@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="1434155d8d937c5a07af67439f8241064f841ad8" #Change heuristics for FP16 Deconv
+DEFAULT_CLFRAMEWORKREVISION="fb9c25d27791d934300581596cce7c5875a79a80" #10342: arm_gemm: fix 2D threading mode for SME2
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

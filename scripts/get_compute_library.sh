@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="fb9c25d27791d934300581596cce7c5875a79a80" #10342: arm_gemm: fix 2D threading mode for SME2
+DEFAULT_CLFRAMEWORKREVISION="95d477e0662c172c264cf495d196dfce6a791248" #10467: Remove padding from CL comparison operator
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

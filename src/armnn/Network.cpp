@@ -799,31 +799,46 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
     for (unsigned int i = 0; i < numOutputs; i++) {
         OutputSlot& outputSlot = layer->GetOutputSlot(i);
         TensorInfo info = outputSlot.GetTensorInfo();
-        if (DataType::QAsymmU8 == info.GetDataType())
-        {
-            if (0.f == info.GetQuantizationScale())
-            {
-                noErrors = false;
-                std::stringstream ss;
-                ss << "output " << i << " of layer " << GetLayerTypeAsCString(layer->GetType())
-                   << " (" << layer->GetNameStr() << ") is of type"
-                   << " Quantized 8 bit but its scale parameter has not been set";
-                ReportError(ss.str(), errMessages);
-            }
-            // Softmax under QuantisedAsymm8 must always be scale (1.0f/256.0f) and offset 0
-            if ((info.GetQuantizationScale() != (1.0f / 256.0f) ||
-                 info.GetQuantizationOffset() != 0) &&
-                 layer->GetType() == armnn::LayerType::Softmax)
-            {
-                std::stringstream ss;
-                ss << "Quantization parameters for Softmax layer (Scale: " <<
-                info.GetQuantizationScale() << " and Offset: " << info.GetQuantizationOffset() <<
-                ") are incorrect and have been updated to Scale: 0.00390625 and Offset: 0";
-                ARMNN_LOG(warning) << ss.str();
-                info.SetQuantizationScale((1.0f /256.0f));
-                info.SetQuantizationOffset(0);
-                outputSlot.SetTensorInfo(info);
-            }
+        auto quantizationDataType = info.GetDataType();
+        auto quantizationScales = info.GetQuantizationScales();
+        // For any Quantized Tensor ensure scale(s) are set
+        switch(quantizationDataType) {
+            case DataType::QAsymmU8:
+            case DataType::QSymmS16:
+            case DataType::QSymmS8:
+            case DataType::QAsymmS8:
+                if ((quantizationDataType == DataType::QAsymmU8 || quantizationDataType == DataType::QAsymmS8)
+                    && info.HasPerAxisQuantization()) {
+                    throw InvalidArgumentException("Per Axis Quantization is not supported in "
+                                                   "Asymmetric Quantization Datatype.");
+                }
+                if ((!info.HasPerAxisQuantization() && info.GetQuantizationScale() == 0.f)
+                    || (info.HasPerAxisQuantization() && (quantizationScales.end() !=
+                    std::find(quantizationScales.begin(), quantizationScales.end(), 0.f)))) {
+                    noErrors = false;
+                    std::stringstream ss;
+                    ss << "output " << i << " of layer " << GetLayerTypeAsCString(layer->GetType())
+                       << " (" << layer->GetNameStr() << ") is of type"
+                       << " Quantized value but the scale parameter has not been set";
+                    ReportError(ss.str(), errMessages);
+                }
+                // Softmax under QuantisedAsymm8 must always be scale (1.0f/256.0f) and offset 0
+                if (!info.HasPerAxisQuantization() && quantizationDataType == DataType::QAsymmU8 &&
+                    (info.GetQuantizationScale() != (1.0f / 256.0f) ||
+                     info.GetQuantizationOffset() != 0) &&
+                    layer->GetType() == armnn::LayerType::Softmax) {
+                    std::stringstream ss;
+                    ss << "Quantization parameters for Softmax layer (Scale: " <<
+                       info.GetQuantizationScale() << " and Offset: " << info.GetQuantizationOffset() <<
+                       ") are incorrect and have been updated to Scale: 0.00390625 and Offset: 0";
+                    ARMNN_LOG(warning) << ss.str();
+                    info.SetQuantizationScale((1.0f / 256.0f));
+                    info.SetQuantizationOffset(0);
+                    outputSlot.SetTensorInfo(info);
+                }
+                break;
+            default:
+                break;
         }
     }
     return noErrors;

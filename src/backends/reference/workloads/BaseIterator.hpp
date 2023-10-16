@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -894,6 +894,33 @@ public:
 
 private:
     std::vector<float> m_Scales;
+};
+
+class QSymm16PerAxisEncoder : public PerAxisIterator<int16_t, Encoder<float>>
+{
+public:
+    QSymm16PerAxisEncoder(int16_t* data, const std::vector<float>& scale,
+                          unsigned int axisFactor, unsigned int axisDimensionality)
+            : PerAxisIterator(data, axisFactor, axisDimensionality), m_Scale(scale) {}
+
+    void Set(float right)
+    {
+        *m_Iterator = armnn::Quantize<int16_t>(right, m_Scale[m_AxisIndex], 0);
+    }
+
+    float Get() const
+    {
+        return armnn::Dequantize(*m_Iterator, m_Scale[m_AxisIndex], 0);
+    }
+
+    // Get scale of the current value
+    float GetScale() const
+    {
+        return m_Scale[m_AxisIndex];
+    }
+
+private:
+    std::vector<float> m_Scale;
 };
 
 } // namespace armnn

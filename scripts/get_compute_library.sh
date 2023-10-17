@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="95d477e0662c172c264cf495d196dfce6a791248" #10467: Remove padding from CL comparison operator
+DEFAULT_CLFRAMEWORKREVISION="c1204c76d40dcaf754fd7d725c432f19a2f368a4" #10469: Connect MatMul MMUL kernels to ClMatMul operator
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

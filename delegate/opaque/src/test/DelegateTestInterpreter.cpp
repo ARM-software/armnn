@@ -7,7 +7,6 @@
 
 #include <armnn_delegate.hpp>
 
-#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace delegateTestInterpreter
 {
@@ -17,9 +16,6 @@ DelegateTestInterpreter::DelegateTestInterpreter(std::vector<char>& modelBuffer,
                                                  const std::string& customOp,
                                                  bool disableFallback)
 {
-    armnn::IgnoreUnused(backends);
-    armnn::IgnoreUnused(disableFallback);
-
     TfLiteModel* tfLiteModel = delegateTestInterpreter::CreateTfLiteModel(modelBuffer);
 
     TfLiteInterpreterOptions* options = delegateTestInterpreter::CreateTfLiteInterpreterOptions();
@@ -28,8 +24,11 @@ DelegateTestInterpreter::DelegateTestInterpreter(std::vector<char>& modelBuffer,
         options->mutable_op_resolver = delegateTestInterpreter::GenerateCustomOpResolver(customOp);
     }
 
-    // Use default settings until options have been enabled.
-    auto armnnDelegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(nullptr);
+    // Disable fallback by default for unit tests unless specified.
+    armnnDelegate::DelegateOptions delegateOptions(backends);
+    delegateOptions.DisableTfLiteRuntimeFallback(disableFallback);
+
+    auto armnnDelegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(delegateOptions);
     TfLiteInterpreterOptionsAddDelegate(options, armnnDelegate);
 
     m_TfLiteDelegate = armnnDelegate;
@@ -44,8 +43,6 @@ DelegateTestInterpreter::DelegateTestInterpreter(std::vector<char>& modelBuffer,
                                                  const armnnDelegate::DelegateOptions& delegateOptions,
                                                  const std::string& customOp)
 {
-    armnn::IgnoreUnused(delegateOptions);
-
     TfLiteModel* tfLiteModel = delegateTestInterpreter::CreateTfLiteModel(modelBuffer);
 
     TfLiteInterpreterOptions* options = delegateTestInterpreter::CreateTfLiteInterpreterOptions();
@@ -54,8 +51,7 @@ DelegateTestInterpreter::DelegateTestInterpreter(std::vector<char>& modelBuffer,
         options->mutable_op_resolver = delegateTestInterpreter::GenerateCustomOpResolver(customOp);
     }
 
-    // Use default settings until options have been enabled.
-    auto armnnDelegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(nullptr);
+    auto armnnDelegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(delegateOptions);
     TfLiteInterpreterOptionsAddDelegate(options, armnnDelegate);
 
     m_TfLiteDelegate = armnnDelegate;

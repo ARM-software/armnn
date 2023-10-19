@@ -9,7 +9,10 @@ namespace {
 
     TfLiteOpaqueDelegate* ArmNNDelegateCreateFunc(const void* tflite_settings)
     {
-        auto delegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(tflite_settings);
+        armnnDelegate::DelegateOptions opt = armnnOpaqueDelegate::ParseArmNNSettings(
+                static_cast<const tflite::TFLiteSettings*>(tflite_settings));
+
+        auto delegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(opt);
         return delegate;
     }
 

@@ -36,7 +36,7 @@ struct DelegateData
 /// Forward declaration for functions initializing the ArmNN Delegate
 ::armnnDelegate::DelegateOptions TfLiteArmnnDelegateOptionsDefault();
 
-TfLiteOpaqueDelegate* TfLiteArmnnOpaqueDelegateCreate(const void* settings);
+TfLiteOpaqueDelegate* TfLiteArmnnOpaqueDelegateCreate(armnnDelegate::DelegateOptions options);
 
 void TfLiteArmnnOpaqueDelegateDelete(TfLiteOpaqueDelegate* tfLiteDelegate);
 
@@ -96,16 +96,15 @@ using TfLiteOpaqueDelegatePtr = tflite::delegates::TfLiteDelegatePtr;
 class ArmnnDelegatePlugin : public DelegatePluginInterface
 {
 public:
-    static std::unique_ptr<ArmnnDelegatePlugin> New(const tflite::TFLiteSettings& tflite_settings)
+    static std::unique_ptr<ArmnnDelegatePlugin> New(const tflite::TFLiteSettings& tfliteSettings)
     {
-        return std::make_unique<ArmnnDelegatePlugin>(tflite_settings);
+        return std::make_unique<ArmnnDelegatePlugin>(tfliteSettings);
     }
 
     tflite::delegates::TfLiteDelegatePtr Create() override
     {
-        // Use default settings until options have been enabled.
-        return tflite::delegates::TfLiteDelegatePtr(
-            TfLiteArmnnOpaqueDelegateCreate(nullptr), TfLiteArmnnOpaqueDelegateDelete);
+        return tflite::delegates::TfLiteDelegatePtr(TfLiteArmnnOpaqueDelegateCreate(m_delegateOptions),
+                                                    TfLiteArmnnOpaqueDelegateDelete);
     }
 
     int GetDelegateErrno(TfLiteOpaqueDelegate* from_delegate) override
@@ -114,9 +113,11 @@ public:
     }
 
     explicit ArmnnDelegatePlugin(const tflite::TFLiteSettings& tfliteSettings)
-    {
-        // Use default settings until options have been enabled.
-    }
+            : m_delegateOptions(ParseArmNNSettings(&tfliteSettings))
+    {}
+
+private:
+    armnnDelegate::DelegateOptions m_delegateOptions;
 };
 
 /// ArmnnSubgraph class where parsing the nodes to ArmNN format and creating the ArmNN Graph

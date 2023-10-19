@@ -146,38 +146,47 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
     bool internalProfilingState = false;
     armnn::ProfilingDetailsMethod internalProfilingDetail = armnn::ProfilingDetailsMethod::DetailsWithEvents;
 
+    // Process backends
     bool GpuAccFound = false;
     bool CpuAccFound = false;
-
     for (size_t i = 0; i < num_options; ++i)
     {
-        // Process backends
         if (std::string(options_keys[i]) == std::string("backends"))
         {
             // The backend option is a comma separated string of backendIDs that needs to be split
             std::vector<armnn::BackendId> backends;
-            char* dup = strdup(options_values[i]);
-            char* pch = std::strtok(dup, ",");
+            char *dup = strdup(options_values[i]);
+            char *pch = std::strtok(dup, ",");
             while (pch != NULL)
             {
                 backends.push_back(pch);
-                pch = strtok (NULL, ",");
+                pch = strtok(NULL, ",");
             }
             SetBackends(backends);
             GpuAccFound = std::count(GetBackends().begin(), GetBackends().end(), "GpuAcc");
             CpuAccFound = std::count(GetBackends().begin(), GetBackends().end(), "CpuAcc");
+            break;
         }
-            // Process dynamic-backends-path
+    }
+
+    // Rest of options after knowing the backend
+    for (size_t i = 0; i < num_options; ++i)
+    {
+        if (std::string(options_keys[i]) == std::string("backends"))
+        {
+            continue;
+        }
+        // Process dynamic-backends-path
         else if (std::string(options_keys[i]) == std::string("dynamic-backends-path"))
         {
             runtimeOptions.m_DynamicBackendsPath = std::string(options_values[i]);
         }
-            // Process logging level
+        // Process logging level
         else if (std::string(options_keys[i]) == std::string("logging-severity"))
         {
             SetLoggingSeverity(options_values[i]);
         }
-            // Process GPU backend options
+        // Process GPU backend options
         else if (std::string(options_keys[i]) == std::string("gpu-tuning-level"))
         {
             if (GpuAccFound)
@@ -266,7 +275,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
                 "WARNING: CachedNetworkFilePath is enabled, but no backends that accept this option are set.";
             }
         }
-            // Process GPU & CPU backend options
+        // Process GPU & CPU backend options
         else if (std::string(options_keys[i]) == std::string("enable-fast-math"))
         {
             if (GpuAccFound)
@@ -287,7 +296,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
                 "WARNING: Fastmath is enabled, but no backends that accept this option are set.";
             }
         }
-            // Process CPU backend options
+        // Process CPU backend options
         else if (std::string(options_keys[i]) == std::string("number-of-threads"))
         {
             if (CpuAccFound)
@@ -303,17 +312,17 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
                 "WARNING: NumberOfThreads is enabled, but no backends that accept this option are set.";
             }
         }
-            // Process reduce-fp32-to-fp16 option
+        // Process reduce-fp32-to-fp16 option
         else if (std::string(options_keys[i]) == std::string("reduce-fp32-to-fp16"))
         {
             optimizerOptions.SetReduceFp32ToFp16(armnn::stringUtils::StringToBool(options_values[i]));
         }
-            // Process debug-data
+        // Process debug-data
         else if (std::string(options_keys[i]) == std::string("debug-data"))
         {
             optimizerOptions.SetDebugEnabled(armnn::stringUtils::StringToBool(options_values[i]));
         }
-            // Infer output-shape
+        // Infer output-shape
         else if (std::string(options_keys[i]) == std::string("infer-output-shape"))
         {
             if (armnn::stringUtils::StringToBool(options_values[i]))
@@ -325,23 +334,23 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
                 optimizerOptions.SetShapeInferenceMethod(armnn::ShapeInferenceMethod::ValidateOnly);
             }
         }
-            // Allow expanded dims
+        // Allow expanded dims
         else if (std::string(options_keys[i]) == std::string("allow-expanded-dims"))
         {
             optimizerOptions.SetAllowExpandedDims(armnn::stringUtils::StringToBool(options_values[i]));
         }
-            // Process memory-import
+        // Process memory-import
         else if (std::string(options_keys[i]) == std::string("memory-import"))
         {
             optimizerOptions.SetImportEnabled(armnn::stringUtils::StringToBool(options_values[i]));
         }
-            // Process enable-internal-profiling
+        // Process enable-internal-profiling
         else if (std::string(options_keys[i]) == std::string("enable-internal-profiling"))
         {
             internalProfilingState = *options_values[i] != '0';
             optimizerOptions.SetProfilingEnabled(internalProfilingState);
         }
-            // Process internal-profiling-detail
+        // Process internal-profiling-detail
         else if (std::string(options_keys[i]) == std::string("internal-profiling-detail"))
         {
             uint32_t detailLevel = static_cast<uint32_t>(std::stoul(options_values[i]));
@@ -358,7 +367,7 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
                     break;
             }
         }
-            // Process enable-external-profiling
+        // Process enable-external-profiling
         else if (std::string(options_keys[i]) == std::string("enable-external-profiling"))
         {
             runtimeOptions.m_ProfilingOptions.m_EnableProfiling = armnn::stringUtils::StringToBool(options_values[i]);
@@ -398,7 +407,6 @@ DelegateOptions::DelegateOptions(char const* const* options_keys,
         {
             SetSerializeToDot(options_values[i]);
         }
-
         // Process disable-tflite-runtime-fallback
         else if (std::string(options_keys[i]) == std::string("disable-tflite-runtime-fallback"))
         {

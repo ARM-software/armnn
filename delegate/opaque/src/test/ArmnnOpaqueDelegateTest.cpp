@@ -8,11 +8,94 @@
 
 #include <opaque/include/armnn_delegate.hpp>
 
+#include <tensorflow/lite/kernels/builtin_op_kernels.h>
+#include <tensorflow/lite/interpreter.h>
+#include <tensorflow/lite/kernels/register.h>
+#include "tensorflow/lite/core/c/builtin_op_data.h"
+
 namespace armnnOpaqueDelegate
 {
 
 TEST_SUITE("ArmnnOpaqueDelegate")
 {
+
+TEST_CASE ("ArmnnOpaqueDelegate_Registered")
+{
+    using namespace tflite;
+    auto tfLiteInterpreter = std::make_unique<Interpreter>();
+
+    tfLiteInterpreter->AddTensors(3);
+    tfLiteInterpreter->SetInputs({0, 1});
+    tfLiteInterpreter->SetOutputs({2});
+
+    tfLiteInterpreter->SetTensorParametersReadWrite(0, kTfLiteFloat32, "input1", {1,2,2,1}, TfLiteQuantization());
+    tfLiteInterpreter->SetTensorParametersReadWrite(1, kTfLiteFloat32, "input2", {1,2,2,1}, TfLiteQuantization());
+    tfLiteInterpreter->SetTensorParametersReadWrite(2, kTfLiteFloat32, "output", {1,2,2,1}, TfLiteQuantization());
+
+    TfLiteAddParams* addParams = reinterpret_cast<TfLiteAddParams*>(malloc(sizeof(TfLiteAddParams)));
+    addParams->activation = kTfLiteActNone;
+    addParams->pot_scale_int16 = false;
+
+    tflite::ops::builtin::BuiltinOpResolver opResolver;
+    const TfLiteRegistration* opRegister = opResolver.FindOp(BuiltinOperator_ADD, 1);
+    tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, addParams, opRegister);
+
+    // Create the Armnn Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendOptions> backendOptions;
+    backendOptions.emplace_back(
+            armnn::BackendOptions{ "BackendName",
+                                   {
+                                           { "Option1", 42 },
+                                           { "Option2", true }
+                                   }}
+    );
+
+    armnnDelegate::DelegateOptions delegateOptions(backends, backendOptions);
+    std::unique_ptr<TfLiteDelegate, decltype(&armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete)>
+            theArmnnDelegate(armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(delegateOptions),
+                             armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete);
+
+    auto status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+    CHECK(status == kTfLiteOk);
+    CHECK(tfLiteInterpreter != nullptr);
+}
+
+TEST_CASE ("ArmnnOpaqueDelegate_OptimizerOptionsRegistered")
+{
+    using namespace tflite;
+    auto tfLiteInterpreter = std::make_unique<Interpreter>();
+
+    tfLiteInterpreter->AddTensors(3);
+    tfLiteInterpreter->SetInputs({0, 1});
+    tfLiteInterpreter->SetOutputs({2});
+
+    tfLiteInterpreter->SetTensorParametersReadWrite(0, kTfLiteFloat32, "input1", {1,2,2,1}, TfLiteQuantization());
+    tfLiteInterpreter->SetTensorParametersReadWrite(1, kTfLiteFloat32, "input2", {1,2,2,1}, TfLiteQuantization());
+    tfLiteInterpreter->SetTensorParametersReadWrite(2, kTfLiteFloat32, "output", {1,2,2,1}, TfLiteQuantization());
+
+    TfLiteAddParams* addParams = reinterpret_cast<TfLiteAddParams*>(malloc(sizeof(TfLiteAddParams)));
+    addParams->activation = kTfLiteActNone;
+    addParams->pot_scale_int16 = false;
+
+    tflite::ops::builtin::BuiltinOpResolver opResolver;
+    const TfLiteRegistration* opRegister = opResolver.FindOp(BuiltinOperator_ADD, 1);
+    tfLiteInterpreter->AddNodeWithParameters({0, 1}, {2}, "", 0, addParams, opRegister);
+
+    // Create the Armnn Delegate
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+
+    armnn::OptimizerOptionsOpaque optimizerOptions(true, true, false, true);
+
+    armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
+    std::unique_ptr<TfLiteDelegate, decltype(&armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete)>
+                        theArmnnDelegate(armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(delegateOptions),
+                                         armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete);
+
+    auto status = tfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+    CHECK(status == kTfLiteOk);
+    CHECK(tfLiteInterpreter != nullptr);
+}
 
 TEST_CASE ("DelegateOptions_OpaqueDelegateDefault")
 {
@@ -28,7 +111,7 @@ TEST_CASE ("DelegateOptions_OpaqueDelegateDefault")
     CHECK(builder);
 
     // Check Opaque delegate created
-    auto opaqueDelegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(&options);
+    auto opaqueDelegate = armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(options);
     CHECK(opaqueDelegate);
 
     // Check Opaque Delegate can be deleted
@@ -38,16 +121,27 @@ TEST_CASE ("DelegateOptions_OpaqueDelegateDefault")
 
 TEST_CASE ("DelegatePluginTest")
 {
-    // Use default settings until options have been enabled.
-    flatbuffers::FlatBufferBuilder flatBufferBuilder;
-    tflite::TFLiteSettingsBuilder tfliteSettingsBuilder(flatBufferBuilder);
-    flatbuffers::Offset<tflite::TFLiteSettings> tfliteSettings = tfliteSettingsBuilder.Finish();
-    flatBufferBuilder.Finish(tfliteSettings);
-    const tflite::TFLiteSettings* settings = flatbuffers::GetRoot<tflite::TFLiteSettings>(
-        flatBufferBuilder.GetBufferPointer());
+    const char* backends = "CpuRef";
+    bool fastmath = false;
+    const char* additional_parameters = "allow-expanded-dims=true";
+
+    flatbuffers::FlatBufferBuilder flatbuffer_builder;
+    flatbuffers::Offset<tflite::ArmNNSettings>
+            armnn_settings_offset = tflite::CreateArmNNSettingsDirect(flatbuffer_builder,
+                                                                      backends,
+                                                                      fastmath,
+                                                                      additional_parameters);
+
+    tflite::TFLiteSettingsBuilder tflite_settings_builder(flatbuffer_builder);
+    tflite_settings_builder.add_armnn_settings(armnn_settings_offset);
+    flatbuffers::Offset<tflite::TFLiteSettings> tflite_settings_offset = tflite_settings_builder.Finish();
+    flatbuffer_builder.Finish(tflite_settings_offset);
+
+    const tflite::TFLiteSettings* tflite_settings = flatbuffers::GetRoot<tflite::TFLiteSettings>(
+            flatbuffer_builder.GetBufferPointer());
 
     std::unique_ptr<tflite::delegates::DelegatePluginInterface> delegatePlugin =
-        tflite::delegates::DelegatePluginRegistry::CreateByName("armnn_delegate", *settings);
+        tflite::delegates::DelegatePluginRegistry::CreateByName("armnn_delegate", *tflite_settings);
 
     // Plugin is created correctly using armnn_delegate name.
     CHECK((delegatePlugin != nullptr));

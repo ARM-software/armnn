@@ -18,7 +18,7 @@ namespace armnnDelegate
 TEST_SUITE("ArmnnDelegate")
 {
 
-TEST_CASE ("ArmnnDelegate Registered")
+TEST_CASE ("ArmnnDelegate_Registered")
 {
     using namespace tflite;
     auto tfLiteInterpreter = std::make_unique<Interpreter>();
@@ -60,7 +60,7 @@ TEST_CASE ("ArmnnDelegate Registered")
     CHECK(tfLiteInterpreter != nullptr);
 }
 
-TEST_CASE ("ArmnnDelegateOptimizerOptionsRegistered")
+TEST_CASE ("ArmnnDelegate_OptimizerOptionsRegistered")
 {
     using namespace tflite;
     auto tfLiteInterpreter = std::make_unique<Interpreter>();

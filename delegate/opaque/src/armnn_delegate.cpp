@@ -258,12 +258,8 @@ TfLiteStatus DoPrepare(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueDelegate*
     return status;
 }
 
-TfLiteOpaqueDelegate* TfLiteArmnnOpaqueDelegateCreate(const void* settings)
+TfLiteOpaqueDelegate* TfLiteArmnnOpaqueDelegateCreate(armnnDelegate::DelegateOptions options)
 {
-    // This method will always create Opaque Delegate with default settings until
-    // we have a DelegateOptions Constructor which can parse the void* settings
-    armnn::IgnoreUnused(settings);
-    auto options = TfLiteArmnnDelegateOptionsDefault();
     auto* armnnDelegate = new ::armnnOpaqueDelegate::ArmnnOpaqueDelegate(options);
     return TfLiteOpaqueDelegateCreate(armnnDelegate->GetDelegateBuilder());
 }

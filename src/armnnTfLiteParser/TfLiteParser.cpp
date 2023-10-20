@@ -5125,7 +5125,6 @@ void TfLiteParserImpl::ParseSquaredDifference(size_t subgraphIndex, size_t opera
 
     TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
     TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
-    CheckMatchingQuantization(inputTensorInfo, input1TensorInfo, layerName, "Input 0", "Input 1");
 
     IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::SqDiff, layerName.c_str());
 
@@ -5136,7 +5135,6 @@ void TfLiteParserImpl::ParseSquaredDifference(size_t subgraphIndex, size_t opera
     }
 
     TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
-    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto inputTensorIndexes = AsUnsignedVector(GetInputTensorIds(m_Model, subgraphIndex, operatorIndex));

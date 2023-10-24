@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="0fa92b849fd4892a341a3cda5e2ff9092093f841" #10487: arm_gemm: Add SME2 FP16 GEMV using FP16->FP32 dot product.
+DEFAULT_CLFRAMEWORKREVISION="074b985f3855193bb47fb4055abb6b12f09f48d7" #FuseBatchNorm changes to enable fp16 in armv8a multi_isa builds
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -71,27 +71,24 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
     if (m_Params.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteOpaqueDelegate)
     {
 #if defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
-        // Use default settings until options have been enabled
-        flatbuffers::FlatBufferBuilder flatBufferBuilder;
-        TFLiteSettingsBuilder tfliteSettingsBuilder(flatBufferBuilder);
-        flatbuffers::Offset<TFLiteSettings> tfliteSettings = tfliteSettingsBuilder.Finish();
-        flatBufferBuilder.Finish(tfliteSettings);
-        const TFLiteSettings* settings =
-            flatbuffers::GetRoot<TFLiteSettings>(flatBufferBuilder.GetBufferPointer());
-
-        std::unique_ptr<delegates::DelegatePluginInterface> delegatePlugIn =
-            delegates::DelegatePluginRegistry::CreateByName("armnn_delegate", *settings);
-
-        // Create Armnn Opaque Delegate from Armnn Delegate Plugin
-        delegates::TfLiteDelegatePtr armnnDelegate = delegatePlugIn->Create();
-
-        // Add Delegate to the builder
-        builder.AddDelegate(armnnDelegate.get());
         if (builder(&m_TfLiteInterpreter) != kTfLiteOk)
         {
             LogAndThrow("Error loading the model into the TfLiteInterpreter.");
         }
+        // Populate a DelegateOptions from the ExecuteNetworkParams.
+        armnnDelegate::DelegateOptions delegateOptions = m_Params.ToDelegateOptions();
+        delegateOptions.SetRuntimeOptions(runtimeOptions);
+        std::unique_ptr<TfLiteDelegate, decltype(&armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete)>
+                theArmnnDelegate(armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateCreate(delegateOptions),
+                                 armnnOpaqueDelegate::TfLiteArmnnOpaqueDelegateDelete);
 
+        // Register armnn_delegate to TfLiteInterpreter
+        auto result = m_TfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
+        if (result != kTfLiteOk)
+        {
+            LogAndThrow("Could not register ArmNN TfLite Opaque Delegate to TfLiteInterpreter: " +
+                        TfLiteStatusToString(result) + ".");
+        }
 #else
         LogAndThrow("Not built with Arm NN Tensorflow-Lite opaque delegate support.");
 #endif

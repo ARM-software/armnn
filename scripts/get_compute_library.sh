@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="074b985f3855193bb47fb4055abb6b12f09f48d7" #FuseBatchNorm changes to enable fp16 in armv8a multi_isa builds
+DEFAULT_CLFRAMEWORKREVISION="72b7471955f32d2fccb170ab1ab40c7eecfa7f44" #Add check to disable dynamic bias with quantized datatypes in Conv2D layer
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -9,8 +9,6 @@
 
 #include <armnnUtils/TensorUtils.hpp>
 
-#include <armnn/utility/Assert.hpp>
-
 namespace armnn
 {
 
@@ -89,7 +87,25 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported target Data Type!");
+            throw InvalidArgumentException("Unsupported target Data Type!");
+            break;
+        }
+    }
+    return nullptr;
+}
+
+template<>
+inline std::unique_ptr<Encoder<double_t>> MakeEncoder(const TensorInfo& info, void* data)
+{
+    switch(info.GetDataType())
+    {
+        case armnn::DataType::Signed64:
+        {
+            return std::make_unique<Int64Encoder>(static_cast<int64_t*>(data));
+        }
+        default:
+        {
+            throw InvalidArgumentException("Cannot encode from double. Unsupported target Data Type!");
             break;
         }
     }
@@ -107,7 +123,7 @@ inline std::unique_ptr<Encoder<bool>> MakeEncoder(const TensorInfo& info, void* 
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Cannot encode from boolean. Not supported target Data Type!");
+            throw InvalidArgumentException("Cannot encode from boolean. Unsupported target Data Type!");
             break;
         }
     }
@@ -125,7 +141,7 @@ inline std::unique_ptr<Encoder<int32_t>> MakeEncoder(const TensorInfo& info, voi
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported Data Type!");
+            throw InvalidArgumentException("Cannot encode from int32. Unsupported Data Type!");
             break;
         }
     }

@@ -7,6 +7,7 @@
 
 #include <armnnUtils/TensorUtils.hpp>
 
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 namespace armnn

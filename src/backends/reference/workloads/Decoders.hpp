@@ -10,8 +10,6 @@
 #include <armnnUtils/FloatingPointConverter.hpp>
 #include <armnnUtils/TensorUtils.hpp>
 
-#include <armnn/utility/Assert.hpp>
-
 namespace armnn
 {
 
@@ -121,7 +119,25 @@ inline std::unique_ptr<Decoder<float>> MakeDecoder(const TensorInfo& info, const
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported Data Type!");
+            throw InvalidArgumentException("Unsupported target Data Type!");
+            break;
+        }
+    }
+    return nullptr;
+}
+
+template<>
+inline std::unique_ptr<Decoder<double_t>> MakeDecoder(const TensorInfo& info, const void* data)
+{
+    switch(info.GetDataType())
+    {
+        case DataType::Signed64:
+        {
+            return std::make_unique<Int64Decoder>(static_cast<const int64_t*>(data));
+        }
+        default:
+        {
+            throw InvalidArgumentException("Cannot decode to double. Unsupported origin Data Type!");
             break;
         }
     }
@@ -139,7 +155,7 @@ inline std::unique_ptr<Decoder<bool>> MakeDecoder(const TensorInfo& info, const 
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported Data Type!");
+            throw InvalidArgumentException("Cannot decode to bool. Unsupported origin Data Type!");
             break;
         }
     }
@@ -157,7 +173,7 @@ inline std::unique_ptr<Decoder<int32_t>> MakeDecoder(const TensorInfo& info, con
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "Unsupported Data Type!");
+            throw InvalidArgumentException("Cannot decode to int32. Unsupported origin Data Type!");
             break;
         }
     }

@@ -5,6 +5,8 @@
 
 #include <reference/workloads/Decoders.hpp>
 
+#include <armnn/utility/IgnoreUnused.hpp>
+
 #include <fmt/format.h>
 
 #include <doctest/doctest.h>

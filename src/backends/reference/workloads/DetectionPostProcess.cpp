@@ -6,6 +6,7 @@
 #include "DetectionPostProcess.hpp"
 
 #include <armnn/utility/Assert.hpp>
+#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 #include <algorithm>

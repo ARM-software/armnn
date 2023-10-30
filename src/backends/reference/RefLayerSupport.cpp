@@ -847,7 +847,7 @@ bool RefLayerSupport::IsCastSupported(const TensorInfo& input,
                                       const TensorInfo& output,
                                       Optional<std::string&> reasonIfUnsupported) const
 {
-    std::array<DataType, 9> supportedInputTypes =
+    std::array<DataType, 10> supportedInputTypes =
         {
                 DataType::Float32,
                 DataType::Float16,
@@ -855,7 +855,8 @@ bool RefLayerSupport::IsCastSupported(const TensorInfo& input,
                 DataType::QAsymmS8,
                 DataType::QAsymmU8,
                 DataType::QSymmS16,
-                DataType::Signed32
+                DataType::Signed32,
+                DataType::Signed64
         };
 
     bool supported = true;

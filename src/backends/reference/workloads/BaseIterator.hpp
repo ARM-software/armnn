@@ -7,7 +7,6 @@
 
 #include <armnn/TypesUtils.hpp>
 #include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnnUtils/FloatingPointConverter.hpp>
 #include <armnnUtils/TensorUtils.hpp>
@@ -45,9 +44,7 @@ public:
 
     virtual IType Get() const = 0;
 
-    virtual std::vector<float>
-    DecodeTensor(const TensorShape &tensorShape,
-                 bool isDepthwise = false) = 0;
+    virtual std::vector<float> DecodeTensor(const TensorShape &tensorShape, bool isDepthwise = false) = 0;
 };
 
 template<typename IType>
@@ -125,11 +122,8 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -162,11 +156,8 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -199,11 +190,8 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -236,11 +224,8 @@ public:
     {
         return armnn::Dequantize(*m_Iterator, m_Scale, m_Offset);
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -275,11 +260,8 @@ public:
         armnnUtils::FloatingPointConverter::ConvertFloat16To32(m_Iterator, 1, &val);
         return val;
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool ) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -311,10 +293,8 @@ public:
     {
         return *m_Iterator;
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
 
@@ -338,11 +318,8 @@ public:
     {
         return static_cast<float>(*m_Iterator) * m_Scale;
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -374,11 +351,8 @@ public:
     {
         return static_cast<float>(*m_Iterator);
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -406,11 +380,37 @@ public:
     {
         return *m_Iterator;
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
+        const unsigned int size = tensorShape.GetNumElements();
+        std::vector<float> decodedTensor;
+        decodedTensor.reserve(size);
 
+        for (uint32_t i = 0; i < size; ++i)
+        {
+            this->operator[](i);
+            decodedTensor.emplace_back(static_cast<float>(*m_Iterator));
+        }
+
+        return decodedTensor;
+    }
+};
+
+class Int64Decoder : public TypedIterator<const int64_t, Decoder<double_t>>
+{
+public:
+    Int64Decoder(const int64_t* data)
+            : TypedIterator(data) {}
+
+    Int64Decoder()
+            : Int64Decoder(nullptr) {}
+
+    double_t Get() const override
+    {
+        return static_cast<double_t>(*m_Iterator);
+    }
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
+    {
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -438,11 +438,8 @@ public:
     {
         return *m_Iterator;
     }
-    std::vector<float> DecodeTensor (const TensorShape& tensorShape,
-                                     const bool isDepthwise) override
+    std::vector<float> DecodeTensor (const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -471,11 +468,8 @@ public:
         return *m_Iterator;
     }
 
-    std::vector<float> DecodeTensor(const TensorShape& tensorShape,
-                                    const bool isDepthwise) override
+    std::vector<float> DecodeTensor(const TensorShape& tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);
@@ -668,6 +662,26 @@ public:
     }
 };
 
+class Int64Encoder : public TypedIterator<int64_t, Encoder<double>>
+{
+public:
+    Int64Encoder(int64_t* data)
+            : TypedIterator(data) {}
+
+    Int64Encoder()
+            : Int64Encoder(nullptr) {}
+
+    void Set(double right) override
+    {
+        *m_Iterator = static_cast<int64_t>(right);
+    }
+
+    double_t Get() const override
+    {
+        return static_cast<double>(*m_Iterator);
+    }
+};
+
 class BooleanEncoder : public TypedIterator<uint8_t, Encoder<bool>>
 {
 public:
@@ -797,11 +811,8 @@ public:
         return m_Scales[m_AxisIndex];
     }
 
-    std::vector<float> DecodeTensor(const TensorShape &tensorShape,
-                                    bool isDepthwise) override
+    std::vector<float> DecodeTensor(const TensorShape &tensorShape, const bool) override
     {
-        IgnoreUnused(isDepthwise);
-
         const unsigned int size = tensorShape.GetNumElements();
         std::vector<float> decodedTensor;
         decodedTensor.reserve(size);

@@ -220,6 +220,9 @@ TfLiteIntArray* Delegate::IdentifyOperatorsToDelegate(TfLiteContext* tfLiteConte
         {
             ARMNN_LOG(error) << "ArmNN Failed to visit node with error: " << ex.what();
             visitStatus = kTfLiteError;
+            TF_LITE_KERNEL_LOG(tfLiteContext,
+                               "Exception text: %s",
+                               ex.what());
         }
 
         if ( visitStatus != kTfLiteOk)

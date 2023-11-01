@@ -259,7 +259,7 @@ void RunSoftmaxProfilerJsonPrinterTest(const std::vector<armnn::BackendId>& back
     const armnn::BackendId& firstBackend = backends.at(0);
     if (firstBackend == armnn::Compute::GpuAcc)
     {
-        CHECK(result.find("OpenClKernelTimer/: softmax_layer_max_shift_exp_sum_quantized_serial GWS[,,]")
+        CHECK(result.find("OpenClKernelTimer/: softmax_x GWS[,,]")
                     != std::string::npos);
     }
     else if (firstBackend == armnn::Compute::CpuAcc)

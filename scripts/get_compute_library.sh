@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="72b7471955f32d2fccb170ab1ab40c7eecfa7f44" #Add check to disable dynamic bias with quantized datatypes in Conv2D layer
+DEFAULT_CLFRAMEWORKREVISION="704c22f1373e1276acb43c71e7e17048271bbc03" #10523: [GPU] Update Reverse layer to allow negative axis and reversed axis order
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

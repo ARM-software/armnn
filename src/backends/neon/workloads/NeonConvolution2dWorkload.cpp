@@ -47,12 +47,6 @@ arm_compute::Status NeonConvolution2dWorkloadValidate(const TensorInfo& input,
             return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
                                        "ArmNN NeonConvolution2dWorkload has empty bias value."};
         }
-        // There's currently a problem with non const bias, so we'll explicitly block it here.
-        if (!biases.value().IsConstant())
-        {
-            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
-                                        "ArmNN NeonConvolution2dWorkload does not support non constant bias."};
-        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         aclBiasesInfo.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiasesInfo = &aclBiasesInfo;

@@ -162,6 +162,8 @@ Delegate::Delegate(armnnDelegate::DelegateOptions options)
             else
             {
                 backends.push_back(backend);
+                TFLITE_LOG_PROD(tflite::TFLITE_LOG_INFO,
+                                     "TfLiteArmnnDelegate: Added backend %s", backend.Get().c_str());
             }
         }
     }

@@ -152,6 +152,8 @@ ArmnnOpaqueDelegate::ArmnnOpaqueDelegate(armnnDelegate::DelegateOptions options)
             else
             {
                 backends.push_back(backend);
+                TFLITE_LOG_PROD(tflite::TFLITE_LOG_INFO,
+                                 "TfLiteArmnnOpaqueDelegate: Added backend %s", backend.Get().c_str());
             }
         }
     }

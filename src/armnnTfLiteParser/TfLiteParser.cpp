@@ -3088,7 +3088,6 @@ void TfLiteParserImpl::ParsePrelu(size_t subgraphIndex, size_t operatorIndex)
     }
 
     armnn::TensorInfo outputTensorInfo = OutputTensorInfoFromInputs(subgraphIndex, operatorIndex, layer, 0, {0, 1});
-    CheckMatchingQuantization(inputTensorInfo, outputTensorInfo, layerName, "Input 0", "Output 0");
     layer->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
     auto outputTensorIndexes = AsUnsignedVector(GetOutputTensorIds(m_Model, subgraphIndex, operatorIndex));

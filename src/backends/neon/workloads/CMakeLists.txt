@@ -113,6 +113,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonReshapeWorkload.hpp
     NeonResizeWorkload.cpp
     NeonResizeWorkload.hpp
+    NeonReverseV2Workload.cpp
+    NeonReverseV2Workload.hpp
     NeonRsqrtWorkload.cpp
     NeonRsqrtWorkload.hpp
     NeonSinWorkload.cpp

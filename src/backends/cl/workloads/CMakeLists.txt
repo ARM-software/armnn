@@ -109,6 +109,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClReshapeWorkload.hpp
     ClResizeWorkload.cpp
     ClResizeWorkload.hpp
+    ClReverseV2Workload.cpp
+    ClReverseV2Workload.hpp
     ClRsqrtWorkload.cpp
     ClRsqrtWorkload.hpp
     ClSinWorkload.cpp

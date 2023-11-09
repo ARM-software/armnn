@@ -55,6 +55,7 @@
 #include "ClReduceWorkload.hpp"
 #include "ClReshapeWorkload.hpp"
 #include "ClResizeWorkload.hpp"
+#include "ClReverseV2Workload.hpp"
 #include "ClRsqrtWorkload.hpp"
 #include "ClSinWorkload.hpp"
 #include "ClSliceWorkload.hpp"

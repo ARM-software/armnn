@@ -295,6 +295,11 @@ public:
                            const ResizeDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
+    bool IsReverseV2Supported(const TensorInfo& input,
+                              const TensorInfo& axis,
+                              const TensorInfo& output,
+                              Optional<std::string&> reasonIfUnsupported) const;
+
     bool IsSliceSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           const SliceDescriptor& descriptor,

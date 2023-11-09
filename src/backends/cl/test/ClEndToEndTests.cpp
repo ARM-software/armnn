@@ -22,6 +22,7 @@
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ReverseV2EndToEndTestImpl.hpp>
 #include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -343,6 +344,12 @@ TEST_CASE("ClReshapeEndToEndTest")
 TEST_CASE("ClReshapeEndToEndTestFloat16")
 {
     ReshapeEndToEndFloat16<armnn::DataType::Float16>(clDefaultBackends);
+}
+
+// ReverseV2
+TEST_CASE("ClReverseV2EndToEndTest")
+{
+    ReverseV2EndToEnd<armnn::DataType::Float32>(clDefaultBackends);
 }
 
 // Space to depth

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -294,6 +294,11 @@ public:
                            const TensorInfo& output,
                            const ResizeDescriptor& descriptor,
                            Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
+    bool IsReverseV2Supported(const TensorInfo& input,
+                              const TensorInfo& axis,
+                              const TensorInfo& output,
+                              Optional<std::string&> reasonIfUnsupported) const;
 
     bool IsSliceSupported(const TensorInfo& input,
                           const TensorInfo& output,

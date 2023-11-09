@@ -70,6 +70,7 @@
 #include "workloads/ClReduceWorkload.hpp"
 #include "workloads/ClReshapeWorkload.hpp"
 #include "workloads/ClResizeWorkload.hpp"
+#include "workloads/ClReverseV2Workload.hpp"
 #include "workloads/ClRsqrtWorkload.hpp"
 #include "workloads/ClSinWorkload.hpp"
 #include "workloads/ClSliceWorkload.hpp"
@@ -571,6 +572,11 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
                                      infos[1],
                                      *(PolymorphicDowncast<const ResizeDescriptor*>(&descriptor)),
                                      reasonIfUnsupported);
+        case LayerType::ReverseV2:
+            return IsReverseV2Supported(infos[0],
+                                        infos[1],
+                                        infos[2],
+                                        reasonIfUnsupported);
         case LayerType::Shape:
             return LayerSupportBase::IsShapeSupported(infos[0],
                                                       infos[1],
@@ -1421,6 +1427,18 @@ bool ClLayerSupport::IsResizeSupported(const TensorInfo& input,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
     FORWARD_WORKLOAD_VALIDATE_FUNC(ClResizeWorkloadValidate, reasonIfUnsupported, input, output, descriptor);
+}
+
+bool ClLayerSupport::IsReverseV2Supported(const TensorInfo& input,
+                                          const TensorInfo& axis,
+                                          const TensorInfo& output,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClReverseV2WorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   axis,
+                                   output);
 }
 
 bool ClLayerSupport::IsSliceSupported(const TensorInfo& input,

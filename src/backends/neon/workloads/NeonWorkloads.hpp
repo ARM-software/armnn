@@ -59,6 +59,7 @@
 #include "NeonReduceWorkload.hpp"
 #include "NeonReshapeWorkload.hpp"
 #include "NeonResizeWorkload.hpp"
+#include "NeonReverseV2Workload.hpp"
 #include "NeonRsqrtWorkload.hpp"
 #include "NeonSinWorkload.hpp"
 #include "NeonSliceWorkload.hpp"

@@ -572,6 +572,11 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
             auto resizeQueueDescriptor = PolymorphicDowncast<const ResizeQueueDescriptor*>(&descriptor);
             return std::make_unique<NeonResizeWorkload>(*resizeQueueDescriptor, info);
         }
+        case LayerType::ReverseV2 :
+        {
+            auto reverseV2QueueDescriptor = PolymorphicDowncast<const ReverseV2QueueDescriptor*>(&descriptor);
+            return std::make_unique<NeonReverseV2Workload>(*reverseV2QueueDescriptor, info);
+        }
         case LayerType::Slice :
         {
             auto sliceQueueDescriptor = PolymorphicDowncast<const SliceQueueDescriptor*>(&descriptor);

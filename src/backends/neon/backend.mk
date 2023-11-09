@@ -77,6 +77,7 @@ BACKEND_SOURCES := \
         workloads/NeonReduceWorkload.cpp \
         workloads/NeonReshapeWorkload.cpp \
         workloads/NeonResizeWorkload.cpp \
+        workloads/NeonReverseV2Workload.cpp \
         workloads/NeonRsqrtWorkload.cpp \
         workloads/NeonSinWorkload.cpp \
         workloads/NeonSliceWorkload.cpp \

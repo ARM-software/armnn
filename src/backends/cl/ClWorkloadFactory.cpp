@@ -711,6 +711,11 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
             auto resizeQueueDescriptor = PolymorphicDowncast<const ResizeQueueDescriptor*>(&descriptor);
             return MakeWorkload<ClResizeWorkload>(*resizeQueueDescriptor, info, m_CLCompileContext);
         }
+        case LayerType::ReverseV2:
+        {
+            auto reverseV2QueueDescriptor = PolymorphicDowncast<const ReverseV2QueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClReverseV2Workload>(*reverseV2QueueDescriptor, info, m_CLCompileContext);
+        }
         case LayerType::Slice :
         {
             auto sliceQueueDescriptor = PolymorphicDowncast<const SliceQueueDescriptor*>(&descriptor);

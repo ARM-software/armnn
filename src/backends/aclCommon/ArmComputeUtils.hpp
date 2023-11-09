@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -282,20 +282,6 @@ inline int ComputeAclAxis(const int& armnnAxis, const armnn::TensorInfo& tensor)
     int aclAxis = sign * rank - 1  - armnnAxis;
 
     return aclAxis;
-}
-
-/// Function to convert axis to its positive equivalent value.
-/// [-rank, rank) --> [0, rank)
-inline unsigned int ComputePositiveAxis(const int& axis, const armnn::TensorInfo& tensor)
-{
-    int rank = static_cast<int>(tensor.GetNumDimensions());
-
-    ARMNN_ASSERT(rank != 0);
-    ARMNN_ASSERT((-1 * rank) <= axis);
-    ARMNN_ASSERT(axis < rank);
-
-    int positiveAxis = (axis < 0) ? rank + axis : axis;
-    return static_cast<unsigned int>(positiveAxis);
 }
 
 /// Utility function used to setup an arm_compute::Conv3dInfo object from convolution3d descriptor.

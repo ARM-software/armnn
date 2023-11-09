@@ -69,6 +69,7 @@
 #include "workloads/NeonReduceWorkload.hpp"
 #include "workloads/NeonReshapeWorkload.hpp"
 #include "workloads/NeonResizeWorkload.hpp"
+#include "workloads/NeonReverseV2Workload.hpp"
 #include "workloads/NeonRsqrtWorkload.hpp"
 #include "workloads/NeonSinWorkload.hpp"
 #include "workloads/NeonSliceWorkload.hpp"
@@ -582,6 +583,11 @@ bool IsLayerTypeSupported(const LayerType& type,
                                              infos[1],
                                              *(PolymorphicDowncast<const ReduceDescriptor*>(&descriptor)),
                                              reasonIfUnsupported);
+        case LayerType::ReverseV2:
+            return support.IsReverseV2Supported(infos[0],
+                                                infos[1],
+                                                infos[2],
+                                                reasonIfUnsupported);
         case LayerType::Shape:
             return support.IsShapeSupported(infos[0],
                                             infos[1],
@@ -1513,6 +1519,18 @@ bool NeonLayerSupport::IsResizeSupported(const TensorInfo& input,
                                    input,
                                    output,
                                    descriptor);
+}
+
+bool NeonLayerSupport::IsReverseV2Supported(const armnn::TensorInfo &input,
+                                            const armnn::TensorInfo &axis,
+                                            const armnn::TensorInfo &output,
+                                            Optional<std::string &> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonReverseV2WorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   axis,
+                                   output);
 }
 
 bool NeonLayerSupport::IsSliceSupported(const TensorInfo& input,

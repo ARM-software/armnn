@@ -38,7 +38,7 @@ namespace armnn
                                                                           inputs[0]->Map());
 
         std::unique_ptr<Decoder<int>> axisDecoder = MakeDecoder<int>(GetTensorInfo(inputs[1]),
-                                                                          inputs[1]->Map());
+                                                                     inputs[1]->Map());
 
         std::unique_ptr<Encoder<float>> outputEncoder = MakeEncoder<float>(GetTensorInfo(outputs[0]),
                                                                            outputs[0]->Map());

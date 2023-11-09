@@ -79,6 +79,7 @@ BACKEND_SOURCES := \
         workloads/ClReduceWorkload.cpp \
         workloads/ClReshapeWorkload.cpp \
         workloads/ClResizeWorkload.cpp \
+        workloads/ClReverseV2Workload.cpp \
         workloads/ClRsqrtWorkload.cpp \
         workloads/ClSinWorkload.cpp \
         workloads/ClSliceWorkload.cpp \

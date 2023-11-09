@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_08" # Release 23.08
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="4a9dbedfbfa66c2612c7461e60cd867b8aea825b" #10659: Update heuristic for MatMul Native U8
+#DEFAULT_CLFRAMEWORKREVISION="449af409bae38951730e860599001c81c83ec8ed" #10586: Fix Elementwise Division Dynamic Shape tests
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

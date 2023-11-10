@@ -31,6 +31,7 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     }
 
     const TfLiteOpaqueTensor* tfLiteInputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[0]);
+
     if (!IsValid(tfLiteContext, tfLiteInputTensor, operatorCode, nodeIndex))
     {
         return kTfLiteError;
@@ -63,14 +64,23 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_OPAQUE_SUPPORT_FUNC("DEQUANTIZE",
-                                          tfLiteContext,
-                                          IsDequantizeSupported,
-                                          delegateData.m_Backends,
-                                          isSupported,
-                                          setBackend,
-                                          inputTensorInfo,
-                                          outputTensorInfo);
+        // If this is a Dequantize with a Constant input then will be replaced by a Constant layer that contains the
+        // dequantized values during optimization so there's no need to check if it can be supported by the backend
+        if (IsConstantTensor(tfLiteInputTensor))
+        {
+            isSupported = true;
+        }
+        else
+        {
+            FORWARD_LAYER_OPAQUE_SUPPORT_FUNC("DEQUANTIZE",
+                                              tfLiteContext,
+                                              IsDequantizeSupported,
+                                              delegateData.m_Backends,
+                                              isSupported,
+                                              setBackend,
+                                              inputTensorInfo,
+                                              outputTensorInfo);
+        }
     };
 
     if (!delegateData.m_Network)

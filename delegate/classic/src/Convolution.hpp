@@ -56,7 +56,6 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     {
         return kTfLiteError;
     }
-
     const TfLiteTensor& tfLiteFilterTensor = tfLiteTensors[tfLiteNode->inputs->data[1]];
     if (!IsValid(tfLiteContext, tfLiteFilterTensor, operatorCode, nodeIndex))
     {
@@ -86,6 +85,7 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     if(biasEnabled)
     {
         const TfLiteTensor& tfLiteBiasTensor = tfLiteTensors[tfLiteNode->inputs->data[2]];
+
         if (!IsValid(tfLiteContext, tfLiteBiasTensor, operatorCode, nodeIndex))
         {
             return kTfLiteError;
@@ -115,6 +115,27 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
+        bool filterIsConst = filterTensorInfo.IsConstant();
+
+        if (!filterIsConst)
+        {
+            filterIsConst = WillInputBeOptimizedToConst(tfLiteContext, tfLiteNode->inputs->data[1]);
+        }
+        armnn::TensorInfo filterTensorInfoCopy(filterTensorInfo);
+        filterTensorInfoCopy.SetConstant(filterIsConst);
+        armnn::Optional<armnn::TensorInfo> optionalBiasInfoCopy(biasTensorInfo);
+
+        if (biasEnabled)
+        {
+            bool biasIsConst = biasTensorInfo.IsConstant();
+
+            if (!biasIsConst)
+            {
+                biasIsConst = WillInputBeOptimizedToConst(tfLiteContext, tfLiteNode->inputs->data[2]);
+            }
+            optionalBiasInfoCopy.value().SetConstant(biasIsConst);
+        }
+
         bool isSupported = false;
         FORWARD_LAYER_SUPPORT_FUNC("CONV2D",
                                    tfLiteContext,
@@ -125,8 +146,8 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
-                                   filterTensorInfo,
-                                   optionalBiasInfo);
+                                   filterTensorInfoCopy,
+                                   optionalBiasInfoCopy);
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
@@ -480,6 +501,28 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
     armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
+        bool filterIsConst = filterTensorInfo.IsConstant();
+
+        if (!filterIsConst)
+        {
+            filterIsConst = WillInputBeOptimizedToConst(tfLiteContext, tfLiteNode->inputs->data[1]);
+        }
+        armnn::TensorInfo filterTensorInfoCopy(filterTensorInfo);
+        filterTensorInfoCopy.SetConstant(filterIsConst);
+
+        armnn::Optional<armnn::TensorInfo> optionalBiasInfoCopy(biasTensorInfo);
+
+        if (biasEnabled)
+        {
+            bool biasIsConst = biasTensorInfo.IsConstant();
+
+            if (!biasIsConst)
+            {
+                biasIsConst = WillInputBeOptimizedToConst(tfLiteContext, tfLiteNode->inputs->data[2]);
+            }
+            optionalBiasInfoCopy.value().SetConstant(biasIsConst);
+        }
+
         bool isSupported = false;
         FORWARD_LAYER_SUPPORT_FUNC("DEPTHWISE_CONV2D",
                                    tfLiteContext,
@@ -490,8 +533,8 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
                                    inputTensorInfo,
                                    outputTensorInfo,
                                    descriptor,
-                                   filterTensorInfo,
-                                   armnn::Optional<armnn::TensorInfo>(biasTensorInfo));
+                                   filterTensorInfoCopy,
+                                   optionalBiasInfoCopy);
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 

@@ -21,5 +21,11 @@ TfLiteStatus ValidateFusedActivationOperator(DelegateData& delegateData,
                                              const armnn::TensorInfo& outputInfo,
                                              TfLiteFusedActivation activationType);
 
+TfLiteNode* GetNodeConnectedToInput(TfLiteContext* tfLiteContext,
+                                    int32_t& connectedIndex,
+                                    int32_t inputIdx);
+
+bool WillInputBeOptimizedToConst(TfLiteContext* tfLiteContext, int32_t inputIdx);
+
 } // namespace armnnDelegate
 

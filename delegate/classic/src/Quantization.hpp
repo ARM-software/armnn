@@ -23,7 +23,6 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
 {
     TF_LITE_ENSURE_STATUS(ValidateNumInputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
     TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
-
     const TfLiteTensor* tfLiteTensors = tfLiteContext->tensors;
     const TfLiteTensor& tfLiteInputTensor = tfLiteTensors[tfLiteNode->inputs->data[0]];
     if (IsDynamicTensor(tfLiteInputTensor))
@@ -34,7 +33,6 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
             tfLiteDequantizeOperatorCode, nodeIndex);
         return kTfLiteError;
     }
-
     const TfLiteTensor& tfLiteOutputTensor = tfLiteTensors[tfLiteNode->outputs->data[0]];
     if (IsDynamicTensor(tfLiteOutputTensor))
     {
@@ -54,14 +52,23 @@ TfLiteStatus VisitDequantizeOperator(DelegateData& delegateData,
     armnn::BackendId setBackend;
     auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo, bool& isSupported)
     {
-        FORWARD_LAYER_SUPPORT_FUNC("DEQUANTIZE",
-                                   tfLiteContext,
-                                   IsDequantizeSupported,
-                                   delegateData.m_Backends,
-                                   isSupported,
-                                   setBackend,
-                                   inputTensorInfo,
-                                   outputTensorInfo);
+        // If this is a Dequantize with a Constant input then will be replaced by a Constant layer that contains the
+        // dequantized values during optimization so there's no need to check if it can be supported by the backend
+        if (tflite::IsConstantTensor(&tfLiteInputTensor))
+        {
+            isSupported = true;
+        }
+        else
+        {
+            FORWARD_LAYER_SUPPORT_FUNC("DEQUANTIZE",
+                                       tfLiteContext,
+                                       IsDequantizeSupported,
+                                       delegateData.m_Backends,
+                                       isSupported,
+                                       setBackend,
+                                       inputTensorInfo,
+                                       outputTensorInfo);
+        }
     };
 
     if (!delegateData.m_Network)

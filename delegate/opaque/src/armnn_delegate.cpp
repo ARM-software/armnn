@@ -678,7 +678,10 @@ TfLiteStatus ArmnnSubgraph::Invoke(TfLiteOpaqueContext* tfLiteContext, TfLiteOpa
     }
     catch (armnn::InvalidArgumentException& ex)
     {
-        ARMNN_LOG(error) << "ArmNN Failed to EnqueueWorkload with error: " <<  ex.what();
+        std::stringstream exMessage;
+        exMessage << "ArmNN Failed to EnqueueWorkload with error: " <<  ex.what();
+        ARMNN_LOG(error) << exMessage.str();
+        TFLITE_LOG_PROD_ONCE(tflite::TFLITE_LOG_INFO, exMessage.str().c_str());
         // This should really be kTfLiteDelegateError but the Delegate Test Suite expects kTfLiteError so we return
         // that instead
         return kTfLiteError;

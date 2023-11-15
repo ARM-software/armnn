@@ -109,6 +109,7 @@ where N = batches, C = channels, H = height, W = width
        <li>ANEURALNETWORKS_RELU6
        <li>ANEURALNETWORKS_SQRT
        <li>ANEURALNETWORKS_TANH
+       <li>GELU
       </ul>
    <td>CpuRef
      <td>
@@ -407,6 +408,45 @@ where N = batches, C = channels, H = height, W = width
     <tr><td>All
     </table>
 <tr>
+  <td rowspan="3">BroadcastToLayer
+  <td rowspan="3" style="width:200px;"> Layer to broadcast a tensor to a given size.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+    <td>CpuRef
+      <td>
+          <ul>
+           <li>N/A
+          </ul>
+      <td>
+       <table>
+       <tr><th>
+       <tr><td>N/A
+       </table>
+  <tr>
+    <td>CpuAcc
+    <td>
+        <ul>
+         <li>N/A
+        </ul>
+    <td>
+      <table>
+      <tr><th>
+      <tr><td>N/A
+      </table>
+  <tr>
+    <td>GpuAcc
+    <td>
+        <ul>
+         <li>N/A
+        </ul>
+    <td>
+      <table>
+      <tr><th>
+      <tr><td>N/A
+      </table>
+  <tr>
   <td rowspan="3">CastLayer
   <td rowspan="3" style="width:200px;"> Layer to cast a tensor to a type.
   <td rowspan="3">
@@ -429,6 +469,7 @@ where N = batches, C = channels, H = height, W = width
        <tr><td>QASYMMU8
        <tr><td>QSYMMS16
        <tr><td>SIGNED32
+       <tr><td>SIGNED64
       </table>
 <tr>
   <td>CpuAcc
@@ -439,11 +480,12 @@ where N = batches, C = channels, H = height, W = width
   <td>
     <table>
     <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
     <tr><td>QASYMMS8
     <tr><td>QASYMMU8
-    <tr><td>FLOAT16
     <tr><td>SIGNED32
-    <tr><td>FLOAT32
+    <tr><td>SIGNED64
     </table>
 <tr>
   <td>GpuAcc
@@ -454,11 +496,12 @@ where N = batches, C = channels, H = height, W = width
   <td>
     <table>
     <tr><th>
+    <tr><td>FLOAT32
+    <tr><td>FLOAT16
     <tr><td>QASYMMS8
     <tr><td>QASYMMU8
     <tr><td>SIGNED32
-    <tr><td>FLOAT16
-    <tr><td>FLOAT32
+    <tr><td>SIGNED64
     </table>
 <tr>
   <td rowspan="3">ChannelShuffleLayer

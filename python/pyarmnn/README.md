@@ -69,8 +69,8 @@ PyArmNN can be distributed as a source package or a binary package (wheel).
 
 Binary package is platform dependent, the name of the package will indicate the platform it was built for, e.g.:
 
-* Linux x86 64bit machine: pyarmnn-33.0.0-cp36-cp36m-*linux_x86_64*.whl
-* Linux Aarch 64 bit machine: pyarmnn-33.0.0-cp36-cp36m-*linux_aarch64*.whl
+* Linux x86 64bit machine: pyarmnn-33.1.0-cp36-cp36m-*linux_x86_64*.whl
+* Linux Aarch 64 bit machine: pyarmnn-33.1.0-cp36-cp36m-*linux_aarch64*.whl
 
 The source package is platform independent but installation involves compilation of Arm NN python extension. You will need to have g++ compatible with C++ 14 standard and a python development library installed on the build machine.
 
@@ -110,7 +110,7 @@ $ pip show pyarmnn
 You can also verify it by running the following and getting output similar to below:
 ```bash
 $ python -c "import pyarmnn as ann;print(ann.GetVersion())"
-'33.0.0'
+'33.1.0'
 ```
 
 
@@ -148,7 +148,7 @@ $ pip show pyarmnn
 You can also verify it by running the following and getting output similar to below:
 ```bash
 $ python -c "import pyarmnn as ann;print(ann.GetVersion())"
-'33.0.0'
+'33.1.0'
 ```
 
 # PyArmNN API overview

@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 import os
 
-version_info = (33, 0, 0)
+version_info = (33, 1, 0)
 
 __dev_version_env = os.getenv("PYARMNN_DEV_VER", "")
 
@@ -24,7 +24,7 @@ def check_armnn_version(installed_armnn_version: str, expected_armnn_version: st
     """Compares expected Arm NN version and Arm NN version used to build the package.
 
     Args:
-        installed_armnn_version (str): Arm NN version used to generate the package (e.g. 33.0.0)
+        installed_armnn_version (str): Arm NN version used to generate the package (e.g. 33.1.0)
         expected_armnn_version (str): Expected Arm NN version
 
     Returns:

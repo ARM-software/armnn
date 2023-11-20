@@ -371,6 +371,7 @@ function PushBuildSourcesToBoard {
     adb push GatordMock /data/local/tmp/
     adb push libarmnnBasePipeServer.so /data/local/tmp/
     adb push libarmnnTestUtils.so /data/local/tmp/
+    adb push libarmnnTfLiteParser.so /data/local/tmp/
     adb push UnitTests /data/local/tmp/
     if [[ $DELEGATE == 1 ]]; then
         adb push ${WORKING_DIR}/armnn/build/delegate/DelegateUnitTests /data/local/tmp/

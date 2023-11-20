@@ -357,7 +357,7 @@ function BuildStandaloneDynamicBackend {
 
 # push sources to board
 function PushBuildSourcesToBoard {
-    echo "+++ Removing files and symbolic links from previous runs"
+    cd $WORKING_DIR/armnn/build
     adb start-server
     adb shell rm -rf /data/local/tmp/*
     echo "+++ Pushing sources to board"

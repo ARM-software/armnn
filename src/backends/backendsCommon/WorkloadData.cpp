@@ -1592,6 +1592,7 @@ void ResizeQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 

@@ -352,6 +352,30 @@ TEST_CASE("IsLayerSupportedTosaReferenceReshape")
     CHECK(supported);
 }
 
+TEST_CASE("IsLayerSupportedTosaReferenceResize")
+{
+    TensorShape inShape  = { 1, 720, 1280, 3 };
+    TensorShape outShape = { 1, 1080, 1920, 3 };
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
+
+    ResizeDescriptor descriptor;
+    descriptor.m_DataLayout = armnn::DataLayout::NHWC;
+    descriptor.m_TargetHeight = 1080;
+    descriptor.m_TargetWidth = 1920;
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Resize,
+                                                     {in, out},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
 TEST_CASE("IsLayerSupportedTosaReferenceReshapeUnsupported")
 {
     TensorShape inShape = {3,4};

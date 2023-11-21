@@ -11,6 +11,7 @@
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
@@ -143,6 +144,47 @@ TEST_CASE("TosaRefRsqrtEndtoEndTestFloat32")
 {
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends,
                                                              UnaryOperation::Rsqrt);
+}
+
+// Resize
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat32AlignCornersNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+}
+
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat32HalfPixelNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+}
+
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat16AlignCornersNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+}
+
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat16HalfPixelNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+}
+
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt8AlignCornersNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+}
+
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt8HalfPixelNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+}
+
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt16AlignCornersNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+}
+
+TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt16HalfPixelNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
 }
 
 // Slice

@@ -42,8 +42,14 @@ private:
         this->m_Data.m_Outputs[slot] = tensorHandle;
     }
 
+    template <typename T, typename Trunner>
+    void SetInput(TosaReference::IModelRunner& runner, std::string inputName, uint32_t inputIndex) const;
+
     template <typename T>
     void SetInput(TosaReference::IModelRunner& runner, std::string inputName, uint32_t inputIndex) const;
+
+    template <typename T, typename Trunner>
+    void GetOutput(TosaReference::IModelRunner& runner, std::string outputName, uint32_t outputIndex) const;
 
     template <typename T>
     void GetOutput(TosaReference::IModelRunner& runner, std::string outputName, uint32_t outputIndex) const;

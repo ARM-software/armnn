@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2019-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -37,7 +37,9 @@ armnn::INetworkPtr CreateResizeNetwork(const armnn::ResizeDescriptor& descriptor
 template<armnn::DataType ArmnnType>
 void ResizeEndToEnd(const std::vector<armnn::BackendId>& backends,
                     armnn::DataLayout dataLayout,
-                    armnn::ResizeMethod resizeMethod)
+                    armnn::ResizeMethod resizeMethod,
+                    bool alignCorners = false,
+                    bool halfPixel = false)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -64,6 +66,11 @@ void ResizeEndToEnd(const std::vector<armnn::BackendId>& backends,
        7.f, 8.f, 9.f
     };
 
+    if (alignCorners && halfPixel)
+    {
+        throw InvalidArgumentException("alignCorners and halfPixel cannot be true simultaneously ");
+    }
+
     std::vector<float> expectedOutputData;
     switch(resizeMethod)
     {
@@ -81,14 +88,42 @@ void ResizeEndToEnd(const std::vector<armnn::BackendId>& backends,
         }
         case ResizeMethod::NearestNeighbor:
         {
-            expectedOutputData =
+            if (alignCorners)
             {
-                1.f, 1.f, 2.f, 2.f, 3.f,
-                1.f, 1.f, 2.f, 2.f, 3.f,
-                4.f, 4.f, 5.f, 5.f, 6.f,
-                4.f, 4.f, 5.f, 5.f, 6.f,
-                7.f, 7.f, 8.f, 8.f, 9.f
-            };
+                expectedOutputData =
+                {
+                    1.f, 2.f, 2.f, 3.f, 3.f,
+                    4.f, 5.f, 5.f, 6.f, 6.f,
+                    4.f, 5.f, 5.f, 6.f, 6.f,
+                    7.f, 8.f, 8.f, 9.f, 9.f,
+                    7.f, 8.f, 8.f, 9.f, 9.f
+                };
+            }
+            else
+            {
+                if (halfPixel)
+                {
+                    expectedOutputData =
+                    {
+                        1.f, 1.f, 2.f, 3.f, 3.f,
+                        1.f, 1.f, 2.f, 3.f, 3.f,
+                        4.f, 4.f, 5.f, 6.f, 6.f,
+                        7.f, 7.f, 8.f, 9.f, 9.f,
+                        7.f, 7.f, 8.f, 9.f, 9.f
+                    };
+                }
+                else
+                {
+                    expectedOutputData =
+                    {
+                        1.f, 1.f, 2.f, 2.f, 3.f,
+                        1.f, 1.f, 2.f, 2.f, 3.f,
+                        4.f, 4.f, 5.f, 5.f, 6.f,
+                        4.f, 4.f, 5.f, 5.f, 6.f,
+                        7.f, 7.f, 8.f, 8.f, 9.f
+                    };
+                }
+            }
             break;
         }
         default:
@@ -102,6 +137,9 @@ void ResizeEndToEnd(const std::vector<armnn::BackendId>& backends,
     descriptor.m_TargetHeight = outputHeight;
     descriptor.m_Method       = resizeMethod;
     descriptor.m_DataLayout   = dataLayout;
+    descriptor.m_AlignCorners = alignCorners;
+    descriptor.m_HalfPixelCenters = halfPixel;
+
 
     // swizzle data if needed
     if (dataLayout == armnn::DataLayout::NHWC)
@@ -137,7 +175,9 @@ void ResizeBilinearEndToEnd(const std::vector<armnn::BackendId>& backends,
 
 template<armnn::DataType ArmnnType>
 void ResizeNearestNeighborEndToEnd(const std::vector<armnn::BackendId>& backends,
-                                   armnn::DataLayout dataLayout)
+                                   armnn::DataLayout dataLayout,
+                                   bool alignCorners = false,
+                                   bool halfPixel = false)
 {
-    ResizeEndToEnd<ArmnnType>(backends, dataLayout, armnn::ResizeMethod::NearestNeighbor);
+    ResizeEndToEnd<ArmnnType>(backends, dataLayout, armnn::ResizeMethod::NearestNeighbor, alignCorners, halfPixel);
 }

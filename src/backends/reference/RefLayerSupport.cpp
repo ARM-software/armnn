@@ -2381,13 +2381,14 @@ bool RefLayerSupport::IsResizeSupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
     bool supported = true;
-    std::array<DataType,6> supportedTypes =
+    std::array<DataType,7> supportedTypes =
     {
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 

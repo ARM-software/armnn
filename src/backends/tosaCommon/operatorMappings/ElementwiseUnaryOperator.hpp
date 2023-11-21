@@ -6,9 +6,6 @@
 #pragma once
 
 #include "TosaOperatorUtils.hpp"
-#include <Layer.hpp>
-
-#include <tosa_serialization_handler.h>
 
 using namespace armnn;
 using namespace tosa;

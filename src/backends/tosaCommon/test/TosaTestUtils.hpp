@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -125,16 +125,65 @@ inline void VerifyTosaAttribute(const BaseDescriptor& descriptor,
 
             break;
         }
+        case LayerType::Resize:
+        {
+            auto resizeDesc = PolymorphicDowncast<const ResizeDescriptor*>(&descriptor);
+            TosaResizeAttribute resizeAttribute(attribute);
+
+            // Check output shape
+            uint32_t outputHeight = resizeDesc->m_TargetHeight;
+            uint32_t outputWidth = resizeDesc->m_TargetWidth;
+
+            CHECK((outputShape.size() == 4));
+            if (resizeDesc->m_DataLayout == DataLayout::NHWC)
+            {
+                //Check output is not dynamic
+                CHECK((outputShape[1] > 0));
+                CHECK((outputShape[2] > 0));
+
+                CHECK((outputHeight == static_cast<uint32_t>(outputShape[1])));
+                CHECK((outputWidth == static_cast<uint32_t>(outputShape[2])));
+            }
+            else if (resizeDesc->m_DataLayout == DataLayout::NCHW)
+            {
+                //Check output is not dynamic
+                CHECK((outputShape[2] > 0));
+                CHECK((outputShape[3] > 0));
+
+                CHECK((outputHeight == static_cast<uint32_t>(outputShape[2])));
+                CHECK((outputWidth == static_cast<uint32_t>(outputShape[3])));
+            }
+            else
+            {
+                throw armnn::Exception("VerifyTosaAttribute: Invalid DataLayout in Resize.");
+            }
+
+            // Check Resize mode/method
+            if (resizeDesc->m_Method == ResizeMethod::NearestNeighbor)
+            {
+                CHECK((resizeAttribute.mode() == tosa::ResizeMode_NEAREST));
+            }
+            else if (resizeDesc->m_Method == ResizeMethod::Bilinear)
+            {
+                CHECK((resizeAttribute.mode() == tosa::ResizeMode_BILINEAR));
+            }
+            else
+            {
+                throw armnn::Exception("VerifyTosaAttribute: Unsupported Resize method.");
+            }
+
+            break;
+        }
         case LayerType::Slice:
         {
             auto sliceDesc = PolymorphicDowncast<const SliceDescriptor*>(&descriptor);
-            TosaSliceAttribute reshapeAttribute(attribute);
+            TosaSliceAttribute sliceAttribute(attribute);
 
             std::vector<int32_t> begin(sliceDesc->m_Begin.begin(), sliceDesc->m_Begin.end());
             std::vector<int32_t> size(sliceDesc->m_Size.begin(), sliceDesc->m_Size.end());
 
-            CHECK(begin == reshapeAttribute.start());
-            CHECK(size == reshapeAttribute.size());
+            CHECK(begin == sliceAttribute.start());
+            CHECK(size == sliceAttribute.size());
 
             CHECK(begin.size() == inputShape.size());
             CHECK(size.size() == inputShape.size());

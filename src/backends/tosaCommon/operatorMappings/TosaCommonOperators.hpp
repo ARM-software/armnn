@@ -13,6 +13,7 @@
 #include "ElementwiseUnaryOperator.hpp"
 #include "Pooling2DOperator.hpp"
 #include "ReshapeOperator.hpp"
+#include "ResizeOperator.hpp"
 #include "SliceOperator.hpp"
 #include "TransposeConv2dOperator.hpp"
 #include "TransposeOperator.hpp"

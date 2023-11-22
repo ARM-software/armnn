@@ -121,6 +121,16 @@ arm_compute::PadStrideInfo BuildArmComputePadStrideInfo(const Descriptor& descri
                                       arm_compute::DimensionRoundingType::FLOOR);
 }
 
+/// Utility function used to setup an arm_compute::Padding2D object from an armnn layer descriptor.
+template <typename Descriptor>
+arm_compute::Padding2D BuildArmComputePaddingInfo(const Descriptor &descriptor)
+{
+    return arm_compute::Padding2D(descriptor.m_PadLeft,
+                                  descriptor.m_PadRight,
+                                  descriptor.m_PadTop,
+                                  descriptor.m_PadBottom);
+}
+
 /// Utility function used to setup an arm_compute::CropInfo object from an ArmNN layer descriptor.
 template <typename Descriptor>
 arm_compute::CropInfo BuildArmComputeCropInfo(const Descriptor& descriptor, const unsigned int rank = 4)

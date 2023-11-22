@@ -1906,6 +1906,18 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
     profiler->EnableProfiling(options.GetProfilingEnabled());
 
+    // Some backends don't play well together. Check here before continuing.
+    {
+        std::set<BackendId> backendSet(backendPreferences.begin(), backendPreferences.end());
+        // GpuFsa cannot co-exist with GpuAcc.
+        if (backendSet.find("GpuFsa") != backendSet.end() &&
+            backendSet.find("GpuAcc") != backendSet.end())
+        {
+            throw InvalidArgumentException("The backends \"GpuAcc\" and \"GpuFsa\" cannot be specified "
+                                           "for the same optimized network.");
+        }
+    }
+
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer");
     if (backendPreferences.empty())
     {

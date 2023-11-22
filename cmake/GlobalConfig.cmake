@@ -11,6 +11,7 @@ option(ARMNN_SAMPLE_APPS_ENABLED "Build Sample ArmNN Applications" ON)
 option(BUILD_FOR_COVERAGE "Use no optimization and output .gcno and .gcda files" OFF)
 option(ARMCOMPUTENEON "Build with ARM Compute NEON support" OFF)
 option(ARMCOMPUTECL "Build with ARM Compute OpenCL support" OFF)
+option(ARMCOMPUTEGPUFSA "Build with GPU Dynamic Fusion Backend" OFF)
 option(ARMNNREF "Build with ArmNN reference support" ON)
 option(ARMNNTOSAREF "Build with TOSA reference support" OFF)
 option(PROFILING_BACKEND_STREAMLINE "Forward the armNN profiling events to DS-5/Streamline as annotations" OFF)
@@ -286,7 +287,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/profiling)
 # ARM Compute
 # Note that ARM Compute has a different folder layout depending on the branch but also on
 # whether it comes from a prepackaged archive (this is why we add several hints below)
-if(ARMCOMPUTENEON OR ARMCOMPUTECL)
+if(ARMCOMPUTENEON OR ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
     find_path(ARMCOMPUTE_INCLUDE arm_compute/core/CL/OpenCL.h
               PATHS ${ARMCOMPUTE_ROOT}/include
               PATHS ${ARMCOMPUTE_ROOT}/applications/arm_compute
@@ -343,7 +344,7 @@ if(ARMCOMPUTENEON)
 endif()
 
 # ARM Compute OpenCL backend
-if(ARMCOMPUTECL)
+if(ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
     # verify we have a valid flatbuffers include path
     find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
               HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
@@ -367,15 +368,22 @@ if(ARMCOMPUTECL)
 
     include_directories(SYSTEM ${OPENCL_INCLUDE})
 
-    # Add preprocessor definition for ARM Compute OpenCL
-    add_definitions(-DARMCOMPUTECL_ENABLED)
+    if(ARMCOMPUTECL)
+        # Add preprocessor definition for ARM Compute OpenCL
+        add_definitions(-DARMCOMPUTECL_ENABLED)
+    endif()
+
+    if(ARMCOMPUTEGPUFSA)
+        # Add preprocessor definition for ARM Compute OpenCL with Fusion
+        add_definitions(-DARMCOMPUTEGPUFSA_ENABLED)
+    endif()
 
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DARM_COMPUTE_DEBUG_ENABLED")
 endif()
 
 # Used by both Arm Compute backends, but should be added
 # to the search path after the system directories if necessary
-if(ARMCOMPUTENEON OR ARMCOMPUTECL)
+if(ARMCOMPUTENEON OR ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
     find_path(HALF_INCLUDE half/half.hpp)
     find_path(HALF_INCLUDE half/half.hpp
               PATHS ${ARMCOMPUTE_ROOT}/include

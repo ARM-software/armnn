@@ -523,7 +523,7 @@ install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(DIRECTORY profiling/common/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/armnn/profiling/common/include)
 install(DIRECTORY profiling/client/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/armnn/profiling/client/include)
 
-if(ARMCOMPUTENEON OR ARMCOMPUTECL)
+if(ARMCOMPUTENEON OR ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
     target_link_libraries(armnn PUBLIC ${ARMCOMPUTE_LIBRARIES})
 endif()
 

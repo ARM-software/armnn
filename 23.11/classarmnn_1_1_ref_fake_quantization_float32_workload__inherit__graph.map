@@ -1,0 +1,6 @@
+<map id="RefFakeQuantizationFloat32Workload" name="RefFakeQuantizationFloat32Workload">
+<area shape="rect" id="node1" title=" " alt="" coords="32,244,237,285"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_typed_workload.html" title=" " alt="" coords="5,155,264,196"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="7,80,262,107"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="91,5,178,32"/>
+</map>

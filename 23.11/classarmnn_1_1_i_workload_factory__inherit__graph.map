@@ -1,0 +1,9 @@
+<map id="IWorkloadFactory" name="IWorkloadFactory">
+<area shape="rect" id="node1" title=" " alt="" coords="5,81,140,108"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_ref_workload_factory.html" title=" " alt="" coords="231,5,383,32"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_tosa_ref_workload_factory.html" title=" " alt="" coords="216,56,397,83"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_workload_factory_base.html" title=" " alt="" coords="225,107,388,133"/>
+<area shape="rect" id="node7" href="$classsdb_1_1_sample_dynamic_workload_factory.html" title=" " alt="" coords="188,157,425,184"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_cl_workload_factory.html" title=" " alt="" coords="484,81,627,108"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_neon_workload_factory.html" title=" " alt="" coords="473,132,637,159"/>
+</map>

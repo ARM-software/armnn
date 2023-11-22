@@ -1,0 +1,6 @@
+<map id="SampleDynamicAdditionWorkload" name="SampleDynamicAdditionWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="5,261,249,288"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="23,171,231,212"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="79,5,165,32"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="144,81,399,108"/>
+</map>

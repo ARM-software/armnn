@@ -78,7 +78,8 @@ install_apt_packages()
       scons \
       unzip \
       wget \
-      xxd
+      xxd  \
+      llvm
 
   # Install cross compile toolchains if host is x86_64
   if [ "$HOST_ARCH" == "x86_64" ]; then

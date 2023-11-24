@@ -43,7 +43,7 @@ build_acl()
       ;;
 
     "android64")
-      compile_flags+="$AARCH64_COMPILER_FLAGS"
+      compile_flags+="$ANDROID64_COMPILER_FLAGS"
       acl_arch="arch=arm64-v8a"
       ;;
 
@@ -63,12 +63,12 @@ build_acl()
 
   if [ "$TARGET_ARCH" == "android64" ]; then
     eval "$compile_flags" \
-    scons toolchain_prefix=llvm- \
-      compiler_prefix=aarch64-linux-android$ANDROID_API_VERSION- \
+    scons toolchain_prefix=llvm- compiler_prefix="" \
       "$acl_arch" \
       "$acl_params" \
+      build_dir="$ACL_BUILD_TARGET" \
       "$extra_cxx_flags" \
-      os=android -j "$NUM_THREADS"
+      build=cross_compile os=android
   else
     eval "$compile_flags" \
     scons "$native_flag" \

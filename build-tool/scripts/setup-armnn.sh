@@ -128,8 +128,11 @@ build_flatbuffers()
 
   if [ "$native_build" -eq 0 ]; then
     mkdir -p "$FLATBUFFERS_BUILD_TARGET"
-    if [ "$TARGET_ARCH" == "aarch64" ] || [ "$TARGET_ARCH" == "android64" ]; then
+    if [ "$TARGET_ARCH" == "aarch64" ]; then
       cmake_flags+="$AARCH64_COMPILER_FLAGS"
+    fi
+    if [ "$TARGET_ARCH" == "android64" ]; then
+      cmake_flags+="$ANDROID64_COMPILER_FLAGS"
     fi
   else
     target_arch="$HOST_ARCH"
@@ -200,7 +203,7 @@ build_tflite()
       fi
       ;;
     "android64")
-      cmake_flags+="$AARCH64_COMPILER_FLAGS"
+      cmake_flags+="$ANDROID64_COMPILER_FLAGS"
       if [ "$NATIVE_BUILD" -eq 0 ]; then
         target_arch_cmd="-DCMAKE_TOOLCHAIN_FILE=$NDK_SRC/build/cmake/android.toolchain.cmake \
                          -DANDROID_ABI=$ANDROID_ARM_ARCH \

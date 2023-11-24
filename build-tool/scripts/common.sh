@@ -45,8 +45,8 @@ NDK_SRC="$SOURCE_DIR"/android-ndk-r"$NDK_VERSION"
 # ANDROID
 ANDROID_API_VERSION=30
 ANDROID_ARM_ARCH="arm64-v8a"
-ANDROID64_x86_TOOLCHAIN+="$NDK_SRC/toolchains/llvm/prebuilt/linux-x86_64"
-ANDROID64_COMPILER_FLAGS+="CC="$ANDROID64_x86_TOOLCHAIN"/bin/aarch64-linux-android"$ANDROID_API_VERSION"-clang \
+ANDROID64_x86_TOOLCHAIN="$NDK_SRC/toolchains/llvm/prebuilt/linux-x86_64/"
+ANDROID64_COMPILER_FLAGS="CC="$ANDROID64_x86_TOOLCHAIN"/bin/aarch64-linux-android"$ANDROID_API_VERSION"-clang \
                            CXX="$ANDROID64_x86_TOOLCHAIN"/bin/aarch64-linux-android"$ANDROID_API_VERSION"-clang++ "
 
 # Flatbuffers

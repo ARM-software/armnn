@@ -314,33 +314,21 @@ if(ARMCOMPUTENEON OR ARMCOMPUTECL)
                      PATHS ${ARMCOMPUTE_BUILD_DIR}
                      PATH_SUFFIXES "Release"
                      NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-        find_library(ARMCOMPUTE_CORE_LIBRARY_DEBUG NAMES arm_compute_core-static
-                     PATHS ${ARMCOMPUTE_BUILD_DIR}
-                     PATH_SUFFIXES "Debug"
-                     NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-        find_library(ARMCOMPUTE_CORE_LIBRARY_RELEASE NAMES arm_compute_core-static
-                     PATHS ${ARMCOMPUTE_BUILD_DIR}
-                     PATH_SUFFIXES "Release"
-                     NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
         # In case it wasn't there, try a default search (will work in cases where
         # the library has been installed into a standard location)
         find_library(ARMCOMPUTE_LIBRARY_DEBUG NAMES arm_compute-static)
         find_library(ARMCOMPUTE_LIBRARY_RELEASE NAMES arm_compute-static)
-        find_library(ARMCOMPUTE_CORE_LIBRARY_DEBUG NAMES arm_compute_core-static)
-        find_library(ARMCOMPUTE_CORE_LIBRARY_RELEASE NAMES arm_compute_core-static)
 
         # In case it wasn't there, try the dynamic libraries
         # This case will get used in a linux setup where the Compute Library
         # has been installed in a standard system library path as a dynamic library
         find_library(ARMCOMPUTE_LIBRARY_DEBUG NAMES arm_compute)
         find_library(ARMCOMPUTE_LIBRARY_RELEASE NAMES arm_compute)
-        find_library(ARMCOMPUTE_CORE_LIBRARY_DEBUG NAMES arm_compute_core)
-        find_library(ARMCOMPUTE_CORE_LIBRARY_RELEASE NAMES arm_compute_core)
 
         set(ARMCOMPUTE_LIBRARIES
-            debug ${ARMCOMPUTE_LIBRARY_DEBUG} ${ARMCOMPUTE_CORE_LIBRARY_DEBUG}
-            optimized ${ARMCOMPUTE_LIBRARY_RELEASE} ${ARMCOMPUTE_CORE_LIBRARY_RELEASE} )
+            debug ${ARMCOMPUTE_LIBRARY_DEBUG}
+            optimized ${ARMCOMPUTE_LIBRARY_RELEASE} )
     endif()
 endif()
 

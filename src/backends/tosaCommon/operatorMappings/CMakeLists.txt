@@ -1,9 +1,11 @@
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 list(APPEND armnnTosaBackendOperators_sources
+        ActivationOperator.hpp
+        ActivationOperator.cpp
         AvgPool2DIgnoreValueOperator.hpp
         AvgPool2DIgnoreValueOperator.cpp
         ConcatOperator.hpp
@@ -29,6 +31,7 @@ list(APPEND armnnTosaBackendOperators_sources
         SplitOperator.hpp
         SplitOperator.cpp
         TosaOperatorUtils.hpp
+        TosaRescaleOperatorUtils.hpp
         TransposeConv2dOperator.hpp
         TransposeConv2dOperator.cpp
         TransposeOperator.hpp

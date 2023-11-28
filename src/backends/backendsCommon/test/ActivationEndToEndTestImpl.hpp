@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -162,6 +162,33 @@ void HardSwishEndToEndTest(const std::vector<BackendId>& backends)
     armnn::TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
 
     armnn::ActivationDescriptor descriptor(ActivationFunction::HardSwish, 1.0);
+
+    ActivationEndToEndImpl<ArmnnType>(backends,
+                                      floatInputData,
+                                      floatExpectedOutputData,
+                                      inputInfo,
+                                      outputInfo,
+                                      descriptor);
+}
+
+/** Executes an end to end test for Leaky Relu activation with specific input and expected-output data
+ *
+ * @tparam ArmnnType  The armnn data type for the input and expected-output data
+ * @param backends  The backends on which to run the test
+ */
+template<armnn::DataType ArmnnType>
+void LeakyReluEndToEndTest(const std::vector<BackendId>& backends, const float qScale=1.0f, const int32_t qOffset=0)
+{
+    std::vector<float> floatInputData{ -2.0f, -1.0f, -0.0f, 0.0f,
+                                        1.0f,  2.0f,  3.0f, 4.0f };
+
+    std::vector<float> floatExpectedOutputData{ -0.02f, -0.01f, -0.0f, 0.0f,
+                                                 1.0f,   2.0f,   3.0f, 4.0f };
+
+    armnn::TensorInfo inputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset, true);
+    armnn::TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
+
+    armnn::ActivationDescriptor descriptor(ActivationFunction::LeakyReLu, static_cast<float>(0.01));
 
     ActivationEndToEndImpl<ArmnnType>(backends,
                                       floatInputData,

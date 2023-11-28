@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -23,6 +23,18 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
 {
     switch (type)
     {
+        case LayerType::Activation:
+        {
+            auto activationDesc = PolymorphicDowncast<const ActivationDescriptor*>(&descriptor);
+            if (activationDesc->m_Function == ActivationFunction::LeakyReLu)
+            {
+                return ConvertActivationToTosaOperator(layer, inputs, outputs, activationDesc);
+            }
+            else
+            {
+                return CreateEmptyTosaSerializationBasicBlock();
+            }
+        }
         case LayerType::Addition:
         case LayerType::Multiplication:
         case LayerType::Subtraction:

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1042,6 +1042,32 @@ TEST_CASE("RefHardSwishEndToEndTestQAsymmU8")
 TEST_CASE("RefHardSwishEndToEndTestQSymmS16")
 {
     HardSwishEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+// LeakyRelu
+TEST_CASE("RefLeakyReluActivationFloat32")
+{
+    LeakyReluEndToEndTest<DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefLeakyReluActivationFloat16")
+{
+    LeakyReluEndToEndTest<DataType::Float16>(defaultBackends, 0.3f, 5);
+}
+
+TEST_CASE("RefLeakyReluActivationInt8")
+{
+    LeakyReluEndToEndTest<DataType::QAsymmS8>(defaultBackends, 0.6f, 7);
+}
+
+TEST_CASE("RefLeakyReluActivationUInt8")
+{
+    LeakyReluEndToEndTest<DataType::QAsymmU8>(defaultBackends, 0.12f, 15);
+}
+
+TEST_CASE("RefLeakyReluActivationInt16")
+{
+    LeakyReluEndToEndTest<DataType::QSymmS16>(defaultBackends, 0.15f, 55);
 }
 
 // LogSoftmax

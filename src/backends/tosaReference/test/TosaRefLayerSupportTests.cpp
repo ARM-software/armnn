@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -285,6 +285,46 @@ TEST_CASE("IsLayerSupportedTosaReferenceAvgPooling2d_IgnoreValue")
                                                      reasonIfNotSupported);
 
     CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceLeakyReLuActivation")
+{
+    TensorInfo inputInfo1({1,1,3,4}, DataType::Float32);
+    TensorInfo inputInfo2({1,1,3,4}, DataType::Float32);
+    TensorInfo outputInfo({1,1,3,4}, DataType::Float32);
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::LeakyReLu;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Activation,
+                                                     {inputInfo1, inputInfo2, outputInfo},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceActivationUnsupported")
+{
+    TensorInfo inputInfo1({1,1,3,4}, DataType::Float32);
+    TensorInfo inputInfo2({1,1,3,4}, DataType::Float32);
+    TensorInfo outputInfo({1,1,3,4}, DataType::Float32);
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::HardSwish;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Activation,
+                                                     {inputInfo1, inputInfo2, outputInfo},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceMaxPooling2dUnsupported")

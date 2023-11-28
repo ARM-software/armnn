@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -34,6 +34,10 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
 
     switch (type)
     {
+        case LayerType::Activation:
+            inputInfos.push_back(&infos[0]);
+            outputInfos.push_back(&infos[1]);
+            break;
         case LayerType::Input:
         case LayerType::Output:
             return true;

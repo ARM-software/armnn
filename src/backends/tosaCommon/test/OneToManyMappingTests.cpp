@@ -1,12 +1,12 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "AvgPool2DIgnoreValueChecker.hpp"
 #include "QuantizeChecker.hpp"
 #include "SplitChecker.hpp"
-
+#include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
 #include <armnn/IRuntime.hpp>
 
 using namespace armnn;
@@ -189,5 +189,53 @@ TEST_CASE("GetTosaMappingFromLayer_SplitLayer")
                 inShape,
                 outShape,
                 descriptor);
+}
+
+// Activation
+
+static std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
+
+TEST_CASE("GetTosaMapping_ActivationFloat32")
+{
+    LeakyReluEndToEndTest<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("GetTosaMapping_ActivationFloat16")
+{
+    try
+    {
+        LeakyReluEndToEndTest<DataType::Float16>(tosaDefaultBackends);
+    }
+    catch (armnn::Exception& e)
+    {
+        CHECK_EQ(std::string(e.what()), "Failed to assign a backend to each layer");
+    }
+}
+
+TEST_CASE("GetTosaMapping_ActivationInt32")
+{
+    LeakyReluEndToEndTest<DataType::Signed32>(tosaDefaultBackends, 0.15f, 0);
+}
+
+TEST_CASE("GetTosaMapping_ActivationInt16")
+{
+    LeakyReluEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, 0.35f, 0);
+}
+
+TEST_CASE("GetTosaMapping_ActivationInt8")
+{
+    LeakyReluEndToEndTest<DataType::QSymmS8>(tosaDefaultBackends, 0.75f, 0);
+}
+
+TEST_CASE("GetTosaMapping_ActivationUInt8")
+{
+    try
+    {
+        LeakyReluEndToEndTest<DataType::QAsymmU8>(tosaDefaultBackends);
+    }
+    catch (armnn::Exception& e)
+    {
+        CHECK_EQ(std::string(e.what()), "Failed to assign a backend to each layer");
+    }
 }
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,6 +12,7 @@
 #include "common/include/ProfilingGuid.hpp"
 
 #include <tosa_serialization_handler.h>
+#include <version.h>
 
 using namespace armnn;
 using namespace tosa;
@@ -355,7 +356,6 @@ inline std::vector<uint8_t> ConvertConstantTensorDataToBuffer(const std::shared_
     return uint8Data;
 }
 
-
 inline std::vector<uint8_t> CreateConstTosaData(const void* value,
                                                 DType dtype,
                                                 const std::vector<int32_t>& shape)
@@ -453,3 +453,9 @@ inline void CreateConstTosaOperator(const std::string& outputName,
     tensor = new TosaSerializationTensor(outputName, shape, dtype, uint8Data);
     ARMNN_THROW_MSG_IF_FALSE(tensor, armnn::Exception, "CreateConstTosaOperator: failed to created tensor");
 }
+
+// Macro to conditionally compile Tosa code
+#define TOSA_FWD_COMPAT_VERSION(_major, _minor, _patch) \
+        (TOSA_REFERENCE_MODEL_VERSION_MAJOR >= _major) && \
+        (TOSA_REFERENCE_MODEL_VERSION_MINOR >= _minor) && \
+        (TOSA_REFERENCE_MODEL_VERSION_PATCH >= _patch)

@@ -25,7 +25,7 @@
 
 TEST_SUITE("TosaRefEndToEnd")
 {
-std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
+static std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
 
 // Addition
 TEST_CASE("TosaRefAdditionEndtoEndTestFloat32")

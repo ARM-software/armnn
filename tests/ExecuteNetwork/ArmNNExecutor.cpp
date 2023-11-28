@@ -212,6 +212,10 @@ void ArmNNExecutor::ExecuteSync()
 
 std::vector<const void*> ArmNNExecutor::Execute()
 {
+    ARMNN_LOG(info) << "Inferences began at: "
+        << std::chrono::duration_cast<std::chrono::nanoseconds>(armnn::GetTimeNow().time_since_epoch()).count()
+        << " ns\n";
+
     if(m_Params.m_ThreadPoolSize == 0)
     {
         ExecuteSync();
@@ -220,6 +224,11 @@ std::vector<const void*> ArmNNExecutor::Execute()
     {
         ExecuteAsync();
     }
+
+    ARMNN_LOG(info) << "Inferences ended at: "
+        << std::chrono::duration_cast<std::chrono::nanoseconds>(armnn::GetTimeNow().time_since_epoch()).count()
+        << " ns\n";
+
     std::vector<const void*> results;
     for (auto& output : m_OutputStorage)
     {

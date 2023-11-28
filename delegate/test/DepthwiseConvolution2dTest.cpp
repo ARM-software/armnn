@@ -18,7 +18,7 @@
 namespace armnnDelegate
 {
 
-void DepthwiseConv2dValidReluFp32Test(std::vector<armnn::BackendId>& backends)
+void DepthwiseConv2dValidReluFp32Test()
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 2, 2 };
@@ -60,7 +60,6 @@ void DepthwiseConv2dValidReluFp32Test(std::vector<armnn::BackendId>& backends)
                            1, // dilationY
                            padding,
                            tflite::ActivationFunctionType_RELU,
-                           backends,
                            inputShape,
                            filterShape,
                            outputShape,
@@ -80,7 +79,7 @@ void DepthwiseConv2dValidReluFp32Test(std::vector<armnn::BackendId>& backends)
                            depth_multiplier);
 }
 
-void DepthwiseConv2dSameUint8Test(std::vector<armnn::BackendId>& backends)
+void DepthwiseConv2dSameUint8Test()
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 3, 1 };
@@ -116,7 +115,6 @@ void DepthwiseConv2dSameUint8Test(std::vector<armnn::BackendId>& backends)
                                       1, // dilationY
                                       padding,
                                       tflite::ActivationFunctionType_NONE,
-                                      backends,
                                       inputShape,
                                       filterShape,
                                       outputShape,
@@ -200,7 +198,6 @@ void DepthwiseConv2dSameInt8PerChannelTest(std::vector<armnn::BackendId>& backen
                                       1, // dilationY
                                       padding,
                                       tflite::ActivationFunctionType_NONE,
-                                      backends,
                                       inputShape,
                                       filterShape,
                                       outputShape,
@@ -218,64 +215,30 @@ void DepthwiseConv2dSameInt8PerChannelTest(std::vector<armnn::BackendId>& backen
                                       inputScale,
                                       0,
                                       depth_multiplier,
-                                      filterQuantizationDim);
+                                      filterQuantizationDim,
+                                      backends);
 }
 
-TEST_SUITE("DepthwiseConv2d_CpuRef_Tests")
+TEST_SUITE("DepthwiseConv2d_Tests")
 {
 
-TEST_CASE ("DepthwiseConv2d_Valid_Relu_Fp32_CpuRef_Test")
+TEST_CASE ("DepthwiseConv2d_Valid_Relu_Fp32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    DepthwiseConv2dValidReluFp32Test(backends);
+    DepthwiseConv2dValidReluFp32Test();
 }
 
-TEST_CASE ("DepthwiseConv2d_Same_Uint8_CpuRef_Test")
+TEST_CASE ("DepthwiseConv2d_Same_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    DepthwiseConv2dSameUint8Test(backends);
+    DepthwiseConv2dSameUint8Test();
 }
 
 TEST_CASE ("DepthwiseConv2d_Same_Int8_PerChannelQuantization_CpuRef_Test")
 {
+    // Only works on CpuRef.
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     DepthwiseConv2dSameInt8PerChannelTest(backends);
 }
 
-}//End of TEST_SUITE("DepthwiseConv2d_CpuRef_Tests")
-
-TEST_SUITE("DepthwiseConv2d_CpuAcc_Tests")
-{
-
-TEST_CASE ("DepthwiseConv2d_Valid_Relu_Fp32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    DepthwiseConv2dValidReluFp32Test(backends);
-}
-
-TEST_CASE ("DepthwiseConv2d_Same_Uint8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    DepthwiseConv2dSameUint8Test(backends);
-}
-
-}//End of TEST_SUITE("DepthwiseConv2d_CpuAcc_Tests")
-
-TEST_SUITE("DepthwiseConv2d_GpuAcc_Tests")
-{
-
-TEST_CASE ("DepthwiseConv2d_Valid_Relu_Fp32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    DepthwiseConv2dValidReluFp32Test(backends);
-}
-
-TEST_CASE ("DepthwiseConv2d_Same_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    DepthwiseConv2dSameUint8Test(backends);
-}
-
-}//End of TEST_SUITE("DepthwiseConv2d_GpuAcc_Tests")
+}//End of TEST_SUITE("DepthwiseConv2d_Tests")
 
 } // namespace armnnDelegate

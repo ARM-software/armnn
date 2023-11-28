@@ -201,7 +201,6 @@ void ConvolutionTest(tflite::BuiltinOperator convolutionOperatorCode,
                      uint32_t dilationY,
                      tflite::Padding padding,
                      tflite::ActivationFunctionType fused_activation_function,
-                     std::vector<armnn::BackendId>& backends,
                      std::vector<int32_t>& inputShape,
                      std::vector<int32_t>& filterShape,
                      std::vector<int32_t>& outputShape,
@@ -219,8 +218,8 @@ void ConvolutionTest(tflite::BuiltinOperator convolutionOperatorCode,
                      float quantScale = 1.0f,
                      int quantOffset = 0,
                      int32_t depth_multiplier = 1,
-                     int32_t filterQuantizationDim = 3)
-
+                     int32_t filterQuantizationDim = 3,
+                     const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
 
@@ -259,7 +258,7 @@ void ConvolutionTest(tflite::BuiltinOperator convolutionOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
@@ -437,7 +436,6 @@ void Convolution3dTest(tflite::BuiltinOperator convolutionOperatorCode,
                        std::vector<uint32_t> dilation,
                        tflite::Padding padding,
                        tflite::ActivationFunctionType fused_activation_function,
-                       std::vector<armnn::BackendId>& backends,
                        std::vector<int32_t>& inputShape,
                        std::vector<int32_t>& filterShape,
                        std::vector<int32_t>& outputShape,
@@ -455,7 +453,8 @@ void Convolution3dTest(tflite::BuiltinOperator convolutionOperatorCode,
                        float quantScale = 1.0f,
                        int quantOffset = 0,
                        int32_t depth_multiplier = 1,
-                       int32_t filterQuantizationDim = 3)
+                       int32_t filterQuantizationDim = 3,
+                       const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
 
@@ -492,7 +491,7 @@ void Convolution3dTest(tflite::BuiltinOperator convolutionOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
@@ -631,8 +630,7 @@ std::vector<char> CreateTransposeConvTfLiteModel(tflite::TensorType tensorType,
 }
 
 template <typename T>
-void TransposeConvTest(std::vector<armnn::BackendId>& backends,
-                       tflite::TensorType tensorType,
+void TransposeConvTest(tflite::TensorType tensorType,
                        uint32_t strideX,
                        uint32_t strideY,
                        tflite::Padding padding,
@@ -649,7 +647,8 @@ void TransposeConvTest(std::vector<armnn::BackendId>& backends,
                        float outputQuantScale = 1.0f,
                        int outputQuantOffset = 0,
                        float quantScale = 1.0f,
-                       int quantOffset = 0)
+                       int quantOffset = 0,
+                       const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
 
@@ -681,7 +680,7 @@ void TransposeConvTest(std::vector<armnn::BackendId>& backends,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 2) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

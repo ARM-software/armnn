@@ -150,7 +150,6 @@ std::vector<char> CreateBatchSpaceTfLiteModel(tflite::BuiltinOperator batchSpace
 template <typename T>
 void BatchSpaceTest(tflite::BuiltinOperator controlOperatorCode,
                     tflite::TensorType tensorType,
-                    std::vector<armnn::BackendId>& backends,
                     std::vector<int32_t>& inputShape,
                     std::vector<int32_t>& expectedOutputShape,
                     std::vector<T>& inputValues,
@@ -158,7 +157,8 @@ void BatchSpaceTest(tflite::BuiltinOperator controlOperatorCode,
                     std::vector<std::pair<unsigned int, unsigned int>>& cropsPaddingValues,
                     std::vector<T>& expectedOutputValues,
                     float quantScale = 1.0f,
-                    int quantOffset  = 0)
+                    int quantOffset  = 0,
+                    const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateBatchSpaceTfLiteModel(controlOperatorCode,
@@ -179,7 +179,7 @@ void BatchSpaceTest(tflite::BuiltinOperator controlOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

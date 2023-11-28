@@ -92,10 +92,10 @@ std::vector<char> CreateActivationTfLiteModel(tflite::BuiltinOperator activation
 }
 
 void ActivationTest(tflite::BuiltinOperator activationOperatorCode,
-                    std::vector<armnn::BackendId>& backends,
                     std::vector<float>& inputValues,
                     std::vector<float>& expectedOutputValues,
-                    float alpha = 0)
+                    float alpha = 0,
+                    const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<int32_t> inputShape  { { 4, 1, 4} };
@@ -113,7 +113,7 @@ void ActivationTest(tflite::BuiltinOperator activationOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<float>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

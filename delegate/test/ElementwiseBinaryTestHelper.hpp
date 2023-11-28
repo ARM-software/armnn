@@ -184,7 +184,6 @@ template <typename T>
 void ElementwiseBinaryTest(tflite::BuiltinOperator binaryOperatorCode,
                            tflite::ActivationFunctionType activationType,
                            tflite::TensorType tensorType,
-                           std::vector<armnn::BackendId>& backends,
                            std::vector<int32_t>& input0Shape,
                            std::vector<int32_t>& input1Shape,
                            std::vector<int32_t>& outputShape,
@@ -193,7 +192,8 @@ void ElementwiseBinaryTest(tflite::BuiltinOperator binaryOperatorCode,
                            std::vector<T>& expectedOutputValues,
                            float quantScale = 1.0f,
                            int quantOffset  = 0,
-                           bool constantInput = false)
+                           bool constantInput = false,
+                           const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateElementwiseBinaryTfLiteModel<T>(binaryOperatorCode,
@@ -217,7 +217,7 @@ void ElementwiseBinaryTest(tflite::BuiltinOperator binaryOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(input0Values, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(input1Values, 1) == kTfLiteOk);

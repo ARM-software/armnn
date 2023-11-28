@@ -14,7 +14,7 @@
 namespace armnnDelegate
 {
 
-void ArgMaxFP32Test(std::vector<armnn::BackendId>& backends, int axisValue)
+void ArgMaxFP32Test(int axisValue)
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 2, 4 };
@@ -36,7 +36,6 @@ void ArgMaxFP32Test(std::vector<armnn::BackendId>& backends, int axisValue)
 
     ArgMinMaxTest<float, int32_t>(tflite::BuiltinOperator_ARG_MAX,
                                   ::tflite::TensorType_FLOAT32,
-                                  backends,
                                   inputShape,
                                   axisShape,
                                   outputShape,
@@ -46,7 +45,7 @@ void ArgMaxFP32Test(std::vector<armnn::BackendId>& backends, int axisValue)
                                   ::tflite::TensorType_INT32);
 }
 
-void ArgMinFP32Test(std::vector<armnn::BackendId>& backends, int axisValue)
+void ArgMinFP32Test(int axisValue)
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 2, 4 };
@@ -68,7 +67,6 @@ void ArgMinFP32Test(std::vector<armnn::BackendId>& backends, int axisValue)
 
     ArgMinMaxTest<float, int32_t>(tflite::BuiltinOperator_ARG_MIN,
                                   ::tflite::TensorType_FLOAT32,
-                                  backends,
                                   inputShape,
                                   axisShape,
                                   outputShape,
@@ -78,7 +76,7 @@ void ArgMinFP32Test(std::vector<armnn::BackendId>& backends, int axisValue)
                                   ::tflite::TensorType_INT32);
 }
 
-void ArgMaxUint8Test(std::vector<armnn::BackendId>& backends, int axisValue)
+void ArgMaxUint8Test(int axisValue)
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 1, 1, 5 };
@@ -91,7 +89,6 @@ void ArgMaxUint8Test(std::vector<armnn::BackendId>& backends, int axisValue)
 
     ArgMinMaxTest<uint8_t, int32_t>(tflite::BuiltinOperator_ARG_MAX,
                                     ::tflite::TensorType_UINT8,
-                                    backends,
                                     inputShape,
                                     axisShape,
                                     outputShape,
@@ -101,73 +98,23 @@ void ArgMaxUint8Test(std::vector<armnn::BackendId>& backends, int axisValue)
                                     ::tflite::TensorType_INT32);
 }
 
-TEST_SUITE("ArgMinMax_CpuRefTests")
+TEST_SUITE("ArgMinMax_Tests")
 {
 
-TEST_CASE ("ArgMaxFP32Test_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ArgMaxFP32Test(backends, 2);
+    TEST_CASE("ArgMaxFP32Test_Test")
+    {
+        ArgMaxFP32Test(2);
+    }
+
+    TEST_CASE("ArgMinFP32Test_Test")
+    {
+        ArgMinFP32Test(3);
+    }
+
+    TEST_CASE("ArgMaxUint8Test_Test")
+    {
+        ArgMaxUint8Test(-1);
+    }
 }
-
-TEST_CASE ("ArgMinFP32Test_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ArgMinFP32Test(backends, 3);
-}
-
-TEST_CASE ("ArgMaxUint8Test_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ArgMaxUint8Test(backends, -1);
-}
-
-} // TEST_SUITE("ArgMinMax_CpuRefTests")
-
-TEST_SUITE("ArgMinMax_CpuAccTests")
-{
-
-TEST_CASE ("ArgMaxFP32Test_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ArgMaxFP32Test(backends, 2);
-}
-
-TEST_CASE ("ArgMinFP32Test_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ArgMinFP32Test(backends, 3);
-}
-
-TEST_CASE ("ArgMaxUint8Test_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ArgMaxUint8Test(backends, -1);
-}
-
-} // TEST_SUITE("ArgMinMax_CpuAccTests")
-
-TEST_SUITE("ArgMinMax_GpuAccTests")
-{
-
-TEST_CASE ("ArgMaxFP32Test_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ArgMaxFP32Test(backends, 2);
-}
-
-TEST_CASE ("ArgMinFP32Test_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ArgMinFP32Test(backends, 3);
-}
-
-TEST_CASE ("ArgMaxUint8Test_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ArgMaxUint8Test(backends, -1);
-}
-
-} // TEST_SUITE("ArgMinMax_GpuAccTests")
 
 } // namespace armnnDelegate

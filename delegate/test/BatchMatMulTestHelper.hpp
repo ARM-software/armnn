@@ -118,7 +118,6 @@ std::vector<char> CreateBatchMatMulTfLiteModel(
 template <typename T>
 void BatchMatMulTest(tflite::BuiltinOperator bmmOperatorCode,
                    tflite::TensorType tensorType,
-                   std::vector<armnn::BackendId>& backends,
                    std::vector<int32_t>& LHSInputShape,
                    std::vector<int32_t>& RHSInputShape,
                    std::vector<int32_t>& outputShape,
@@ -128,7 +127,8 @@ void BatchMatMulTest(tflite::BuiltinOperator bmmOperatorCode,
                    bool adjX = false,
                    bool adjY = false,
                    float quantScale = 1.0f,
-                   int quantOffset  = 0)
+                   int quantOffset  = 0,
+                   const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateBatchMatMulTfLiteModel(bmmOperatorCode,
@@ -151,7 +151,7 @@ void BatchMatMulTest(tflite::BuiltinOperator bmmOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(LHSInputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(RHSInputValues, 1) == kTfLiteOk);

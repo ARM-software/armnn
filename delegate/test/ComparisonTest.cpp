@@ -45,13 +45,16 @@ void EqualFP32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
+
 }
 
 void EqualBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -74,13 +77,15 @@ void EqualBroadcastTest(std::vector<armnn::BackendId>& backends)
     };
     ComparisonTest<float>(tflite::BuiltinOperator_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void EqualInt32Test(std::vector<armnn::BackendId>& backends)
@@ -97,13 +102,15 @@ void EqualInt32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<int32_t>(tflite::BuiltinOperator_EQUAL,
                             ::tflite::TensorType_INT32,
-                            backends,
                             input0Shape,
                             input1Shape,
                             expectedOutputShape,
                             input0Values,
                             input1Values,
-                            expectedOutputValues);
+                            expectedOutputValues,
+                            1.0f,
+                            0,
+                            backends);
 }
 
 void NotEqualFP32Test(std::vector<armnn::BackendId>& backends)
@@ -132,13 +139,15 @@ void NotEqualFP32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_NOT_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void NotEqualBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -161,13 +170,15 @@ void NotEqualBroadcastTest(std::vector<armnn::BackendId>& backends)
     };
     ComparisonTest<float>(tflite::BuiltinOperator_NOT_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void NotEqualInt32Test(std::vector<armnn::BackendId>& backends)
@@ -184,13 +195,15 @@ void NotEqualInt32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<int32_t>(tflite::BuiltinOperator_NOT_EQUAL,
                             ::tflite::TensorType_INT32,
-                            backends,
                             input0Shape,
                             input1Shape,
                             expectedOutputShape,
                             input0Values,
                             input1Values,
-                            expectedOutputValues);
+                            expectedOutputValues,
+                            1.0f,
+                            0,
+                            backends);
 }
 
 void GreaterFP32Test(std::vector<armnn::BackendId>& backends)
@@ -207,13 +220,15 @@ void GreaterFP32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_GREATER,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void GreaterBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -236,13 +251,15 @@ void GreaterBroadcastTest(std::vector<armnn::BackendId>& backends)
     };
     ComparisonTest<float>(tflite::BuiltinOperator_GREATER,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void GreaterInt32Test(std::vector<armnn::BackendId>& backends)
@@ -259,13 +276,15 @@ void GreaterInt32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<int32_t>(tflite::BuiltinOperator_GREATER,
                             ::tflite::TensorType_INT32,
-                            backends,
                             input0Shape,
                             input1Shape,
                             expectedOutputShape,
                             input0Values,
                             input1Values,
-                            expectedOutputValues);
+                            expectedOutputValues,
+                            1.0f,
+                            0,
+                            backends);
 }
 
 void GreaterEqualFP32Test(std::vector<armnn::BackendId>& backends)
@@ -282,13 +301,15 @@ void GreaterEqualFP32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_GREATER_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void GreaterEqualBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -312,13 +333,15 @@ void GreaterEqualBroadcastTest(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_GREATER_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void GreaterEqualInt32Test(std::vector<armnn::BackendId>& backends)
@@ -335,13 +358,15 @@ void GreaterEqualInt32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<int32_t>(tflite::BuiltinOperator_GREATER_EQUAL,
                             ::tflite::TensorType_INT32,
-                            backends,
                             input0Shape,
                             input1Shape,
                             expectedOutputShape,
                             input0Values,
                             input1Values,
-                            expectedOutputValues);
+                            expectedOutputValues,
+                            1.0f,
+                            0,
+                            backends);
 }
 
 void LessFP32Test(std::vector<armnn::BackendId>& backends)
@@ -358,13 +383,15 @@ void LessFP32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_LESS,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void LessBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -388,13 +415,15 @@ void LessBroadcastTest(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_LESS,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void LessInt32Test(std::vector<armnn::BackendId>& backends)
@@ -411,13 +440,15 @@ void LessInt32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<int32_t>(tflite::BuiltinOperator_LESS,
                             ::tflite::TensorType_INT32,
-                            backends,
                             input0Shape,
                             input1Shape,
                             expectedOutputShape,
                             input0Values,
                             input1Values,
-                            expectedOutputValues);
+                            expectedOutputValues,
+                            1.0f,
+                            0,
+                            backends);
 }
 
 void LessEqualFP32Test(std::vector<armnn::BackendId>& backends)
@@ -434,13 +465,15 @@ void LessEqualFP32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_LESS_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void LessEqualBroadcastTest(std::vector<armnn::BackendId>& backends)
@@ -464,13 +497,15 @@ void LessEqualBroadcastTest(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<float>(tflite::BuiltinOperator_LESS_EQUAL,
                           ::tflite::TensorType_FLOAT32,
-                          backends,
                           input0Shape,
                           input1Shape,
                           expectedOutputShape,
                           input0Values,
                           input1Values,
-                          expectedOutputValues);
+                          expectedOutputValues,
+                          1.0f,
+                          0,
+                          backends);
 }
 
 void LessEqualInt32Test(std::vector<armnn::BackendId>& backends)
@@ -487,357 +522,127 @@ void LessEqualInt32Test(std::vector<armnn::BackendId>& backends)
 
     ComparisonTest<int32_t>(tflite::BuiltinOperator_LESS_EQUAL,
                             ::tflite::TensorType_INT32,
-                            backends,
                             input0Shape,
                             input1Shape,
                             expectedOutputShape,
                             input0Values,
                             input1Values,
-                            expectedOutputValues);
+                            expectedOutputValues,
+                            1.0f,
+                            0,
+                            backends);
 }
 
-TEST_SUITE("Comparison_CpuRefTests")
+TEST_SUITE("Comparison_Tests")
 {
 
-TEST_CASE ("EQUAL_FP32_CpuRef_Test")
+TEST_CASE ("EQUAL_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     EqualFP32Test(backends);
 }
 
-TEST_CASE ("EQUAL_Broadcast_CpuRef_Test")
+TEST_CASE ("EQUAL_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     EqualBroadcastTest(backends);
 }
 
-TEST_CASE ("EQUAL_INT32_CpuRef_Test")
+TEST_CASE ("EQUAL_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     EqualInt32Test(backends);
 }
 
-TEST_CASE ("NOT_EQUAL_FP32_CpuRef_Test")
+TEST_CASE ("NOT_EQUAL_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     NotEqualFP32Test(backends);
 }
 
-TEST_CASE ("NOT_EQUAL_Broadcast_CpuRef_Test")
+TEST_CASE ("NOT_EQUAL_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     NotEqualBroadcastTest(backends);
 }
 
-TEST_CASE ("NOT_EQUAL_INT32_CpuRef_Test")
+TEST_CASE ("NOT_EQUAL_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     NotEqualInt32Test(backends);
 }
 
-TEST_CASE ("GREATER_FP32_CpuRef_Test")
+TEST_CASE ("GREATER_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     GreaterFP32Test(backends);
 }
 
-TEST_CASE ("GREATER_Broadcast_CpuRef_Test")
+TEST_CASE ("GREATER_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     GreaterBroadcastTest(backends);
 }
 
-TEST_CASE ("GREATER_INT32_CpuRef_Test")
+TEST_CASE ("GREATER_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     GreaterInt32Test(backends);
 }
 
-TEST_CASE ("GREATER_EQUAL_FP32_CpuRef_Test")
+TEST_CASE ("GREATER_EQUAL_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     GreaterEqualFP32Test(backends);
 }
 
-TEST_CASE ("GREATER_EQUAL_Broadcast_CpuRef_Test")
+TEST_CASE ("GREATER_EQUAL_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     GreaterEqualBroadcastTest(backends);
 }
 
-TEST_CASE ("GREATER_EQUAL_INT32_CpuRef_Test")
+TEST_CASE ("GREATER_EQUAL_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     GreaterEqualInt32Test(backends);
 }
 
-TEST_CASE ("LESS_FP32_CpuRef_Test")
+TEST_CASE ("LESS_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     LessFP32Test(backends);
 }
 
-TEST_CASE ("LESS_Broadcast_CpuRef_Test")
+TEST_CASE ("LESS_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     LessBroadcastTest(backends);
 }
 
-TEST_CASE ("LESS_INT32_CpuRef_Test")
+TEST_CASE ("LESS_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     LessInt32Test(backends);
 }
 
-TEST_CASE ("LESS_EQUAL_FP32_CpuRef_Test")
+TEST_CASE ("LESS_EQUAL_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     LessEqualFP32Test(backends);
 }
 
-TEST_CASE ("LESS_EQUAL_Broadcast_CpuRef_Test")
+TEST_CASE ("LESS_EQUAL_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     LessEqualBroadcastTest(backends);
 }
 
-TEST_CASE ("LESS_EQUAL_INT32_CpuRef_Test")
+TEST_CASE ("LESS_EQUAL_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { };
     LessEqualInt32Test(backends);
 }
-} // End TEST_SUITE("Comparison_CpuRefTests")
-
-
-
-TEST_SUITE("Comparison_GpuAccTests")
-{
-
-TEST_CASE ("EQUAL_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    EqualFP32Test(backends);
-}
-
-TEST_CASE ("EQUAL_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    EqualBroadcastTest(backends);
-}
-
-TEST_CASE ("EQUAL_INT32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    EqualInt32Test(backends);
-}
-
-TEST_CASE ("NOT_EQUAL_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    NotEqualFP32Test(backends);
-}
-
-TEST_CASE ("NOT_EQUAL_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    NotEqualBroadcastTest(backends);
-}
-
-TEST_CASE ("NOT_EQUAL_INT32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    NotEqualInt32Test(backends);
-}
-
-TEST_CASE ("GREATER_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    GreaterFP32Test(backends);
-}
-
-TEST_CASE ("GREATER_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    GreaterBroadcastTest(backends);
-}
-
-TEST_CASE ("GREATER_INT32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc,
-                                               armnn::Compute::CpuRef };
-    GreaterInt32Test(backends);
-}
-
-TEST_CASE ("GREATER_EQUAL_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    GreaterEqualFP32Test(backends);
-}
-
-TEST_CASE ("GREATER_EQUAL_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    GreaterEqualBroadcastTest(backends);
-}
-
-TEST_CASE ("GREATER_EQUAL_INT32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    GreaterEqualInt32Test(backends);
-}
-
-TEST_CASE ("LESS_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LessFP32Test(backends);
-}
-
-TEST_CASE ("LESS_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LessBroadcastTest(backends);
-}
-
-TEST_CASE ("LESS_INT32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LessInt32Test(backends);
-}
-
-TEST_CASE ("LESS_EQUAL_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LessEqualFP32Test(backends);
-}
-
-TEST_CASE ("LESS_EQUAL_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LessEqualBroadcastTest(backends);
-}
-
-TEST_CASE ("LESS_EQUAL_INT32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LessEqualInt32Test(backends);
-}
-
-} // End TEST_SUITE("Comparison_GpuAccTests")
-
-
-TEST_SUITE("Comparison_CpuAccTests")
-{
-
-TEST_CASE ("EQUAL_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    EqualFP32Test(backends);
-}
-
-TEST_CASE ("EQUAL_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    EqualBroadcastTest(backends);
-}
-
-TEST_CASE ("EQUAL_INT32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    EqualInt32Test(backends);
-}
-
-TEST_CASE ("NOT_EQUAL_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    NotEqualFP32Test(backends);
-}
-
-TEST_CASE ("NOT_EQUAL_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    NotEqualBroadcastTest(backends);
-}
-
-TEST_CASE ("NOT_EQUAL_INT32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    NotEqualInt32Test(backends);
-}
-
-TEST_CASE ("GREATER_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    GreaterFP32Test(backends);
-}
-
-TEST_CASE ("GREATER_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    GreaterBroadcastTest(backends);
-}
-
-TEST_CASE ("GREATER_INT32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    GreaterInt32Test(backends);
-}
-
-TEST_CASE ("GREATER_EQUAL_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    GreaterEqualFP32Test(backends);
-}
-
-TEST_CASE ("GREATER_EQUAL_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    GreaterEqualBroadcastTest(backends);
-}
-
-TEST_CASE ("GREATER_EQUAL_INT32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    GreaterEqualInt32Test(backends);
-}
-
-TEST_CASE ("LESS_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LessFP32Test(backends);
-}
-
-TEST_CASE ("LESS_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LessBroadcastTest(backends);
-}
-
-TEST_CASE ("LESS_INT32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LessInt32Test(backends);
-}
-
-TEST_CASE ("LESS_EQUAL_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LessEqualFP32Test(backends);
-}
-
-TEST_CASE ("LESS_EQUAL_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LessEqualBroadcastTest(backends);
-}
-
-TEST_CASE ("LESS_EQUAL_INT32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LessEqualInt32Test(backends);
-}
-
-} // End TEST_SUITE("Comparison_CpuAccTests")
+} // End TEST_SUITE("Comparison_Tests")
 
 } // namespace armnnDelegate

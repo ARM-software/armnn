@@ -74,9 +74,9 @@ std::vector<char> CreateElementwiseUnaryTfLiteModel(tflite::BuiltinOperator unar
 }
 
 void ElementwiseUnaryFP32Test(tflite::BuiltinOperator unaryOperatorCode,
-                              std::vector<armnn::BackendId>& backends,
                               std::vector<float>& inputValues,
-                              std::vector<float>& expectedOutputValues)
+                              std::vector<float>& expectedOutputValues,
+                              const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<int32_t> inputShape  { { 3, 1, 2} };
@@ -93,7 +93,7 @@ void ElementwiseUnaryFP32Test(tflite::BuiltinOperator unaryOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<float>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
@@ -108,10 +108,10 @@ void ElementwiseUnaryFP32Test(tflite::BuiltinOperator unaryOperatorCode,
 }
 
 void ElementwiseUnaryBoolTest(tflite::BuiltinOperator unaryOperatorCode,
-                              std::vector<armnn::BackendId>& backends,
                               std::vector<int32_t>& inputShape,
                               std::vector<bool>& inputValues,
-                              std::vector<bool>& expectedOutputValues)
+                              std::vector<bool>& expectedOutputValues,
+                              const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateElementwiseUnaryTfLiteModel(unaryOperatorCode,
@@ -127,7 +127,7 @@ void ElementwiseUnaryBoolTest(tflite::BuiltinOperator unaryOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

@@ -206,14 +206,14 @@ std::vector<char> CreateMeanTfLiteModel(tflite::BuiltinOperator controlOperatorC
 template <typename T>
 void ConcatenationTest(tflite::BuiltinOperator controlOperatorCode,
                        tflite::TensorType tensorType,
-                       std::vector<armnn::BackendId>& backends,
                        std::vector<int32_t>& inputShapes,
                        std::vector<int32_t>& expectedOutputShape,
                        std::vector<std::vector<T>>& inputValues,
                        std::vector<T>& expectedOutputValues,
                        int32_t axis = 0,
                        float quantScale = 1.0f,
-                       int quantOffset  = 0)
+                       int quantOffset  = 0,
+                       const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateConcatTfLiteModel(controlOperatorCode,
@@ -230,7 +230,7 @@ void ConcatenationTest(tflite::BuiltinOperator controlOperatorCode,
     CHECK(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
 
     for (unsigned int i = 0; i < inputValues.size(); ++i)
@@ -257,7 +257,6 @@ void ConcatenationTest(tflite::BuiltinOperator controlOperatorCode,
 template <typename T>
 void MeanTest(tflite::BuiltinOperator controlOperatorCode,
               tflite::TensorType tensorType,
-              std::vector<armnn::BackendId>& backends,
               std::vector<int32_t>& input0Shape,
               std::vector<int32_t>& input1Shape,
               std::vector<int32_t>& expectedOutputShape,
@@ -266,7 +265,8 @@ void MeanTest(tflite::BuiltinOperator controlOperatorCode,
               std::vector<T>& expectedOutputValues,
               const bool keepDims,
               float quantScale = 1.0f,
-              int quantOffset  = 0)
+              int quantOffset  = 0,
+              const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateMeanTfLiteModel(controlOperatorCode,
@@ -288,7 +288,7 @@ void MeanTest(tflite::BuiltinOperator controlOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(input0Values, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

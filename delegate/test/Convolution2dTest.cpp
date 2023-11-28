@@ -18,7 +18,7 @@
 namespace armnnDelegate
 {
 
-void Conv2DWithBiasesFp32Test(std::vector<armnn::BackendId>& backends)
+void Conv2DWithBiasesFp32Test()
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 5, 5, 1 };
@@ -61,7 +61,6 @@ void Conv2DWithBiasesFp32Test(std::vector<armnn::BackendId>& backends)
                            1, // dilationY
                            padding,
                            tflite::ActivationFunctionType_NONE,
-                           backends,
                            inputShape,
                            filterShape,
                            outputShape,
@@ -72,7 +71,7 @@ void Conv2DWithBiasesFp32Test(std::vector<armnn::BackendId>& backends)
                            biasValues);
 }
 
-void Conv2DWithBiasesInt8Test(std::vector<armnn::BackendId>& backends)
+void Conv2DWithBiasesInt8Test()
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 2, 2, 1 };
@@ -104,7 +103,6 @@ void Conv2DWithBiasesInt8Test(std::vector<armnn::BackendId>& backends)
                                      1, // dilationY
                                      padding,
                                      tflite::ActivationFunctionType_NONE,
-                                     backends,
                                      inputShape,
                                      filterShape,
                                      outputShape,
@@ -115,7 +113,7 @@ void Conv2DWithBiasesInt8Test(std::vector<armnn::BackendId>& backends)
                                      biasValues);
 }
 
-void Conv2DWithBiasesReluUint8Test(std::vector<armnn::BackendId>& backends)
+void Conv2DWithBiasesReluUint8Test()
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 2, 2, 1 };
@@ -156,7 +154,6 @@ void Conv2DWithBiasesReluUint8Test(std::vector<armnn::BackendId>& backends)
                                      1, // dilationY
                                      padding,
                                      tflite::ActivationFunctionType_RELU,
-                                     backends,
                                      inputShape,
                                      filterShape,
                                      outputShape,
@@ -173,7 +170,7 @@ void Conv2DWithBiasesReluUint8Test(std::vector<armnn::BackendId>& backends)
                                      20); // output offset
 }
 
-void Conv2DWithBiasesRelu6Uint8Test(std::vector<armnn::BackendId>& backends)
+void Conv2DWithBiasesRelu6Uint8Test()
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 2, 2, 1 };
@@ -210,7 +207,6 @@ void Conv2DWithBiasesRelu6Uint8Test(std::vector<armnn::BackendId>& backends)
                                      1, // dilationY
                                      padding,
                                      tflite::ActivationFunctionType_RELU6,
-                                     backends,
                                      inputShape,
                                      filterShape,
                                      outputShape,
@@ -222,7 +218,7 @@ void Conv2DWithBiasesRelu6Uint8Test(std::vector<armnn::BackendId>& backends)
 }
 
 
-void Conv2DPerChannelInt8Test(std::vector<armnn::BackendId>& backends)
+void Conv2DPerChannelInt8Test()
 {
     // Set input data
     std::vector<int32_t> inputShape  { 1,4,4,2 };
@@ -277,7 +273,6 @@ void Conv2DPerChannelInt8Test(std::vector<armnn::BackendId>& backends)
                                      1, // dilationY
                                      padding,
                                      tflite::ActivationFunctionType_NONE,
-                                     backends,
                                      inputShape,
                                      filterShape,
                                      outputShape,
@@ -298,73 +293,24 @@ void Conv2DPerChannelInt8Test(std::vector<armnn::BackendId>& backends)
                                      filterQuantizationDim);
 }
 
-TEST_SUITE("Convolution2dTest_CpuRefTests")
+TEST_SUITE("Convolution2dTest_Tests")
 {
 
-TEST_CASE ("Conv2DWithBiases_Fp32_CpuRef_Test")
+TEST_CASE ("Conv2DWithBiases_Fp32_Test")
 {
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv2DWithBiasesFp32Test(backends);
+    Conv2DWithBiasesFp32Test();
 }
 
-TEST_CASE ("Conv2DWithBiases_Int8_CpuRef_Test")
+TEST_CASE ("Conv2DWithBiases_Int8_Test")
 {
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv2DWithBiasesInt8Test(backends);
+    Conv2DWithBiasesInt8Test();
 }
 
-TEST_CASE ("Conv2DPerChannel_Int8_CpuRef_Test")
+TEST_CASE ("Conv2DPerChannel_Int8_Test")
 {
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv2DPerChannelInt8Test(backends);
+    Conv2DPerChannelInt8Test();
 }
 
-} //End of TEST_SUITE("Convolution2dTest_CpuRef")
-
-TEST_SUITE("Convolution2dTest_CpuAccTests")
-{
-
-TEST_CASE ("Conv2DWithBiases_Fp32_CpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    Conv2DWithBiasesFp32Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Int8_CpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    Conv2DWithBiasesInt8Test(backends);
-}
-
-TEST_CASE ("Conv2DPerChannel_Int8_CpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    Conv2DPerChannelInt8Test(backends);
-}
-
-} //End of TEST_SUITE("Convolution2dTest_CpuAcc")
-
-TEST_SUITE("Convolution2dTest_GpuAccTests")
-{
-
-TEST_CASE ("Conv2DWithBiases_Fp32_GpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    Conv2DWithBiasesFp32Test(backends);
-}
-
-TEST_CASE ("Conv2DWithBiases_Int8_GpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    Conv2DWithBiasesInt8Test(backends);
-}
-
-TEST_CASE ("Conv2DPerChannel_Int8_GpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    Conv2DPerChannelInt8Test(backends);
-}
-
-} //End of TEST_SUITE("Convolution2dTest_GpuAcc")
+} //End of TEST_SUITE("Convolution2dTest_Tests")
 
 } // namespace armnnDelegate

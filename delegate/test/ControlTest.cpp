@@ -15,7 +15,7 @@ namespace armnnDelegate
 {
 
 // CONCATENATION Operator
-void ConcatUint8TwoInputsTest(std::vector<armnn::BackendId>& backends)
+void ConcatUint8TwoInputsTest()
 {
     std::vector<int32_t> inputShape { 2, 2 };
     std::vector<int32_t> expectedOutputShape { 4, 2 };
@@ -31,14 +31,13 @@ void ConcatUint8TwoInputsTest(std::vector<armnn::BackendId>& backends)
 
     ConcatenationTest<uint8_t>(tflite::BuiltinOperator_CONCATENATION,
                                ::tflite::TensorType_UINT8,
-                               backends,
                                inputShape,
                                expectedOutputShape,
                                inputValues,
                                expectedOutputValues);
 }
 
-void ConcatInt16TwoInputsTest(std::vector<armnn::BackendId>& backends)
+void ConcatInt16TwoInputsTest()
 {
     std::vector<int32_t> inputShape { 2, 2 };
     std::vector<int32_t> expectedOutputShape { 4, 2 };
@@ -53,14 +52,13 @@ void ConcatInt16TwoInputsTest(std::vector<armnn::BackendId>& backends)
 
     ConcatenationTest<int16_t>(tflite::BuiltinOperator_CONCATENATION,
                                ::tflite::TensorType_INT16,
-                               backends,
                                inputShape,
                                expectedOutputShape,
                                inputValues,
                                expectedOutputValues);
 }
 
-void ConcatFloat32TwoInputsTest(std::vector<armnn::BackendId>& backends)
+void ConcatFloat32TwoInputsTest()
 {
     std::vector<int32_t> inputShape { 2, 2 };
     std::vector<int32_t> expectedOutputShape { 4, 2 };
@@ -75,14 +73,13 @@ void ConcatFloat32TwoInputsTest(std::vector<armnn::BackendId>& backends)
 
     ConcatenationTest<float>(tflite::BuiltinOperator_CONCATENATION,
                              ::tflite::TensorType_FLOAT32,
-                             backends,
                              inputShape,
                              expectedOutputShape,
                              inputValues,
                              expectedOutputValues);
 }
 
-void ConcatThreeInputsTest(std::vector<armnn::BackendId>& backends)
+void ConcatThreeInputsTest()
 {
     std::vector<int32_t> inputShape { 2, 2 };
     std::vector<int32_t> expectedOutputShape { 6, 2 };
@@ -99,14 +96,13 @@ void ConcatThreeInputsTest(std::vector<armnn::BackendId>& backends)
 
     ConcatenationTest<uint8_t>(tflite::BuiltinOperator_CONCATENATION,
                                ::tflite::TensorType_UINT8,
-                               backends,
                                inputShape,
                                expectedOutputShape,
                                inputValues,
                                expectedOutputValues);
 }
 
-void ConcatAxisTest(std::vector<armnn::BackendId>& backends)
+void ConcatAxisTest()
 {
     std::vector<int32_t> inputShape { 1, 2, 2 };
     std::vector<int32_t> expectedOutputShape { 1, 2, 4 };
@@ -121,7 +117,6 @@ void ConcatAxisTest(std::vector<armnn::BackendId>& backends)
 
     ConcatenationTest<uint8_t>(tflite::BuiltinOperator_CONCATENATION,
                                ::tflite::TensorType_UINT8,
-                               backends,
                                inputShape,
                                expectedOutputShape,
                                inputValues,
@@ -130,7 +125,7 @@ void ConcatAxisTest(std::vector<armnn::BackendId>& backends)
 }
 
 // MEAN Operator
-void MeanUint8KeepDimsTest(std::vector<armnn::BackendId>& backends)
+void MeanUint8KeepDimsTest()
 {
     std::vector<int32_t> input0Shape { 1, 3 };
     std::vector<int32_t> input1Shape { 1 };
@@ -143,7 +138,6 @@ void MeanUint8KeepDimsTest(std::vector<armnn::BackendId>& backends)
 
     MeanTest<uint8_t>(tflite::BuiltinOperator_MEAN,
                       ::tflite::TensorType_UINT8,
-                      backends,
                       input0Shape,
                       input1Shape,
                       expectedOutputShape,
@@ -153,7 +147,7 @@ void MeanUint8KeepDimsTest(std::vector<armnn::BackendId>& backends)
                       true);
 }
 
-void MeanUint8Test(std::vector<armnn::BackendId>& backends)
+void MeanUint8Test()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1 };
@@ -166,7 +160,6 @@ void MeanUint8Test(std::vector<armnn::BackendId>& backends)
 
     MeanTest<uint8_t>(tflite::BuiltinOperator_MEAN,
                       ::tflite::TensorType_UINT8,
-                      backends,
                       input0Shape,
                       input1Shape,
                       expectedOutputShape,
@@ -176,7 +169,7 @@ void MeanUint8Test(std::vector<armnn::BackendId>& backends)
                       false);
 }
 
-void MeanFp32KeepDimsTest(std::vector<armnn::BackendId>& backends)
+void MeanFp32KeepDimsTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1 };
@@ -189,7 +182,6 @@ void MeanFp32KeepDimsTest(std::vector<armnn::BackendId>& backends)
 
     MeanTest<float>(tflite::BuiltinOperator_MEAN,
                     ::tflite::TensorType_FLOAT32,
-                    backends,
                     input0Shape,
                     input1Shape,
                     expectedOutputShape,
@@ -199,7 +191,7 @@ void MeanFp32KeepDimsTest(std::vector<armnn::BackendId>& backends)
                     true);
 }
 
-void MeanFp32Test(std::vector<armnn::BackendId>& backends)
+void MeanFp32Test()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 1 };
     std::vector<int32_t> input1Shape { 1 };
@@ -212,7 +204,6 @@ void MeanFp32Test(std::vector<armnn::BackendId>& backends)
 
     MeanTest<float>(tflite::BuiltinOperator_MEAN,
                     ::tflite::TensorType_FLOAT32,
-                    backends,
                     input0Shape,
                     input1Shape,
                     expectedOutputShape,
@@ -223,195 +214,58 @@ void MeanFp32Test(std::vector<armnn::BackendId>& backends)
 }
 
 // CONCATENATION Tests.
-TEST_SUITE("Concatenation_CpuAccTests")
+TEST_SUITE("Concatenation_Tests")
 {
 
-TEST_CASE ("Concatenation_Uint8_CpuAcc_Test")
+TEST_CASE ("Concatenation_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    ConcatUint8TwoInputsTest(backends);
+    ConcatUint8TwoInputsTest();
 }
 
-TEST_CASE ("Concatenation_Int16_CpuAcc_Test")
+TEST_CASE ("Concatenation_Int16_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    ConcatInt16TwoInputsTest(backends);
+    ConcatInt16TwoInputsTest();
 }
 
-TEST_CASE ("Concatenation_Float32_CpuAcc_Test")
+TEST_CASE ("Concatenation_Float32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    ConcatFloat32TwoInputsTest(backends);
+    ConcatFloat32TwoInputsTest();
 }
 
-TEST_CASE ("Concatenation_Three_Inputs_CpuAcc_Test")
+TEST_CASE ("Concatenation_Three_Inputs_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    ConcatThreeInputsTest(backends);
+    ConcatThreeInputsTest();
 }
 
-TEST_CASE ("Concatenation_Axis_CpuAcc_Test")
+TEST_CASE ("Concatenation_Axis_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    ConcatAxisTest(backends);
-}
-
-}
-
-TEST_SUITE("Concatenation_GpuAccTests")
-{
-
-TEST_CASE ("Concatenation_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    ConcatUint8TwoInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Int16_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    ConcatInt16TwoInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Float32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    ConcatFloat32TwoInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Three_Inputs_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    ConcatThreeInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Axis_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    ConcatAxisTest(backends);
-}
-
-}
-
-TEST_SUITE("Concatenation_CpuRefTests")
-{
-
-TEST_CASE ("Concatenation_Uint8_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    ConcatUint8TwoInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Int16_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    ConcatInt16TwoInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Float32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    ConcatFloat32TwoInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Three_Inputs_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    ConcatThreeInputsTest(backends);
-}
-
-TEST_CASE ("Concatenation_Axis_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    ConcatAxisTest(backends);
+    ConcatAxisTest();
 }
 
 }
 
 // MEAN Tests
-TEST_SUITE("Mean_CpuAccTests")
+TEST_SUITE("Mean_Tests")
 {
 
-TEST_CASE ("Mean_Uint8_KeepDims_CpuAcc_Test")
+TEST_CASE ("Mean_Uint8_KeepDims_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    MeanUint8KeepDimsTest(backends);
+    MeanUint8KeepDimsTest();
 }
 
-TEST_CASE ("Mean_Uint8_CpuAcc_Test")
+TEST_CASE ("Mean_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    MeanUint8Test(backends);
+    MeanUint8Test();
 }
 
-TEST_CASE ("Mean_Fp32_KeepDims_CpuAcc_Test")
+TEST_CASE ("Mean_Fp32_KeepDims_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    MeanFp32KeepDimsTest(backends);
+    MeanFp32KeepDimsTest();
 }
 
-TEST_CASE ("Mean_Fp32_CpuAcc_Test")
+TEST_CASE ("Mean_Fp32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    MeanFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("Mean_GpuAccTests")
-{
-
-TEST_CASE ("Mean_Uint8_KeepDims_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    MeanUint8KeepDimsTest(backends);
-}
-
-TEST_CASE ("Mean_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    MeanUint8Test(backends);
-}
-
-TEST_CASE ("Mean_Fp32_KeepDims_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    MeanFp32KeepDimsTest(backends);
-}
-
-TEST_CASE ("Mean_Fp32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    MeanFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("Mean_CpuRefTests")
-{
-
-TEST_CASE ("Mean_Uint8_KeepDims_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    MeanUint8KeepDimsTest(backends);
-}
-
-TEST_CASE ("Mean_Uint8_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    MeanUint8Test(backends);
-}
-
-TEST_CASE ("Mean_Fp32_KeepDims_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    MeanFp32KeepDimsTest(backends);
-}
-
-TEST_CASE ("Mean_Fp32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    MeanFp32Test(backends);
+    MeanFp32Test();
 }
 
 }

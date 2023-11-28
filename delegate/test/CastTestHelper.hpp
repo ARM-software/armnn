@@ -96,12 +96,12 @@ std::vector<char> CreateCastTfLiteModel(tflite::TensorType inputTensorType,
 template<typename T, typename K>
 void CastTest(tflite::TensorType inputTensorType,
               tflite::TensorType outputTensorType,
-              std::vector<armnn::BackendId>& backends,
               std::vector<int32_t>& shape,
               std::vector<T>& inputValues,
               std::vector<K>& expectedOutputValues,
               float quantScale = 1.0f,
-              int quantOffset = 0)
+              int quantOffset = 0,
+              const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateCastTfLiteModel(inputTensorType,
@@ -119,7 +119,7 @@ void CastTest(tflite::TensorType inputTensorType,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

@@ -148,7 +148,6 @@ std::vector<char> CreateComparisonTfLiteModel(tflite::BuiltinOperator comparison
 template <typename T>
 void ComparisonTest(tflite::BuiltinOperator comparisonOperatorCode,
                     tflite::TensorType tensorType,
-                    std::vector<armnn::BackendId>& backends,
                     std::vector<int32_t>& input0Shape,
                     std::vector<int32_t>& input1Shape,
                     std::vector<int32_t>& outputShape,
@@ -156,7 +155,8 @@ void ComparisonTest(tflite::BuiltinOperator comparisonOperatorCode,
                     std::vector<T>& input1Values,
                     std::vector<bool>& expectedOutputValues,
                     float quantScale = 1.0f,
-                    int quantOffset  = 0)
+                    int quantOffset  = 0,
+                    const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateComparisonTfLiteModel(comparisonOperatorCode,
@@ -177,7 +177,7 @@ void ComparisonTest(tflite::BuiltinOperator comparisonOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(input0Values, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(input1Values, 1) == kTfLiteOk);

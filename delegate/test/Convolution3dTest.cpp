@@ -34,7 +34,7 @@ std::vector<T> CreateFloatData(int32_t size, float divisor)
     return data;
 }
 
-void Conv3DWithBiasesSimpleWithPaddingFp32Test(std::vector<armnn::BackendId>& backends)
+void Conv3DWithBiasesSimpleWithPaddingFp32Test()
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 2, 2, 2, 1 };
@@ -65,7 +65,6 @@ void Conv3DWithBiasesSimpleWithPaddingFp32Test(std::vector<armnn::BackendId>& ba
                              { 1, 1, 1 }, // dilationX, dilationY, dilationZ
                              tflite::Padding_SAME,
                              tflite::ActivationFunctionType_NONE,
-                             backends,
                              inputShape,
                              filterShape,
                              outputShape,
@@ -76,7 +75,7 @@ void Conv3DWithBiasesSimpleWithPaddingFp32Test(std::vector<armnn::BackendId>& ba
                              biasValues);
 }
 
-void Conv3DWithBiasesStridesFp32Test(std::vector<armnn::BackendId>& backends)
+void Conv3DWithBiasesStridesFp32Test()
 {
     std::vector<int32_t> inputShape { 1, 3, 10, 10, 1 };
     std::vector<int32_t> filterShape { 3, 5, 5, 1, 1 };
@@ -123,7 +122,6 @@ void Conv3DWithBiasesStridesFp32Test(std::vector<armnn::BackendId>& backends)
                              { 1, 1, 1 }, // dilationX, dilationY, dilationZ
                              tflite::Padding_VALID,
                              tflite::ActivationFunctionType_NONE,
-                             backends,
                              inputShape,
                              filterShape,
                              outputShape,
@@ -175,7 +173,6 @@ void Conv3DWithBiasesDilationFp32Test(std::vector<armnn::BackendId>& backends)
                              { 3, 3, 3 }, // dilationX, dilationY, dilationZ
                              tflite::Padding_VALID,
                              tflite::ActivationFunctionType_NONE,
-                             backends,
                              inputShape,
                              filterShape,
                              outputShape,
@@ -183,10 +180,21 @@ void Conv3DWithBiasesDilationFp32Test(std::vector<armnn::BackendId>& backends)
                              filterValues,
                              expectedOutputValues,
                              biasShape,
-                             biasValues);
+                             biasValues,
+                             {1.0f},
+                             {0},
+                             {1.0f},
+                             {0},
+                             2.0f,
+                             0,
+                             1.0f,
+                             0,
+                             1,
+                             3,
+                             backends);
 }
 
-void Conv3DFp32SmallTest(std::vector<armnn::BackendId>& backends)
+void Conv3DFp32SmallTest()
 {
     std::vector<int32_t> inputShape { 1, 3, 10, 10, 1 };
     std::vector<int32_t> filterShape { 3, 3, 3, 1, 1 };
@@ -226,7 +234,6 @@ void Conv3DFp32SmallTest(std::vector<armnn::BackendId>& backends)
                              { 1, 1, 1 }, // dilationX, dilationY, dilationZ
                              tflite::Padding_VALID,
                              tflite::ActivationFunctionType_NONE,
-                             backends,
                              inputShape,
                              filterShape,
                              outputShape,
@@ -240,77 +247,29 @@ void Conv3DFp32SmallTest(std::vector<armnn::BackendId>& backends)
 TEST_SUITE("Convolution3dTest_CpuRefTests")
 {
 
-TEST_CASE ("Conv3DWithBiasesSimpleWithPadding_Fp32_CpuRef_Test")
+TEST_CASE ("Conv3DWithBiasesSimpleWithPadding_Fp32_Test")
 {
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv3DWithBiasesSimpleWithPaddingFp32Test(backends);
+    Conv3DWithBiasesSimpleWithPaddingFp32Test();
 }
 
-TEST_CASE ("Conv3DWithBiasesStrides_Fp32_CpuRef_Test")
+TEST_CASE ("Conv3DWithBiasesStrides_Fp32_Test")
 {
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv3DWithBiasesStridesFp32Test(backends);
+    Conv3DWithBiasesStridesFp32Test();
 }
 
 TEST_CASE ("Conv3DWithBiasesDilation_Fp32_CpuRef_Test")
 {
+    // Known to only work on CpuRef.
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     Conv3DWithBiasesDilationFp32Test(backends);
 }
 
-TEST_CASE ("Conv3DFp32Small_Fp32_CpuRef_Test")
+TEST_CASE ("Conv3DFp32Small_Fp32_Test")
 {
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    Conv3DFp32SmallTest(backends);
+    Conv3DFp32SmallTest();
 }
 
-} //End of TEST_SUITE("Convolution3dTest_CpuRefTests")
-
-TEST_SUITE("Convolution3dTest_CpuAccTests")
-{
-
-TEST_CASE ("Conv3DWithBiasesSimpleWithPadding_Fp32_CpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    Conv3DWithBiasesSimpleWithPaddingFp32Test(backends);
-}
-
-TEST_CASE ("Conv3DWithBiasesStrides_Fp32_CpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    Conv3DWithBiasesStridesFp32Test(backends);
-}
-
-TEST_CASE ("Conv3DFp32Small_Fp32_CpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    Conv3DFp32SmallTest(backends);
-}
-
-} //End of TEST_SUITE("Convolution3dTest_CpuAccTests")
-
-TEST_SUITE("Convolution3dTest_GpuAccTests")
-{
-
-TEST_CASE ("Conv3DWithBiasesSimpleWithPadding_Fp32_GpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    Conv3DWithBiasesSimpleWithPaddingFp32Test(backends);
-}
-
-TEST_CASE ("Conv3DWithBiasesStrides_Fp32_GpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    Conv3DWithBiasesStridesFp32Test(backends);
-}
-
-TEST_CASE ("Conv3DFp32Small_Fp32_GpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    Conv3DFp32SmallTest(backends);
-}
-
-} //End of TEST_SUITE("Convolution3dTest_GpuAccTests")
+} //End of TEST_SUITE("Convolution3dTest_Tests")
 
 #endif
 

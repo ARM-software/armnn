@@ -126,7 +126,6 @@ std::vector<char> CreateArgMinMaxTfLiteModel(tflite::BuiltinOperator argMinMaxOp
 template <typename InputT, typename OutputT>
 void ArgMinMaxTest(tflite::BuiltinOperator argMinMaxOperatorCode,
                    tflite::TensorType tensorType,
-                   const std::vector<armnn::BackendId>& backends,
                    const std::vector<int32_t>& inputShape,
                    const std::vector<int32_t>& axisShape,
                    std::vector<int32_t>& outputShape,
@@ -135,7 +134,8 @@ void ArgMinMaxTest(tflite::BuiltinOperator argMinMaxOperatorCode,
                    OutputT axisValue,
                    tflite::TensorType outputType,
                    float quantScale = 1.0f,
-                   int quantOffset  = 0)
+                   int quantOffset  = 0,
+                   const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateArgMinMaxTfLiteModel<InputT, OutputT>(argMinMaxOperatorCode,
@@ -157,7 +157,7 @@ void ArgMinMaxTest(tflite::BuiltinOperator argMinMaxOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<InputT>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

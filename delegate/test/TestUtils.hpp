@@ -10,10 +10,60 @@
 
 #include <doctest/doctest.h>
 
+#include <armnn/BackendId.hpp>
 #include <half/half.hpp>
 
 using Half = half_float::half;
 
+namespace
+{
+/**
+ * Based on the compilation options capture subcases for the available backends. If "onlyTheseBackends" is NOT empty
+ * then we'll ignore any backend NOT listed in it.
+ *
+ * @param onlyTheseBackends limit the number of backends considered for sub casing. If empty all are considered.
+ * @return vector of backends that have been captured for sub casing.
+ */
+std::vector<armnn::BackendId> CaptureAvailableBackends(const std::vector<armnn::BackendId>& onlyTheseBackends)
+{
+    std::vector<armnn::BackendId> availableBackends;
+#if defined(ARMNNREF_ENABLED)
+    // Careful logic here. An empty onlyTheseBackends means we always evaluate.
+    if (onlyTheseBackends.empty() || (std::find(onlyTheseBackends.begin(), onlyTheseBackends.end(),
+                                                armnn::Compute::CpuRef) != onlyTheseBackends.end()))
+    {
+        SUBCASE("CpuRef")
+        {
+            availableBackends.push_back({ armnn::Compute::CpuRef });
+        }
+    }
+#endif
+#if defined(ARMCOMPUTENEON_ENABLED)
+    // Careful logic here. An empty onlyTheseBackends means we always evaluate.
+    if (onlyTheseBackends.empty() || (std::find(onlyTheseBackends.begin(), onlyTheseBackends.end(),
+                                                armnn::Compute::CpuAcc) != onlyTheseBackends.end()))
+    {
+        SUBCASE("CpuAcc")
+        {
+            availableBackends.push_back({ armnn::Compute::CpuAcc });
+        }
+    }
+#endif
+#if defined(ARMCOMPUTECL_ENABLED)
+    if (onlyTheseBackends.empty() || (std::find(onlyTheseBackends.begin(), onlyTheseBackends.end(),
+                                                armnn::Compute::GpuAcc) != onlyTheseBackends.end()))
+    {
+        SUBCASE("GpuAcc")
+        {
+            availableBackends.push_back({ armnn::Compute::GpuAcc });
+        }
+    }
+#endif
+    CAPTURE(availableBackends);
+    return availableBackends;
+}
+
+}    // namespace
 namespace armnnDelegate
 {
 
@@ -65,9 +115,9 @@ void CompareOutputData(std::vector<T>& tfLiteDelegateOutputs,
                        std::vector<T>& armnnDelegateOutputs,
                        std::vector<T>& expectedOutputValues)
 {
-    armnnDelegate::CompareData(expectedOutputValues.data(),  armnnDelegateOutputs.data(), expectedOutputValues.size());
+    armnnDelegate::CompareData(expectedOutputValues.data(), armnnDelegateOutputs.data(), expectedOutputValues.size());
     armnnDelegate::CompareData(tfLiteDelegateOutputs.data(), expectedOutputValues.data(), expectedOutputValues.size());
     armnnDelegate::CompareData(tfLiteDelegateOutputs.data(), armnnDelegateOutputs.data(), expectedOutputValues.size());
 }
 
-} // namespace armnnDelegate
+}    // namespace armnnDelegate

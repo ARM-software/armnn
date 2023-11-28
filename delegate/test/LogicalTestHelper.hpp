@@ -126,7 +126,6 @@ std::vector<char> CreateLogicalBinaryTfLiteModel(tflite::BuiltinOperator logical
 
 void LogicalBinaryTest(tflite::BuiltinOperator logicalOperatorCode,
                        tflite::TensorType tensorType,
-                       std::vector<armnn::BackendId>& backends,
                        std::vector<int32_t>& input0Shape,
                        std::vector<int32_t>& input1Shape,
                        std::vector<int32_t>& expectedOutputShape,
@@ -134,7 +133,8 @@ void LogicalBinaryTest(tflite::BuiltinOperator logicalOperatorCode,
                        std::vector<bool>& input1Values,
                        std::vector<bool>& expectedOutputValues,
                        float quantScale = 1.0f,
-                       int quantOffset  = 0)
+                       int quantOffset  = 0,
+                       const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
     std::vector<char> modelBuffer = CreateLogicalBinaryTfLiteModel(logicalOperatorCode,
@@ -155,7 +155,7 @@ void LogicalBinaryTest(tflite::BuiltinOperator logicalOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor(input0Values, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor(input1Values, 1) == kTfLiteOk);

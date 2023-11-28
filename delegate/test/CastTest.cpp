@@ -26,10 +26,12 @@ void CastUint8ToFp32Test(std::vector<armnn::BackendId>& backends)
 
     CastTest<uint8_t, float>(::tflite::TensorType_UINT8,
                              ::tflite::TensorType_FLOAT32,
-                             backends,
                              inputShape,
                              inputValues,
-                             expectedOutputValues);
+                             expectedOutputValues,
+                             1.0f,
+                             0,
+                             backends);
 }
 
 void CastInt32ToFp32Test(std::vector<armnn::BackendId>& backends)
@@ -44,47 +46,28 @@ void CastInt32ToFp32Test(std::vector<armnn::BackendId>& backends)
 
     CastTest<int32_t, float>(::tflite::TensorType_INT32,
                              ::tflite::TensorType_FLOAT32,
-                             backends,
                              inputShape,
                              inputValues,
-                             expectedOutputValues);
+                             expectedOutputValues,
+                             1.0f,
+                             0,
+                             backends);
 }
 
 // CAST Test Suite
-TEST_SUITE("CAST_CpuRefTests")
+TEST_SUITE("CASTTests")
 {
 
 TEST_CASE ("CAST_UINT8_TO_FP32_CpuRef_Test")
 {
+    // This only works on CpuRef.
     std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
     CastUint8ToFp32Test(backends);
 }
 
-TEST_CASE ("CAST_INT32_TO_FP32_CpuRef_Test")
+TEST_CASE ("CAST_INT32_TO_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    CastInt32ToFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("CAST_CpuAccTests")
-{
-
-TEST_CASE ("CAST_INT32_TO_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    CastInt32ToFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("CAST_GpuAccTests")
-{
-
-TEST_CASE ("CAST_INT32_TO_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
+    std::vector<armnn::BackendId> backends = {};
     CastInt32ToFp32Test(backends);
 }
 

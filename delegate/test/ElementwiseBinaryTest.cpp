@@ -19,7 +19,7 @@
 namespace armnnDelegate
 {
 
-void AddFP32Test(std::vector<armnn::BackendId>& backends)
+void AddFP32Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 3 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 3 };
@@ -73,7 +73,6 @@ void AddFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_ADD,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -82,7 +81,7 @@ void AddFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void AddBroadcastTest(std::vector<armnn::BackendId>& backends)
+void AddBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 3, 2, 1 };
     std::vector<int32_t> input1Shape { 1, 1, 2, 3 };
@@ -120,7 +119,6 @@ void AddBroadcastTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_ADD,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -129,7 +127,7 @@ void AddBroadcastTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void AddConstInputTest(std::vector<armnn::BackendId>& backends)
+void AddConstInputTest()
 {
     std::vector<int32_t> input0Shape { 1, 3, 2, 1 };
     std::vector<int32_t> input1Shape { 1 };
@@ -166,7 +164,6 @@ void AddConstInputTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_ADD,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -178,7 +175,7 @@ void AddConstInputTest(std::vector<armnn::BackendId>& backends)
                                  true);
 }
 
-void AddActivationTest(std::vector<armnn::BackendId>& backends)
+void AddActivationTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 1 };
     std::vector<int32_t> input1Shape { 1, 2, 2, 1 };
@@ -191,7 +188,6 @@ void AddActivationTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_ADD,
                                  tflite::ActivationFunctionType_RELU,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -200,7 +196,7 @@ void AddActivationTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void AddUint8Test(std::vector<armnn::BackendId>& backends)
+void AddUint8Test()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 3 };
     std::vector<int32_t> input1Shape { 1, 2, 2, 3 };
@@ -227,7 +223,6 @@ void AddUint8Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<uint8_t>(tflite::BuiltinOperator_ADD,
                                    tflite::ActivationFunctionType_NONE,
                                    ::tflite::TensorType_UINT8,
-                                   backends,
                                    input0Shape,
                                    input1Shape,
                                    expectedOutputShape,
@@ -236,7 +231,7 @@ void AddUint8Test(std::vector<armnn::BackendId>& backends)
                                    expectedOutputValues, 7.0f, 3);
 }
 
-void DivFP32Test(std::vector<armnn::BackendId>& backends)
+void DivFP32Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
@@ -264,7 +259,6 @@ void DivFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_DIV,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -273,7 +267,7 @@ void DivFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void DivBroadcastTest(std::vector<armnn::BackendId>& backends)
+void DivBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1, 1 };
@@ -286,7 +280,6 @@ void DivBroadcastTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_DIV,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -323,16 +316,19 @@ void DivUint8Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<uint8_t>(tflite::BuiltinOperator_DIV,
                                    tflite::ActivationFunctionType_NONE,
                                    ::tflite::TensorType_UINT8,
-                                   backends,
                                    input0Shape,
                                    input1Shape,
                                    expectedOutputShape,
                                    input0Values,
                                    input1Values,
-                                   expectedOutputValues, 0.25f, 0);
+                                   expectedOutputValues,
+                                   0.25f,
+                                   0,
+                                   false,
+                                   backends);
 }
 
-void FloorDivFP32Test(std::vector<armnn::BackendId>& backends)
+void FloorDivFP32Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
@@ -359,7 +355,6 @@ void FloorDivFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_FLOOR_DIV,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -369,7 +364,7 @@ void FloorDivFP32Test(std::vector<armnn::BackendId>& backends)
 
 }
 
-void MaxFP32Test(std::vector<armnn::BackendId>& backends)
+void MaxFP32Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
@@ -397,7 +392,6 @@ void MaxFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_MAXIMUM,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -406,7 +400,7 @@ void MaxFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void MaxBroadcastTest(std::vector<armnn::BackendId>& backends)
+void MaxBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1, 1 };
@@ -419,7 +413,6 @@ void MaxBroadcastTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_MAXIMUM,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -428,7 +421,7 @@ void MaxBroadcastTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void MaxUint8Test(std::vector<armnn::BackendId>& backends)
+void MaxUint8Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
@@ -456,7 +449,6 @@ void MaxUint8Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<uint8_t>(tflite::BuiltinOperator_MAXIMUM,
                                    tflite::ActivationFunctionType_NONE,
                                    ::tflite::TensorType_UINT8,
-                                   backends,
                                    input0Shape,
                                    input1Shape,
                                    expectedOutputShape,
@@ -465,7 +457,7 @@ void MaxUint8Test(std::vector<armnn::BackendId>& backends)
                                    expectedOutputValues, 1.0f, 0);
 }
 
-void MinFP32Test(std::vector<armnn::BackendId>& backends)
+void MinFP32Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
@@ -493,7 +485,6 @@ void MinFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_MINIMUM,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -502,7 +493,7 @@ void MinFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void MinBroadcastTest(std::vector<armnn::BackendId>& backends)
+void MinBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1, 1 };
@@ -517,7 +508,6 @@ void MinBroadcastTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_MINIMUM,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -526,7 +516,7 @@ void MinBroadcastTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void MinUint8Test(std::vector<armnn::BackendId>& backends)
+void MinUint8Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
@@ -554,7 +544,6 @@ void MinUint8Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<uint8_t>(tflite::BuiltinOperator_MINIMUM,
                                    tflite::ActivationFunctionType_NONE,
                                    ::tflite::TensorType_UINT8,
-                                   backends,
                                    input0Shape,
                                    input1Shape,
                                    expectedOutputShape,
@@ -563,7 +552,7 @@ void MinUint8Test(std::vector<armnn::BackendId>& backends)
                                    expectedOutputValues, 1.0f, 0);
 }
 
-void MulFP32Test(std::vector<armnn::BackendId>& backends)
+void MulFP32Test()
 {
     std::vector<int32_t> input0Shape { 2, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 2, 2, 2, 2 };
@@ -591,7 +580,6 @@ void MulFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_MUL,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -600,7 +588,7 @@ void MulFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void MulBroadcastTest(std::vector<armnn::BackendId>& backends)
+void MulBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1, 1 };
@@ -613,7 +601,6 @@ void MulBroadcastTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_MUL,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -622,7 +609,7 @@ void MulBroadcastTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void MulUint8Test(std::vector<armnn::BackendId>& backends)
+void MulUint8Test()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 3 };
     std::vector<int32_t> input1Shape { 1, 1, 1, 3 };
@@ -646,7 +633,6 @@ void MulUint8Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<uint8_t>(tflite::BuiltinOperator_MUL,
                                    tflite::ActivationFunctionType_NONE,
                                    ::tflite::TensorType_UINT8,
-                                   backends,
                                    input0Shape,
                                    input1Shape,
                                    expectedOutputShape,
@@ -655,7 +641,7 @@ void MulUint8Test(std::vector<armnn::BackendId>& backends)
                                    expectedOutputValues, 1.0f, 0);
 }
 
-void MulActivationTest(std::vector<armnn::BackendId>& backends)
+void MulActivationTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2, 1 };
     std::vector<int32_t> input1Shape { 1, 2, 2, 1 };
@@ -668,7 +654,6 @@ void MulActivationTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_MUL,
                                  tflite::ActivationFunctionType_RELU,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -677,7 +662,7 @@ void MulActivationTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void SubFP32Test(std::vector<armnn::BackendId>& backends)
+void SubFP32Test()
 {
     std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 2, 2 };
@@ -690,7 +675,6 @@ void SubFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_SUB,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -699,7 +683,7 @@ void SubFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void PowerFP32Test(std::vector<armnn::BackendId>& backends)
+void PowerFP32Test()
 {
     std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 2, 2 };
@@ -712,7 +696,6 @@ void PowerFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_POW,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -721,7 +704,7 @@ void PowerFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void SqDiffFP32Test(std::vector<armnn::BackendId>& backends)
+void SqDiffFP32Test()
 {
     std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 2, 2 };
@@ -734,7 +717,6 @@ void SqDiffFP32Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_SQUARED_DIFFERENCE,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -743,7 +725,7 @@ void SqDiffFP32Test(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void SubBroadcastTest(std::vector<armnn::BackendId>& backends)
+void SubBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1, 1 };
@@ -756,7 +738,6 @@ void SubBroadcastTest(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<float>(tflite::BuiltinOperator_SUB,
                                  tflite::ActivationFunctionType_NONE,
                                  ::tflite::TensorType_FLOAT32,
-                                 backends,
                                  input0Shape,
                                  input1Shape,
                                  expectedOutputShape,
@@ -765,7 +746,7 @@ void SubBroadcastTest(std::vector<armnn::BackendId>& backends)
                                  expectedOutputValues);
 }
 
-void SubUint8Test(std::vector<armnn::BackendId>& backends)
+void SubUint8Test()
 {
     std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1, 1 };
@@ -778,7 +759,6 @@ void SubUint8Test(std::vector<armnn::BackendId>& backends)
     ElementwiseBinaryTest<uint8_t>(tflite::BuiltinOperator_SUB,
                                    tflite::ActivationFunctionType_NONE,
                                    ::tflite::TensorType_UINT8,
-                                   backends,
                                    input0Shape,
                                    input1Shape,
                                    expectedOutputShape,
@@ -787,404 +767,129 @@ void SubUint8Test(std::vector<armnn::BackendId>& backends)
                                    expectedOutputValues, 1.0f, 0);
 }
 
-TEST_SUITE("ElementwiseBinary_GpuAccTests")
+TEST_SUITE("ElementwiseBinary_Tests")
 {
 
-TEST_CASE ("ADD_FP32_GpuAcc_Test")
+TEST_CASE ("ADD_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AddFP32Test(backends);
+    AddFP32Test();
 }
 
-TEST_CASE ("ADD_Broadcast_GpuAcc_Test")
+TEST_CASE ("ADD_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AddBroadcastTest(backends);
+    AddBroadcastTest();
 }
 
-TEST_CASE ("ADD_Activation_GpuAcc_Test")
+TEST_CASE ("ADD_Constant_Input_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AddActivationTest(backends);
+    AddConstInputTest();
 }
 
-TEST_CASE ("ADD_UINT8_GpuAcc_Test")
+TEST_CASE ("ADD_Activation_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AddUint8Test(backends);
+    AddActivationTest();
 }
 
-TEST_CASE ("DIV_FP32_GpuAcc_Test")
+TEST_CASE ("ADD_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    DivFP32Test(backends);
+    AddUint8Test();
 }
 
-TEST_CASE ("DIV_Broadcast_GpuAcc_Test")
+TEST_CASE ("DIV_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    DivBroadcastTest(backends);
+    DivFP32Test();
 }
 
-TEST_CASE ("FLOORDIV_FP32_GpuAcc_Test")
+TEST_CASE ("DIV_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    FloorDivFP32Test(backends);
+    DivBroadcastTest();
 }
 
-TEST_CASE ("MAX_FP32_GpuAcc_Test")
+TEST_CASE ("FLOORDIV_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxFP32Test(backends);
+    FloorDivFP32Test();
 }
 
-TEST_CASE ("MAX_Broadcast_GpuAcc_Test")
+TEST_CASE ("DIV_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxBroadcastTest(backends);
-}
-
-TEST_CASE ("MAX_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxUint8Test(backends);
-}
-
-TEST_CASE ("MIN_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MinFP32Test(backends);
-}
-
-TEST_CASE ("MIN_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MinBroadcastTest(backends);
-}
-
-TEST_CASE ("MIN_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MinUint8Test(backends);
-}
-
-TEST_CASE ("MUL_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MulFP32Test(backends);
-}
-
-TEST_CASE ("MUL_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MulBroadcastTest(backends);
-}
-
-TEST_CASE ("MUL_Activation_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MulActivationTest(backends);
-}
-
-TEST_CASE ("MUL_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MulUint8Test(backends);
-}
-
-TEST_CASE ("SUB_FP32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    SubFP32Test(backends);
-}
-
-TEST_CASE ("SUB_Broadcast_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    SubBroadcastTest(backends);
-}
-
-TEST_CASE ("SUB_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    SubUint8Test(backends);
-}
-
-} //TEST_SUITE("ElementwiseBinary_GpuAccTests")
-
-
-
-TEST_SUITE("ElementwiseBinary_CpuAccTests")
-{
-
-TEST_CASE ("ADD_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AddFP32Test(backends);
-}
-
-TEST_CASE ("ADD_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AddBroadcastTest(backends);
-}
-
-TEST_CASE ("ADD_Activation_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AddActivationTest(backends);
-}
-
-TEST_CASE ("ADD_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AddUint8Test(backends);
-}
-
-TEST_CASE ("DIV_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    DivFP32Test(backends);
-}
-
-TEST_CASE ("DIV_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    DivBroadcastTest(backends);
-}
-
-TEST_CASE ("FLOORDIV_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    FloorDivFP32Test(backends);
-}
-
-TEST_CASE ("MAX_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxFP32Test(backends);
-}
-
-TEST_CASE ("MAX_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxBroadcastTest(backends);
-}
-
-TEST_CASE ("MAX_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxUint8Test(backends);
-}
-
-TEST_CASE ("MIN_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MinFP32Test(backends);
-}
-
-TEST_CASE ("MIN_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MinBroadcastTest(backends);
-}
-
-TEST_CASE ("MIN_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MinUint8Test(backends);
-}
-
-TEST_CASE ("MUL_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MulFP32Test(backends);
-}
-
-TEST_CASE ("MUL_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MulBroadcastTest(backends);
-}
-
-TEST_CASE ("MUL_Actiation_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MulActivationTest(backends);
-}
-
-TEST_CASE ("MUL_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MulUint8Test(backends);
-}
-
-TEST_CASE ("SUB_FP32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    SubFP32Test(backends);
-}
-
-TEST_CASE ("SUB_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    SubBroadcastTest(backends);
-}
-
-TEST_CASE ("SUB_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    SubUint8Test(backends);
-}
-
-} // TEST_SUITE("ElementwiseBinary_CpuAccTests")
-
-
-TEST_SUITE("ElementwiseBinary_CpuRefTests")
-{
-
-TEST_CASE ("ADD_FP32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AddFP32Test(backends);
-}
-
-TEST_CASE ("ADD_Broadcast_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AddBroadcastTest(backends);
-}
-
-TEST_CASE ("ADD_Constant_Input_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AddConstInputTest(backends);
-}
-
-TEST_CASE ("ADD_Activation_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AddActivationTest(backends);
-}
-
-TEST_CASE ("ADD_UINT8_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AddUint8Test(backends);
-}
-
-TEST_CASE ("DIV_FP32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    DivFP32Test(backends);
-}
-
-TEST_CASE ("DIV_Broadcast_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    DivBroadcastTest(backends);
-}
-
-TEST_CASE ("FLOORDIV_FP32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    FloorDivFP32Test(backends);
-}
-
-TEST_CASE ("DIV_UINT8_CpuRef_Test")
-{
+    // Only works on CpuRef.
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     DivUint8Test(backends);
 }
 
-TEST_CASE ("MAX_FP32_CpuRef_Test")
+TEST_CASE ("MAX_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxFP32Test(backends);
+    MaxFP32Test();
 }
 
-TEST_CASE ("MAX_Broadcast_CpuRef_Test")
+TEST_CASE ("MAX_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxBroadcastTest(backends);
+    MaxBroadcastTest();
 }
 
-TEST_CASE ("MAX_UINT8_CpuRef_Test")
+TEST_CASE ("MAX_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxUint8Test(backends);
+    MaxUint8Test();
 }
 
-TEST_CASE ("MIN_FP32_CpuRef_Test")
+TEST_CASE ("MIN_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MinFP32Test(backends);
+    MinFP32Test();
 }
 
-TEST_CASE ("MIN_Broadcast_CpuRef_Test")
+TEST_CASE ("MIN_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MinBroadcastTest(backends);
+    MinBroadcastTest();
 }
 
-TEST_CASE ("MIN_UINT8_CpuRef_Test")
+TEST_CASE ("MIN_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MinUint8Test(backends);
+    MinUint8Test();
 }
 
-TEST_CASE ("MUL_FP32_CpuRef_Test")
+TEST_CASE ("MUL_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MulFP32Test(backends);
+    MulFP32Test();
 }
 
-TEST_CASE ("MUL_Broadcast_CpuRef_Test")
+TEST_CASE ("MUL_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MulBroadcastTest(backends);
+    MulBroadcastTest();
 }
 
-TEST_CASE ("MUL_Actiation_CpuRef_Test")
+TEST_CASE ("MUL_Actiation_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MulActivationTest(backends);
+    MulActivationTest();
 }
 
-TEST_CASE ("MUL_UINT8_CpuRef_Test")
+TEST_CASE ("MUL_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MulUint8Test(backends);
+    MulUint8Test();
 }
 
-TEST_CASE ("SUB_FP32_CpuRef_Test")
+TEST_CASE ("SUB_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    SubFP32Test(backends);
+    SubFP32Test();
 }
 
-TEST_CASE ("SUB_Broadcast_CpuRef_Test")
+TEST_CASE ("SUB_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    SubBroadcastTest(backends);
+    SubBroadcastTest();
 }
 
-TEST_CASE ("SUB_UINT8_CpuRef_Test")
+TEST_CASE ("SUB_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    SubUint8Test(backends);
+    SubUint8Test();
 }
 
-TEST_CASE ("SqDiffFP32_CpuRef_Test")
+TEST_CASE ("SqDiffFP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    SqDiffFP32Test(backends);
+    SqDiffFP32Test();
 }
 
-TEST_CASE ("PowerFP32_CpuRef_Test")
+TEST_CASE ("PowerFP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PowerFP32Test(backends);
+    PowerFP32Test();
 }
 
 } // TEST_SUITE("ElementwiseBinary_CpuRefTests")

@@ -39,37 +39,40 @@ void BroadcastToTest(std::vector<armnn::BackendId> &backends, tflite::TensorType
 
     BroadcastToTestImpl<T>(inputTensorType,
                            tflite::BuiltinOperator_BROADCAST_TO,
-                           backends,
                            inputValues,
                            inputShape,
                            shapeShape,
                            shapeData,
                            expectedOutputValues,
-                           expectedOutputShape);
+                           expectedOutputShape,
+                           backends);
 }
 
-TEST_SUITE("BroadcastToTests_CpuRefTests")
+TEST_SUITE("BroadcastToTests_Tests")
 {
 
-    TEST_CASE ("BroadcastTo_int_CpuRef_Test")
+    /**
+     * Only CpuRef is supported for these tests.
+     */
+    TEST_CASE ("BroadcastTo_int_Test")
     {
         std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
         BroadcastToTest<int32_t>(backends, ::tflite::TensorType::TensorType_INT32);
     }
 
-    TEST_CASE ("BroadcastTo_Float32_CpuRef_Test")
+    TEST_CASE ("BroadcastTo_Float32_Test")
     {
         std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
         BroadcastToTest<float>(backends, ::tflite::TensorType::TensorType_FLOAT32);
     }
 
-    TEST_CASE ("BroadcastTo_Uint8_t_CpuRef_Test")
+    TEST_CASE ("BroadcastTo_Uint8_t_Test")
     {
         std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
         BroadcastToTest<uint8_t>(backends, ::tflite::TensorType::TensorType_UINT8);
     }
 
-    TEST_CASE ("BroadcastTo_Int8_t_CpuRef_Test")
+    TEST_CASE ("BroadcastTo_Int8_t_Test")
     {
         std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
         BroadcastToTest<int8_t>(backends, ::tflite::TensorType::TensorType_INT8);

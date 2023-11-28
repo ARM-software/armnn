@@ -15,7 +15,7 @@
 namespace armnnDelegate
 {
 
-void LogicalBinaryAndBoolTest(std::vector<armnn::BackendId>& backends)
+void LogicalBinaryAndBoolTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 2, 2 };
@@ -28,7 +28,6 @@ void LogicalBinaryAndBoolTest(std::vector<armnn::BackendId>& backends)
 
     LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_AND,
                       ::tflite::TensorType_BOOL,
-                      backends,
                       input0Shape,
                       input1Shape,
                       expectedOutputShape,
@@ -37,7 +36,7 @@ void LogicalBinaryAndBoolTest(std::vector<armnn::BackendId>& backends)
                       expectedOutputValues);
 }
 
-void LogicalBinaryAndBroadcastTest(std::vector<armnn::BackendId>& backends)
+void LogicalBinaryAndBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1 };
@@ -49,7 +48,6 @@ void LogicalBinaryAndBroadcastTest(std::vector<armnn::BackendId>& backends)
 
     LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_AND,
                       ::tflite::TensorType_BOOL,
-                      backends,
                       input0Shape,
                       input1Shape,
                       expectedOutputShape,
@@ -58,7 +56,7 @@ void LogicalBinaryAndBroadcastTest(std::vector<armnn::BackendId>& backends)
                       expectedOutputValues);
 }
 
-void LogicalBinaryOrBoolTest(std::vector<armnn::BackendId>& backends)
+void LogicalBinaryOrBoolTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 2, 2 };
@@ -70,7 +68,6 @@ void LogicalBinaryOrBoolTest(std::vector<armnn::BackendId>& backends)
 
     LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_OR,
                       ::tflite::TensorType_BOOL,
-                      backends,
                       input0Shape,
                       input1Shape,
                       expectedOutputShape,
@@ -79,7 +76,7 @@ void LogicalBinaryOrBoolTest(std::vector<armnn::BackendId>& backends)
                       expectedOutputValues);
 }
 
-void LogicalBinaryOrBroadcastTest(std::vector<armnn::BackendId>& backends)
+void LogicalBinaryOrBroadcastTest()
 {
     std::vector<int32_t> input0Shape { 1, 2, 2 };
     std::vector<int32_t> input1Shape { 1, 1, 1 };
@@ -91,7 +88,6 @@ void LogicalBinaryOrBroadcastTest(std::vector<armnn::BackendId>& backends)
 
     LogicalBinaryTest(tflite::BuiltinOperator_LOGICAL_OR,
                       ::tflite::TensorType_BOOL,
-                      backends,
                       input0Shape,
                       input1Shape,
                       expectedOutputShape,
@@ -101,7 +97,7 @@ void LogicalBinaryOrBroadcastTest(std::vector<armnn::BackendId>& backends)
 }
 
 // LogicalNot operator uses ElementwiseUnary unary layer and descriptor but is still classed as logical operator.
-void LogicalNotBoolTest(std::vector<armnn::BackendId>& backends)
+void LogicalNotBoolTest()
 {
     std::vector<int32_t> inputShape { 1, 2, 2 };
 
@@ -109,115 +105,37 @@ void LogicalNotBoolTest(std::vector<armnn::BackendId>& backends)
     std::vector<bool> expectedOutputValues { 1, 0, 1, 0 };
 
     ElementwiseUnaryBoolTest(tflite::BuiltinOperator_LOGICAL_NOT,
-                             backends,
                              inputShape,
                              inputValues,
                              expectedOutputValues);
 }
 
-TEST_SUITE("LogicalBinaryTests_GpuAccTests")
+TEST_SUITE("LogicalBinaryTests_Tests")
 {
 
-TEST_CASE ("LogicalBinary_AND_Bool_GpuAcc_Test")
+TEST_CASE ("LogicalBinary_AND_Bool_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LogicalBinaryAndBoolTest(backends);
+    LogicalBinaryAndBoolTest();
 }
 
-TEST_CASE ("LogicalBinary_AND_Broadcast_GpuAcc_Test")
+TEST_CASE ("LogicalBinary_AND_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LogicalBinaryAndBroadcastTest(backends);
+    LogicalBinaryAndBroadcastTest();
 }
 
-TEST_CASE ("Logical_NOT_Bool_GpuAcc_Test")
+TEST_CASE ("Logical_NOT_Bool_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LogicalNotBoolTest(backends);
+    LogicalNotBoolTest();
 }
 
-TEST_CASE ("LogicalBinary_OR_Bool_GpuAcc_Test")
+TEST_CASE ("LogicalBinary_OR_Bool_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LogicalBinaryOrBoolTest(backends);
+    LogicalBinaryOrBoolTest();
 }
 
-TEST_CASE ("LogicalBinary_OR_Broadcast_GpuAcc_Test")
+TEST_CASE ("LogicalBinary_OR_Broadcast_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    LogicalBinaryOrBroadcastTest(backends);
-}
-
-}
-
-
-TEST_SUITE("LogicalBinaryTests_CpuAccTests")
-{
-
-TEST_CASE ("LogicalBinary_AND_Bool_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LogicalBinaryAndBoolTest(backends);
-}
-
-TEST_CASE ("LogicalBinary_AND_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LogicalBinaryAndBroadcastTest(backends);
-}
-
-TEST_CASE ("Logical_NOT_Bool_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LogicalNotBoolTest(backends);
-}
-
-TEST_CASE ("LogicalBinary_OR_Bool_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LogicalBinaryOrBoolTest(backends);
-}
-
-TEST_CASE ("LogicalBinary_OR_Broadcast_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    LogicalBinaryOrBroadcastTest(backends);
-}
-
-}
-
-
-TEST_SUITE("LogicalBinaryTests_CpuRefTests")
-{
-
-TEST_CASE ("LogicalBinary_AND_Bool_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    LogicalBinaryAndBoolTest(backends);
-}
-
-TEST_CASE ("LogicalBinary_AND_Broadcast_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    LogicalBinaryAndBroadcastTest(backends);
-}
-
-TEST_CASE ("Logical_NOT_Bool_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    LogicalNotBoolTest(backends);
-}
-
-TEST_CASE ("LogicalBinary_OR_Bool_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    LogicalBinaryOrBoolTest(backends);
-}
-
-TEST_CASE ("LogicalBinary_OR_Broadcast_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    LogicalBinaryOrBroadcastTest(backends);
+    LogicalBinaryOrBroadcastTest();
 }
 
 }

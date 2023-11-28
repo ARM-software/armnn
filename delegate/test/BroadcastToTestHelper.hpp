@@ -119,13 +119,13 @@ namespace
     template<typename T>
     void BroadcastToTestImpl(tflite::TensorType inputTensorType,
                              tflite::BuiltinOperator operatorCode,
-                             std::vector<armnn::BackendId>& backends,
                              std::vector<T>& inputValues,
                              std::vector<int32_t> inputShape,
                              std::vector<int32_t> shapeShapes,
                              std::vector<int32_t> shapeData,
                              std::vector<T>& expectedOutputValues,
-                             std::vector<int32_t> expectedOutputShape)
+                             std::vector<int32_t> expectedOutputShape,
+                             const std::vector<armnn::BackendId>& backends)
     {
         using namespace delegateTestInterpreter;
 
@@ -147,7 +147,7 @@ namespace
         std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
         // Setup interpreter with Arm NN Delegate applied.
-        auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+        auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
         CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
         CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
         CHECK(armnnInterpreter.FillInputTensor<int32_t>(shapeData, 1) == kTfLiteOk);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -97,7 +97,7 @@ void Splitter1dEndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 }, {1, expectedOutput1} };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -132,7 +132,7 @@ void Splitter2dDim0EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 }, {1, expectedOutput1} };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -170,7 +170,7 @@ void Splitter2dDim1EndToEnd(const std::vector<BackendId>& backends)
                                                          { 1, expectedOutput1 },
                                                          { 2, expectedOutput2 } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -218,7 +218,7 @@ void Splitter3dDim0EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 },
                                                          { 1, expectedOutput1 } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -266,7 +266,7 @@ void Splitter3dDim1EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput0 },
                                                          { 1, expectedOutput1 } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -306,7 +306,7 @@ void Splitter3dDim2EndToEnd(const std::vector<BackendId>& backends)
                                                          { 1, expectedOutput1 },
                                                          { 2, expectedOutput2 } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -386,7 +386,7 @@ void Splitter4dDim0EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput0 }, { 1, expectedOutput1 }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -466,7 +466,7 @@ void Splitter4dDim1EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput0 }, { 1, expectedOutput1 }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -546,7 +546,7 @@ void Splitter4dDim2EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput0 }, { 1, expectedOutput1 }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -613,7 +613,7 @@ void Splitter4dDim3EndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput0 }, { 1, expectedOutput1 }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

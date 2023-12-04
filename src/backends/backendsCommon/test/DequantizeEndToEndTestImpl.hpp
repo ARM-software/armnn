@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019,2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -54,7 +54,7 @@ void DequantizeEndToEndLayerTestImpl(const std::vector<BackendId>& backends,
     std::map<int, std::vector<float>> expectedOutputData = { { 0, expectedOutput } };
 
     EndToEndLayerTestImpl<ArmnnType, armnn::DataType::Float32>(
-            move(net), inputTensorData, expectedOutputData, backends);
+            std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

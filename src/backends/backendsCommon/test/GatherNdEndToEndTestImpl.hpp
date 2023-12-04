@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -87,7 +87,7 @@ void GatherNdEndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0, paramsData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
@@ -155,7 +155,7 @@ void GatherNdMultiDimEndToEnd(const std::vector<BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData = {{ 0, paramsData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

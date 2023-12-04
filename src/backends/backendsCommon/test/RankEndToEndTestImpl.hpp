@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,7 +57,7 @@ void RankEndToEnd(const std::vector<armnn::BackendId>& backends)
     std::map<int, std::vector<T>> inputTensorData   = {{ 0, inputData }};
     std::map<int, std::vector<int32_t>> expectedOutputTensorData = {{ 0, expectedOutputData }};
 
-    EndToEndLayerTestImpl<ArmnnType, DataType::Signed32>(move(network),
+    EndToEndLayerTestImpl<ArmnnType, DataType::Signed32>(std::move(network),
                                                          inputTensorData,
                                                          expectedOutputTensorData,
                                                          backends);

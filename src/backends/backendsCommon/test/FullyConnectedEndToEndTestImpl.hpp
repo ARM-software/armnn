@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -210,7 +210,7 @@ void FullyConnectedWithDynamicWeightsEndToEnd(const std::vector<armnn::BackendId
     std::map<int, std::vector<T>> inputTensorData    = {{ 0, inputData }, {1, weightsData}};
     std::map<int, std::vector<T>> expectedOutputTensorData = {{ 0, expectedOutputData }};
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(network),
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
                                                 inputTensorData,
                                                 expectedOutputTensorData,
                                                 backends,
@@ -305,7 +305,7 @@ void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::
         std::map<int, std::vector<T>> inputTensorData    = {{ 0, input }, {1, weights}};
         std::map<int, std::vector<T>> expectedOutputTensorData = {{ 0, expectedOutput }};
 
-        EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(network),
+        EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
                                                     inputTensorData,
                                                     expectedOutputTensorData,
                                                     backends,
@@ -327,7 +327,7 @@ void FullyConnectedWithDynamicOrConstantInputsEndToEnd(const std::vector<armnn::
         std::map<int, std::vector<T>> inputTensorData    = {{ 0, input }, {2, biasValues}};
         std::map<int, std::vector<T>> expectedOutputTensorData = {{ 0, expectedOutput }};
 
-        EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(network),
+        EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
                                                     inputTensorData,
                                                     expectedOutputTensorData,
                                                     backends,

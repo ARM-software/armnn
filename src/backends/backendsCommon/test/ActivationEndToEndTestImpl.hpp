@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -106,7 +106,7 @@ void ActivationEndToEndImpl(const std::vector<armnn::BackendId>& backends,
 
     float tolerance = GetActivationTolerance(descriptor.m_Function, ArmnnType);
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net),
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net),
                                                 inputTensorData,
                                                 expectedOutputTensorData,
                                                 backends,

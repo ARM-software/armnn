@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019,2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -87,7 +87,7 @@ void SpaceToDepthEndToEnd(const std::vector<armnn::BackendId>& backends,
     std::map<int, std::vector<float>> expectedOutputTensorData = { { 0, expectedOutputData } };
 
     EndToEndLayerTestImpl<DataType::Float32, DataType::Float32>(
-            move(net),
+            std::move(net),
             inputTensorData,
             expectedOutputTensorData,
             backends);

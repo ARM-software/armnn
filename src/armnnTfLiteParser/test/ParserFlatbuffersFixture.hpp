@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -135,7 +135,7 @@ struct ParserFlatbuffersFixture
                                   m_Runtime->GetDeviceSpec());
         std::string errorMessage;
 
-        armnn::Status ret = m_Runtime->LoadNetwork(networkId, move(optimized), errorMessage);
+        armnn::Status ret = m_Runtime->LoadNetwork(networkId, std::move(optimized), errorMessage);
 
         if (ret != armnn::Status::Success)
         {

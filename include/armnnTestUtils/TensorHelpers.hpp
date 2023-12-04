@@ -47,7 +47,7 @@ struct SelectiveComparer<T, false>
             return true;
         }
 
-        if (std::isnan(a) && std::isnan(b))
+        if (std::isnan(static_cast<float>(a)) && std::isnan(static_cast<float>(b)))
         {
             return true;
         }

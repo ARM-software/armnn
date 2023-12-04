@@ -39,7 +39,7 @@ void ExecutionFrame::RegisterDebugCallback(const DebugCallbackFunction& func)
 
 void ExecutionFrame::AddWorkloadToQueue(std::unique_ptr<IWorkload> workload)
 {
-    m_WorkloadQueue.push_back(move(workload));
+    m_WorkloadQueue.push_back(std::move(workload));
 }
 
 void ExecutionFrame::SetNextExecutionFrame(IExecutionFrame* nextExecutionFrame)

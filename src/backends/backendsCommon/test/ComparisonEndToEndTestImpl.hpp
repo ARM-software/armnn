@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -72,7 +72,8 @@ void ComparisonSimpleEndToEnd(const std::vector<BackendId>& backends,
     std::map<int, std::vector<TInput>>  inputTensorData    = {{ 0, input0 }, { 1, input1 }};
     std::map<int, std::vector<uint8_t>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<ArmnnInType, DataType::Boolean>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnInType, DataType::Boolean>(std::move(net), inputTensorData, expectedOutputData,
+                                                          backends);
 }
 
 template<armnn::DataType ArmnnInType,
@@ -97,7 +98,8 @@ void ComparisonBroadcastEndToEnd(const std::vector<BackendId>& backends,
     std::map<int, std::vector<TInput>>  inputTensorData    = {{ 0, input0 }, { 1, input1 }};
     std::map<int, std::vector<uint8_t>> expectedOutputData = {{ 0, expectedOutput }};
 
-    EndToEndLayerTestImpl<ArmnnInType, DataType::Boolean>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnInType, DataType::Boolean>(std::move(net), inputTensorData, expectedOutputData,
+                                                          backends);
 }
 
 } // anonymous namespace

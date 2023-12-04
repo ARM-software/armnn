@@ -8,7 +8,6 @@
 
 namespace armnn
 {
-
 template<typename Function,
         typename Iterator,
         typename Category = typename std::iterator_traits<Iterator>::iterator_category,
@@ -16,7 +15,7 @@ template<typename Function,
         typename Distance = typename std::iterator_traits<Iterator>::difference_type,
         typename Pointer = typename std::iterator_traits<Iterator>::pointer,
         typename Reference =
-        typename std::result_of<const Function(typename std::iterator_traits<Iterator>::reference)>::type
+                typename std::invoke_result<const Function, typename std::iterator_traits<Iterator>::reference>::type
 >
 class TransformIterator
 {
@@ -73,7 +72,7 @@ public:
     bool operator<=(const TransformIterator& rhs) const {return m_it <= rhs.m_it;}
 
     bool operator==(TransformIterator other) const {return (m_it == other.m_it);}
-    bool operator!=(TransformIterator other) const {return !(m_it == other.m_it);}
+    bool operator!=(TransformIterator other) const {return (m_it != other.m_it);}
 
     Reference operator*() const {return m_fn(*m_it);}
 

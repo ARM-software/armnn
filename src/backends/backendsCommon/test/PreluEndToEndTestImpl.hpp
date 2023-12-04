@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2019,2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -65,7 +65,7 @@ void PreluEndToEnd(const std::vector<BackendId>& backends,
     std::map<int, std::vector<T>> inputTensorData          = { { 0, inputData }, { 1, alphaData} };
     std::map<int, std::vector<T>> expectedOutputTensorData = { { 0, expectedOutputData } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net),
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net),
                                                 inputTensorData,
                                                 expectedOutputTensorData,
                                                 backends);

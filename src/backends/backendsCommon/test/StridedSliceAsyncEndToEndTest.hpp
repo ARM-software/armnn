@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -323,7 +323,7 @@ void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends, size_t nu
     std::map<int, std::vector<T>> inputTensorData = {{0, inputData}};
     std::map<int, std::vector<T>> expectedOutputData = {{0, outputExpected}};
 
-    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(move(net),
+    AsyncEndToEndTestImpl<ArmnnType, ArmnnType>(std::move(net),
                                                 inputTensorData,
                                                 expectedOutputData,
                                                 backends,
@@ -392,7 +392,7 @@ void StridedSlicedMultiThreadedEndToEndTest(const std::vector<BackendId>& backen
     outputTensors.push_back(std::map<int, std::vector<T>> {{0, outputExpected1}});
     outputTensors.push_back(std::map<int, std::vector<T>> {{0, outputExpected2}});
 
-    AsyncThreadedEndToEndTestImpl<ArmnnType, ArmnnType>(move(net), inputTensors, outputTensors, backends, 2);
+    AsyncThreadedEndToEndTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensors, outputTensors, backends, 2);
 }
 
 } // experimental namespace

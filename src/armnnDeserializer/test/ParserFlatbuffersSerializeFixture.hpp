@@ -66,7 +66,7 @@ struct ParserFlatbuffersSerializeFixture
                                   m_Runtime->GetDeviceSpec());
 
         std::string errorMessage;
-        armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
+        armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optimized), errorMessage);
 
         if (ret != armnn::Status::Success)
         {

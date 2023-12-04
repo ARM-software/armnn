@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2019-2021,2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -72,7 +72,7 @@ void BatchToSpaceNdEndToEnd(const std::vector<BackendId>& backends, armnn::DataL
     std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 template<armnn::DataType ArmnnType>
@@ -113,7 +113,7 @@ void BatchToSpaceNdComplexEndToEnd(const std::vector<BackendId>& backends, armnn
     std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(move(net), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

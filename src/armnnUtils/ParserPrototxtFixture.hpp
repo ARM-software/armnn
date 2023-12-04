@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -127,7 +127,7 @@ void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::Te
     armnn::INetworkPtr network =
         m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes, requestedOutputs);
     auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
-    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
+    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optimized), errorMessage);
     if (ret != armnn::Status::Success)
     {
         throw armnn::Exception(fmt::format("LoadNetwork failed with error: '{0}' {1}",
@@ -144,7 +144,7 @@ void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::Te
     armnn::INetworkPtr network =
         m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes);
     auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
-    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
+    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optimized), errorMessage);
     if (ret != armnn::Status::Success)
     {
         throw armnn::Exception(fmt::format("LoadNetwork failed with error: '{0}' {1}",
@@ -161,7 +161,7 @@ void ParserPrototxtFixture<TParser>::Setup()
     armnn::INetworkPtr network =
         m_Parser->CreateNetworkFromString(m_Prototext.c_str());
     auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
-    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, move(optimized), errorMessage);
+    armnn::Status ret = m_Runtime->LoadNetwork(m_NetworkIdentifier, std::move(optimized), errorMessage);
     if (ret != armnn::Status::Success)
     {
         throw armnn::Exception(fmt::format("LoadNetwork failed with error: '{0}' {1}",

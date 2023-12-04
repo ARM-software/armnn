@@ -233,7 +233,7 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModel(
     auto numOutputs = getMainModel(model).outputIndexes.size();
     try
     {
-        if (runtime->LoadNetwork(netId, move(optNet), msg, networkProperties) != armnn::Status::Success)
+        if (runtime->LoadNetwork(netId, std::move(optNet), msg, networkProperties) != armnn::Status::Success)
         {
             return NN_ERROR(ErrorStatus::GENERAL_FAILURE) << "Network could not be loaded";
         }
@@ -530,7 +530,7 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModelFromCache(
                                                 options.IsGpuProfilingEnabled());
     try
     {
-        if (runtime->LoadNetwork(netId, move(optNet), msg, networkProperties) != armnn::Status::Success)
+        if (runtime->LoadNetwork(netId, std::move(optNet), msg, networkProperties) != armnn::Status::Success)
         {
             return NN_ERROR(ErrorStatus::GENERAL_FAILURE) << "Network could not be loaded";
         }

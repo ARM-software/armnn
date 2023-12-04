@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8d4cdd43a74574e0f99f83f1adb1d391c0c85abe" #10777: BatchNorm changes to enable fp16 in armv8a multi_isa builds
+DEFAULT_CLFRAMEWORKREVISION="7720b904f648aafa95900a32d65ee7011505b2b1" #10803: Fix driver build error
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

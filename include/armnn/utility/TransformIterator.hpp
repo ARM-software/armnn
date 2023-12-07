@@ -14,8 +14,13 @@ template<typename Function,
         typename T = typename std::iterator_traits<Iterator>::value_type,
         typename Distance = typename std::iterator_traits<Iterator>::difference_type,
         typename Pointer = typename std::iterator_traits<Iterator>::pointer,
+#if __cplusplus < 201703
+        typename Reference =
+                typename std::result_of<const Function(typename std::iterator_traits<Iterator>::reference)>::type
+#else
         typename Reference =
                 typename std::invoke_result<const Function, typename std::iterator_traits<Iterator>::reference>::type
+#endif
 >
 class TransformIterator
 {

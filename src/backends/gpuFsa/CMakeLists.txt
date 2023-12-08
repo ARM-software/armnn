@@ -23,7 +23,7 @@ if(ARMCOMPUTEGPUFSA)
         GpuFsaWorkloadFactory.hpp
     )
 
-    add_subdirectory(layerValidators)
+    add_subdirectory(layers)
     add_subdirectory(workloads)
 
     if(BUILD_UNIT_TESTS)

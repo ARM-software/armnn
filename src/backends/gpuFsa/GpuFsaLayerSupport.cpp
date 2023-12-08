@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,7 +10,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #if defined(ARMCOMPUTEGPUFSA_ENABLED)
-#include "layerValidators/GpuFsaConvolution2dValidate.hpp"
+#include "layers/GpuFsaConvolution2d.hpp"
 #endif
 
 #include <vector>

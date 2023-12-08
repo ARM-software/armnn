@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -9,6 +9,7 @@
 
 #include <arm_compute/core/Error.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadSketch.h>
+#include <gpuFsa/GpuFsaBackend.hpp>
 
 namespace armnn
 {
@@ -20,7 +21,8 @@ arm_compute::Status GpuFsaConvolution2dValidate(const TensorInfo& input,
                                                 const TensorInfo& weights,
                                                 const Optional<TensorInfo>& biases);
 
-void GpuFsaConvolution2dCreateOp(const TensorInfo& input,
+void GpuFsaConvolution2dCreateOp(GpuFsaPreCompiledBlob* blob,
+                                 const TensorInfo& input,
                                  const Convolution2dDescriptor& descriptor,
                                  const TensorInfo& weights,
                                  const Optional<TensorInfo>& biases);

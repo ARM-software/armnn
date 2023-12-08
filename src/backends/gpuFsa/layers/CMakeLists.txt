@@ -1,11 +1,11 @@
 #
-# Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 list(APPEND armnnGpuFsaBackendLayerValidators_sources
-        GpuFsaConvolution2dValidate.cpp
-        GpuFsaConvolution2dValidate.hpp
+        GpuFsaConvolution2d.cpp
+        GpuFsaConvolution2d.hpp
     )
 
 add_library(armnnGpuFsaBackendLayerValidators OBJECT ${armnnGpuFsaBackendLayerValidators_sources})

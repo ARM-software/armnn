@@ -1,10 +1,15 @@
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 list(APPEND armnnGpuFsaBackendWorkloads_sources
         GpuFsaBaseWorkload.hpp
+        GpuFsaConstantWorkload.hpp
+        GpuFsaConstantWorkload.cpp
+        GpuFsaPreCompiledWorkload.hpp
+        GpuFsaPreCompiledWorkload.cpp
+        GpuFsaWorkloadUtils.hpp
 )
 
 add_library(armnnGpuFsaBackendWorkloads OBJECT ${armnnGpuFsaBackendWorkloads_sources})

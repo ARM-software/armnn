@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -7,6 +7,8 @@
 #include <aclCommon/BaseMemoryManager.hpp>
 
 #include <armnn/Optional.hpp>
+
+#include <arm_compute/core/CL/CLCompileContext.h>
 
 namespace armnn
 {
@@ -44,6 +46,7 @@ public:
     std::unique_ptr<ITensorHandle> CreateTensorHandle(const TensorInfo& tensorInfo,
                                                       DataLayout dataLayout,
                                                       const bool IsMemoryManaged = true) const override;
+    void InitializeCLCompileContext();
 
     std::unique_ptr<IWorkload> CreateWorkload(LayerType type,
                                               const QueueDescriptor& descriptor,
@@ -54,6 +57,7 @@ private:
     std::unique_ptr<IWorkload> MakeWorkload(const QueueDescriptorType& descriptor, const WorkloadInfo& info) const;
 
     mutable std::shared_ptr<GpuFsaMemoryManager> m_MemoryManager;
+    arm_compute::CLCompileContext m_CLCompileContext;
 };
 
 } // namespace armnn

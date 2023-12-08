@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -11,6 +11,8 @@
 #include <arm_compute/runtime/CL/CLMemoryRegion.h>
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <CL/cl_ext.h>
+#include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadContext.h>
+#include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadSketch.h>
 
 // System includes for mapping and unmapping memory
 #include <sys/mman.h>
@@ -18,13 +20,31 @@
 namespace armnn
 {
 
+/**
+ * A structure which contains all the elements needed to execute a fused workload in the GpuFsa Backend
+ *
+ * @param[in, out]  sketch      A unique pointer to the sketch containing the operators which have been fused.
+ * @param[in, out]  TensorInfos A shared pointer to a GpuWorkloadContext which contains TensorInfos
+ * @param[in, out]  inputIds    A unique pointer to a vector of input Ids used to access workloadContext TensorInfos
+ * @param[in, out]  outputIds   A unique pointer to a vector of output Ids used to access workloadContext TensorInfos
+ *
+ */
+struct GpuFsaPreCompiledBlob
+{
+    std::unique_ptr<arm_compute::experimental::dynamic_fusion::GpuWorkloadSketch> sketch = nullptr;
+    std::shared_ptr<arm_compute::experimental::dynamic_fusion::GpuWorkloadContext> workloadContext = nullptr;
+
+    std::unique_ptr<std::vector<int32_t>> inputIds = nullptr;
+    std::unique_ptr<std::vector<int32_t>> outputIds = nullptr;
+};
+
 // add new capabilities here..
 const BackendCapabilities gpuFsaCapabilities("GpuFsa",
                                              {
                                                      {"NonConstWeights", false},
                                                      {"AsyncExecution", false},
                                                      {"ProtectedContentAllocation", false},
-                                                     {"ConstantTensorsAsInputs", false},
+                                                     {"ConstantTensorsAsInputs", true},
                                                      {"PreImportIOTensors", false},
                                                      {"ExternallyManagedMemory", false},
                                                      {"MultiAxisPacking", false},

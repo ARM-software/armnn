@@ -87,7 +87,10 @@ unsigned int ExtractHeader(const std::vector<char>& buffer, std::string& tensorN
         throw ParseException("Invalid data type in header.");
     }
     // Remember to move the iterator past the colon.
-    return (++endOfHeader - buffer.begin());
+    endOfHeader++;
+    // Breaking this into two parts to avoid an awkward gcc compiler problem.
+    auto dataStart = endOfHeader - buffer.begin();
+    return static_cast<unsigned int>(dataStart);
 }
 
 /**
@@ -118,21 +121,21 @@ void ReadData(const std::vector<char>& buffer,
             switch (tensorType)
             {
                 case DataType::Float32: {
-                    results.push_back(std::stof(elementString));
+                    results.push_back(static_cast<T>(std::stof(elementString)));
                     break;
                 }
 
                 case DataType::Signed32: {
-                    results.push_back(std::stoi(elementString));
+                    results.push_back(static_cast<T>(std::stoi(elementString)));
                     break;
                 }
                 case DataType::QSymmS8:
                 case DataType::QAsymmS8: {
-                    results.push_back(elementString[0]);
+                    results.push_back(static_cast<T>(elementString[0]));
                     break;
                 }
                 case DataType::QAsymmU8: {
-                    results.push_back(elementString[0]);
+                    results.push_back(static_cast<T>(elementString[0]));
                     break;
                 }
                 case DataType::Float16:
@@ -182,7 +185,7 @@ Tensor ReadTensorFromFile(const std::string fileName)
     // We'll read the entire file into one buffer.
     std::ifstream file(fileName, std::ios::binary);
     std::vector<char> buffer(fileSize);
-    if (file.read(buffer.data(), fileSize))
+    if (file.read(buffer.data(), static_cast<std::streamsize>(fileSize)))
     {
         std::string tensorName;
         DataType tensorType;

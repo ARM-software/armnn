@@ -8,7 +8,6 @@
 #include <armnn_delegate.hpp>
 
 #include <flatbuffers/flatbuffers.h>
-#include <schema_generated.h>
 #include <doctest/doctest.h>
 
 namespace armnnDelegate

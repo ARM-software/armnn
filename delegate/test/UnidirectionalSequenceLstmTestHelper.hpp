@@ -14,8 +14,6 @@
 #include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
 
-#include <schema_generated.h>
-
 #include <doctest/doctest.h>
 
 #include <armnn/utility/IgnoreUnused.hpp>

@@ -9,7 +9,6 @@
 
 #include <flatbuffers/flatbuffers.h>
 #include <tensorflow/lite/interpreter.h>
-#include <schema_generated.h>
 
 #include <doctest/doctest.h>
 

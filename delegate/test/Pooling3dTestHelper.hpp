@@ -16,8 +16,6 @@
 #include <tensorflow/lite/kernels/custom_ops_register.h>
 #include <tensorflow/lite/version.h>
 
-#include <schema_generated.h>
-
 #include <doctest/doctest.h>
 
 namespace

@@ -8,6 +8,7 @@
 #include <armnn/backends/WorkloadFactory.hpp>
 
 #if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED) || defined(ARMCOMPUTEGPUFSA_ENABLED)
+#include <arm_compute/runtime/MemoryGroup.h>
 #include <arm_compute/runtime/IAllocator.h>
 #include <arm_compute/runtime/IMemoryGroup.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>

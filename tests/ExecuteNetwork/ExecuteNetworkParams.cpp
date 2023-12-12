@@ -162,6 +162,13 @@ armnnDelegate::DelegateOptions ExecuteNetworkParams::ToDelegateOptions() const
         optimizerOptions.AddModelOption(networkOption);
     }
 
+    if (m_EnableLayerDetails)
+    {
+        fs::path filename = m_ModelPath;
+        filename.replace_extension("dot");
+        delegateOptions.SetSerializeToDot(filename);
+    }
+
     {
         armnn::BackendOptions option("GpuAcc", {{"FastMathEnabled", m_EnableFastMath}});
         optimizerOptions.AddModelOption(option);

@@ -1084,6 +1084,17 @@ TEST_CASE("RefSpaceToDepthNchwEndToEndTest2")
     SpaceToDepthNchwEndToEndTest2(defaultBackends);
 }
 
+// Split
+TEST_CASE("RefSplit1dEndtoEndTestSigned16")
+{
+    Splitter1dEndToEnd<DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("TosaRefSplit1dEndtoEndTestFloat16")
+{
+    Splitter1dEndToEndFloat16<DataType::Float16>(defaultBackends);
+}
+
 TEST_CASE("RefSplitter1dEndToEndTest")
 {
     Splitter1dEndToEnd<armnn::DataType::Float32>(defaultBackends);
@@ -1112,6 +1123,16 @@ TEST_CASE("RefSplitter2dDim0EndToEndUint8Test")
 TEST_CASE("RefSplitter2dDim1EndToEndUint8Test")
 {
     Splitter2dDim1EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("RefSplit3dDim1EndtoEndTestSigned16")
+{
+    Splitter3dDim1EndToEnd<DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefSplit3dDim1EndtoEndTestFloat16")
+{
+    Splitter3dDim1EndToEndFloat16<DataType::Float16>(defaultBackends);
 }
 
 TEST_CASE("RefSplitter3dDim0EndToEndTest")
@@ -1157,6 +1178,11 @@ TEST_CASE("RefSplitter4dDim1EndToEndTest")
 TEST_CASE("RefSplitter4dDim2EndToEndTest")
 {
     Splitter4dDim2EndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefSplit4dDim2EndtoEndTestFloat16")
+{
+    Splitter4dDim2EndToEndFloat16<DataType::Float16>(defaultBackends);
 }
 
 TEST_CASE("RefSplitter4dDim3EndToEndTest")

@@ -84,6 +84,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto sliceDesc = PolymorphicDowncast<const SliceDescriptor*>(&descriptor);
             return ConvertSliceToTosaOperator(layer, inputs, outputs, sliceDesc);
         }
+        case LayerType::Splitter:
+        {
+            auto splitDesc = PolymorphicDowncast<const SplitterDescriptor*>(&descriptor);
+            return ConvertSplitToTosaOperator(layer, inputs, outputs, splitDesc);
+        }
         case LayerType::TransposeConvolution2d:
         {
             auto transposeConv2dDesc = PolymorphicDowncast<const TransposeConvolution2dDescriptor*>(&descriptor);

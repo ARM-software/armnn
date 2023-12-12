@@ -15,5 +15,6 @@
 #include "ReshapeOperator.hpp"
 #include "ResizeOperator.hpp"
 #include "SliceOperator.hpp"
+#include "SplitOperator.hpp"
 #include "TransposeConv2dOperator.hpp"
 #include "TransposeOperator.hpp"

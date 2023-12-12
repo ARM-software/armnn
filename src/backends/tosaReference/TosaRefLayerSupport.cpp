@@ -74,9 +74,20 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         case LayerType::Resize:
         case LayerType::Slice:
         case LayerType::Transpose:
+        {
             inputInfos.push_back(&infos[0]);
             outputInfos.push_back(&infos[1]);
             break;
+        }
+        case LayerType::Splitter:
+        {
+            inputInfos.push_back(&infos[0]);
+            for (unsigned int i = 1; i < infos.size(); ++i)
+            {
+                outputInfos.push_back(&infos[i]);
+            }
+            break;
+        }
         case LayerType::TransposeConvolution2d:
         {
             inputInfos.push_back(&infos[0]); // input

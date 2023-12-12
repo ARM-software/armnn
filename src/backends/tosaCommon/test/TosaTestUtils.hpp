@@ -193,6 +193,38 @@ inline void VerifyTosaAttribute(const BaseDescriptor& descriptor,
 
             break;
         }
+        case LayerType::Splitter:
+        {
+            auto splitDesc = PolymorphicDowncast<const SplitterDescriptor*>(&descriptor);
+            TosaSliceAttribute sliceAttribute(attribute);
+
+            // Each slice op has a different beginning point.
+            // The size is the same for each slice op.
+            std::vector<int32_t> beginVals;
+            beginVals.reserve(inputShape.size());
+            std::vector<int32_t> sizeVals;
+            sizeVals.reserve(inputShape.size());
+            for (unsigned int j = 0; j < inputShape.size(); ++j)
+            {
+                beginVals.emplace_back(0);
+                int32_t dim = inputShape[j];
+                sizeVals.emplace_back(dim);
+            }
+
+            uint32_t axis = static_cast<uint32_t>(splitDesc->GetAxis());
+            sizeVals[axis] = sizeVals[axis] / static_cast<int32_t>(splitDesc->GetNumViews());
+            beginVals[axis] = static_cast<int>(mappingOpNumber) * sizeVals[axis];
+            CHECK(beginVals == sliceAttribute.start());
+            CHECK(sizeVals == sliceAttribute.size());
+
+            CHECK(beginVals.size() == inputShape.size());
+            CHECK(sizeVals.size() == inputShape.size());
+
+            CHECK(beginVals.size() == outputShape.size());
+            CHECK(sizeVals.size() == outputShape.size());
+
+            break;
+        }
         case LayerType::TransposeConvolution2d:
         {
             auto transposeConv2dDesc = PolymorphicDowncast<const TransposeConvolution2dDescriptor*>(&descriptor);

@@ -484,6 +484,54 @@ TEST_CASE("IsLayerSupportedTosaReferenceSliceUnsupported")
     CHECK(!supported);
 }
 
+TEST_CASE("IsLayerSupportedTosaReferenceSplit")
+{
+    TensorShape inShape = {1, 18, 4, 4};
+    TensorShape outShape = {1, 6, 4, 4};
+    TensorInfo in(inShape, DataType::Float32);
+    TensorInfo out(outShape, DataType::Float32);
+
+    const unsigned int numViews = 3;
+    const unsigned int numDimensions = 4;
+    armnn::SplitterDescriptor descriptor(numViews, numDimensions);
+    descriptor.SetAxis(static_cast<int32_t>(1));
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Splitter,
+                                                     {in, out},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
+TEST_CASE("IsLayerSupportedTosaReferenceSplitUnsupported")
+{
+    TensorShape inShape = {1, 18, 4, 4};
+    TensorShape outShape = {1, 6, 4, 4};
+    TensorInfo in(inShape, DataType::Signed64);
+    TensorInfo out(outShape, DataType::Signed64);
+
+    const unsigned int numViews = 3;
+    const unsigned int numDimensions = 4;
+    armnn::SplitterDescriptor descriptor(numViews, numDimensions);
+    descriptor.SetAxis(static_cast<int32_t>(1));
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Splitter,
+                                                     {in, out},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+}
+
 TEST_CASE("IsLayerSupportedTosaReferenceSubtraction")
 {
     TensorShape shape0 = {1,1,3,4};

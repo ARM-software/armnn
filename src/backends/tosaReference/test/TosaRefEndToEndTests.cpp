@@ -14,6 +14,7 @@
 #include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
+#include "backendsCommon/test/SplitterEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeEndToEndTestImpl.hpp"
@@ -202,6 +203,129 @@ TEST_CASE("TosaRefSliceEndtoEndTestFloat16")
 {
     SliceEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
 }
+
+// Split
+TEST_CASE("TosaRefSplit1dEndtoEndTestBoolean")
+{
+    Splitter1dEndToEnd<DataType::Boolean>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit1dEndtoEndTestInt8")
+{
+    Splitter1dEndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit1dEndtoEndTestSigned16")
+{
+    Splitter1dEndToEnd<DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit1dEndtoEndTestInt32")
+{
+    Splitter1dEndToEnd<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit1dEndtoEndTestFloat16")
+{
+    Splitter1dEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit1dEndToEndFloat32")
+{
+    Splitter1dEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit2dDim0EndtoEndTestFloat32")
+{
+    Splitter2dDim0EndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit2dDim1EndtoEndTestFloat32")
+{
+    Splitter2dDim1EndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim0EndtoEndTestFloat32")
+{
+    Splitter3dDim0EndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim1EndtoEndTestFloat32")
+{
+    Splitter3dDim1EndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim1EndtoEndTestFloat16")
+{
+    Splitter3dDim1EndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim1EndtoEndTestBoolean")
+{
+    Splitter3dDim1EndToEnd<DataType::Boolean>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim1EndtoEndTestInt8")
+{
+    Splitter3dDim1EndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim1EndtoEndTestSigned16")
+{
+    Splitter3dDim1EndToEnd<DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim1EndtoEndTestInt32")
+{
+    Splitter3dDim1EndToEnd<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit3dDim2EndtoEndTestInt8")
+{
+    Splitter3dDim2EndToEnd<DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim0EndtoEndTestInt8")
+{
+    Splitter4dDim0EndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim1EndtoEndTestInt8")
+{
+    Splitter4dDim1EndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim2EndtoEndTestBoolean")
+{
+    Splitter4dDim2EndToEnd<DataType::Boolean>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim2EndtoEndTestInt8")
+{
+    Splitter4dDim2EndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim2EndtoEndTestInt16")
+{
+    Splitter4dDim2EndToEnd<DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim2EndtoEndTestInt32")
+{
+    Splitter4dDim2EndToEnd<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim2EndtoEndTestFloat16")
+{
+    Splitter4dDim2EndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefSplit4dDim3EndtoEndTestInt8")
+{
+    Splitter4dDim3EndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+// Subtraction
 TEST_CASE("TosaRefSubtractionEndtoEndTestFloat32")
 {
     SubtractionEndToEnd<DataType::Float32>(tosaDefaultBackends);

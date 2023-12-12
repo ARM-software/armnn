@@ -8,11 +8,12 @@
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
-#include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SplitterEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
@@ -107,6 +108,13 @@ TEST_CASE("TosaRefAvgPool2DEndtoEndTestFloat16")
 TEST_CASE("TosaRefAvgPool2DIgnoreValueEndtoEndTestFloat32")
 {
     AvgPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+// Maximum
+TEST_CASE("TosaRefMaximumEndtoEndTestInt8")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
+                                                                 armnn::BinaryOperation::Maximum);
 }
 
 // Max Pool 2D

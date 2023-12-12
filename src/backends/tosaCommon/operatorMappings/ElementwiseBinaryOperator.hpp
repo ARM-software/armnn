@@ -13,4 +13,6 @@ using namespace tosa;
 TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer* layer,
                                                                     const LayerType type,
                                                                     const std::vector<const TensorInfo*>& inputs,
-                                                                    const std::vector<const TensorInfo*>& outputs);
+                                                                    const std::vector<const TensorInfo*>& outputs,
+                                                                    const ElementwiseBinaryDescriptor*
+                                                                        descriptor = nullptr);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -92,6 +92,39 @@ void SliceEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
 
     std::map<int, std::vector<Half>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<Half>> expectedOutputData = { { 0, expectedOutput } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void SliceEndToEnd4Dim(const std::vector<armnn::BackendId>& backends)
+{
+    using namespace armnn;
+
+    const TensorShape& inputShape  = { 2, 3, 2, 3 };
+    const TensorShape& outputShape = { 1, 3, 2, 1 };
+
+    SliceDescriptor descriptor;
+    descriptor.m_Begin = { 1, 0, 0, 0 };
+    descriptor.m_Size  = { 1, 3, 2, 1 };
+
+    INetworkPtr network = CreateSliceNetwork<ArmnnType>(inputShape, outputShape, descriptor);
+
+    CHECK(network);
+
+    std::vector<T> inputData{ 1, 1, 1, 2, 2, 2,
+                              3, 3, 3, 4, 4, 4,
+                              5, 5, 5, 6, 6, 6,
+                              1, 1, 1, 2, 2, 2,
+                              3, 3, 3, 4, 4, 4,
+                              5, 5, 5, 6, 6, 6 };
+
+    std::vector<T> expectedOutput{ 1, 2,
+                                   3, 4,
+                                   5, 6 };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput } };
 
     EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
 }

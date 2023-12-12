@@ -29,6 +29,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         {
             return ConvertElementwiseBinaryToTosaOperator(layer, type, inputs, outputs);
         }
+        case LayerType::ElementwiseBinary:
+        {
+            auto binaryDesc = PolymorphicDowncast<const ElementwiseBinaryDescriptor*>(&descriptor);
+            return ConvertElementwiseBinaryToTosaOperator(layer, type, inputs, outputs, binaryDesc);
+        }
         case LayerType::ElementwiseUnary:
         {
             auto unaryDesc = PolymorphicDowncast<const ElementwiseUnaryDescriptor*>(&descriptor);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,7 +8,8 @@
 TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer* layer,
                                                                     const LayerType type,
                                                                     const std::vector<const TensorInfo*>& inputs,
-                                                                    const std::vector<const TensorInfo*>& outputs)
+                                                                    const std::vector<const TensorInfo*>& outputs,
+                                                                    const ElementwiseBinaryDescriptor* descriptor)
 {
     std::string input0Name = std::string("input0_");
     std::string input1Name = std::string("input1_");
@@ -41,6 +42,25 @@ TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer*
                                                {input0Name, input1Name},
                                                {outputName});
             blockName = std::string("Op_ADD_block_") + GetUniqueTosaMappingID();
+            break;
+        }
+        case LayerType::ElementwiseBinary:
+        {
+            switch (descriptor->m_Operation)
+            {
+                case armnn::BinaryOperation::Maximum:
+                {
+                    op = new TosaSerializationOperator(Op_MAXIMUM,
+                                                       Attribute_NONE,
+                                                       nullptr,
+                                                       {input0Name, input1Name},
+                                                       {outputName});
+                    blockName = std::string("Op_MAXIMUM_block_") + GetUniqueTosaMappingID();
+                    break;
+                }
+                default:
+                    throw armnn::Exception("ConvertElementwiseBinaryToTosaOperator: Unsupported layer type.");
+            }
             break;
         }
         case LayerType::Multiplication:

@@ -18,8 +18,8 @@ TosaSerializationBasicBlock* ConvertSplitToTosaOperator(const Layer* layer,
     ARMNN_THROW_INVALIDARG_MSG_IF_FALSE( inputs.size() == 1,
                                          "ConvertSplitToTosaOperator: Split must have only one input" );
 
-    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE( outputs.size() < 1,
-                                         "ConvertSplitToTosaOperator: Split must have more than one output" );
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE( outputs.size() >= 1,
+                                         "ConvertSplitToTosaOperator: Split must have at least one output" );
 
     if (!inputs[0]->GetShape().AreAllDimensionsSpecified())
     {

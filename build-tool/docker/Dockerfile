@@ -33,6 +33,15 @@ WORKDIR /root
 COPY ./scripts/install-packages.sh .
 RUN ./install-packages.sh
 
+RUN git clone https://github.com/google/flatbuffers.git && \
+    cd flatbuffers && \
+    cmake -G "Unix Makefiles" . && \
+    make && \
+    ./flattests && \
+    make install && \
+    ldconfig && \
+    flatc --version
+
 # Define user for non-root processes (overwriteable during 'docker build' with --build-arg)
 ARG USER_ID=1000
 ARG GROUP_ID=1000

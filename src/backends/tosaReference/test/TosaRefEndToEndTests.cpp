@@ -12,6 +12,7 @@
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/QuantizationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
@@ -131,6 +132,37 @@ TEST_CASE("TosaRefMaxPool2DEndtoEndTestFloat16")
 TEST_CASE("TosaRefMaxPool2DIgnoreValueEndtoEndTestFloat32")
 {
     MaxPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+// Quantization
+TEST_CASE("TosaRefQuantizeFromFloat32ToInt8")
+{
+    QuantizationEndToEndFloat32<DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeFromFloat32ToInt16")
+{
+    QuantizationEndToEndFloat32<DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeFromFloat32ToInt32")
+{
+    QuantizationEndToEndFloat32<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeFromFloat16ToInt8")
+{
+    QuantizationEndToEndFloat16<DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeFromFloat16ToInt16")
+{
+    QuantizationEndToEndFloat16<DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeFromFloat16ToInt32")
+{
+    QuantizationEndToEndFloat16<DataType::Signed32>(tosaDefaultBackends);
 }
 
 // Reshape

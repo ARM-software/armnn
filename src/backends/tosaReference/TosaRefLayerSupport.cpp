@@ -71,6 +71,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         }
         case LayerType::ElementwiseUnary:
         case LayerType::Pooling2d:
+        case LayerType::Quantize:
         case LayerType::Reshape:
         case LayerType::Resize:
         case LayerType::Slice:

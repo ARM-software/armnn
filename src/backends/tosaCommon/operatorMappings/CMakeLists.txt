@@ -18,6 +18,8 @@ list(APPEND armnnTosaBackendOperators_sources
         ElementwiseUnaryOperator.hpp
         Pooling2DOperator.hpp
         Pooling2DOperator.cpp
+        QuantizeOperator.hpp
+        QuantizeOperator.cpp
         ReshapeOperator.hpp
         ReshapeOperator.cpp
         ResizeOperator.hpp

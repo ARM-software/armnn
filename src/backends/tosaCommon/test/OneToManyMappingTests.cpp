@@ -4,7 +4,9 @@
 //
 
 #include "AvgPool2DIgnoreValueChecker.hpp"
+#include "QuantizeChecker.hpp"
 #include "SplitChecker.hpp"
+
 #include <armnn/IRuntime.hpp>
 
 using namespace armnn;
@@ -82,6 +84,46 @@ TEST_CASE("GetTosaMappingFromLayer_AvgPool2DIgnoreValueLayer")
                               outputShape,
                               intermediateShape,
                               descriptor);
+}
+
+TEST_CASE("GetTosaMapping_QuantizeLayer")
+{
+    NullDescriptor descriptor;
+    DataType outputDataType = DataType::Signed32;
+
+    TensorInfo inputTensorInfo({ 1, 3, 3, 1 }, DataType::Float32);
+    TensorInfo outputTensorInfo({ 1, 3, 3, 1 }, outputDataType);
+    std::vector<int32_t> shape = { 1, 3, 3, 1 };
+
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMapping(nullptr, LayerType::Quantize, {&inputTensorInfo}, {&outputTensorInfo}, descriptor);
+    VerifyQuantize(basicBlock, shape, ArmNNToDType(DataType::Float32), ArmNNToDType(outputDataType));
+}
+TEST_CASE("GetTosaMappingFromLayer_QuantizeLayer")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+    NullDescriptor descriptor;
+    DataType outputDataType = DataType::Signed32;
+
+    IConnectableLayer* input0   = net->AddInputLayer(0, "input0");
+    IConnectableLayer* quantize = net->AddQuantizeLayer("quantize");
+    IConnectableLayer* output   = net->AddOutputLayer(0, "output");
+
+    input0->GetOutputSlot(0).Connect(quantize->GetInputSlot(0));
+    quantize->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    armnn::TensorInfo inputTensorInfo({ 1, 3, 3, 1 }, DataType::Float32);
+    armnn::TensorInfo outputTensorInfo({ 1, 3, 3, 1 }, outputDataType);
+    std::vector<int32_t> shape = { 1, 3, 3, 1 };
+
+    input0->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
+    quantize->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
+
+    TosaSerializationBasicBlock* basicBlock = GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(quantize));
+    VerifyQuantize(basicBlock, shape, ArmNNToDType(DataType::Float32), ArmNNToDType(outputDataType));
 }
 
 TEST_CASE("GetTosaMapping_SplitLayer")

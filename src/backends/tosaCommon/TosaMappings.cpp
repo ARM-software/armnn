@@ -74,6 +74,10 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
                 return ConvertPooling2DToTosaOperator(layer, inputs, outputs, poolDesc);
             }
         }
+        case LayerType::Quantize:
+        {
+            return ConvertQuantizeToTosaOperator(layer, inputs, outputs);
+        }
         case LayerType::Reshape:
         {
             auto reshapeDesc = PolymorphicDowncast<const ReshapeDescriptor*>(&descriptor);

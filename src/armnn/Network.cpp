@@ -2004,7 +2004,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat32(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat16()));
 
-
     // Initialize backend settings
     BackendSettings backendSettings(backendPreferences, deviceSpec);
     auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();

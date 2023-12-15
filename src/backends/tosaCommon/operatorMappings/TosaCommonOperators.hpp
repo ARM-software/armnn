@@ -12,6 +12,7 @@
 #include "ElementwiseBinaryOperator.hpp"
 #include "ElementwiseUnaryOperator.hpp"
 #include "Pooling2DOperator.hpp"
+#include "QuantizeOperator.hpp"
 #include "ReshapeOperator.hpp"
 #include "ResizeOperator.hpp"
 #include "SliceOperator.hpp"

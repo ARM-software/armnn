@@ -29,6 +29,7 @@
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
+#include <backendsCommon/test/QuantizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/RankEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
@@ -792,42 +793,42 @@ TEST_CASE("RefGatherNdMultiDimInt16Test")
 }
 
 // DepthToSpace
-TEST_CASE("DephtToSpaceEndToEndNchwFloat32")
+TEST_CASE("DepthToSpaceEndToEndNchwFloat32")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNchwFloat16")
+TEST_CASE("DepthToSpaceEndToEndNchwFloat16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float16>(defaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNchwUint8")
+TEST_CASE("DepthToSpaceEndToEndNchwUint8")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNchwInt16")
+TEST_CASE("DepthToSpaceEndToEndNchwInt16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NCHW);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcFloat32")
+TEST_CASE("DepthToSpaceEndToEndNhwcFloat32")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcFloat16")
+TEST_CASE("DepthToSpaceEndToEndNhwcFloat16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float16>(defaultBackends, armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcUint8")
+TEST_CASE("DepthToSpaceEndToEndNhwcUint8")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("DephtToSpaceEndToEndNhwcInt16")
+TEST_CASE("DepthToSpaceEndToEndNhwcInt16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NHWC);
 }
@@ -1064,6 +1065,38 @@ TEST_CASE("RefPreluEndToEndTestQSymm16")
     PreluEndToEndPositiveTest<armnn::DataType::QSymmS16>(defaultBackends);
 }
 
+// Quantization
+TEST_CASE("QuantizationEndToEndFloat32_U8Test")
+{
+    QuantizationEndToEndFloat32<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("QuantizationEndToEndFloat32_I8Test")
+{
+    QuantizationEndToEndFloat32<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("QuantizationEndToEndFloat32_S16Test")
+{
+    QuantizationEndToEndFloat32<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("QuantizationEndToEndFloat16_U8Test")
+{
+    QuantizationEndToEndFloat16<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("QuantizationEndToEndFloat16_I8Test")
+{
+    QuantizationEndToEndFloat16<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("QuantizationEndToEndFloat16_S16Test")
+{
+    QuantizationEndToEndFloat16<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+// SpaceToDepth
 TEST_CASE("RefSpaceToDepthNhwcEndToEndTest1")
 {
     SpaceToDepthNhwcEndToEndTest1(defaultBackends);

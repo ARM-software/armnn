@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -167,6 +167,128 @@ void AvgPool2dEndToEndFloat16(const std::vector<armnn::BackendId>& backends,
                                                 expectedOutputData,
                                                 backends,
                                                 0.00001f);
+}
+
+template<typename armnn::DataType DataType>
+armnn::INetworkPtr CreateTwoLayerPooling2dNetwork(const armnn::TensorShape& inputShape,
+                                                  const armnn::TensorShape& outputShape,
+                                                  PaddingMethod padMethod = PaddingMethod::Exclude,
+                                                  PoolingAlgorithm poolAlg = PoolingAlgorithm::Max,
+                                                  const float qScale = 1.0f,
+                                                  const int32_t qOffset = 0)
+{
+    INetworkPtr network(INetwork::Create());
+
+    TensorInfo inputTensorInfo(inputShape, DataType, qScale, qOffset, true);
+    TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset, true);
+
+    Pooling2dDescriptor descriptor;
+    descriptor.m_PoolType = poolAlg;
+    descriptor.m_PoolWidth = descriptor.m_PoolHeight = 3;
+    descriptor.m_StrideX = descriptor.m_StrideY = 1;
+    descriptor.m_PadLeft = 1;
+    descriptor.m_PadRight = 1;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 1;
+    descriptor.m_PaddingMethod = padMethod;
+    descriptor.m_DataLayout = DataLayout::NHWC;
+
+    IConnectableLayer* input = network->AddInputLayer(0, "input");
+    IConnectableLayer* pool1 = network->AddPooling2dLayer(descriptor, "pool_1");
+    IConnectableLayer* pool2 = network->AddPooling2dLayer(descriptor, "pool_2");
+    IConnectableLayer* output = network->AddOutputLayer(0, "output");
+
+    Connect(input, pool1, inputTensorInfo, 0, 0);
+    Connect(pool1, pool2, inputTensorInfo, 0, 0);
+    Connect(pool2, output, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
+template<typename armnn::DataType DataType>
+armnn::INetworkPtr CreateThreeLayerPooling2dNetwork(const armnn::TensorShape& inputShape,
+                                                    const armnn::TensorShape& outputShape,
+                                                    PaddingMethod padMethod = PaddingMethod::Exclude,
+                                                    PoolingAlgorithm poolAlg = PoolingAlgorithm::Max,
+                                                    const float qScale = 1.0f,
+                                                    const int32_t qOffset = 0)
+{
+    INetworkPtr network(INetwork::Create());
+
+    TensorInfo inputTensorInfo(inputShape, DataType, qScale, qOffset, true);
+    TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset, true);
+
+    Pooling2dDescriptor descriptor;
+    descriptor.m_PoolType = poolAlg;
+    descriptor.m_PoolWidth = descriptor.m_PoolHeight = 3;
+    descriptor.m_StrideX = descriptor.m_StrideY = 1;
+    descriptor.m_PadLeft = 1;
+    descriptor.m_PadRight = 1;
+    descriptor.m_PadTop = 1;
+    descriptor.m_PadBottom = 1;
+    descriptor.m_PaddingMethod = padMethod;
+    descriptor.m_DataLayout = DataLayout::NHWC;
+
+    IConnectableLayer* input = network->AddInputLayer(0, "input");
+    IConnectableLayer* pool1 = network->AddPooling2dLayer(descriptor, "pool_1");
+    IConnectableLayer* pool2 = network->AddPooling2dLayer(descriptor, "pool_2");
+    IConnectableLayer* pool3 = network->AddPooling2dLayer(descriptor, "pool_3");
+    IConnectableLayer* output = network->AddOutputLayer(0, "output");
+
+    Connect(input, pool1, inputTensorInfo, 0, 0);
+    Connect(pool1, pool2, inputTensorInfo, 0, 0);
+    Connect(pool2, pool3, inputTensorInfo, 0, 0);
+    Connect(pool3, output, outputTensorInfo, 0, 0);
+
+    return network;
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void MaxPool2dTwoLayerEndToEnd(const std::vector<armnn::BackendId>& backends,
+                               PaddingMethod padMethod = PaddingMethod::Exclude)
+{
+    const TensorShape& inputShape = { 1, 3, 3, 1 };
+    const TensorShape& outputShape = { 1, 3, 3, 1 };
+
+    INetworkPtr network = CreateTwoLayerPooling2dNetwork<ArmnnType>(inputShape, outputShape, padMethod);
+
+    CHECK(network);
+
+    std::vector<T> inputData{ 1, 2, 3,
+                              4, 5, 6,
+                              7, 8, 9 };
+    std::vector<T> expectedOutput{ 9, 9, 9,
+                                   9, 9, 9,
+                                   9, 9, 9 };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void MaxPool2dThreeLayerEndToEnd(const std::vector<armnn::BackendId>& backends,
+                                 PaddingMethod padMethod = PaddingMethod::Exclude)
+{
+    const TensorShape& inputShape = { 1, 3, 3, 1 };
+    const TensorShape& outputShape = { 1, 3, 3, 1 };
+
+    INetworkPtr network = CreateThreeLayerPooling2dNetwork<ArmnnType>(inputShape, outputShape, padMethod);
+
+    CHECK(network);
+
+    std::vector<T> inputData{ 1, 2, 3,
+                              4, 5, 6,
+                              7, 8, 9 };
+    std::vector<T> expectedOutput{ 9, 9, 9,
+                                   9, 9, 9,
+                                   9, 9, 9 };
+
+    std::map<int, std::vector<T>> inputTensorData = { { 0, inputData } };
+    std::map<int, std::vector<T>> expectedOutputData = { { 0, expectedOutput } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
 }
 
 } // anonymous namespace

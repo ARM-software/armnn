@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -132,6 +132,16 @@ TEST_CASE("TosaRefMaxPool2DEndtoEndTestFloat16")
 TEST_CASE("TosaRefMaxPool2DIgnoreValueEndtoEndTestFloat32")
 {
     MaxPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+TEST_CASE("TosaRefMaxPool2DTwoLayerEndtoEndTestFloat32")
+{
+    MaxPool2dTwoLayerEndToEnd<DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefMaxPool2DThreeLayerEndtoEndTestFloat32")
+{
+    MaxPool2dThreeLayerEndToEnd<DataType::Float32>(tosaDefaultBackends);
 }
 
 // Quantization

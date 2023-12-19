@@ -8,14 +8,12 @@
 #include "TensorBufferArrayView.hpp"
 
 #include <armnn/utility/NumericCast.hpp>
+#include <armnn/Utils.hpp>
 
 #include <cmath>
 #include <algorithm>
 
 using namespace armnnUtils;
-
-namespace armnn
-{
 
 namespace
 {
@@ -62,12 +60,14 @@ inline float PixelScaler(const unsigned int& Pixel,
 
 }// anonymous namespace
 
+namespace armnn
+{
 void Resize(Decoder<float>&   in,
             const TensorInfo& inputInfo,
             Encoder<float>&   out,
             const TensorInfo& outputInfo,
             DataLayoutIndexed dataLayout,
-            armnn::ResizeMethod resizeMethod,
+            ResizeMethod resizeMethod,
             bool alignCorners,
             bool halfPixelCenters)
 {
@@ -91,8 +91,8 @@ void Resize(Decoder<float>&   in,
     const float scaleY = CalculateResizeScale(inputHeight, outputHeight, alignCorners);
     const float scaleX = CalculateResizeScale(inputWidth, outputWidth, alignCorners);
 
-    TensorShape inputShape =  inputInfo.GetShape();
-    TensorShape outputShape =  outputInfo.GetShape();
+    const TensorShape& inputShape =  inputInfo.GetShape();
+    const TensorShape& outputShape =  outputInfo.GetShape();
 
     for (unsigned int n = 0; n < batchSize; ++n)
     {
@@ -104,8 +104,8 @@ void Resize(Decoder<float>&   in,
                 float iy = PixelScaler(y, scaleY, halfPixelCenters, resizeMethod);
 
                 // Discrete height coordinate of top-left texel (in the 2x2 texel area used for interpolation).
-                const float fiy = (resizeMethod == armnn::ResizeMethod::NearestNeighbor && alignCorners) ?
-                                  roundf(iy) : floorf(iy);
+                const float fiy = (resizeMethod == ResizeMethod::NearestNeighbor && alignCorners) ? armnn::roundf(iy)
+                                                                                                  : floorf(iy);
                 // Pixel scaling a value with Half Pixel Centers can be negative, if so set to 0
                 const unsigned int y0 = static_cast<unsigned int>(std::max(fiy, 0.0f));
 
@@ -118,8 +118,8 @@ void Resize(Decoder<float>&   in,
                     float ix = PixelScaler(x, scaleX, halfPixelCenters, resizeMethod);
 
                     // Nearest Neighbour uses rounding to align to corners
-                    const float fix = resizeMethod == armnn::ResizeMethod::NearestNeighbor && alignCorners ?
-                                      roundf(ix) : floorf(ix);
+                    const float fix = resizeMethod == ResizeMethod::NearestNeighbor && alignCorners ? armnn::roundf(ix)
+                                                                                                    : floorf(ix);
                     // Pixel scaling a value with Half Pixel Centers can be negative, if so set to 0
                     const unsigned int x0 = static_cast<unsigned int>(std::max(fix, 0.0f));
 
@@ -144,7 +144,7 @@ void Resize(Decoder<float>&   in,
                     float interpolatedValue;
                     switch (resizeMethod)
                     {
-                        case armnn::ResizeMethod::Bilinear:
+                        case ResizeMethod::Bilinear:
                         {
                             in[dataLayout.GetIndex(inputShape, n, c, y0, x0)];
                             float input1 = in.Get();
@@ -160,7 +160,7 @@ void Resize(Decoder<float>&   in,
                             interpolatedValue = Lerp(ly0, ly1, yw);
                             break;
                         }
-                        case armnn::ResizeMethod::NearestNeighbor:
+                        case ResizeMethod::NearestNeighbor:
                         {
                             // calculate euclidean distance to the 4 neighbours
                             auto distance00 = EuclideanDistance(fix, fiy, x0, y0);
@@ -195,7 +195,7 @@ void Resize(Decoder<float>&   in,
                             }
                             else
                             {
-                                throw armnn::InvalidArgumentException("Resize Nearest Neighbor failure");
+                                throw InvalidArgumentException("Resize Nearest Neighbor failure");
                             }
 
                             in[dataLayout.GetIndex(inputShape, n, c, yNearest, xNearest)];
@@ -203,8 +203,8 @@ void Resize(Decoder<float>&   in,
                             break;
                         }
                         default:
-                            throw armnn::InvalidArgumentException("Unknown resize method: " +
-                                                                  std::to_string(static_cast<int>(resizeMethod)));
+                            throw InvalidArgumentException("Unknown resize method: " +
+                                                            std::to_string(static_cast<int>(resizeMethod)));
                     }
                     out[dataLayout.GetIndex(outputShape, n, c, y, x)];
                     out.Set(interpolatedValue);

@@ -5,6 +5,7 @@
 #pragma once
 
 #include <string>
+#include <cmath>
 
 namespace armnn
 {
@@ -38,5 +39,11 @@ void ConfigureLogging(bool printToStandardOutput, bool printToDebugOutput, LogSe
 bool NeonDetected();
 
 const std::string GetVersion();
+
+inline float roundf(float value)
+{
+    // Workaround Valgrind's mismatches: when running from Valgrind the call to std::round(4.5) == 4.0 instead of 5.0
+    return (value < 0.f) ? ::floorf(value - 0.5f) : ::floorf(value + 0.5f);
+}
 
 } // namespace armnn

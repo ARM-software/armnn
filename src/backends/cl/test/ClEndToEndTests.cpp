@@ -22,6 +22,7 @@
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReduceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
+#include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReverseV2EndToEndTestImpl.hpp>
 #include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
@@ -344,6 +345,38 @@ TEST_CASE("ClReshapeEndToEndTest")
 TEST_CASE("ClReshapeEndToEndTestFloat16")
 {
     ReshapeEndToEndFloat16<armnn::DataType::Float16>(clDefaultBackends);
+}
+
+// Resize Bilinear
+TEST_CASE("ClResizeBilinearEndToEndFloatNchwTest")
+{
+    ResizeBilinearEndToEnd<armnn::DataType::Float32>(clDefaultBackends, armnn::DataLayout::NCHW);
+}
+
+TEST_CASE("ClResizeBilinearEndToEndFloatNhwcTest")
+{
+    ResizeBilinearEndToEnd<armnn::DataType::Float32>(clDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Resize NearestNeighbor
+TEST_CASE("ClResizeNearestNeighborEndToEndFloatNchwTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(clDefaultBackends, armnn::DataLayout::NCHW);
+}
+
+TEST_CASE("ClResizeNearestNeighborEndToEndFloatNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(clDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("ClResizeNearestNeighborEndToEndFloatAlignCornersNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(clDefaultBackends, armnn::DataLayout::NHWC, true, false);
+}
+
+TEST_CASE("ClResizeNearestNeighborEndToEndFloatHalfPixelNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(clDefaultBackends, armnn::DataLayout::NHWC, false, true);
 }
 
 // ReverseV2

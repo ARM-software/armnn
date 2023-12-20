@@ -519,11 +519,6 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
             {
                 continue;
             }
-            // Cannot remove a Reshape if it's connected to a SplitterLayer
-            if (ConnectedToLayerType(baseLayer, LayerType::Splitter))
-            {
-                continue;
-            }
             RemoveReshapeLayer(baseLayer, untouched, optimizationViews);
         }
 

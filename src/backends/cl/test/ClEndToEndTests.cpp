@@ -673,4 +673,19 @@ TEST_CASE("ClForceImportWithMisalignedInputAndOutputBuffersEndToEndTest")
     ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(clDefaultBackends);
 }
 
+TEST_CASE("ClReshapeRemovalSimpleCaseEndToEnd")
+{
+    ReshapeRemovalEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClReshapeRemovalNCHWFirstEndToEnd")
+{
+    ReshapeRemovalNCHWEndToEnd<armnn::DataType::Float32>(clDefaultBackends, false, true);
+}
+
+TEST_CASE("ClReshapeRemovalNCHWSecondEndToEnd")
+{
+    ReshapeRemovalNCHWEndToEnd<armnn::DataType::Float32>(clDefaultBackends, false, false);
+}
+
 }

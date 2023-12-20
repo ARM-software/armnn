@@ -673,6 +673,19 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
             }
         }
 
+        // Remove Reshape where possible
+        if (base.GetType() == LayerType::Reshape)
+        {
+            ReshapeLayer* baseLayer = PolymorphicDowncast<ReshapeLayer*>(&base);
+
+            // Cannot remove a Reshape if it's connected to any layer that has an NCHW layout
+            if (ConnectedToLayerWithNCHW(baseLayer))
+            {
+                continue;
+            }
+            RemoveReshapeLayer(baseLayer, untouched, optimizationViews);
+        }
+
         // Special case to fuse padding into average pooling 2d for quantized datatype.
         // Required to be done as a backend specific optimization as Neon does not support this special case.
         if (base.GetType() == LayerType::Pooling2d)

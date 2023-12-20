@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="270576a9fbeeda5210483931388e62f9a1059dd9" #10874: Fix nightly bug caused by wrong validation in Gemm mmul kernel
+DEFAULT_CLFRAMEWORKREVISION="306a8a9fb0dacd2c1e5d65f76420c12162203986" #10891: Fix nightly bug caused by not validation 3d cases for input tensor
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

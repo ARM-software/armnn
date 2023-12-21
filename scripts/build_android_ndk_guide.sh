@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: MIT
 #
@@ -79,7 +79,8 @@ while getopts "hl:a:c:A:n:g:r:u:d:p:s:i:t:" opt; do
 done
 shift $((OPTIND - 1))
 
-export NDK_DIR=$WORKING_DIR/android-ndk-r25
+export NDK_DIR=$WORKING_DIR/android-ndk-r26b
+
 export NDK_TOOLCHAIN_ROOT=$NDK_DIR/toolchains/llvm/prebuilt/linux-x86_64
 export PATH=$NDK_TOOLCHAIN_ROOT/bin/:$PATH
 
@@ -87,10 +88,10 @@ pushd $WORKING_DIR
 
 function GetAndroidNDK {
     cd $WORKING_DIR
-    if [[ ! -d android-ndk-r25 ]]; then
+    if [[ ! -d android-ndk-r26b ]]; then
         echo "+++ Getting Android NDK"
-        wget https://dl.google.com/android/repository/android-ndk-r25-linux.zip
-        unzip android-ndk-r25-linux.zip
+        wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
+        unzip android-ndk-r26b-linux.zip
     fi
 }
 
@@ -283,11 +284,11 @@ function BuildArmNN {
 
     CMARGS="-DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_ANDROID_NDK=$NDK_DIR \
-            -DNDK_VERSION=r25 \
+            -DNDK_VERSION=r26b \
             -DCMAKE_SYSTEM_NAME=Android \
             -DCMAKE_SYSTEM_VERSION=$ANDROID_API \
             -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
-            -DCMAKE_SYSROOT=$WORKING_DIR/android-ndk-r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
+            -DCMAKE_SYSROOT=$WORKING_DIR/android-ndk-r26b/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
             -DARMCOMPUTE_ROOT=$WORKING_DIR/ComputeLibrary \
             -DARMCOMPUTE_BUILD_DIR=$WORKING_DIR/ComputeLibrary/build \
             -DARMCOMPUTENEON=$ACL_NEON -DARMCOMPUTECL=$ACL_CL -DARMNNREF=$REFERENCE \
@@ -347,7 +348,7 @@ function BuildStandaloneDynamicBackend {
     -DCMAKE_SYSTEM_NAME=Android \
     -DCMAKE_SYSTEM_VERSION=$ANDROID_API \
     -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
-    -DCMAKE_SYSROOT=$WORKING_DIR/android-ndk-r25/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
+    -DCMAKE_SYSROOT=$WORKING_DIR/android-ndk-r26b/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
     -DCMAKE_CXX_FLAGS=--std=c++14 \
     -DCMAKE_EXE_LINKER_FLAGS="-pie -llog" \
     -DCMAKE_MODULE_LINKER_FLAGS="-llog" \
@@ -377,7 +378,8 @@ function PushBuildSourcesToBoard {
         adb push ${WORKING_DIR}/armnn/build/delegate/DelegateUnitTests /data/local/tmp/
         adb push ${WORKING_DIR}/armnn/build/delegate/libarmnnDelegate.so /data/local/tmp/
     fi
-    adb push $NDK_DIR/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
+    #adb push $NDK_DIR/sources/cxx-stl/llvm-libc++/libs/arm64-v8a/libc++_shared.so /data/local/tmp/
+    adb push $NDK_DIR/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/x86_64-linux-android/libc++_shared.so /data/local/tmp/
     echo "+++ Pushing test files to board"
     adb shell mkdir -p /data/local/tmp/src/backends/backendsCommon/test/testSharedObject
     adb push -p ${WORKING_DIR}/armnn/build/src/backends/backendsCommon/test/testSharedObject/* /data/local/tmp/src/backends/backendsCommon/test/testSharedObject/

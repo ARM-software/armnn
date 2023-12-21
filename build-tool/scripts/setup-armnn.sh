@@ -38,11 +38,11 @@ download_androidndk()
 {
   cd "$SOURCE_DIR"
   echo -e "\n***** Downloading Android NDK *****\n"
-  wget https://dl.google.com/android/repository/android-ndk-r25-linux.zip
+  wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
   echo -e "\n***** Extracting archive *****"
-  unzip android-ndk-r25-linux.zip
+  unzip android-ndk-r26b-linux.zip
   echo -e "\n***** Removing archive *****"
-  rm android-ndk-r25-linux.zip
+  rm android-ndk-r26b-linux.zip
   echo -e "\n***** Android NDK downloaded *****"
 }
 

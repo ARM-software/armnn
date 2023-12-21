@@ -39,7 +39,7 @@ fi
 AARCH64_COMPILER_FLAGS+="CC=/usr/bin/aarch64-linux-gnu-gcc CXX=/usr/bin/aarch64-linux-gnu-g++ "
 
 # NDK
-NDK_VERSION=25
+NDK_VERSION=26b
 NDK_SRC="$SOURCE_DIR"/android-ndk-r"$NDK_VERSION"
 
 # ANDROID

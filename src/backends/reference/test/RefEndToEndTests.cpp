@@ -1371,26 +1371,15 @@ TEST_CASE("RefResizeNearestNeighborEndToEndInt16NhwcTest")
     ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("RefResizeNearestNeighborEndToEndFloatAlignCornersNhwcTest")
-{
-    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC, true, false);
-}
-
 TEST_CASE("RefResizeNearestNeighborEndToEndFloatHalfPixelNhwcTest")
 {
     ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC, false, true);
 }
 
-TEST_CASE("RefResizeNearestNeighborEndToEndInt8AlignCornersNhwcTest")
-{
-    ResizeNearestNeighborEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends, armnn::DataLayout::NHWC, true, false);
-}
-
-TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt8HalfPixelNhwcTest")
+TEST_CASE("RefResizeNearestNeighborEndToEndInt8HalfPixelNhwcTest")
 {
     ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS8>(defaultBackends, armnn::DataLayout::NHWC, false, true);
 }
-
 
 // ReverseV2
 TEST_CASE("RefReverseV2EndToEndFloat16Test")

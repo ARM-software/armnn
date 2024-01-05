@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2018-2023 Arm Ltd. All rights reserved.
+# Copyright © 2018-2024 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c310c11a4baa1eca4e4007b3250f4a771989f36f" #Fix nightly issue caused by gemm_reshaped_only_rhs_mmul kernel
+DEFAULT_CLFRAMEWORKREVISION="7fe7791468978429ab02343a8485b51b39832027" #10916: Prevent RELU from being processed thru LUT in INT8
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

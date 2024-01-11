@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="7fe7791468978429ab02343a8485b51b39832027" #10916: Prevent RELU from being processed thru LUT in INT8
+DEFAULT_CLFRAMEWORKREVISION="5d7a93a331b556b29bb00d436286fb7674a49f1a" #10950: Fix compilation error on GCC 13.2
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -187,6 +187,8 @@ public:
 
     bool operator==(const TensorInfo& other) const;
     bool operator!=(const TensorInfo& other) const;
+
+    using DifferenceType = std::vector<TensorInfo>::difference_type;
 
     const TensorShape& GetShape() const              { return m_Shape; }
     TensorShape& GetShape()                          { return m_Shape; }

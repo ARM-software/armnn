@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,6 +13,7 @@
 
 #include <LayerSupportCommon.hpp>
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/NumericCast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #if defined(ARMCOMPUTENEON_ENABLED)
@@ -438,8 +439,9 @@ bool IsLayerTypeSupported(const LayerType& type,
                 throw InvalidArgumentException("Invalid number of FusedLayer TensorInfos.");
             }
 
-            std::vector<TensorInfo> inputInfos(infos.begin(), infos.begin() + fusedDescriptor.m_NumInputSlots);
-            std::vector<TensorInfo> outputInfos(infos.begin() + fusedDescriptor.m_NumInputSlots, infos.end());
+            auto it = infos.begin() + numeric_cast<TensorInfo::DifferenceType>(fusedDescriptor.m_NumInputSlots);
+            std::vector<TensorInfo> inputInfos(infos.begin(), it);
+            std::vector<TensorInfo> outputInfos(it, infos.end());
 
             return support.IsFusedSupported({inputInfos.begin(), inputInfos.end()},
                                             {outputInfos.begin(), outputInfos.end()},

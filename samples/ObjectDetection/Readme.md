@@ -20,7 +20,7 @@ with detections shown in bounding boxes, class labels and confidence.
 This example utilizes OpenCV functions to capture and output video data.
 1. Public Arm NN C++ API is provided by Arm NN library.
 2. For Delegate file mode following dependencies exist:
-2.1 Tensorflow version 2.14
+2.1 Tensorflow version 2.15
 2.2 Flatbuffers version 23.5.26
 2.3 Arm NN delegate library
 
@@ -97,7 +97,7 @@ Please see [find_opencv.cmake](./cmake/find_opencv.cmake) for implementation det
 
 ### Tensorflow Lite (Needed only in delegate file mode)
 
-This application uses [Tensorflow Lite)](https://www.tensorflow.org/) version 2.14 for demonstrating use of 'armnnDelegate'.
+This application uses [Tensorflow Lite)](https://www.tensorflow.org/) version 2.15 for demonstrating use of 'armnnDelegate'.
 armnnDelegate is a library for accelerating certain TensorFlow Lite operators on Arm hardware by providing
 the TensorFlow Lite interpreter with an alternative implementation of the operators via its delegation mechanism.
 You may clone and build Tensorflow lite and provide the path to its root and output library directories through the cmake
@@ -106,13 +106,13 @@ For implementation details see the scripts FindTfLite.cmake and FindTfLiteSrc.cm
 
 The application links with the Tensorflow lite library libtensorflow-lite.a
 
-#### Download and build Tensorflow Lite version. We currently use Tf 2.14 for the Cmake build.
+#### Download and build Tensorflow Lite version. We currently use Tf 2.15 for the Cmake build.
 Example for Tensorflow Lite native compilation
 ```commandline
 sudo apt install build-essential
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow/tensorflow
-git checkout v2.14.0
+git checkout v2.15.0
 mkdir build && cd build
 cmake ../lite -DTFLITE_ENABLE_XNNPACK=OFF
 make

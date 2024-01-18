@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: MIT
 #
@@ -8,7 +8,7 @@
 CMD=$( basename "$0" )
 
 # Revision or tag that Arm NN has been tested with:
-DEFAULT_TENSORFLOW_REVISION=v2.14.0 # tag v2.14.0
+DEFAULT_TENSORFLOW_REVISION=v2.15.0 # tag v2.15.0
 
 Usage() {
     echo "Gets the revision or tag of TensorFlow that this version of Arm NN has been" 

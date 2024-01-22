@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,11 +10,7 @@
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
 
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
-
-#include <doctest/doctest.h>
 
 namespace
 {
@@ -117,7 +113,6 @@ std::vector<char> CreateSplitTfLiteModel(tflite::TensorType tensorType,
 
 template <typename T>
 void SplitTest(tflite::TensorType tensorType,
-               std::vector<armnn::BackendId>& backends,
                std::vector<int32_t>& axisTensorShape,
                std::vector<int32_t>& inputTensorShape,
                std::vector<std::vector<int32_t>>& outputTensorShapes,
@@ -125,6 +120,7 @@ void SplitTest(tflite::TensorType tensorType,
                std::vector<T>& inputValues,
                std::vector<std::vector<T>>& expectedOutputValues,
                const int32_t numSplits,
+               const std::vector<armnn::BackendId>& backends = {},
                float quantScale = 1.0f,
                int quantOffset  = 0)
 {
@@ -144,7 +140,7 @@ void SplitTest(tflite::TensorType tensorType,
     CHECK(tfLiteInterpreter.Invoke() == kTfLiteOk);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 1) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
@@ -275,7 +271,6 @@ std::vector<char> CreateSplitVTfLiteModel(tflite::TensorType tensorType,
 
 template <typename T>
 void SplitVTest(tflite::TensorType tensorType,
-                std::vector<armnn::BackendId>& backends,
                 std::vector<int32_t>& inputTensorShape,
                 std::vector<int32_t>& splitsTensorShape,
                 std::vector<int32_t>& axisTensorShape,
@@ -285,6 +280,7 @@ void SplitVTest(tflite::TensorType tensorType,
                 std::vector<int32_t>& axisData,
                 std::vector<std::vector<T>>& expectedOutputValues,
                 const int32_t numSplits,
+                const std::vector<armnn::BackendId>& backends = {},
                 float quantScale = 1.0f,
                 int quantOffset  = 0)
 {
@@ -307,7 +303,7 @@ void SplitVTest(tflite::TensorType tensorType,
     CHECK(tfLiteInterpreter.Invoke() == kTfLiteOk);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

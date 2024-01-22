@@ -1,25 +1,16 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ReverseV2TestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
-#include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-
-#include <tensorflow/lite/version.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void ReverseV2Float32Test(std::vector<armnn::BackendId>& backends)
+void ReverseV2Float32Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<float> inputValues =
@@ -62,7 +53,6 @@ void ReverseV2Float32Test(std::vector<armnn::BackendId>& backends)
     const std::vector<int32_t> expectedOutputShape = {3, 3, 3};
 
     ReverseV2FP32TestImpl(tflite::BuiltinOperator_REVERSE_V2,
-                          backends,
                           inputValues,
                           inputShape,
                           axisValues,
@@ -71,7 +61,7 @@ void ReverseV2Float32Test(std::vector<armnn::BackendId>& backends)
                           expectedOutputShape);
 }
 
-void ReverseV2NegativeAxisFloat32Test(std::vector<armnn::BackendId>& backends)
+void ReverseV2NegativeAxisFloat32Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<float> inputValues =
@@ -114,7 +104,6 @@ void ReverseV2NegativeAxisFloat32Test(std::vector<armnn::BackendId>& backends)
     const std::vector<int32_t> expectedOutputShape = {3, 3, 3};
 
     ReverseV2FP32TestImpl(tflite::BuiltinOperator_REVERSE_V2,
-                          backends,
                           inputValues,
                           inputShape,
                           axisValues,
@@ -123,55 +112,19 @@ void ReverseV2NegativeAxisFloat32Test(std::vector<armnn::BackendId>& backends)
                           expectedOutputShape);
 }
 
-TEST_SUITE("ReverseV2Tests_GpuAccTests")
+TEST_SUITE("ReverseV2TestsTests")
 {
 
-    TEST_CASE ("ReverseV2_Float32_GpuAcc_Test")
+    TEST_CASE ("ReverseV2_Float32_Test")
     {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-        ReverseV2Float32Test(backends);
+        ReverseV2Float32Test();
     }
 
-    TEST_CASE ("ReverseV2_NegativeAxis_Float32_GpuAcc_Test")
+    TEST_CASE ("ReverseV2_NegativeAxis_Float32_Test")
     {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-        ReverseV2NegativeAxisFloat32Test(backends);
+        ReverseV2NegativeAxisFloat32Test();
     }
 
-} // TEST_SUITE("ReverseV2Tests_GpuAccTests")
-
-TEST_SUITE("ReverseV2Tests_CpuAccTests")
-{
-
-    TEST_CASE ("ReverseV2_Float32_CpuAcc_Test")
-    {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-        ReverseV2Float32Test(backends);
-    }
-
-    TEST_CASE ("ReverseV2_NegativeAxis_Float32_CpuAcc_Test")
-    {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-        ReverseV2NegativeAxisFloat32Test(backends);
-    }
-
-} // TEST_SUITE("ReverseV2Tests_CpuAccTests")
-
-TEST_SUITE("ReverseV2Tests_CpuRefTests")
-{
-
-    TEST_CASE ("ReverseV2_Float32_CpuRef_Test")
-    {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-        ReverseV2Float32Test(backends);
-    }
-
-    TEST_CASE ("ReverseV2_NegativeAxis_Float32_CpuRef_Test")
-    {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-        ReverseV2NegativeAxisFloat32Test(backends);
-    }
-
-} // TEST_SUITE("ReverseV2Tests_CpuRefTests")
+} // TEST_SUITE("ReverseV2TestsTests")
 
 } // namespace armnnDelegate

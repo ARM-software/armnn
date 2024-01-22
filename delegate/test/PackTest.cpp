@@ -1,13 +1,9 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "PackTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
@@ -15,7 +11,7 @@ namespace armnnDelegate
 {
 
 template <typename T>
-void PackFp32Axis0Test(tflite::TensorType tensorType, std::vector<armnn::BackendId>& backends)
+void PackFp32Axis0Test(tflite::TensorType tensorType)
 {
     std::vector<int32_t> inputShape { 3, 2, 3 };
     std::vector<int32_t> expectedOutputShape { 2, 3, 2, 3 };
@@ -69,16 +65,16 @@ void PackFp32Axis0Test(tflite::TensorType tensorType, std::vector<armnn::Backend
 
     PackTest<T>(tflite::BuiltinOperator_PACK,
                 tensorType,
-                backends,
                 inputShape,
                 expectedOutputShape,
                 inputValues,
                 expectedOutputValues,
+                {},
                 0);
 }
 
 template <typename T>
-void PackFp32Axis1Test(tflite::TensorType tensorType, std::vector<armnn::BackendId>& backends)
+void PackFp32Axis1Test(tflite::TensorType tensorType)
 {
     std::vector<int32_t> inputShape { 3, 2, 3 };
     std::vector<int32_t> expectedOutputShape { 3, 2, 2, 3 };
@@ -133,16 +129,16 @@ void PackFp32Axis1Test(tflite::TensorType tensorType, std::vector<armnn::Backend
 
     PackTest<T>(tflite::BuiltinOperator_PACK,
                 tensorType,
-                backends,
                 inputShape,
                 expectedOutputShape,
                 inputValues,
                 expectedOutputValues,
+                {},
                 1);
 }
 
 template <typename T>
-void PackFp32Axis2Test(tflite::TensorType tensorType, std::vector<armnn::BackendId>& backends)
+void PackFp32Axis2Test(tflite::TensorType tensorType)
 {
     std::vector<int32_t> inputShape { 3, 2, 3 };
     std::vector<int32_t> expectedOutputShape { 3, 2, 2, 3 };
@@ -195,16 +191,16 @@ void PackFp32Axis2Test(tflite::TensorType tensorType, std::vector<armnn::Backend
 
     PackTest<T>(tflite::BuiltinOperator_PACK,
                 tensorType,
-                backends,
                 inputShape,
                 expectedOutputShape,
                 inputValues,
                 expectedOutputValues,
+                {},
                 2);
 }
 
 template <typename T>
-void PackFp32Axis3Test(tflite::TensorType tensorType, std::vector<armnn::BackendId>& backends)
+void PackFp32Axis3Test(tflite::TensorType tensorType)
 {
     std::vector<int32_t> inputShape { 3, 2, 3 };
     std::vector<int32_t> expectedOutputShape { 3, 2, 3, 2 };
@@ -265,16 +261,16 @@ void PackFp32Axis3Test(tflite::TensorType tensorType, std::vector<armnn::Backend
 
     PackTest<T>(tflite::BuiltinOperator_PACK,
                 tflite::TensorType_FLOAT32,
-                backends,
                 inputShape,
                 expectedOutputShape,
                 inputValues,
                 expectedOutputValues,
+                {},
                 3);
 }
 
 template <typename T>
-void PackFp32Inputs3Test(tflite::TensorType tensorType, std::vector<armnn::BackendId>& backends)
+void PackFp32Inputs3Test(tflite::TensorType tensorType)
 {
     std::vector<int32_t> inputShape { 3, 3 };
     std::vector<int32_t> expectedOutputShape { 3, 3, 3 };
@@ -318,196 +314,63 @@ void PackFp32Inputs3Test(tflite::TensorType tensorType, std::vector<armnn::Backe
 
     PackTest<T>(tflite::BuiltinOperator_PACK,
                 tensorType,
-                backends,
                 inputShape,
                 expectedOutputShape,
                 inputValues,
                 expectedOutputValues,
+                {},
                 1);
 }
 
-TEST_SUITE("Pack_CpuAccTests")
+TEST_SUITE("PackTests")
 {
 
 // Fp32
-TEST_CASE ("Pack_Fp32_Axis0_CpuAcc_Test")
+TEST_CASE ("Pack_Fp32_Axis0_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Axis0Test<float>(tflite::TensorType_FLOAT32, backends);
+    PackFp32Axis0Test<float>(tflite::TensorType_FLOAT32);
 }
 
-TEST_CASE ("Pack_Fp32_Axis1_CpuAcc_Test")
+TEST_CASE ("Pack_Fp32_Axis1_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Axis1Test<float>(tflite::TensorType_FLOAT32, backends);
+    PackFp32Axis1Test<float>(tflite::TensorType_FLOAT32);
 }
 
-TEST_CASE ("Pack_Fp32_Axis2_CpuAcc_Test")
+TEST_CASE ("Pack_Fp32_Axis2_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Axis2Test<float>(tflite::TensorType_FLOAT32, backends);
+    PackFp32Axis2Test<float>(tflite::TensorType_FLOAT32);
 }
 
-TEST_CASE ("Pack_Fp32_Axis3_CpuAcc_Test")
+TEST_CASE ("Pack_Fp32_Axis3_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Axis3Test<float>(tflite::TensorType_FLOAT32, backends);
+    PackFp32Axis3Test<float>(tflite::TensorType_FLOAT32);
 }
 
-TEST_CASE ("Pack_Fp32_Inputs3_CpuAcc_Test")
+TEST_CASE ("Pack_Fp32_Inputs3_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Inputs3Test<float>(tflite::TensorType_FLOAT32, backends);
+    PackFp32Inputs3Test<float>(tflite::TensorType_FLOAT32);
 }
 
 // Uint8
-TEST_CASE ("Pack_Uint8_Axis0_CpuAcc_Test")
+TEST_CASE ("Pack_Uint8_Axis0_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Axis0Test<uint8_t>(tflite::TensorType_UINT8, backends);
+    PackFp32Axis0Test<uint8_t>(tflite::TensorType_UINT8);
 }
 
-TEST_CASE ("Pack_Uint8_Inputs3_CpuAcc_Test")
+TEST_CASE ("Pack_Uint8_Inputs3_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Inputs3Test<uint8_t>(tflite::TensorType_UINT8, backends);
-}
-
-// Uint8
-TEST_CASE ("Pack_Int8_Axis0_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Axis0Test<int8_t>(tflite::TensorType_INT8, backends);
-}
-
-TEST_CASE ("Pack_Int8_Inputs3_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    PackFp32Inputs3Test<int8_t>(tflite::TensorType_INT8, backends);
-}
-
-}
-
-TEST_SUITE("Pack_GpuAccTests")
-{
-
-// Fp32
-TEST_CASE ("Pack_Fp32_Axis0_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Axis0Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Axis1_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Axis1Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Axis2_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Axis2Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Axis3_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Axis3Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Inputs3_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Inputs3Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-// Uint8
-TEST_CASE ("Pack_Uint8_Axis0_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Axis0Test<uint8_t>(tflite::TensorType_UINT8, backends);
-}
-
-TEST_CASE ("Pack_Uint8_Inputs3_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Inputs3Test<uint8_t>(tflite::TensorType_UINT8, backends);
+    PackFp32Inputs3Test<uint8_t>(tflite::TensorType_UINT8);
 }
 
 // Int8
-TEST_CASE ("Pack_Int8_Axis0_GpuAcc_Test")
+TEST_CASE ("Pack_Int8_Axis0_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Axis0Test<int8_t>(tflite::TensorType_INT8, backends);
+    PackFp32Axis0Test<int8_t>(tflite::TensorType_INT8);
 }
 
-TEST_CASE ("Pack_Int8_Inputs3_GpuAcc_Test")
+TEST_CASE ("Pack_Int8_Inputs3_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    PackFp32Inputs3Test<int8_t>(tflite::TensorType_INT8, backends);
-}
-
-}
-
-TEST_SUITE("Pack_CpuRefTests")
-{
-
-// Fp32
-TEST_CASE ("Pack_Fp32_Axis0_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Axis0Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Axis1_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Axis1Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Axis2_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Axis2Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Axis3_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Axis3Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-TEST_CASE ("Pack_Fp32_Inputs3_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Inputs3Test<float>(tflite::TensorType_FLOAT32, backends);
-}
-
-// Uint8
-TEST_CASE ("Pack_Uint8_Axis0_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Axis0Test<uint8_t>(tflite::TensorType_UINT8, backends);
-}
-
-TEST_CASE ("Pack_Uint8_Inputs3_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Inputs3Test<uint8_t>(tflite::TensorType_UINT8, backends);
-}
-
-// Int8
-TEST_CASE ("Pack_Int8_Axis0_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Axis0Test<int8_t>(tflite::TensorType_INT8, backends);
-}
-
-TEST_CASE ("Pack_Int8_Inputs3_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    PackFp32Inputs3Test<int8_t>(tflite::TensorType_INT8, backends);
+    PackFp32Inputs3Test<int8_t>(tflite::TensorType_INT8);
 }
 
 }

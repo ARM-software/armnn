@@ -1,19 +1,16 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "UnidirectionalSequenceLstmTestHelper.hpp"
 
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void UnidirectionalSequenceLstmTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmTest(const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -108,8 +105,7 @@ void UnidirectionalSequenceLstmTest(std::vector<armnn::BackendId>& backends)
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<float>(backends,
-                                              ::tflite::TensorType_FLOAT32,
+    UnidirectionalSequenceLstmTestImpl<float>(::tflite::TensorType_FLOAT32,
                                               batchSize,
                                               timeSize,
                                               inputSize,
@@ -153,13 +149,14 @@ void UnidirectionalSequenceLstmTest(std::vector<armnn::BackendId>& backends)
                                               activationFunction,
                                               clippingThresCell,
                                               clippingThresProj,
-                                              isTimeMajor);
+                                              isTimeMajor,
+                                              backends);
 }
 
-void UnidirectionalSequenceLstmTimeMajorTestImpl(std::vector<armnn::BackendId>& backends,
-                                                 int32_t timeSize,
+void UnidirectionalSequenceLstmTimeMajorTestImpl(int32_t timeSize,
                                                  std::vector<float>& inputValues,
-                                                 std::vector<float>& expectedOutputValues)
+                                                 std::vector<float>& expectedOutputValues,
+                                                 const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t inputSize = 3;
@@ -249,8 +246,7 @@ void UnidirectionalSequenceLstmTimeMajorTestImpl(std::vector<armnn::BackendId>& 
     float clippingThresProj = 0.f;
     bool isTimeMajor = true;
 
-    UnidirectionalSequenceLstmTestImpl<float>(backends,
-                                              ::tflite::TensorType_FLOAT32,
+    UnidirectionalSequenceLstmTestImpl<float>(::tflite::TensorType_FLOAT32,
                                               batchSize,
                                               timeSize,
                                               inputSize,
@@ -294,9 +290,10 @@ void UnidirectionalSequenceLstmTimeMajorTestImpl(std::vector<armnn::BackendId>& 
                                               activationFunction,
                                               clippingThresCell,
                                               clippingThresProj,
-                                              isTimeMajor);}
+                                              isTimeMajor,
+                                              backends);}
 
-void UnidirectionalSequenceLstmTimeMajorTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmTimeMajorTest(const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t timeSize = 2;
 
@@ -311,13 +308,13 @@ void UnidirectionalSequenceLstmTimeMajorTest(std::vector<armnn::BackendId>& back
                                                 0.111716f, 0.043119f, 0.0762981f, -0.0122854f,
                                                 0.104397f, 0.2144f, 0.119192f, -0.0839058f };
 
-    UnidirectionalSequenceLstmTimeMajorTestImpl(backends,
-                                                timeSize,
+    UnidirectionalSequenceLstmTimeMajorTestImpl(timeSize,
                                                 inputValues,
-                                                expectedOutputValues);
+                                                expectedOutputValues,
+                                                backends);
 }
 
-void UnidirectionalSequenceLstmTimeMajorSingleTimeTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmTimeMajorSingleTimeTest(const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t timeSize = 1;
 
@@ -329,13 +326,13 @@ void UnidirectionalSequenceLstmTimeMajorSingleTimeTest(std::vector<armnn::Backen
                                                 0.1053334f, 0.08508634f, 0.00667238f, -0.00356043f,
                                                 0.05638668f, 0.02924093f, 0.00119751f, -0.00017249f };
 
-    UnidirectionalSequenceLstmTimeMajorTestImpl(backends,
-                                                timeSize,
+    UnidirectionalSequenceLstmTimeMajorTestImpl(timeSize,
                                                 inputValues,
-                                                expectedOutputValues);
+                                                expectedOutputValues,
+                                                backends);
 }
 
-void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest(const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 2;
     int32_t timeSize = 3;
@@ -475,8 +472,7 @@ void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest(std::vector<
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<float>(backends,
-                                              ::tflite::TensorType_FLOAT32,
+    UnidirectionalSequenceLstmTestImpl<float>(::tflite::TensorType_FLOAT32,
                                               batchSize,
                                               timeSize,
                                               inputSize,
@@ -520,10 +516,11 @@ void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest(std::vector<
                                               activationFunction,
                                               clippingThresCell,
                                               clippingThresProj,
-                                              isTimeMajor);
+                                              isTimeMajor,
+                                              backends);
 }
 
-void UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest(const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -612,8 +609,7 @@ void UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest(std::vector<
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<float>(backends,
-                                              ::tflite::TensorType_FLOAT32,
+    UnidirectionalSequenceLstmTestImpl<float>(::tflite::TensorType_FLOAT32,
                                               batchSize,
                                               timeSize,
                                               inputSize,
@@ -657,11 +653,12 @@ void UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest(std::vector<
                                               activationFunction,
                                               clippingThresCell,
                                               clippingThresProj,
-                                              isTimeMajor);
+                                              isTimeMajor,
+                                              backends);
 }
 
 void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest(
-    std::vector<armnn::BackendId>& backends)
+    const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -767,8 +764,7 @@ void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<float>(backends,
-                                              ::tflite::TensorType_FLOAT32,
+    UnidirectionalSequenceLstmTestImpl<float>(::tflite::TensorType_FLOAT32,
                                               batchSize,
                                               timeSize,
                                               inputSize,
@@ -812,10 +808,11 @@ void UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest
                                               activationFunction,
                                               clippingThresCell,
                                               clippingThresProj,
-                                              isTimeMajor);
+                                              isTimeMajor,
+                                              backends);
 }
 
-void UnidirectionalSequenceLstmInt8Test(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmInt8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -888,8 +885,7 @@ void UnidirectionalSequenceLstmInt8Test(std::vector<armnn::BackendId>& backends)
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
-                                               ::tflite::TensorType_INT8,
+    UnidirectionalSequenceLstmTestImpl<int8_t>(::tflite::TensorType_INT8,
                                                batchSize,
                                                timeSize,
                                                inputSize,
@@ -934,10 +930,11 @@ void UnidirectionalSequenceLstmInt8Test(std::vector<armnn::BackendId>& backends)
                                                clippingThresCell,
                                                clippingThresProj,
                                                isTimeMajor,
+                                               backends,
                                                0.1f);
 }
 
-void UnidirectionalSequenceLstmInt8TimeMajorTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmInt8TimeMajorTest(const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -1010,8 +1007,7 @@ void UnidirectionalSequenceLstmInt8TimeMajorTest(std::vector<armnn::BackendId>& 
     float clippingThresProj = 0.f;
     bool isTimeMajor = true;
 
-    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
-                                               ::tflite::TensorType_INT8,
+    UnidirectionalSequenceLstmTestImpl<int8_t>(::tflite::TensorType_INT8,
                                                batchSize,
                                                timeSize,
                                                inputSize,
@@ -1056,10 +1052,12 @@ void UnidirectionalSequenceLstmInt8TimeMajorTest(std::vector<armnn::BackendId>& 
                                                clippingThresCell,
                                                clippingThresProj,
                                                isTimeMajor,
+                                               backends,
                                                0.1);
 }
 
-void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest(
+    const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -1130,8 +1128,7 @@ void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest(std::vec
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
-                                               ::tflite::TensorType_INT8,
+    UnidirectionalSequenceLstmTestImpl<int8_t>(::tflite::TensorType_INT8,
                                                batchSize,
                                                timeSize,
                                                inputSize,
@@ -1176,10 +1173,12 @@ void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest(std::vec
                                                clippingThresCell,
                                                clippingThresProj,
                                                isTimeMajor,
+                                               backends,
                                                0.1f);
 }
 
-void UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest(std::vector<armnn::BackendId>& backends)
+void UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest(
+    const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -1251,8 +1250,7 @@ void UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest(std::vec
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
-                                               ::tflite::TensorType_INT8,
+    UnidirectionalSequenceLstmTestImpl<int8_t>(::tflite::TensorType_INT8,
                                                batchSize,
                                                timeSize,
                                                inputSize,
@@ -1297,11 +1295,12 @@ void UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest(std::vec
                                                clippingThresCell,
                                                clippingThresProj,
                                                isTimeMajor,
+                                               backends,
                                                0.1);
 }
 
 void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest(
-    std::vector<armnn::BackendId>& backends)
+    const std::vector<armnn::BackendId>& backends = {})
 {
     int32_t batchSize = 3;
     int32_t timeSize = 2;
@@ -1376,8 +1375,7 @@ void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNorm
     float clippingThresProj = 0.f;
     bool isTimeMajor = false;
 
-    UnidirectionalSequenceLstmTestImpl<int8_t>(backends,
-                                               ::tflite::TensorType_INT8,
+    UnidirectionalSequenceLstmTestImpl<int8_t>(::tflite::TensorType_INT8,
                                                batchSize,
                                                timeSize,
                                                inputSize,
@@ -1422,78 +1420,79 @@ void UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNorm
                                                clippingThresCell,
                                                clippingThresProj,
                                                isTimeMajor,
+                                               backends,
                                                0.1);
 }
 
-TEST_SUITE("UnidirectionalSequenceLstmTest_CpuRefTests")
+TEST_SUITE("UnidirectionalSequenceLstmTestTests")
 {
 
-TEST_CASE ("UnidirectionalSequenceLstmTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmTimeMajorTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmTimeMajorTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmTimeMajorTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmTimeMajorSingleTimeTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmTimeMajorSingleTimeTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmTimeMajorSingleTimeTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmWithCifgWithPeepholeNoProjectionTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmNoCifgWithPeepholeWithProjectionWithLayerNormTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmInt8Test_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmInt8Test_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmInt8Test(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmTimeInt8TimeMajorTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmTimeInt8TimeMajorTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmInt8TimeMajorTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmInt8WithCifgWithPeepholeNoProjectionTest(backends);
 }
 
-TEST_CASE ("UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest_CpuRef_Test")
+TEST_CASE ("UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest_Test")
 {
     std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
     UnidirectionalSequenceLstmInt8NoCifgWithPeepholeWithProjectionWithLayerNormTest(backends);
 }
 
-} //End of TEST_SUITE("UnidirectionalSequenceLstmTest_CpuRef")
+} //End of TEST_SUITE("UnidirectionalSequenceLstmTest")
 
 } // namespace armnnDelegate

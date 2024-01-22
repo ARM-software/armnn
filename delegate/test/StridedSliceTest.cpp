@@ -1,20 +1,16 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "StridedSliceTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void StridedSlice4DTest(std::vector<armnn::BackendId>& backends)
+void StridedSlice4DTest()
 {
     std::vector<int32_t> inputShape  { 3, 2, 3, 1 };
     std::vector<int32_t> outputShape { 1, 2, 3, 1 };
@@ -31,7 +27,6 @@ void StridedSlice4DTest(std::vector<armnn::BackendId>& backends)
     std::vector<float> outputData { 3.0f, 3.0f, 3.0f, 4.0f, 4.0f, 4.0f };
 
     StridedSliceTestImpl<float>(
-            backends,
             inputData,
             outputData,
             beginData,
@@ -45,7 +40,7 @@ void StridedSlice4DTest(std::vector<armnn::BackendId>& backends)
             );
 }
 
-void StridedSlice4DReverseTest(std::vector<armnn::BackendId>& backends)
+void StridedSlice4DReverseTest()
 {
     std::vector<int32_t> inputShape  { 3, 2, 3, 1 };
     std::vector<int32_t> outputShape { 1, 2, 3, 1 };
@@ -62,7 +57,6 @@ void StridedSlice4DReverseTest(std::vector<armnn::BackendId>& backends)
     std::vector<float>   outputData { 4.0f, 4.0f, 4.0f, 3.0f, 3.0f, 3.0f };
 
     StridedSliceTestImpl<float>(
-            backends,
             inputData,
             outputData,
             beginData,
@@ -76,7 +70,7 @@ void StridedSlice4DReverseTest(std::vector<armnn::BackendId>& backends)
     );
 }
 
-void StridedSliceSimpleStrideTest(std::vector<armnn::BackendId>& backends)
+void StridedSliceSimpleStrideTest()
 {
     std::vector<int32_t> inputShape  { 3, 2, 3, 1 };
     std::vector<int32_t> outputShape { 2, 1, 2, 1 };
@@ -94,7 +88,6 @@ void StridedSliceSimpleStrideTest(std::vector<armnn::BackendId>& backends)
                                       5.0f, 5.0f };
 
     StridedSliceTestImpl<float>(
-            backends,
             inputData,
             outputData,
             beginData,
@@ -108,7 +101,7 @@ void StridedSliceSimpleStrideTest(std::vector<armnn::BackendId>& backends)
     );
 }
 
-void StridedSliceSimpleRangeMaskTest(std::vector<armnn::BackendId>& backends)
+void StridedSliceSimpleRangeMaskTest()
 {
     std::vector<int32_t> inputShape  { 3, 2, 3, 1 };
     std::vector<int32_t> outputShape { 3, 2, 3, 1 };
@@ -131,7 +124,6 @@ void StridedSliceSimpleRangeMaskTest(std::vector<armnn::BackendId>& backends)
                                       5.0f, 5.0f, 5.0f, 6.0f, 6.0f, 6.0f };
 
     StridedSliceTestImpl<float>(
-            backends,
             inputData,
             outputData,
             beginData,
@@ -142,100 +134,35 @@ void StridedSliceSimpleRangeMaskTest(std::vector<armnn::BackendId>& backends)
             endShape,
             strideShape,
             outputShape,
+            {},
             beginMask,
             endMask
     );
 }
 
-TEST_SUITE("StridedSlice_CpuRefTests")
+TEST_SUITE("StridedSliceTests")
 {
 
-TEST_CASE ("StridedSlice_4D_CpuRef_Test")
+TEST_CASE ("StridedSlice_4D_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    StridedSlice4DTest(backends);
+    StridedSlice4DTest();
 }
 
-TEST_CASE ("StridedSlice_4D_Reverse_CpuRef_Test")
+TEST_CASE ("StridedSlice_4D_Reverse_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    StridedSlice4DReverseTest(backends);
+    StridedSlice4DReverseTest();
 }
 
-TEST_CASE ("StridedSlice_SimpleStride_CpuRef_Test")
+TEST_CASE ("StridedSlice_SimpleStride_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    StridedSliceSimpleStrideTest(backends);
+    StridedSliceSimpleStrideTest();
 }
 
-TEST_CASE ("StridedSlice_SimpleRange_CpuRef_Test")
+TEST_CASE ("StridedSlice_SimpleRange_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    StridedSliceSimpleRangeMaskTest(backends);
+    StridedSliceSimpleRangeMaskTest();
 }
 
-} // StridedSlice_CpuRefTests TestSuite
-
-
-
-TEST_SUITE("StridedSlice_CpuAccTests")
-{
-
-TEST_CASE ("StridedSlice_4D_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    StridedSlice4DTest(backends);
-}
-
-TEST_CASE ("StridedSlice_4D_Reverse_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    StridedSlice4DReverseTest(backends);
-}
-
-TEST_CASE ("StridedSlice_SimpleStride_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    StridedSliceSimpleStrideTest(backends);
-}
-
-TEST_CASE ("StridedSlice_SimpleRange_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    StridedSliceSimpleRangeMaskTest(backends);
-}
-
-} // StridedSlice_CpuAccTests TestSuite
-
-
-
-TEST_SUITE("StridedSlice_GpuAccTests")
-{
-
-TEST_CASE ("StridedSlice_4D_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    StridedSlice4DTest(backends);
-}
-
-TEST_CASE ("StridedSlice_4D_Reverse_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    StridedSlice4DReverseTest(backends);
-}
-
-TEST_CASE ("StridedSlice_SimpleStride_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    StridedSliceSimpleStrideTest(backends);
-}
-
-TEST_CASE ("StridedSlice_SimpleRange_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    StridedSliceSimpleRangeMaskTest(backends);
-}
-
-} // StridedSlice_GpuAccTests TestSuite
+} // StridedSliceTests TestSuite
 
 } // namespace armnnDelegate

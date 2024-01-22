@@ -1,24 +1,15 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "PreluTestHelper.hpp"
 
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
-#include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-
-#include <tensorflow/lite/version.h>
-
 #include <doctest/doctest.h>
 
 namespace armnnDelegate {
 
-void PreluFloatSimpleTest(std::vector <armnn::BackendId>& backends, bool isAlphaConst, bool isDynamicOutput = false)
+void PreluFloatSimpleTest(bool isAlphaConst, bool isDynamicOutput = false)
 {
     std::vector<int32_t> inputShape { 1, 2, 3 };
     std::vector<int32_t> alphaShape { 1 };
@@ -35,7 +26,6 @@ void PreluFloatSimpleTest(std::vector <armnn::BackendId>& backends, bool isAlpha
 
     PreluTest(tflite::BuiltinOperator_PRELU,
               ::tflite::TensorType_FLOAT32,
-              backends,
               inputShape,
               alphaShape,
               outputShape,
@@ -45,91 +35,29 @@ void PreluFloatSimpleTest(std::vector <armnn::BackendId>& backends, bool isAlpha
               isAlphaConst);
 }
 
-TEST_SUITE("Prelu_CpuRefTests")
+TEST_SUITE("PreluTests")
 {
 
-TEST_CASE ("PreluFp32SimpleConstTest_CpuRef_Test")
+TEST_CASE ("PreluFp32SimpleConstTest_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PreluFloatSimpleTest(backends, true);
+    PreluFloatSimpleTest(true);
 }
 
-TEST_CASE ("PreluFp32SimpleTest_CpuRef_Test")
+TEST_CASE ("PreluFp32SimpleTest_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PreluFloatSimpleTest(backends, false);
+    PreluFloatSimpleTest(false);
 }
 
-TEST_CASE ("PreluFp32SimpleConstDynamicTest_CpuRef_Test")
+TEST_CASE ("PreluFp32SimpleConstDynamicTest_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PreluFloatSimpleTest(backends, true, true);
+    PreluFloatSimpleTest(true, true);
 }
 
-TEST_CASE ("PreluFp32SimpleDynamicTest_CpuRef_Test")
+TEST_CASE ("PreluFp32SimpleDynamicTest_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PreluFloatSimpleTest(backends, false, true);
+    PreluFloatSimpleTest(false, true);
 }
 
-} // TEST_SUITE("Prelu_CpuRefTests")
-
-TEST_SUITE("Prelu_CpuAccTests")
-{
-
-TEST_CASE ("PreluFp32SimpleConstTest_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PreluFloatSimpleTest(backends, true);
-}
-
-TEST_CASE ("PreluFp32SimpleTest_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PreluFloatSimpleTest(backends, false);
-}
-
-TEST_CASE ("PreluFp32SimpleConstDynamicTest_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PreluFloatSimpleTest(backends, true, true);
-}
-
-TEST_CASE ("PreluFp32SimpleDynamicTest_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PreluFloatSimpleTest(backends, false, true);
-}
-
-} // TEST_SUITE("Prelu_CpuAccTests")
-
-TEST_SUITE("Prelu_GpuAccTests")
-{
-
-TEST_CASE ("PreluFp32SimpleConstTest_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PreluFloatSimpleTest(backends, true);
-}
-
-TEST_CASE ("PreluFp32SimpleTest_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PreluFloatSimpleTest(backends, false);
-}
-
-TEST_CASE ("PreluFp32SimpleConstDynamicTest_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PreluFloatSimpleTest(backends, true, true);
-}
-
-TEST_CASE ("PreluFp32SimpleDynamicTest_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PreluFloatSimpleTest(backends, false, true);
-}
-
-} // TEST_SUITE("Prelu_GpuAccTests")
+} // TEST_SUITE("PreluTests")
 
 }

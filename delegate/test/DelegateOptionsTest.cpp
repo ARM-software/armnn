@@ -1,11 +1,13 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "DelegateOptionsTestHelper.hpp"
 #include <common/include/ProfilingGuid.hpp>
 #include <armnnUtils/Filesystem.hpp>
+
+#include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
@@ -229,7 +231,13 @@ TEST_CASE ("ArmnnDelegateModelOptions_CpuAcc_Test")
 
     armnn::OptimizerOptionsOpaque optimizerOptions(false, false, false,
                                                    false, modelOptions, false);
-    armnnDelegate::DelegateOptions delegateOptions(backends, optimizerOptions);
+    std::vector<armnn::BackendId> availableBackends = CaptureAvailableBackends(backends);
+    // It's possible that CpuAcc isn't supported. In that case availableBackends will be empty.
+    if (availableBackends.empty())
+    {
+        return;
+    }
+    armnnDelegate::DelegateOptions delegateOptions(availableBackends, optimizerOptions);
 
     DelegateOptionTest<float>(::tflite::TensorType_FLOAT32,
                               tensorShape,

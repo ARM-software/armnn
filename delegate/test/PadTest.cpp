@@ -1,21 +1,16 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "PadTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void Pad2dTest(std::vector<armnn::BackendId>& backends,
-               tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
+void Pad2dTest(tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
                float pad = 0.0f)
 {
     // Set input data
@@ -50,7 +45,6 @@ void Pad2dTest(std::vector<armnn::BackendId>& backends,
 
     PadTest<float>(padOperatorCode,
                    ::tflite::TensorType_FLOAT32,
-                   backends,
                    inputShape,
                    paddingShape,
                    outputShape,
@@ -60,8 +54,7 @@ void Pad2dTest(std::vector<armnn::BackendId>& backends,
                    pad);
 }
 
-void Pad3dTest(std::vector<armnn::BackendId>& backends,
-               tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
+void Pad3dTest(tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
                float pad = 0.0f)
 {
     // Set input data
@@ -96,7 +89,6 @@ void Pad3dTest(std::vector<armnn::BackendId>& backends,
 
     PadTest<float>(padOperatorCode,
                    ::tflite::TensorType_FLOAT32,
-                   backends,
                    inputShape,
                    paddingShape,
                    outputShape,
@@ -106,8 +98,7 @@ void Pad3dTest(std::vector<armnn::BackendId>& backends,
                    pad);
 }
 
-void Pad4dTest(std::vector<armnn::BackendId>& backends,
-               tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
+void Pad4dTest(tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
                float pad = 0.0f)
 {
     // Set input data
@@ -295,7 +286,6 @@ void Pad4dTest(std::vector<armnn::BackendId>& backends,
 
     PadTest<float>(padOperatorCode,
                    ::tflite::TensorType_FLOAT32,
-                   backends,
                    inputShape,
                    paddingShape,
                    outputShape,
@@ -305,8 +295,7 @@ void Pad4dTest(std::vector<armnn::BackendId>& backends,
                    pad);
 }
 
-void PadInt8Test(std::vector<armnn::BackendId>& backends,
-                 tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
+void PadInt8Test(tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
                  int8_t paddingValue = 0,
                  int8_t p = 3,
                  float quantizationScale = -2.0f,
@@ -344,7 +333,6 @@ void PadInt8Test(std::vector<armnn::BackendId>& backends,
 
     PadTest<int8_t>(padOperatorCode,
                     ::tflite::TensorType_INT8,
-                    backends,
                     inputShape,
                     paddingShape,
                     outputShape,
@@ -352,12 +340,12 @@ void PadInt8Test(std::vector<armnn::BackendId>& backends,
                     paddingDim,
                     expectedOutputValues,
                     paddingValue,
+                    {},
                     quantizationScale,
                     quantizationOffset);
 }
 
-void PadUint8Test(std::vector<armnn::BackendId>& backends,
-                  tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
+void PadUint8Test(tflite::BuiltinOperator padOperatorCode = tflite::BuiltinOperator_PAD,
                   uint8_t paddingValue = 0,
                   uint8_t p = 3,
                   float quantizationScale = -2.0f,
@@ -395,7 +383,6 @@ void PadUint8Test(std::vector<armnn::BackendId>& backends,
 
     PadTest<uint8_t>(padOperatorCode,
                      ::tflite::TensorType_UINT8,
-                     backends,
                      inputShape,
                      paddingShape,
                      outputShape,
@@ -403,203 +390,64 @@ void PadUint8Test(std::vector<armnn::BackendId>& backends,
                      paddingDim,
                      expectedOutputValues,
                      paddingValue,
+                     {},
                      quantizationScale,
                      quantizationOffset);
 }
 
-TEST_SUITE("Pad_CpuRefTests")
+TEST_SUITE("PadTests")
 {
 
-TEST_CASE ("Pad2d_CpuRef_Test")
+TEST_CASE ("Pad2d_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    Pad2dTest(backends);
+    Pad2dTest();
 }
 
-TEST_CASE ("Pad3d_CpuRef_Test")
+TEST_CASE ("Pad3d_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    Pad3dTest(backends);
+    Pad3dTest();
 }
 
-TEST_CASE ("Pad4d_CpuRef_Test")
+TEST_CASE ("Pad4d_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    Pad4dTest(backends);
+    Pad4dTest();
 }
 
-TEST_CASE ("Pad_Int8_CpuRef_Test")
+TEST_CASE ("Pad_Int8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PadInt8Test(backends);
+    PadInt8Test();
 }
 
-TEST_CASE ("Pad_Uint8_CpuRef_Test")
+TEST_CASE ("Pad_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PadUint8Test(backends);
+    PadUint8Test();
 }
 
-TEST_CASE ("PadV22d_CpuRef_Test")
+TEST_CASE ("PadV22d_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    Pad2dTest(backends, tflite::BuiltinOperator_PADV2, -2.5);
+    Pad2dTest(tflite::BuiltinOperator_PADV2, -2.5);
 }
 
-TEST_CASE ("PadV23d_CpuRef_Test")
+TEST_CASE ("PadV23d_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    Pad3dTest(backends, tflite::BuiltinOperator_PADV2, 2.0);
+    Pad3dTest(tflite::BuiltinOperator_PADV2, 2.0);
 }
 
-TEST_CASE ("PadV24d_CpuRef_Test")
+TEST_CASE ("PadV24d_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    Pad4dTest(backends, tflite::BuiltinOperator_PADV2, -1.33);
+    Pad4dTest(tflite::BuiltinOperator_PADV2, -1.33);
 }
 
-TEST_CASE ("PadV2_Int8_CpuRef_Test")
+TEST_CASE ("PadV2_Int8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PadInt8Test(backends, tflite::BuiltinOperator_PADV2, -1, -1);
+    PadInt8Test(tflite::BuiltinOperator_PADV2, -1, -1);
 }
 
-TEST_CASE ("PadV2_Uint8_CpuRef_Test")
+TEST_CASE ("PadV2_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    PadUint8Test(backends, tflite::BuiltinOperator_PADV2, -1, -1);
+    PadUint8Test(tflite::BuiltinOperator_PADV2, -1, -1);
 }
 
-} // TEST_SUITE("Pad_CpuRefTests")
-
-TEST_SUITE("Pad_CpuAccTests")
-{
-
-TEST_CASE ("Pad2d_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    Pad2dTest(backends);
-}
-
-TEST_CASE ("Pad3d_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    Pad3dTest(backends);
-}
-
-TEST_CASE ("Pad4d_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    Pad4dTest(backends);
-}
-
-TEST_CASE ("Pad_Int8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PadInt8Test(backends);
-}
-
-TEST_CASE ("Pad_Uint8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PadUint8Test(backends);
-}
-
-TEST_CASE ("PadV22d_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    Pad2dTest(backends, tflite::BuiltinOperator_PADV2, -2.5);
-}
-
-TEST_CASE ("PadV23d_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    Pad3dTest(backends, tflite::BuiltinOperator_PADV2, 2.0);
-}
-
-TEST_CASE ("PadV24d_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    Pad4dTest(backends, tflite::BuiltinOperator_PADV2, -1.33);
-}
-
-TEST_CASE ("PadV2_Int8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PadInt8Test(backends, tflite::BuiltinOperator_PADV2, -1, -1);
-}
-
-TEST_CASE ("PadV2_Uint8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    PadUint8Test(backends, tflite::BuiltinOperator_PADV2, -1, -1);
-}
-
-} // TEST_SUITE("Pad_CpuAccTests")
-
-TEST_SUITE("Pad_GpuAccTests")
-{
-
-TEST_CASE ("Pad2d_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    Pad2dTest(backends);
-}
-
-TEST_CASE ("Pad3d_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    Pad3dTest(backends);
-}
-
-TEST_CASE ("Pad4d_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    Pad4dTest(backends);
-}
-
-TEST_CASE ("Pad_Int8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PadInt8Test(backends);
-}
-
-TEST_CASE ("Pad_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PadUint8Test(backends);
-}
-
-TEST_CASE ("PadV22d_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    Pad2dTest(backends, tflite::BuiltinOperator_PADV2, -2.5);
-}
-
-TEST_CASE ("PadV23d_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    Pad3dTest(backends, tflite::BuiltinOperator_PADV2, 2.0);
-}
-
-TEST_CASE ("PadV24d_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    Pad4dTest(backends, tflite::BuiltinOperator_PADV2, -1.33);
-}
-
-TEST_CASE ("PadV2_Int8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PadInt8Test(backends, tflite::BuiltinOperator_PADV2, -1, -1);
-}
-
-TEST_CASE ("PadV2_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    PadUint8Test(backends, tflite::BuiltinOperator_PADV2, -1, -1);
-}
-
-} // TEST_SUITE("Pad_GpuAccTests")
+} // TEST_SUITE("PadTests")
 
 } // namespace armnnDelegate

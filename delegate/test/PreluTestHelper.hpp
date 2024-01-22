@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,11 +10,7 @@
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
 
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
-
-#include <doctest/doctest.h>
 
 namespace
 {
@@ -113,14 +109,14 @@ std::vector<char> CreatePreluTfLiteModel(tflite::BuiltinOperator preluOperatorCo
 
 void PreluTest(tflite::BuiltinOperator preluOperatorCode,
                tflite::TensorType tensorType,
-               const std::vector<armnn::BackendId>& backends,
                const std::vector<int32_t>& inputShape,
                const std::vector<int32_t>& alphaShape,
                std::vector<int32_t>& outputShape,
                std::vector<float>& inputData,
                std::vector<float>& alphaData,
                std::vector<float>& expectedOutput,
-               bool alphaIsConstant)
+               bool alphaIsConstant,
+               const std::vector<armnn::BackendId>& backends = {})
 {
     using namespace delegateTestInterpreter;
 
@@ -138,7 +134,7 @@ void PreluTest(tflite::BuiltinOperator preluOperatorCode,
     CHECK(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
 
     CHECK(armnnInterpreter.FillInputTensor<float>(inputData, 0) == kTfLiteOk);

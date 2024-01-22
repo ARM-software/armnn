@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,13 +10,8 @@
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
 
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
 
-#include <doctest/doctest.h>
-
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/TypesUtils.hpp>
 
@@ -573,8 +568,7 @@ std::vector<char> CreateUnidirectionalSequenceLstmTfLiteModel(tflite::TensorType
 }
 
 template<typename T>
-void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
-                                        tflite::TensorType tensorType,
+void UnidirectionalSequenceLstmTestImpl(tflite::TensorType tensorType,
                                         int32_t batchSize,
                                         int32_t timeSize,
                                         int32_t inputSize,
@@ -619,6 +613,7 @@ void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
                                         float clippingThresCell,
                                         float clippingThresProj,
                                         bool isTimeMajor,
+                                        const std::vector<armnn::BackendId>& backends = {},
                                         float quantScale = 0.1f)
 {
     using namespace delegateTestInterpreter;
@@ -687,7 +682,7 @@ void UnidirectionalSequenceLstmTestImpl(std::vector<armnn::BackendId>& backends,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<float>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

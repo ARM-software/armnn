@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,13 +10,8 @@
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
 
-#include <flatbuffers/flatbuffers.h>
 #include <flatbuffers/flexbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/kernels/custom_ops_register.h>
 #include <tensorflow/lite/version.h>
-
-#include <doctest/doctest.h>
 
 namespace
 {
@@ -138,11 +133,11 @@ std::vector<char> CreatePooling3dTfLiteModel(
 template<typename T>
 void Pooling3dTest(std::string poolType,
                    tflite::TensorType tensorType,
-                   std::vector<armnn::BackendId>& backends,
                    std::vector<int32_t>& inputShape,
                    std::vector<int32_t>& outputShape,
                    std::vector<T>& inputValues,
                    std::vector<T>& expectedOutputValues,
+                   const std::vector<armnn::BackendId>& backends = {},
                    TfLitePadding padding = kTfLitePaddingSame,
                    int32_t strideWidth = 0,
                    int32_t strideHeight = 0,
@@ -190,7 +185,7 @@ void Pooling3dTest(std::string poolType,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends, opType);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends), opType);
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<T>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

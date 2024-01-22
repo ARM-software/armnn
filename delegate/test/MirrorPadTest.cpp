@@ -1,13 +1,9 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "PadTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
@@ -43,7 +39,6 @@ void MirrorPadSymmetric2dTest(std::vector<armnn::BackendId>& backends)
 
     PadTest<float>(tflite::BuiltinOperator_MIRROR_PAD,
                    ::tflite::TensorType_FLOAT32,
-                   backends,
                    inputShape,
                    paddingShape,
                    outputShape,
@@ -51,6 +46,7 @@ void MirrorPadSymmetric2dTest(std::vector<armnn::BackendId>& backends)
                    paddingDim,
                    expectedOutputValues,
                    0,    // Padding value - Not used in these tests.
+                   backends,
                    1.0f, // Scale
                    0,    // Offset
                    tflite::MirrorPadMode_SYMMETRIC);
@@ -85,7 +81,6 @@ void MirrorPadReflect2dTest(std::vector<armnn::BackendId>& backends)
 
     PadTest<float>(tflite::BuiltinOperator_MIRROR_PAD,
                    ::tflite::TensorType_FLOAT32,
-                   backends,
                    inputShape,
                    paddingShape,
                    outputShape,
@@ -93,6 +88,7 @@ void MirrorPadReflect2dTest(std::vector<armnn::BackendId>& backends)
                    paddingDim,
                    expectedOutputValues,
                    0,    // Padding value - Not used in these tests.
+                   backends,
                    1.0f, // Scale
                    0,    // Offset
                    tflite::MirrorPadMode_REFLECT);
@@ -143,7 +139,6 @@ void MirrorPadSymmetric3dTest(std::vector<armnn::BackendId>& backends)
 
     PadTest<float>(tflite::BuiltinOperator_MIRROR_PAD,
                    ::tflite::TensorType_FLOAT32,
-                   backends,
                    inputShape,
                    paddingShape,
                    outputShape,
@@ -151,6 +146,7 @@ void MirrorPadSymmetric3dTest(std::vector<armnn::BackendId>& backends)
                    paddingDim,
                    expectedOutputValues,
                    0,    // Padding value - Not used in these tests.
+                   backends,
                    1.0f, // Scale
                    0,    // Offset
                    tflite::MirrorPadMode_SYMMETRIC);
@@ -201,7 +197,6 @@ void MirrorPadReflect3dTest(std::vector<armnn::BackendId>& backends)
 
     PadTest<float>(tflite::BuiltinOperator_MIRROR_PAD,
                    ::tflite::TensorType_FLOAT32,
-                   backends,
                    inputShape,
                    paddingShape,
                    outputShape,
@@ -209,6 +204,7 @@ void MirrorPadReflect3dTest(std::vector<armnn::BackendId>& backends)
                    paddingDim,
                    expectedOutputValues,
                    0,    // Padding value - Not used in these tests.
+                   backends,
                    1.0f, // Scale
                    0,    // Offset
                    tflite::MirrorPadMode_REFLECT);
@@ -241,7 +237,6 @@ void MirrorPadSymmetricUint8Test(std::vector<armnn::BackendId>& backends)
 
     PadTest<uint8_t>(tflite::BuiltinOperator_MIRROR_PAD,
                      ::tflite::TensorType_UINT8,
-                     backends,
                      inputShape,
                      paddingShape,
                      outputShape,
@@ -249,6 +244,7 @@ void MirrorPadSymmetricUint8Test(std::vector<armnn::BackendId>& backends)
                      paddingDim,
                      expectedOutputValues,
                      0,    // Padding value - Not used in these tests.
+                     backends,
                      1.0f, // Scale
                      1,    // Offset
                      tflite::MirrorPadMode_SYMMETRIC);
@@ -283,7 +279,6 @@ void MirrorPadReflectInt8Test(std::vector<armnn::BackendId>& backends)
 
     PadTest<int8_t>(tflite::BuiltinOperator_MIRROR_PAD,
                     ::tflite::TensorType_INT8,
-                    backends,
                     inputShape,
                     paddingShape,
                     outputShape,
@@ -291,6 +286,7 @@ void MirrorPadReflectInt8Test(std::vector<armnn::BackendId>& backends)
                     paddingDim,
                     expectedOutputValues,
                     0,    // Padding value - Not used in these tests.
+                    backends,
                     1.0f, // Scale
                     1,    // Offset
                     tflite::MirrorPadMode_REFLECT);

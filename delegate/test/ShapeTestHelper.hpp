@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,11 +10,7 @@
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
 
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
-
-#include <doctest/doctest.h>
 
 namespace
 {
@@ -104,11 +100,11 @@ std::vector<char> CreateShapeTfLiteModel(tflite::TensorType inputTensorType,
 template<typename T, typename K>
 void ShapeTest(tflite::TensorType inputTensorType,
                tflite::TensorType outputTensorType,
-               std::vector<armnn::BackendId>& backends,
                std::vector<int32_t>& inputShape,
                std::vector<T>& inputValues,
                std::vector<K>& expectedOutputValues,
                std::vector<int32_t>& expectedOutputShape,
+               const std::vector<armnn::BackendId>& backends = {},
                float quantScale = 1.0f,
                int quantOffset = 0)
 {
@@ -128,7 +124,7 @@ void ShapeTest(tflite::TensorType inputTensorType,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
     std::vector<K>       armnnOutputValues = armnnInterpreter.GetOutputResult<K>(0);

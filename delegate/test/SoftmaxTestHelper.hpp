@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -9,13 +9,8 @@
 
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
-#include <armnnUtils/FloatingPointComparison.hpp>
 
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
-
-#include <doctest/doctest.h>
 
 namespace
 {
@@ -102,10 +97,10 @@ std::vector<char> CreateSoftmaxTfLiteModel(tflite::BuiltinOperator softmaxOperat
 
 void SoftmaxTest(tflite::BuiltinOperator softmaxOperatorCode,
                  tflite::TensorType tensorType,
-                 std::vector<armnn::BackendId>& backends,
                  std::vector<int32_t>& shape,
                  std::vector<float>& inputValues,
                  std::vector<float>& expectedOutputValues,
+                 const std::vector<armnn::BackendId>& backends = {},
                  float beta = 0)
 {
     using namespace delegateTestInterpreter;
@@ -123,7 +118,7 @@ void SoftmaxTest(tflite::BuiltinOperator softmaxOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor<float>(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);
@@ -143,8 +138,9 @@ void SoftmaxTest(tflite::BuiltinOperator softmaxOperatorCode,
 /// \param backends armnn backends to target
 /// \param beta multiplicative parameter to the softmax function
 /// \param expectedOutput to be checked against transformed input
-void SoftmaxTestCase(tflite::BuiltinOperator operatorCode,
-                     std::vector<armnn::BackendId> backends, float beta, std::vector<float> expectedOutput) {
+void SoftmaxTestCase(tflite::BuiltinOperator operatorCode, float beta,
+                     std::vector<float> expectedOutput, const std::vector<armnn::BackendId> backends = {})
+{
     std::vector<float> input = {
         1.0, 2.5, 3.0, 4.5, 5.0,
         -1.0, -2.5, -3.0, -4.5, -5.0};
@@ -152,10 +148,10 @@ void SoftmaxTestCase(tflite::BuiltinOperator operatorCode,
 
     SoftmaxTest(operatorCode,
                 tflite::TensorType_FLOAT32,
-                backends,
                 shape,
                 input,
                 expectedOutput,
+                backends,
                 beta);
 }
 

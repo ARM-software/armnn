@@ -1,17 +1,16 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <tensorflow/lite/c/common.h>
-#include <tensorflow/lite/interpreter.h>
-
-#include <doctest/doctest.h>
 
 #include <armnn/BackendId.hpp>
 #include <half/half.hpp>
+
+#include <doctest/doctest.h>
 
 using Half = half_float::half;
 

@@ -1,13 +1,9 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "RedefineTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
@@ -18,7 +14,7 @@ using Half = half_float::half;
 namespace armnnDelegate
 {
 
-void ReshapeSimpleTest(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeSimpleTest(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -35,18 +31,18 @@ void ReshapeSimpleTest(std::vector<armnn::BackendId>& backends, bool useOption =
 
     RedefineTest<float>(tflite::BuiltinOperator_RESHAPE,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
                         expectedOutputValues,
                         targetShape,
-                        useOption);
+                        useOption,
+                        backends);
 }
 
 using namespace half_float::literal;
 
-void ReshapeSimpleFloat16Test(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeSimpleFloat16Test(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -63,16 +59,16 @@ void ReshapeSimpleFloat16Test(std::vector<armnn::BackendId>& backends, bool useO
 
     RedefineTest<Half>(tflite::BuiltinOperator_RESHAPE,
                         ::tflite::TensorType_FLOAT16,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
                         expectedOutputValues,
                         targetShape,
-                        useOption);
+                        useOption,
+                        backends);
 }
 
-void ReshapeReduceDimTest(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeReduceDimTest(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -89,16 +85,16 @@ void ReshapeReduceDimTest(std::vector<armnn::BackendId>& backends, bool useOptio
 
     RedefineTest<float>(tflite::BuiltinOperator_RESHAPE,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
                         expectedOutputValues,
                         targetShape,
-                        useOption);
+                        useOption,
+                        backends);
 }
 
-void ReshapeFlattenTest(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeFlattenTest(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -115,16 +111,16 @@ void ReshapeFlattenTest(std::vector<armnn::BackendId>& backends, bool useOption 
 
     RedefineTest<float>(tflite::BuiltinOperator_RESHAPE,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
                         expectedOutputValues,
                         targetShape,
-                        useOption);
+                        useOption,
+                        backends);
 }
 
-void ReshapeFlattenAllTest(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeFlattenAllTest(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -141,16 +137,16 @@ void ReshapeFlattenAllTest(std::vector<armnn::BackendId>& backends, bool useOpti
 
     RedefineTest<float>(tflite::BuiltinOperator_RESHAPE,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
                         expectedOutputValues,
                         targetShape,
-                        useOption);
+                        useOption,
+                        backends);
 }
 
-void ReshapeInt8Test(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeInt8Test(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -167,18 +163,18 @@ void ReshapeInt8Test(std::vector<armnn::BackendId>& backends, bool useOption = t
 
     RedefineTest<int8_t>(tflite::BuiltinOperator_RESHAPE,
                          ::tflite::TensorType_INT8,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
                          targetShape,
                          useOption,
+                         backends,
                          2.5f,
                          1);
 }
 
-void ReshapeUint8Test(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeUint8Test(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -195,18 +191,18 @@ void ReshapeUint8Test(std::vector<armnn::BackendId>& backends, bool useOption = 
 
     RedefineTest<uint8_t>(tflite::BuiltinOperator_RESHAPE,
                           ::tflite::TensorType_UINT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
                           targetShape,
                           useOption,
+                          backends,
                           2.5f,
                           1);
 }
 
-void ReshapeInt16Test(std::vector<armnn::BackendId>& backends, bool useOption = true)
+void ReshapeInt16Test(bool useOption = true, const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -223,294 +219,100 @@ void ReshapeInt16Test(std::vector<armnn::BackendId>& backends, bool useOption = 
 
     RedefineTest<int16_t>(tflite::BuiltinOperator_RESHAPE,
                           ::tflite::TensorType_INT16,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
                           targetShape,
                           useOption,
+                          backends,
                           2.5f,
                           0);
 }
 
-TEST_SUITE("Reshape_GpuAccTests")
+TEST_SUITE("ReshapeTests")
 {
 
-TEST_CASE ("Reshape_Simple_GpuAcc_Test")
+TEST_CASE ("Reshape_Simple_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeSimpleTest(backends);
+    ReshapeSimpleTest();
 }
 
-TEST_CASE ("Reshape_ReduceDimension_GpuAcc_Test")
+TEST_CASE ("Reshape_ReduceDimension_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeReduceDimTest(backends);
+    ReshapeReduceDimTest();
 }
 
-TEST_CASE ("Reshape_Flatten_GpuAcc_Test")
+TEST_CASE ("Reshape_Flatten_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeFlattenTest(backends);
+    ReshapeFlattenTest();
 }
 
-TEST_CASE ("Reshape_FlattenAll_GpuAcc_Test")
+TEST_CASE ("Reshape_FlattenAll_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeFlattenAllTest(backends);
+    ReshapeFlattenAllTest();
 }
 
-TEST_CASE ("Reshape_Int8_GpuAcc_Test")
+TEST_CASE ("Reshape_Int8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeInt8Test(backends);
+    ReshapeInt8Test();
 }
 
-TEST_CASE ("Reshape_Uint8_GpuAcc_Test")
+TEST_CASE ("Reshape_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeUint8Test(backends);
+    ReshapeUint8Test();
 }
 
-TEST_CASE ("Reshape_Float16_GpuAcc_Test")
+TEST_CASE ("Reshape_Int16_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeSimpleFloat16Test(backends);
+    ReshapeInt16Test();
 }
 
-TEST_CASE ("Reshape_Simple_ShapeTensor_GpuAcc_Test")
+TEST_CASE ("Reshape_Float16_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeSimpleTest(backends, false);
+    ReshapeSimpleFloat16Test();
 }
 
-TEST_CASE ("Reshape_ReduceDimension_ShapeTensor_GpuAcc_Test")
+TEST_CASE ("Reshape_Simple_ShapeTensor_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeReduceDimTest(backends, false);
+    ReshapeSimpleTest(false);
 }
 
-TEST_CASE ("Reshape_Flatten_ShapeTensor_GpuAcc_Test")
+TEST_CASE ("Reshape_ReduceDimension_ShapeTensor_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeFlattenTest(backends, false);
+    ReshapeReduceDimTest(false);
 }
 
-TEST_CASE ("Reshape_FlattenAll_ShapeTensor_GpuAcc_Test")
+TEST_CASE ("Reshape_Flatten_ShapeTensor_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeFlattenAllTest(backends, false);
+    ReshapeFlattenTest(false);
 }
 
-TEST_CASE ("Reshape_Int8_ShapeTensor_GpuAcc_Test")
+TEST_CASE ("Reshape_FlattenAll_ShapeTensor_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeInt8Test(backends, false);
+    ReshapeFlattenAllTest(false);
 }
 
-TEST_CASE ("Reshape_Uint8_ShapeTensor_GpuAcc_Test")
+TEST_CASE ("Reshape_Int8_ShapeTensor_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeUint8Test(backends, false);
+    ReshapeInt8Test(false);
 }
 
-TEST_CASE ("Reshape_Float16_ShapeTensor_GpuAcc_Test")
+TEST_CASE ("Reshape_Uint8_ShapeTensor_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ReshapeSimpleFloat16Test(backends, false);
+    ReshapeUint8Test(false);
 }
 
-} // TEST_SUITE("Reshape_GpuAccTests")
-
-TEST_SUITE("Reshape_CpuAccTests")
+TEST_CASE ("Reshape_Int16_ShapeTensor_Test")
 {
-
-TEST_CASE ("Reshape_Simple_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeSimpleTest(backends);
+    ReshapeInt16Test(false);
 }
 
-TEST_CASE ("Reshape_ReduceDimension_CpuAcc_Test")
+TEST_CASE ("Reshape_Float16_ShapeTensor_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeReduceDimTest(backends);
+    ReshapeSimpleFloat16Test(false);
 }
 
-TEST_CASE ("Reshape_Flatten_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeFlattenTest(backends);
-}
-
-TEST_CASE ("Reshape_FlattenAll_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeFlattenAllTest(backends);
-}
-
-TEST_CASE ("Reshape_Int8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeInt8Test(backends);
-}
-
-TEST_CASE ("Reshape_Uint8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeUint8Test(backends);
-}
-
-TEST_CASE ("Reshape_Float16_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeSimpleFloat16Test(backends);
-}
-
-TEST_CASE ("Reshape_Simple_ShapeTensor_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeSimpleTest(backends, false);
-}
-
-TEST_CASE ("Reshape_ReduceDimension_ShapeTensor_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeReduceDimTest(backends, false);
-}
-
-TEST_CASE ("Reshape_Flatten_ShapeTensor_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeFlattenTest(backends, false);
-}
-
-TEST_CASE ("Reshape_FlattenAll_ShapeTensor_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeFlattenAllTest(backends, false);
-}
-
-TEST_CASE ("Reshape_Int8_ShapeTensor_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeInt8Test(backends, false);
-}
-
-TEST_CASE ("Reshape_Uint8_ShapeTensor_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeUint8Test(backends, false);
-}
-
-TEST_CASE ("Reshape_Float16_ShapeTensor_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ReshapeSimpleFloat16Test(backends, false);
-}
-
-} // TEST_SUITE("Reshape_CpuAccTests")
-
-TEST_SUITE("Reshape_CpuRefTests")
-{
-
-TEST_CASE ("Reshape_Simple_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeSimpleTest(backends);
-}
-
-TEST_CASE ("Reshape_ReduceDimension_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeReduceDimTest(backends);
-}
-
-TEST_CASE ("Reshape_Flatten_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeFlattenTest(backends);
-}
-
-TEST_CASE ("Reshape_FlattenAll_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeFlattenAllTest(backends);
-}
-
-TEST_CASE ("Reshape_Int8_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeInt8Test(backends);
-}
-
-TEST_CASE ("Reshape_Uint8_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeUint8Test(backends);
-}
-
-TEST_CASE ("Reshape_Int16_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeInt16Test(backends);
-}
-
-TEST_CASE ("Reshape_Float16_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeSimpleFloat16Test(backends);
-}
-
-TEST_CASE ("Reshape_Simple_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeSimpleTest(backends, false);
-}
-
-TEST_CASE ("Reshape_ReduceDimension_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeReduceDimTest(backends, false);
-}
-
-TEST_CASE ("Reshape_Flatten_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeFlattenTest(backends, false);
-}
-
-TEST_CASE ("Reshape_FlattenAll_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeFlattenAllTest(backends, false);
-}
-
-TEST_CASE ("Reshape_Int8_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeInt8Test(backends, false);
-}
-
-TEST_CASE ("Reshape_Uint8_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeUint8Test(backends, false);
-}
-
-TEST_CASE ("Reshape_Int16_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeInt16Test(backends, false);
-}
-
-TEST_CASE ("Reshape_Float16_ShapeTensor_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ReshapeSimpleFloat16Test(backends, false);
-}
-
-} // TEST_SUITE("Reshape_CpuRefTests")
+} // TEST_SUITE("ReshapeTests")
 
 } // namespace armnnDelegate

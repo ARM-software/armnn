@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,11 +10,7 @@
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
 
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
-
-#include <doctest/doctest.h>
 
 namespace
 {
@@ -122,11 +118,11 @@ template <typename InputT, typename OutputT>
 void QuantizationTest(tflite::BuiltinOperator quantizeOperatorCode,
                       tflite::TensorType inputTensorType,
                       tflite::TensorType outputTensorType,
-                      std::vector<armnn::BackendId>& backends,
                       std::vector<int32_t>& inputShape,
                       std::vector<int32_t>& outputShape,
                       std::vector<InputT>&  inputValues,
                       std::vector<OutputT>& expectedOutputValues,
+                      const std::vector<armnn::BackendId>& backends = {},
                       float quantScale = 1.0f,
                       int quantOffset  = 0)
 {
@@ -148,7 +144,7 @@ void QuantizationTest(tflite::BuiltinOperator quantizeOperatorCode,
     std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
     CHECK(armnnInterpreter.FillInputTensor(inputValues, 0) == kTfLiteOk);
     CHECK(armnnInterpreter.Invoke() == kTfLiteOk);

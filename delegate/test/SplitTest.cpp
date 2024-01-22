@@ -1,13 +1,9 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "SplitTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
@@ -15,7 +11,7 @@ namespace armnnDelegate
 {
 
 // SPLIT Operator
-void SplitUint8Test(std::vector<armnn::BackendId>& backends)
+void SplitUint8Test()
 {
     std::vector<int32_t> axisShape { 1 };
     std::vector<int32_t> inputShape { 2, 2, 2, 2} ;
@@ -35,7 +31,6 @@ void SplitUint8Test(std::vector<armnn::BackendId>& backends)
     int32_t numSplits = 2;
 
     SplitTest<uint8_t>(::tflite::TensorType_UINT8,
-                       backends,
                        axisShape,
                        inputShape,
                        outputShapes,
@@ -45,7 +40,7 @@ void SplitUint8Test(std::vector<armnn::BackendId>& backends)
                        numSplits);
 }
 
-void SplitFp32Test(std::vector<armnn::BackendId>& backends)
+void SplitFp32Test()
 {
     std::vector<int32_t> axisShape { 1 };
     std::vector<int32_t> inputShape { 2, 2, 2, 2 };
@@ -65,7 +60,6 @@ void SplitFp32Test(std::vector<armnn::BackendId>& backends)
     int32_t numSplits = 2;
 
     SplitTest<float>(::tflite::TensorType_FLOAT32,
-                     backends,
                      axisShape,
                      inputShape,
                      outputShapes,
@@ -76,60 +70,24 @@ void SplitFp32Test(std::vector<armnn::BackendId>& backends)
 }
 
 // SPLIT Test Suite
-TEST_SUITE("SPLIT_CpuRefTests")
+TEST_SUITE("SPLITTests")
 {
 
-TEST_CASE ("SPLIT_Uint8_CpuRef_Test")
+TEST_CASE ("SPLIT_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    SplitUint8Test(backends);
+    SplitUint8Test();
 }
 
-TEST_CASE ("SPLIT_Fp32_CpuRef_Test")
+TEST_CASE ("SPLIT_Fp32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    SplitFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("SPLIT_CpuAccTests")
-{
-
-TEST_CASE ("SPLIT_Uint8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    SplitUint8Test(backends);
-}
-
-TEST_CASE ("SPLIT_Fp32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    SplitFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("SPLIT_GpuAccTests")
-{
-
-TEST_CASE ("SPLIT_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    SplitUint8Test(backends);
-}
-
-TEST_CASE ("SPLIT_Fp32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    SplitFp32Test(backends);
+    SplitFp32Test();
 }
 
 }
 // End of SPLIT Test Suite
 
 // SPLIT_V Operator
-void SplitVUint8Test(std::vector<armnn::BackendId>& backends)
+void SplitVUint8Test()
 {
     std::vector<int32_t> axisShape { 1 };
     std::vector<int32_t> inputShape { 2, 4, 2, 2 };
@@ -155,7 +113,6 @@ void SplitVUint8Test(std::vector<armnn::BackendId>& backends)
     int32_t numSplits = 2;
 
     SplitVTest<uint8_t>(::tflite::TensorType_UINT8,
-                        backends,
                         inputShape,
                         splitsShape,
                         axisShape,
@@ -167,7 +124,7 @@ void SplitVUint8Test(std::vector<armnn::BackendId>& backends)
                         numSplits);
 }
 
-void SplitVFp32Test(std::vector<armnn::BackendId>& backends)
+void SplitVFp32Test()
 {
     std::vector<int32_t> axisShape { 1 };
     std::vector<int32_t> inputShape { 2, 4, 2, 2 };
@@ -193,7 +150,6 @@ void SplitVFp32Test(std::vector<armnn::BackendId>& backends)
     int32_t numSplits = 2;
 
     SplitVTest<float>(::tflite::TensorType_FLOAT32,
-                      backends,
                       inputShape,
                       splitsShape,
                       axisShape,
@@ -206,56 +162,19 @@ void SplitVFp32Test(std::vector<armnn::BackendId>& backends)
 }
 
 // SPLIT_V Test Suite
-TEST_SUITE("SPLIT_V_CpuRefTests")
+TEST_SUITE("SPLIT_VTests")
 {
 
-TEST_CASE ("SPLIT_V_Uint8_CpuRef_Test")
+TEST_CASE ("SPLIT_V_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    SplitVUint8Test(backends);
+    SplitVUint8Test();
 }
 
-TEST_CASE ("SPLIT_V_Fp32_CpuRef_Test")
+TEST_CASE ("SPLIT_V_Fp32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    SplitVFp32Test(backends);
+    SplitVFp32Test();
 }
 
-}
-
-TEST_SUITE("SPLIT_V_CpuAccTests")
-{
-
-TEST_CASE ("SPLIT_V_Uint8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    SplitVUint8Test(backends);
-}
-
-TEST_CASE ("SPLIT_V_Fp32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    SplitVFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("SPLIT_V_GpuAccTests")
-{
-
-TEST_CASE ("SPLIT_V_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    SplitVUint8Test(backends);
-}
-
-TEST_CASE ("SPLIT_V_Fp32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    SplitVFp32Test(backends);
-}
-
-}
-// End of SPLIT_V Test Suite
+} // End of SPLIT_V Test Suite
 
 } // namespace armnnDelegate

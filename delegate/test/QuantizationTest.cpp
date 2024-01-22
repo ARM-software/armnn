@@ -1,14 +1,9 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "QuantizationTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
-
 
 #include <doctest/doctest.h>
 
@@ -16,7 +11,7 @@ namespace armnnDelegate
 {
 
 // Dequantize operator test functions.
-void DequantizeUint8Test(std::vector<armnn::BackendId>& backends)
+void DequantizeUint8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -36,14 +31,14 @@ void DequantizeUint8Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<uint8_t, float>(tflite::BuiltinOperator_DEQUANTIZE,
                                      ::tflite::TensorType_UINT8,
                                      ::tflite::TensorType_FLOAT32,
-                                     backends,
                                      inputShape,
                                      outputShape,
                                      inputValues,
-                                     expectedOutputValues);
+                                     expectedOutputValues,
+                                     backends);
 }
 
-void DequantizeInt8Test(std::vector<armnn::BackendId>& backends)
+void DequantizeInt8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -62,14 +57,14 @@ void DequantizeInt8Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<int8_t , float>(tflite::BuiltinOperator_DEQUANTIZE,
                                      ::tflite::TensorType_INT8,
                                      ::tflite::TensorType_FLOAT32,
-                                     backends,
                                      inputShape,
                                      outputShape,
                                      inputValues,
-                                     expectedOutputValues);
+                                     expectedOutputValues,
+                                     backends);
 }
 
-void DequantizeInt16Test(std::vector<armnn::BackendId>& backends)
+void DequantizeInt16Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 5 };
     std::vector<int32_t> outputShape { 2, 5 };
@@ -88,15 +83,15 @@ void DequantizeInt16Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<int16_t, float>(tflite::BuiltinOperator_DEQUANTIZE,
                                      ::tflite::TensorType_INT16,
                                      ::tflite::TensorType_FLOAT32,
-                                     backends,
                                      inputShape,
                                      outputShape,
                                      inputValues,
-                                     expectedOutputValues);
+                                     expectedOutputValues,
+                                     backends);
 }
 
 // Quantize operator test functions.
-void QuantizeFloat32Uint8Test(std::vector<armnn::BackendId>& backends)
+void QuantizeFloat32Uint8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -116,14 +111,14 @@ void QuantizeFloat32Uint8Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<float, uint8_t>(tflite::BuiltinOperator_QUANTIZE,
                                      ::tflite::TensorType_FLOAT32,
                                      ::tflite::TensorType_UINT8,
-                                     backends,
                                      inputShape,
                                      outputShape,
                                      inputValues,
-                                     expectedOutputValues);
+                                     expectedOutputValues,
+                                     backends);
 }
 
-void QuantizeFloat32Int8Test(std::vector<armnn::BackendId>& backends)
+void QuantizeFloat32Int8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -140,16 +135,16 @@ void QuantizeFloat32Int8Test(std::vector<armnn::BackendId>& backends)
     };
 
     QuantizationTest<float, int8_t>(tflite::BuiltinOperator_QUANTIZE,
-                                     ::tflite::TensorType_FLOAT32,
-                                     ::tflite::TensorType_INT8,
-                                     backends,
-                                     inputShape,
-                                     outputShape,
-                                     inputValues,
-                                     expectedOutputValues);
+                                    ::tflite::TensorType_FLOAT32,
+                                    ::tflite::TensorType_INT8,
+                                    inputShape,
+                                    outputShape,
+                                    inputValues,
+                                    expectedOutputValues,
+                                    backends);
 }
 
-void QuantizeFloat32Int16Test(std::vector<armnn::BackendId>& backends)
+void QuantizeFloat32Int16Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -168,14 +163,14 @@ void QuantizeFloat32Int16Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<float, int16_t>(tflite::BuiltinOperator_QUANTIZE,
                                     ::tflite::TensorType_FLOAT32,
                                     ::tflite::TensorType_INT16,
-                                    backends,
                                     inputShape,
                                     outputShape,
                                     inputValues,
-                                    expectedOutputValues);
+                                    expectedOutputValues,
+                                    backends);
 }
 
-void QuantizeInt16Int16Test(std::vector<armnn::BackendId>& backends)
+void QuantizeInt16Int16Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -194,14 +189,14 @@ void QuantizeInt16Int16Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<int16_t, int16_t>(tflite::BuiltinOperator_QUANTIZE,
                                      ::tflite::TensorType_INT16,
                                      ::tflite::TensorType_INT16,
-                                     backends,
                                      inputShape,
                                      outputShape,
                                      inputValues,
-                                     expectedOutputValues);
+                                     expectedOutputValues,
+                                     backends);
 }
 
-void QuantizeInt16Int8Test(std::vector<armnn::BackendId>& backends)
+void QuantizeInt16Int8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -218,16 +213,16 @@ void QuantizeInt16Int8Test(std::vector<armnn::BackendId>& backends)
     };
 
     QuantizationTest<int16_t, int8_t>(tflite::BuiltinOperator_QUANTIZE,
-                                       ::tflite::TensorType_INT16,
-                                       ::tflite::TensorType_INT8,
-                                       backends,
-                                       inputShape,
-                                       outputShape,
-                                       inputValues,
-                                       expectedOutputValues);
+                                      ::tflite::TensorType_INT16,
+                                      ::tflite::TensorType_INT8,
+                                      inputShape,
+                                      outputShape,
+                                      inputValues,
+                                      expectedOutputValues,
+                                      backends);
 }
 
-void QuantizeInt8Uint8Test(std::vector<armnn::BackendId>& backends)
+void QuantizeInt8Uint8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -246,14 +241,14 @@ void QuantizeInt8Uint8Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<int8_t, uint8_t>(tflite::BuiltinOperator_QUANTIZE,
                                       ::tflite::TensorType_INT8,
                                       ::tflite::TensorType_UINT8,
-                                      backends,
                                       inputShape,
                                       outputShape,
                                       inputValues,
-                                      expectedOutputValues);
+                                      expectedOutputValues,
+                                      backends);
 }
 
-void QuantizeUint8Int8Test(std::vector<armnn::BackendId>& backends)
+void QuantizeUint8Int8Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 2, 4 };
     std::vector<int32_t> outputShape { 2, 4 };
@@ -272,66 +267,61 @@ void QuantizeUint8Int8Test(std::vector<armnn::BackendId>& backends)
     QuantizationTest<uint8_t, int8_t>(tflite::BuiltinOperator_QUANTIZE,
                                       ::tflite::TensorType_UINT8,
                                       ::tflite::TensorType_INT8,
-                                      backends,
                                       inputShape,
                                       outputShape,
                                       inputValues,
-                                      expectedOutputValues);
+                                      expectedOutputValues,
+                                      backends);
 }
 
 TEST_SUITE("CpuRef_QuantizationTests")
 {
 
-TEST_CASE ("DEQUANTIZE_UINT8_CpuRef_Test")
+TEST_CASE ("DEQUANTIZE_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    DequantizeUint8Test(backends);
+    DequantizeUint8Test();
 }
 
 
-TEST_CASE ("DEQUANTIZE_INT8_CpuRef_Test")
+TEST_CASE ("DEQUANTIZE_INT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    DequantizeInt8Test(backends);
+    DequantizeInt8Test();
 }
 
 
-TEST_CASE ("DEQUANTIZE_INT16_CpuRef_Test")
+TEST_CASE ("DEQUANTIZE_INT16_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    DequantizeInt16Test(backends);
+    DequantizeInt16Test();
 }
 
 
-TEST_CASE ("QUANTIZE_FLOAT32_UINT8_CpuRef_Test")
+TEST_CASE ("QUANTIZE_FLOAT32_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeFloat32Uint8Test(backends);
+    QuantizeFloat32Uint8Test();
 }
 
 
-TEST_CASE ("QUANTIZE_FLOAT32_INT8_CpuRef_Test")
+TEST_CASE ("QUANTIZE_FLOAT32_INT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeFloat32Int8Test(backends);
+    QuantizeFloat32Int8Test();
 }
 
 
-TEST_CASE ("QUANTIZE_FLOAT32_INT16_CpuRef_Test")
+TEST_CASE ("QUANTIZE_FLOAT32_INT16_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     QuantizeFloat32Int16Test(backends);
 }
 
 
-TEST_CASE ("QUANTIZE_INT16_INT16_CpuRef_Test")
+TEST_CASE ("QUANTIZE_INT16_INT16_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     QuantizeInt16Int16Test(backends);
 }
 
 
-TEST_CASE ("QUANTIZE_INT16_INT8_CpuRef_Test")
+TEST_CASE ("QUANTIZE_INT16_INT8_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     QuantizeInt16Int8Test(backends);
@@ -339,115 +329,15 @@ TEST_CASE ("QUANTIZE_INT16_INT8_CpuRef_Test")
 
 
 
-TEST_CASE ("QUANTIZE_INT8_UINT8_CpuRef_Test")
+TEST_CASE ("QUANTIZE_INT8_UINT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeInt8Uint8Test(backends);
+    QuantizeInt8Uint8Test();
 }
 
 
-TEST_CASE ("QUANTIZE_UINT8_INT8_CpuRef_Test")
+TEST_CASE ("QUANTIZE_UINT8_INT8_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    QuantizeUint8Int8Test(backends);
-}
-
-}
-
-TEST_SUITE("CpuAcc_QuantizationTests")
-{
-
-// Dequantize Operator Tests
-TEST_CASE ("DEQUANTIZE_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    DequantizeUint8Test(backends);
-}
-
-TEST_CASE ("DEQUANTIZE_INT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    DequantizeInt8Test(backends);
-}
-
-TEST_CASE ("DEQUANTIZE_INT16_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    DequantizeInt16Test(backends);
-}
-
-// Quantize Operator Tests
-TEST_CASE ("QUANTIZE_FLOAT32_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    QuantizeFloat32Uint8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_FLOAT32_INT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    QuantizeFloat32Int8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_INT8_UINT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    QuantizeInt8Uint8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_UINT8_INT8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    QuantizeUint8Int8Test(backends);
-}
-
-}
-
-TEST_SUITE("GpuAcc_QuantizationTests")
-{
-
-// Dequantize Operator Tests
-TEST_CASE ("DEQUANTIZE_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    DequantizeUint8Test(backends);
-}
-
-TEST_CASE ("DEQUANTIZE_INT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    DequantizeInt8Test(backends);
-}
-
-TEST_CASE ("DEQUANTIZE_INT16_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    DequantizeInt16Test(backends);
-}
-
-// Quantize Operator Tests
-TEST_CASE ("QUANTIZE_FLOAT32_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    QuantizeFloat32Uint8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_FLOAT32_INT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    QuantizeFloat32Int8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_INT8_UINT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    QuantizeInt8Uint8Test(backends);
-}
-
-TEST_CASE ("QUANTIZE_UINT8_INT8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    QuantizeUint8Int8Test(backends);
+    QuantizeUint8Int8Test();
 }
 
 }

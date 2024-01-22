@@ -1,21 +1,17 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "GatherNdTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-// GATHER_ND Operator
-void GatherNdUint8Test(std::vector<armnn::BackendId>& backends)
+// Gather_Nd Operator
+void GatherNdUint8Test()
 {
 
     std::vector<int32_t> paramsShape{ 5, 2 };
@@ -27,7 +23,6 @@ void GatherNdUint8Test(std::vector<armnn::BackendId>& backends)
     std::vector<uint8_t> expectedOutputValues{ 3, 4, 1, 2, 9, 10 };
 
     GatherNdTest<uint8_t>(::tflite::TensorType_UINT8,
-                          backends,
                           paramsShape,
                           indicesShape,
                           expectedOutputShape,
@@ -36,7 +31,7 @@ void GatherNdUint8Test(std::vector<armnn::BackendId>& backends)
                           expectedOutputValues);
 }
 
-void GatherNdFp32Test(std::vector<armnn::BackendId>& backends)
+void GatherNdFp32Test()
 {
     std::vector<int32_t> paramsShape{ 5, 2 };
     std::vector<int32_t> indicesShape{ 3, 1 };
@@ -47,7 +42,6 @@ void GatherNdFp32Test(std::vector<armnn::BackendId>& backends)
     std::vector<float>   expectedOutputValues{ 3.3f, 4.4f, 1.1f, 2.2f, 9.9f, 10.10f };
 
     GatherNdTest<float>(::tflite::TensorType_FLOAT32,
-                        backends,
                         paramsShape,
                         indicesShape,
                         expectedOutputShape,
@@ -56,57 +50,22 @@ void GatherNdFp32Test(std::vector<armnn::BackendId>& backends)
                         expectedOutputValues);
 }
 
-// GATHER_ND Test Suite
-TEST_SUITE("GATHER_ND_CpuRefTests")
+// Gather_Nd Test Suite
+TEST_SUITE("Gather_NdTests")
 {
 
-TEST_CASE ("GATHER_ND_Uint8_CpuRef_Test")
+TEST_CASE ("Gather_Nd_Uint8_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    GatherNdUint8Test(backends);
+    GatherNdUint8Test();
 }
 
-TEST_CASE ("GATHER_ND_Fp32_CpuRef_Test")
+TEST_CASE ("Gather_Nd_Fp32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    GatherNdFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("GATHER_ND_CpuAccTests")
-{
-
-TEST_CASE ("GATHER_ND_Uint8_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    GatherNdUint8Test(backends);
-}
-
-TEST_CASE ("GATHER_ND_Fp32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    GatherNdFp32Test(backends);
+    GatherNdFp32Test();
 }
 
 }
 
-TEST_SUITE("GATHER_ND_GpuAccTests")
-{
-
-TEST_CASE ("GATHER_ND_Uint8_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    GatherNdUint8Test(backends);
-}
-
-TEST_CASE ("GATHER_ND_Fp32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    GatherNdFp32Test(backends);
-}
-
-}
-// End of GATHER_ND Test Suite
+// End of Gather_Nd Test Suite
 
 } // namespace armnnDelegate

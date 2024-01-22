@@ -1,19 +1,16 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "TransposeTestHelper.hpp"
 
-#include <armnn_delegate.hpp>
-
 #include <doctest/doctest.h>
-#include <flatbuffers/flatbuffers.h>
 
 namespace armnnDelegate
 {
 
-void TransposeFP32Test(std::vector<armnn::BackendId>& backends)
+void TransposeFP32Test()
 {
     // set test input data
     std::vector<int32_t> input0Shape {4, 2, 3};
@@ -26,8 +23,7 @@ void TransposeFP32Test(std::vector<armnn::BackendId>& backends)
     std::vector<float> expectedOutputValues = {0, 3, 6, 9, 12, 15, 18, 21, 1, 4, 7, 10,
                                                13, 16, 19, 22, 2, 5, 8, 11, 14, 17, 20, 23};
 
-    TransposeTest<float>(backends,
-                         input0Shape,
+    TransposeTest<float>(input0Shape,
                          inputPermVecShape,
                          outputShape,
                          input0Values,
@@ -35,35 +31,12 @@ void TransposeFP32Test(std::vector<armnn::BackendId>& backends)
                          expectedOutputValues);
 }
 
-TEST_SUITE ("Transpose_GpuAccTests")
+TEST_SUITE ("TransposeTests")
 {
 
-TEST_CASE ("Transpose_Float32_GpuAcc_Test")
+TEST_CASE ("Transpose_Float32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    TransposeFP32Test(backends);
-}
-
-}
-
-TEST_SUITE ("Transpose_CpuAccTests")
-{
-
-TEST_CASE ("Transpose_Float32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    TransposeFP32Test(backends);
-}
-
-}
-
-TEST_SUITE ("Transpose_CpuRefTests")
-{
-
-TEST_CASE ("Transpose_Float32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    TransposeFP32Test(backends);
+    TransposeFP32Test();
 }
 
 }

@@ -1,13 +1,9 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "LstmTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
@@ -118,8 +114,7 @@ void LstmTest(std::vector<armnn::BackendId>& backends)
     float clippingThresCell = 0.f;
     float clippingThresProj = 0.f;
 
-    LstmTestImpl<float>(backends,
-                        ::tflite::TensorType_FLOAT32,
+    LstmTestImpl<float>(::tflite::TensorType_FLOAT32,
                         batchSize,
                         inputSize,
                         outputSize,
@@ -161,29 +156,18 @@ void LstmTest(std::vector<armnn::BackendId>& backends)
                         expectedOutputValues,
                         activationFunction,
                         clippingThresCell,
-                        clippingThresProj);
+                        clippingThresProj,
+                        backends);
 }
 
-TEST_SUITE("LstmTest_CpuRefTests")
+TEST_SUITE("LstmTest_Tests")
 {
 
-TEST_CASE ("LstmTest_CpuRef_Test")
+TEST_CASE ("LstmTest_Test")
 {
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef};
+    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuRef, armnn::Compute::CpuAcc};
     LstmTest(backends);
 }
 
-} //End of TEST_SUITE("Convolution2dTest_CpuRef")
-
-TEST_SUITE("LstmTest_CpuAccTests")
-{
-
-TEST_CASE ("LstmTest_CpuAcc_Test")
-{
-    std::vector <armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    LstmTest(backends);
 }
-
-} //End of TEST_SUITE("Convolution2dTest_CpuAcc")
-
 } // namespace armnnDelegate

@@ -1,14 +1,16 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "RedefineTestHelper.hpp"
 
+#include <doctest/doctest.h>
+
 namespace armnnDelegate
 {
 
-void ExpandDimsSimpleTest(std::vector<armnn::BackendId>& backends)
+void ExpandDimsSimpleTest()
 {
     // Set input data
     std::vector<int32_t> inputShape  { 2, 2, 1 };
@@ -20,15 +22,15 @@ void ExpandDimsSimpleTest(std::vector<armnn::BackendId>& backends)
 
     RedefineTest<float>(tflite::BuiltinOperator_EXPAND_DIMS,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
                         expectedOutputValues,
-                        axis);
+                        axis,
+                        true);
 }
 
-void ExpandDimsWithNegativeAxisTest(std::vector<armnn::BackendId>& backends)
+void ExpandDimsWithNegativeAxisTest()
 {
     // Set input data
     std::vector<int32_t> inputShape  { 1, 2, 2 };
@@ -40,63 +42,27 @@ void ExpandDimsWithNegativeAxisTest(std::vector<armnn::BackendId>& backends)
 
     RedefineTest<float>(tflite::BuiltinOperator_EXPAND_DIMS,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
                         expectedOutputValues,
-                        axis);
+                        axis,
+                        true);
 }
 
-TEST_SUITE("ExpandDims_GpuAccTests")
+TEST_SUITE("ExpandDimsTests")
 {
 
-TEST_CASE ("ExpandDims_Simple_GpuAcc_Test")
+TEST_CASE ("ExpandDims_Simple_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ExpandDimsSimpleTest(backends);
+    ExpandDimsSimpleTest();
 }
 
-TEST_CASE ("ExpandDims_With_Negative_Axis_GpuAcc_Test")
+TEST_CASE ("ExpandDims_With_Negative_Axis_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ExpandDimsWithNegativeAxisTest(backends);
+    ExpandDimsWithNegativeAxisTest();
 }
 
-} // TEST_SUITE("ExpandDims_GpuAccTests")
-
-TEST_SUITE("ExpandDims_CpuAccTests")
-{
-
-TEST_CASE ("ExpandDims_Simple_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ExpandDimsSimpleTest(backends);
-}
-
-TEST_CASE ("ExpandDims_With_Negative_Axis_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ExpandDimsWithNegativeAxisTest(backends);
-}
-
-} // TEST_SUITE("ExpandDims_CpuAccTests")
-
-TEST_SUITE("ExpandDims_CpuRefTests")
-{
-
-TEST_CASE ("ExpandDims_Simple_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ExpandDimsSimpleTest(backends);
-}
-
-TEST_CASE ("ExpandDims_With_Negative_Axis_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ExpandDimsWithNegativeAxisTest(backends);
-}
-
-} // TEST_SUITE("ExpandDims_CpuRefTests")
+} // TEST_SUITE("ExpandDimsTests")
 
 } // namespace armnnDelegate

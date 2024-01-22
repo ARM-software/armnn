@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,11 +10,7 @@
 #include <armnn_delegate.hpp>
 #include <DelegateTestInterpreter.hpp>
 
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/kernels/register.h>
 #include <tensorflow/lite/version.h>
-
-#include <doctest/doctest.h>
 
 namespace
 {
@@ -113,11 +109,11 @@ std::vector<char> CreatePackTfLiteModel(tflite::BuiltinOperator packOperatorCode
 template <typename T>
 void PackTest(tflite::BuiltinOperator packOperatorCode,
               tflite::TensorType tensorType,
-              std::vector<armnn::BackendId>& backends,
               std::vector<int32_t>& inputShape,
               std::vector<int32_t>& expectedOutputShape,
               std::vector<std::vector<T>>& inputValues,
               std::vector<T>& expectedOutputValues,
+              const std::vector<armnn::BackendId>& backends = {},
               unsigned int axis = 0,
               float quantScale = 1.0f,
               int quantOffset  = 0)
@@ -137,7 +133,7 @@ void PackTest(tflite::BuiltinOperator packOperatorCode,
     CHECK(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
 
     // Setup interpreter with Arm NN Delegate applied.
-    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, backends);
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
     CHECK(armnnInterpreter.AllocateTensors() == kTfLiteOk);
 
     // Set input data for all input tensors.

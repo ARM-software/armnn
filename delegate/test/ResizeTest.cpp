@@ -1,25 +1,16 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ResizeTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
-#include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-
-#include <tensorflow/lite/version.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void ResizeBiliniarFloat32Test(std::vector<armnn::BackendId>& backends)
+void ResizeBiliniarFloat32Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<float> input1Values
@@ -45,7 +36,6 @@ void ResizeBiliniarFloat32Test(std::vector<armnn::BackendId>& backends)
     const std::vector<int32_t> expectedOutputShape = { 1, 5, 5, 1 };
 
     ResizeFP32TestImpl(tflite::BuiltinOperator_RESIZE_BILINEAR,
-                       backends,
                        input1Values,
                        input1Shape,
                        input2NewShape,
@@ -54,7 +44,7 @@ void ResizeBiliniarFloat32Test(std::vector<armnn::BackendId>& backends)
                        expectedOutputShape);
 }
 
-void ResizeNearestNeighbourFloat32Test(std::vector<armnn::BackendId>& backends)
+void ResizeNearestNeighbourFloat32Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<float> input1Values {  1.0f, 2.0f, 3.0f, 4.0f }
@@ -69,7 +59,6 @@ void ResizeNearestNeighbourFloat32Test(std::vector<armnn::BackendId>& backends)
     const std::vector<int32_t> expectedOutputShape = { 1, 1, 1, 1 };
 
     ResizeFP32TestImpl(tflite::BuiltinOperator_RESIZE_NEAREST_NEIGHBOR,
-                       backends,
                        input1Values,
                        input1Shape,
                        input2NewShape,
@@ -78,57 +67,19 @@ void ResizeNearestNeighbourFloat32Test(std::vector<armnn::BackendId>& backends)
                        expectedOutputShape);
 }
 
-TEST_SUITE("ResizeTests_GpuAccTests")
+TEST_SUITE("ResizeTestsTests")
 {
 
-TEST_CASE ("Resize_Biliniar_Float32_GpuAcc_Test")
+TEST_CASE ("Resize_Biliniar_Float32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ResizeBiliniarFloat32Test(backends);
+    ResizeBiliniarFloat32Test();
 }
 
-TEST_CASE ("Resize_NearestNeighbour_Float32_GpuAcc_Test")
+TEST_CASE ("Resize_NearestNeighbour_Float32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    ResizeNearestNeighbourFloat32Test(backends);
+    ResizeNearestNeighbourFloat32Test();
 }
 
-} // TEST_SUITE("ResizeTests_GpuAccTests")
-
-
-TEST_SUITE("ResizeTests_CpuAccTests")
-{
-
-TEST_CASE ("Resize_Biliniar_Float32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ResizeBiliniarFloat32Test(backends);
-}
-
-TEST_CASE ("Resize_NearestNeighbour_Float32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    ResizeNearestNeighbourFloat32Test(backends);
-}
-
-} // TEST_SUITE("ResizeTests_CpuAccTests")
-
-
-TEST_SUITE("ResizeTests_CpuRefTests")
-{
-
-TEST_CASE ("Resize_Biliniar_Float32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ResizeBiliniarFloat32Test(backends);
-}
-
-TEST_CASE ("Resize_NearestNeighbour_Float32_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    ResizeNearestNeighbourFloat32Test(backends);
-}
-
-} // TEST_SUITE("ResizeTests_CpuRefTests")
+} // TEST_SUITE("ResizeTestsTests")
 
 } // namespace armnnDelegate

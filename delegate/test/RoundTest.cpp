@@ -1,20 +1,16 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "RoundTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void FloorFp32Test(std::vector<armnn::BackendId>& backends)
+void FloorFp32Test(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  {1, 3, 2, 3};
     std::vector<int32_t> outputShape {1, 3, 2, 3};
@@ -27,42 +23,18 @@ void FloorFp32Test(std::vector<armnn::BackendId>& backends)
 
     RoundTest<float>(tflite::BuiltinOperator_FLOOR,
                      ::tflite::TensorType_FLOAT32,
-                     backends,
                      inputShape,
                      inputValues,
                      expectedOutputValues);
 }
 
 // FLOOR Test Suite
-TEST_SUITE("FLOOR_CpuRefTests")
+TEST_SUITE("FLOORTests")
 {
 
-TEST_CASE ("FLOOR_Fp32_CpuRef_Test")
+TEST_CASE ("FLOOR_Fp32_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    FloorFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("FLOOR_CpuAccTests")
-{
-
-TEST_CASE ("FLOOR_Fp32_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    FloorFp32Test(backends);
-}
-
-}
-
-TEST_SUITE("FLOOR_GpuAccTests")
-{
-
-TEST_CASE ("FLOOR_Fp32_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    FloorFp32Test(backends);
+    FloorFp32Test();
 }
 
 }

@@ -1,20 +1,16 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "SliceTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void SliceFixtureSimpleTest(std::vector<armnn::BackendId>& backends)
+void SliceFixtureSimpleTest(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 3, 2, 3 };
     std::vector<int32_t> outputShape { 2, 1, 3 };
@@ -30,7 +26,6 @@ void SliceFixtureSimpleTest(std::vector<armnn::BackendId>& backends)
                                     5.0f, 5.0f, 5.0f };
 
     SliceTestImpl<float>(
-        backends,
         inputData,
         outputData,
         beginData,
@@ -41,7 +36,7 @@ void SliceFixtureSimpleTest(std::vector<armnn::BackendId>& backends)
         outputShape);
 }
 
-void SliceFixtureSizeTest(std::vector<armnn::BackendId>& backends)
+void SliceFixtureSizeTest(const std::vector<armnn::BackendId>& backends = {})
 {
     std::vector<int32_t> inputShape  { 3, 2, 3 };
     std::vector<int32_t> outputShape { 2, 1, 3 };
@@ -57,7 +52,6 @@ void SliceFixtureSizeTest(std::vector<armnn::BackendId>& backends)
                                     5.0f, 5.0f, 5.0f };
 
     SliceTestImpl<float>(
-            backends,
             inputData,
             outputData,
             beginData,
@@ -68,55 +62,19 @@ void SliceFixtureSizeTest(std::vector<armnn::BackendId>& backends)
             outputShape);
 }
 
-TEST_SUITE("Slice_CpuRefTests")
+TEST_SUITE("SliceTests")
 {
 
-TEST_CASE ("Slice_Simple_CpuRef_Test")
+TEST_CASE ("Slice_Simple_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    SliceFixtureSimpleTest(backends);
+    SliceFixtureSimpleTest();
 }
 
-TEST_CASE ("Slice_Size_CpuRef_Test")
+TEST_CASE ("Slice_Size_Test")
 {
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-    SliceFixtureSizeTest(backends);
+    SliceFixtureSizeTest();
 }
 
-} // Slice_CpuRefTests TestSuite
-
-TEST_SUITE("Slice_CpuAccTests")
-{
-
-TEST_CASE ("Slice_Simple_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    SliceFixtureSimpleTest(backends);
-}
-
-TEST_CASE ("Slice_Size_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuAcc};
-    SliceFixtureSizeTest(backends);
-}
-
-} // Slice_CpuAccTests TestSuite
-
-TEST_SUITE("StridedSlice_GpuAccTests")
-{
-
-TEST_CASE ("Slice_Simple_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    SliceFixtureSimpleTest(backends);
-}
-
-TEST_CASE ("Slice_Size_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = {armnn::Compute::GpuAcc};
-    SliceFixtureSizeTest(backends);
-}
-
-} // Slice_GpuAccTests TestSuite
+} // SliceTests TestSuite
 
 } // namespace armnnDelegate

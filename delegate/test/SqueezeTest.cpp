@@ -1,14 +1,16 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "RedefineTestHelper.hpp"
 
+#include <doctest/doctest.h>
+
 namespace armnnDelegate
 {
 
-void SqueezeSimpleTest(std::vector<armnn::BackendId>& backends)
+void SqueezeSimpleTest()
 {
     // Set input data
     std::vector<int32_t> inputShape  { 1, 2, 2, 1 };
@@ -20,7 +22,6 @@ void SqueezeSimpleTest(std::vector<armnn::BackendId>& backends)
 
     RedefineTest<float>(tflite::BuiltinOperator_SQUEEZE,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
@@ -28,7 +29,7 @@ void SqueezeSimpleTest(std::vector<armnn::BackendId>& backends)
                         squeezeDims);
 }
 
-void SqueezeWithDimsTest(std::vector<armnn::BackendId>& backends)
+void SqueezeWithDimsTest()
 {
     // Set input data
     std::vector<int32_t> inputShape  { 1, 2, 2, 1 };
@@ -40,7 +41,6 @@ void SqueezeWithDimsTest(std::vector<armnn::BackendId>& backends)
 
     RedefineTest<float>(tflite::BuiltinOperator_SQUEEZE,
                         ::tflite::TensorType_FLOAT32,
-                        backends,
                         inputShape,
                         outputShape,
                         inputValues,
@@ -48,55 +48,19 @@ void SqueezeWithDimsTest(std::vector<armnn::BackendId>& backends)
                         squeezeDims);
 }
 
-TEST_SUITE("Squeeze_GpuAccTests")
+TEST_SUITE("SqueezeTests")
 {
 
-TEST_CASE ("Squeeze_Simple_GpuAcc_Test")
+TEST_CASE ("Squeeze_Simple_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    SqueezeSimpleTest(backends);
+    SqueezeSimpleTest();
 }
 
-TEST_CASE ("Squeeze_With_Dims_GpuAcc_Test")
+TEST_CASE ("Squeeze_With_Dims_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    SqueezeWithDimsTest(backends);
+    SqueezeWithDimsTest();
 }
 
-} // TEST_SUITE("Squeeze_GpuAccTests")
-
-TEST_SUITE("Squeeze_CpuAccTests")
-{
-
-TEST_CASE ("Squeeze_Simple_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    SqueezeSimpleTest(backends);
-}
-
-TEST_CASE ("Squeeze_With_Dims_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    SqueezeWithDimsTest(backends);
-}
-
-} // TEST_SUITE("Squeeze_CpuAccTests")
-
-TEST_SUITE("Squeeze_CpuRefTests")
-{
-
-TEST_CASE ("Squeeze_Simple_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    SqueezeSimpleTest(backends);
-}
-
-TEST_CASE ("Squeeze_With_Dims_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    SqueezeWithDimsTest(backends);
-}
-
-} // TEST_SUITE("Squeeze_CpuRefTests")
+} // TEST_SUITE("SqueezeTests")
 
 } // namespace armnnDelegate

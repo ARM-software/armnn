@@ -1,25 +1,16 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "Pooling2dTestHelper.hpp"
-
-#include <armnn_delegate.hpp>
-
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
-#include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-
-#include <tensorflow/lite/version.h>
 
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
 
-void MaxPool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dFP32PaddingValidTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -33,11 +24,11 @@ void MaxPool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_MAX_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_VALID,
                          2,
                          2,
@@ -45,7 +36,7 @@ void MaxPool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
                          2);
 }
 
-void MaxPool2dInt8PaddingValidTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dInt8PaddingValidTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -59,11 +50,11 @@ void MaxPool2dInt8PaddingValidTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_VALID,
                           2,
                           2,
@@ -74,7 +65,7 @@ void MaxPool2dInt8PaddingValidTest(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void MaxPool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dFP32PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -88,11 +79,11 @@ void MaxPool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_MAX_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_SAME,
                          2,
                          2,
@@ -100,7 +91,7 @@ void MaxPool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
                          2);
 }
 
-void MaxPool2dInt8PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dInt8PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -114,11 +105,11 @@ void MaxPool2dInt8PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_SAME,
                           2,
                           2,
@@ -129,7 +120,7 @@ void MaxPool2dInt8PaddingSameTest(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void MaxPool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dFP32ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -143,11 +134,11 @@ void MaxPool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_MAX_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_VALID,
                          1,
                          1,
@@ -156,7 +147,7 @@ void MaxPool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
                          ::tflite::ActivationFunctionType_RELU);
 }
 
-void MaxPool2dInt8ReluTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dInt8ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -170,11 +161,11 @@ void MaxPool2dInt8ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_VALID,
                           1,
                           1,
@@ -185,7 +176,7 @@ void MaxPool2dInt8ReluTest(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void MaxPool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
+void MaxPool2dFP32Relu6Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -199,11 +190,11 @@ void MaxPool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_MAX_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_SAME,
                          2,
                          2,
@@ -212,7 +203,7 @@ void MaxPool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
                          ::tflite::ActivationFunctionType_RELU6);
 }
 
-void MaxPool2dInt8Relu6Test(std::vector<armnn::BackendId>& backends)
+void MaxPool2dInt8Relu6Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -226,11 +217,11 @@ void MaxPool2dInt8Relu6Test(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_SAME,
                           2,
                           2,
@@ -241,7 +232,7 @@ void MaxPool2dInt8Relu6Test(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void MaxPool2dUint8PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dUint8PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -255,11 +246,11 @@ void MaxPool2dUint8PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<uint8_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                            ::tflite::TensorType_UINT8,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_SAME,
                            2,
                            2,
@@ -270,7 +261,7 @@ void MaxPool2dUint8PaddingSameTest(std::vector<armnn::BackendId>& backends)
                            1);
 }
 
-void MaxPool2dUint8ReluTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dUint8ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -284,11 +275,11 @@ void MaxPool2dUint8ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<uint8_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                            ::tflite::TensorType_UINT8,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_VALID,
                            1,
                            1,
@@ -299,7 +290,7 @@ void MaxPool2dUint8ReluTest(std::vector<armnn::BackendId>& backends)
                            1);
 }
 
-void MaxPool2dInt16PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dInt16PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -313,11 +304,11 @@ void MaxPool2dInt16PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int16_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                            ::tflite::TensorType_INT16,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_SAME,
                            2,
                            2,
@@ -328,7 +319,7 @@ void MaxPool2dInt16PaddingSameTest(std::vector<armnn::BackendId>& backends)
                            0);
 }
 
-void MaxPool2dInt16ReluTest(std::vector<armnn::BackendId>& backends)
+void MaxPool2dInt16ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -342,11 +333,11 @@ void MaxPool2dInt16ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int16_t>(tflite::BuiltinOperator_MAX_POOL_2D,
                            ::tflite::TensorType_INT16,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_VALID,
                            1,
                            1,
@@ -357,7 +348,7 @@ void MaxPool2dInt16ReluTest(std::vector<armnn::BackendId>& backends)
                            0);
 }
 
-void AveragePool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dFP32PaddingValidTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -371,11 +362,11 @@ void AveragePool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_VALID,
                          2,
                          2,
@@ -383,7 +374,7 @@ void AveragePool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
                          2);
 }
 
-void AveragePool2dInt8PaddingValidTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dInt8PaddingValidTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -397,11 +388,11 @@ void AveragePool2dInt8PaddingValidTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_VALID,
                           2,
                           2,
@@ -412,7 +403,7 @@ void AveragePool2dInt8PaddingValidTest(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void AveragePool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dFP32PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -426,11 +417,11 @@ void AveragePool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_SAME,
                          2,
                          2,
@@ -438,7 +429,7 @@ void AveragePool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
                          2);
 }
 
-void AveragePool2dInt8PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dInt8PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -452,11 +443,11 @@ void AveragePool2dInt8PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_SAME,
                           2,
                           2,
@@ -467,7 +458,7 @@ void AveragePool2dInt8PaddingSameTest(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void AveragePool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dFP32ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -481,11 +472,11 @@ void AveragePool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_VALID,
                          1,
                          1,
@@ -494,7 +485,7 @@ void AveragePool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
                          ::tflite::ActivationFunctionType_RELU);
 }
 
-void AveragePool2dInt8ReluTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dInt8ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -508,11 +499,11 @@ void AveragePool2dInt8ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_VALID,
                           1,
                           1,
@@ -523,7 +514,7 @@ void AveragePool2dInt8ReluTest(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void AveragePool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
+void AveragePool2dFP32Relu6Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -537,11 +528,11 @@ void AveragePool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_SAME,
                          2,
                          2,
@@ -550,7 +541,7 @@ void AveragePool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
                          ::tflite::ActivationFunctionType_RELU6);
 }
 
-void AveragePool2dInt8Relu6Test(std::vector<armnn::BackendId>& backends)
+void AveragePool2dInt8Relu6Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -564,11 +555,11 @@ void AveragePool2dInt8Relu6Test(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int8_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                           ::tflite::TensorType_INT8,
-                          backends,
                           inputShape,
                           outputShape,
                           inputValues,
                           expectedOutputValues,
+                          backends,
                           ::tflite::Padding_SAME,
                           2,
                           2,
@@ -579,7 +570,7 @@ void AveragePool2dInt8Relu6Test(std::vector<armnn::BackendId>& backends)
                           1);
 }
 
-void AveragePool2dUint8PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dUint8PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -593,11 +584,11 @@ void AveragePool2dUint8PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<uint8_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                            ::tflite::TensorType_UINT8,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_SAME,
                            2,
                            2,
@@ -608,7 +599,7 @@ void AveragePool2dUint8PaddingSameTest(std::vector<armnn::BackendId>& backends)
                            1);
 }
 
-void AveragePool2dUint8ReluTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dUint8ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -622,11 +613,11 @@ void AveragePool2dUint8ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<uint8_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                            ::tflite::TensorType_UINT8,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_VALID,
                            1,
                            1,
@@ -637,7 +628,7 @@ void AveragePool2dUint8ReluTest(std::vector<armnn::BackendId>& backends)
                            1);
 }
 
-void AveragePool2dInt16PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dInt16PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -651,11 +642,11 @@ void AveragePool2dInt16PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int16_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                            ::tflite::TensorType_INT16,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_SAME,
                            2,
                            2,
@@ -666,7 +657,7 @@ void AveragePool2dInt16PaddingSameTest(std::vector<armnn::BackendId>& backends)
                            0);
 }
 
-void AveragePool2dInt16ReluTest(std::vector<armnn::BackendId>& backends)
+void AveragePool2dInt16ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -680,11 +671,11 @@ void AveragePool2dInt16ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<int16_t>(tflite::BuiltinOperator_AVERAGE_POOL_2D,
                            ::tflite::TensorType_INT16,
-                           backends,
                            inputShape,
                            outputShape,
                            inputValues,
                            expectedOutputValues,
+                           backends,
                            ::tflite::Padding_VALID,
                            1,
                            1,
@@ -695,7 +686,7 @@ void AveragePool2dInt16ReluTest(std::vector<armnn::BackendId>& backends)
                            0);
 }
 
-void L2Pool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
+void L2Pool2dFP32PaddingValidTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -709,11 +700,11 @@ void L2Pool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_L2_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_VALID,
                          2,
                          2,
@@ -721,7 +712,7 @@ void L2Pool2dFP32PaddingValidTest(std::vector<armnn::BackendId>& backends)
                          2);
 }
 
-void L2Pool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
+void L2Pool2dFP32PaddingSameTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -735,11 +726,11 @@ void L2Pool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_L2_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_SAME,
                          2,
                          2,
@@ -747,7 +738,7 @@ void L2Pool2dFP32PaddingSameTest(std::vector<armnn::BackendId>& backends)
                          2);
 }
 
-void L2Pool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
+void L2Pool2dFP32ReluTest(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -761,11 +752,11 @@ void L2Pool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_L2_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_VALID,
                          1,
                          1,
@@ -774,7 +765,7 @@ void L2Pool2dFP32ReluTest(std::vector<armnn::BackendId>& backends)
                          ::tflite::ActivationFunctionType_RELU);
 }
 
-void L2Pool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
+void L2Pool2dFP32Relu6Test(const std::vector<armnn::BackendId>& backends = {})
 {
     // Set input data
     std::vector<int32_t> inputShape { 1, 3, 4, 1 };
@@ -788,11 +779,11 @@ void L2Pool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
 
     Pooling2dTest<float>(tflite::BuiltinOperator_L2_POOL_2D,
                          ::tflite::TensorType_FLOAT32,
-                         backends,
                          inputShape,
                          outputShape,
                          inputValues,
                          expectedOutputValues,
+                         backends,
                          ::tflite::Padding_SAME,
                          2,
                          2,
@@ -801,475 +792,153 @@ void L2Pool2dFP32Relu6Test(std::vector<armnn::BackendId>& backends)
                          ::tflite::ActivationFunctionType_RELU6);
 }
 
-TEST_SUITE("Pooling2d_GpuAccTests")
+TEST_SUITE("Pooling2dTests")
 {
 
-TEST_CASE ("MaxPooling2d_FP32_PaddingValid_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_FP32_PaddingValid_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dFP32PaddingValidTest(backends);
+    MaxPool2dFP32PaddingValidTest();
 }
 
-TEST_CASE ("MaxPooling2d_Int8_PaddingValid_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_Int8_PaddingValid_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dInt8PaddingValidTest(backends);
+    MaxPool2dInt8PaddingValidTest();
 }
 
-TEST_CASE ("MaxPooling2d_FP32_PaddingSame_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_FP32_PaddingSame_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dFP32PaddingSameTest(backends);
+    MaxPool2dFP32PaddingSameTest();
 }
 
-TEST_CASE ("MaxPooling2d_Int8_PaddingSame_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_Int8_PaddingSame_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dInt8PaddingSameTest(backends);
+    MaxPool2dInt8PaddingSameTest();
 }
 
-TEST_CASE ("MaxPooling2d_FP32_Relu_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_FP32_Relu_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dFP32ReluTest(backends);
+    MaxPool2dFP32ReluTest();
 }
 
-TEST_CASE ("MaxPooling2d_Int8_Relu_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_Int8_Relu_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dInt8ReluTest(backends);
+    MaxPool2dInt8ReluTest();
 }
 
-TEST_CASE ("MaxPooling2d_FP32_Relu6_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_FP32_Relu6_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dFP32Relu6Test(backends);
+    MaxPool2dFP32Relu6Test();
 }
 
-TEST_CASE ("MaxPooling2d_Int8_Relu6_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_Int8_Relu6_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dInt8Relu6Test(backends);
+    MaxPool2dInt8Relu6Test();
 }
 
-TEST_CASE ("MaxPooling2d_Uint8_PaddingSame_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_Uint8_PaddingSame_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dUint8PaddingSameTest(backends);
+    MaxPool2dUint8PaddingSameTest();
 }
 
-TEST_CASE ("MaxPooling2d_Uint8_Relu_GpuAcc_Test")
+TEST_CASE ("MaxPooling2d_Uint8_Relu_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    MaxPool2dUint8ReluTest(backends);
+    MaxPool2dUint8ReluTest();
 }
 
-TEST_CASE ("AveragePooling2d_FP32_PaddingValid_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dFP32PaddingValidTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_PaddingValid_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dInt8PaddingValidTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_FP32_PaddingSame_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dFP32PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_PaddingSame_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dInt8PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_FP32_Relu_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dFP32ReluTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_FP32_Relu6_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dFP32Relu6Test(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_Relu_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dInt8ReluTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_Relu6_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dInt8Relu6Test(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Uint8_PaddingSame_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dUint8PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Uint8_Relu_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    AveragePool2dUint8ReluTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_PaddingValid_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    L2Pool2dFP32PaddingValidTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_PaddingSame_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    L2Pool2dFP32PaddingSameTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_Relu_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    L2Pool2dFP32ReluTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_Relu6_GpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-    L2Pool2dFP32Relu6Test(backends);
-}
-
-} // TEST_SUITE("Pooling2d_GpuAccTests")
-
-TEST_SUITE("Pooling2d_CpuAccTests")
-{
-
-TEST_CASE ("MaxPooling2d_FP32_PaddingValid_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dFP32PaddingValidTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_PaddingValid_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dInt8PaddingValidTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_FP32_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dFP32PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dInt8PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_FP32_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dFP32ReluTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dInt8ReluTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_FP32_Relu6_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dFP32Relu6Test(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_Relu6_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dInt8Relu6Test(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Uint8_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dUint8PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Uint8_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    MaxPool2dUint8ReluTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_FP32_PaddingValid_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dFP32PaddingValidTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_PaddingValid_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dInt8PaddingValidTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_FP32_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dFP32PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dInt8PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_FP32_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dFP32ReluTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_FP32_Relu6_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dFP32Relu6Test(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dInt8ReluTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Int8_Relu6_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dInt8Relu6Test(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Uint8_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dUint8PaddingSameTest(backends);
-}
-
-TEST_CASE ("AveragePooling2d_Uint8_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    AveragePool2dUint8ReluTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_PaddingValid_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    L2Pool2dFP32PaddingValidTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_PaddingSame_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    L2Pool2dFP32PaddingSameTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_Relu_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    L2Pool2dFP32ReluTest(backends);
-}
-
-TEST_CASE ("L2Pooling2d_FP32_Relu6_CpuAcc_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-    L2Pool2dFP32Relu6Test(backends);
-}
-
-} // TEST_SUITE("Pooling2d_CpuAccTests")
-
-TEST_SUITE("Pooling2d_CpuRefTests")
-{
-
-TEST_CASE ("MaxPooling2d_FP32_PaddingValid_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dFP32PaddingValidTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_PaddingValid_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dInt8PaddingValidTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_FP32_PaddingSame_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dFP32PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_PaddingSame_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dInt8PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_FP32_Relu_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dFP32ReluTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_Relu_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dInt8ReluTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_FP32_Relu6_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dFP32Relu6Test(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int8_Relu6_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dInt8Relu6Test(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Uint8_PaddingSame_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dUint8PaddingSameTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Uint8_Relu_CpuRef_Test")
-{
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    MaxPool2dUint8ReluTest(backends);
-}
-
-TEST_CASE ("MaxPooling2d_Int16_PaddingSame_CpuRef_Test")
+TEST_CASE ("MaxPooling2d_Int16_PaddingSame_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     MaxPool2dInt16PaddingSameTest(backends);
 }
 
-TEST_CASE ("MaxPooling2d_Int16_Relu_CpuRef_Test")
+TEST_CASE ("MaxPooling2d_Int16_Relu_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     MaxPool2dInt16ReluTest(backends);
 }
 
-TEST_CASE ("AveragePooling2d_FP32_PaddingValid_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_FP32_PaddingValid_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dFP32PaddingValidTest(backends);
+    AveragePool2dFP32PaddingValidTest();
 }
 
-TEST_CASE ("AveragePooling2d_Int8_PaddingValid_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Int8_PaddingValid_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dInt8PaddingValidTest(backends);
+    AveragePool2dInt8PaddingValidTest();
 }
 
-TEST_CASE ("AveragePooling2d_FP32_PaddingSame_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_FP32_PaddingSame_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dFP32PaddingSameTest(backends);
+    AveragePool2dFP32PaddingSameTest();
 }
 
-TEST_CASE ("AveragePooling2d_Int8_PaddingSame_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Int8_PaddingSame_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dInt8PaddingSameTest(backends);
+    AveragePool2dInt8PaddingSameTest();
 }
 
-TEST_CASE ("AveragePooling2d_FP32_Relu_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_FP32_Relu_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dFP32ReluTest(backends);
+    AveragePool2dFP32ReluTest();
 }
 
-TEST_CASE ("AveragePooling2d_FP32_Relu6_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_FP32_Relu6_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dFP32Relu6Test(backends);
+    AveragePool2dFP32Relu6Test();
 }
 
-TEST_CASE ("AveragePooling2d_Int8_Relu_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Int8_Relu_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dInt8ReluTest(backends);
+    AveragePool2dInt8ReluTest();
 }
 
-TEST_CASE ("AveragePooling2d_Int8_Relu6_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Int8_Relu6_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dInt8Relu6Test(backends);
+    AveragePool2dInt8Relu6Test();
 }
 
-TEST_CASE ("AveragePooling2d_Uint8_PaddingSame_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Uint8_PaddingSame_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dUint8PaddingSameTest(backends);
+    AveragePool2dUint8PaddingSameTest();
 }
 
-TEST_CASE ("AveragePooling2d_Uint8_Relu_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Uint8_Relu_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    AveragePool2dUint8ReluTest(backends);
+    AveragePool2dUint8ReluTest();
 }
 
-TEST_CASE ("AveragePooling2d_Int16_PaddingSame_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Int16_PaddingSame_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     AveragePool2dInt16PaddingSameTest(backends);
 }
 
-TEST_CASE ("AveragePooling2d_Int16_Relu_CpuRef_Test")
+TEST_CASE ("AveragePooling2d_Int16_Relu_Test")
 {
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     AveragePool2dInt16ReluTest(backends);
 }
 
-TEST_CASE ("L2Pooling2d_FP32_PaddingValid_CpuRef_Test")
+TEST_CASE ("L2Pooling2d_FP32_PaddingValid_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    L2Pool2dFP32PaddingValidTest(backends);
+    L2Pool2dFP32PaddingValidTest();
 }
 
-TEST_CASE ("L2Pooling2d_FP32_PaddingSame_CpuRef_Test")
+TEST_CASE ("L2Pooling2d_FP32_PaddingSame_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    L2Pool2dFP32PaddingSameTest(backends);
+    L2Pool2dFP32PaddingSameTest();
 }
 
-TEST_CASE ("L2Pooling2d_FP32_Relu_CpuRef_Test")
+TEST_CASE ("L2Pooling2d_FP32_Relu_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    L2Pool2dFP32ReluTest(backends);
+    L2Pool2dFP32ReluTest();
 }
 
-TEST_CASE ("L2Pooling2d_FP32_Relu6_CpuRef_Test")
+TEST_CASE ("L2Pooling2d_FP32_Relu6_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-    L2Pool2dFP32Relu6Test(backends);
+    L2Pool2dFP32Relu6Test();
 }
 
-} // TEST_SUITE("Pooling2d_CpuRefTests")
+} // TEST_SUITE("Pooling2dTests")
 
 } // namespace armnnDelegate

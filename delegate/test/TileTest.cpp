@@ -1,21 +1,15 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "TileTestHelper.hpp"
 
-#include <armnn_delegate.hpp>
-#include <flatbuffers/flatbuffers.h>
-#include <tensorflow/lite/interpreter.h>
-#include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-#include <tensorflow/lite/version.h>
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
 {
-void TileFloat32Test(std::vector<armnn::BackendId>& backends)
+void TileFloat32Test()
 {
     // Set input data
     std::vector<float> inputValues =
@@ -43,7 +37,6 @@ void TileFloat32Test(std::vector<armnn::BackendId>& backends)
     const std::vector<int32_t> expectedOutputShape = { 4, 6 };
 
     TileFP32TestImpl(tflite::BuiltinOperator_TILE,
-                     backends,
                      inputValues,
                      inputShape,
                      multiplesValues,
@@ -52,37 +45,14 @@ void TileFloat32Test(std::vector<armnn::BackendId>& backends)
                      expectedOutputShape);
 }
 
-TEST_SUITE("TileTests_GpuAccTests")
+TEST_SUITE("TileTestsTests")
 {
 
-    TEST_CASE ("Tile_Float32_GpuAcc_Test")
+    TEST_CASE ("Tile_Float32_Test")
     {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::GpuAcc };
-        TileFloat32Test(backends);
+        TileFloat32Test();
     }
 
-} // TEST_SUITE("Tile_Float32_GpuAcc_Test")
-
-TEST_SUITE("TileTests_CpuAccTests")
-{
-
-    TEST_CASE ("Tile_Float32_CpuAcc_Test")
-    {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::CpuAcc };
-        TileFloat32Test(backends);
-    }
-
-} // TEST_SUITE("Tile_Float32_CpuAcc_Test")
-
-TEST_SUITE("TileTests_CpuRefTests")
-{
-
-    TEST_CASE ("Tile_Float32_CpuRef_Test")
-    {
-        std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-        TileFloat32Test(backends);
-    }
-
-} // TEST_SUITE("Tile_Float32_CpuRef_Test")
+} // TEST_SUITE("Tile_Float32_Test")
 
 } // namespace armnnDelegate

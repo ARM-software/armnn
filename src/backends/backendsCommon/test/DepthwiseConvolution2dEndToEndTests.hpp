@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -67,34 +67,34 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     unsigned int kernelWidth  = 3;
 
     unsigned int outputHeight    = inputHeight - kernelHeight + 1 + 2;
-    unsigned int outputWidth     = (inputWidth - kernelWidth + 1)/2;
+    unsigned int outputWidth     = inputWidth - kernelWidth + 1;
     unsigned int outputChannels  = inputChannels * depthMultiplier;
     unsigned int outputBatchSize = inputBatchSize;
 
-    TensorInfo inputInfo({ inputBatchSize, inputChannels, inputHeight, inputWidth }, ArmnnType, qScale, qOffset, true);
-    TensorInfo outputInfo({ outputBatchSize, outputChannels, outputHeight, outputWidth }, ArmnnType, qScale, qOffset);
-    TensorInfo weightsInfo({1, kernelHeight, kernelWidth, outputChannels}, ArmnnType, qScale, qOffset, true);
-    TensorInfo biasesInfo({outputChannels}, ArmnnBType, qScale * qScale, 0, true);
+    TensorInfo inputInfo({ inputBatchSize, inputHeight, inputWidth, inputChannels }, ArmnnType, qScale, qOffset, true);
+    TensorInfo outputInfo({ outputBatchSize, outputHeight, outputWidth, outputChannels }, ArmnnType, qScale, qOffset);
+    TensorInfo weightsInfo({ 1, kernelHeight, kernelWidth, outputChannels }, ArmnnType, qScale, qOffset, true);
+    TensorInfo biasesInfo({ outputChannels }, ArmnnBType, qScale * qScale, 0, true);
 
     std::vector<float> inputData =
     {
-        0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
-   };
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f
+    };
 
     std::vector<float> weightsData =
     {
@@ -127,31 +127,43 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
 
     std::vector<float> expectedOutputData =
     {
-        3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f, 3.0f,
-        5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.5f, 5.5f, 5.5f, 5.5f, 5.5f, 5.5f, 5.5f,
-        5.5f, 5.5f, 5.5f, 5.5f, 5.5f, 5.5f, 5.5f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f, 5.0f,
-        2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 2.5f, 3.5f, 3.5f, 3.5f, 3.5f, 3.5f, 3.5f, 3.5f,
-        4.5f, 4.5f, 4.5f, 4.5f, 4.5f, 4.5f, 4.5f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f,
-        6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f, 6.0f,
-        1.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        2.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        2.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 2.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        2.0f, 4.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        3.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        3.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3.0f, 5.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
-   };
+        3.0f,  4.5f,  2.0f,  1.0f,  3.0f,  4.5f,  3.0f,  1.0f,  3.0f,  4.5f,  4.0f,  3.0f,  3.0f,  4.5f,
+        1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
+        3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,
+        1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
+        3.0f,  5.5f,  3.0f,  2.0f,  3.0f,  5.5f,  4.0f,  2.0f,  3.0f,  5.5f,  5.0f,  4.0f,  3.0f,  5.5f,
+        1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
+        3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,
+        1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
+        5.0f,  6.5f,  3.0f,  2.0f,  5.0f,  6.5f,  4.0f,  2.0f,  5.0f,  6.5f,  5.0f,  4.0f,  5.0f,  6.5f,
+        1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
+        5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,
+        1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
+        5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
+        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+        5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
+        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+        5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
+        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+        5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
+        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+        5.0f,  8.0f,  3.0f,  2.0f,  5.0f,  8.0f,  4.0f,  2.0f,  5.0f,  8.0f,  5.0f,  4.0f,  5.0f,  8.0f,
+        1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,
+        5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,
+        1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f
+    };
 
     DepthwiseConvolution2dDescriptor descriptor;
     descriptor.m_PadLeft     = 0;
     descriptor.m_PadRight    = 0;
     descriptor.m_PadTop      = 1;
-    descriptor.m_PadBottom   = 0;
-    descriptor.m_StrideX     = 2;
+    descriptor.m_PadBottom   = 1;
+    descriptor.m_StrideX     = 1;
     descriptor.m_StrideY     = 1;
     descriptor.m_BiasEnabled = true;
     descriptor.m_DataLayout  = dataLayout;
 
-    // Permute input and output if NCDHW.
+    // Permute input if NCHW, the original input and output are in NHWC format.
     if (dataLayout == DataLayout::NCHW)
     {
         PermuteTensorNhwcToNchw(inputInfo, inputData);

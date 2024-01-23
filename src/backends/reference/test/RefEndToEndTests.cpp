@@ -17,6 +17,7 @@
 #include <backendsCommon/test/Convolution2dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/Convolution3dEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
+#include <backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp>
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/DetectionPostProcessEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp>
@@ -650,6 +651,12 @@ TEST_CASE("RefConvolution3dInt8Test")
 {
     Convolution3dEndToEnd<armnn::DataType::QAsymmS8, armnn::DataType::Signed32>(defaultBackends,
                                                                                 armnn::DataLayout::NDHWC);
+}
+
+TEST_CASE("RefDepthwiseConvolution2dEndtoEndFloat32Test")
+{
+    DepthwiseConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(defaultBackends,
+                                                                                       armnn::DataLayout::NHWC);
 }
 
 TEST_CASE("RefEluEndToEndTestFloat32")

@@ -11,6 +11,7 @@
 
 #if defined(ARMCOMPUTEGPUFSA_ENABLED)
 #include "layers/GpuFsaConvolution2d.hpp"
+#include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #endif
 
 #include <vector>
@@ -91,6 +92,34 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             else
             {
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaConvolution2dValidate,
+                                            reasonIfUnsupported,
+                                            infos[0],
+                                            desc,
+                                            infos[2],
+                                            infos[3]);
+            }
+        }
+        case LayerType::DepthwiseConvolution2d:
+        {
+            if (infos.size() != 4)
+            {
+                throw InvalidArgumentException("Invalid number of DepthwiseConvolution2dDescriptor TensorInfos. "
+                                               "TensorInfos should be of format: {input, output, weights, biases}.");
+            }
+
+            auto desc = *(PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&descriptor));
+            if (infos[3] == TensorInfo())
+            {
+                FORWARD_LAYER_VALIDATE_FUNC(GpuFsaDepthwiseConvolution2dValidate,
+                                            reasonIfUnsupported,
+                                            infos[0],
+                                            desc,
+                                            infos[2],
+                                            EmptyOptional());
+            }
+            else
+            {
+                FORWARD_LAYER_VALIDATE_FUNC(GpuFsaDepthwiseConvolution2dValidate,
                                             reasonIfUnsupported,
                                             infos[0],
                                             desc,

@@ -21,6 +21,7 @@
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 
 #include "layers/GpuFsaConvolution2d.hpp"
+#include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 
 namespace armnn
 {
@@ -265,6 +266,31 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
                                                 *desc,
                                                 weights,
                                                 EmptyOptional());
+                }
+                break;
+            }
+            case (LayerType::DepthwiseConvolution2d):
+            {
+                auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto weights = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
+
+                auto desc = PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&base.GetParameters());
+                if (desc->m_BiasEnabled)
+                {
+                    auto bias = base.GetInputSlot(2).GetConnectedOutputSlot()->GetTensorInfo();
+                    GpuFsaDepthwiseConvolution2dCreateOp(preCompiledBlobPtr,
+                                                         input,
+                                                         *desc,
+                                                         weights,
+                                                         bias);
+                }
+                else
+                {
+                    GpuFsaDepthwiseConvolution2dCreateOp(preCompiledBlobPtr,
+                                                         input,
+                                                         *desc,
+                                                         weights,
+                                                         EmptyOptional());
                 }
                 break;
             }

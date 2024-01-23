@@ -21,7 +21,6 @@
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>
 
 #include <vector>
-#include <iostream>
 
 namespace armnn
 {

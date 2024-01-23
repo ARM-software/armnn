@@ -65,7 +65,7 @@ TosaSerializationBasicBlock* ConvertActivationToTosaOperator(const Layer* layer,
     DType outputDType0 = ArmNNToDType(outputs[0]->GetDataType());
     tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
 
-#if TOSA_FWD_COMPAT_VERSION(0, 60, 0)
+#if TOSA_COMPAT_VERSION(0, 60, 0)
     std::string outputNameMAXMIN= std::string("intermediate3_") + GetUniqueTosaMappingID();
 
     if (inputDType0 == DType::DType_FP32)

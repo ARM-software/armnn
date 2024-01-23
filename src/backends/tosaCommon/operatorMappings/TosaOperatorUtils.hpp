@@ -12,7 +12,6 @@
 #include "common/include/ProfilingGuid.hpp"
 
 #include <tosa_serialization_handler.h>
-#include <version.h>
 
 using namespace armnn;
 using namespace tosa;
@@ -454,8 +453,9 @@ inline void CreateConstTosaOperator(const std::string& outputName,
     ARMNN_THROW_MSG_IF_FALSE(tensor, armnn::Exception, "CreateConstTosaOperator: failed to created tensor");
 }
 
-// Macro to conditionally compile Tosa code
-#define TOSA_FWD_COMPAT_VERSION(_major, _minor, _patch) \
-        (TOSA_REFERENCE_MODEL_VERSION_MAJOR >= _major) && \
-        (TOSA_REFERENCE_MODEL_VERSION_MINOR >= _minor) && \
-        (TOSA_REFERENCE_MODEL_VERSION_PATCH >= _patch)
+// Macro to preserve usage of a code block as the TOSA library version advances. Parameters
+// specify the minimum version required by the code block.
+#define TOSA_COMPAT_VERSION(_major, _minor, _patch) \
+        (TOSA_VERSION_MAJOR >= _major) || \
+        (TOSA_VERSION_MINOR >= _minor) || \
+        (TOSA_VERSION_PATCH >= _patch)

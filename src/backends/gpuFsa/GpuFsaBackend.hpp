@@ -23,10 +23,10 @@ namespace armnn
 /**
  * A structure which contains all the elements needed to execute a fused workload in the GpuFsa Backend
  *
- * @param[in, out]  sketch      A unique pointer to the sketch containing the operators which have been fused.
- * @param[in, out]  TensorInfos A shared pointer to a GpuWorkloadContext which contains TensorInfos
- * @param[in, out]  inputIds    A unique pointer to a vector of input Ids used to access workloadContext TensorInfos
- * @param[in, out]  outputIds   A unique pointer to a vector of output Ids used to access workloadContext TensorInfos
+ * @param[in, out]  sketch              A unique pointer to the sketch containing the operators which have been fused.
+ * @param[in, out]  TensorInfos         A shared pointer to a GpuWorkloadContext which creates + stores TensorInfos
+ * @param[in, out]  inputTensorInfos    A unique pointer to a vector of inputTensorInfos used by the sketch
+ * @param[in, out]  outputTensorInfos   A unique pointer to a vector of outputTensorInfos used by the sketch
  *
  */
 struct GpuFsaPreCompiledBlob
@@ -34,8 +34,8 @@ struct GpuFsaPreCompiledBlob
     std::unique_ptr<arm_compute::experimental::dynamic_fusion::GpuWorkloadSketch> sketch = nullptr;
     std::shared_ptr<arm_compute::experimental::dynamic_fusion::GpuWorkloadContext> workloadContext = nullptr;
 
-    std::unique_ptr<std::vector<int32_t>> inputIds = nullptr;
-    std::unique_ptr<std::vector<int32_t>> outputIds = nullptr;
+    std::unique_ptr<std::vector<arm_compute::ITensorInfo*>> inputTensorInfos = nullptr;
+    std::unique_ptr<std::vector<arm_compute::ITensorInfo*>> outputTensorInfos = nullptr;
 };
 
 // add new capabilities here..

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="fdf56fb9d414a754e7cedfdc1351ab0ce2866a0c" #10990: Make GpuWorkloadContext own all tensor info objects
+DEFAULT_CLFRAMEWORKREVISION="2aec5f1870b6cd5edd7de6403b5cf75530eb77f5" #11014: Fix tolerance issue in BF16 MatMul tests
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

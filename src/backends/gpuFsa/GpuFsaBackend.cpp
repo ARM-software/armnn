@@ -22,6 +22,7 @@
 
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
+#include "layers/GpuFsaElementwiseBinaryAdd.hpp"
 
 namespace armnn
 {
@@ -291,6 +292,18 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
                                                          *desc,
                                                          weights,
                                                          EmptyOptional());
+                }
+                break;
+            }
+            case LayerType::ElementwiseBinary:
+            {
+                auto desc = PolymorphicDowncast<const ElementwiseBinaryDescriptor *>(&base.GetParameters());
+                if (desc->m_Operation == BinaryOperation::Add)
+                {
+                    auto input0 = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                    auto input1 = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
+
+                    GpuFsaElementwiseBinaryAddCreateOp(preCompiledBlobPtr, input0, input1);
                 }
                 break;
             }

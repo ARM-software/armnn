@@ -6,7 +6,9 @@
 #include "backendsCommon/test/EndToEndTestImpl.hpp"
 
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
+
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
+#include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
@@ -30,6 +32,17 @@ TEST_CASE("GpuFsaDepthwiseConvolution2dEndtoEndTestFloat32")
 {
     DepthwiseConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(gpuFsaDefaultBackends,
                                                                                        armnn::DataLayout::NHWC);
+}
+
+// ElementwiseBinary Add
+TEST_CASE("GpuFsaElementwiseBinaryAddTestFloat32")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, BinaryOperation::Add);
+}
+
+TEST_CASE("GpuFsaElementwiseBinaryAddTestFloat16")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(gpuFsaDefaultBackends, BinaryOperation::Add);
 }
 
 }

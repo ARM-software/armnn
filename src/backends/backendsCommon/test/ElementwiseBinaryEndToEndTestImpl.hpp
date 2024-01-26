@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -94,6 +94,71 @@ void ElementwiseBinarySimpleEndToEnd(const std::vector<BackendId>& backends,
             break;
         case armnn::BinaryOperation::Power:
             expectedOutput = { 1, 1, 1, 1, 25, 25, 25, 25,  9, 9, 9, 9,  16, 16, 16, 16 };
+            break;
+        default:
+            throw("Invalid Elementwise Binary operation");
+    }
+    const std::vector<float> expectedOutput_const = expectedOutput;
+    // quantize data
+    std::vector<TInput> qInput1Data     = armnnUtils::QuantizedVector<TInput>(input1, qScale, qOffset);
+    std::vector<TInput> qInput2Data     = armnnUtils::QuantizedVector<TInput>(input2, qScale, qOffset);
+    std::vector<TInput> qExpectedOutput = armnnUtils::QuantizedVector<TInput>(expectedOutput_const, qScale, qOffset);
+
+    std::map<int, std::vector<TInput>> inputTensorData    = {{ 0, qInput1Data }, { 1, qInput2Data }};
+    std::map<int, std::vector<TInput>> expectedOutputData = {{ 0, qExpectedOutput }};
+
+    EndToEndLayerTestImpl<ArmnnInType, ArmnnInType>(std::move(net), inputTensorData, expectedOutputData, backends);
+}
+
+
+template<armnn::DataType ArmnnInType,
+        typename TInput = armnn::ResolveType<ArmnnInType>>
+void ElementwiseBinarySimple3DEndToEnd(const std::vector<BackendId>& backends,
+                                       BinaryOperation operation)
+{
+    using namespace armnn;
+
+    const float   qScale  = IsQuantizedType<TInput>() ? 0.25f : 1.0f;
+    const int32_t qOffset = IsQuantizedType<TInput>() ? 50    : 0;
+
+    const TensorShape& input1Shape  = { 2, 2 };
+    const TensorShape& input2Shape  = { 2, 2 };
+    const TensorShape& outputShape  = { 2, 2 };
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateElementwiseBinaryNetwork<ArmnnInType>(input1Shape, input2Shape, outputShape,
+                                                                  operation, qScale, qOffset);
+
+    CHECK(net);
+
+    const std::vector<float> input1({ 1, -1, 1, 1 });
+
+    const std::vector<float> input2({ 2, 2, 2, 2 });
+    std::vector<float> expectedOutput;
+    switch (operation) {
+        case armnn::BinaryOperation::Add:
+            expectedOutput = { 3, 1, 3, 3 };
+            break;
+        case armnn::BinaryOperation::Div:
+            expectedOutput = {0.5f, -0.5f, 0.5f, 0.5f };
+            break;
+        case armnn::BinaryOperation::Maximum:
+            expectedOutput = { 2, 2, 2, 2 };
+            break;
+        case armnn::BinaryOperation::Minimum:
+            expectedOutput = { 1, -1, 1, 1 };
+            break;
+        case armnn::BinaryOperation::Mul:
+            expectedOutput = { 2, -2, 2, 2 };
+            break;
+        case armnn::BinaryOperation::Sub:
+            expectedOutput = { -1, -3, -1, -1 };
+            break;
+        case armnn::BinaryOperation::SqDiff:
+            expectedOutput = { 1, 9, 1, 1 };
+            break;
+        case armnn::BinaryOperation::Power:
+            expectedOutput = { 1, 1, 1, 1 };
             break;
         default:
             throw("Invalid Elementwise Binary operation");

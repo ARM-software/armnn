@@ -18,7 +18,6 @@
 
 #include <arm_compute/dynamic_fusion/runtime/gpu/cl/ClWorkloadRuntime.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadContext.h>
-#include <src/dynamic_fusion/sketch/gpu/GpuWorkloadContextImpl.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuDepthwiseConv2d.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>
 

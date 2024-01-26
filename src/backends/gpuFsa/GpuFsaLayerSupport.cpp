@@ -12,6 +12,7 @@
 #if defined(ARMCOMPUTEGPUFSA_ENABLED)
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
+#include "layers/GpuFsaElementwiseBinaryAdd.hpp"
 #endif
 
 #include <vector>
@@ -79,13 +80,13 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
                                                "TensorInfos should be of format: {input, output, weights, biases}.");
             }
 
-            auto desc = *(PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor));
+            auto desc = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor);
             if (infos[3] == TensorInfo())
             {
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaConvolution2dValidate,
                                             reasonIfUnsupported,
                                             infos[0],
-                                            desc,
+                                            *desc,
                                             infos[2],
                                             EmptyOptional());
             }
@@ -94,7 +95,7 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaConvolution2dValidate,
                                             reasonIfUnsupported,
                                             infos[0],
-                                            desc,
+                                            *desc,
                                             infos[2],
                                             infos[3]);
             }
@@ -107,13 +108,13 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
                                                "TensorInfos should be of format: {input, output, weights, biases}.");
             }
 
-            auto desc = *(PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&descriptor));
+            auto desc = PolymorphicDowncast<const DepthwiseConvolution2dDescriptor *>(&descriptor);
             if (infos[3] == TensorInfo())
             {
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaDepthwiseConvolution2dValidate,
                                             reasonIfUnsupported,
                                             infos[0],
-                                            desc,
+                                            *desc,
                                             infos[2],
                                             EmptyOptional());
             }
@@ -122,10 +123,32 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaDepthwiseConvolution2dValidate,
                                             reasonIfUnsupported,
                                             infos[0],
-                                            desc,
+                                            *desc,
                                             infos[2],
                                             infos[3]);
             }
+        }
+        case LayerType::ElementwiseBinary:
+        {
+            if (infos.size() != 3)
+            {
+                throw InvalidArgumentException("Invalid number of ElementwiseBinary TensorInfos. "
+                                               "TensorInfos should be of format: {input0, input1, output0}.");
+            }
+
+            auto desc = PolymorphicDowncast<const ElementwiseBinaryDescriptor *>(&descriptor);
+            if (desc->m_Operation == BinaryOperation::Add)
+            {
+                FORWARD_LAYER_VALIDATE_FUNC(GpuFsaElementwiseBinaryAddValidate,
+                                            reasonIfUnsupported,
+                                            infos[0],
+                                            infos[1]);
+            }
+            else
+            {
+                throw InvalidArgumentException("Invalid ElementwiseBinary BinaryOperation operation.");
+            }
+            return false;
         }
         case LayerType::Constant:
         case LayerType::Input:

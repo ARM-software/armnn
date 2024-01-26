@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -149,6 +149,15 @@ TEST_CASE("NeonAdditionEndToEndFloat32Test")
 TEST_CASE("NeonAdditionEndToEndUint8Test")
 {
     AdditionEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonAdditionEndToEndFloat32Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Add);
+}
+TEST_CASE("NeonAdditionEndToEndFloat16Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, BinaryOperation::Add);
 }
 
 // Power

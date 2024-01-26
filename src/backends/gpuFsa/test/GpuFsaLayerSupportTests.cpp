@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -59,6 +59,26 @@ TEST_CASE("IsLayerSupportedGpuFsaConv2dUnsupported")
                                                      reasonIfNotSupported);
     CHECK(!supported);
     REQUIRE(reasonIfNotSupported.find("NCHW not supported by this kernel") != std::string::npos);
+}
+
+TEST_CASE("IsLayerSupportedGpuFsaElementWiseBinaryAdd")
+{
+    TensorInfo input0Info({ 2, 2 }, DataType::Float32);
+    TensorInfo input1Info({ 2, 2 }, DataType::Float32);
+    TensorInfo outputInfo({ 2, 2 }, DataType::Float32);
+
+    ElementwiseBinaryDescriptor desc;
+    desc.m_Operation = BinaryOperation::Add;
+
+    GpuFsaLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::ElementwiseBinary,
+                                                     {input0Info, input1Info, outputInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+    CHECK(supported);
 }
 
 }

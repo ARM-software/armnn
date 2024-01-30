@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2aec5f1870b6cd5edd7de6403b5cf75530eb77f5" #11014: Fix tolerance issue in BF16 MatMul tests
+DEFAULT_CLFRAMEWORKREVISION="fb92e22c642985a5ea7906e7e7f46285d1d47718" #11004: arm_gemm: convolution: optimize convolver.hpp.
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

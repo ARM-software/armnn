@@ -5,10 +5,7 @@
 #pragma once
 
 #include <armnn/Descriptors.hpp>
-#include <armnn/Tensor.hpp>
 
-#include <arm_compute/core/Error.h>
-#include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadSketch.h>
 #include <gpuFsa/GpuFsaBackend.hpp>
 
 namespace armnn

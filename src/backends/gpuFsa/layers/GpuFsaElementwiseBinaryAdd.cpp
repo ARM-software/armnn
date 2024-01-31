@@ -5,11 +5,7 @@
 
 #include "GpuFsaElementwiseBinaryAdd.hpp"
 
-#include <armnn/Types.hpp>
-
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-
-#include <arm_compute/core/CL/CLKernelLibrary.h>
 
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuAdd.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>

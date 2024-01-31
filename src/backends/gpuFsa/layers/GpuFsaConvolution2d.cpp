@@ -5,17 +5,17 @@
 
 #include "GpuFsaConvolution2d.hpp"
 
-#include <armnn/Types.hpp>
+//#include <armnn/Types.hpp>
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
-#include <arm_compute/core/ITensorInfo.h>
-#include <arm_compute/core/TensorInfo.h>
-#include <arm_compute/core/TensorShape.h>
-#include <arm_compute/core/CL/CLKernelLibrary.h>
-#include <arm_compute/core/CL/CLCompileContext.h>
+//#include <arm_compute/core/ITensorInfo.h>
+//#include <arm_compute/core/TensorInfo.h>
+//#include <arm_compute/core/TensorShape.h>
+//#include <arm_compute/core/CL/CLKernelLibrary.h>
+//#include <arm_compute/core/CL/CLCompileContext.h>
 
-#include <arm_compute/dynamic_fusion/runtime/gpu/cl/ClWorkloadRuntime.h>
+//#include <arm_compute/dynamic_fusion/runtime/gpu/cl/ClWorkloadRuntime.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadContext.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuConv2d.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>

@@ -13,6 +13,7 @@
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
+#include "layers/GpuFsaElementwiseBinarySub.hpp"
 #endif
 
 #include <vector>
@@ -140,6 +141,13 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             if (desc->m_Operation == BinaryOperation::Add)
             {
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaElementwiseBinaryAddValidate,
+                                            reasonIfUnsupported,
+                                            infos[0],
+                                            infos[1]);
+            }
+            else if (desc->m_Operation == BinaryOperation::Sub)
+            {
+                FORWARD_LAYER_VALIDATE_FUNC(GpuFsaElementwiseBinarySubValidate,
                                             reasonIfUnsupported,
                                             infos[0],
                                             infos[1]);

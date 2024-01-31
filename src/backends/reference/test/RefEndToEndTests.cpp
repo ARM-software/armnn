@@ -1819,6 +1819,14 @@ TEST_CASE("RefSubEndToEndTestUint8")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends, BinaryOperation::Sub);
 }
+TEST_CASE("RefSubEndToEndTestFloat32Simple3D")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Sub);
+}
+TEST_CASE("RefSubEndToEndTestFloat16Simple3D")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(defaultBackends, BinaryOperation::Sub);
+}
 TEST_CASE("RefMaximumEndToEndTestFloat32")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends, BinaryOperation::Maximum);

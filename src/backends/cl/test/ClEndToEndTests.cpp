@@ -90,6 +90,15 @@ TEST_CASE("ClSquaredDifferenceEndToEndTestUint8")
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends, BinaryOperation::SqDiff);
 }
 
+TEST_CASE("ClSubtractionEndToEndFloat32Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Sub);
+}
+TEST_CASE("ClSubtractionEndToEndFloat16Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(clDefaultBackends, BinaryOperation::Sub);
+}
+
 // Batch Mat Mul
 TEST_CASE("ClBatchMatMulEndToEndFloat32Test")
 {

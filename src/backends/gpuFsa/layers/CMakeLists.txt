@@ -10,6 +10,8 @@ list(APPEND armnnGpuFsaBackendLayerValidators_sources
         GpuFsaDepthwiseConvolution2d.hpp
         GpuFsaElementwiseBinaryAdd.cpp
         GpuFsaElementwiseBinaryAdd.hpp
+        GpuFsaElementwiseBinarySub.cpp
+        GpuFsaElementwiseBinarySub.hpp
     )
 
 add_library(armnnGpuFsaBackendLayerValidators OBJECT ${armnnGpuFsaBackendLayerValidators_sources})

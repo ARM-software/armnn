@@ -182,4 +182,52 @@ TEST_CASE("ElementwiseBinaryAddSupportedOptimizedNetwork")
                         &IsLayerOfType<OutputLayer>));
 }
 
+TEST_CASE("ElementwiseBinarySubSupportedOptimizedNetwork")
+{
+    using namespace armnn;
+
+    const float qScale = 1.0f;
+    const int32_t qOffset = 0;
+
+    const TensorShape& input1Shape  = { 2, 2, 2 };
+    const TensorShape& input2Shape  = { 2, 2, 2 };
+    const TensorShape& outputShape  = { 2, 2, 2 };
+
+    TensorInfo input1TensorInfo(input1Shape, DataType::Float32, qScale, qOffset, true);
+    TensorInfo input2TensorInfo(input2Shape, DataType::Float32, qScale, qOffset, true);
+    TensorInfo outputTensorInfo(outputShape, DataType::Float32, qScale, qOffset);
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+    INetworkPtr network(INetwork::Create());
+
+    IConnectableLayer* input1 = network->AddInputLayer(0, "input0");
+    IConnectableLayer* input2 = network->AddInputLayer(1, "input1");
+
+    ElementwiseBinaryDescriptor desc;
+    desc.m_Operation = BinaryOperation::Sub;
+
+    IConnectableLayer* elementwiseBinaryLayer = network->AddElementwiseBinaryLayer(desc, "elementwiseBinary");
+    IConnectableLayer* output = network->AddOutputLayer(2, "output");
+
+    Connect(input1, elementwiseBinaryLayer, input1TensorInfo, 0, 0);
+    Connect(input2, elementwiseBinaryLayer, input2TensorInfo, 0, 1);
+    Connect(elementwiseBinaryLayer, output, outputTensorInfo, 0, 0);
+
+    std::vector<BackendId> backends = { "GpuFsa" };
+
+    OptimizerOptionsOpaque optimizedOptions;
+    IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optimizedOptions);
+    CHECK(optNet);
+
+    Graph& graph = GetGraphForTesting(optNet.get());
+
+    // Check graph layer sequence to ensure that the network has been replaced with a PreCompiledLayer
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<PreCompiledLayer>,
+                        &IsLayerOfType<OutputLayer>));
+}
+
 }

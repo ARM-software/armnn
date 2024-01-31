@@ -45,4 +45,15 @@ TEST_CASE("GpuFsaElementwiseBinaryAddTestFloat16")
     ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(gpuFsaDefaultBackends, BinaryOperation::Add);
 }
 
+// ElementwiseBinary Sub
+TEST_CASE("GpuFsaElementwiseBinarySubTestFloat32")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, BinaryOperation::Sub);
+}
+
+TEST_CASE("GpuFsaElementwiseBinarySubTestFloat16")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(gpuFsaDefaultBackends, BinaryOperation::Sub);
+}
+
 }

@@ -177,6 +177,15 @@ TEST_CASE("NeonSquaredDifferenceEndToEndTestUint8")
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, BinaryOperation::SqDiff);
 }
 
+TEST_CASE("NeonSubtractionEndToEndFloat32Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Sub);
+}
+TEST_CASE("NeonSubtractionEndToEndFloat16Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, BinaryOperation::Sub);
+}
+
 // Batch Mat Mul
 TEST_CASE("NeonBatchMatMulEndToEndFloat32Test")
 {

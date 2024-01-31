@@ -23,6 +23,7 @@
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
+#include "layers/GpuFsaElementwiseBinarySub.hpp"
 
 namespace armnn
 {
@@ -304,6 +305,13 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
                     auto input1 = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
 
                     GpuFsaElementwiseBinaryAddCreateOp(preCompiledBlobPtr, input0, input1);
+                }
+                else if (desc->m_Operation == BinaryOperation::Sub)
+                {
+                    auto input0 = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                    auto input1 = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
+
+                    GpuFsaElementwiseBinarySubCreateOp(preCompiledBlobPtr, input0, input1);
                 }
                 break;
             }

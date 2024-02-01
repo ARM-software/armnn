@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -140,7 +140,6 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
                 activationInfo,
                 aclDilationInfo);
     }
-    ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
     // Add details for profiling output
     WorkloadInfo detailsInfo;
@@ -158,7 +157,6 @@ ClDepthwiseConvolutionWorkload::ClDepthwiseConvolutionWorkload(
 void ClDepthwiseConvolutionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClDepthwiseConvolutionWorkload_Execute");
-    ARMNN_ASSERT(m_DepthwiseConvolutionLayer);
 
     RunClFunction(*m_DepthwiseConvolutionLayer, CHECK_LOCATION());
 }

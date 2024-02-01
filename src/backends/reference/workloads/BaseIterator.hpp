@@ -1,12 +1,11 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/TypesUtils.hpp>
-#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnnUtils/FloatingPointConverter.hpp>
 #include <armnnUtils/TensorUtils.hpp>
@@ -78,28 +77,28 @@ public:
 
     TypedIterator& operator++() override
     {
-        ARMNN_ASSERT(m_Iterator);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_Iterator, "TypedIterator: m_Iterator is null!");
         ++m_Iterator;
         return *this;
     }
 
     TypedIterator& operator+=(const unsigned int increment) override
     {
-        ARMNN_ASSERT(m_Iterator);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_Iterator, "TypedIterator: m_Iterator is null!");
         m_Iterator += increment;
         return *this;
     }
 
     TypedIterator& operator-=(const unsigned int increment) override
     {
-        ARMNN_ASSERT(m_Iterator);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_Iterator, "TypedIterator: m_Iterator is null!");
         m_Iterator -= increment;
         return *this;
     }
 
     TypedIterator& operator[](const unsigned int index) override
     {
-        ARMNN_ASSERT(m_Iterator);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_Iterator, "TypedIterator: m_Iterator is null!");
         m_Iterator = m_Start + index;
         return *this;
     }
@@ -763,7 +762,7 @@ public:
 
     inline PerAxisIterator& SetIndexOnMem(const unsigned int index)
     {
-        ARMNN_ASSERT(m_Iterator);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_Iterator, "PerAxisIterator: m_Iterator is null!");
         m_Iterator = m_Start + index;
         if (index < m_AxisFactor)
         {

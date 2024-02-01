@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -139,8 +139,6 @@ NeonGatherNdWorkload::NeonGatherNdWorkload(const GatherNdQueueDescriptor& descri
     flattenedCoeff_Info.SetShape({ keyIndices["ND"] });
     BuildArmComputeTensor(m_FlattenedCoeff, flattenedCoeff_Info);
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_FlattenedCoeff);
-    ARMNN_ASSERT_MSG(indicesInfo.GetDataType() == DataType::Signed32,
-                     "flattenedCoeff must be same data type as m_FlattenedCoeff");
     CopyArmComputeITensorData<int32_t>(flattenedCoeff.data(), m_FlattenedCoeff);
 
     // Prepare the tensor to store the output of the multiplication

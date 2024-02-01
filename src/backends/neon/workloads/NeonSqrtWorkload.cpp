@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,7 +31,10 @@ arm_compute::Status NeonSqrtWorkloadValidate(const TensorInfo& input, const Tens
 NeonSqrtWorkload::NeonSqrtWorkload(const ElementwiseUnaryQueueDescriptor& descriptor, const WorkloadInfo& info)
     : NeonBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
-    ARMNN_ASSERT(descriptor.m_Parameters.m_Operation == UnaryOperation::Sqrt);
+    if (descriptor.m_Parameters.m_Operation != UnaryOperation::Sqrt)
+    {
+        throw InvalidArgumentException("NeonSqrtWorkload: The descriptor does not indicate a Sqrt operation.");
+    }
 
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("NeonSqrtWorkload_Construct",
                                          descriptor.m_Parameters,

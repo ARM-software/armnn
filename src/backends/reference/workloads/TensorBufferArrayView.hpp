@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,8 +8,6 @@
 #include <armnn/Tensor.hpp>
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
-
-#include <armnn/utility/Assert.hpp>
 
 namespace armnn
 {
@@ -25,7 +23,8 @@ public:
         , m_Data(data)
         , m_DataLayout(dataLayout)
     {
-        ARMNN_ASSERT(m_Shape.GetNumDimensions() == 4);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_Shape.GetNumDimensions() == 4,
+                                            "Only $d tensors are supported by TensorBufferArrayView.");
     }
 
     DataType& Get(unsigned int b, unsigned int c, unsigned int h, unsigned int w) const

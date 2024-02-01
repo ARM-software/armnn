@@ -2,10 +2,11 @@
 // Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
+#include <armnn/Exceptions.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
 
-#include "armnn/Exceptions.hpp"
 #include "ArmComputeUtils.hpp"
 #include <armnn/Descriptors.hpp>
 
@@ -43,7 +44,6 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multi
         case armnn::DataType::Signed32:
             return arm_compute::DataType::S32;
         default:
-            ARMNN_ASSERT_MSG(false, "Unknown data type");
             return arm_compute::DataType::UNKNOWN;
     }
 }
@@ -75,8 +75,7 @@ armnn::DataType GetArmNNDataType(arm_compute::DataType dataType)
         case arm_compute::DataType::S32:
             return armnn::DataType::Signed32;
         default:
-            ARMNN_ASSERT_MSG(false, "Unknown data type");
-            return armnn::DataType::Float32;
+            throw InvalidArgumentException("Unknown arm_compute::DataType data type");
     }
 }
 

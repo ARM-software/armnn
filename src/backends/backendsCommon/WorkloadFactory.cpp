@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -61,7 +61,7 @@ inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Option
         case armnn::DataType::QSymmS16:
             return armnn::DataType::Signed32;
         default:
-            ARMNN_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
+            throw InvalidArgumentException("GetBiasTypeFromWeightsType(): Unsupported data type.");
     }
     return armnn::EmptyOptional();
 }
@@ -262,8 +262,9 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo input  = OverrideDataType(layer.GetInputSlot(0).GetTensorInfo(),
                                                        dataType);
             const TensorInfo output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
-            ARMNN_ASSERT_MSG(layer.GetInputSlot(1).GetConnection(),
-                             "Convolution2dLayer: Weights should be connected as a Constant Layer.");
+
+            ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(layer.GetInputSlot(1).GetConnection(),
+                                                "Convolution2dLayer: Weights should be connected as a Constant Layer.");
             const TensorInfo weights = OverrideDataType(layer.GetInputSlot(1).GetTensorInfo(),
                                                         dataType);
 
@@ -273,8 +274,8 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                ARMNN_ASSERT_MSG(layer.GetInputSlot(2).GetConnection(),
-                                 "Convolution2dLayer: Bias should be connected as a Constant Layer.");
+                ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(layer.GetInputSlot(2).GetConnection(),
+                                                    "Convolution2dLayer:Bias should be connected as a Constant Layer.");
                 biases = OverrideDataType(layer.GetInputSlot(2).GetTensorInfo(),
                                           GetBiasTypeFromWeightsType(dataType));
             }
@@ -296,8 +297,8 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                        dataType);
             const TensorInfo output = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
 
-            ARMNN_ASSERT_MSG(layer.GetInputSlot(1).GetConnection(),
-                             "Convolution3dLayer: Weights should be connected as a Constant Layer.");
+            ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(layer.GetInputSlot(1).GetConnection(),
+                                                "Convolution3dLayer: Weights should be connected as a Constant Layer.");
             const TensorInfo weights = OverrideDataType(layer.GetInputSlot(1).GetTensorInfo(),
                                                         dataType);
 
@@ -351,8 +352,6 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             const TensorInfo& output  = OverrideDataType(layer.GetOutputSlot(0).GetTensorInfo(), dataType);
             const TensorInfo& weights = OverrideDataType(layer.GetInputSlot(1).GetTensorInfo(),
                                                          dataType);
-
-            ARMNN_ASSERT(cLayer->GetInputSlot(1).GetConnection() != nullptr);
 
             const DepthwiseConvolution2dDescriptor& descriptor = cLayer->GetParameters();
 
@@ -524,7 +523,7 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                     }
                     default:
                     {
-                        ARMNN_ASSERT_MSG(false, "Unexpected bias type");
+                        throw InvalidArgumentException("Unexpected bias type");
                     }
                 }
             }
@@ -987,9 +986,6 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             LstmInputParamsInfo paramsInfo;
 
             // Basic parameters
-            ARMNN_ASSERT(cLayer->m_BasicParameters.m_InputToForgetWeights.get() != nullptr);
-            ARMNN_ASSERT(cLayer->m_BasicParameters.m_InputToCellWeights.get() != nullptr);
-            ARMNN_ASSERT(cLayer->m_BasicParameters.m_InputToOutputWeights.get() != nullptr);
             paramsInfo.m_InputToForgetWeights = &cLayer->m_BasicParameters.m_InputToForgetWeights->GetTensorInfo();
             paramsInfo.m_InputToCellWeights   = &cLayer->m_BasicParameters.m_InputToCellWeights->GetTensorInfo();
             paramsInfo.m_InputToOutputWeights = &cLayer->m_BasicParameters.m_InputToOutputWeights->GetTensorInfo();
@@ -1431,12 +1427,15 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
             Optional<TensorInfo> biases;
             if (descriptor.m_BiasEnabled)
             {
-                ARMNN_ASSERT(cLayer->m_Bias.get() != nullptr);
+                ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(
+                    cLayer->m_Bias.get() != nullptr,
+                    "TransposeConvolution2d: Bias was enabled in the descriptor but no value was supplied.");
                 biases = OverrideDataType(cLayer->m_Bias->GetTensorInfo(),
                                           GetBiasTypeFromWeightsType(dataType));
             }
 
-            ARMNN_ASSERT(cLayer->m_Weight.get() != nullptr);
+            ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(cLayer->m_Weight.get() != nullptr,
+                                                "TransposeConvolution2d: Weights cannot be null.");
             const TensorInfo weights = OverrideDataType(cLayer->m_Weight->GetTensorInfo(), dataType);
 
             result = layerSupportObject.IsTransposeConvolution2dSupported(input,
@@ -1602,7 +1601,6 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
         }
         default:
         {
-            ARMNN_ASSERT_MSG(false, "WorkloadFactory did not recognise type of layer.");
             reason.value() = "Unrecognised layer type";
             result = false;
             break;

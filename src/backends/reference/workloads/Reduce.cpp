@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -153,8 +153,6 @@ void Reduce(const TensorInfo& inputInfo,
     for (unsigned int idx = 0; idx < numResolvedAxis; ++idx)
     {
         unsigned int current = inputDims[resolvedAxis[idx]];
-        ARMNN_ASSERT(armnn::numeric_cast<float>(current) <
-                     (std::numeric_limits<float>::max() / armnn::numeric_cast<float>(numElementsInAxis)));
         numElementsInAxis *= current;
     }
 

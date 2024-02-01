@@ -12,8 +12,6 @@
 
 #include <Profiling.hpp>
 
-#include <armnn/utility/Assert.hpp>
-
 namespace armnn
 {
 
@@ -37,9 +35,6 @@ void RefLogSoftmaxWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vec
 
     std::unique_ptr<Decoder<float>> decoder = MakeDecoder<float>(inputInfo, inputs[0]->Map());
     std::unique_ptr<Encoder<float>> encoder = MakeEncoder<float>(outputInfo, outputs[0]->Map());
-
-    ARMNN_ASSERT(decoder != nullptr);
-    ARMNN_ASSERT(encoder != nullptr);
 
     LogSoftmax(*decoder, *encoder, inputInfo, m_Data.m_Parameters);
 }

@@ -1,12 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "NeonTimer.hpp"
 #include "NeonInterceptorScheduler.hpp"
 
-#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <memory>
@@ -21,7 +20,10 @@ static thread_local auto g_Interceptor = std::make_shared<NeonInterceptorSchedul
 void NeonTimer::Start()
 {
     m_Kernels.clear();
-    ARMNN_ASSERT(g_Interceptor->GetKernels() == nullptr);
+    if (g_Interceptor->GetKernels() != nullptr)
+    {
+        throw RuntimeException("This NeonTimer instance has already been started.");
+    }
     g_Interceptor->SetKernels(&m_Kernels);
 
     m_RealSchedulerType = arm_compute::Scheduler::get_type();

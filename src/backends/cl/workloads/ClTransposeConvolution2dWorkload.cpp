@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,8 +38,11 @@ arm_compute::Status ClTransposeConvolution2dWorkloadValidate(const TensorInfo& i
 
     if (descriptor.m_BiasEnabled)
     {
-        ARMNN_ASSERT(biases.has_value());
-
+        if (!biases.has_value())
+        {
+            return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                        "ArmNN ClTransposeConv2dWorkload has empty bias value."};
+        }
         aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
     }

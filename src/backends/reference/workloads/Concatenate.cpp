@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,9 @@ void Concatenate(const ConcatQueueDescriptor &data,
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& inputInfo = GetTensorInfo(inputs[viewIdx]);
-            ARMNN_ASSERT(inputInfo.GetNumDimensions() == outputInfo0.GetNumDimensions());
+            ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(
+                inputInfo.GetNumDimensions() == outputInfo0.GetNumDimensions(),
+                "The number of output dimensions does not match the number of input dimensions.");
 
             // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;

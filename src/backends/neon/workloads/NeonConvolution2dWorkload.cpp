@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -95,8 +95,6 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
         m_BiasTensor = std::make_unique<arm_compute::Tensor>();
         BuildArmComputeTensor(*m_BiasTensor, info.m_InputTensorInfos[2], m_Data.m_Parameters.m_DataLayout);
         m_BiasTensor->info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
-        // We assume here that NeonConvolution2dWorkloadValidate has been called before the constructor.
-        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
     }
 
     arm_compute::PadStrideInfo padStrideInfo = BuildArmComputePadStrideInfo(m_Data.m_Parameters);
@@ -141,8 +139,6 @@ NeonConvolution2dWorkload::NeonConvolution2dWorkload(
                                          GetGuid());
 
     m_ConvolutionLayer.reset(convolutionLayer.release());
-
-    ARMNN_ASSERT(m_ConvolutionLayer);
     m_KernelTensorInfo = info.m_InputTensorInfos[1];
 
     if (m_Data.m_Parameters.m_BiasEnabled)

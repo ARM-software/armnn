@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -34,7 +34,10 @@ ClSqrtWorkload::ClSqrtWorkload(const ElementwiseUnaryQueueDescriptor& descriptor
                                const arm_compute::CLCompileContext& clCompileContext)
     : ClBaseWorkload<ElementwiseUnaryQueueDescriptor>(descriptor, info)
 {
-    ARMNN_ASSERT(descriptor.m_Parameters.m_Operation == UnaryOperation::Sqrt);
+    if (descriptor.m_Parameters.m_Operation != UnaryOperation::Sqrt)
+    {
+        throw InvalidArgumentException("ClSqrtWorkload: The descriptor does not indicate a Sqrt operation.");
+    }
 
     // Report Profiling Details
     ARMNN_REPORT_PROFILING_WORKLOAD_DESC("ClSqrtWorkload_Construct",

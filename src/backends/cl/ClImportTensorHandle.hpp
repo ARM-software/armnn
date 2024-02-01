@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -244,8 +244,6 @@ private:
         {
             throw MemoryImportException(status.error_description());
         }
-
-        ARMNN_ASSERT(!m_Tensor.info()->is_resizable());
         return imported;
     }
     // Only used for testing

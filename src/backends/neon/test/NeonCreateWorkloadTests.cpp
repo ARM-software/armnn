@@ -1,13 +1,11 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "NeonWorkloadFactoryHelper.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
-#include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/backends/MemCopyWorkload.hpp>
 
@@ -283,27 +281,20 @@ TEST_CASE("CreateConvolution2dFloatNhwcWorkload")
 TEST_CASE("CreateConvolution2dFastMathEnabledWorkload")
 {
     Graph graph;
-    using ModelOptions = std::vector<BackendOptions>;
+    using ModelOptions        = std::vector<BackendOptions>;
     ModelOptions modelOptions = {};
-    BackendOptions cpuAcc("CpuAcc",
-    {
-        { "FastMathEnabled", true }
-    });
+    BackendOptions cpuAcc("CpuAcc", { { "FastMathEnabled", true } });
     modelOptions.push_back(cpuAcc);
     NeonWorkloadFactory factory =
         NeonWorkloadFactoryHelper::GetFactory(NeonWorkloadFactoryHelper::GetMemoryManager(), modelOptions);
 
-    auto workload =
-        CreateConvolution2dWorkloadFastMathTest<NeonConvolution2dWorkload, armnn::DataType::Float32>(factory,
-                                                                                             graph,
-                                                                                             DataLayout::NCHW,
-                                                                                             modelOptions);
+    auto workload = CreateConvolution2dWorkloadFastMathTest<NeonConvolution2dWorkload, armnn::DataType::Float32>(
+        factory, graph, DataLayout::NCHW, modelOptions);
 
-    ARMNN_ASSERT(workload != nullptr);
+    CHECK(workload != nullptr);
     auto conv2dWorkload = PolymorphicDowncast<NeonConvolution2dWorkload*>(workload.get());
-    IgnoreUnused(conv2dWorkload);
-    ARMNN_ASSERT(conv2dWorkload != nullptr);
-    ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::WINOGRAD);
+    CHECK(conv2dWorkload != nullptr);
+    CHECK(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::WINOGRAD);
 }
 
 template <typename armnn::DataType DataType>

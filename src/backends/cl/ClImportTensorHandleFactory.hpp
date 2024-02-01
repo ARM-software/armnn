@@ -4,7 +4,6 @@
 //
 #pragma once
 
-#include <aclCommon/BaseMemoryManager.hpp>
 #include <armnn/MemorySources.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
 #include <armnn/backends/ITensorHandleFactory.hpp>

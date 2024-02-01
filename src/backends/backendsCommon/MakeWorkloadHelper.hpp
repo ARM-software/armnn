@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -70,8 +70,7 @@ std::unique_ptr<IWorkload> MakeWorkloadHelper(const QueueDescriptorType& descrip
         case DataType::QSymmS16:
             return nullptr;
         default:
-            ARMNN_ASSERT_MSG(false, "Unknown DataType.");
-            return nullptr;
+            throw InvalidArgumentException("Unknown data type passed to MakeWorkloadHelper");
     }
 }
 

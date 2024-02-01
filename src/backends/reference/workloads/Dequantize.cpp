@@ -1,11 +1,9 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "Dequantize.hpp"
-
-#include <armnn/utility/IgnoreUnused.hpp>
 
 namespace armnn
 {
@@ -15,8 +13,9 @@ void Dequantize(Decoder<float>& inputDecoder,
                 const TensorInfo& inputInfo,
                 const TensorInfo& outputInfo)
 {
-    IgnoreUnused(outputInfo);
-    ARMNN_ASSERT(inputInfo.GetNumElements() == outputInfo.GetNumElements());
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(
+        inputInfo.GetNumElements() == outputInfo.GetNumElements(),
+        "Dequantize: The number of elements in the input and output tensors must be the same.");
     for (unsigned int i = 0; i < inputInfo.GetNumElements(); i++)
     {
         // inputDecoder.Get() dequantizes the data element from whatever

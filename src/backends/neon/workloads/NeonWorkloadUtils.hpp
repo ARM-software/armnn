@@ -1,9 +1,10 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
+#include <armnn/Exceptions.hpp>
 #include <armnn/backends/Workload.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 #include <neon/NeonTensorHandle.hpp>
@@ -69,8 +70,7 @@ inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
                                            TensorInfo tensorInfo,
                                            const ITensorHandle* handle)
 {
-    ARMNN_ASSERT(handle);
-
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(handle, "Null tensor handle passed to InitializeArmComputeTensorData.");
     switch(tensorInfo.GetDataType())
     {
         case DataType::Float16:
@@ -104,8 +104,7 @@ inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
 inline void InitializeArmComputeTensorData(arm_compute::Tensor& tensor,
                                            const ConstTensorHandle* handle)
 {
-    ARMNN_ASSERT(handle);
-
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(handle, "Null tensor handle passed to InitializeArmComputeTensorData.");
     switch(handle->GetTensorInfo().GetDataType())
     {
         case DataType::Float16:

@@ -1,12 +1,10 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "DetectionPostProcess.hpp"
 
-#include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 #include <algorithm>
@@ -140,11 +138,11 @@ void AllocateOutputData(unsigned int numOutput,
 
 void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
                           const TensorInfo& scoresInfo,
-                          const TensorInfo& anchorsInfo,
+                          const TensorInfo&,
                           const TensorInfo& detectionBoxesInfo,
-                          const TensorInfo& detectionClassesInfo,
-                          const TensorInfo& detectionScoresInfo,
-                          const TensorInfo& numDetectionsInfo,
+                          const TensorInfo&,
+                          const TensorInfo&,
+                          const TensorInfo&,
                           const DetectionPostProcessDescriptor& desc,
                           Decoder<float>& boxEncodings,
                           Decoder<float>& scores,
@@ -154,7 +152,6 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
                           float* detectionScores,
                           float* numDetections)
 {
-    IgnoreUnused(anchorsInfo, detectionClassesInfo, detectionScoresInfo, numDetectionsInfo);
 
     // Transform center-size format which is (ycenter, xcenter, height, width) to box-corner format,
     // which represents the lower left corner and the upper right corner (ymin, xmin, ymax, xmax)
@@ -212,9 +209,6 @@ void DetectionPostProcess(const TensorInfo& boxEncodingsInfo,
         boxCorners[indexH] = yCentre + halfH;
         // xmax
         boxCorners[indexW] = xCentre + halfW;
-
-        ARMNN_ASSERT(boxCorners[indexY] < boxCorners[indexH]);
-        ARMNN_ASSERT(boxCorners[indexX] < boxCorners[indexW]);
     }
 
     unsigned int numClassesWithBg = desc.m_NumClasses + 1;

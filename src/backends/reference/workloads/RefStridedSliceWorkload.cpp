@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,13 +31,8 @@ void RefStridedSliceWorkload::Execute(std::vector<ITensorHandle*> inputs, std::v
     ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefStridedSliceWorkload_Execute");
 
     const TensorInfo& inputInfo  = GetTensorInfo(inputs[0]);
-    const TensorInfo& outputInfo = GetTensorInfo(outputs[0]);
 
     DataType inputDataType  = inputInfo.GetDataType();
-    DataType outputDataType = outputInfo.GetDataType();
-
-    ARMNN_ASSERT(inputDataType == outputDataType);
-    IgnoreUnused(outputDataType);
 
     StridedSlice(inputInfo,
                  m_Data.m_Parameters,

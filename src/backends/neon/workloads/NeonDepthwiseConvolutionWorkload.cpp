@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -146,15 +146,12 @@ NeonDepthwiseConvolutionWorkload::NeonDepthwiseConvolutionWorkload(
                                          detailsInfo,
                                          GetGuid());
 
-    ARMNN_ASSERT(m_pDepthwiseConvolutionLayer);
-
     m_pDepthwiseConvolutionLayer->prepare();
 }
 
 void NeonDepthwiseConvolutionWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_NEON_NAME_GUID("NeonDepthwiseConvolutionWorkload_Execute");
-    ARMNN_ASSERT(m_pDepthwiseConvolutionLayer);
 
     m_pDepthwiseConvolutionLayer->run();
 }

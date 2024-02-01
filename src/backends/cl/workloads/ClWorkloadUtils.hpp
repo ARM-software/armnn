@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -124,8 +124,7 @@ inline auto SetClSliceData(const std::vector<unsigned int>& m_begin,
 inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
                                              const ConstTensorHandle* handle)
 {
-    ARMNN_ASSERT(handle);
-
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(handle, "Null tensor handle passed to InitializeArmComputeTensorData.");
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(clTensor);
     switch(handle->GetTensorInfo().GetDataType())
     {

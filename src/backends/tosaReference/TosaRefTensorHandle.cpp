@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "TosaRefTensorHandle.hpp"
@@ -44,9 +44,9 @@ void TosaRefTensorHandle::Manage()
 {
     if (!m_IsImportEnabled)
     {
-        ARMNN_ASSERT_MSG(!m_Pool, "TosaRefTensorHandle::Manage() called twice");
-        ARMNN_ASSERT_MSG(!m_UnmanagedMemory, "TosaRefTensorHandle::Manage() called after Allocate()");
-
+        ARMNN_THROW_MSG_IF_FALSE(!m_Pool, RuntimeException, "TosaRefTensorHandle::Manage() called twice");
+        ARMNN_THROW_MSG_IF_FALSE(!m_UnmanagedMemory, RuntimeException,
+                                 "TosaRefTensorHandle::Manage() called after Allocate()");
         m_Pool = m_MemoryManager->Manage(m_TensorInfo.GetNumBytes());
     }
 }

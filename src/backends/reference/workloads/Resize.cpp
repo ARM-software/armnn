@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -72,7 +72,8 @@ void Resize(Decoder<float>&   in,
             bool halfPixelCenters)
 {
     // alignCorners and halfPixelCenters cannot both be true
-    ARMNN_ASSERT(!(alignCorners && halfPixelCenters));
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(!(alignCorners && halfPixelCenters),
+                                        "Resize: alignCorners and halfPixelCenters cannot both be true");
 
     // We follow the definition of TensorFlow and AndroidNN: the top-left corner of a texel in the output
     // image is projected into the input image to figure out the interpolants and weights. Note that this

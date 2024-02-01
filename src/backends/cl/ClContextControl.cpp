@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,9 +8,6 @@
 #include <armnn/Exceptions.hpp>
 
 #include <LeakChecking.hpp>
-
-#include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLScheduler.h>
@@ -34,9 +31,6 @@ ClContextControl::ClContextControl(arm_compute::CLTuner *tuner,
     , m_HeuristicsHandle(heuristicsHandle)
     , m_ProfilingEnabled(profilingEnabled)
 {
-    // Ignore m_ProfilingEnabled if unused to avoid compiling problems when ArmCompute is disabled.
-    IgnoreUnused(m_ProfilingEnabled);
-
     try
     {
         std::vector<cl::Platform> platforms;
@@ -60,11 +54,9 @@ ClContextControl::ClContextControl(arm_compute::CLTuner *tuner,
 
     // Removes the use of global CL context.
     cl::Context::setDefault(cl::Context{});
-    ARMNN_ASSERT(cl::Context::getDefault()() == NULL);
 
     // Removes the use of global CL command queue.
     cl::CommandQueue::setDefault(cl::CommandQueue{});
-    ARMNN_ASSERT(cl::CommandQueue::getDefault()() == NULL);
 
     // Always load the OpenCL runtime.
     LoadOpenClRuntime();

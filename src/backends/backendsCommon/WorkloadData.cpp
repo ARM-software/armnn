@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,8 +40,7 @@ DataType GetBiasDataType(DataType inputDataType)
         case DataType::QSymmS16:
             return DataType::Signed32;
         default:
-            ARMNN_ASSERT_MSG(false, "Invalid input data type");
-            return DataType::Float32;
+            throw InvalidArgumentException("GetBiasDataType(): Unsupported data type.");
     }
 }
 

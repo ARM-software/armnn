@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -37,7 +37,9 @@ arm_compute::Status NeonFullyConnectedWorkloadValidate(const TensorInfo& input,
     arm_compute::TensorInfo* optionalAclBiases = nullptr;
     if (descriptor.m_BiasEnabled)
     {
-        ARMNN_ASSERT(biases.has_value());
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(
+            biases.has_value(),
+            "NeonFullyConnectedWorkload: Bias was enabled in the descriptor but no value was supplied.");
         aclBiases = BuildArmComputeTensorInfo(biases.value());
         aclBiases.set_are_values_constant(biases.value().IsConstant());
         optionalAclBiases = &aclBiases;

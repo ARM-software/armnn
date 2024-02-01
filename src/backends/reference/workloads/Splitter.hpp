@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,9 @@ void Splitter(const SplitterQueueDescriptor& data,
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& outputInfo = GetTensorInfo(outputs[viewIdx]);
-            ARMNN_ASSERT(outputInfo.GetNumDimensions() == inputInfo0.GetNumDimensions());
+            ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(
+                outputInfo.GetNumDimensions() == inputInfo0.GetNumDimensions(),
+                "The number of output dimensions does not match the number of input dimensions.");
 
             // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;
@@ -69,11 +71,7 @@ void Splitter(const SplitterQueueDescriptor& data,
 
                 //We are within the view, to copy input data to the output corresponding to this view.
                 DataType* outputData = GetOutputTensorData<DataType>(viewIdx, data);
-                ARMNN_ASSERT(outputData);
-
                 const DataType* inputData = GetInputTensorData<DataType>(0, data);
-                ARMNN_ASSERT(inputData);
-
                 outputData[outIndex] = inputData[index];
             }
         }

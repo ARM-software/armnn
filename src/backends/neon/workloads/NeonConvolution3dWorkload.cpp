@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -105,9 +105,6 @@ NeonConvolution3dWorkload::NeonConvolution3dWorkload(const Convolution3dQueueDes
                                          this->GetGuid());
 
     m_ConvolutionLayer.reset(convolutionLayer.release());
-
-    ARMNN_ASSERT(m_ConvolutionLayer);
-
     m_ConvolutionLayer->prepare();
 }
 

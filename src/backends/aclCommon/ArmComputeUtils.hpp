@@ -1,12 +1,12 @@
 //
-// Copyright © 2017-2023 Arm Ltd. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
 #include <armnn/Descriptors.hpp>
+#include <armnn/Exceptions.hpp>
 #include <armnn/Tensor.hpp>
-#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnn/backends/WorkloadData.hpp>
 #include <armnnUtils/TensorUtils.hpp>
@@ -233,8 +233,7 @@ inline T ComputeSoftmaxAclAxis(const SoftmaxDescriptor& softmaxDesc, const armnn
     }
 
     unsigned int dim = tensor.GetNumDimensions();
-
-    ARMNN_ASSERT(dim != 0);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(dim != 0, "The number of dimensions in this tensor cannot be zero.");
 
     // Currently ArmNN support axis 1.
     auto aclAxis = (static_cast<T>(dim) - 1);
@@ -274,9 +273,9 @@ inline int ComputeAclAxis(const int& armnnAxis, const armnn::TensorInfo& tensor)
 {
     int rank = static_cast<int>(tensor.GetNumDimensions());
 
-    ARMNN_ASSERT(rank != 0);
-    ARMNN_ASSERT((-1 * rank) <= armnnAxis);
-    ARMNN_ASSERT(armnnAxis < rank);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(rank != 0, "The number of dimensions in this tensor cannot be zero.");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(armnnAxis < rank, "Incompatible value of armnnAxis.");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE((-1 * rank) <= armnnAxis, "Incompatible value of armnnAxis.");
 
     int sign = (armnnAxis < 0) ? -1 : 1;
     int aclAxis = sign * rank - 1  - armnnAxis;

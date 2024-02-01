@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,7 +7,6 @@
 #include "ClContextControl.hpp"
 
 #include <armnn/Logging.hpp>
-#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <arm_compute/core/CL/OpenCL.h>
@@ -94,8 +93,7 @@ ClBackendContext::ClBackendContext(const IRuntime::CreationOptions& options)
                             return TuningLevel::Exhaustive;
                         default:
                         {
-                            ARMNN_ASSERT_MSG(false, "Tuning level not recognised.");
-                            return TuningLevel::None;
+                            throw InvalidArgumentException("Invalid value of tuning level specified.");
                         }
                     }
                 };

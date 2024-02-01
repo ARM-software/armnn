@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,10 +8,9 @@
 #include <BFloat16.hpp>
 #include <Half.hpp>
 
-#include <armnn/utility/Assert.hpp>
-
 #include <aclCommon/ArmComputeTensorHandle.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <armnn/Exceptions.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #include <arm_compute/runtime/MemoryGroup.h>
@@ -68,7 +67,7 @@ public:
         // If we have enabled Importing, don't manage the tensor
         if (!m_IsImportEnabled)
         {
-            ARMNN_ASSERT(m_MemoryGroup != nullptr);
+            ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_MemoryGroup, "arm_compute::MemoryGroup is null.");
             m_MemoryGroup->manage(&m_Tensor);
         }
     }

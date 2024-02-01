@@ -1,11 +1,9 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ConvImpl.hpp"
-
-#include <armnn/utility/Assert.hpp>
 
 #include <cmath>
 #include <limits>
@@ -15,7 +13,8 @@ namespace armnn
 
 QuantizedMultiplierSmallerThanOne::QuantizedMultiplierSmallerThanOne(float multiplier)
 {
-    ARMNN_ASSERT(multiplier >= 0.0f && multiplier < 1.0f);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(multiplier >= 0.0f && multiplier < 1.0f,
+                                        "QuantizedMultiplierSmallerThanOne: multiplier must be between 0.0f and 1.0f.");
     if (multiplier == 0.0f)
     {
         m_Multiplier = 0;
@@ -26,14 +25,11 @@ QuantizedMultiplierSmallerThanOne::QuantizedMultiplierSmallerThanOne(float multi
         const double q = std::frexp(multiplier, &m_RightShift);
         m_RightShift = -m_RightShift;
         int64_t qFixed = static_cast<int64_t>(::round(q * (1ll << 31)));
-        ARMNN_ASSERT(qFixed <= (1ll << 31));
         if (qFixed == (1ll << 31))
         {
             qFixed /= 2;
             --m_RightShift;
         }
-        ARMNN_ASSERT(m_RightShift >= 0);
-        ARMNN_ASSERT(qFixed <= std::numeric_limits<int32_t>::max());
         m_Multiplier = static_cast<int32_t>(qFixed);
     }
 }
@@ -61,7 +57,8 @@ int32_t QuantizedMultiplierSmallerThanOne::SaturatingRoundingDoublingHighMul(int
 
 int32_t QuantizedMultiplierSmallerThanOne::RoundingDivideByPOT(int32_t x, int exponent)
 {
-    ARMNN_ASSERT(exponent >= 0 && exponent <= 31);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(exponent >= 0 && exponent <= 31,
+                                        "RoundingDivideByPOT: exponent must be between 0 and 31.");
     int32_t mask = (1 << exponent) - 1;
     int32_t remainder = x & mask;
     int32_t threshold = (mask >> 1) + (x < 0 ? 1 : 0);

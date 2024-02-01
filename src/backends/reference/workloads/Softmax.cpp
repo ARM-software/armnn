@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,10 +16,10 @@ namespace armnn
 /// Computes the softmax function on some inputs, into outputs, with a shape given by tensorInfo.
 void Softmax(Decoder<float>& in, Encoder<float>& out, const TensorInfo& inputTensorInfo, float beta, int axis)
 {
-    ARMNN_ASSERT_MSG(axis < static_cast<int>(inputTensorInfo.GetNumDimensions()),
-                     "Required axis index greater than number of dimensions.");
-    ARMNN_ASSERT_MSG(axis >= -static_cast<int>(inputTensorInfo.GetNumDimensions()),
-                     "Required axis index lower than negative of the number of dimensions");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(axis < static_cast<int>(inputTensorInfo.GetNumDimensions()),
+                                        "Required axis index greater than number of dimensions.");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(axis >= -static_cast<int>(inputTensorInfo.GetNumDimensions()),
+                                        "Required axis index lower than negative of the number of dimensions");
 
     unsigned int uAxis = axis < 0  ?
                          inputTensorInfo.GetNumDimensions() - static_cast<unsigned int>(abs(axis))

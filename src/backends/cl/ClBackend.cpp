@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,7 +18,6 @@
 
 #include <aclCommon/ArmComputeSubgraphUtils.hpp>
 #include <aclCommon/ArmComputeUtils.hpp>
-#include <aclCommon/BaseMemoryManager.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>

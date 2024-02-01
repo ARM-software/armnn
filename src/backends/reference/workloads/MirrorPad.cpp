@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,8 +18,8 @@ inline std::vector<unsigned int> IndexToCoord(const armnn::TensorShape& shape, u
 {
     unsigned int numOfElements = shape.GetNumElements();
 
-    ARMNN_ASSERT_MSG(index <= numOfElements, "Index has to be in [0, num_elements]");
-    ARMNN_ASSERT_MSG(numOfElements != 0, "Cannot create coordinate from empty shape");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(index <= numOfElements, "Index has to be in [0, num_elements]");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(numOfElements != 0, "Cannot create coordinate from empty shape");
 
     std::vector<unsigned int> coord(shape.GetNumDimensions());
     for(unsigned int i = 0; i < shape.GetNumDimensions(); ++i)
@@ -36,8 +36,8 @@ inline std::vector<unsigned int> IndexToCoord(const armnn::TensorShape& shape, u
 // E.g. [0, 0, 2] returns 2.
 inline unsigned int CoordToIndex(const armnn::TensorShape& shape, const std::vector<unsigned int>& coord)
 {
-    ARMNN_ASSERT_MSG(shape.GetNumDimensions() != 0, "Cannot get index from empty shape");
-    ARMNN_ASSERT_MSG(coord.size() != 0, "Cannot get index of empty coordinate");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(shape.GetNumDimensions() != 0, "Cannot get index from empty shape");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(coord.size() != 0, "Cannot get index of empty coordinate");
 
     unsigned int index    = 0;
     unsigned int dimSize  = 1;

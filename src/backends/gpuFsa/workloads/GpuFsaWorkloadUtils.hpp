@@ -100,7 +100,7 @@ namespace armnn
     inline void InitializeArmComputeClTensorData(arm_compute::CLTensor& clTensor,
                                                  const ConstTensorHandle* handle)
     {
-        ARMNN_ASSERT(handle);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(handle, "Null tensor handle passed to InitializeArmComputeClTensorData.");
 
         armcomputetensorutils::InitialiseArmComputeTensorEmpty(clTensor);
         switch(handle->GetTensorInfo().GetDataType())

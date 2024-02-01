@@ -57,8 +57,6 @@ void GpuFsaConstantWorkload::Execute() const
     if (!m_RanOnce)
     {
         const ConstantQueueDescriptor& data = this->m_Data;
-
-        ARMNN_ASSERT(data.m_LayerOutput != nullptr);
         arm_compute::CLTensor& output = static_cast<GpuFsaTensorHandle*>(data.m_Outputs[0])->GetTensor();
         arm_compute::DataType computeDataType = static_cast<GpuFsaTensorHandle*>(data.m_Outputs[0])->GetDataType();
 
@@ -102,7 +100,7 @@ void GpuFsaConstantWorkload::Execute() const
             }
             default:
             {
-                ARMNN_ASSERT_MSG(false, "Unknown data type");
+                throw InvalidArgumentException("Unknown data type passed to GpuFsaConstantWorkload::Execute()");
                 break;
             }
         }

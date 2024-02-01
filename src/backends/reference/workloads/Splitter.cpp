@@ -1,12 +1,11 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "RefWorkloadUtils.hpp"
 #include <armnn/backends/WorkloadData.hpp>
 #include <armnn/Tensor.hpp>
-#include <armnn/utility/Assert.hpp>
 #include "Splitter.hpp"
 
 #include <cmath>
@@ -48,7 +47,9 @@ void Split(const SplitterQueueDescriptor& data,
 
             //Split view extents are defined by the size of (the corresponding) input tensor.
             const TensorInfo& outputInfo = GetTensorInfo(outputs[viewIdx]);
-            ARMNN_ASSERT(outputInfo.GetNumDimensions() == inputInfo.GetNumDimensions());
+            ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(
+                outputInfo.GetNumDimensions() == inputInfo.GetNumDimensions(),
+                "The number of output dimensions does not match the number of input dimensions.");
 
             // Check all dimensions to see if this element is inside the given input view.
             bool insideView = true;

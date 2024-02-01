@@ -1,13 +1,10 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "StridedSlice.hpp"
 
-#include <ResolveType.hpp>
-
-#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 #include <cstring>
@@ -20,12 +17,11 @@ namespace
 
 void PadParams(StridedSliceDescriptor& p, unsigned int dimCount)
 {
-    ARMNN_ASSERT_MSG(dimCount <= 4, "Expected input with at most 4 dimensions");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(dimCount <= 4, "Expected input with at most 4 dimensions");
 
     const unsigned int beginIndicesCount =
         armnn::numeric_cast<unsigned int>(p.m_Begin.size());
 
-    ARMNN_ASSERT(dimCount >= beginIndicesCount);
     const unsigned int padCount = dimCount - beginIndicesCount;
 
     p.m_Begin.resize(dimCount);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -76,7 +76,8 @@ NeonChannelShuffleWorkload::NeonChannelShuffleWorkload(const ChannelShuffleQueue
             aclDataLayout = ConvertDataLayout(armnn::DataLayout::NHWC);
             break;
         default:
-            ARMNN_ASSERT_MSG(false, "Unsupported axis");
+            throw InvalidArgumentException("Value for axis: " + std::to_string(descriptor.m_Parameters.m_Axis) +
+                                           " is not valid");
             break;
     }
     input.info()->set_data_layout(aclDataLayout);

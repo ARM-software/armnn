@@ -1,13 +1,11 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "LogSoftmax.hpp"
 
 #include <armnnUtils/TensorUtils.hpp>
-#include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/NumericCast.hpp>
 
 #include <cmath>
@@ -33,10 +31,8 @@ void LogSoftmax(Decoder<float>& input,
 {
     const unsigned int numDimensions = inputInfo.GetNumDimensions();
 
-    bool axisIsValid = ValidateAxis(descriptor.m_Axis, numDimensions);
-    ARMNN_ASSERT_MSG(axisIsValid,
-        "Axis index is not in range [-numDimensions, numDimensions).");
-    IgnoreUnused(axisIsValid);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(ValidateAxis(descriptor.m_Axis, numDimensions),
+                                        "Axis index is not in range [-numDimensions, numDimensions).");
 
     unsigned int uAxis = descriptor.m_Axis < 0  ?
         numDimensions - armnn::numeric_cast<unsigned int>(std::abs(descriptor.m_Axis)) :

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -99,7 +99,8 @@ ClConvolution2dWorkload::ClConvolution2dWorkload(const Convolution2dQueueDescrip
         arm_compute::ICLTensor& bias = static_cast<IClTensorHandle*>(m_Data.m_Inputs[2])->GetTensor();
         bias.info()->set_are_values_constant(info.m_InputTensorInfos[2].IsConstant());
         // We assume here that NeonConvolution2dWorkloadValidate has been called before the constructor.
-        ARMNN_ASSERT(info.m_InputTensorInfos[2].IsConstant() == true);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(info.m_InputTensorInfos[2].IsConstant() == true,
+                                            "The bias tensor must be constant.");
         m_BiasProxy = std::make_unique<ICLTensorProxy>(&bias);
     }
 

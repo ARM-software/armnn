@@ -1,11 +1,9 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "FullyConnected.hpp"
-
-#include <armnn/utility/Assert.hpp>
 
 #include "RefWorkloadUtils.hpp"
 
@@ -31,7 +29,6 @@ void FullyConnected(const TensorShape& rInputShape,
 
     const TensorShape biasShape{outputSize};
 
-    ARMNN_ASSERT(!biasEnabled || pBiasDecoder != nullptr);
     const std::vector<float> decodedBiases = biasEnabled ? pBiasDecoder->DecodeTensor(biasShape) : std::vector<float>();
 
 

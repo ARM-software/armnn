@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,8 +44,8 @@ RefTensorHandle::~RefTensorHandle()
 
 void RefTensorHandle::Manage()
 {
-    ARMNN_ASSERT_MSG(!m_Pool, "RefTensorHandle::Manage() called twice");
-    ARMNN_ASSERT_MSG(!m_UnmanagedMemory, "RefTensorHandle::Manage() called after Allocate()");
+    ARMNN_THROW_MSG_IF_FALSE(!m_Pool, RuntimeException, "RefTensorHandle::Manage() called twice");
+    ARMNN_THROW_MSG_IF_FALSE(!m_UnmanagedMemory, RuntimeException, "RefTensorHandle::Manage() called after Allocate()");
 
     if (m_MemoryManager)
     {

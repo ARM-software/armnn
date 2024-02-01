@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -65,7 +65,7 @@ void NeonConstantWorkload::Execute() const
     {
         const ConstantQueueDescriptor& data = this->m_Data;
 
-        ARMNN_ASSERT(data.m_LayerOutput != nullptr);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(data.m_LayerOutput, "Output tensor handle is null.");
         arm_compute::ITensor& output =
             PolymorphicDowncast<NeonTensorHandle*>(data.m_Outputs[0])->GetTensor();
         arm_compute::DataType computeDataType =
@@ -116,8 +116,7 @@ void NeonConstantWorkload::Execute() const
             }
             default:
             {
-                ARMNN_ASSERT_MSG(false, "Unknown data type");
-                break;
+                throw InvalidArgumentException("Unknown data type.");
             }
         }
 

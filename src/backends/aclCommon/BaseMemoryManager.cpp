@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "BaseMemoryManager.hpp"
@@ -18,7 +18,7 @@ namespace armnn
 BaseMemoryManager::BaseMemoryManager(std::shared_ptr<arm_compute::IAllocator> alloc,
                                      MemoryAffinity memoryAffinity)
 {
-    ARMNN_ASSERT(alloc);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(alloc, "A null allocator has been passed to BaseMemoryManager.");
     m_Allocator = std::move(alloc);
 
     m_IntraLayerMemoryMgr = CreateArmComputeMemoryManager(memoryAffinity);
@@ -50,30 +50,24 @@ void BaseMemoryManager::Acquire()
     static const size_t s_NumPools = 1;
 
     // Allocate memory pools for intra-layer memory manager
-    ARMNN_ASSERT(m_IntraLayerMemoryMgr);
     m_IntraLayerMemoryMgr->populate(*m_Allocator, s_NumPools);
 
     // Allocate memory pools for inter-layer memory manager
-    ARMNN_ASSERT(m_InterLayerMemoryMgr);
     m_InterLayerMemoryMgr->populate(*m_Allocator, s_NumPools);
 
     // Acquire inter-layer memory group. NOTE: This has to come after allocating the pools
-    ARMNN_ASSERT(m_InterLayerMemoryGroup);
     m_InterLayerMemoryGroup->acquire();
 }
 
 void BaseMemoryManager::Release()
 {
     // Release inter-layer memory group. NOTE: This has to come before releasing the pools
-    ARMNN_ASSERT(m_InterLayerMemoryGroup);
     m_InterLayerMemoryGroup->release();
 
     // Release memory pools managed by intra-layer memory manager
-    ARMNN_ASSERT(m_IntraLayerMemoryMgr);
     m_IntraLayerMemoryMgr->clear();
 
     // Release memory pools managed by inter-layer memory manager
-    ARMNN_ASSERT(m_InterLayerMemoryMgr);
     m_InterLayerMemoryMgr->clear();
 }
 #else

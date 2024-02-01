@@ -1,12 +1,11 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/backends/OptimizationViews.hpp>
-#include <armnn/utility/Assert.hpp>
 
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <backendsCommon/SubgraphUtils.hpp>
@@ -330,11 +329,6 @@ std::vector<IConnectableLayer*> ChainReduceLayers(OptimizationViews& optimizatio
 
         layers.emplace_back(replacementLayer);
     }
-
-    // Check if the TensorInfo from the last layer equals the inferred output from the original layer.
-    ARMNN_ASSERT(baseLayer->GetOutputSlot(0).GetTensorInfo() ==
-                 PolymorphicDowncast<Layer*>(layers.back())->GetOutputSlot().GetTensorInfo());
-
     return layers;
 }
 

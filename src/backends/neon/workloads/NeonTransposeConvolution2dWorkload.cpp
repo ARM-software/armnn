@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "NeonTransposeConvolution2dWorkload.hpp"
@@ -37,9 +37,10 @@ arm_compute::Status NeonTransposeConvolution2dWorkloadValidate(const TensorInfo&
 
     if (descriptor.m_BiasEnabled)
     {
-        ARMNN_ASSERT(biases.has_value());
-
-        aclBiasesInfo = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(
+            biases.has_value(),
+            "NeonTransposeConvolution2dWorkload: Bias was enabled in the descriptor but no value was supplied.");
+        aclBiasesInfo         = BuildArmComputeTensorInfo(biases.value(), descriptor.m_DataLayout);
         optionalAclBiasesInfo = &aclBiasesInfo;
     }
 
@@ -96,8 +97,6 @@ NeonTransposeConvolution2dWorkload::NeonTransposeConvolution2dWorkload(
 
     m_Layer = std::make_unique<arm_compute::NEDeconvolutionLayer>(memoryManager);
     m_Layer->configure(&input, m_KernelTensor.get(), m_BiasTensor.get(), &output, padStrideInfo);
-
-    ARMNN_ASSERT(m_Layer);
 
     InitializeArmComputeTensorData(*m_KernelTensor, m_Data.m_Weight);
 

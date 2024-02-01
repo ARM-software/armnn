@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,8 +43,6 @@ TosaSerializationBasicBlock* ConvertElementwiseUnaryOperator(const Layer* layer,
         default:
             throw armnn::Exception("ConvertElementwiseUnaryToTosaOperator: Unsupported layer type.");
     }
-
-    ARMNN_ASSERT(op != nullptr);
 
     std::vector<TosaSerializationTensor*> tensors;
     // Only add input tensor if connected layer is an input layer.

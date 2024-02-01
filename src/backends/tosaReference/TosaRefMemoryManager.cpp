@@ -1,11 +1,10 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "TosaRefMemoryManager.hpp"
 
-#include <armnn/utility/Assert.hpp>
-
+#include <armnn/Exceptions.hpp>
 #include <algorithm>
 
 namespace armnn
@@ -35,7 +34,7 @@ TosaRefMemoryManager::Pool* TosaRefMemoryManager::Manage(unsigned int numBytes)
 
 void TosaRefMemoryManager::Allocate(TosaRefMemoryManager::Pool* pool)
 {
-    ARMNN_ASSERT(pool);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(pool, "Null memory manager passed to TosaRefMemoryManager.");
     m_FreePools.push_back(pool);
 }
 
@@ -75,25 +74,29 @@ TosaRefMemoryManager::Pool::~Pool()
 
 void* TosaRefMemoryManager::Pool::GetPointer()
 {
-    ARMNN_ASSERT_MSG(m_Pointer, "TosaRefMemoryManager::Pool::GetPointer() called when memory not acquired");
+    ARMNN_THROW_MSG_IF_FALSE(m_Pointer, RuntimeException,
+                             "TosaRefMemoryManager::Pool::GetPointer() called when memory not acquired");
     return m_Pointer;
 }
 
 void TosaRefMemoryManager::Pool::Reserve(unsigned int numBytes)
 {
-    ARMNN_ASSERT_MSG(!m_Pointer, "TosaRefMemoryManager::Pool::Reserve() cannot be called after memory acquired");
+    ARMNN_THROW_MSG_IF_FALSE(!m_Pointer, RuntimeException,
+                             "TosaRefMemoryManager::Pool::Reserve() cannot be called after memory acquired");
     m_Size = std::max(m_Size, numBytes);
 }
 
 void TosaRefMemoryManager::Pool::Acquire()
 {
-    ARMNN_ASSERT_MSG(!m_Pointer, "TosaRefMemoryManager::Pool::Acquire() called when memory already acquired");
+    ARMNN_THROW_MSG_IF_FALSE(!m_Pointer, RuntimeException,
+                             "TosaRefMemoryManager::Pool::Acquire() called when memory already acquired");
     m_Pointer = ::operator new(size_t(m_Size));
 }
 
 void TosaRefMemoryManager::Pool::Release()
 {
-    ARMNN_ASSERT_MSG(m_Pointer, "TosaRefMemoryManager::Pool::Release() called when memory not acquired");
+    ARMNN_THROW_MSG_IF_FALSE(m_Pointer, RuntimeException,
+                             "TosaRefMemoryManager::Pool::Release() called when memory not acquired");
     ::operator delete(m_Pointer);
     m_Pointer = nullptr;
 }

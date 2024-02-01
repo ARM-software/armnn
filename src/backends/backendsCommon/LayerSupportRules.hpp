@@ -1,11 +1,10 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
-#include <armnn/utility/Assert.hpp>
 #include <algorithm>
 
 namespace armnn
@@ -29,7 +28,7 @@ inline armnn::Optional<armnn::DataType> GetBiasTypeFromWeightsType(armnn::Option
         case armnn::DataType::QSymmS16:
             return armnn::DataType::Signed32;
         default:
-            ARMNN_ASSERT_MSG(false, "GetBiasTypeFromWeightsType(): Unsupported data type.");
+            throw InvalidArgumentException("GetBiasTypeFromWeightsType(): Unsupported data type.");
     }
     return armnn::EmptyOptional();
 }

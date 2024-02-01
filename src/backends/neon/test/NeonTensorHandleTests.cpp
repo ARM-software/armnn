@@ -1,9 +1,11 @@
 //
-// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <Graph.hpp>
 #include <Network.hpp>
+
+#include <aclCommon/BaseMemoryManager.hpp>
 
 #include <neon/NeonTensorHandle.hpp>
 #include <neon/NeonTensorHandleFactory.hpp>
@@ -16,7 +18,6 @@
 #include <CommonTestUtils.hpp>
 
 #include <doctest/doctest.h>
-#include <armnn/utility/Assert.hpp>
 
 TEST_SUITE("NeonTensorHandleTests")
 {
@@ -190,7 +191,7 @@ TEST_CASE("NeonTensorHandleSupportsInPlaceComputation")
     NeonTensorHandleFactory handleFactory(memoryManager);
 
     // NeonTensorHandleFactory supports InPlaceComputation
-    ARMNN_ASSERT(handleFactory.SupportsInPlaceComputation());
+    CHECK(handleFactory.SupportsInPlaceComputation() == true);
 }
 
 }

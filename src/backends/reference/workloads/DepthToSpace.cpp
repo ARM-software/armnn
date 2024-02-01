@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,8 +7,6 @@
 
 #include <armnnUtils/DataLayoutIndexed.hpp>
 #include <armnnUtils/Permute.hpp>
-
-#include <armnn/utility/Assert.hpp>
 
 using namespace armnnUtils;
 
@@ -22,7 +20,6 @@ void DepthToSpace(const TensorInfo& inputInfo,
                   unsigned int dataTypeSize)
 {
     const unsigned int blockSize = descriptor.m_BlockSize;
-    ARMNN_ASSERT(blockSize != 0u);
 
     const TensorShape& inputShape = inputInfo.GetShape();
     const unsigned int batches = inputShape[0];

@@ -28,6 +28,7 @@
 #include <backendsCommon/test/GatherNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
+#include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizationEndToEndTestImpl.hpp>
@@ -1098,6 +1099,49 @@ TEST_CASE("RefPreluEndToEndTestQSymm16")
     PreluEndToEndPositiveTest<armnn::DataType::QSymmS16>(defaultBackends);
 }
 
+// Pooling 2D
+// Average Pool 2D
+TEST_CASE("RefAvgPool2DEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefAvgPool2DEndtoEndTestFloat16")
+{
+    AvgPool2dEndToEndFloat16<DataType::Float16>(defaultBackends);
+}
+
+TEST_CASE("RefAvgPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(defaultBackends, PaddingMethod::IgnoreValue);
+}
+
+// Max Pool 2D
+TEST_CASE("RefMaxPool2DEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefMaxPool2DEndtoEndTestFloat16")
+{
+    MaxPool2dEndToEndFloat16<DataType::Float16>(defaultBackends);
+}
+
+TEST_CASE("RefMaxPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(defaultBackends, PaddingMethod::IgnoreValue);
+}
+
+TEST_CASE("RefMaxPool2DTwoLayerEndtoEndTestFloat32")
+{
+    MaxPool2dTwoLayerEndToEnd<DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefMaxPool2DThreeLayerEndtoEndTestFloat32")
+{
+    MaxPool2dThreeLayerEndToEnd<DataType::Float32>(defaultBackends);
+}
+
 // Quantization
 TEST_CASE("QuantizationEndToEndFloat32_U8Test")
 {
@@ -1156,7 +1200,7 @@ TEST_CASE("RefSplit1dEndtoEndTestSigned16")
     Splitter1dEndToEnd<DataType::QSymmS16>(defaultBackends);
 }
 
-TEST_CASE("TosaRefSplit1dEndtoEndTestFloat16")
+TEST_CASE("RefSplit1dEndtoEndTestFloat16")
 {
     Splitter1dEndToEndFloat16<DataType::Float16>(defaultBackends);
 }

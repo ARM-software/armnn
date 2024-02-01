@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <aclCommon/ArmComputeTensorUtils.hpp>
@@ -276,12 +276,12 @@ arm_compute::PoolingLayerInfo BuildArmComputePoolingLayerInfo(const Pooling2dDes
     const arm_compute::DimensionRoundingType rounding = ConvertOutputShapeRoundingToAclDimensionRoundingType(
                                                                                     descriptor.m_OutputShapeRounding);
     const arm_compute::PadStrideInfo padStrideInfo(descriptor.m_StrideX,
-                                      descriptor.m_StrideY,
-                                      descriptor.m_PadLeft,
-                                      descriptor.m_PadRight,
-                                      descriptor.m_PadTop,
-                                      descriptor.m_PadBottom,
-                                      rounding);
+                                                   descriptor.m_StrideY,
+                                                   descriptor.m_PadLeft,
+                                                   descriptor.m_PadRight,
+                                                   descriptor.m_PadTop,
+                                                   descriptor.m_PadBottom,
+                                                   rounding);
 
     const bool excludePadding = (descriptor.m_PaddingMethod == PaddingMethod::Exclude);
 

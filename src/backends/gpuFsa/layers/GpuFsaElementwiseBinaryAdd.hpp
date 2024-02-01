@@ -10,14 +10,11 @@
 
 namespace armnn
 {
+arm_compute::Status GpuFsaElementwiseBinaryAddValidate(const TensorInfo& input0,
+                                                       const TensorInfo& input1);
 
-    using namespace arm_compute::experimental::dynamic_fusion;
-
-    arm_compute::Status GpuFsaElementwiseBinaryAddValidate(const TensorInfo& input0,
-                                                           const TensorInfo& input1);
-
-    void GpuFsaElementwiseBinaryAddCreateOp(GpuFsaPreCompiledBlob* blob,
-                                            const TensorInfo& input0,
-                                            const TensorInfo& input1);
+void GpuFsaElementwiseBinaryAddCreateOp(GpuFsaPreCompiledBlob* blob,
+                                        const TensorInfo& input0,
+                                        const TensorInfo& input1);
 
 } // namespace armnn

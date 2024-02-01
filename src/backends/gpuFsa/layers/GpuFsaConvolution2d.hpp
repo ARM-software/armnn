@@ -10,9 +10,6 @@
 
 namespace armnn
 {
-
-using namespace arm_compute::experimental::dynamic_fusion;
-
 arm_compute::Status GpuFsaConvolution2dValidate(const TensorInfo& input,
                                                 const Convolution2dDescriptor& descriptor,
                                                 const TensorInfo& weights,

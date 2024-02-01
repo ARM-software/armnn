@@ -14,6 +14,7 @@
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
 #include "layers/GpuFsaElementwiseBinarySub.hpp"
+#include "layers/GpuFsaPooling2d.hpp"
 #endif
 
 #include <vector>
@@ -156,7 +157,21 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             {
                 throw InvalidArgumentException("Invalid ElementwiseBinary BinaryOperation operation.");
             }
-            return false;
+        }
+        case LayerType::Pooling2d:
+        {
+            if (infos.size() != 2)
+            {
+                throw InvalidArgumentException("Invalid number of Pooling2d TensorInfos. "
+                                               "TensorInfos should be of format: {input, output}.");
+            }
+
+            auto desc = PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor);
+
+            FORWARD_LAYER_VALIDATE_FUNC(GpuFsaPooling2dValidate,
+                                        reasonIfUnsupported,
+                                        infos[0],
+                                        *desc);
         }
         case LayerType::Constant:
         case LayerType::Input:

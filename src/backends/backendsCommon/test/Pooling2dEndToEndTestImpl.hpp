@@ -76,7 +76,8 @@ void MaxPool2dEndToEnd(const std::vector<armnn::BackendId>& backends,
 }
 
 template<armnn::DataType ArmnnType>
-void MaxPool2dEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
+void MaxPool2dEndToEndFloat16(const std::vector<armnn::BackendId>& backends,
+                              PaddingMethod padMethod = PaddingMethod::Exclude)
 {
     using namespace half_float::literal;
     using Half = half_float::half;
@@ -84,7 +85,7 @@ void MaxPool2dEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
     const TensorShape& inputShape = { 1, 3, 3, 1 };
     const TensorShape& outputShape = { 1, 3, 3, 1 };
 
-    INetworkPtr network = CreatePooling2dNetwork<ArmnnType>(inputShape, outputShape);
+    INetworkPtr network = CreatePooling2dNetwork<ArmnnType>(inputShape, outputShape, padMethod);
     CHECK(network);
 
     std::vector<Half> inputData{ 1._h, 2._h, 3._h,
@@ -140,7 +141,7 @@ void AvgPool2dEndToEnd(const std::vector<armnn::BackendId>& backends,
 
 template<armnn::DataType ArmnnType>
 void AvgPool2dEndToEndFloat16(const std::vector<armnn::BackendId>& backends,
-                              PaddingMethod padMethod = PaddingMethod::IgnoreValue)
+                              PaddingMethod padMethod = PaddingMethod::Exclude)
 {
     using namespace half_float::literal;
     using Half = half_float::half;
@@ -155,9 +156,19 @@ void AvgPool2dEndToEndFloat16(const std::vector<armnn::BackendId>& backends,
     std::vector<Half> inputData{ 1._h, 2._h, 3._h,
                                  4._h, 5._h, 6._h,
                                  7._h, 8._h, 9._h };
-    std::vector<Half> expectedOutput{ 1.33333_h, 2.33333_h, 1.77778_h,
-                                      3._h     , 5._h     , 3.66667_h,
-                                      2.66667_h, 4.33333_h, 3.11111_h };
+    std::vector<Half> expectedOutput;
+    if (padMethod == PaddingMethod::Exclude)
+    {
+        expectedOutput  = { 3._h , 3.5_h, 4._h ,
+                            4.5_h, 5._h , 5.5_h,
+                            6._h , 6.5_h, 7._h  };
+    }
+    else
+    {
+        expectedOutput  = { 1.33333_h, 2.33333_h, 1.77778_h,
+                            3._h     , 5._h     , 3.66667_h,
+                            2.66667_h, 4.33333_h, 3.11111_h };
+    }
 
     std::map<int, std::vector<Half>> inputTensorData = { { 0, inputData } };
     std::map<int, std::vector<Half>> expectedOutputData = { { 0, expectedOutput } };

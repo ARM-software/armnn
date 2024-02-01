@@ -24,6 +24,7 @@
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
 #include "layers/GpuFsaElementwiseBinarySub.hpp"
+#include "layers/GpuFsaPooling2d.hpp"
 
 namespace armnn
 {
@@ -313,6 +314,13 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
 
                     GpuFsaElementwiseBinarySubCreateOp(preCompiledBlobPtr, input0, input1);
                 }
+                break;
+            }
+            case (LayerType::Pooling2d):
+            {
+                auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto desc = PolymorphicDowncast<const Pooling2dDescriptor*>(&base.GetParameters());
+                GpuFsaPooling2dCreateOp(preCompiledBlobPtr, input, *desc);
                 break;
             }
             default:

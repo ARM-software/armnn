@@ -17,6 +17,7 @@
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
+#include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
@@ -245,8 +246,8 @@ TEST_CASE("ClGreaterSimpleEndToEndUint8Test")
                                                 0, 0, 0, 0,  0, 0, 0, 0 });
 
     ComparisonSimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends,
-                                                               ComparisonOperation::Greater,
-                                                               expectedOutput);
+                                                        ComparisonOperation::Greater,
+                                                        expectedOutput);
 }
 
 TEST_CASE("ClGreaterBroadcastEndToEndTest")
@@ -265,8 +266,8 @@ TEST_CASE("ClGreaterBroadcastEndToEndUint8Test")
                                                 1, 1, 1, 1, 1, 1 });
 
     ComparisonBroadcastEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends,
-                                                                  ComparisonOperation::Greater,
-                                                                  expectedOutput);
+                                                           ComparisonOperation::Greater,
+                                                           expectedOutput);
 }
 
 // HardSwish
@@ -314,6 +315,49 @@ TEST_CASE("ClInstanceNormalizationNhwcEndToEndTest2")
 TEST_CASE("ClInstanceNormalizationNchwEndToEndTest2")
 {
     InstanceNormalizationNchwEndToEndTest2(clDefaultBackends);
+}
+
+// Pooling 2D
+// Average Pool 2D
+TEST_CASE("ClAvgPool2DEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClAvgPool2DEndtoEndTestFloat16")
+{
+    AvgPool2dEndToEndFloat16<DataType::Float16>(clDefaultBackends);
+}
+
+TEST_CASE("ClAvgPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(clDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+// Max Pool 2D
+TEST_CASE("ClMaxPool2DEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClMaxPool2DEndtoEndTestFloat16")
+{
+    MaxPool2dEndToEndFloat16<DataType::Float16>(clDefaultBackends);
+}
+
+TEST_CASE("ClMaxPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(clDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+TEST_CASE("ClMaxPool2DTwoLayerEndtoEndTestFloat32")
+{
+    MaxPool2dTwoLayerEndToEnd<DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClMaxPool2DThreeLayerEndtoEndTestFloat32")
+{
+    MaxPool2dThreeLayerEndToEnd<DataType::Float32>(clDefaultBackends);
 }
 
 // Fill

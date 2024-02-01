@@ -95,6 +95,14 @@ TEST_CASE("TosaRefConv2dWithoutBiasEndtoEndTestFloat32")
     Convolution2dEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
 }
 
+// Maximum
+TEST_CASE("TosaRefMaximumEndtoEndTestInt8")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
+                                                                 armnn::BinaryOperation::Maximum);
+}
+
+// Pooling
 // Average Pool 2D
 TEST_CASE("TosaRefAvgPool2DEndtoEndTestFloat32")
 {
@@ -109,13 +117,6 @@ TEST_CASE("TosaRefAvgPool2DEndtoEndTestFloat16")
 TEST_CASE("TosaRefAvgPool2DIgnoreValueEndtoEndTestFloat32")
 {
     AvgPool2dEndToEnd<DataType::Float32>(tosaDefaultBackends, PaddingMethod::IgnoreValue);
-}
-
-// Maximum
-TEST_CASE("TosaRefMaximumEndtoEndTestInt8")
-{
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
-                                                                 armnn::BinaryOperation::Maximum);
 }
 
 // Max Pool 2D

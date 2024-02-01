@@ -18,6 +18,7 @@
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FillEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
+#include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QuantizedLstmEndToEndTestImpl.hpp>
@@ -550,6 +551,49 @@ TEST_CASE("NeonInstanceNormalizationNchwEndToEndTest1")
 TEST_CASE("NeonInstanceNormalizationNchwEndToEndTest2")
 {
     InstanceNormalizationNchwEndToEndTest2(neonDefaultBackends);
+}
+
+// Pooling 2D
+// Average Pool 2D
+TEST_CASE("NeonAvgPool2DEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonAvgPool2DEndtoEndTestFloat16")
+{
+    AvgPool2dEndToEndFloat16<DataType::Float16>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonAvgPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    AvgPool2dEndToEnd<DataType::Float32>(neonDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+// Max Pool 2D
+TEST_CASE("NeonMaxPool2DEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonMaxPool2DEndtoEndTestFloat16")
+{
+    MaxPool2dEndToEndFloat16<DataType::Float16>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonMaxPool2DIgnoreValueEndtoEndTestFloat32")
+{
+    MaxPool2dEndToEnd<DataType::Float32>(neonDefaultBackends, PaddingMethod::IgnoreValue);
+}
+
+TEST_CASE("NeonMaxPool2DTwoLayerEndtoEndTestFloat32")
+{
+    MaxPool2dTwoLayerEndToEnd<DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonMaxPool2DThreeLayerEndtoEndTestFloat32")
+{
+    MaxPool2dThreeLayerEndToEnd<DataType::Float32>(neonDefaultBackends);
 }
 
 // Fill

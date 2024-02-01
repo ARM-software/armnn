@@ -4,21 +4,24 @@
 //
 
 #include "GpuFsaDepthwiseConvolution2d.hpp"
+#include "UtilsGpuFsa.hpp"
+
 #include <backendsCommon/WorkloadUtils.hpp>
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
-#include <arm_compute/dynamic_fusion/runtime/gpu/cl/ClWorkloadRuntime.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadContext.h>
+#include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadSketch.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuDepthwiseConv2d.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>
 
 #include <vector>
 
+using namespace arm_compute::experimental::dynamic_fusion;
+using namespace armnn::armcomputetensorutils;
+
 namespace armnn
 {
-
-using namespace armcomputetensorutils;
 
 arm_compute::Status GpuFsaDepthwiseConvolution2dValidate(const TensorInfo& input,
                                                          const DepthwiseConvolution2dDescriptor& descriptor,
@@ -71,17 +74,7 @@ arm_compute::Status GpuFsaDepthwiseConvolution2dValidate(const TensorInfo& input
         biasSketchInfoPtr = workloadContext.create_tensor_info(aclBiasInfo);
     }
 
-    // Set DepthwiseConv2d attributes using descriptor
-    const arm_compute::Size2D    aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
-                                                                         descriptor.m_DilationY);
-    const arm_compute::Padding2D aclPadInfo      = BuildArmComputePaddingInfo(descriptor);
-    const arm_compute::Size2D    aclStrideInfo   = BuildArmComputeSize2D(descriptor.m_StrideX, descriptor.m_StrideY);
-
-    DepthwiseConv2dAttributes depthwiseConv2dAttributes{};
-    depthwiseConv2dAttributes.pad(aclPadInfo);
-    depthwiseConv2dAttributes.stride(aclStrideInfo);
-    depthwiseConv2dAttributes.dilation(aclDilationInfo);
-    depthwiseConv2dAttributes.depth_multiplier(aclDepthMultiplier);
+    DepthwiseConv2dAttributes depthwiseConv2dAttributes = CreateDWConv2dAttributes(descriptor, aclDepthMultiplier);
 
     // Validate operator, check status and update reasonIfUnsupported
     arm_compute::Status aclStatus = GpuDepthwiseConv2d::validate_op(sketch,
@@ -110,7 +103,6 @@ void GpuFsaDepthwiseConvolution2dCreateOp(GpuFsaPreCompiledBlob* blob,
 * as the TensorInfos used when creating the Tensors must match those used to create the Sketch. Otherwise the runtime
 * doesn't know which Tensors to use.
 */
-    using namespace arm_compute::experimental::dynamic_fusion;
     GpuWorkloadSketch* sketch = blob->sketch.get();
     GpuWorkloadContext* workloadContext = blob->workloadContext.get();
     std::vector<arm_compute::ITensorInfo*> inputTensorInfos = {};
@@ -157,17 +149,7 @@ void GpuFsaDepthwiseConvolution2dCreateOp(GpuFsaPreCompiledBlob* blob,
         biasSketchInfoPtr = inputTensorInfos[2];
     }
 
-    // Set DepthwiseConv2d attributes using descriptor
-    const arm_compute::Size2D    aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
-                                                                         descriptor.m_DilationY);
-    const arm_compute::Padding2D aclPadInfo      = BuildArmComputePaddingInfo(descriptor);
-    const arm_compute::Size2D    aclStrideInfo   = BuildArmComputeSize2D(descriptor.m_StrideX, descriptor.m_StrideY);
-
-    DepthwiseConv2dAttributes depthwiseConv2dAttributes{};
-    depthwiseConv2dAttributes.pad(aclPadInfo);
-    depthwiseConv2dAttributes.stride(aclStrideInfo);
-    depthwiseConv2dAttributes.dilation(aclDilationInfo);
-    depthwiseConv2dAttributes.depth_multiplier(aclDepthMultiplier);
+    DepthwiseConv2dAttributes depthwiseConv2dAttributes = CreateDWConv2dAttributes(descriptor, aclDepthMultiplier);
 
     // Validate operator, check status and update reasonIfUnsupported
     arm_compute::Status aclStatus = GpuDepthwiseConv2d::validate_op(*sketch,

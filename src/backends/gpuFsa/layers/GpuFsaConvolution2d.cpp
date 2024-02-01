@@ -4,28 +4,22 @@
 //
 
 #include "GpuFsaConvolution2d.hpp"
-
-//#include <armnn/Types.hpp>
+#include "UtilsGpuFsa.hpp"
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
-//#include <arm_compute/core/ITensorInfo.h>
-//#include <arm_compute/core/TensorInfo.h>
-//#include <arm_compute/core/TensorShape.h>
-//#include <arm_compute/core/CL/CLKernelLibrary.h>
-//#include <arm_compute/core/CL/CLCompileContext.h>
-
-//#include <arm_compute/dynamic_fusion/runtime/gpu/cl/ClWorkloadRuntime.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadContext.h>
+#include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadSketch.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuConv2d.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>
 
 #include <vector>
 
+using namespace arm_compute::experimental::dynamic_fusion;
+using namespace armnn::armcomputetensorutils;
+
 namespace armnn
 {
-
-using namespace armcomputetensorutils;
 
 arm_compute::Status GpuFsaConvolution2dValidate(const TensorInfo& input,
                                                 const Convolution2dDescriptor& descriptor,
@@ -61,23 +55,14 @@ arm_compute::Status GpuFsaConvolution2dValidate(const TensorInfo& input,
         biasSketchInfoPtr = workloadContext.create_tensor_info(aclBiasInfo);
     }
 
-    // Set Conv2d attributes using descriptor
-    const arm_compute::Size2D    aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
-                                                                         descriptor.m_DilationY);
-    const arm_compute::Padding2D aclPadInfo      = BuildArmComputePaddingInfo(descriptor);
-    const arm_compute::Size2D    aclStrideInfo   = BuildArmComputeSize2D(descriptor.m_StrideX, descriptor.m_StrideY);
-
-    Conv2dAttributes conv2DAttributes{};
-    conv2DAttributes.dilation(aclDilationInfo);
-    conv2DAttributes.pad(aclPadInfo);
-    conv2DAttributes.stride(aclStrideInfo);
+    Conv2dAttributes conv2dAttributes = CreateConv2dAttributes(descriptor);
 
     // Validate operator, check status and update reasonIfUnsupported
     arm_compute::Status aclStatus = GpuConv2d::validate_op(sketch,
                                                            inputInfo,
                                                            weightInfo,
                                                            biasSketchInfoPtr,
-                                                           conv2DAttributes);
+                                                           conv2dAttributes);
 
     return aclStatus;
 }
@@ -99,7 +84,6 @@ void GpuFsaConvolution2dCreateOp(GpuFsaPreCompiledBlob* blob,
  * as the TensorInfos used when creating the Tensors must match those used to create the Sketch. Otherwise the runtime
  * doesn't know which Tensors to use.
  */
-    using namespace arm_compute::experimental::dynamic_fusion;
     GpuWorkloadSketch* sketch = blob->sketch.get();
     GpuWorkloadContext* workloadContext = blob->workloadContext.get();
     std::vector<arm_compute::ITensorInfo*> inputTensorInfos = {};
@@ -130,23 +114,14 @@ void GpuFsaConvolution2dCreateOp(GpuFsaPreCompiledBlob* blob,
         biasSketchInfoPtr = inputTensorInfos[2];
     }
 
-    // Set Conv2d attributes using descriptor
-    const arm_compute::Size2D    aclDilationInfo = BuildArmComputeSize2D(descriptor.m_DilationX,
-                                                                         descriptor.m_DilationY);
-    const arm_compute::Padding2D aclPadInfo      = BuildArmComputePaddingInfo(descriptor);
-    const arm_compute::Size2D    aclStrideInfo   = BuildArmComputeSize2D(descriptor.m_StrideX, descriptor.m_StrideY);
-
-    Conv2dAttributes conv2DAttributes{};
-    conv2DAttributes.dilation(aclDilationInfo);
-    conv2DAttributes.pad(aclPadInfo);
-    conv2DAttributes.stride(aclStrideInfo);
+    Conv2dAttributes conv2dAttributes = CreateConv2dAttributes(descriptor);
 
     // Validate operator, check status and update reasonIfUnsupported
     arm_compute::Status aclStatus = GpuConv2d::validate_op(*sketch,
                                                            inputTensorInfos[0],
                                                            inputTensorInfos[1],
                                                            biasSketchInfoPtr,
-                                                           conv2DAttributes);
+                                                           conv2dAttributes);
 
     const bool supported = (aclStatus.error_code() == arm_compute::ErrorCode::OK);
     if (!supported)
@@ -159,7 +134,7 @@ void GpuFsaConvolution2dCreateOp(GpuFsaPreCompiledBlob* blob,
                                                                  inputTensorInfos[0],
                                                                  inputTensorInfos[1],
                                                                  biasSketchInfoPtr,
-                                                                 conv2DAttributes);
+                                                                 conv2dAttributes);
 
     // Create the Output
     outputTensorInfos.emplace_back(workloadContext->create_tensor_info());

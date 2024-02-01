@@ -2,7 +2,6 @@
 // Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-
 #pragma once
 
 #include <armnn/Descriptors.hpp>
@@ -11,13 +10,11 @@
 
 namespace armnn
 {
+arm_compute::Status GpuFsaElementwiseBinarySubValidate(const TensorInfo& input0,
+                                                       const TensorInfo& input1);
 
-    using namespace arm_compute::experimental::dynamic_fusion;
+void GpuFsaElementwiseBinarySubCreateOp(GpuFsaPreCompiledBlob* blob,
+                                        const TensorInfo& input0,
+                                        const TensorInfo& input1);
 
-    arm_compute::Status GpuFsaElementwiseBinarySubValidate(const TensorInfo& input0,
-                                                           const TensorInfo& input1);
-
-    void GpuFsaElementwiseBinarySubCreateOp(GpuFsaPreCompiledBlob* blob,
-                                            const TensorInfo& input0,
-                                            const TensorInfo& input1);
-}
+} // namespace armnn

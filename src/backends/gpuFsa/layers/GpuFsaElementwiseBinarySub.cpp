@@ -7,12 +7,13 @@
 
 #include <aclCommon/ArmComputeTensorUtils.hpp>
 
-#include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuSub.h>
-#include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadContext.h>
 #include <arm_compute/dynamic_fusion/sketch/gpu/GpuWorkloadSketch.h>
+#include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuSub.h>
+#include <arm_compute/dynamic_fusion/sketch/gpu/operators/GpuOutput.h>
 
 using namespace arm_compute::experimental::dynamic_fusion;
+using namespace armnn::armcomputetensorutils;
 
 namespace armnn
 {
@@ -20,8 +21,6 @@ namespace armnn
 arm_compute::Status GpuFsaElementwiseBinarySubValidate(const TensorInfo& input0,
                                                        const TensorInfo& input1)
 {
-    using namespace armcomputetensorutils;
-
     // Create a new workload sketch, for validation purposes
     auto compileCtx         = arm_compute::CLKernelLibrary::get().get_compile_context();
     auto workloadContext    = GpuWorkloadContext(&compileCtx);
@@ -43,8 +42,6 @@ void GpuFsaElementwiseBinarySubCreateOp(GpuFsaPreCompiledBlob* blob,
                                         const TensorInfo& input0,
                                         const TensorInfo& input1)
 {
-    using namespace armcomputetensorutils;
-
     GpuWorkloadSketch* sketch           = blob->sketch.get();
     GpuWorkloadContext* workloadContext = blob->workloadContext.get();
     std::vector<arm_compute::ITensorInfo*> inputTensorInfos  = {};

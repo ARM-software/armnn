@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="2b9fa593a0a172bf36a02b5cdb840c6b9b361d7c" #Use the stable CKW API in the GPU dynamic fusion backend
+DEFAULT_CLFRAMEWORKREVISION="0c17c4b42e6b819b0140f36527dbaf6166f37b2b" #10966: Fix leftover cols in CpuGemmLowpMatrixBReductionKernel
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

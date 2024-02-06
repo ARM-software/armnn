@@ -17,6 +17,24 @@ using namespace armnn;
 TEST_SUITE("GpuFsaLayerSupport")
 {
 
+TEST_CASE("IsLayerSupportedCast")
+{
+    armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensorInfo({1, 3, 2, 3}, armnn::DataType::Float16);
+
+    BaseDescriptor desc;
+
+    GpuFsaLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Cast,
+                                                     {inputTensorInfo, outputTensorInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+    CHECK(supported);
+}
+
 TEST_CASE("IsLayerSupportedGpuFsaConv2d")
 {
     TensorInfo inputInfo ({ 1, 5, 5, 1 }, DataType::Float32);

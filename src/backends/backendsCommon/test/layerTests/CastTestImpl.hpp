@@ -1,9 +1,11 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
+
+#include <backendsCommon/test/EndToEndTestImpl.hpp>
 
 #include <armnnTestUtils/LayerTestResult.hpp>
 
@@ -82,3 +84,39 @@ LayerTestResult<uint8_t , 4> CastFloat32ToUInt82dTest(
         armnn::IWorkloadFactory& workloadFactory,
         const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
         const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template<armnn::DataType inputDataType, armnn::DataType outputDataType, typename TInput, typename TOutput>
+void CastSimpleTest(const std::vector<armnn::BackendId>& backends,
+                    const std::vector<unsigned int>& shape,
+                    const std::vector<TInput>& inputValues,
+                    const std::vector<TOutput>& outputValues,
+                    float qScale = 1.0f,
+                    int32_t qOffset = 0)
+{
+    using namespace armnn;
+
+    const TensorShape inputShape(static_cast<unsigned int>(shape.size()), shape.data());
+    const TensorShape outputShape(static_cast<unsigned int>(shape.size()), shape.data());
+
+    TensorInfo inputTensorInfo(inputShape, inputDataType, qScale, qOffset, true);
+    TensorInfo outputTensorInfo(outputShape, outputDataType, qScale, qOffset);
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+    INetworkPtr network(INetwork::Create());
+
+    IConnectableLayer* input     = network->AddInputLayer(0, "input");
+    IConnectableLayer* castLayer = network->AddCastLayer("cast");
+    IConnectableLayer* output    = network->AddOutputLayer(0, "output");
+
+    Connect(input, castLayer, inputTensorInfo, 0, 0);
+    Connect(castLayer, output, outputTensorInfo, 0, 0);
+
+    std::map<int, std::vector<TInput>> inputTensorData     = {{ 0, inputValues }};
+    std::map<int, std::vector<TOutput>> expectedOutputData = {{ 0, outputValues }};
+
+    EndToEndLayerTestImpl<inputDataType, outputDataType>(std::move(network),
+                                                         inputTensorData,
+                                                         expectedOutputData,
+                                                         backends);
+}

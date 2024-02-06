@@ -10,6 +10,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #if defined(ARMCOMPUTEGPUFSA_ENABLED)
+#include "layers/GpuFsaCast.hpp"
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
@@ -73,7 +74,20 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
     IgnoreUnused(lstmParamsInfo);
     IgnoreUnused(quantizedLstmInputParamsInfo);
 
-    switch (type) {
+    switch (type)
+    {
+        case LayerType::Cast:
+        {
+            if (infos.size() != 2)
+            {
+                throw InvalidArgumentException("Invalid number of cast TensorInfos. "
+                                               "TensorInfos should be of format: {input, output}.");
+            }
+            FORWARD_LAYER_VALIDATE_FUNC(GpuFsaCastValidate,
+                                        reasonIfUnsupported,
+                                        infos[0],
+                                        infos[1]);
+        }
         case LayerType::Convolution2d:
         {
             if (infos.size() != 4)
@@ -110,7 +124,7 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
                                                "TensorInfos should be of format: {input, output, weights, biases}.");
             }
 
-            auto desc = PolymorphicDowncast<const DepthwiseConvolution2dDescriptor *>(&descriptor);
+            auto desc = PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&descriptor);
             if (infos[3] == TensorInfo())
             {
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaDepthwiseConvolution2dValidate,
@@ -138,7 +152,7 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
                                                "TensorInfos should be of format: {input0, input1, output0}.");
             }
 
-            auto desc = PolymorphicDowncast<const ElementwiseBinaryDescriptor *>(&descriptor);
+            auto desc = PolymorphicDowncast<const ElementwiseBinaryDescriptor*>(&descriptor);
             if (desc->m_Operation == BinaryOperation::Add)
             {
                 FORWARD_LAYER_VALIDATE_FUNC(GpuFsaElementwiseBinaryAddValidate,

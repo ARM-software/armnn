@@ -20,6 +20,7 @@
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 
+#include "layers/GpuFsaCast.hpp"
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
@@ -247,6 +248,13 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
         // Configure and setup the sketch for each supported op. Their data will be wrapped into a PreCompiled layer
         switch (base.GetType())
         {
+            case (LayerType::Cast):
+            {
+                auto input  = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto output = base.GetOutputSlot(0).GetTensorInfo();
+                GpuFsaCastCreateOp(preCompiledBlobPtr, input, output);
+                break;
+            }
             case (LayerType::Convolution2d):
             {
                 auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();

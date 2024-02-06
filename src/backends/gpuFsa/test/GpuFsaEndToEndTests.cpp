@@ -6,6 +6,7 @@
 #include "backendsCommon/test/EndToEndTestImpl.hpp"
 
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/layerTests/CastTestImpl.hpp"
 
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
@@ -18,6 +19,24 @@ TEST_SUITE("GpuFsaEndToEnd")
 {
 
 std::vector<BackendId> gpuFsaDefaultBackends = {"GpuFsa"};
+
+TEST_CASE("GpuFsaCastEndtoEndTestFloat32ToFloat16")
+{
+    using namespace half_float::literal;
+
+    std::vector<unsigned int> inputShape { 2, 2, 2 };
+
+    std::vector<float> inputValues { -3.5f, -1.2f, -8.6f, -2.0f, -1.5f, -1.3f, -0.5f, -0.4f };
+
+    std::vector<armnn::Half> outputValues { -3.50_h, -1.20_h, -8.6_h, -2._h, -1.50_h, -1.30_h, -0.50_h, -0.40_h };
+
+    CastSimpleTest<DataType::Float32, DataType::Float16, float, armnn::Half>(gpuFsaDefaultBackends,
+                                                                             inputShape,
+                                                                             inputValues,
+                                                                             outputValues,
+                                                                             1.0f,
+                                                                             0);
+}
 
 // Conv2d
 TEST_CASE("GpuFsaConv2dEndtoEndTestFloat32")

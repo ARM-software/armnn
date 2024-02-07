@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_23_11" # Release 23.11
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_02" # Release 24.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="e695579911fbe6aa06b11dbeeec7af5637a92f2b" #arm_gemm: SME: Remove artificial single-thread constraint on quantized int8 kernels.
+#DEFAULT_CLFRAMEWORKREVISION="e695579911fbe6aa06b11dbeeec7af5637a92f2b" #arm_gemm: SME: Remove artificial single-thread constraint on quantized int8 kernels.
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

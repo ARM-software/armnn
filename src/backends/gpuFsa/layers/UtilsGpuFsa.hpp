@@ -9,6 +9,7 @@
 #include "arm_compute/dynamic_fusion/sketch/attributes/Conv2dAttributes.h"
 #include "arm_compute/dynamic_fusion/sketch/attributes/DepthwiseConv2dAttributes.h"
 #include "arm_compute/dynamic_fusion/sketch/attributes/Pool2dAttributes.h"
+#include "arm_compute/dynamic_fusion/sketch/attributes/ResizeAttributes.h"
 
 /// Utility function used to setup an arm_compute::Conv2dAttributes object from given descriptor
 /// @param[in] armnn::Convolution2dDescriptor
@@ -28,3 +29,9 @@ CreateDWConv2dAttributes(const armnn::DepthwiseConvolution2dDescriptor& descript
 /// @return arm_compute::experimental::dynamic_fusion::Pool2dAttributes
 arm_compute::experimental::dynamic_fusion::Pool2dAttributes
 CreatePool2dAttributes(const armnn::Pooling2dDescriptor& descriptor);
+
+/// Utility function used to setup an arm_compute::ResizeDescriptor object from given descriptor
+/// @param[in] armnn::ResizeDescriptor
+/// @return arm_compute::experimental::dynamic_fusion::ResizeAttributes
+arm_compute::experimental::dynamic_fusion::ResizeAttributes
+CreateResizeAttributes(const armnn::ResizeDescriptor& descriptor);

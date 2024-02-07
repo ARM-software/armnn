@@ -11,7 +11,7 @@
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
-
+#include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
@@ -127,6 +127,30 @@ TEST_CASE("UNSUPPORTED_GpuFsaMaxPool2DIgnoreValueEndtoEndTestFloat32")
     {
         CHECK(strcmp(e.what(), "Failed to assign a backend to each layer") == 0);
     }
+}
+
+// Resize Bilinear
+TEST_CASE("GpuFsaResizeBilinearEndToEndFloatNhwcTest")
+{
+    ResizeBilinearEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Resize NearestNeighbor
+TEST_CASE("GpuFsaResizeNearestNeighborEndToEndFloatNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("GpuFsaResizeNearestNeighborEndToEndFloatAlignCornersNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, armnn::DataLayout::NHWC, 
+                                                            true, false);
+}
+
+TEST_CASE("GpuFsaResizeNearestNeighborEndToEndFloatHalfPixelNhwcTest")
+{
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, armnn::DataLayout::NHWC, 
+                                                            false, true);
 }
 
 }

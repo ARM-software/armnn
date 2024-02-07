@@ -16,6 +16,7 @@
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
 #include "layers/GpuFsaElementwiseBinarySub.hpp"
 #include "layers/GpuFsaPooling2d.hpp"
+#include "layers/GpuFsaResize.hpp"
 #endif
 
 #include <vector>
@@ -183,6 +184,21 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             auto desc = PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor);
 
             FORWARD_LAYER_VALIDATE_FUNC(GpuFsaPooling2dValidate,
+                                        reasonIfUnsupported,
+                                        infos[0],
+                                        *desc);
+        }
+        case LayerType::Resize:
+        {
+            if (infos.size() != 2)
+            {
+                throw InvalidArgumentException("Invalid number of Resize TensorInfos. "
+                                               "TensorInfos should be of format: {input, output}.");
+            }
+
+            auto desc = PolymorphicDowncast<const ResizeDescriptor*>(&descriptor);
+
+            FORWARD_LAYER_VALIDATE_FUNC(GpuFsaResizeValidate,
                                         reasonIfUnsupported,
                                         infos[0],
                                         *desc);

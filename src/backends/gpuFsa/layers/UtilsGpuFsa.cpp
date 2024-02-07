@@ -59,3 +59,19 @@ CreatePool2dAttributes(const Pooling2dDescriptor& descriptor)
 
     return pool2dAttributes;
 }
+
+arm_compute::experimental::dynamic_fusion::ResizeAttributes
+CreateResizeAttributes(const armnn::ResizeDescriptor& descriptor)
+{
+    arm_compute::experimental::dynamic_fusion::ResizeAttributes resizeAttributes{};
+    resizeAttributes.output_width(static_cast<int32_t>(descriptor.m_TargetWidth));
+    resizeAttributes.output_height(static_cast<int32_t>(descriptor.m_TargetHeight));
+    resizeAttributes.interpolation_policy(descriptor.m_Method == ResizeMethod::Bilinear ?
+                                          arm_compute::InterpolationPolicy::BILINEAR :
+                                          arm_compute::InterpolationPolicy::NEAREST_NEIGHBOR);
+    resizeAttributes.sampling_policy(descriptor.m_HalfPixelCenters ? arm_compute::SamplingPolicy::CENTER
+                                                                   : arm_compute::SamplingPolicy::TOP_LEFT);
+    resizeAttributes.align_corners(descriptor.m_AlignCorners);
+
+    return resizeAttributes;
+}

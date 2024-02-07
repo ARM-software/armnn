@@ -16,6 +16,8 @@ list(APPEND armnnGpuFsaBackendLayers_sources
         GpuFsaElementwiseBinarySub.hpp
         GpuFsaPooling2d.cpp
         GpuFsaPooling2d.hpp
+        GpuFsaResize.cpp
+        GpuFsaResize.hpp
         UtilsGpuFsa.cpp
         UtilsGpuFsa.hpp
     )

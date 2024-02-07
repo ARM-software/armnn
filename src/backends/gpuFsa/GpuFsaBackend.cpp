@@ -26,6 +26,7 @@
 #include "layers/GpuFsaElementwiseBinaryAdd.hpp"
 #include "layers/GpuFsaElementwiseBinarySub.hpp"
 #include "layers/GpuFsaPooling2d.hpp"
+#include "layers/GpuFsaResize.hpp"
 
 namespace armnn
 {
@@ -329,6 +330,13 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
                 auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
                 auto desc = PolymorphicDowncast<const Pooling2dDescriptor*>(&base.GetParameters());
                 GpuFsaPooling2dCreateOp(preCompiledBlobPtr, input, *desc);
+                break;
+            }
+            case (LayerType::Resize):
+            {
+                auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto desc = PolymorphicDowncast<const ResizeDescriptor*>(&base.GetParameters());
+                GpuFsaResizeCreateOp(preCompiledBlobPtr, input, *desc);
                 break;
             }
             default:

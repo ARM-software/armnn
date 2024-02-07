@@ -149,4 +149,26 @@ TEST_CASE("IsLayerSupportedGpuFsaPooling2d")
     CHECK(supported);
 }
 
+TEST_CASE("IsLayerSupportedGpuFsaResize")
+{
+    TensorInfo inputInfo({ 1, 5, 5, 1 }, DataType::Float32);
+    TensorInfo outputInfo({ 1, 10, 10, 1 }, DataType::Float32);
+
+    ResizeDescriptor desc{};
+    desc.m_Method = ResizeMethod::NearestNeighbor;
+    desc.m_TargetHeight = 10;
+    desc.m_TargetWidth = 10;
+    desc.m_DataLayout = DataLayout::NHWC;
+
+    GpuFsaLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Resize,
+                                                     {inputInfo, outputInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+    CHECK(supported);
+}
+
 }

@@ -38,6 +38,7 @@
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReverseV2EndToEndTestImpl.hpp>
 #include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
+#include <backendsCommon/test/SoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
@@ -1240,6 +1241,12 @@ TEST_CASE("RefTanHEndToEndTestQSymmS16")
 TEST_CASE("RefLogSoftmaxEndToEndTest")
 {
     LogSoftmaxEndToEndTest(defaultBackends);
+}
+
+// Softmax
+TEST_CASE("RefSoftmaxEndToEndTestFloat32")
+{
+    SoftmaxEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
 
 // Prelu

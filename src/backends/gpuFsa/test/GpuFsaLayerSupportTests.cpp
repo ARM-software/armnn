@@ -181,4 +181,25 @@ TEST_CASE("IsLayerSupportedGpuFsaResize")
     CHECK(supported);
 }
 
+TEST_CASE("UNSUPPORTED_IsLayerSupportedGpuFsaSoftmax")
+{
+    TensorInfo inputInfo({ 2, 2 }, DataType::Float32);
+    TensorInfo outputInfo({ 2, 2 }, DataType::Float32);
+
+    SoftmaxDescriptor desc;
+    desc.m_Axis = 1;
+    desc.m_Beta = 1.0f;
+
+    GpuFsaLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Softmax,
+                                                     {inputInfo, outputInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+}
+
 }

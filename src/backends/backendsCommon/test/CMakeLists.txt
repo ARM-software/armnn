@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -57,6 +57,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp
     SliceEndToEndTestImpl.hpp
+    SoftmaxEndToEndTestImpl.hpp
     SpaceToDepthEndToEndTestImpl.cpp
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp

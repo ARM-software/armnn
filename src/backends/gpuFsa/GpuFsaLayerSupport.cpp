@@ -17,6 +17,7 @@
 #include "layers/GpuFsaElementwiseBinary.hpp"
 #include "layers/GpuFsaPooling2d.hpp"
 #include "layers/GpuFsaResize.hpp"
+#include "layers/GpuFsaSoftmax.hpp"
 #endif
 
 #include <vector>
@@ -204,6 +205,21 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             FORWARD_LAYER_VALIDATE_FUNC(GpuFsaResizeValidate,
                                         reasonIfUnsupported,
                                         infos[0],
+                                        *desc);
+        }
+        case LayerType::Softmax:
+        {
+            if (infos.size() != 2)
+            {
+                throw InvalidArgumentException("Invalid number of Softmax TensorInfos. "
+                                               "TensorInfos should be of format: {input, output}.");
+            }
+
+            auto desc = PolymorphicDowncast<const SoftmaxDescriptor*>(&descriptor);
+            FORWARD_LAYER_VALIDATE_FUNC(GpuFsaSoftmaxValidate,
+                                        reasonIfUnsupported,
+                                        infos[0],
+                                        infos[1],
                                         *desc);
         }
         case LayerType::Constant:

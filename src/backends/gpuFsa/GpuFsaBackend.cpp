@@ -27,6 +27,7 @@
 #include "layers/GpuFsaElementwiseBinary.hpp"
 #include "layers/GpuFsaPooling2d.hpp"
 #include "layers/GpuFsaResize.hpp"
+#include "layers/GpuFsaSoftmax.hpp"
 
 namespace armnn
 {
@@ -334,6 +335,18 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
                 auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
                 auto desc = PolymorphicDowncast<const ResizeDescriptor*>(&base.GetParameters());
                 GpuFsaResizeCreateOp(preCompiledBlobPtr, input, *desc);
+                break;
+            }
+            case (LayerType::Softmax):
+            {
+                auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto output = base.GetOutputSlot(0).GetTensorInfo();
+
+                auto desc = PolymorphicDowncast<const SoftmaxDescriptor*>(&base.GetParameters());
+                GpuFsaSoftmaxCreateOp(preCompiledBlobPtr,
+                                      input,
+                                      output,
+                                      *desc);
                 break;
             }
             default:

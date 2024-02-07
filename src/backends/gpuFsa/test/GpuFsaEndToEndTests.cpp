@@ -12,6 +12,7 @@
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
+#include "backendsCommon/test/SoftmaxEndToEndTestImpl.hpp"
 
 #include <doctest/doctest.h>
 
@@ -167,8 +168,21 @@ TEST_CASE("GpuFsaResizeNearestNeighborEndToEndFloatAlignCornersNhwcTest")
 
 TEST_CASE("GpuFsaResizeNearestNeighborEndToEndFloatHalfPixelNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, armnn::DataLayout::NHWC, 
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, armnn::DataLayout::NHWC,
                                                             false, true);
+}
+
+TEST_CASE("UNSUPPORTED_GpuFsaSoftmaxTestFloat32")
+{
+    try
+    {
+        SoftmaxEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends);
+        FAIL("An exception should have been thrown");
+    }
+    catch (const armnn::InvalidArgumentException& e)
+    {
+        CHECK(strcmp(e.what(), "Failed to assign a backend to each layer") == 0);
+    }
 }
 
 }

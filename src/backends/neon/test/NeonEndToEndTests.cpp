@@ -161,6 +161,32 @@ TEST_CASE("NeonAdditionEndToEndFloat16Simple3DTest")
     ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, BinaryOperation::Add);
 }
 
+// Div
+TEST_CASE("NeonDivEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Div);
+}
+
+// Mul
+TEST_CASE("NeonMulEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Mul);
+}
+TEST_CASE("NeonMulEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, BinaryOperation::Mul);
+}
+
+// Sub
+TEST_CASE("NeonSubtractionEndToEndFloat32Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Sub);
+}
+TEST_CASE("NeonSubtractionEndToEndFloat16Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, BinaryOperation::Sub);
+}
+
 // Power
 TEST_CASE("NeonPowerEndToEndTestFloat32")
 {
@@ -176,15 +202,6 @@ TEST_CASE("NeonSquaredDifferenceEndToEndTestFloat32")
 TEST_CASE("NeonSquaredDifferenceEndToEndTestUint8")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends, BinaryOperation::SqDiff);
-}
-
-TEST_CASE("NeonSubtractionEndToEndFloat32Simple3DTest")
-{
-    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, BinaryOperation::Sub);
-}
-TEST_CASE("NeonSubtractionEndToEndFloat16Simple3DTest")
-{
-    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(neonDefaultBackends, BinaryOperation::Sub);
 }
 
 // Batch Mat Mul
@@ -281,37 +298,56 @@ TEST_CASE("DequantizeEndToEndOffsetTest")
     DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
-TEST_CASE("NeonEluEndToEndTestFloat32")
+// Activations
+// Linear
+TEST_CASE("NeonLinearEndToEndTestFloat32")
 {
-    EluEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends);
+    ActivationEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends, ActivationFunction::Linear);
 }
 
-TEST_CASE("NeonEluEndToEndTestFloat16")
+// Sigmoid
+TEST_CASE("NeonSigmoidEndToEndTestFloat32")
 {
-    EluEndToEndTest<armnn::DataType::Float16>(neonDefaultBackends);
+    ActivationEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends, ActivationFunction::Sigmoid);
+}
+
+// ReLu
+TEST_CASE("NeonReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends, ActivationFunction::ReLu);
+}
+
+// BoundedReLu
+TEST_CASE("NeonBoundedReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends, ActivationFunction::BoundedReLu);
+}
+
+// LeakyRelu
+TEST_CASE("NeonLeakyReluActivationFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(neonDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0,  0.01f);
+}
+
+// Elu
+TEST_CASE("NeonEluEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(neonDefaultBackends, ActivationFunction::Elu);
 }
 
 // HardSwish
 TEST_CASE("NeonHardSwishEndToEndTestFloat32")
 {
-    HardSwishEndToEndTest<armnn::DataType::Float32>(neonDefaultBackends);
+    ActivationEndToEndTest<DataType::Float32>(neonDefaultBackends, ActivationFunction::HardSwish);
 }
 
-TEST_CASE("NeonHardSwishEndToEndTestFloat16")
+// TanH
+TEST_CASE("NeonTanHEndToEndTestFloat32")
 {
-    HardSwishEndToEndTest<armnn::DataType::Float16>(neonDefaultBackends);
+    ActivationEndToEndTest<DataType::Float32>(neonDefaultBackends, ActivationFunction::TanH, 1.f, 0, 2, 3);
 }
 
-TEST_CASE("NeonHardSwishEndToEndTestQAsymmS8")
-{
-    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(neonDefaultBackends);
-}
-
-TEST_CASE("NeonHardSwishEndToEndTestQAsymmU8")
-{
-    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(neonDefaultBackends);
-}
-
+// Prelu
 TEST_CASE("NeonPreluEndToEndFloat32Test")
 {
     PreluEndToEndNegativeTest<armnn::DataType::Float32>(neonDefaultBackends);
@@ -322,6 +358,7 @@ TEST_CASE("NeonPreluEndToEndTestUint8Test")
     PreluEndToEndPositiveTest<armnn::DataType::QAsymmU8>(neonDefaultBackends);
 }
 
+// SpaceToDepth
 TEST_CASE("NeonSpaceToDepthNhwcEndToEndTest1")
 {
     SpaceToDepthNhwcEndToEndTest1(neonDefaultBackends);
@@ -342,6 +379,7 @@ TEST_CASE("NeonSpaceToDepthNchwEndToEndTest2")
     SpaceToDepthNchwEndToEndTest2(neonDefaultBackends);
 }
 
+// Split
 TEST_CASE("NeonSplitter1dEndToEndTest")
 {
     Splitter1dEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);

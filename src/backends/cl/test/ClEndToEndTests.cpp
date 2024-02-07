@@ -39,18 +39,106 @@ TEST_SUITE("ClEndToEnd")
 {
 std::vector<armnn::BackendId> clDefaultBackends = {armnn::Compute::GpuAcc};
 
+// Activations
+// Linear
+TEST_CASE("ClLinearEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(clDefaultBackends, ActivationFunction::Linear);
+}
+
+TEST_CASE("ClLinearEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(clDefaultBackends, ActivationFunction::Linear);
+}
+
+// Sigmoid
+TEST_CASE("ClSigmoidEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(clDefaultBackends, ActivationFunction::Sigmoid);
+}
+
+// ReLu
+TEST_CASE("ClReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(clDefaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("ClReLuEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(clDefaultBackends, ActivationFunction::ReLu);
+}
+
+// BoundedReLu
+TEST_CASE("ClBoundedReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(clDefaultBackends, ActivationFunction::BoundedReLu);
+}
+
+TEST_CASE("ClBoundedReLuEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(clDefaultBackends, ActivationFunction::BoundedReLu);
+}
+
+// SoftReLu
+TEST_CASE("ClSoftReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(clDefaultBackends, ActivationFunction::SoftReLu);
+}
+
+// LeakyRelu
+TEST_CASE("ClLeakyReluActivationFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(clDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
+}
+
+TEST_CASE("ClLeakyReluActivationFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(clDefaultBackends, ActivationFunction::LeakyReLu, 0.3f, 5, 0.01f);
+}
+
+// Elu
+TEST_CASE("ClEluEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(clDefaultBackends, ActivationFunction::Elu);
+}
+
+TEST_CASE("ClEluEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(clDefaultBackends, ActivationFunction::Elu);
+}
+
+// HardSwish
+TEST_CASE("ClHardSwishEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(clDefaultBackends, ActivationFunction::HardSwish);
+}
+
+TEST_CASE("ClHardSwishEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(clDefaultBackends, ActivationFunction::HardSwish);
+}
+
+// TanH
+TEST_CASE("ClTanHEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(clDefaultBackends, ActivationFunction::TanH, 1.f, 0, 2, 3);
+}
+
+TEST_CASE("ClTanHEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(clDefaultBackends, ActivationFunction::TanH, 1.f, 0, 2, 3);
+}
+
 // ElementwiseUnary
 // Abs
 TEST_CASE("ClAbsEndToEndTestFloat32")
 {
-    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends,
-                                                             UnaryOperation::Abs);
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, UnaryOperation::Abs);
 }
 // Rsqrt
 TEST_CASE("ClRsqrtEndToEndTestFloat32")
 {
-    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends,
-                                                             UnaryOperation::Rsqrt);
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, UnaryOperation::Rsqrt);
 }
 
 // ElementwiseBinary
@@ -59,7 +147,6 @@ TEST_CASE("ClAdditionEndToEndFloat32Test")
 {
     AdditionEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
 }
-
 TEST_CASE("ClAdditionEndToEndUint8Test")
 {
     AdditionEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends);
@@ -74,6 +161,52 @@ TEST_CASE("ClAdditionEndToEndFloat16Simple3DTest")
     ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(clDefaultBackends, BinaryOperation::Add);
 }
 
+// Div
+TEST_CASE("ClDivEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Div);
+}
+
+// Mul
+TEST_CASE("ClMulEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Mul);
+}
+TEST_CASE("ClMulEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends, BinaryOperation::Mul);
+}
+
+// Sub
+TEST_CASE("ClSubtractionEndToEndFloat32Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Sub);
+}
+TEST_CASE("ClSubtractionEndToEndFloat16Simple3DTest")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(clDefaultBackends, BinaryOperation::Sub);
+}
+
+// Max
+TEST_CASE("ClMaximumEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Maximum);
+}
+TEST_CASE("ClMaximumEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends, BinaryOperation::Maximum);
+}
+
+// Min
+TEST_CASE("ClMinimumEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Minimum);
+}
+TEST_CASE("ClMinimumEndToEndTestUint8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends, BinaryOperation::Minimum);
+}
+
 // Power
 TEST_CASE("ClPowerEndToEndTestFloat32")
 {
@@ -85,19 +218,9 @@ TEST_CASE("ClSquaredDifferenceEndToEndTestFloat32")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::SqDiff);
 }
-
 TEST_CASE("ClSquaredDifferenceEndToEndTestUint8")
 {
     ElementwiseBinarySimpleEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends, BinaryOperation::SqDiff);
-}
-
-TEST_CASE("ClSubtractionEndToEndFloat32Simple3DTest")
-{
-    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(clDefaultBackends, BinaryOperation::Sub);
-}
-TEST_CASE("ClSubtractionEndToEndFloat16Simple3DTest")
-{
-    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(clDefaultBackends, BinaryOperation::Sub);
 }
 
 // Batch Mat Mul
@@ -220,16 +343,6 @@ TEST_CASE("ClStridedSliceInvalidSliceEndToEndTest")
     StridedSliceInvalidSliceEndToEndTest(clDefaultBackends);
 }
 
-TEST_CASE("ClEluEndToEndTestFloat32")
-{
-    EluEndToEndTest<armnn::DataType::Float32>(clDefaultBackends);
-}
-
-TEST_CASE("ClEluEndToEndTestFloat16")
-{
-    EluEndToEndTest<armnn::DataType::Float16>(clDefaultBackends);
-}
-
 TEST_CASE("ClGreaterSimpleEndToEndTest")
 {
     const std::vector<uint8_t> expectedOutput({ 0, 0, 0, 0,  1, 1, 1, 1,
@@ -268,32 +381,6 @@ TEST_CASE("ClGreaterBroadcastEndToEndUint8Test")
     ComparisonBroadcastEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends,
                                                            ComparisonOperation::Greater,
                                                            expectedOutput);
-}
-
-// HardSwish
-TEST_CASE("ClHardSwishEndToEndTestFloat32")
-{
-    HardSwishEndToEndTest<armnn::DataType::Float32>(clDefaultBackends);
-}
-
-TEST_CASE("ClHardSwishEndToEndTestFloat16")
-{
-    HardSwishEndToEndTest<armnn::DataType::Float16>(clDefaultBackends);
-}
-
-TEST_CASE("ClHardSwishEndToEndTestQAsymmS8")
-{
-    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(clDefaultBackends);
-}
-
-TEST_CASE("ClHardSwishEndToEndTestQAsymmU8")
-{
-    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(clDefaultBackends);
-}
-
-TEST_CASE("ClHardSwishEndToEndTestQSymmS16")
-{
-    HardSwishEndToEndTest<armnn::DataType::QSymmS16>(clDefaultBackends);
 }
 
 // InstanceNormalization
@@ -366,7 +453,7 @@ TEST_CASE("ClFillEndToEndTest")
     FillEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
 }
 
-TEST_CASE("RefFillEndToEndTestFloat16")
+TEST_CASE("ClFillEndToEndTestFloat16")
 {
     FillEndToEnd<armnn::DataType::Float16>(clDefaultBackends);
 }

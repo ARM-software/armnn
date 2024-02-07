@@ -197,14 +197,15 @@ static std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
 
 TEST_CASE("GetTosaMapping_ActivationFloat32")
 {
-    LeakyReluEndToEndTest<DataType::Float32>(tosaDefaultBackends);
+    ActivationEndToEndTest<DataType::Float32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
 }
 
-TEST_CASE("GetTosaMapping_ActivationFloat16")
+TEST_CASE("UNSUPPORTED_GetTosaMapping_ActivationFloat16")
 {
     try
     {
-        LeakyReluEndToEndTest<DataType::Float16>(tosaDefaultBackends);
+        ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
+        FAIL("An exception should have been thrown");
     }
     catch (armnn::Exception& e)
     {
@@ -214,24 +215,25 @@ TEST_CASE("GetTosaMapping_ActivationFloat16")
 
 TEST_CASE("GetTosaMapping_ActivationInt32")
 {
-    LeakyReluEndToEndTest<DataType::Signed32>(tosaDefaultBackends, 0.15f, 0);
+    ActivationEndToEndTest<DataType::Signed32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
 }
 
 TEST_CASE("GetTosaMapping_ActivationInt16")
 {
-    LeakyReluEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, 0.35f, 0);
+    ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.35f, 0, 0.01f);
 }
 
 TEST_CASE("GetTosaMapping_ActivationInt8")
 {
-    LeakyReluEndToEndTest<DataType::QSymmS8>(tosaDefaultBackends, 0.75f, 0);
+    ActivationEndToEndTest<DataType::QSymmS8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.75f, 0, 0.01f);
 }
 
-TEST_CASE("GetTosaMapping_ActivationUInt8")
+TEST_CASE("UNSUPPORTED_GetTosaMapping_ActivationUInt8")
 {
     try
     {
-        LeakyReluEndToEndTest<DataType::QAsymmU8>(tosaDefaultBackends);
+        ActivationEndToEndTest<DataType::QAsymmU8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
+        FAIL("An exception should have been thrown");
     }
     catch (armnn::Exception& e)
     {

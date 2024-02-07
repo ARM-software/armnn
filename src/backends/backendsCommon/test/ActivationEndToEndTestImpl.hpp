@@ -57,12 +57,12 @@ armnn::INetworkPtr CreateActivationNetwork(const armnn::TensorInfo& inputInfo,
 
     INetworkPtr net(INetwork::Create());
 
-    IConnectableLayer* input = net->AddInputLayer(0, "input");
-    IConnectableLayer* prelu = net->AddActivationLayer(descriptor, ActivationName);
-    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+    IConnectableLayer* inputLayer = net->AddInputLayer(0, "input");
+    IConnectableLayer* activationLayer = net->AddActivationLayer(descriptor, ActivationName);
+    IConnectableLayer* outputLayer = net->AddOutputLayer(0, "output");
 
-    Connect(input, prelu, inputInfo, 0, 0);
-    Connect(prelu, output, outputInfo, 0, 0);
+    Connect(inputLayer, activationLayer, inputInfo, 0, 0);
+    Connect(activationLayer, outputLayer, outputInfo, 0, 0);
 
     return net;
 }
@@ -113,82 +113,168 @@ void ActivationEndToEndImpl(const std::vector<armnn::BackendId>& backends,
                                                 tolerance);
 }
 
-/** Executes an end to end test for Elu activation with specific input and expected-output data
- *
- * @tparam ArmnnType  The armnn data type for the input and expected-output data
- * @param backends  The backends on which to run the test
- */
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-void EluEndToEndTest(const std::vector<BackendId>& backends)
+std::vector<float> Activation(const std::vector<float>& input,
+                              const ActivationDescriptor& descriptor)
 {
-    std::vector<float> floatInputData{ -2.0f, -1.0f, -0.0f, 0.0f,
-                                        1.0f,  2.0f,  3.0f, 4.0f };
+    float a = descriptor.m_A;
+    float b = descriptor.m_B;
 
-    std::vector<float> floatExpectedOutputData{ -0.86466471676f,  -0.63212055882f,  -0.0f, 0.0f,
-                                                 1.0f          ,   2.0f          ,   3.0f, 4.0f };
+    std::vector<float> output;
+    output.reserve(input.size());
 
-    float qScale = 1.0f;
-    int32_t qOffset = 0;
-    armnn::TensorInfo inputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset, true);
-    armnn::TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
-
-    armnn::ActivationDescriptor descriptor(ActivationFunction::Elu, 1.0);
-
-    ActivationEndToEndImpl<ArmnnType>(backends,
-                                      floatInputData,
-                                      floatExpectedOutputData,
-                                      inputInfo,
-                                      outputInfo,
-                                      descriptor);
+    // Compute the result of the activation function.
+    switch (descriptor.m_Function)
+    {
+        case ActivationFunction::Linear:
+        {
+            for (auto in :input)
+            {
+                auto out = a * in + b;
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::Sigmoid:
+        {
+            for (auto in :input)
+            {
+                auto out = 1.f / (1.f + expf(-in));
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::ReLu:
+        {
+            for (auto in :input)
+            {
+                auto out = std::max(0.f, in);
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::BoundedReLu:
+        {
+            for (auto in :input)
+            {
+                auto out = std::min(a, std::max(b, in));
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::SoftReLu:
+        {
+            for (auto in :input)
+            {
+                auto out = logf(1.0f + expf(in));
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::LeakyReLu:
+        {
+            for (auto in :input)
+            {
+                auto out = in > 0.0f ? in : (in * a);
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::Abs:
+        {
+            for (auto in :input)
+            {
+                auto out = in < 0 ? -in : in;
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::Sqrt:
+        {
+            for (auto in :input)
+            {
+                auto out = sqrtf(in);
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::Square:
+        {
+            for (auto in :input)
+            {
+                auto out = in * in;
+                output.push_back(out);
+            }
+            break;
+       }
+        case ActivationFunction::TanH:
+        {
+            for (auto in :input)
+            {
+                auto out = a * tanhf(b * in);
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::Elu:
+        {
+            for (auto in: input) {
+                auto out = (in >= 0) ? in : a * (expf(in) - 1);
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::HardSwish:
+        {
+            for (auto in :input)
+            {
+                // hard_swish(x) = x * relu6(x+3) / 6
+                // relu6(x) = min(max(x,0),6)
+                auto out = in * (std::min(std::max((in + 3), 0.0f), 6.0f)) / 6;
+                output.push_back(out);
+            }
+            break;
+        }
+        case ActivationFunction::Gelu:
+        {
+            for (auto in :input)
+            {
+                // gelu(x) = x * 1/2 * (1 + erf(x / sqrt(2))),
+                // where erf is Gaussian error function
+                auto out = in * (0.5f * (1.0f + erff(static_cast<float>(in / std::sqrt(2)))));
+                output.push_back(out);
+            }
+            break;
+        }
+        default:
+        {
+            throw InvalidArgumentException("Unsupported activation function");
+        }
+    }
+    return output;
 }
 
-/** Executes an end to end test for HardSwish activation with specific input and expected-output data
+/** Executes an end to end test for activation layers with specific input and expected-output data
  *
  * @tparam ArmnnType  The armnn data type for the input and expected-output data
  * @param backends  The backends on which to run the test
  */
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
-void HardSwishEndToEndTest(const std::vector<BackendId>& backends)
+void ActivationEndToEndTest(const std::vector<BackendId>& backends,
+                            const ActivationFunction activationFunction,
+                            const float qScale=1.0f,
+                            const int32_t qOffset=0,
+                            const float a = 1,
+                            const float b = 0)
 {
-    std::vector<float> floatInputData{ -2.0f, -1.0f, -0.5f, 0.0f,
+    std::vector<float> floatInputData{ -2.0f, -1.0f, -0.0f, 0.0f,
                                        1.0f,  2.0f,  3.0f, 4.0f };
 
-    std::vector<float> floatExpectedOutputData{ -0.33333333333f,  -0.33333333333f, -0.208333f, 0.0f,
-                                                 0.66666666667f,   1.66666666667f,  3.0f     , 4.0f };
+    ActivationDescriptor descriptor(activationFunction, a, b);
 
-    float qScale = 1.0f;
-    int32_t qOffset = 0;
-    armnn::TensorInfo inputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset, true);
-    armnn::TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
-
-    armnn::ActivationDescriptor descriptor(ActivationFunction::HardSwish, 1.0);
-
-    ActivationEndToEndImpl<ArmnnType>(backends,
-                                      floatInputData,
-                                      floatExpectedOutputData,
-                                      inputInfo,
-                                      outputInfo,
-                                      descriptor);
-}
-
-/** Executes an end to end test for Leaky Relu activation with specific input and expected-output data
- *
- * @tparam ArmnnType  The armnn data type for the input and expected-output data
- * @param backends  The backends on which to run the test
- */
-template<armnn::DataType ArmnnType>
-void LeakyReluEndToEndTest(const std::vector<BackendId>& backends, const float qScale=1.0f, const int32_t qOffset=0)
-{
-    std::vector<float> floatInputData{ -2.0f, -1.0f, -0.0f, 0.0f,
-                                        1.0f,  2.0f,  3.0f, 4.0f };
-
-    std::vector<float> floatExpectedOutputData{ -0.02f, -0.01f, -0.0f, 0.0f,
-                                                 1.0f,   2.0f,   3.0f, 4.0f };
+    std::vector<float> floatExpectedOutputData = Activation(floatInputData, descriptor);
 
     armnn::TensorInfo inputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset, true);
     armnn::TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset);
-
-    armnn::ActivationDescriptor descriptor(ActivationFunction::LeakyReLu, static_cast<float>(0.01));
 
     ActivationEndToEndImpl<ArmnnType>(backends,
                                       floatInputData,

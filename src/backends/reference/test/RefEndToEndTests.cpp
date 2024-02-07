@@ -660,31 +660,6 @@ TEST_CASE("RefDepthwiseConvolution2dEndtoEndFloat32Test")
                                                                                        armnn::DataLayout::NHWC);
 }
 
-TEST_CASE("RefEluEndToEndTestFloat32")
-{
-    EluEndToEndTest<armnn::DataType::Float32>(defaultBackends);
-}
-
-TEST_CASE("RefEluEndToEndTestFloat16")
-{
-    EluEndToEndTest<armnn::DataType::Float16>(defaultBackends);
-}
-
-TEST_CASE("RefEluEndToEndTestQAsymmS8")
-{
-    EluEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
-}
-
-TEST_CASE("RefEluEndToEndTestQAsymmU8")
-{
-    EluEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
-}
-
-TEST_CASE("RefEluEndToEndTestQSymmS16")
-{
-    EluEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
-}
-
 TEST_CASE("RefFillEndToEndTest")
 {
     FillEndToEnd<armnn::DataType::Float32>(defaultBackends);
@@ -1026,56 +1001,239 @@ TEST_CASE("RefDetectionPostProcessFastNmsUint8Test")
                                                                           1.0f, 1, 0.01f, 0, 0.5f, 0);
 }
 
-// HardSwish
-TEST_CASE("RefHardSwishEndToEndTestFloat32")
+// Activations
+// Linear
+TEST_CASE("RefLinearEndToEndTestFloat32")
 {
-    HardSwishEndToEndTest<armnn::DataType::Float32>(defaultBackends);
+    ActivationEndToEndTest<armnn::DataType::Float32>(defaultBackends, ActivationFunction::Linear);
 }
 
-TEST_CASE("RefHardSwishEndToEndTestFloat16")
+TEST_CASE("RefLinearEndToEndTestFloat16")
 {
-    HardSwishEndToEndTest<armnn::DataType::Float16>(defaultBackends);
+    ActivationEndToEndTest<armnn::DataType::Float16>(defaultBackends, ActivationFunction::Linear);
 }
 
-TEST_CASE("RefHardSwishEndToEndTestQAsymmS8")
+TEST_CASE("RefLinearEndToEndTestQAsymmS8")
 {
-    HardSwishEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends, ActivationFunction::Linear);
 }
 
-TEST_CASE("RefHardSwishEndToEndTestQAsymmU8")
+TEST_CASE("RefLinearEndToEndTestQAsymmU8")
 {
-    HardSwishEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+    ActivationEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends, ActivationFunction::Linear);
 }
 
-TEST_CASE("RefHardSwishEndToEndTestQSymmS16")
+TEST_CASE("RefLinearEndToEndTestQSymmS16")
 {
-    HardSwishEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends, ActivationFunction::Linear);
+}
+
+// Sigmoid
+TEST_CASE("RefSigmoidEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(defaultBackends, ActivationFunction::Sigmoid);
+}
+
+TEST_CASE("RefSigmoidEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(defaultBackends, ActivationFunction::Sigmoid);
+}
+
+TEST_CASE("RefSigmoidEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends, ActivationFunction::Sigmoid);
+}
+
+TEST_CASE("RefSigmoidEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends, ActivationFunction::Sigmoid, 0.12f, 15);
+}
+
+TEST_CASE("RefSigmoidEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends, ActivationFunction::Sigmoid);
+}
+
+// ReLu
+TEST_CASE("RefReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(defaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("RefReLuEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(defaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("RefReLuEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("RefReLuEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("RefReLuEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends, ActivationFunction::ReLu);
+}
+
+// BoundedReLu
+TEST_CASE("RefBoundedReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(defaultBackends, ActivationFunction::BoundedReLu);
+}
+
+TEST_CASE("RefBoundedReLuEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(defaultBackends, ActivationFunction::BoundedReLu);
+}
+
+TEST_CASE("RefBoundedReLuEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends, ActivationFunction::BoundedReLu);
+}
+
+TEST_CASE("RefBoundedReLuEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends, ActivationFunction::BoundedReLu);
+}
+
+TEST_CASE("RefBoundedReLuEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends, ActivationFunction::BoundedReLu);
+}
+
+// SoftReLu
+TEST_CASE("RefSoftReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(defaultBackends, ActivationFunction::SoftReLu);
+}
+
+TEST_CASE("RefSoftReLuEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(defaultBackends, ActivationFunction::SoftReLu);
+}
+
+TEST_CASE("RefSoftReLuEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends, ActivationFunction::SoftReLu);
+}
+
+TEST_CASE("RefSoftReLuEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends, ActivationFunction::SoftReLu, 0.12f, 15);
+}
+
+TEST_CASE("RefSoftReLuEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends, ActivationFunction::SoftReLu);
 }
 
 // LeakyRelu
 TEST_CASE("RefLeakyReluActivationFloat32")
 {
-    LeakyReluEndToEndTest<DataType::Float32>(defaultBackends);
+    ActivationEndToEndTest<DataType::Float32>(defaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
 }
 
 TEST_CASE("RefLeakyReluActivationFloat16")
 {
-    LeakyReluEndToEndTest<DataType::Float16>(defaultBackends, 0.3f, 5);
+    ActivationEndToEndTest<DataType::Float16>(defaultBackends, ActivationFunction::LeakyReLu, 0.3f, 5, 0.01f);
 }
 
 TEST_CASE("RefLeakyReluActivationInt8")
 {
-    LeakyReluEndToEndTest<DataType::QAsymmS8>(defaultBackends, 0.6f, 7);
+    ActivationEndToEndTest<DataType::QAsymmS8>(defaultBackends, ActivationFunction::LeakyReLu, 0.6f, 7, 0.01f);
 }
 
 TEST_CASE("RefLeakyReluActivationUInt8")
 {
-    LeakyReluEndToEndTest<DataType::QAsymmU8>(defaultBackends, 0.12f, 15);
+    ActivationEndToEndTest<DataType::QAsymmU8>(defaultBackends, ActivationFunction::LeakyReLu, 0.12f, 15, 0.01f);
 }
 
 TEST_CASE("RefLeakyReluActivationInt16")
 {
-    LeakyReluEndToEndTest<DataType::QSymmS16>(defaultBackends, 0.15f, 55);
+    ActivationEndToEndTest<DataType::QSymmS16>(defaultBackends, ActivationFunction::LeakyReLu, 0.15f, 55, 0.01f);
+}
+
+// Elu
+TEST_CASE("RefEluEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(defaultBackends, ActivationFunction::Elu);
+}
+
+TEST_CASE("RefEluEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(defaultBackends, ActivationFunction::Elu);
+}
+
+TEST_CASE("RefEluEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<DataType::QAsymmS8>(defaultBackends, ActivationFunction::Elu);
+}
+
+TEST_CASE("RefEluEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<DataType::QAsymmU8>(defaultBackends, ActivationFunction::Elu);
+}
+
+TEST_CASE("RefEluEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<DataType::QSymmS16>(defaultBackends, ActivationFunction::Elu);
+}
+
+// HardSwish
+TEST_CASE("RefHardSwishEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(defaultBackends, ActivationFunction::HardSwish);
+}
+
+TEST_CASE("RefHardSwishEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(defaultBackends, ActivationFunction::HardSwish);
+}
+
+TEST_CASE("RefHardSwishEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<DataType::QAsymmS8>(defaultBackends, ActivationFunction::HardSwish);
+}
+
+TEST_CASE("RefHardSwishEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<DataType::QAsymmU8>(defaultBackends, ActivationFunction::HardSwish);
+}
+
+TEST_CASE("RefHardSwishEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<DataType::QSymmS16>(defaultBackends, ActivationFunction::HardSwish);
+}
+
+// TanH
+TEST_CASE("RefTanHEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(defaultBackends, ActivationFunction::TanH, 1.f, 0, 2, 3);
+}
+
+TEST_CASE("RefTanHEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(defaultBackends, ActivationFunction::TanH, 1.f, 0, 2, 3);
+}
+
+TEST_CASE("RefTanHEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<DataType::QAsymmS8>(defaultBackends, ActivationFunction::TanH, 1.f, 0, 3, 2);
+}
+
+TEST_CASE("RefTanHEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<DataType::QAsymmU8>(defaultBackends, ActivationFunction::TanH, 1.f, 0, 3, 2);
+}
+
+TEST_CASE("RefTanHEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<DataType::QSymmS16>(defaultBackends, ActivationFunction::TanH, 1.f, 0, 3, 2);
 }
 
 // LogSoftmax
@@ -1084,6 +1242,7 @@ TEST_CASE("RefLogSoftmaxEndToEndTest")
     LogSoftmaxEndToEndTest(defaultBackends);
 }
 
+// Prelu
 TEST_CASE("RefPreluEndToEndTestFloat32")
 {
     PreluEndToEndNegativeTest<armnn::DataType::Float32>(defaultBackends);

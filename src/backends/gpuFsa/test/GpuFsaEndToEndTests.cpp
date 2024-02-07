@@ -5,6 +5,7 @@
 
 #include "backendsCommon/test/EndToEndTestImpl.hpp"
 
+#include "backendsCommon/test/ActivationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/layerTests/CastTestImpl.hpp"
@@ -20,6 +21,18 @@ TEST_SUITE("GpuFsaEndToEnd")
 {
 
 std::vector<BackendId> gpuFsaDefaultBackends = {"GpuFsa"};
+
+// Activation
+// TanH
+TEST_CASE("GpuFsaTanHEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(gpuFsaDefaultBackends, ActivationFunction::TanH, 1.f, 0, 1.f, 1.f);
+}
+// Sigmoid
+TEST_CASE("GpuFsaSigmoidEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(gpuFsaDefaultBackends, ActivationFunction::Sigmoid);
+}
 
 // BatchMatMul
 TEST_CASE("RefBatchMatMulEndToEndFloat32Test")

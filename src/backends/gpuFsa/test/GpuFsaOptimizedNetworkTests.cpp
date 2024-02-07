@@ -15,10 +15,56 @@ using namespace armnn;
 TEST_SUITE("GpuFsaOptimizedNetwork")
 {
 
+TEST_CASE("ActivationSupportedOptimizedNetwork")
+{
+    const float qScale = 1.0f;
+    const int32_t qOffset = 0;
+
+    const TensorShape& inputShape  = { 2, 2, 2 };
+    const TensorShape& outputShape  = { 2, 2, 2 };
+
+    TensorInfo inputTensorInfo(inputShape, DataType::Float32, qScale, qOffset, true);
+    TensorInfo outputTensorInfo(outputShape, DataType::Float32, qScale, qOffset);
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+    INetworkPtr network(INetwork::Create());
+
+    ActivationDescriptor desc;
+    SUBCASE("TanH")
+    {
+        desc.m_Function = ActivationFunction::TanH;
+        desc.m_A = 1.f;
+        desc.m_B = 1.f;
+    }
+    SUBCASE("Sigmoid")
+    {
+        desc.m_Function = ActivationFunction::Sigmoid;
+    }
+
+    IConnectableLayer* input = network->AddInputLayer(0, "input");
+    IConnectableLayer* activationLayer = network->AddActivationLayer(desc, "activation");
+    IConnectableLayer* output = network->AddOutputLayer(1, "output");
+
+    Connect(input, activationLayer, inputTensorInfo, 0, 0);
+    Connect(activationLayer, output, outputTensorInfo, 0, 0);
+
+    std::vector<BackendId> backends = { "GpuFsa" };
+
+    OptimizerOptionsOpaque optimizedOptions;
+    IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optimizedOptions);
+    CHECK(optNet);
+
+    Graph& graph = GetGraphForTesting(optNet.get());
+
+    // Check graph layer sequence to ensure that the network has been replaced with a PreCompiledLayer
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(),
+                        &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<PreCompiledLayer>,
+                        &IsLayerOfType<OutputLayer>));
+}
 TEST_CASE("BatchMatMulSupportedOptimizedNetwork")
 {
-    using namespace armnn;
-
     const float qScale = 1.0f;
     const int32_t qOffset = 0;
 
@@ -63,8 +109,6 @@ TEST_CASE("BatchMatMulSupportedOptimizedNetwork")
 
 TEST_CASE("CastSupportedOptimizedNetwork")
 {
-    using namespace armnn;
-
     const float qScale = 1.0f;
     const int32_t qOffset = 0;
 
@@ -221,8 +265,6 @@ TEST_CASE("TwoConv2dSupportedOptimizedNetwork")
 
 TEST_CASE("ElementwiseBinarySupportedOptimizedNetwork")
 {
-    using namespace armnn;
-
     const float qScale = 1.0f;
     const int32_t qOffset = 0;
 

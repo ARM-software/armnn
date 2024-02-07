@@ -17,6 +17,24 @@ using namespace armnn;
 TEST_SUITE("GpuFsaLayerSupport")
 {
 
+TEST_CASE("IsLayerSupportedGpuFsaActivation")
+{
+    TensorInfo inputInfo ({ 1, 5, 5, 1 }, DataType::Float32);
+    TensorInfo outputInfo({ 1, 5, 5, 1 }, DataType::Float32);
+
+    ActivationDescriptor desc{};
+
+    GpuFsaLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Activation,
+                                                     {inputInfo, outputInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+    CHECK(supported);
+}
+
 TEST_CASE("IsLayerSupportedGpuFsaBatchMatMul")
 {
     TensorInfo input0Info({ 2, 2 }, DataType::Float32);
@@ -82,7 +100,6 @@ TEST_CASE("IsLayerSupportedGpuFsaConv2dUnsupported")
     TensorInfo outputInfo({ 1, 3, 3, 1 }, DataType::Float32);
     TensorInfo weightsInfo({ 1, 3, 3, 1 }, DataType::Float32, 0.0f, 0, true);
 
-    // NCHW is unsupported.
     Convolution2dDescriptor desc;
     desc.m_DataLayout = DataLayout::NCHW;
 

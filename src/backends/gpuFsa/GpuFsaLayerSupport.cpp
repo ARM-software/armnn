@@ -10,6 +10,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #if defined(ARMCOMPUTEGPUFSA_ENABLED)
+#include "layers/GpuFsaActivation.hpp"
 #include "layers/GpuFsaBatchMatMul.hpp"
 #include "layers/GpuFsaCast.hpp"
 #include "layers/GpuFsaConvolution2d.hpp"
@@ -78,6 +79,20 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
 
     switch (type)
     {
+        case LayerType::Activation:
+        {
+            if (infos.size() != 2)
+            {
+                throw InvalidArgumentException("Invalid number of Activation TensorInfos. "
+                                               "TensorInfos should be of format: {input, output}.");
+            }
+
+            auto desc = PolymorphicDowncast<const ActivationDescriptor*>(&descriptor);
+            FORWARD_LAYER_VALIDATE_FUNC(GpuFsaActivationValidate,
+                                        reasonIfUnsupported,
+                                        infos[0],
+                                        *desc);
+        }
         case LayerType::BatchMatMul:
         {
             if (infos.size() != 3)
@@ -87,7 +102,6 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             }
 
             auto desc = PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor);
-
             FORWARD_LAYER_VALIDATE_FUNC(GpuFsaBatchMatMulValidate,
                                         reasonIfUnsupported,
                                         infos[0],
@@ -101,6 +115,7 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
                 throw InvalidArgumentException("Invalid number of cast TensorInfos. "
                                                "TensorInfos should be of format: {input, output}.");
             }
+
             FORWARD_LAYER_VALIDATE_FUNC(GpuFsaCastValidate,
                                         reasonIfUnsupported,
                                         infos[0],
@@ -186,7 +201,6 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             }
 
             auto desc = PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor);
-
             FORWARD_LAYER_VALIDATE_FUNC(GpuFsaPooling2dValidate,
                                         reasonIfUnsupported,
                                         infos[0],
@@ -201,7 +215,6 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
             }
 
             auto desc = PolymorphicDowncast<const ResizeDescriptor*>(&descriptor);
-
             FORWARD_LAYER_VALIDATE_FUNC(GpuFsaResizeValidate,
                                         reasonIfUnsupported,
                                         infos[0],

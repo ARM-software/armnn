@@ -20,6 +20,7 @@
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 
+#include "layers/GpuFsaActivation.hpp"
 #include "layers/GpuFsaBatchMatMul.hpp"
 #include "layers/GpuFsaCast.hpp"
 #include "layers/GpuFsaConvolution2d.hpp"
@@ -250,6 +251,13 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
         // Configure and setup the sketch for each supported op. Their data will be wrapped into a PreCompiled layer
         switch (base.GetType())
         {
+            case (LayerType::Activation):
+            {
+                auto desc = PolymorphicDowncast<const ActivationDescriptor*>(&base.GetParameters());
+                auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                GpuFsaActivationCreateOp(preCompiledBlobPtr, input, *desc);
+                break;
+            }
             case (LayerType::Cast):
             {
                 auto input  = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();

@@ -176,6 +176,63 @@ TEST_CASE("IsLayerSupportedGpuFsaPooling2d")
     CHECK(supported);
 }
 
+TEST_CASE("UNSUPPORTED_IsLayerSupportedGpuFsaReshape")
+{
+    TensorInfo inputInfo{};
+    TensorInfo outputInfo{};
+
+    SUBCASE("Float32")
+    {
+        inputInfo  = { { 2, 3 }, DataType::Float32 };
+        outputInfo = { { 6 }   , DataType::Float32 };
+    }
+
+    SUBCASE("Float16")
+    {
+        inputInfo  = { { 2, 3 }, DataType::Float16 };
+        outputInfo = { { 6 }   , DataType::Float16 };
+    }
+
+    SUBCASE("Int32")
+    {
+        inputInfo  = { { 2, 3 }, DataType::Signed32 };
+        outputInfo = { { 6 }   , DataType::Signed32 };
+    }
+
+    SUBCASE("Int16")
+    {
+        inputInfo  = { { 2, 3 }, DataType::QSymmS16 };
+        outputInfo = { { 6 }   , DataType::QSymmS16 };
+    }
+
+    SUBCASE("UInt8")
+    {
+        inputInfo  = { { 2, 3 }, DataType::QAsymmU8 };
+        outputInfo = { { 6 }   , DataType::QAsymmU8 };
+    }
+
+    SUBCASE("Int8")
+    {
+        inputInfo  = { { 2, 3 }, DataType::QAsymmS8 };
+        outputInfo = { { 6 }   , DataType::QAsymmS8 };
+    }
+
+    ReshapeDescriptor desc;
+    desc.m_TargetShape = outputInfo.GetShape();
+
+    GpuFsaLayerSupport supportChecker;
+    std::string        reasonIfNotSupported;
+
+    auto supported = supportChecker.IsLayerSupported(LayerType::Reshape,
+                                                     { inputInfo, outputInfo },
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(!supported);
+}
+
 TEST_CASE("IsLayerSupportedGpuFsaResize")
 {
     TensorInfo inputInfo({ 1, 5, 5, 1 }, DataType::Float32);

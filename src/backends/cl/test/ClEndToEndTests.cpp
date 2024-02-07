@@ -496,6 +496,26 @@ TEST_CASE("ClReshapeEndToEndTestFloat16")
     ReshapeEndToEndFloat16<armnn::DataType::Float16>(clDefaultBackends);
 }
 
+TEST_CASE("ClReshapeEndToEndTestInt32")
+{
+    ReshapeEndToEnd<armnn::DataType::Signed32>(clDefaultBackends);
+}
+
+TEST_CASE("ClReshapeEndToEndTestInt16")
+{
+    ReshapeEndToEnd<armnn::DataType::QSymmS16>(clDefaultBackends);
+}
+
+TEST_CASE("ClReshapeEndToEndTestUInt8")
+{
+    ReshapeEndToEnd<armnn::DataType::QAsymmU8>(clDefaultBackends);
+}
+
+TEST_CASE("ClReshapeEndToEndTestInt8")
+{
+    ReshapeEndToEnd<armnn::DataType::QAsymmS8>(clDefaultBackends);
+}
+
 // Resize Bilinear
 TEST_CASE("ClResizeBilinearEndToEndFloatNchwTest")
 {

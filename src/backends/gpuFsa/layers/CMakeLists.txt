@@ -18,6 +18,8 @@ list(APPEND armnnGpuFsaBackendLayers_sources
         GpuFsaElementwiseBinary.hpp
         GpuFsaPooling2d.cpp
         GpuFsaPooling2d.hpp
+        GpuFsaReshape.cpp
+        GpuFsaReshape.hpp
         GpuFsaResize.cpp
         GpuFsaResize.hpp
         GpuFsaSoftmax.cpp

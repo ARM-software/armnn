@@ -13,7 +13,6 @@
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
-#include <aclCommon/BaseMemoryManager.hpp>
 #include <backendsCommon/SubgraphUtils.hpp>
 #include <Optimizer.hpp>
 
@@ -27,6 +26,7 @@
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinary.hpp"
 #include "layers/GpuFsaPooling2d.hpp"
+#include "layers/GpuFsaReshape.hpp"
 #include "layers/GpuFsaResize.hpp"
 #include "layers/GpuFsaSoftmax.hpp"
 
@@ -336,6 +336,14 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
                 auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
                 auto desc = PolymorphicDowncast<const Pooling2dDescriptor*>(&base.GetParameters());
                 GpuFsaPooling2dCreateOp(preCompiledBlobPtr, input, *desc);
+                break;
+            }
+            case LayerType::Reshape:
+            {
+                auto input = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto desc = PolymorphicDowncast<const ReshapeDescriptor*>(&base.GetParameters());
+                GpuFsaReshapeCreateOp(preCompiledBlobPtr, input, *desc);
+
                 break;
             }
             case (LayerType::Resize):

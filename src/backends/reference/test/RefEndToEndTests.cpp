@@ -1886,6 +1886,27 @@ TEST_CASE("RefReshapeEndToEndTestFloat16")
     ReshapeEndToEndFloat16<armnn::DataType::Float16>(defaultBackends);
 }
 
+TEST_CASE("RefReshapeEndToEndTestInt32")
+{
+    ReshapeEndToEnd<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefReshapeEndToEndTestInt16")
+{
+    ReshapeEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefReshapeEndToEndTestUInt8")
+{
+    ReshapeEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+TEST_CASE("RefReshapeEndToEndTestInt8")
+{
+    ReshapeEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+// Force Import
 TEST_CASE("RefForceImportWithAlignedBuffersEndToEndTest")
 {
     ForceImportWithAlignedBuffersEndToEndTest(defaultBackends);

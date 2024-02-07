@@ -17,6 +17,7 @@
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
 #include "layers/GpuFsaElementwiseBinary.hpp"
 #include "layers/GpuFsaPooling2d.hpp"
+#include "layers/GpuFsaReshape.hpp"
 #include "layers/GpuFsaResize.hpp"
 #include "layers/GpuFsaSoftmax.hpp"
 #endif
@@ -202,6 +203,21 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
 
             auto desc = PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor);
             FORWARD_LAYER_VALIDATE_FUNC(GpuFsaPooling2dValidate,
+                                        reasonIfUnsupported,
+                                        infos[0],
+                                        *desc);
+        }
+        case LayerType::Reshape:
+        {
+            if (infos.size() != 2)
+            {
+                throw InvalidArgumentException("Invalid number of Reshape TensorInfos. "
+                                               "TensorInfos should be of format: { input, output }.");
+            }
+
+            auto desc = PolymorphicDowncast<const ReshapeDescriptor*>(&descriptor);
+
+            FORWARD_LAYER_VALIDATE_FUNC(GpuFsaReshapeValidate,
                                         reasonIfUnsupported,
                                         infos[0],
                                         *desc);

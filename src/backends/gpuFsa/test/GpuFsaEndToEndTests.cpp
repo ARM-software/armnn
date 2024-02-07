@@ -12,6 +12,7 @@
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SoftmaxEndToEndTestImpl.hpp"
 
@@ -125,15 +126,8 @@ TEST_CASE("GpuFsaAvgPool2DEndtoEndTestFloat16")
 TEST_CASE("UNSUPPORTED_GpuFsaAvgPool2DIgnoreValueEndtoEndTestFloat32")
 {
     // Exclude padding must be set to true in Attributes! to be supported by GPU
-    try
-    {
-        AvgPool2dEndToEnd<DataType::Float32>(gpuFsaDefaultBackends, PaddingMethod::IgnoreValue);
-        FAIL("An exception should have been thrown");
-    }
-    catch (const armnn::InvalidArgumentException& e)
-    {
-        CHECK(strcmp(e.what(), "Failed to assign a backend to each layer") == 0);
-    }
+    CHECK_THROWS_AS(AvgPool2dEndToEnd<DataType::Float32>(gpuFsaDefaultBackends, PaddingMethod::IgnoreValue),
+                    armnn::InvalidArgumentException);
 }
 
 // Max Pool 2D
@@ -150,15 +144,40 @@ TEST_CASE("GpuFsaMaxPool2DEndtoEndTestFloat16")
 TEST_CASE("UNSUPPORTED_GpuFsaMaxPool2DIgnoreValueEndtoEndTestFloat32")
 {
     // Exclude padding must be set to true in Attributes! to be supported by GPU
-    try
-    {
-        MaxPool2dEndToEnd<DataType::Float32>(gpuFsaDefaultBackends, PaddingMethod::IgnoreValue);
-        FAIL("An exception should have been thrown");
-    }
-    catch (const armnn::InvalidArgumentException& e)
-    {
-        CHECK(strcmp(e.what(), "Failed to assign a backend to each layer") == 0);
-    }
+    CHECK_THROWS_AS(MaxPool2dEndToEnd<DataType::Float32>(gpuFsaDefaultBackends, PaddingMethod::IgnoreValue),
+                    armnn::InvalidArgumentException);
+}
+
+// Reshape
+TEST_CASE("UNSUPPORTED_GpuFsaReshapeTestFloat32")
+{
+    CHECK_THROWS_AS(ReshapeEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends), armnn::InvalidArgumentException);
+}
+
+TEST_CASE("UNSUPPORTED_GpuFsaReshapeTestFloat16")
+{
+    CHECK_THROWS_AS(ReshapeEndToEndFloat16<armnn::DataType::Float16>(gpuFsaDefaultBackends),
+                    armnn::InvalidArgumentException);
+}
+
+TEST_CASE("UNSUPPORTED_GpuFsaReshapeTestInt32")
+{
+    CHECK_THROWS_AS(ReshapeEndToEnd<armnn::DataType::Signed32>(gpuFsaDefaultBackends),armnn::InvalidArgumentException);
+}
+
+TEST_CASE("UNSUPPORTED_GpuFsaReshapeTestInt16")
+{
+    CHECK_THROWS_AS(ReshapeEndToEnd<armnn::DataType::QSymmS16>(gpuFsaDefaultBackends),armnn::InvalidArgumentException);
+}
+
+TEST_CASE("UNSUPPORTED_GpuFsaReshapeTestUInt8")
+{
+    CHECK_THROWS_AS(ReshapeEndToEnd<armnn::DataType::QAsymmU8>(gpuFsaDefaultBackends),armnn::InvalidArgumentException);
+}
+
+TEST_CASE("UNSUPPORTED_GpuFsaReshapeTestInt8")
+{
+    CHECK_THROWS_AS(ReshapeEndToEnd<armnn::DataType::QAsymmS8>(gpuFsaDefaultBackends), armnn::InvalidArgumentException);
 }
 
 // Resize Bilinear
@@ -187,15 +206,7 @@ TEST_CASE("GpuFsaResizeNearestNeighborEndToEndFloatHalfPixelNhwcTest")
 
 TEST_CASE("UNSUPPORTED_GpuFsaSoftmaxTestFloat32")
 {
-    try
-    {
-        SoftmaxEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends);
-        FAIL("An exception should have been thrown");
-    }
-    catch (const armnn::InvalidArgumentException& e)
-    {
-        CHECK(strcmp(e.what(), "Failed to assign a backend to each layer") == 0);
-    }
+    CHECK_THROWS_AS(SoftmaxEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends), armnn::InvalidArgumentException);
 }
 
 }

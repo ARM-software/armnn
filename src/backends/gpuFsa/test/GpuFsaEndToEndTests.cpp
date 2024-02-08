@@ -5,9 +5,9 @@
 
 #include "backendsCommon/test/EndToEndTestImpl.hpp"
 
+#include "backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/layerTests/CastTestImpl.hpp"
-
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
@@ -20,6 +20,13 @@ TEST_SUITE("GpuFsaEndToEnd")
 
 std::vector<BackendId> gpuFsaDefaultBackends = {"GpuFsa"};
 
+// BatchMatMul
+TEST_CASE("RefBatchMatMulEndToEndFloat32Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends);
+}
+
+// Cast
 TEST_CASE("GpuFsaCastEndtoEndTestFloat32ToFloat16")
 {
     using namespace half_float::literal;

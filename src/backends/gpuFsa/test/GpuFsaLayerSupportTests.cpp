@@ -17,6 +17,25 @@ using namespace armnn;
 TEST_SUITE("GpuFsaLayerSupport")
 {
 
+TEST_CASE("IsLayerSupportedGpuFsaBatchMatMul")
+{
+    TensorInfo input0Info({ 2, 2 }, DataType::Float32);
+    TensorInfo input1Info({ 2, 2 }, DataType::Float32);
+    TensorInfo outputInfo({ 2, 2 }, DataType::Float32);
+
+    BatchMatMulDescriptor desc{};
+
+    GpuFsaLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    auto supported = supportChecker.IsLayerSupported(LayerType::BatchMatMul,
+                                                     {input0Info, input1Info, outputInfo},
+                                                     desc,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+    CHECK(supported);
+}
+
 TEST_CASE("IsLayerSupportedCast")
 {
     armnn::TensorInfo inputTensorInfo({1, 3, 2, 3}, armnn::DataType::Float32);

@@ -4,6 +4,8 @@
 #
 
 list(APPEND armnnGpuFsaBackendLayers_sources
+        GpuFsaBatchMatMul.cpp
+        GpuFsaBatchMatMul.hpp
         GpuFsaCast.cpp
         GpuFsaCast.hpp
         GpuFsaConvolution2d.cpp

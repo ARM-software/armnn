@@ -10,6 +10,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 #if defined(ARMCOMPUTEGPUFSA_ENABLED)
+#include "layers/GpuFsaBatchMatMul.hpp"
 #include "layers/GpuFsaCast.hpp"
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
@@ -76,6 +77,22 @@ bool GpuFsaLayerSupport::IsLayerSupported(const LayerType& type,
 
     switch (type)
     {
+        case LayerType::BatchMatMul:
+        {
+            if (infos.size() != 3)
+            {
+                throw InvalidArgumentException("Invalid number of BatchMatMul TensorInfos. "
+                                               "TensorInfos should be of format: {input0, input1 output}.");
+            }
+
+            auto desc = PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor);
+
+            FORWARD_LAYER_VALIDATE_FUNC(GpuFsaBatchMatMulValidate,
+                                        reasonIfUnsupported,
+                                        infos[0],
+                                        infos[1],
+                                        *desc);
+        }
         case LayerType::Cast:
         {
             if (infos.size() != 2)

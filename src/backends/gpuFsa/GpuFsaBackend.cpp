@@ -20,6 +20,7 @@
 #include <arm_compute/core/CL/CLKernelLibrary.h>
 #include <arm_compute/runtime/CL/CLBufferAllocator.h>
 
+#include "layers/GpuFsaBatchMatMul.hpp"
 #include "layers/GpuFsaCast.hpp"
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
@@ -278,6 +279,14 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
                                                 weights,
                                                 EmptyOptional());
                 }
+                break;
+            }
+            case (LayerType::BatchMatMul):
+            {
+                auto input0 = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto input1 = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
+                auto desc = PolymorphicDowncast<const BatchMatMulDescriptor*>(&base.GetParameters());
+                GpuFsaBatchMatMulCreateOp(preCompiledBlobPtr, input0, input1, *desc);
                 break;
             }
             case (LayerType::DepthwiseConvolution2d):

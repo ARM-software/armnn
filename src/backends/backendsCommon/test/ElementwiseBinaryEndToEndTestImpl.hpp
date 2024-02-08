@@ -135,7 +135,8 @@ void ElementwiseBinarySimple3DEndToEnd(const std::vector<BackendId>& backends,
 
     const std::vector<float> input2({ 2, 2, 2, 2 });
     std::vector<float> expectedOutput;
-    switch (operation) {
+    switch (operation)
+    {
         case armnn::BinaryOperation::Add:
             expectedOutput = { 3, 1, 3, 3 };
             break;

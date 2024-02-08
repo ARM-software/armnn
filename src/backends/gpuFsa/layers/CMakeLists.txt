@@ -10,10 +10,8 @@ list(APPEND armnnGpuFsaBackendLayers_sources
         GpuFsaConvolution2d.hpp
         GpuFsaDepthwiseConvolution2d.cpp
         GpuFsaDepthwiseConvolution2d.hpp
-        GpuFsaElementwiseBinaryAdd.cpp
-        GpuFsaElementwiseBinaryAdd.hpp
-        GpuFsaElementwiseBinarySub.cpp
-        GpuFsaElementwiseBinarySub.hpp
+        GpuFsaElementwiseBinary.cpp
+        GpuFsaElementwiseBinary.hpp
         GpuFsaPooling2d.cpp
         GpuFsaPooling2d.hpp
         GpuFsaResize.cpp

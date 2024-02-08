@@ -79,34 +79,25 @@ TEST_CASE("IsLayerSupportedGpuFsaConv2dUnsupported")
     REQUIRE(reasonIfNotSupported.find("NCHW not supported by this kernel") != std::string::npos);
 }
 
-TEST_CASE("IsLayerSupportedGpuFsaElementWiseBinaryAdd")
+TEST_CASE("IsLayerSupportedGpuFsaElementWiseBinary")
 {
     TensorInfo input0Info({ 2, 2 }, DataType::Float32);
     TensorInfo input1Info({ 2, 2 }, DataType::Float32);
     TensorInfo outputInfo({ 2, 2 }, DataType::Float32);
 
     ElementwiseBinaryDescriptor desc;
-    desc.m_Operation = BinaryOperation::Add;
-
-    GpuFsaLayerSupport supportChecker;
-    std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(LayerType::ElementwiseBinary,
-                                                     {input0Info, input1Info, outputInfo},
-                                                     desc,
-                                                     EmptyOptional(),
-                                                     EmptyOptional(),
-                                                     reasonIfNotSupported);
-    CHECK(supported);
-}
-
-TEST_CASE("IsLayerSupportedGpuFsaElementWiseBinarySub")
-{
-    TensorInfo input0Info({ 2, 2 }, DataType::Float32);
-    TensorInfo input1Info({ 2, 2 }, DataType::Float32);
-    TensorInfo outputInfo({ 2, 2 }, DataType::Float32);
-
-    ElementwiseBinaryDescriptor desc;
-    desc.m_Operation = BinaryOperation::Sub;
+    SUBCASE("Add")
+    {
+        desc.m_Operation = BinaryOperation::Add;
+    }
+    SUBCASE("Mul")
+    {
+        desc.m_Operation = BinaryOperation::Mul;
+    }
+    SUBCASE("Sub")
+    {
+        desc.m_Operation = BinaryOperation::Sub;
+    }
 
     GpuFsaLayerSupport supportChecker;
     std::string reasonIfNotSupported;

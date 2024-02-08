@@ -66,6 +66,17 @@ TEST_CASE("GpuFsaElementwiseBinaryAddTestFloat16")
     ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(gpuFsaDefaultBackends, BinaryOperation::Add);
 }
 
+// ElementwiseBinary Mul
+TEST_CASE("GpuFsaElementwiseBinaryMulTestFloat32")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float32>(gpuFsaDefaultBackends, BinaryOperation::Mul);
+}
+
+TEST_CASE("GpuFsaElementwiseBinaryMulTestFloat16")
+{
+    ElementwiseBinarySimple3DEndToEnd<armnn::DataType::Float16>(gpuFsaDefaultBackends, BinaryOperation::Mul);
+}
+
 // ElementwiseBinary Sub
 TEST_CASE("GpuFsaElementwiseBinarySubTestFloat32")
 {

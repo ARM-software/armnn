@@ -23,8 +23,7 @@
 #include "layers/GpuFsaCast.hpp"
 #include "layers/GpuFsaConvolution2d.hpp"
 #include "layers/GpuFsaDepthwiseConvolution2d.hpp"
-#include "layers/GpuFsaElementwiseBinaryAdd.hpp"
-#include "layers/GpuFsaElementwiseBinarySub.hpp"
+#include "layers/GpuFsaElementwiseBinary.hpp"
 #include "layers/GpuFsaPooling2d.hpp"
 #include "layers/GpuFsaResize.hpp"
 
@@ -309,20 +308,9 @@ OptimizationViews GpuFsaBackend::OptimizeSubgraphView(const SubgraphView& subgra
             case LayerType::ElementwiseBinary:
             {
                 auto desc = PolymorphicDowncast<const ElementwiseBinaryDescriptor *>(&base.GetParameters());
-                if (desc->m_Operation == BinaryOperation::Add)
-                {
-                    auto input0 = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
-                    auto input1 = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
-
-                    GpuFsaElementwiseBinaryAddCreateOp(preCompiledBlobPtr, input0, input1);
-                }
-                else if (desc->m_Operation == BinaryOperation::Sub)
-                {
-                    auto input0 = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
-                    auto input1 = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
-
-                    GpuFsaElementwiseBinarySubCreateOp(preCompiledBlobPtr, input0, input1);
-                }
+                auto input0 = base.GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
+                auto input1 = base.GetInputSlot(1).GetConnectedOutputSlot()->GetTensorInfo();
+                GpuFsaElementwiseBinaryCreateOp(preCompiledBlobPtr, input0, input1, *desc);
                 break;
             }
             case (LayerType::Pooling2d):

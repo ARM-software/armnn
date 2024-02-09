@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,7 +11,9 @@
 #include "TfliteExecutor.hpp"
 #include "tensorflow/lite/kernels/kernel_util.h"
 
+#include <chrono>
 #include <string>
+#include <thread>
 
 std::string TfLiteStatusToString(const TfLiteStatus status)
 {
@@ -58,6 +60,7 @@ std::string TfLiteStatusToString(const TfLiteStatus status)
 TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRuntime::CreationOptions runtimeOptions)
                              : m_Params(params)
 {
+    using namespace std::chrono_literals;
     m_Model = tflite::FlatBufferModel::BuildFromFile(m_Params.m_ModelPath.c_str());
     if (!m_Model)
     {
@@ -111,8 +114,24 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
         auto result = m_TfLiteInterpreter->ModifyGraphWithDelegate(std::move(theArmnnDelegate));
         if (result != kTfLiteOk)
         {
-            LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter: " +
-                        TfLiteStatusToString(result) + ".");
+            // We'll make an exception for kTfLiteApplicationError and allow it through in special circumstances.
+            if (result == kTfLiteApplicationError)
+            {
+                std::cout << std::endl;
+                ARMNN_LOG(warning) << "*****";
+                ARMNN_LOG(warning) << "***** Calling ModifyGraphWithDelegate on the TfLite runtime resulted in "
+                                      "kTfLiteApplicationError. We will allow inference to continue but be warned the "
+                                      "results may be surprising!";
+                ARMNN_LOG(warning) << "***** There will now be a 5 second delay.";
+                ARMNN_LOG(warning) << "*****\n";
+                // Insert an intentional delay so the user is aware of this significant warning.
+                std::this_thread::sleep_for(5000ms);
+            }
+            else
+            {
+                LogAndThrow("Could not register ArmNN TfLite Delegate to TfLiteInterpreter: " +
+                            TfLiteStatusToString(result) + ".");
+            }
         }
 #else
         LogAndThrow("Not built with Arm NN Tensorflow-Lite delegate support.");
@@ -203,7 +222,7 @@ TfLiteExecutor::TfLiteExecutor(const ExecuteNetworkParams& params, armnn::IRunti
 
 std::vector<const void *> TfLiteExecutor::Execute()
 {
-    int status = 0;
+    TfLiteStatus status;
     std::vector<const void*> results;
     for (size_t x = 0; x < m_Params.m_Iterations; x++)
     {
@@ -211,6 +230,11 @@ std::vector<const void *> TfLiteExecutor::Execute()
         const auto start_time = armnn::GetTimeNow();
         // Run the inference
         status = m_TfLiteInterpreter->Invoke();
+        if (status != kTfLiteOk)
+        {
+            LogAndThrow("Failed to execute the inference on the TfLite runtime.. The result was: " +
+                        TfLiteStatusToString(status) + ".");
+        }
         const auto duration = armnn::GetTimeDuration(start_time);
 
         if (!m_Params.m_DontPrintOutputs)
@@ -243,8 +267,6 @@ std::vector<const void *> TfLiteExecutor::Execute()
                 }
 
                 std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
-                results.push_back(m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->allocation);
-
                 switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
                 {
 
@@ -252,6 +274,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     {
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(
                                 tfLiteDelegateOutputId);
+                        results.push_back(tfLiteDelegateOutputData);
 
                         for (int i = 0; i < outputSize; ++i)
                         {
@@ -263,6 +286,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     {
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(
                                 tfLiteDelegateOutputId);
+                        results.push_back(tfLiteDelegateOutputData);
                         for (int i = 0; i < outputSize; ++i)
                         {
                             fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
@@ -273,6 +297,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     {
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(
                                 tfLiteDelegateOutputId);
+                        results.push_back(tfLiteDelegateOutputData);
                         for (int i = 0; i < outputSize; ++i)
                         {
                             fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
@@ -283,6 +308,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     {
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(
                                 tfLiteDelegateOutputId);
+                        results.push_back(tfLiteDelegateOutputData);
                         for (int i = 0; i < outputSize; ++i)
                         {
                             fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
@@ -293,6 +319,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     {
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<bool>(
                                 tfLiteDelegateOutputId);
+                        results.push_back(tfLiteDelegateOutputData);
                         for (int i = 0; i < outputSize; ++i) {
                             fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
                         }
@@ -303,14 +330,12 @@ std::vector<const void *> TfLiteExecutor::Execute()
                         LogAndThrow("Unsupported output type");
                     }
                 }
-
                 std::cout << std::endl;
             }
         }
         CheckInferenceTimeThreshold(duration, m_Params.m_ThresholdTime);
     }
 
-    std::cout << status;
     return results;
 }
 
@@ -319,9 +344,45 @@ void TfLiteExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
     for (unsigned int outputIndex = 0; outputIndex < m_TfLiteInterpreter->outputs().size(); ++outputIndex)
     {
         auto tfLiteDelegateOutputId = m_TfLiteInterpreter->outputs()[outputIndex];
-        size_t size = m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->bytes;
-        double result = ComputeByteLevelRMSE(m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->allocation,
-                                             otherOutput[outputIndex], size);
+        size_t size                 = m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->bytes;
+        double result = 1; // Presume failure.
+        switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
+        {
+            case kTfLiteFloat32:
+            {
+                auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(tfLiteDelegateOutputId);
+                result = ComputeByteLevelRMSE(tfLiteDelegateOutputData, otherOutput[outputIndex], size);
+                break;
+            }
+            case kTfLiteInt32:
+            {
+                auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(tfLiteDelegateOutputId);
+                result = ComputeByteLevelRMSE(tfLiteDelegateOutputData, otherOutput[outputIndex], size);
+                break;
+            }
+            case kTfLiteUInt8:
+            {
+                auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(tfLiteDelegateOutputId);
+                result = ComputeByteLevelRMSE(tfLiteDelegateOutputData, otherOutput[outputIndex], size);
+                break;
+            }
+            case kTfLiteInt8:
+            {
+                auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(tfLiteDelegateOutputId);
+                result = ComputeByteLevelRMSE(tfLiteDelegateOutputData, otherOutput[outputIndex], size);
+                break;
+            }
+            case kTfLiteBool:
+            {
+                auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<bool>(tfLiteDelegateOutputId);
+                result = ComputeByteLevelRMSE(tfLiteDelegateOutputData, otherOutput[outputIndex], size);
+                break;
+            }
+            default:
+            {
+                LogAndThrow("Unsupported output type");
+            }
+        }
         std::cout << "Byte level root mean square error: " << result << "\n";
     }
 };

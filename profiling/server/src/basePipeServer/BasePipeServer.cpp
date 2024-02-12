@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,7 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
-#include <string.h>
+#include <string>
 
 namespace arm
 {
@@ -87,8 +87,15 @@ bool BasePipeServer::WaitForStreamMetaData()
     uint32_t metaDataLength = ToUint32(&header[4], m_Endianness) - 4;
     // Read the entire packet.
     std::vector<uint8_t> packetData(metaDataLength);
-    if (metaDataLength !=
-        arm::pipe::numeric_cast<uint32_t>(arm::pipe::Read(m_ClientConnection, packetData.data(), metaDataLength)))
+    long bytesRead = arm::pipe::Read(m_ClientConnection, packetData.data(), metaDataLength);
+    // On Socket error Read will return -1.
+    if (bytesRead < 0)
+    {
+        std::cerr << ": Socket error: " << strerror(errno) << std::endl;
+        return false;
+    }
+    // bytesRead cannot be negative here.
+    if (metaDataLength != arm::pipe::numeric_cast<uint32_t>(bytesRead))
     {
         std::cerr << ": Protocol read error. Data length mismatch." << std::endl;
         return false;

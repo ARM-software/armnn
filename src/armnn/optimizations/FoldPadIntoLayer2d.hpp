@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -152,6 +152,29 @@ Layer2dT* FoldPadIntoLayer2dImpl(Graph& graph, InputSlot& connection)
     if (!TryFoldPadIntoLayer2d(padDescriptor, newLayer2dDescriptor, padLayer.GetOutputSlot().GetTensorInfo()))
     {
         return nullptr;
+    }
+
+    // Workaround an issue in the compute library. The conv2d algorithm that the
+    // compute library is choosing is not handling the 1x1 filter case when
+    // the padding size >= filter size
+    if constexpr (std::is_same<Layer2dT, armnn::Convolution2dLayer>::value)
+    {
+        // Get filter width and height
+        armnnUtils::DataLayoutIndexed dataLayoutIndex(newLayer2dDescriptor.m_DataLayout);
+        const TensorShape& filterShape = layer2d.GetInputSlot(1).GetTensorInfo().GetShape();
+        unsigned int filterWidth       = filterShape[dataLayoutIndex.GetWidthIndex()];
+        unsigned int filterHeight      = filterShape[dataLayoutIndex.GetHeightIndex()];
+        // Calculate total padding and check conditions
+        auto horizontalPadding = newLayer2dDescriptor.m_PadLeft + newLayer2dDescriptor.m_PadRight;
+        auto verticalPadding   = newLayer2dDescriptor.m_PadTop  + newLayer2dDescriptor.m_PadBottom;
+        if ((filterWidth == 1) && (horizontalPadding >= filterWidth))
+        {
+            return nullptr;
+        }
+        else if ((filterHeight == 1) && (verticalPadding >= filterHeight))
+        {
+            return nullptr;
+        }
     }
 
     // Save original parent output slot of the pad layer

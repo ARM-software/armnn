@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -95,6 +95,73 @@ TEST_CASE("FoldPadLayerIntoConvolution2dLayer")
                                                       &IsLayerOfType<ConstantLayer>,
                                                       checkPadFoldedIntoConv2d,
                                                       &IsLayerOfType<OutputLayer>));
+}
+
+TEST_CASE("RejectFoldPadLayerIntoConvolution2dLayerWith1x1Filter")
+{
+    // This test can be fixed to check for the folding once the
+    // compute library issue is addressed and the restriction in
+    // FoldPadIntoLayer2dImpl() is removed for the 1x1 case
+
+    Graph graph;
+    const unsigned int inputShape[]   = {1, 18, 18, 512};
+    const unsigned int paddedShape[]  = {1, 19, 19, 512};
+    const unsigned int weightsShape[] = {512, 1, 1, 512};
+    const unsigned int outputShape[]  = {1, 19, 19, 512};
+
+    TensorInfo inputInfo(4, inputShape, DataType::Float32);
+    TensorInfo paddedInfo(4, paddedShape, DataType::Float32);
+    TensorInfo weightsInfo(4, weightsShape, DataType::Float32, 1.0f, 0, true);
+    TensorInfo outputInfo(4, outputShape, DataType::Float32);
+
+    Layer* input = graph.AddLayer<InputLayer>(0, "input");
+    input->GetOutputSlot().SetTensorInfo(inputInfo);
+
+    PadDescriptor padDescriptor({{0, 0},
+                                 {1, 1},
+                                 {2, 1},
+                                 {0, 0}});
+
+    PadLayer* padLayer = graph.AddLayer<PadLayer>(padDescriptor, "pad");
+    padLayer->GetOutputSlot().SetTensorInfo(paddedInfo);
+
+    Convolution2dDescriptor convolution2dDescriptor;
+    convolution2dDescriptor.m_BiasEnabled = false;
+    convolution2dDescriptor.m_StrideX     = 1;
+    convolution2dDescriptor.m_StrideY     = 1;
+    convolution2dDescriptor.m_DataLayout  = DataLayout::NHWC;
+
+    std::vector<float> weightsVector(512 * 512);
+    ConstTensor        weights(weightsInfo, weightsVector);
+
+    ConstantLayer* weightsLayer = graph.AddLayer<ConstantLayer>("Weights");
+    weightsLayer->m_LayerOutput = std::make_shared<ScopedTensorHandle>(weights);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+
+    Convolution2dLayer* conv2dLayer = graph.AddLayer<Convolution2dLayer>(convolution2dDescriptor, "conv2d");
+    conv2dLayer->GetOutputSlot().SetTensorInfo(outputInfo);
+
+    Layer* output = graph.AddLayer<OutputLayer>(0, "output");
+
+    // Connect up layers - input -> pad -> conv2d -> output
+    input->GetOutputSlot().Connect(padLayer->GetInputSlot(0));
+    padLayer->GetOutputSlot().Connect(conv2dLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot().Connect(conv2dLayer->GetInputSlot(1));
+    conv2dLayer->GetOutputSlot().Connect(output->GetInputSlot(0));
+
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<ConstantLayer>,
+                        &IsLayerOfType<PadLayer>,
+                        &IsLayerOfType<Convolution2dLayer>,
+                        &IsLayerOfType<OutputLayer>));
+
+    armnn::Optimizer::Pass(graph, armnn::MakeOptimizations(FoldPadIntoConvolution2d()));
+
+    CHECK(CheckSequence(graph.cbegin(), graph.cend(), &IsLayerOfType<InputLayer>,
+                        &IsLayerOfType<ConstantLayer>,
+                        &IsLayerOfType<PadLayer>,
+                        &IsLayerOfType<Convolution2dLayer>,
+                        &IsLayerOfType<OutputLayer>));
 }
 
 TEST_CASE("FoldPadLayerIntoDepthwiseConvolution2dLayer")

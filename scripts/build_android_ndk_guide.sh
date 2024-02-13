@@ -14,7 +14,7 @@ function Usage() {
   echo "    -l Use this copy of Arm NN and ComputeLibrary instead of cloning new copies"
   echo "       <1 or 0> defaults to 1"
   echo "    -a Override Arm NN branch (defaults to main branch). For example to use 23.02 release use branch name branches/armnn_23_02"
-  echo "    -b Override ACL branch (defaults to main branch). For example to use 23.02 release use tag v23.02"
+  echo "    -c Override ACL branch (defaults to main branch). For example to use 23.02 release use tag v23.02"
   echo "    -A Android API level defaults to 30"
   echo "    -n Neon (CpuAcc backend) enabled <1 or 0> defaults to 1"
   echo "    -g CL (GpuAcc backend) enabled <1 or 0> defaults to 1"

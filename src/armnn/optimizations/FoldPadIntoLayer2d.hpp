@@ -157,7 +157,7 @@ Layer2dT* FoldPadIntoLayer2dImpl(Graph& graph, InputSlot& connection)
     // Workaround an issue in the compute library. The conv2d algorithm that the
     // compute library is choosing is not handling the 1x1 filter case when
     // the padding size >= filter size
-    if constexpr (std::is_same<Layer2dT, armnn::Convolution2dLayer>::value)
+    if (layer2d.GetType() == armnn::LayerType::Convolution2d)
     {
         // Get filter width and height
         armnnUtils::DataLayoutIndexed dataLayoutIndex(newLayer2dDescriptor.m_DataLayout);

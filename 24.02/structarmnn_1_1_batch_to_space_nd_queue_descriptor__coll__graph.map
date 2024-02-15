@@ -1,0 +1,8 @@
+<map id="BatchToSpaceNdQueueDescriptor" name="BatchToSpaceNdQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="961,47,1200,73"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="677,39,912,81"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="185,39,420,81"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_batch_to_space_nd_descriptor.html" title="A BatchToSpaceNdDescriptor for the BatchToSpaceNdLayer." alt="" coords="204,105,401,132"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="10,105,131,132"/>
+</map>

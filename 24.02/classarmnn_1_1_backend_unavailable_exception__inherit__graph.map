@@ -1,0 +1,6 @@
+<map id="BackendUnavailableException" name="BackendUnavailableException">
+<area shape="rect" id="node1" title="Class for non&#45;fatal exceptions raised while initialising a backend." alt="" coords="12,155,231,181"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_cl_runtime_unavailable_exception.html" title=" " alt="" coords="5,229,237,256"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="78,80,165,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="78,5,165,32"/>
+</map>

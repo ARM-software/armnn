@@ -1,0 +1,9 @@
+<map id="SliceLayer" name="SliceLayer">
+<area shape="rect" id="node1" title=" " alt="" coords="112,352,201,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="75,261,238,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="47,81,106,108"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="75,157,238,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="5,5,148,32"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_slice_descriptor.html" title="A SliceDescriptor for the SliceLayer." alt="" coords="262,165,382,191"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="261,81,383,108"/>
+</map>

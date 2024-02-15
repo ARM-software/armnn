@@ -1,0 +1,4 @@
+<map id="FakeQuantizationDescriptor" name="FakeQuantizationDescriptor">
+<area shape="rect" id="node1" title="A FakeQuantizationDescriptor for the FakeQuantizationLayer." alt="" coords="5,80,207,107"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="45,5,167,32"/>
+</map>

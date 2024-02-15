@@ -1,0 +1,13 @@
+<map id="NeonQuantizedLstmWorkload" name="NeonQuantizedLstmWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="1963,283,2177,309"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_neon_base_workload.html" title=" " alt="" coords="1683,275,1913,317"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="1135,303,1363,345"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="199,344,286,371"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="561,311,816,337"/>
+<area shape="rect" id="node11" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="561,252,816,279"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_quantized_lstm_queue_descriptor.html" title=" " alt="" coords="574,187,803,213"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="177,221,308,248"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_const_tensor_handle.html" title=" " alt="" coords="169,143,316,169"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="5,143,120,169"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_neon_base_workload.html" title=" " alt="" coords="1105,252,1393,279"/>
+</map>

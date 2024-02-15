@@ -1,0 +1,25 @@
+var classarmnn_1_1_gpu_fsa_backend =
+[
+    [ "ClBackendCustomAllocatorMemoryRegion", "classarmnn_1_1_gpu_fsa_backend_1_1_cl_backend_custom_allocator_memory_region.html", "classarmnn_1_1_gpu_fsa_backend_1_1_cl_backend_custom_allocator_memory_region" ],
+    [ "GpuFsaBackendCustomAllocatorWrapper", "classarmnn_1_1_gpu_fsa_backend_1_1_gpu_fsa_backend_custom_allocator_wrapper.html", "classarmnn_1_1_gpu_fsa_backend_1_1_gpu_fsa_backend_custom_allocator_wrapper" ],
+    [ "GpuFsaBackend", "classarmnn_1_1_gpu_fsa_backend.html#a9276766329005275da8c7776a3bd4e14", null ],
+    [ "GpuFsaBackend", "classarmnn_1_1_gpu_fsa_backend.html#a7e9e0ac5cbec2ebb0088b6c88abd276b", null ],
+    [ "~GpuFsaBackend", "classarmnn_1_1_gpu_fsa_backend.html#ad6fcacd26dd76f95a616a2ada7f931e0", null ],
+    [ "CreateBackendContext", "classarmnn_1_1_gpu_fsa_backend.html#a801cf3170dc777aca3e6f926d1bd70a5", null ],
+    [ "CreateBackendProfilingContext", "classarmnn_1_1_gpu_fsa_backend.html#a68c2ef244261cc9649799284774af132", null ],
+    [ "CreateMemoryManager", "classarmnn_1_1_gpu_fsa_backend.html#a93fcb3bff141d8c77b53466a44b58eee", null ],
+    [ "CreateWorkloadFactory", "classarmnn_1_1_gpu_fsa_backend.html#a5362d5d9510627da3c9d5db2e669d64a", null ],
+    [ "CreateWorkloadFactory", "classarmnn_1_1_gpu_fsa_backend.html#a8e19e275c8162e34e6d8d10a9245dbc9", null ],
+    [ "CreateWorkloadFactory", "classarmnn_1_1_gpu_fsa_backend.html#aa2d432e503780e146c08729323da519a", null ],
+    [ "GetCapabilities", "classarmnn_1_1_gpu_fsa_backend.html#ab9199ff425571ba62412bb903c2c933e", null ],
+    [ "GetDefaultAllocator", "classarmnn_1_1_gpu_fsa_backend.html#afb75bad43612f5314622c4fa8a16e63d", null ],
+    [ "GetHandleFactoryPreferences", "classarmnn_1_1_gpu_fsa_backend.html#a63559c7f206c265f5fff5ffcc8a58e3e", null ],
+    [ "GetId", "classarmnn_1_1_gpu_fsa_backend.html#a6c6c3d137a7792e264a89cc40ea94bb0", null ],
+    [ "GetLayerSupport", "classarmnn_1_1_gpu_fsa_backend.html#a93d4285a3ea5e4e3b35578484d889daa", null ],
+    [ "OptimizeSubgraphView", "classarmnn_1_1_gpu_fsa_backend.html#a339efc194a1738cd93fcdde4d948a5cd", null ],
+    [ "RegisterTensorHandleFactories", "classarmnn_1_1_gpu_fsa_backend.html#a531177ce89c53c6af616175b0b05e5c0", null ],
+    [ "RegisterTensorHandleFactories", "classarmnn_1_1_gpu_fsa_backend.html#a5f7312e595427f00078975f71c61dd8f", null ],
+    [ "UseCustomMemoryAllocator", "classarmnn_1_1_gpu_fsa_backend.html#a729cbc38a0ee1b8349cae8ef8acf1aad", null ],
+    [ "m_CustomAllocator", "classarmnn_1_1_gpu_fsa_backend.html#afe31515f8502943018e1a6244beea1a2", null ],
+    [ "m_UsingCustomAllocator", "classarmnn_1_1_gpu_fsa_backend.html#adda2579a4649278c81f18a1d3915b3a0", null ]
+];

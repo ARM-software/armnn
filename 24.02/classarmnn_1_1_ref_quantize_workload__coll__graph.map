@@ -1,0 +1,11 @@
+<map id="RefQuantizeWorkload" name="RefQuantizeWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="1529,137,1692,164"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="1269,130,1480,171"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="767,97,997,138"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="27,135,114,161"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="240,84,495,111"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="240,185,495,212"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_quantize_queue_descriptor.html" title=" " alt="" coords="273,5,462,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,12,136,39"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="744,167,1020,193"/>
+</map>

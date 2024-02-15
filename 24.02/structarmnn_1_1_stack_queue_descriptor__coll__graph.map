@@ -1,0 +1,9 @@
+<map id="StackQueueDescriptor" name="StackQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="67,289,234,316"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="33,199,268,240"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node7" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="33,95,268,136"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_stack_descriptor.html" title="A StackDescriptor for the StackLayer." alt="" coords="292,102,417,129"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="195,5,317,32"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_tensor_shape.html" title=" " alt="" coords="341,5,445,32"/>
+</map>

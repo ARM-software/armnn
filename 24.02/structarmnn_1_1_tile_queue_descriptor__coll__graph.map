@@ -1,0 +1,8 @@
+<map id="TileQueueDescriptor" name="TileQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="100,276,255,303"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="60,185,295,227"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="60,81,295,123"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_tile_descriptor.html" title=" " alt="" coords="319,89,433,115"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="315,5,437,32"/>
+</map>

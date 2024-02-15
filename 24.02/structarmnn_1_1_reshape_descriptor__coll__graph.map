@@ -1,0 +1,5 @@
+<map id="ReshapeDescriptor" name="ReshapeDescriptor">
+<area shape="rect" id="node1" title="A ReshapeDescriptor for the ReshapeLayer." alt="" coords="61,95,207,121"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="5,5,127,32"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_tensor_shape.html" title=" " alt="" coords="151,5,255,32"/>
+</map>

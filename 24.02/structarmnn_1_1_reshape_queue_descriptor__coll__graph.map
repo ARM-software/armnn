@@ -1,0 +1,9 @@
+<map id="ReshapeQueueDescriptor" name="ReshapeQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="52,289,239,316"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="28,199,263,240"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node7" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="28,95,263,136"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_reshape_descriptor.html" title="A ReshapeDescriptor for the ReshapeLayer." alt="" coords="287,102,433,129"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="201,5,322,32"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_tensor_shape.html" title=" " alt="" coords="347,5,451,32"/>
+</map>

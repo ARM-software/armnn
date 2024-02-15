@@ -1,0 +1,8 @@
+<map id="InstanceNormalizationQueueDescriptor" name="InstanceNormalizationQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="1035,39,1245,81"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="719,39,985,81"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="186,39,421,81"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_instance_normalization_descriptor.html" title="An InstanceNormalizationDescriptor for InstanceNormalizationLayer." alt="" coords="185,105,421,132"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="10,105,131,132"/>
+</map>

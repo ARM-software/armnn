@@ -1,0 +1,7 @@
+<map id="NormalizationLayer" name="NormalizationLayer">
+<area shape="rect" id="node1" title="This layer represents a normalization operation." alt="" coords="35,352,186,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,216,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="76,81,135,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="127,157,289,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="34,5,177,32"/>
+</map>

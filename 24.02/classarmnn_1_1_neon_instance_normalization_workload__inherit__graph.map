@@ -1,0 +1,9 @@
+<map id="NeonInstanceNormalizationWorkload" name="NeonInstanceNormalizationWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="1487,52,1689,93"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_neon_base_workload.html" title=" " alt="" coords="1199,52,1437,93"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="659,23,936,64"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="5,38,92,65"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="141,38,396,65"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="141,89,396,115"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_neon_base_workload.html" title=" " alt="" coords="653,89,941,115"/>
+</map>

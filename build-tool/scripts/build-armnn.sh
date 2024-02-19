@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -166,6 +166,13 @@ build_armnn()
   cd "$ARMNN_BUILD_TARGET"
   rm -rf include
   cp -r "$SOURCE_DIR"/armnn/include .
+
+  if [ "$flag_tflite_classic_delegate" -eq 1 ]; then
+    cp -r "$SOURCE_DIR"/armnn/delegate/classic/include ./delegate/classic/
+  fi
+  if [ "$flag_tflite_opaque_delegate" -eq 1 ]; then
+    cp -r "$SOURCE_DIR"/armnn/delegate/opaque/include ./delegate/opaque/
+  fi
 
   echo -e "\n***** Built Arm NN for $TARGET_ARCH *****"
 

@@ -1968,8 +1968,12 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         optGraph.InferTensorInfos();
     }
 
-    // Perform BroadcastToOptimizationLayer and then AddBroadcastReshapeLayer optimisation
     using namespace optimizations;
+    // Substitute Max + Min with Bounded Relu before AddBroadcastReshapeLayer optimisation,
+    // as Bounded ReLu needs the constants to be 1D size 1
+    Optimizer::Pass(optGraph, MakeOptimizations(MaxMinIntoBoundedRelu()));
+
+    // Perform BroadcastToOptimizationLayer before AddBroadcastReshapeLayer optimisation
     Optimizer::Pass(optGraph, MakeOptimizations(BroadcastToOptimizationLayer()));
 
     Optimizer::Pass(optGraph, MakeOptimizations(AddBroadcastReshapeLayer()));
@@ -1979,7 +1983,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         // Validate the tensor infos for all output slots. Throws an exception on failure
         optGraph.InferTensorInfos();
     }
-
 
     // Group Constant Layer optimizations together where possible.
     // This is important as:

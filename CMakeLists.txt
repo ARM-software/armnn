@@ -612,6 +612,7 @@ if(BUILD_UNIT_TESTS)
         src/armnn/test/optimizations/Fp32NetworkToFp16ConverterTests.cpp
         src/armnn/test/optimizations/FuseActivationTests.cpp
         src/armnn/test/optimizations/InsertDebugLayerTests.cpp
+        src/armnn/test/optimizations/MaxMinIntoBoundedReluTests.cpp
         src/armnn/test/optimizations/MovePermuteUpTests.cpp
         src/armnn/test/optimizations/MoveTransposeUpTests.cpp
         src/armnn/test/optimizations/OptimizeConsecutiveReshapesTests.cpp

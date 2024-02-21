@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/Types.hpp>
@@ -60,6 +60,12 @@ template<>
 bool CompatibleTypes<int32_t>(DataType dataType)
 {
     return dataType == DataType::Signed32;
+}
+
+template<>
+bool CompatibleTypes<int64_t>(DataType dataType)
+{
+    return dataType == DataType::Signed64;
 }
 
 } //namespace armnnUtils

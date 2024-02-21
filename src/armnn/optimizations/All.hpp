@@ -1,5 +1,5 @@
 //
-// Copyright © 2022, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -13,6 +13,7 @@
 #include "DeleteBroadcastTo.hpp"
 #include "FoldPadIntoLayer2d.hpp"
 #include "FuseBatchNorm.hpp"
+#include "MaxMinIntoBoundedRelu.hpp"
 #include "MovePermuteUp.hpp"
 #include "MoveTransposeUp.hpp"
 #include "OptimizeConsecutiveReshapes.hpp"

@@ -1,13 +1,12 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ClContextControlFixture.hpp"
 #include "ClWorkloadFactoryHelper.hpp"
 
-#include <armnn/utility/Assert.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
+#include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/backends/MemCopyWorkload.hpp>
 #include <armnnTestUtils/TensorCopyUtils.hpp>
@@ -331,11 +330,10 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dFastMathEnabledWo
                                                                                            DataLayout::NCHW,
                                                                                            modelOptions);
 
-    ARMNN_ASSERT(workload != nullptr);
+    CHECK(workload != nullptr);
     auto conv2dWorkload = PolymorphicDowncast<ClConvolution2dWorkload*>(workload.get());
-    IgnoreUnused(conv2dWorkload);
-    ARMNN_ASSERT(conv2dWorkload != nullptr);
-    ARMNN_ASSERT(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::WINOGRAD);
+    CHECK(conv2dWorkload != nullptr);
+    CHECK(conv2dWorkload->GetConvolutionMethod() == arm_compute::ConvolutionMethod::WINOGRAD);
 }
 
 TEST_CASE_FIXTURE(ClContextControlFixture, "ClReplaceInputOutputConvolution2dWorkload")
@@ -480,7 +478,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "CreateConvolution2dClCompiledContext
                                                               workloadInfo,
                                                               clMemoryManager->GetIntraLayerManager(),
                                                               clCompileContext);
-    ARMNN_ASSERT(workload != nullptr);
+    CHECK(workload != nullptr);
     // Check built programs are not empty in context
     CHECK(!clCompileContext.get_built_programs().empty());
 }

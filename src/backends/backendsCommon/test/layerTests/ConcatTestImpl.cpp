@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -61,7 +61,7 @@ bool NeedPermuteForConcat(
         }
         else
         {
-            ARMNN_ASSERT_MSG(nDimensions == tensorInfo.GetShape().GetNumDimensions(),
+            CHECK_MESSAGE(nDimensions == tensorInfo.GetShape().GetNumDimensions(),
                 "Input shapes must have the same number of dimensions");
         }
     }
@@ -92,7 +92,7 @@ void Generate3dPermuteVectorForConcat(
     unsigned int & concatDim,
     std::pair<PermutationVector, PermutationVector> & permutations)
 {
-    ARMNN_ASSERT_MSG(numDimensions <= 3,
+    CHECK_MESSAGE(numDimensions <= 3,
        "Only dimensions 1,2 and 3 are supported by this helper");
     unsigned int expandedBy = 3 - numDimensions;
     unsigned int expandedConcatAxis = concatDim + expandedBy;
@@ -113,7 +113,7 @@ void Generate3dPermuteVectorForConcat(
     }
     else
     {
-        ARMNN_ASSERT(expandedConcatAxis == 0);
+        CHECK(expandedConcatAxis == 0);
         concatDim = 0;
     }
 }
@@ -128,7 +128,7 @@ template<typename T> void PermuteTensorData(
     std::vector<T>& outputData)
 {
     IgnoreUnused(memoryManager);
-    ARMNN_ASSERT_MSG(inputData != nullptr, "inputData must not be null");
+    CHECK_MESSAGE(inputData != nullptr, "inputData must not be null");
     if (inputData == nullptr)
     {
         // Nullptr is an error in the test. By returning without doing the concatenation
@@ -182,7 +182,7 @@ template<typename T> void PermuteInputsForConcat(
     TensorInfo & outputTensorInfo)
 {
     IgnoreUnused(memoryManager);
-    ARMNN_ASSERT_MSG(inputTensorInfos.size() > 1,
+    CHECK_MESSAGE(inputTensorInfos.size() > 1,
         "Expecting more than one tensor to be concatenated here");
 
     unsigned int numDims = 0;
@@ -203,12 +203,12 @@ template<typename T> void PermuteInputsForConcat(
 
             // Store the reverese permutation.
             permuteVector = permutations.second;
-            ARMNN_ASSERT_MSG(!permuteVector.IsEqual(identity),
+            CHECK_MESSAGE(!permuteVector.IsEqual(identity),
                 "Test logic error, we don't need permutation, so we shouldn't arrive here");
         }
         else
         {
-            ARMNN_ASSERT_MSG(numDims == tensorInfo.GetShape().GetNumDimensions(),
+            CHECK_MESSAGE(numDims == tensorInfo.GetShape().GetNumDimensions(),
                 "All inputs must have the same number of dimensions");
         }
 
@@ -249,7 +249,7 @@ template <typename T> void PermuteOutputForConcat(
     std::unique_ptr<ITensorHandle> && inputDataHandle,
     T * data)
 {
-    ARMNN_ASSERT_MSG(data != nullptr, "data must not be null");
+    CHECK_MESSAGE(data != nullptr, "data must not be null");
     if (data == nullptr)
     {
         // Nullptr is an error in the test. By returning without doing the permutation
@@ -286,7 +286,7 @@ template<typename T> void Concatenate(
     unsigned int concatDim,
     bool useSubtensor)
 {
-    ARMNN_ASSERT_MSG(output != nullptr, "output must not be null");
+    CHECK_MESSAGE(output != nullptr, "output must not be null");
     if (output == nullptr)
     {
         // Nullptr is an error in the test. By returning without doing the permutation

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1350,10 +1350,10 @@ LayerTestResult<T, 4> CompareActivationTestImpl(
 
     std::unique_ptr<armnn::IWorkload> workload = workloadFactory.CreateWorkload(armnn::LayerType::Activation,
                                                                                 data, info);
-    ARMNN_ASSERT(workload != nullptr);
+    CHECK(workload != nullptr);
     std::unique_ptr<armnn::IWorkload> workloadRef = refWorkloadFactory.CreateWorkload(armnn::LayerType::Activation,
                                                                                       refData, refInfo);
-    ARMNN_ASSERT(workloadRef != nullptr);
+    CHECK(workloadRef != nullptr);
 
     inputHandle->Allocate();
     outputHandle->Allocate();

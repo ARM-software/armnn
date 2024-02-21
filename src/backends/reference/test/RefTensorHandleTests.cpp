@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -190,7 +190,7 @@ TEST_CASE("RefTensorHandleSupportsInPlaceComputation")
     RefTensorHandleFactory handleFactory(memoryManager);
 
     // RefTensorHandleFactory does not support InPlaceComputation
-    ARMNN_ASSERT(!(handleFactory.SupportsInPlaceComputation()));
+    CHECK(!(handleFactory.SupportsInPlaceComputation()));
 }
 
 TEST_CASE("TestManagedConstTensorHandle")

@@ -1,11 +1,10 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "LogicalTestImpl.hpp"
 
-#include <armnn/utility/Assert.hpp>
 #include <ResolveType.hpp>
 
 #include <armnn/backends/Workload.hpp>
@@ -29,10 +28,10 @@ LayerTestResult<uint8_t, NumDims> LogicalUnaryTestHelper(
     std::vector<uint8_t> expectedOutput,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    ARMNN_ASSERT(inputShape.GetNumDimensions() == NumDims);
+    CHECK(inputShape.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo(inputShape, armnn::DataType::Boolean);
 
-    ARMNN_ASSERT(outputShape.GetNumDimensions() == NumDims);
+    CHECK(outputShape.GetNumDimensions() == NumDims);
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Boolean);
 
     std::vector<uint8_t> actualOutput(outputTensorInfo.GetNumElements());
@@ -80,13 +79,13 @@ LayerTestResult<uint8_t, NumDims> LogicalBinaryTestHelper(
     std::vector<uint8_t> expectedOutput,
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
-    ARMNN_ASSERT(inputShape0.GetNumDimensions() == NumDims);
+    CHECK(inputShape0.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo0(inputShape0, armnn::DataType::Boolean);
 
-    ARMNN_ASSERT(inputShape1.GetNumDimensions() == NumDims);
+    CHECK(inputShape1.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo1(inputShape1, armnn::DataType::Boolean);
 
-    ARMNN_ASSERT(outputShape.GetNumDimensions() == NumDims);
+    CHECK(outputShape.GetNumDimensions() == NumDims);
     armnn::TensorInfo outputTensorInfo(outputShape, armnn::DataType::Boolean);
 
     std::vector<uint8_t> actualOutput(outputTensorInfo.GetNumElements());

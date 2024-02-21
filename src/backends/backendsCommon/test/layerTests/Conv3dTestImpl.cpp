@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,9 +57,9 @@ void ApplyBiasToData(std::vector<T>& v, const std::vector<B>& bias,
                      float vScale, int32_t vOffset,
                      float bScale, int32_t bOffset)
 {
-    ARMNN_ASSERT_MSG((armnn::IsQuantizedType<T>() && vScale != 0.0f) || (!armnn::IsQuantizedType<T>()),
+    CHECK_MESSAGE(((armnn::IsQuantizedType<T>() && vScale != 0.0f) || (!armnn::IsQuantizedType<T>())),
                      "Invalid type and parameter combination.");
-    ARMNN_ASSERT_MSG((armnn::IsQuantizedType<B>() && bScale != 0.0f) || (!armnn::IsQuantizedType<B>()),
+    CHECK_MESSAGE(((armnn::IsQuantizedType<B>() && bScale != 0.0f) || (!armnn::IsQuantizedType<B>())),
                      "Invalid type and parameter combination.");
 
     for (uint32_t i = 0; i < bias.size(); ++i)
@@ -196,7 +196,7 @@ LayerTestResult<T, 5> SimpleConvolution3dTestImpl(
     bool biasEnabled = bias.size() > 0;
 
     // If a bias is used, its size must equal the number of output channels.
-    ARMNN_ASSERT(!biasEnabled || bias.size() == outputChannels);
+    CHECK((!biasEnabled || (bias.size() == outputChannels)));
 
     // Creates the tensors.
     armnn::TensorInfo inputTensorInfo({inputNum, inputDepth, inputHeight, inputWidth, inputChannels}, ArmnnType);

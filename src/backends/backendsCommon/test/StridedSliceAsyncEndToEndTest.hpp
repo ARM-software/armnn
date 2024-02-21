@@ -1,5 +1,5 @@
 //
-// Copyright © 2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -127,7 +127,7 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
                            float tolerance = 0.000001f,
                            size_t numThreads = 1)
 {
-    ARMNN_ASSERT(numThreads >= 1);
+    CHECK(numThreads >= 1);
     const unsigned int numberOfInferences = numThreads == 1 ? 1 : 1000;
 
     // Create Runtime in which test will run

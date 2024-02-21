@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -97,7 +97,7 @@ TEST_CASE("DefaultAllocatorTestMock")
     // Initialize Mock Backend
     MockBackendInitialiser initialiser;
     auto factoryFun = BackendRegistryInstance().GetFactory(MockBackend().GetIdStatic());
-    ARMNN_ASSERT(factoryFun != nullptr);
+    CHECK(factoryFun != nullptr);
     auto backend = factoryFun();
     auto defaultAllocator = backend->GetDefaultAllocator();
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -104,7 +104,7 @@ LayerTestResult<T, n> SimpleSoftmaxBaseTestImpl(
     outputHandle->Allocate();
     CopyDataToITensorHandle(inputHandle.get(), input.data());
 
-    ARMNN_ASSERT(workload);
+    CHECK(workload);
 
     ExecuteWorkload(*workload, memoryManager);
 

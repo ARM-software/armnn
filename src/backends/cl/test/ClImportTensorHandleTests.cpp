@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -308,7 +308,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     size_t totalBytes = numElements * sizeof(float);
 
     IConnectableLayer* const inputLayer = network->AddInputLayer(0, "input");
-    ARMNN_ASSERT(inputLayer);
+    CHECK(inputLayer);
 
     armnn::ConstTensor weights(kernelInfo, kernel);
 
@@ -324,7 +324,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d, "conv");
     armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights);
 
-    ARMNN_ASSERT(convLayer);
+    CHECK(convLayer);
 
     weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
     weightsLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(1u));
@@ -460,10 +460,10 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp16toFp32EndToE
     size_t totalBytesOutput = numElements * sizeof(float);
 
     IConnectableLayer* const inputLayer = network.AddInputLayer(0, "input");
-    ARMNN_ASSERT(inputLayer);
+    CHECK(inputLayer);
 
     armnn::IConnectableLayer* const convLayer = network.AddConvertFp16ToFp32Layer("convert");
-    ARMNN_ASSERT(convLayer);
+    CHECK(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
@@ -608,10 +608,10 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp32toFp16EndToE
     size_t totalBytesOutput = numElements * sizeof(Half);
 
     IConnectableLayer* const inputLayer = network.AddInputLayer(0, "input");
-    ARMNN_ASSERT(inputLayer);
+    CHECK(inputLayer);
 
     armnn::IConnectableLayer* const convLayer = network.AddConvertFp32ToFp16Layer("convert");
-    ARMNN_ASSERT(convLayer);
+    CHECK(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
@@ -747,10 +747,10 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportSimpleConvertFp32toFp16
     size_t totalBytesOutput = numElements * sizeof(Half);
 
     IConnectableLayer* const inputLayer = network.AddInputLayer(0, "input");
-    ARMNN_ASSERT(inputLayer);
+    CHECK(inputLayer);
 
     armnn::IConnectableLayer* const convLayer = network.AddConvertFp32ToFp16Layer("convert");
-    ARMNN_ASSERT(convLayer);
+    CHECK(convLayer);
 
     inputLayer->GetOutputSlot(0).Connect(convLayer->GetInputSlot(0));
     inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
@@ -884,7 +884,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     size_t totalBytes = numElements * sizeof(float);
 
     IConnectableLayer* const inputLayer = network->AddInputLayer(0, "input");
-    ARMNN_ASSERT(inputLayer);
+    CHECK(inputLayer);
 
     armnn::ConstTensor weights(kernelInfo, kernel);
 
@@ -897,7 +897,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     convDesc2d.m_PadBottom = 1;
     convDesc2d.m_DataLayout = DataLayout::NHWC;
     armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d, "conv");
-    ARMNN_ASSERT(convLayer);
+    CHECK(convLayer);
 
     armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights);
 
@@ -1109,7 +1109,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     size_t totalBytes = numElements * sizeof(float);
 
     IConnectableLayer* const inputLayer = network->AddInputLayer(0, "input");
-    ARMNN_ASSERT(inputLayer);
+    CHECK(inputLayer);
 
     armnn::ConstTensor weights(kernelInfo, kernel);
 
@@ -1123,7 +1123,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     convDesc2d.m_DataLayout = DataLayout::NHWC;
 
     armnn::IConnectableLayer* const convLayer = network->AddConvolution2dLayer(convDesc2d, "conv");
-    ARMNN_ASSERT(convLayer);
+    CHECK(convLayer);
 
     armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights);
 

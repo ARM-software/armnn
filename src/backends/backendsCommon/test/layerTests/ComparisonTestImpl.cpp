@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -43,13 +43,13 @@ LayerTestResult<uint8_t, NumDims> ComparisonTestImpl(
     int outQuantOffset)
 {
     IgnoreUnused(memoryManager);
-    ARMNN_ASSERT(shape0.GetNumDimensions() == NumDims);
+    CHECK(shape0.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo0(shape0, ArmnnInType, quantScale0, quantOffset0);
 
-    ARMNN_ASSERT(shape1.GetNumDimensions() == NumDims);
+    CHECK(shape1.GetNumDimensions() == NumDims);
     armnn::TensorInfo inputTensorInfo1(shape1, ArmnnInType, quantScale1, quantOffset1);
 
-    ARMNN_ASSERT(outShape.GetNumDimensions() == NumDims);
+    CHECK(outShape.GetNumDimensions() == NumDims);
     armnn::TensorInfo outputTensorInfo(outShape, armnn::DataType::Boolean, outQuantScale, outQuantOffset);
 
     std::vector<uint8_t> actualOutput(outputTensorInfo.GetNumElements());

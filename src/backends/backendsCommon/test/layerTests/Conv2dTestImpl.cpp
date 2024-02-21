@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -162,9 +162,9 @@ template<typename T, typename B>
 void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
     const std::vector<B>& bias, float bScale, int32_t bOffset, uint32_t w, uint32_t h)
 {
-    ARMNN_ASSERT_MSG((armnn::IsQuantizedType<T>() && vScale != 0.0f) || (!armnn::IsQuantizedType<T>()),
+    CHECK_MESSAGE(((armnn::IsQuantizedType<T>() && vScale != 0.0f) || (!armnn::IsQuantizedType<T>())),
                      "Invalid type and parameter combination.");
-    ARMNN_ASSERT_MSG((armnn::IsQuantizedType<B>() && bScale != 0.0f) || (!armnn::IsQuantizedType<B>()),
+    CHECK_MESSAGE(((armnn::IsQuantizedType<B>() && bScale != 0.0f) || (!armnn::IsQuantizedType<B>())),
                      "Invalid type and parameter combination.");
 
     // Note we need to dequantize and re-quantize the image value and the bias.
@@ -176,7 +176,7 @@ void ApplyBias(std::vector<T>& v, float vScale, int32_t vOffset,
             for (uint32_t x = 0; x < w; ++x)
             {
                 uint32_t offset = (i * h + y) * w + x;
-                ARMNN_ASSERT(offset < v.size());
+                CHECK(offset < v.size());
                 T& outRef = v[offset];
                 float dOutput = SelectiveDequantize(outRef, vScale, vOffset);
                 outRef = SelectiveQuantize<T>(dOutput + dBias, vScale, vOffset);
@@ -233,11 +233,11 @@ LayerTestResult<T, 4> SimpleConvolution2dTestImpl(
     bool biasEnabled = bias.size() > 0;
 
     // This function currently assumes 1 batch of input/output (and duplicates this into 2 batches).
-    ARMNN_ASSERT(inputNum == 1);
-    ARMNN_ASSERT(outputNum == 1);
+    CHECK(inputNum == 1);
+    CHECK(outputNum == 1);
 
     // If a bias is used, its size must equal the number of output channels.
-    ARMNN_ASSERT(!biasEnabled || bias.size() == outputChannels);
+    CHECK((!biasEnabled || (bias.size() == outputChannels)));
 
     // Note these tensors will use two (identical) batches.
     armnn::TensorInfo inputTensorInfo =
@@ -1719,7 +1719,7 @@ LayerTestResult<T, 4> DepthwiseConvolution2dAsymmetricTestImpl(
 
     // If a bias is used, its size must equal the number of output channels.
     bool biasEnabled = bias.size() > 0;
-    ARMNN_ASSERT(!biasEnabled || bias.size() == outputChannels);
+    CHECK((!biasEnabled || (bias.size() == outputChannels)));
 
     // Creates the tensors.
     armnn::TensorInfo inputTensorInfo =
@@ -2277,11 +2277,11 @@ LayerTestResult<T, 4> DepthwiseConvolution2dTestImpl(
     bool biasEnabled = bias.size() > 0;
 
     // This function currently assumes 1 batch of input/output (and duplicates this into 2 batches).
-    ARMNN_ASSERT(inputNum == 1);
-    ARMNN_ASSERT(outputNum == 1);
+    CHECK(inputNum == 1);
+    CHECK(outputNum == 1);
 
     // If a bias is used, its size must equal the number of output channels.
-    ARMNN_ASSERT(!biasEnabled || bias.size() == outputChannels);
+    CHECK((!biasEnabled || (bias.size() == outputChannels)));
 
 
     // Note these tensors will use two (identical) batches.

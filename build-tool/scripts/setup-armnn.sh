@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -420,7 +420,7 @@ if [ "$TARGET_ARCH" == "android64" ]; then
   download_androidndk
 fi
 
-if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] ||  [ "$flag_tflite_parser" -eq 1 ]; then
+if [ "$flag_onnx_parser" -eq 1 ] || [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
   download_flatbuffers
 
   # Host build
@@ -431,7 +431,9 @@ if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate"
     build_flatbuffers 0
   fi
 
-  download_tensorflow
+  if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
+    download_tensorflow
+  fi
 fi
 
 if [ "$flag_tflite_parser" -eq 1 ]; then

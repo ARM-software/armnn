@@ -12,7 +12,10 @@ set -o nounset  # Catch references to undefined variables.
 set -o pipefail # Catch non zero exit codes within pipelines.
 set -o errexit  # Catch and propagate non zero exit codes.
 
-rel_path=$(dirname "$0") # relative path from where script is executed to script location
+rel_path=$(dirname "$0") 			# relative path from where script is executed to script location
+abs_script_path=$(cd "$rel_path" ; pwd -P) 	# absolute path to script directory
+abs_btool_path=$(dirname "$abs_script_path")	# absolute path to build-tool directory
+abs_armnn_path=$(dirname "$abs_btool_path")	# absolute path to armnn directory
 
 build_acl()
 {
@@ -263,6 +266,8 @@ build-armnn.sh [OPTION]...
     provide additional comma-separated scons parameters string for building ACL (optional)
   --num-threads=<INTEGER>
     specify number of threads/cores to build dependencies with (optional: defaults to number of online CPU cores on host)
+  --symlink-armnn
+    instead of cloning, make a symbolic link from the armnn directory containing the build-tool to the source directory
   -h, --help
     print brief usage information and exit
   -x
@@ -302,6 +307,7 @@ flag_ref_backend=0
 flag_clean=0
 flag_debug=0
 flag_jni=0
+flag_symlink_armnn=0
 
 # Empty strings for optional additional args by default
 armnn_cmake_args=""
@@ -318,7 +324,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$(getopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,help -n "$name"   -- "$@")
+args=$(getopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,symlink-armnn,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then
@@ -394,6 +400,10 @@ while [ $# -gt 0 ]; do
     opt_prev=num_threads
     ;;
 
+  --symlink-armnn)
+    flag_symlink_armnn=1
+    ;;
+    
   -h | --help)
     usage
     exit 0
@@ -449,11 +459,23 @@ fi
 
 # Download Arm NN if not done already in a previous execution of this script
 # Check if Arm NN source directory exists AND that it is a repository (not empty)
+made_symlink_armnn=0
 if [ -d "$ARMNN_SRC" ] && check_if_repository "$ARMNN_SRC"; then
   echo -e "\n***** Arm NN source repository already located at $ARMNN_SRC. Skipping cloning of Arm NN. *****"
 else
-  # Download latest release branch of Arm NN
-  download_armnn
+  # Use sym link or download latest release branch of Arm NN
+  if [ "$flag_symlink_armnn" -eq 1 ]; then
+    if check_if_repository "$abs_armnn_path"; then
+      ln -s "$abs_armnn_path" "$SOURCE_DIR"/armnn
+      made_symlink_armnn=1
+      echo -e "\n***** Arm NN source repository using symbolic link to: $abs_armnn_path *****"
+    else
+      echo "Arm NN directory found is not a repository: $abs_armnn_path"
+      exit 1
+    fi
+  else
+    download_armnn
+  fi
 fi
 
 # Download ACL if not done already in a previous execution of this script
@@ -506,6 +528,9 @@ echo "       acl-scons-params: $acl_scons_params"
 echo "            num-threads: $NUM_THREADS"
 echo "         root directory: $ROOT_DIR"
 echo "       source directory: $SOURCE_DIR"
+if [ "$made_symlink_armnn" -eq 1 ]; then
+  echo "armnn symlink directory: $abs_armnn_path"
+fi
 echo "        build directory: $BUILD_DIR"
 echo "        armnn build dir: $ARMNN_BUILD_TARGET"
 echo -e "\nScript execution will begin in 10 seconds..."

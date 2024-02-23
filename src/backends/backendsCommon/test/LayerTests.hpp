@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -64,6 +64,7 @@
 #include <backendsCommon/test/layerTests/ResizeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ReverseV2TestImpl.hpp>
 #include <backendsCommon/test/layerTests/RsqrtTestImpl.hpp>
+#include <backendsCommon/test/layerTests/ScatterNdTestImpl.hpp>
 #include <backendsCommon/test/layerTests/ShapeTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SinTestImpl.hpp>
 #include <backendsCommon/test/layerTests/SliceTestImpl.hpp>

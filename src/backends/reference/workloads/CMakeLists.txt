@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -85,6 +85,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     RefCastWorkload.hpp
     RefChannelShuffleWorkload.cpp
     RefChannelShuffleWorkload.hpp
+    RefScatterNdWorkload.cpp
+    RefScatterNdWorkload.hpp
     RefShapeWorkload.hpp
     RefComparisonWorkload.cpp
     RefComparisonWorkload.hpp
@@ -195,6 +197,8 @@ list(APPEND armnnRefBackendWorkloads_sources
     Resize.cpp
     Resize.hpp
     Rsqrt.hpp
+    ScatterNd.cpp
+    ScatterNd.hpp
     Sin.hpp
     Slice.cpp
     Slice.hpp

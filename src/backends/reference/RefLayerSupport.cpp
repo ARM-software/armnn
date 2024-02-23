@@ -356,6 +356,13 @@ bool RefLayerSupport::IsLayerSupported(const LayerType& type,
                                      infos[1],
                                      *(PolymorphicDowncast<const ReduceDescriptor*>(&descriptor)),
                                      reasonIfUnsupported);
+        case LayerType::ScatterNd:
+            return IsScatterNdSupported(infos[0],
+                                        infos[1],
+                                        infos[2],
+                                        infos[3],
+                                        *(PolymorphicDowncast<const ScatterNdDescriptor*>(&descriptor)),
+                                        reasonIfUnsupported);
         case LayerType::Slice:
             return IsSliceSupported(infos[0],
                                     infos[1],
@@ -2438,6 +2445,64 @@ bool RefLayerSupport::IsReverseV2Supported(const TensorInfo& input0,
 
     supported &= CheckSupportRule(TypeAnyOf(input1, input2SupportedTypes), reasonIfUnsupported,
                                   "Reference ReverseV2: input1 type not supported");
+
+    return supported;
+}
+
+bool RefLayerSupport::IsScatterNdSupported(const TensorInfo& input,
+                                           const TensorInfo& indices,
+                                           const TensorInfo& updates,
+                                           const TensorInfo& output,
+                                           const ScatterNdDescriptor& descriptor,
+                                            Optional<std::string&> reasonIfUnsupported) const
+{
+    IgnoreUnused(descriptor);
+
+    bool supported = true;
+
+    std::array<DataType, 7> supportedTypes
+    {
+        DataType::Float32,
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8,
+        DataType::QSymmS8,
+        DataType::QSymmS16,
+        DataType::Signed32
+    };
+
+    std::array<DataType, 1> indicesSupportedTypes =
+    {
+        DataType::Signed32
+    };
+
+    supported &= CheckSupportRule(TypeAnyOf(indices, indicesSupportedTypes), reasonIfUnsupported,
+                                  "ScatterNd: indices type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(updates, supportedTypes), reasonIfUnsupported,
+                                  "ScatterNd: updates type not supported.");
+
+    supported &= CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
+                                  "ScatterNd: output type not supported");
+
+    supported &= CheckSupportRule(TypesAreEqual(updates, output), reasonIfUnsupported,
+                                  "ScatterNd: input and updates types are mismatched");
+
+    if (descriptor.m_InputEnabled)
+    {
+        // If the input slot is enabled, we have the input tensor in this slot
+        supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,
+                                      "ScatterNd: input type not supported.");
+
+        supported &= CheckSupportRule(TypesAreEqual(input, output), reasonIfUnsupported,
+                                      "ScatterNd: input and output types are mismatched");
+    }
+    else
+    {
+        // If the input slot is not enabled, we have the shape tensor in this slot
+        supported &= CheckSupportRule(TypeAnyOf(input, indicesSupportedTypes), reasonIfUnsupported,
+                                      "ScatterNd: shape type not supported.");
+    }
 
     return supported;
 }

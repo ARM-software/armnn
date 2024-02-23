@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2023 ARM Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2024 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -267,6 +267,7 @@ LOCAL_SRC_FILES := \
         src/armnn/layers/ReshapeLayer.cpp \
         src/armnn/layers/ResizeLayer.cpp \
         src/armnn/layers/ReverseV2Layer.cpp \
+        src/armnn/layers/ScatterNdLayer.cpp \
         src/armnn/layers/ShapeLayer.cpp \
         src/armnn/layers/SliceLayer.cpp \
         src/armnn/layers/SoftmaxLayer.cpp \

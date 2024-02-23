@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2023 ARM Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2024 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -94,6 +94,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/ResizeTestImpl.cpp \
     test/layerTests/ReverseV2TestImpl.cpp \
     test/layerTests/RsqrtTestImpl.cpp \
+    test/layerTests/ScatterNdTestImpl.cpp \
     test/layerTests/SliceTestImpl.cpp \
     test/layerTests/SquaredDifferenceTestImpl.cpp \
     test/layerTests/QuantizeTestImpl.cpp \

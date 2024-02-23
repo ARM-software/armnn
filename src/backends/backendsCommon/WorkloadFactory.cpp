@@ -1168,6 +1168,23 @@ bool IWorkloadFactory::IsLayerConfigurationSupported(const BackendId& backendId,
                                                              reason);
             break;
         }
+        case LayerType::ScatterNd:
+        {
+            auto cLayer = PolymorphicDowncast<const ScatterNdLayer*>(&layer);
+            const TensorInfo& input  = layer.GetInputSlot(0).GetTensorInfo();
+            const TensorInfo& indices  = layer.GetInputSlot(1).GetTensorInfo();
+            const TensorInfo& updates  = layer.GetInputSlot(2).GetTensorInfo();
+            const TensorInfo& output = layer.GetOutputSlot(0).GetTensorInfo();
+
+            result = layerSupportObject.IsScatterNdSupported(OverrideDataType(input, dataType),
+                                                             OverrideDataType(indices, dataType),
+                                                             OverrideDataType(updates, dataType),
+                                                             OverrideDataType(output, dataType),
+                                                             cLayer->GetParameters(),
+                                                             reason);
+
+            break;
+        }
         case LayerType::Shape:
         {
             const TensorInfo& input  = layer.GetInputSlot(0).GetTensorInfo();

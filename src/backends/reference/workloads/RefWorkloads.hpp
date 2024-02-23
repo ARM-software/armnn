@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -55,6 +55,7 @@
 #include "RefReshapeWorkload.hpp"
 #include "RefResizeWorkload.hpp"
 #include "RefReverseV2Workload.hpp"
+#include "RefScatterNdWorkload.hpp"
 #include "RefShapeWorkload.hpp"
 #include "RefSliceWorkload.hpp"
 #include "RefSplitterWorkload.hpp"

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -67,6 +67,7 @@
 #include "layers/ReshapeLayer.hpp"
 #include "layers/ResizeLayer.hpp"
 #include "layers/ReverseV2Layer.hpp"
+#include "layers/ScatterNdLayer.hpp"
 #include "layers/ShapeLayer.hpp"
 #include "layers/SliceLayer.hpp"
 #include "layers/SoftmaxLayer.hpp"
@@ -172,6 +173,7 @@ DECLARE_LAYER(Reduce)
 DECLARE_LAYER(Reshape)
 DECLARE_LAYER(Resize)
 DECLARE_LAYER(ReverseV2)
+DECLARE_LAYER(ScatterNd)
 DECLARE_LAYER(Shape)
 DECLARE_LAYER(Slice)
 DECLARE_LAYER(Softmax)

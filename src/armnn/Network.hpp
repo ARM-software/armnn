@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -195,6 +195,9 @@ public:
                                        const char* name = nullptr);
 
     IConnectableLayer* AddReverseV2Layer(const char* name = nullptr);
+
+    IConnectableLayer* AddScatterNdLayer(const ScatterNdDescriptor& scatterDescriptor,
+                                         const char* name = nullptr);
 
     IConnectableLayer* AddShapeLayer(const char* name = nullptr);
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -661,6 +661,12 @@ IConnectableLayer* INetwork::AddBroadcastToLayer(const BroadcastToDescriptor& de
                                                  const char* name)
 {
     return pNetworkImpl->AddBroadcastToLayer(descriptor, name);
+}
+
+IConnectableLayer* INetwork::AddScatterNdLayer(const ScatterNdDescriptor &descriptor,
+                                               const char *name)
+{
+    return pNetworkImpl->AddScatterNdLayer(descriptor, name);
 }
 
 void INetwork::ExecuteStrategy(IStrategy& strategy) const
@@ -3083,6 +3089,11 @@ IConnectableLayer* NetworkImpl::AddPrecompiledLayer(const PreCompiledDescriptor&
 IConnectableLayer* NetworkImpl::AddBroadcastToLayer(const BroadcastToDescriptor &desc, const char *name)
 {
     return m_Graph->AddLayer<BroadcastToLayer>(desc, name);
+}
+
+IConnectableLayer* NetworkImpl::AddScatterNdLayer(const ScatterNdDescriptor &desc, const char *name)
+{
+    return m_Graph->AddLayer<ScatterNdLayer>(desc, name);
 }
 
 void NetworkImpl::ExecuteStrategy(IStrategy& strategy) const

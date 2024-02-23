@@ -181,6 +181,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/ReverseV2TestImpl.hpp
     layerTests/RsqrtTestImpl.cpp
     layerTests/RsqrtTestImpl.hpp
+    layerTests/ScatterNdTestImpl.cpp
+    layerTests/ScatterNdTestImpl.hpp
     layerTests/SinTestImpl.cpp
     layerTests/SinTestImpl.hpp
     layerTests/ShapeTestImpl.cpp

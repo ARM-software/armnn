@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,6 +44,7 @@ struct QLstmDescriptor;
 struct ReshapeDescriptor;
 struct ResizeDescriptor;
 struct ReduceDescriptor;
+struct ScatterNdDescriptor;
 struct SliceDescriptor;
 struct SoftmaxDescriptor;
 struct SpaceToBatchNdDescriptor;

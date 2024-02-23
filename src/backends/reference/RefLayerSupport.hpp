@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -307,6 +307,13 @@ public:
     bool IsReverseV2Supported(const TensorInfo& input0,
                               const TensorInfo& input1,
                               const TensorInfo& output,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
+
+    bool IsScatterNdSupported(const TensorInfo& input,
+                              const TensorInfo& indices,
+                              const TensorInfo& updates,
+                              const TensorInfo& output,
+                              const ScatterNdDescriptor& descriptor,
                               Optional<std::string&> reasonIfUnsupported = EmptyOptional()) const;
 
     bool IsShapeSupported(const TensorInfo& input,

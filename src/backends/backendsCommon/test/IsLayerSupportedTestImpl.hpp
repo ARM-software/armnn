@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -751,6 +751,8 @@ DECLARE_LAYER_POLICY_2_PARAM(Resize)
 DECLARE_LAYER_POLICY_2_PARAM(Reshape)
 
 DECLARE_LAYER_POLICY_1_PARAM(ReverseV2)
+
+DECLARE_LAYER_POLICY_2_PARAM(ScatterNd)
 
 DECLARE_LAYER_POLICY_1_PARAM(Shape)
 

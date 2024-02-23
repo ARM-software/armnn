@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2019,2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -379,6 +379,13 @@ public:
     bool IsShapeSupported(const TensorInfo& input,
                           const TensorInfo& output,
                           Optional<std::string&> reasonIfUnsupported = EmptyOptional());
+
+    bool IsScatterNdSupported(const TensorInfo& input,
+                              const TensorInfo& indices,
+                              const TensorInfo& updates,
+                              const TensorInfo& output,
+                              const ScatterNdDescriptor& descriptor,
+                              Optional<std::string&> reasonIfUnsupported = EmptyOptional());
 
     bool IsSliceSupported(const TensorInfo& input,
                           const TensorInfo& output,

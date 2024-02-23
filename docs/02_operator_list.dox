@@ -1,4 +1,4 @@
-/// Copyright (c) 2021, 2023 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2021, 2023-2024 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -2929,6 +2929,63 @@ where N = batches, C = channels, H = height, W = width
     <tr><th>
     <tr><td>FLOAT16
     <tr><td>FLOAT32
+    </table>
+<tr>
+  <td rowspan="3">ScatterLayer
+  <td rowspan="3" style="width:200px;"> Layer to scatter updates according to individual values at the specified indices.
+  <td rowspan="3">
+      <ul>
+       <li>N/A
+      </ul>
+   <td>CpuRef
+     <td>
+         <ul>
+          <li>All
+         </ul>
+     <td>
+      <table>
+       <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QSYMMS8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>CpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+      <table>
+       <tr><th>
+       <tr><td>FLOAT16
+       <tr><td>FLOAT32
+       <tr><td>QASYMMS8
+       <tr><td>QASYMMU8
+       <tr><td>QASYMM8
+       <tr><td>QSYMMS16
+       <tr><td>SIGNED32
+      </table>
+<tr>
+  <td>GpuAcc
+  <td>
+      <ul>
+       <li>All
+      </ul>
+  <td>
+    <table>
+    <tr><th>
+    <tr><td>FLOAT16
+    <tr><td>FLOAT32
+    <tr><td>QASYMMS8
+    <tr><td>QASYMMU8
+    <tr><td>QSYMMS8
+    <tr><td>QSYMMS16
+    <tr><td>SIGNED32
     </table>
 <tr>
   <td rowspan="3">ShapeLayer

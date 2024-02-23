@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1271,6 +1271,23 @@ bool LayerSupportHandle::IsReverseV2Supported(const armnn::TensorInfo &input0,
     return m_LayerSupport->IsLayerSupported(LayerType::ReverseV2,
                                             infos,
                                             BaseDescriptor(),
+                                            EmptyOptional(),
+                                            EmptyOptional(),
+                                            reasonIfUnsupported);
+}
+
+bool LayerSupportHandle::IsScatterNdSupported(const TensorInfo& input,
+                                              const TensorInfo& indices,
+                                              const TensorInfo& updates,
+                                              const TensorInfo& output,
+                                              const armnn::ScatterNdDescriptor &descriptor,
+                                              Optional<std::string&> reasonIfUnsupported)
+{
+    TensorInfos infos{input, indices, updates, output};
+
+    return m_LayerSupport->IsLayerSupported(LayerType::ScatterNd,
+                                            infos,
+                                            descriptor,
                                             EmptyOptional(),
                                             EmptyOptional(),
                                             reasonIfUnsupported);

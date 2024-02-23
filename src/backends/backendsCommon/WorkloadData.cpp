@@ -4443,4 +4443,46 @@ void BroadcastToQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
     ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
 }
 
+void ScatterNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
+{
+    const std::string& descriptorName{"ScatterQueueDescriptor"};
+
+    ValidateNumInputs(workloadInfo,  descriptorName, 3);
+    ValidateNumOutputs(workloadInfo, descriptorName, 1);
+
+    const TensorInfo& inputTensorInfo0     = workloadInfo.m_InputTensorInfos[0];
+    const TensorInfo& inputTensorInfo1     = workloadInfo.m_InputTensorInfos[1];
+    const TensorInfo& inputTensorInfo2     = workloadInfo.m_InputTensorInfos[2];
+    const TensorInfo& outputTensorInfo    = workloadInfo.m_OutputTensorInfos[0];
+
+    std::vector<DataType> supportedTypes =
+    {
+            DataType::Float32,
+            DataType::Float16,
+            DataType::QAsymmS8,
+            DataType::QAsymmU8,
+            DataType::QSymmS8,
+            DataType::QSymmS16,
+            DataType::Signed32
+    };
+
+    std::vector<DataType> indicesSupportedTypes =
+    {
+            DataType::Signed32
+    };
+
+    if (m_Parameters.m_InputEnabled)
+    {
+        ValidateDataTypes(inputTensorInfo0, supportedTypes, descriptorName);
+    }
+    else
+    {
+        ValidateDataTypes(inputTensorInfo0, indicesSupportedTypes, descriptorName);
+    }
+
+    ValidateDataTypes(inputTensorInfo1, indicesSupportedTypes, descriptorName);
+    ValidateDataTypes(inputTensorInfo2, supportedTypes, descriptorName);
+    ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
+}
+
 } // namespace armnn

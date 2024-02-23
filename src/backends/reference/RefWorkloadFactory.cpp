@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <Layer.hpp>
@@ -566,6 +566,11 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
         {
             auto reverseV2QueueDescriptor = PolymorphicDowncast<const ReverseV2QueueDescriptor*>(&descriptor);
             return std::make_unique<RefReverseV2Workload>(*reverseV2QueueDescriptor, info);
+        }
+        case LayerType::ScatterNd:
+        {
+            auto scatterQueueDescriptor = PolymorphicDowncast<const ScatterNdQueueDescriptor*>(&descriptor);
+            return std::make_unique<RefScatterNdWorkload>(*scatterQueueDescriptor, info);
         }
         case LayerType::Shape:
         {

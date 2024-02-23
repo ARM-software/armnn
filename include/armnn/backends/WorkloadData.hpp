@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -766,6 +766,11 @@ struct TileQueueDescriptor : QueueDescriptorWithParameters<TileDescriptor>
 };
 
 struct BroadcastToQueueDescriptor : QueueDescriptorWithParameters<BroadcastToDescriptor>
+{
+    void Validate(const WorkloadInfo& workloadInfo) const;
+};
+
+struct ScatterNdQueueDescriptor : QueueDescriptorWithParameters<ScatterNdDescriptor>
 {
     void Validate(const WorkloadInfo& workloadInfo) const;
 };

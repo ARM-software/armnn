@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -482,8 +482,8 @@ using InferenceTimingPair = std::pair<HighResolutionClock, HighResolutionClock>;
     X(ReverseV2) \
     X(Tile) \
     X(Fused) \
-    X(BroadcastTo) \
-
+    X(BroadcastTo)         \
+    X(ScatterNd) \
 // New layers should be added at last position to minimize instability.
 
 /// When adding a new layer, adapt also the LastLayer enum value in the
@@ -494,7 +494,17 @@ enum class LayerType
     LIST_OF_LAYER_TYPE
 #undef X
     FirstLayer = Activation,
-    LastLayer = BroadcastTo
+    LastLayer = ScatterNd
+};
+
+enum class ScatterNdFunction
+{
+    Update = 0,
+    Add    = 1,
+    Sub    = 2,
+    Max    = 3,
+    Min    = 4,
+    Mul    = 5
 };
 
 const char* GetLayerTypeAsCString(LayerType type);

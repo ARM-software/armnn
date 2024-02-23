@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -2885,4 +2885,56 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(BroadcastTo3dAxis0TestSigned32, BroadcastTo3dAxis0
 ARMNN_AUTO_TEST_CASE_WITH_THF(BroadcastTo3dAxis1TestSigned32, BroadcastTo3dAxis1Test<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BroadcastTo3dAxis2TestSigned32, BroadcastTo3dAxis2Test<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(BroadcastTo4dTestSigned32, BroadcastTo4dTest<DataType::Signed32>)
+
+// ScatterNd
+// With Input tensor
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd1DUpdateTestWithInputFloat32, ScatterNd1DimUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DUpdateTestWithInputFloat32, ScatterNd2DimUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2Dim1Outter1InnerUpdateWithInputFloat32,
+                              ScatterNd2Dim1Outter1InnerUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateWithInputFloat32, ScatterNd3DimUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3Dim1Outter2InnerUpdateWithInputFloat32,
+                              ScatterNd3Dim1Outter2InnerUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3Dim2Outter1InnerUpdateWithInputFloat32,
+                              ScatterNd3Dim2Outter1InnerUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd4DimUpdateWithInputFloat32, ScatterNd4DimUpdateWithInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimAddWithInputFloat32, ScatterNd2DimAddWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimSubWithInputFloat32, ScatterNd2DimSubWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimMaxWithInputFloat32, ScatterNd2DimMaxWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimMinWithInputFloat32, ScatterNd2DimMinWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimMulWithInputFloat32, ScatterNd2DimMulWithInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateWithInputFloat16, ScatterNd3DimUpdateWithInput<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateWithInputQAsymmS8, ScatterNd3DimUpdateWithInput<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateWithInputQAsymmU8, ScatterNd3DimUpdateWithInput<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateWithInputQSymmS8, ScatterNd3DimUpdateWithInput<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateWithInputQSymmS16, ScatterNd3DimUpdateWithInput<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateWithInputSigned32, ScatterNd3DimUpdateWithInput<DataType::Signed32>)
+
+// No input tensor, only shape provided
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd1DUpdateTestNoInputFloat32, ScatterNd1DimUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimUpdateTestNoInputFloat32, ScatterNd2DimUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2Dim1Outter1InnerUpdateNoInputFloat32,
+                              ScatterNd2Dim1Outter1InnerUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateNoInputFloat32, ScatterNd3DimUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3Dim1Outter2InnerUpdateNoInputFloat32,
+                              ScatterNd3Dim1Outter2InnerUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3Dim2Outter1InnerUpdateNoInputFloat32,
+                              ScatterNd3Dim2Outter1InnerUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd4DimUpdateNoInputFloat32, ScatterNd4DimUpdateNoInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimAddNoInputFloat32, ScatterNd2DimAddNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimSubNoInputFloat32, ScatterNd2DimSubNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimMaxNoInputFloat32, ScatterNd2DimMaxNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimMinNoInputFloat32, ScatterNd2DimMinNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd2DimMulNoInputFloat32, ScatterNd2DimMulNoInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateNoInputFloat16, ScatterNd3DimUpdateNoInput<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateNoInputQAsymmS8, ScatterNd3DimUpdateNoInput<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateNoInputQAsymmU8, ScatterNd3DimUpdateNoInput<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateNoInputQSymmS8, ScatterNd3DimUpdateNoInput<DataType::QSymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateNoInputQSymmS16, ScatterNd3DimUpdateNoInput<DataType::QSymmS16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ScatterNd3DimUpdateNoInputSigned32, ScatterNd3DimUpdateNoInput<DataType::Signed32>)
+
 }

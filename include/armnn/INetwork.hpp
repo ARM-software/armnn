@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -863,6 +863,13 @@ public:
     /// @return - Interface for configuring the layer
     IConnectableLayer* AddBroadcastToLayer(const BroadcastToDescriptor& descriptor,
                                            const char* name = nullptr);
+
+    /// Add a ScatterNd layer to the network
+    /// @param descriptor - Parameters for the ScatterNd operation
+    /// @param name - Optional name for the layer
+    /// @return - Interface for configuring the layer
+    IConnectableLayer* AddScatterNdLayer(const ScatterNdDescriptor& descriptor,
+                                         const char* name = nullptr);
 
     void ExecuteStrategy(IStrategy& strategy) const;
 

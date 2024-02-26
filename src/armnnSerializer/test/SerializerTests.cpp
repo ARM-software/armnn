@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -3062,6 +3062,48 @@ TEST_CASE("SerializeTile")
     CHECK(deserializedNetwork);
 
     LayerVerifierBaseWithDescriptor<armnn::TileDescriptor> verifier(layerName, {inputInfo}, {outputInfo}, desc);
+    deserializedNetwork->ExecuteStrategy(verifier);
+}
+
+TEST_CASE("SerializeScatterNd")
+{
+    const std::string layerName("ScatterNd");
+    const armnn::TensorInfo inputInfo ({ 5 }, armnn::DataType::Float32);
+    const armnn::TensorInfo outputInfo ({ 5 }, armnn::DataType::Float32);
+    const armnn::TensorInfo indicesInfo({ 3, 1 }, armnn::DataType::Float32, 0.0f, 0, true);
+    const armnn::TensorInfo updatesInfo ({ 3 }, armnn::DataType::Float32,0.0f, 0, true);
+    std::vector<float> indicesData = { 0, 2, 3 };
+    const armnn::ConstTensor indices(indicesInfo, indicesData);
+
+    std::vector<float> updatesData = { 4, 5, 6 };
+    const armnn::ConstTensor updates(updatesInfo, updatesData);
+
+    armnn::ScatterNdDescriptor desc;
+
+    armnn::INetworkPtr network = armnn::INetwork::Create();
+    armnn::IConnectableLayer* const inputLayer = network->AddInputLayer(0);
+    armnn::IConnectableLayer* const indicesLayer = network->AddConstantLayer(indices, "Indices");
+    armnn::IConnectableLayer* const updatesLayer = network->AddConstantLayer(updates, "Updates");
+    armnn::IConnectableLayer* const scatterNdLayer = network->AddScatterNdLayer(desc, layerName.c_str());
+    armnn::IConnectableLayer* const outputLayer = network->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(scatterNdLayer->GetInputSlot(0));
+    indicesLayer->GetOutputSlot(0).Connect(scatterNdLayer->GetInputSlot(1));
+    updatesLayer->GetOutputSlot(0).Connect(scatterNdLayer->GetInputSlot(2));
+    scatterNdLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    indicesLayer->GetOutputSlot(0).SetTensorInfo(indicesInfo);
+    updatesLayer->GetOutputSlot(0).SetTensorInfo(updatesInfo);
+    scatterNdLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    armnn::INetworkPtr deserializedNetwork = DeserializeNetwork(SerializeNetwork(*network));
+    CHECK(deserializedNetwork);
+
+    LayerVerifierBaseWithDescriptor<armnn::ScatterNdDescriptor> verifier(layerName,
+                                                                         {inputInfo, indicesInfo, updatesInfo},
+                                                                         {outputInfo},
+                                                                         desc);
     deserializedNetwork->ExecuteStrategy(verifier);
 }
 

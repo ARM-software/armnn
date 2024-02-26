@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -138,6 +138,7 @@ private:
     void ParseResizeBilinear(GraphPtr graph, unsigned int layerIndex);
     void ParseReverseV2(GraphPtr graph, unsigned int layerIndex);
     void ParseRsqrt(GraphPtr graph, unsigned int layerIndex);
+    void ParseScatterNd(GraphPtr graph, unsigned int layerIndex);
     void ParseShape(GraphPtr graph, unsigned int layerIndex);
     void ParseSlice(GraphPtr graph, unsigned int layerIndex);
     void ParseSoftmax(GraphPtr graph, unsigned int layerIndex);

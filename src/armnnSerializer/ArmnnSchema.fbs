@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -62,6 +62,14 @@ enum ReduceOperation: byte {
 enum ResizeMethod: byte {
     NearestNeighbor = 0,
     Bilinear = 1,
+}
+
+enum ScatterNdFunction: byte {
+    Update = 0,
+    Add    = 1,
+    Sub    = 2,
+    Max    = 3,
+    Min    = 4
 }
 
 table TensorInfo {
@@ -189,6 +197,7 @@ enum LayerType : uint {
     ElementwiseBinary = 69,
     ReverseV2 = 70,
     Tile = 71,
+    ScatterNd = 72,
 }
 
 // Base layer table to be used as part of other layers
@@ -1066,6 +1075,18 @@ table TileLayer {
     descriptor:TileDescriptor;
 }
 
+table ScatterNdDescriptor {
+   m_Function:ScatterNdFunction = Update;
+   m_InputEnabled:bool = true;
+   m_Axis:int = 0;
+   m_AxisEnabled:bool = false;
+}
+
+table ScatterNdLayer {
+    base:LayerBase;
+    descriptor:ScatterNdDescriptor;
+}
+
 union Layer {
     ActivationLayer,
     AdditionLayer,
@@ -1139,6 +1160,7 @@ union Layer {
     ElementwiseBinaryLayer,
     ReverseV2Layer,
     TileLayer,
+    ScatterNdLayer,
 }
 
 table AnyLayer {

@@ -116,6 +116,8 @@ The Arm NN SDK Serializer currently supports the following layers:
 
 - ReverseV2
 
+- ScatterNd
+
 - Shape
 
 - Slice

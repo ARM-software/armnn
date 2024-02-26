@@ -118,6 +118,8 @@ The Arm NN SDK Deserialize parser currently supports the following layers:
 
 - ReverseV2
 
+- ScatterNd
+
 - Slice
 
 - Softmax

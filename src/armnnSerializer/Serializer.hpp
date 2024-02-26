@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -311,6 +311,10 @@ private:
     void SerializeNormalizationLayer(const armnn::IConnectableLayer* layer,
                                      const armnn::NormalizationDescriptor& normalizationDescriptor,
                                      const char* name = nullptr);
+
+    void SerializeScatterNdLayer(const armnn::IConnectableLayer* layer,
+                                 const armnn::ScatterNdDescriptor& descriptor,
+                                 const char* name);
 
     void SerializeShapeLayer(const armnn::IConnectableLayer* layer,
                              const char* name = nullptr);

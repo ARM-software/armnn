@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -265,6 +265,7 @@ m_ParserFunctions(Layer_MAX+1, &IDeserializer::DeserializerImpl::ParseUnsupporte
     m_ParserFunctions[Layer_ResizeLayer]                 = &DeserializerImpl::ParseResize;
     m_ParserFunctions[Layer_ReverseV2Layer]              = &DeserializerImpl::ParseReverseV2;
     m_ParserFunctions[Layer_RsqrtLayer]                  = &DeserializerImpl::ParseRsqrt;
+    m_ParserFunctions[Layer_ScatterNdLayer]              = &DeserializerImpl::ParseScatterNd;
     m_ParserFunctions[Layer_ShapeLayer]                  = &DeserializerImpl::ParseShape;
     m_ParserFunctions[Layer_SliceLayer]                  = &DeserializerImpl::ParseSlice;
     m_ParserFunctions[Layer_SoftmaxLayer]                = &DeserializerImpl::ParseSoftmax;
@@ -402,6 +403,8 @@ LayerBaseRawPtr IDeserializer::DeserializerImpl::GetBaseLayer(const GraphPtr& gr
             return graphPtr->layers()->Get(layerIndex)->layer_as_ReverseV2Layer()->base();
         case Layer::Layer_RsqrtLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_RsqrtLayer()->base();
+        case Layer::Layer_ScatterNdLayer:
+            return graphPtr->layers()->Get(layerIndex)->layer_as_ScatterNdLayer()->base();
         case Layer::Layer_ShapeLayer:
             return graphPtr->layers()->Get(layerIndex)->layer_as_ShapeLayer()->base();
         case Layer::Layer_SliceLayer:
@@ -518,6 +521,25 @@ armnn::ArgMinMaxFunction ToArgMinMaxFunction(armnnSerializer::ArgMinMaxFunction 
         case armnnSerializer::ArgMinMaxFunction::ArgMinMaxFunction_Min:
         default:
             return armnn::ArgMinMaxFunction::Min;
+    }
+}
+
+armnn::ScatterNdFunction ToScatterNdFunction(armnnSerializer::ScatterNdFunction function)
+{
+    switch (function)
+    {
+        case armnnSerializer::ScatterNdFunction_Update:
+            return armnn::ScatterNdFunction::Update;
+        case armnnSerializer::ScatterNdFunction_Add:
+            return armnn::ScatterNdFunction::Add;
+        case armnnSerializer::ScatterNdFunction_Sub:
+            return armnn::ScatterNdFunction::Sub;
+        case armnnSerializer::ScatterNdFunction_Max:
+            return armnn::ScatterNdFunction::Max;
+        case armnnSerializer::ScatterNdFunction_Min:
+            return armnn::ScatterNdFunction::Min;
+        default:
+            return armnn::ScatterNdFunction::Update;
     }
 }
 
@@ -4003,6 +4025,35 @@ void IDeserializer::DeserializerImpl::ParseUnidirectionalSequenceLstm(GraphPtr g
 
     armnn::TensorInfo outputTensorInfo2 = ToTensorInfo(outputs[2]);
     layer->GetOutputSlot(2).SetTensorInfo(outputTensorInfo2);
+
+    RegisterInputSlots(graph, layerIndex, layer);
+    RegisterOutputSlots(graph, layerIndex, layer);
+}
+
+void IDeserializer::DeserializerImpl::ParseScatterNd(GraphPtr graph, unsigned int layerIndex)
+{
+    CHECK_LAYERS(graph, 0, layerIndex);
+    auto inputs = GetInputs(graph, layerIndex);
+    CHECK_LOCATION();
+    CHECK_VALID_SIZE(inputs.size(), 3);
+
+    auto outputs = GetOutputs(graph, layerIndex);
+    CHECK_VALID_SIZE(outputs.size(), 1);
+
+    auto ScatterNdLayer        = graph->layers()->Get(layerIndex)->layer_as_ScatterNdLayer();
+    auto layerName             = GetLayerName(graph, layerIndex);
+    auto flatBufferDescriptor  = ScatterNdLayer->descriptor();
+
+    armnn::ScatterNdDescriptor scatterNdDescriptor;
+    scatterNdDescriptor.m_Function     = ToScatterNdFunction(flatBufferDescriptor->m_Function());
+    scatterNdDescriptor.m_InputEnabled = flatBufferDescriptor->m_InputEnabled();
+    scatterNdDescriptor.m_Axis         = flatBufferDescriptor->m_Axis();
+    scatterNdDescriptor.m_AxisEnabled  = flatBufferDescriptor->m_AxisEnabled();
+
+    IConnectableLayer* layer = m_Network->AddScatterNdLayer(scatterNdDescriptor, layerName.c_str());
+
+    armnn::TensorInfo output0TensorInfo = ToTensorInfo(outputs[0]);
+    layer->GetOutputSlot(0).SetTensorInfo(output0TensorInfo);
 
     RegisterInputSlots(graph, layerIndex, layer);
     RegisterOutputSlots(graph, layerIndex, layer);

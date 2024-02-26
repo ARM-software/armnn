@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,6 +16,8 @@
 TEST_SUITE("BasePipeServerTests")
 {
 using namespace arm::pipe;
+
+#if !defined(__APPLE__)
 
 TEST_CASE("BasePipeServerTest")
 {
@@ -95,5 +97,7 @@ TEST_CASE("BasePipeServerTest")
 
     socketProfilingConnection.Close();
 }
+
+#endif
 
 }

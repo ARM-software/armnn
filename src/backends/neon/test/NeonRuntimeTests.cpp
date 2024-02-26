@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -66,9 +66,13 @@ TEST_CASE("RuntimeMemoryLeaksCpuAcc")
 }
 #endif
 
+#if !defined(__APPLE__)
+
 TEST_CASE("ProfilingPostOptimisationStructureCpuAcc")
 {
     VerifyPostOptimisationStructureTestImpl(armnn::Compute::CpuAcc);
 }
+
+#endif
 
 }

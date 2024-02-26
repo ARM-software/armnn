@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -90,6 +90,25 @@ install_apt_packages()
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 }
+
+usage_darwin()
+{
+  cat <<EOF
+The $osname platform requires manual setup:
+0) Install the command line developer tools (at a minimum)
+1) Install homebrew and then run the following in a terminal:
+   1) brew install cmake
+   2) brew install scons
+   3) brew install gnu-getopt
+   4) brew install wget
+EOF
+}
+
+osname=$(uname)
+if [ "$osname" == "Darwin" ]; then
+  usage_darwin
+  exit 1
+fi
 
 name=$(basename "$0")
 

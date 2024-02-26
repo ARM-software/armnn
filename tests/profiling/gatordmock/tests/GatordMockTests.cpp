@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -30,6 +30,8 @@ TEST_SUITE("GatordMockTests")
 using namespace armnn;
 using namespace std::this_thread;
 using namespace std::chrono_literals;
+
+#if !defined(__APPLE__)
 
 TEST_CASE("CounterCaptureHandlingTest")
 {
@@ -511,5 +513,7 @@ TEST_CASE("GatorDMockTimeLineActivation")
     mockService.WaitForReceivingThread();
     GetProfilingService(&runtime).Disconnect();
 }
+
+#endif
 
 }

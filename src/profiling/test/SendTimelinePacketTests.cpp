@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,6 +29,9 @@ using namespace arm::pipe;
 
 TEST_SUITE("SendTimelinePacketTests")
 {
+
+#if !defined(__APPLE__)
+
 TEST_CASE("SendTimelineMessageDirectoryPackageTest")
 {
     MockBufferManager mockBuffer(512);
@@ -504,5 +507,7 @@ TEST_CASE("CheckStaticGuidsAndEvents")
     ProfilingStaticGuid expectedEol(hash | MIN_STATIC_GUID);
     CHECK(LabelsAndEventClasses::ARMNN_PROFILING_EOL_EVENT_CLASS == expectedEol);
 }
+
+#endif
 
 }

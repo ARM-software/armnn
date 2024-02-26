@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -155,6 +155,9 @@ arm::pipe::Packet PacketWriter(uint32_t period, std::vector<uint16_t> counterval
 
 TEST_SUITE("BackendProfilingTestSuite")
 {
+
+#if !defined(__APPLE__)
+
 TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
 {
     arm::pipe::LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
@@ -179,6 +182,8 @@ TEST_CASE("BackendProfilingCounterRegisterMockBackendTest")
     GetProfilingService(&runtime).ResetExternalProfilingOptions(
         ConvertExternalProfilingOptions(options.m_ProfilingOptions), true);
 }
+
+#endif
 
 TEST_CASE("TestBackendCounters")
 {
@@ -504,6 +509,8 @@ TEST_CASE("TestBackendCounterLogging")
     CHECK(ss.str().find("ActivateCounters example test error") != std::string::npos);
 }
 
+#if !defined(__APPLE__)
+
 TEST_CASE("BackendProfilingContextGetSendTimelinePacket")
 {
     arm::pipe::LogLevelSwapper logLevelSwapper(arm::pipe::LogSeverity::Fatal);
@@ -577,5 +584,7 @@ TEST_CASE("GetProfilingGuidGenerator")
     // Reset the profiling servie after the test.
     options.m_ProfilingOptions.m_EnableProfiling = false;
 }
+
+#endif
 
 }

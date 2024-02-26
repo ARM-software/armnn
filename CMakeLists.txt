@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 # Copyright © 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -476,10 +476,12 @@ endif()
 
 target_compile_definitions(armnn PRIVATE "ARMNN_COMPILING_DLL")
 
-# Generate a map file for all build modes
-set_property(TARGET armnn APPEND_STRING PROPERTY
-        LINK_FLAGS " -Wl,-Map=libarmnnMapFile.map")
-message(STATUS "Linker will generate mapfile ")
+# Generate a map file for Linux build modes
+if (NOT ("${CMAKE_SYSTEM_NAME}" STREQUAL Darwin))
+    set_property(TARGET armnn APPEND_STRING PROPERTY
+            LINK_FLAGS " -Wl,-Map=libarmnnMapFile.map")
+    message(STATUS "Linker will generate mapfile ")
+endif()
 
 target_include_directories(armnn
     PUBLIC

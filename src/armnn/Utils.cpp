@@ -1,16 +1,18 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "armnn/Logging.hpp"
 #include "armnn/Utils.hpp"
 #include "armnn/Version.hpp"
 
+#if !defined(__APPLE__)
 #if !defined(ARMNN_BUILD_BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
 
 #include <sys/auxv.h>
 #include <asm/hwcap.h>
 
+#endif
 #endif
 
 namespace armnn
@@ -36,6 +38,7 @@ static DefaultLoggingConfiguration g_DefaultLoggingConfiguration;
 // Detect the presence of Neon on Linux
 bool NeonDetected()
 {
+#if !defined(__APPLE__)
 #if !defined(ARMNN_BUILD_BARE_METAL) && (defined(__arm__) || defined(__aarch64__))
     auto hwcaps= getauxval(AT_HWCAP);
 #endif
@@ -67,6 +70,7 @@ bool NeonDetected()
         return false;
     }
 
+#endif
 #endif
 
     // This method of Neon detection is only supported on Linux so in order to prevent a false negative

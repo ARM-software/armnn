@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -682,6 +682,8 @@ void RunSimpleModelThroughDecoder(JSONTimelineDecoder& timelineDecoder)
     timelineDecoder.CreateRelationship(relationship90);
 }
 
+#if !defined(__APPLE__)
+
 TEST_CASE("JSONTimelineDecoderTestStructure")
 {
     JSONTimelineDecoder timelineDecoder;
@@ -823,4 +825,7 @@ TEST_CASE("JSONTimelineDecoderTestJSON")
     // Remove temporary file
     fs::remove(tempFile);
 }
+
+#endif
+
 }

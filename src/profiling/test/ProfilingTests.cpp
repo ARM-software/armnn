@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -58,6 +58,9 @@ using PacketType = MockProfilingConnection::PacketType;
 
 TEST_SUITE("ExternalProfiling")
 {
+
+#if !defined(__APPLE__)
+
 TEST_CASE("CheckCommandHandlerKeyComparisons")
 {
     arm::pipe::CommandHandlerKey testKey1_0(1, 1, 1);
@@ -3857,5 +3860,7 @@ TEST_CASE("CheckFileFormat") {
         FAIL("Expected string not found.");
     }
 }
+
+#endif
 
 }

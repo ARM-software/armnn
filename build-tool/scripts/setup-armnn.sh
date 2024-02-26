@@ -13,6 +13,26 @@ set -o errexit  # Catch and propagate non zero exit codes.
 
 rel_path=$(dirname "$0") # relative path from where script is executed to script location
 
+# Figure out platform specific settings
+osname=$(uname)
+osgetopt=getopt
+os_darwin=0
+if [ "$osname" == "Darwin" ]; then
+  os_darwin=1
+  osgetoptsys="/opt/homebrew/opt/gnu-getopt/bin/getopt"
+  osgetopthome="$HOME/homebrew/opt/gnu-getopt/bin/getopt"
+  if [ -f "$osgetoptsys" ]; then
+    echo "gnu-getopt found at: $osgetoptsys"
+    osgetopt=$osgetoptsys
+  elif [ -f "$osgetopthome" ]; then
+    echo "gnu-getopt found at: $osgetopthome"
+    osgetopt=$osgetopthome
+  else
+    echo "Run $rel_path/install-packages.sh and follow the instructions to configure the environment for $osname"
+    exit 1
+  fi
+fi
+
 # Download an archive using wget and extract using tar
 # Takes three arguments:
 # 1. Name of dependency being downloaded e.g. Flatbuffers
@@ -138,6 +158,9 @@ build_flatbuffers()
     target_arch="$HOST_ARCH"
     mkdir -p "$FLATBUFFERS_BUILD_HOST"
     build_dir="$FLATBUFFERS_BUILD_HOST"
+    if [ "$os_darwin" -eq 1 ]; then
+      cmake_flags+="$AARCH64_COMPILER_FLAGS"
+    fi
   fi
 
   echo -e "\n***** Building flatbuffers for $target_arch *****"
@@ -184,6 +207,14 @@ download_tensorflow()
   echo -e "\n***** TensorFlow downloaded *****"
 }
 
+build_tflite_cpuinfo()
+{
+  cd "$TFLITE_BUILD_TARGET"/cpuinfo
+  cmake .
+  make
+  cp *.a ../_deps/cpuinfo-build
+}
+
 build_tflite()
 {
   mkdir -p "$TFLITE_BUILD_TARGET"
@@ -194,9 +225,13 @@ build_tflite()
 
   case "$TARGET_ARCH" in
     "aarch64")
+      cmake_system="Linux"
+      if [ "$os_darwin" -eq 1 ]; then
+        cmake_system="Darwin"
+      fi
       cmake_flags+="$AARCH64_COMPILER_FLAGS"
       target_arch_cmd="-DCMAKE_SYSTEM_PROCESSOR=aarch64 \
-                       -DCMAKE_SYSTEM_NAME=Linux "
+                       -DCMAKE_SYSTEM_NAME=$cmake_system "
 
       if [ "$NATIVE_BUILD" -eq 0 ]; then
         cmake_flags+="ARMCC_FLAGS='-funsafe-math-optimizations' "
@@ -225,6 +260,11 @@ build_tflite()
         "$target_arch_cmd" \
         "$TFLITE_SRC"
   cmake --build . -j "$NUM_THREADS"
+
+  if [ "$os_darwin" -eq 1 ]; then
+    # Workaround undefined link error for this platform
+    build_tflite_cpuinfo
+  fi
 
   echo -e "\n***** Built TF Lite for $TARGET_ARCH *****"
 }
@@ -324,7 +364,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$(getopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
+args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then

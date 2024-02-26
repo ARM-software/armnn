@@ -17,12 +17,36 @@ abs_script_path=$(cd "$rel_path" ; pwd -P) 	# absolute path to script directory
 abs_btool_path=$(dirname "$abs_script_path")	# absolute path to build-tool directory
 abs_armnn_path=$(dirname "$abs_btool_path")	# absolute path to armnn directory
 
+# Figure out platform specific settings
+osname=$(uname)
+osgetopt=getopt
+os_darwin=0
+if [ "$osname" == "Darwin" ]; then
+  os_darwin=1
+  osgetoptsys="/opt/homebrew/opt/gnu-getopt/bin/getopt"
+  osgetopthome="$HOME/homebrew/opt/gnu-getopt/bin/getopt"
+  if [ -f "$osgetoptsys" ]; then
+    echo "gnu-getopt found at: $osgetoptsys"
+    osgetopt=$osgetoptsys
+  elif [ -f "$osgetopthome" ]; then
+    echo "gnu-getopt found at: $osgetopthome"
+    osgetopt=$osgetopthome
+  else
+    echo "Run $rel_path/install-packages.sh and follow the instructions to configure the environment for $osname"
+    exit 1
+  fi
+fi
+
 build_acl()
 {
   cd "$ACL_SRC"
 
   # $acl_scons_params are additional options provided by the user and will overwrite any previously defined args
-  local acl_params="neon=$flag_neon_backend opencl=$flag_cl_backend Werror=0 embed_kernels=1 examples=0 validation_tests=0 benchmark_tests=0 benchmark_examples=0 $acl_scons_params"
+  acl_extra=""
+  if [ "$os_darwin" -eq 1 ]; then
+    acl_extra="os=macos "
+  fi
+  local acl_params="$acl_extra neon=$flag_neon_backend opencl=$flag_cl_backend Werror=0 embed_kernels=1 examples=0 validation_tests=0 benchmark_tests=0 benchmark_examples=0 $acl_scons_params"
 
   if [ "$flag_debug" -eq 1 ]; then
     acl_params="$acl_params debug=1 asserts=1"
@@ -100,10 +124,16 @@ build_armnn()
   local cmake_flags=""
   local compile_flags=""
   local android_cmake_args=""
+  local linker_cmake_args=""
+  local warn_flags=""
 
   case "$TARGET_ARCH" in
     "aarch64")
       compile_flags+="$AARCH64_COMPILER_FLAGS"
+      if [ "$os_darwin" -eq 1 ]; then
+        linker_cmake_args="-DCMAKE_SHARED_LINKER_FLAGS='-framework CoreFoundation -framework Foundation'"
+        warn_flags="-DCMAKE_CXX_FLAGS='-Wno-error=deprecated-declarations'"
+      fi
       ;;
     "android64")
       compile_flags+="$ANDROID64_COMPILER_FLAGS"
@@ -125,8 +155,17 @@ build_armnn()
 
   echo -e "\n***** Building Arm NN for $TARGET_ARCH *****"
 
+  local flatbuffers_root="$FLATBUFFERS_BUILD_TARGET"
+  local protobuf_root="$PROTOBUF_BUILD_TARGET"
+  if [ "$os_darwin" -eq 1 ]; then
+    flatbuffers_root="$FLATBUFFERS_BUILD_HOST"
+    protobuf_root="$PROTOBUF_BUILD_HOST"
+  fi
+
   eval "$compile_flags" \
   cmake "$android_cmake_args" \
+        "$linker_cmake_args" \
+        "$warn_flags" \
         -DCMAKE_BUILD_TYPE="$build_type" \
         -DBUILD_CLASSIC_DELEGATE="$flag_tflite_classic_delegate" \
         -DBUILD_OPAQUE_DELEGATE="$flag_tflite_opaque_delegate" \
@@ -143,17 +182,21 @@ build_armnn()
         -DTF_LITE_GENERATED_PATH="$TFLITE_SRC"/schema \
         -DTF_LITE_SCHEMA_INCLUDE_PATH="$TFLITE_SRC"/schema \
         -DTFLITE_LIB_ROOT="$TFLITE_BUILD_TARGET" \
-        -DFLATBUFFERS_ROOT="$FLATBUFFERS_BUILD_TARGET" \
+        -DFLATBUFFERS_ROOT="$flatbuffers_root" \
         -DFLATC_DIR="$FLATBUFFERS_BUILD_HOST" \
         -DONNX_GENERATED_SOURCES="$ONNX_BUILD_TARGET" \
-        -DPROTOBUF_ROOT="$PROTOBUF_BUILD_TARGET" \
+        -DPROTOBUF_ROOT="$protobuf_root" \
         "$armnn_cmake_args" \
         "$ARMNN_SRC"
 
   make -j "$NUM_THREADS"
 
   # Copy protobuf library into Arm NN build directory, if ONNX Parser is enabled
-  if [ "$flag_onnx_parser" -eq 1 ]; then
+  if [ "$flag_onnx_parser" -eq 1 ] && [ "$os_darwin" -eq 1 ]; then
+    cd "$ARMNN_BUILD_TARGET"
+    rm -f libprotobuf.dylib libprotobuf.23.dylib
+    cp "$PROTOBUF_LIBRARY_TARGET" .
+  elif [ "$flag_onnx_parser" -eq 1 ]; then
     cd "$ARMNN_BUILD_TARGET"
     rm -f libprotobuf.so libprotobuf.so.23 libprotobuf.so.23.0.0
     if [ "$TARGET_ARCH" != "android64" ]; then
@@ -228,7 +271,12 @@ download_acl()
   acl_tag="$(echo "$armnn_branch" | tr '\n' ' ' | sed -e 's/[^0-9]/ /g' -e 's/^ *//g' -e 's/ *$//g' | tr -s ' ' | sed 's/ /./g')"
 
   cd "$ACL_SRC"
-  git checkout v"$acl_tag"
+  if [ "$acl_tag" == "" ]; then
+    # Take the latest
+    git checkout main
+  else
+    git checkout v"$acl_tag"
+  fi
 
   echo -e "\n***** ACL Downloaded: $acl_tag *****"
 }
@@ -324,7 +372,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$(getopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,symlink-armnn,help -n "$name"   -- "$@")
+args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,symlink-armnn,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then

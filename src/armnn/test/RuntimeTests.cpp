@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -648,6 +648,8 @@ TEST_CASE("ProfilingDisable")
     // Profiling is not enabled, the post-optimisation structure should not be created
     CHECK(!readableBuffer);
 }
+
+#if !defined(__APPLE__)
 
 TEST_CASE("ProfilingEnableCpuRef")
 {
@@ -1298,6 +1300,8 @@ TEST_CASE("ProfilingPostOptimisationStructureCpuRef")
 {
     VerifyPostOptimisationStructureTestImpl(armnn::Compute::CpuRef);
 }
+
+#endif
 
 TEST_CASE("RuntimeOptimizeImportOff_LoadNetworkImportOn")
 {

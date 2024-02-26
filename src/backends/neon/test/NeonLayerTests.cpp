@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -264,7 +264,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x2x2Stride3x3x3SmallTestFloat32,
                               Convolution3d2x2x2Stride3x3x3SmallFloat32Test,
                               false,
                               DataLayout::NDHWC)
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Convolution3d2x3x3TestFloat16,
                               Convolution3d2x3x3Float16Test,
                               true,

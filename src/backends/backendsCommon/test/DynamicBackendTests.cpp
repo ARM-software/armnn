@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,6 +8,8 @@
 #include <UnitTests.hpp>
 
 #include <doctest/doctest.h>
+
+#if !defined(__APPLE__)
 
 TEST_SUITE("DynamicBackendTests")
 {
@@ -78,3 +80,5 @@ ARMNN_SIMPLE_TEST_CASE(SampleDynamicBackendEndToEnd, SampleDynamicBackendEndToEn
 #endif
 
 }
+
+#endif

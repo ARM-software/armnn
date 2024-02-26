@@ -81,7 +81,7 @@ static void NeonCreateActivationWorkloadTest()
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({1, 1}, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateActivationFloat16Workload")
 {
     NeonCreateActivationWorkloadTest<DataType::Float16>();
@@ -114,7 +114,7 @@ static void NeonCreateElementwiseWorkloadTest()
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({2, 3}, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateAdditionFloat16Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonAdditionWorkload,
@@ -132,7 +132,7 @@ TEST_CASE("CreateAdditionFloatWorkload")
                                       DataType::Float32>();
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateSubtractionFloat16Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonSubtractionWorkload,
@@ -158,7 +158,7 @@ TEST_CASE("CreateSubtractionUint8Workload")
                                       DataType::QAsymmU8>();
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateMultiplicationFloat16Workload")
 {
     NeonCreateElementwiseWorkloadTest<NeonMultiplicationWorkload,
@@ -214,7 +214,7 @@ static void NeonCreateBatchNormalizationWorkloadTest(DataLayout dataLayout)
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateBatchNormalizationFloat16NchwWorkload")
 {
     NeonCreateBatchNormalizationWorkloadTest<NeonBatchNormalizationWorkload, DataType::Float16>(DataLayout::NCHW);
@@ -256,7 +256,7 @@ static void NeonCreateConvolution2dWorkloadTest(DataLayout dataLayout = DataLayo
     CHECK(TestNeonTensorHandleInfo(outputHandle,  TensorInfo(outputShape, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateConvolution2dFloat16NchwWorkload")
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float16>();
@@ -266,8 +266,8 @@ TEST_CASE("CreateConvolution2dFloat16NhwcWorkload")
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float16>(DataLayout::NHWC);
 }
-
 #endif
+
 TEST_CASE("CreateConvolution2dFloatNchwWorkload")
 {
     NeonCreateConvolution2dWorkloadTest<DataType::Float32>();
@@ -326,7 +326,7 @@ TEST_CASE("CreateDepthWiseConvolution2dFloat32NhwcWorkload")
     NeonCreateDepthWiseConvolutionWorkloadTest<DataType::Float32>(DataLayout::NHWC);
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateDepthWiseConvolution2dFloat16NhwcWorkload")
 {
     NeonCreateDepthWiseConvolutionWorkloadTest<DataType::Float16>(DataLayout::NHWC);
@@ -354,7 +354,7 @@ static void NeonCreateFullyConnectedWorkloadTest()
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({3, 7}, DataType, outputQScale)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateFullyConnectedFloat16Workload")
 {
     NeonCreateFullyConnectedWorkloadTest<NeonFullyConnectedWorkload, DataType::Float16>();
@@ -397,7 +397,7 @@ static void NeonCreateNormalizationWorkloadTest(DataLayout dataLayout)
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateNormalizationFloat16NchwWorkload")
 {
     NeonCreateNormalizationWorkloadTest<NeonNormalizationFloatWorkload, DataType::Float16>(DataLayout::NCHW);
@@ -440,7 +440,7 @@ static void NeonCreatePooling2dWorkloadTest(DataLayout dataLayout = DataLayout::
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreatePooling2dFloat16Workload")
 {
     NeonCreatePooling2dWorkloadTest<DataType::Float16>();
@@ -493,7 +493,7 @@ static void NeonCreatePreluWorkloadTest(const armnn::TensorShape& inputShape,
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, dataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreatePreluFloat16Workload")
 {
     NeonCreatePreluWorkloadTest({ 1, 4, 1, 2 }, { 5, 4, 3, 1 }, { 5, 4, 3, 2 }, DataType::Float16);
@@ -527,7 +527,7 @@ static void NeonCreateReshapeWorkloadTest()
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo({1, 4}, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateReshapeFloat16Workload")
 {
     NeonCreateReshapeWorkloadTest<DataType::Float16>();
@@ -622,7 +622,7 @@ static void NeonCreateSoftmaxWorkloadTest()
     CHECK(TestNeonTensorHandleInfo(outputHandle, tensorInfo));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateSoftmaxFloat16Workload")
 {
     NeonCreateSoftmaxWorkloadTest<NeonSoftmaxWorkload, DataType::Float16>();
@@ -816,7 +816,7 @@ static void NeonCreateL2NormalizationWorkloadTest(DataLayout dataLayout)
     CHECK(TestNeonTensorHandleInfo(outputHandle, TensorInfo(outputShape, DataType)));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateL2NormalizationFloat16NchwWorkload")
 {
     NeonCreateL2NormalizationWorkloadTest<NeonL2NormalizationFloatWorkload, DataType::Float16>(DataLayout::NCHW);
@@ -857,7 +857,7 @@ static void NeonCreateLogSoftmaxWorkloadTest()
     CHECK(TestNeonTensorHandleInfo(outputHandle, tensorInfo));
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateLogSoftmaxFloat16Workload")
 {
     NeonCreateLogSoftmaxWorkloadTest<NeonLogSoftmaxWorkload, DataType::Float16>();
@@ -975,7 +975,7 @@ TEST_CASE("CreateStackFloat32Workload")
     NeonCreateStackWorkloadTest<armnn::DataType::Float32>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);
 }
 
-#ifdef __ARM_FEATURE_FP16_VECTOR_ARITHMETIC
+#if defined(__ARM_FEATURE_FP16_VECTOR_ARITHMETIC) && !defined(__APPLE__)
 TEST_CASE("CreateStackFloat16Workload")
 {
     NeonCreateStackWorkloadTest<armnn::DataType::Float16>({ 3, 4, 5 }, { 3, 4, 2, 5 }, 2, 2);

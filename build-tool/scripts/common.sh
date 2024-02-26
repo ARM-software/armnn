@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -34,9 +34,16 @@ TARGET_ARCH="$target_arch"
 NATIVE_BUILD=0
 if [ "$TARGET_ARCH" == "$HOST_ARCH" ]; then
   NATIVE_BUILD=1
+elif [ "$TARGET_ARCH" == "aarch64" ]; then
+  if [ "$HOST_ARCH" == "arm64" ]; then
+    NATIVE_BUILD=1
+  fi
 fi
 
 AARCH64_COMPILER_FLAGS+="CC=/usr/bin/aarch64-linux-gnu-gcc CXX=/usr/bin/aarch64-linux-gnu-g++ "
+if [ "$HOST_ARCH" == "arm64" ]; then
+  AARCH64_COMPILER_FLAGS+="CC=/usr/bin/clang CXX=/usr/bin/clang++ "
+fi
 
 # NDK
 NDK_VERSION=26b
@@ -74,7 +81,11 @@ PROTOBUF_BUILD_ROOT="$BUILD_DIR"/protobuf
 PROTOBUF_BUILD_HOST="$PROTOBUF_BUILD_ROOT"/"$HOST_ARCH"_build
 PROTOCOL_COMPILER_HOST="$PROTOBUF_BUILD_HOST"/bin/protoc
 PROTOBUF_BUILD_TARGET="$PROTOBUF_BUILD_ROOT"/"$TARGET_ARCH"_build
-PROTOBUF_LIBRARY_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so.23.0.0
+if [ "$osname" == "Darwin" ]; then
+  PROTOBUF_LIBRARY_TARGET="$PROTOBUF_BUILD_HOST"/lib/libprotobuf.dylib
+else
+  PROTOBUF_LIBRARY_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so.23.0.0
+fi
 PROTOBUF_ANDROID_LIB_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so
 
 # ONNX

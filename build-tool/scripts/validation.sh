@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -16,12 +16,12 @@ set -o errexit  # Catch and propagate non zero exit codes.
 
 # Host and target architecture validation
 if [ "$target_arch" == "" ]; then
-  echo "$name: --target-arch is not set. Example usage: --target-arch=aarch64"
+  echo "$name: --target_arch is not set. Example usage: --target_arch=aarch64"
   exit 1
 fi
 
 if [ "$target_arch" != "aarch64" ] && [ "$target_arch" != "android64" ] && [ "$target_arch" != "x86_64" ]; then
-  echo "$name: --target-arch is not valid. Valid options are: aarch64, android64, x86_64"
+  echo "$name: --target_arch is not valid. Valid options are: aarch64, android64, x86_64"
   exit 1
 fi
 

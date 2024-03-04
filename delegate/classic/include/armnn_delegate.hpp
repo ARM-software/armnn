@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -97,6 +97,8 @@ public:
     static ArmnnSubgraph* Create(TfLiteContext* tfLiteContext,
                                  const TfLiteDelegateParams* parameters,
                                  const Delegate* delegate);
+
+    ~ArmnnSubgraph();
 
     TfLiteStatus Prepare(TfLiteContext* tfLiteContext);
 

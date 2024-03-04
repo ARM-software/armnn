@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -273,6 +273,16 @@ const std::string Delegate::GetVersion()
     return DELEGATE_VERSION;
 }
 
+ArmnnSubgraph::~ArmnnSubgraph()
+{
+    // The delegate holds its own Arm NN runtime so this is our last chance to print internal profiling data.
+    std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
+    if (profiler && profiler->IsProfilingEnabled())
+    {
+        profiler->Print(std::cout);
+    }
+}
+
 TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,
                                           TfLiteContext* tfLiteContext,
                                           const TfLiteIntArray* inputs,
@@ -526,12 +536,6 @@ TfLiteStatus ArmnnSubgraph::Invoke(TfLiteContext* tfLiteContext, TfLiteNode* tfL
 
     // Run graph
     auto status = m_Runtime->EnqueueWorkload(m_NetworkId, inputTensors, outputTensors);
-    // The delegate holds its own Arm NN runtime so this is our last chance to print internal profiling data.
-    std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
-    if (profiler && profiler->IsProfilingEnabled())
-    {
-        profiler->Print(std::cout);
-    }
     return (status == armnn::Status::Success) ? kTfLiteOk : kTfLiteError;
 }
 

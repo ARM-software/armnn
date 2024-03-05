@@ -56,6 +56,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ReshapeEndToEndTestImpl.hpp
     ResizeEndToEndTestImpl.hpp
     RuntimeTestImpl.hpp
+    ScatterNdEndToEndTestImpl.hpp
     SliceEndToEndTestImpl.hpp
     SoftmaxEndToEndTestImpl.hpp
     SpaceToDepthEndToEndTestImpl.cpp

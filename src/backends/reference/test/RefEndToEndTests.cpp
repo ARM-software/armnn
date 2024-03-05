@@ -37,6 +37,7 @@
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReverseV2EndToEndTestImpl.hpp>
+#include <backendsCommon/test/ScatterNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
@@ -1338,6 +1339,49 @@ TEST_CASE("QuantizationEndToEndFloat16_S16Test")
 {
     QuantizationEndToEndFloat16<armnn::DataType::QSymmS16>(defaultBackends);
 }
+
+// ScatterNd
+
+TEST_CASE("RefScatterNd1DInputEndToEndFloat32Test")
+{
+    ScatterNd1DimUpdateWithInputEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefScatterNd1DInputEndToEndInt8Test")
+{
+    ScatterNd1DimUpdateWithInputEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefScatterNd1DNoInputEndToEndFloat32Test")
+{
+    ScatterNd1DimUpdateNoInputEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefScatterNd1DNoInputEndToEndInt8Test")
+{
+    ScatterNd1DimUpdateNoInputEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefScatterNd2DInputEndToEndFloat32Test")
+{
+    ScatterNd2DimUpdateWithInputEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefScatterNd2DInputEndToEndInt8Test")
+{
+    ScatterNd2DimUpdateWithInputEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefScatterNd2DNoInputEndToEndFloat32Test")
+{
+    ScatterNd2DimUpdateNoInputEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefScatterNd2DNoInputEndToEndInt8Test")
+{
+    ScatterNd2DimUpdateNoInputEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
 
 // SpaceToDepth
 TEST_CASE("RefSpaceToDepthNhwcEndToEndTest1")

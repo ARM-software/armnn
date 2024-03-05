@@ -77,7 +77,7 @@ void ScatterNdLayer::ValidateTensorShapesFromInputs()
         // No input tensor, only shape provided via input slot
         // In this case, we cannot validate the output shape from the input shape, but we can
         // validate that the dimensions of shape and output tensor matched
-        unsigned int shapeDims = GetInputSlot(0).GetTensorInfo().GetNumDimensions();
+        unsigned int shapeDims = GetInputSlot(0).GetTensorInfo().GetShape().GetNumElements();
         unsigned int outputDims = GetOutputSlot(0).GetTensorInfo().GetNumDimensions();
 
         if (shapeDims != outputDims)

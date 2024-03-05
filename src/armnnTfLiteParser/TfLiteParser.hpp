@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -180,6 +180,7 @@ private:
     void ParseResizeNearestNeighbor(size_t subgraphIndex, size_t operatorIndex);
     void ParseReverseV2(size_t subgraphIndex, size_t operatorIndex);
     void ParseRsqrt(size_t subgraphIndex, size_t operatorIndex);
+    void ParseScatterNd(size_t subgraphIndex, size_t operatorIndex);
     void ParseShape(size_t subgraphIndex, size_t operatorIndex);
     void ParseSin(size_t subgraphIndex, size_t operatorIndex);
     void ParseSlice(size_t subgraphIndex, size_t operatorIndex);

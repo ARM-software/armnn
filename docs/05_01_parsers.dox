@@ -1,4 +1,4 @@
-/// Copyright (c) 2022-2023 Arm Ltd and Contributors. All rights reserved.
+/// Copyright (c) 2022-2024 Arm Ltd and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -177,6 +177,7 @@ The Arm NN SDK TensorFlow Lite parser currently supports the following operators
 - RESIZE_NEAREST_NEIGHBOR
 - REVERSE_V2
 - RSQRT
+- SCATTER_ND
 - SHAPE
 - SIN
 - SLICE

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -585,9 +585,18 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
         m_ExNetParams.m_ThreadPoolSize = 1;
     }
 
+    // There's an odd combination of parameters to be handled here. It appears that setting m_ThreadPoolSize greater
+    // than 0 implies using the asynchronous mode. However, TfLite executor does not support an asynchronous mode of
+    // execution
     if (m_ExNetParams.m_ThreadPoolSize > 0)
     {
         m_ExNetParams.m_Concurrent = true;
+    }
+    if (m_ExNetParams.m_Concurrent &&
+        m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
+    {
+        ARMNN_LOG(info) << "The TfLite runtime does not support an asynchronous mode of execution. Parameters "
+                           "\"n,concurrent\" or \"P, thread-pool-size\" will be ignored.";
     }
 
     // Parse input tensor shape from the string we got from the command-line.

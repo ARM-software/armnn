@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_02" # Release 24.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="26764247073f959e3e56db2a14b7e9dd81bb1092" #11182: Fix segfault in DWC in WoA
+DEFAULT_CLFRAMEWORKREVISION="40af090c0e4d0196e8d3c14642f423f593fe96df" #11242: Disable FP16 on 32 bit
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

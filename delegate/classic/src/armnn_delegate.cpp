@@ -34,6 +34,7 @@
 #include "Resize.hpp"
 #include "ReverseV2.hpp"
 #include "Round.hpp"
+#include "ScatterNd.hpp"
 #include "Shape.hpp"
 #include "Slice.hpp"
 #include "StridedSlice.hpp"
@@ -1070,6 +1071,12 @@ TfLiteStatus ArmnnSubgraph::VisitNode(DelegateData& delegateData,
                                             tfLiteNode,
                                             nodeIndex,
                                             kTfLiteBuiltinTransposeConv);
+        case kTfLiteBuiltinScatterNd:
+            return VisitScatterNdOperator(delegateData,
+                                          tfLiteContext,
+                                          tfLiteNode,
+                                          nodeIndex,
+                                          kTfLiteBuiltinScatterNd);
         case kTfLiteBuiltinSoftmax:
             return VisitSoftmaxOperator(delegateData,
                                         tfLiteContext,

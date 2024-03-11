@@ -1,5 +1,5 @@
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -188,6 +188,8 @@ if(BUILD_UNIT_TESTS)
         test/ReverseV2TestHelper.hpp
         test/RoundTest.cpp
         test/RoundTestHelper.hpp
+        test/ScatterNdTest.cpp
+        test/ScatterNdTestHelper.hpp
         test/SoftmaxTest.cpp
         test/SoftmaxTestHelper.hpp
         test/SpaceDepthTest.cpp

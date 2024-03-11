@@ -1,5 +1,5 @@
 #
-# Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -37,6 +37,7 @@ list(APPEND armnnClassicDelegateObject_sources
         src/Resize.hpp
         src/ReverseV2.hpp
         src/Round.hpp
+        src/ScatterNd.hpp
         src/Shape.hpp
         src/SharedFunctions.hpp
         src/SharedFunctions.cpp

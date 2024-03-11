@@ -213,11 +213,25 @@ build_armnn()
   rm -rf include
   cp -r "$SOURCE_DIR"/armnn/include .
 
+  if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ]; then
+    mv delegate/libarmnn* .  # move .so files to outer directory
+    mv delegate/*UnitTests . # move UnitTest files to outer directory
+    rm -rf delegate
+
+    mkdir -p ./include/armnnDelegate/
+    cp -r "$SOURCE_DIR"/armnn/delegate/include/* ./include/armnnDelegate/
+
+    mkdir -p ./include/armnnDelegate/armnn/delegate/common/
+    cp -r "$SOURCE_DIR"/armnn/delegate/common/include ./include/armnnDelegate/armnn/delegate/common/
+  fi
+
   if [ "$flag_tflite_classic_delegate" -eq 1 ]; then
-    cp -r "$SOURCE_DIR"/armnn/delegate/classic/include ./delegate/classic/
+    mkdir -p ./include/armnnDelegate/armnn/delegate/classic/
+    cp -r "$SOURCE_DIR"/armnn/delegate/classic/include ./include/armnnDelegate/armnn/delegate/classic/
   fi
   if [ "$flag_tflite_opaque_delegate" -eq 1 ]; then
-    cp -r "$SOURCE_DIR"/armnn/delegate/opaque/include ./delegate/opaque/
+    mkdir -p ./include/armnnDelegate/armnn/delegate/opaque/
+    cp -r "$SOURCE_DIR"/armnn/delegate/opaque/include ./include/armnnDelegate/armnn/delegate/opaque/
   fi
 
   echo -e "\n***** Built Arm NN for $TARGET_ARCH *****"
@@ -581,9 +595,6 @@ if [ "$made_symlink_armnn" -eq 1 ]; then
 fi
 echo "        build directory: $BUILD_DIR"
 echo "        armnn build dir: $ARMNN_BUILD_TARGET"
-echo -e "\nScript execution will begin in 10 seconds..."
-
-sleep 10
 
 if [ "$flag_neon_backend" -eq 1 ] || [ "$flag_cl_backend" -eq 1 ]; then
   build_acl

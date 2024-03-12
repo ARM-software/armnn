@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_02" # Release 24.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="40af090c0e4d0196e8d3c14642f423f593fe96df" #11242: Disable FP16 on 32 bit
+DEFAULT_CLFRAMEWORKREVISION="9167c9cd1c684218f76a3c0ec97574dd6f381b98" #11254: Prefer indirect Gemm vs. Direct convolution if supported
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

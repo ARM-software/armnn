@@ -1039,7 +1039,7 @@ bool CheckFp16Support(BackendsMap& backends,
     // Check if the first preferred backend has FP16 support
     auto firstBackend = availablePreferredBackends[0];
     auto backendObjPtr = backends.find(firstBackend)->second.get();
-    ARMNN_ASSERT(backendObjPtr);
+
     auto hasFp16Capability = BackendOptions::BackendOption{"HasFp16", true};
     auto backendCapabilities = backendObjPtr->GetCapabilities();
 
@@ -1157,10 +1157,6 @@ void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
                 result = res;  // Cannot continue.
                 // Note: we don't need to log the error as it would already
                 // be logged in AttemptBackendAssignment().
-            }
-            else
-            {
-                ARMNN_ASSERT_MSG(res.IsWarningOnly(), "OptimizationResult in unexpected state.");
             }
         }
     }
@@ -1321,7 +1317,6 @@ BackendsMap CreateSupportedBackends(TensorHandleFactoryRegistry& handleFactoryRe
     {
         auto backendFactory = backendRegistry.GetFactory(selectedBackend);
         auto backendObjPtr = backendFactory();
-        ARMNN_ASSERT(backendObjPtr);
 
         backendObjPtr->RegisterTensorHandleFactories(handleFactoryRegistry);
 
@@ -1337,7 +1332,6 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                                              const ModelOptions& modelOptions,
                                              Optional<std::vector<std::string>&> errMessages)
 {
-    ARMNN_ASSERT(optNetObjPtr);
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ApplyBackendOptimizations")
     OptimizationResult result;
 
@@ -1348,7 +1342,10 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
     for (auto&& selectedBackend : backendSettings.m_SelectedBackends)
     {
         auto backendObjPtr = backends.find(selectedBackend)->second.get();
-        ARMNN_ASSERT(backendObjPtr);
+        if (!backendObjPtr)
+        {
+            throw armnn::NullPointerException("backendObjPtr must not be null.");
+        }
 
         if (selectedBackend == armnn::Compute::GpuAcc || selectedBackend == armnn::Compute::CpuAcc)
         {
@@ -1379,7 +1376,10 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
             // Try to optimize the current sub-graph
             ARMNN_SCOPED_PROFILING_EVENT(backendObjPtr->GetId(), "Optimizer_OptimizeSubgraph");
             OptimizationViews optimizationViews = backendObjPtr->OptimizeSubgraphView(*subgraph, modelOptions);
-            ARMNN_ASSERT(optimizationViews.Validate(*subgraph));
+            if (!optimizationViews.Validate(*subgraph))
+            {
+                throw armnn::Exception("optimizationViews must have a valid subgraph.");
+            }
 
             // Optimization attempted, check the resulting optimized sub-graph
             for (auto& substitution : optimizationViews.GetSubstitutions())
@@ -1393,7 +1393,6 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
                 const SubgraphView::IConnectableLayers& subgraphLayers = replacementSubgraph.GetIConnectableLayers();
                 std::for_each(subgraphLayers.begin(), subgraphLayers.end(), [&selectedBackend](IConnectableLayer* l)
                     {
-                        ARMNN_ASSERT(l);
                         PolymorphicDowncast<Layer*>(l)->SetBackendId(selectedBackend);
                     });
             }
@@ -1487,7 +1486,11 @@ ITensorHandleFactory::FactoryId CalculateSlotOptionForInput(BackendsMap& backend
                                                             bool importEnabled)
 {
     Layer& layer = slot.GetOwningLayer();
-    ARMNN_ASSERT(layer.GetType() == LayerType::Input);
+
+    if (layer.GetType() != LayerType::Input)
+    {
+        throw armnn::Exception("layer must be of type \"Input\".");
+    }
 
     // Explicitly select the tensorhandle factory for InputLayer because the rules for it are slightly different. It
     // doesn't matter which backend it is assigned to because they all use the same implementation, which
@@ -1514,7 +1517,10 @@ ITensorHandleFactory::FactoryId CalculateSlotOptionForInput(BackendsMap& backend
         const Layer& connectedLayer = connection->GetOwningLayer();
 
         auto toBackend = backends.find(connectedLayer.GetBackendId());
-        ARMNN_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+        if (toBackend == backends.end())
+        {
+            throw armnn::Exception("Backend id not found for the connected layer");
+        }
 
         if (!toBackend->second.get()->SupportsTensorAllocatorAPI())
         {
@@ -1672,7 +1678,10 @@ ITensorHandleFactory::FactoryId CalculateSlotOption(BackendsMap& backends,
         const Layer& connectedLayer = connection->GetOwningLayer();
 
         auto toBackend = backends.find(connectedLayer.GetBackendId());
-        ARMNN_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+        if (toBackend == backends.end())
+        {
+            throw armnn::Exception("Backend id not found for the connected layer");
+        }
 
         auto dstPrefs = toBackend->second.get()->GetHandleFactoryPreferences();
         for (auto&& src : srcPrefs)
@@ -1734,7 +1743,10 @@ EdgeStrategy CalculateEdgeStrategy(BackendsMap& backends,
                                    bool importEnabled)
 {
     auto toBackend = backends.find(connectedLayer.GetBackendId());
-    ARMNN_ASSERT_MSG(toBackend != backends.end(), "Backend id not found for the connected layer");
+    if (toBackend == backends.end())
+    {
+        throw armnn::Exception("Backend id not found for the connected layer");
+    }
 
     auto dstPrefs = toBackend->second.get()->GetHandleFactoryPreferences();
 
@@ -1827,11 +1839,12 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
 
     optGraph.ForEachLayer([&backends, &registry, &result, &errMessages, importEnabled, exportEnabled](Layer* layer)
     {
-        ARMNN_ASSERT(layer);
-
         // Lets make sure the backend is in our list of supported backends. Something went wrong during backend
         // assignment if this check fails
-        ARMNN_ASSERT(backends.find(layer->GetBackendId()) != backends.end());
+        if (backends.find(layer->GetBackendId()) == backends.end())
+        {
+            throw armnn::Exception("Backend id not found for the layer");
+        }
 
         // Check each output separately
         for (unsigned int slotIdx = 0; slotIdx < layer->GetNumOutputSlots(); slotIdx++)

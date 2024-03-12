@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,11 +33,23 @@ LogicalBinaryLayer* LogicalBinaryLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> LogicalBinaryLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
+
     const TensorShape& input0 = inputShapes[0];
     const TensorShape& input1 = inputShapes[1];
 
-    ARMNN_ASSERT(input0.GetNumDimensions() == input1.GetNumDimensions());
+    if (input0.GetNumDimensions() != input1.GetNumDimensions())
+    {
+        throw armnn::Exception("Input dimensions do not match (\""
+                               + std::to_string(input0.GetNumDimensions()) +
+                               "\" vs \""
+                               + std::to_string(input1.GetNumDimensions()) + "\").");
+    }
+
     unsigned int numDims = input0.GetNumDimensions();
 
     std::vector<unsigned int> dims(numDims);
@@ -46,8 +58,10 @@ std::vector<TensorShape> LogicalBinaryLayer::InferOutputShapes(const std::vector
         unsigned int dim0 = input0[i];
         unsigned int dim1 = input1[i];
 
-        ARMNN_ASSERT_MSG(dim0 == dim1 || dim0 == 1 || dim1 == 1,
-                         "Dimensions should either match or one should be of size 1.");
+        if (dim0 != dim1 && dim0 != 1 && dim1 != 1)
+        {
+            throw armnn::Exception("Dimensions should either match or one should be of size 1.");
+        }
 
         dims[i] = std::max(dim0, dim1);
     }
@@ -67,7 +81,13 @@ void LogicalBinaryLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(0).GetTensorInfo().GetShape(),
         GetInputSlot(1).GetTensorInfo().GetShape()
     });
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "LogicalBinaryLayer");
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ConcatLayer.hpp"
@@ -164,7 +164,11 @@ void ConcatLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
                 OutputSlot* slot = currentLayer->GetInputSlot(i).GetConnectedOutputSlot();
                 OutputHandler& outputHandler = slot->GetOutputHandler();
 
-                ARMNN_ASSERT_MSG(subTensor, "ConcatLayer: Expected a valid sub-tensor for substitution.");
+                if (!subTensor)
+                {
+                    throw armnn::Exception("ConcatLayer: Expected a valid sub-tensor for substitution.");
+                }
+
                 outputHandler.SetData(std::move(subTensor));
 
                 Layer& inputLayer = slot->GetOwningLayer();
@@ -193,7 +197,10 @@ void ConcatLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& registr
     else
     {
         ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
-        ARMNN_ASSERT(handleFactory);
+        if (!handleFactory)
+        {
+            throw armnn::NullPointerException("handleFactory is returning a nullptr.");
+        }
         CreateTensors(registry, *handleFactory, isMemoryManaged);
     }
 }
@@ -205,7 +212,13 @@ ConcatLayer* ConcatLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> ConcatLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == m_Param.GetNumViews());
+    if (inputShapes.size() != m_Param.GetNumViews())
+    {
+        throw armnn::Exception("inputShapes' and m_NumViews' sizes do not match (\""
+                               + std::to_string(inputShapes.size()) +
+                               "\" vs \""
+                               + std::to_string(m_Param.GetNumViews()) + "\")");
+    }
 
     unsigned int numDims = m_Param.GetNumDimensions();
     for (unsigned int i=0; i< inputShapes.size(); i++)
@@ -315,7 +328,12 @@ void ConcatLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes(inputShapes);
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::Exception("inferredShapes has "
+                               + std::to_string(inferredShapes.size()) +
+                               " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ConcatLayer");
 }

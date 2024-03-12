@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "armnn/Descriptors.hpp"
@@ -203,8 +203,9 @@ const uint32_t* OriginsDescriptor::GetViewOrigin(uint32_t idx) const
 // Reorders the viewOrigins in accordance with the indices presented in newOrdering array.
 void OriginsDescriptor::ReorderOrigins(unsigned int*  newOrdering, unsigned int numNewOrdering)
 {
-    ARMNN_ASSERT_MSG(m_NumViews == numNewOrdering, "number of views must match number of "
-        "elements in the new ordering array");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_NumViews == numNewOrdering,
+                                        "number of views must match number of elements in the new ordering array");
+
     std::vector<uint32_t*> viewOrigins(&m_ViewOrigins[0], &m_ViewOrigins[m_NumViews]);
 
     for (unsigned int i = 0; i < numNewOrdering; ++i)

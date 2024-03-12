@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -81,14 +81,19 @@ public:
             for (PartialSubgraph* a : m_Antecedents)
             {
                 size_t numErased = a->m_Dependants.erase(this);
-                ARMNN_ASSERT(numErased == 1);
-                IgnoreUnused(numErased);
+                if (numErased != 1)
+                {
+                    throw armnn::Exception("number of dependents erased must only be 1.");
+                }
                 a->m_Dependants.insert(m_Parent);
             }
             for (PartialSubgraph* a : m_Dependants)
             {
                 size_t numErased = a->m_Antecedents.erase(this);
-                ARMNN_ASSERT(numErased == 1);
+                if (numErased != 1)
+                {
+                    throw armnn::Exception("number of antecedents erased must only be 1.");
+                }
                 IgnoreUnused(numErased);
                 a->m_Antecedents.insert(m_Parent);
             }
@@ -200,7 +205,12 @@ struct LayerSelectionInfo
              ++slot)
         {
             OutputSlot* parentLayerOutputSlot = slot->GetConnectedOutputSlot();
-            ARMNN_ASSERT_MSG(parentLayerOutputSlot != nullptr, "The input slots must be connected here.");
+
+            if (!parentLayerOutputSlot)
+            {
+                throw armnn::NullPointerException("The input slots must be connected here.");
+            }
+
             if (parentLayerOutputSlot)
             {
                 Layer& parentLayer = parentLayerOutputSlot->GetOwningLayer();
@@ -273,7 +283,10 @@ void ForEachLayerInput(LayerSelectionInfo::LayerInfoContainer& layerInfos,
     for (auto inputSlot : layer.GetInputSlots())
     {
         auto connectedInput = PolymorphicDowncast<OutputSlot*>(inputSlot.GetConnection());
-        ARMNN_ASSERT_MSG(connectedInput, "Dangling input slot detected.");
+        if (!connectedInput)
+        {
+            throw armnn::Exception("Dangling input slot detected.");
+        }
         Layer& inputLayer = connectedInput->GetOwningLayer();
 
         auto parentInfo = layerInfos.find(&inputLayer);

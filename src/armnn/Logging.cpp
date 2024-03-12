@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -99,7 +99,7 @@ void SetLogFilter(LogSeverity level)
             SimpleLogger<LogSeverity::Fatal>::Get().Enable(true);
             break;
         default:
-            ARMNN_ASSERT(false);
+            throw armnn::InvalidArgumentException("Unknown LoggingSeverity level.");
     }
 }
 

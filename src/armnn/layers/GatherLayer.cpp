@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,12 @@ GatherLayer* GatherLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> GatherLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
+
     const TensorShape& params = inputShapes[0];
     const TensorShape& indices = inputShapes[1];
 
@@ -82,9 +87,19 @@ void GatherLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inferredShapes = InferOutputShapes(
             {GetInputSlot(0).GetTensorInfo().GetShape(),
              GetInputSlot(1).GetTensorInfo().GetShape()});
-    ARMNN_ASSERT(inferredShapes.size() == 1);
-    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified ||
-                 inferredShapes[0].GetDimensionality() == Dimensionality::Scalar);
+
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
+
+    if (inferredShapes[0].GetDimensionality() != Dimensionality::Specified &&
+        inferredShapes[0].GetDimensionality() != Dimensionality::Scalar)
+    {
+        throw armnn::LayerValidationException("inferredShapes' dimensionality is neither specified nor scalar.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "GatherLayer");
 }

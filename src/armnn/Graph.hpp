@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -126,8 +126,15 @@ public:
             otherLayer->Reparent(*this, m_Layers.end());
         });
 
-        ARMNN_ASSERT(other.m_PosInGraphMap.empty());
-        ARMNN_ASSERT(other.m_Layers.empty());
+        if (!other.m_PosInGraphMap.empty())
+        {
+            throw armnn::Exception("assignment positions in graph map must be empty.");
+        }
+
+        if (!other.m_Layers.empty())
+        {
+            throw armnn::Exception("assignment layers must be empty.");
+        }
 
         return *this;
     }
@@ -336,8 +343,10 @@ private:
         graph.m_Layers.erase(layerIt);
 
         const size_t numErased = graph.m_PosInGraphMap.erase(this);
-        IgnoreUnused(numErased);
-        ARMNN_ASSERT(numErased == 1);
+        if (numErased != 1)
+        {
+            throw armnn::Exception("numErased must be \"1\".");
+        }
     }
 
 protected:
@@ -415,7 +424,6 @@ public:
     {
         const size_t numErased = m_Graph->m_InputIds.erase(GetBindingId());
         IgnoreUnused(numErased);
-        ARMNN_ASSERT(numErased == 1);
     }
 };
 
@@ -441,14 +449,16 @@ public:
     {
         const size_t numErased = m_Graph->m_OutputIds.erase(GetBindingId());
         IgnoreUnused(numErased);
-        ARMNN_ASSERT(numErased == 1);
     }
 };
 
 inline Graph::Iterator Graph::GetPosInGraph(Layer& layer)
 {
     auto it = m_PosInGraphMap.find(&layer);
-    ARMNN_ASSERT(it != m_PosInGraphMap.end());
+    if (it == m_PosInGraphMap.end())
+    {
+        throw armnn::Exception("unable to find layer in graph map.");
+    }
     return it->second;
 }
 
@@ -491,7 +501,10 @@ inline LayerT* Graph::InsertNewLayer(OutputSlot& insertAfter, Args&&... args)
     const Iterator pos = std::next(GetPosInGraph(owningLayer));
     LayerT* const layer = new LayerInGraph<LayerT>(*this, pos, std::forward<Args>(args)...);
 
-    ARMNN_ASSERT(layer->GetNumInputSlots() == 1);
+    if (layer->GetNumInputSlots() != 1)
+    {
+        throw armnn::Exception("layer must only one input slot.");
+    }
 
     insertAfter.MoveAllConnections(layer->GetOutputSlot());
     insertAfter.Connect(layer->GetInputSlot(0));
@@ -511,7 +524,11 @@ inline void Graph::EraseLayer(Iterator pos)
 template <typename LayerT>
 inline void Graph::EraseLayer(LayerT*& layer)
 {
-    ARMNN_ASSERT(layer != nullptr);
+    if (!layer)
+    {
+        throw armnn::NullPointerException("layer must not be null.");
+    }
+
     EraseLayer(GetPosInGraph(*layer));
     layer = nullptr;
 }

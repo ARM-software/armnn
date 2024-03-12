@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -37,7 +37,11 @@ PreluLayer* PreluLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
 
     const TensorShape& inputShape = inputShapes[0];
     const TensorShape& alphaShape = inputShapes[1];
@@ -45,8 +49,16 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
     const unsigned int inputShapeDimensions = inputShape.GetNumDimensions();
     const unsigned int alphaShapeDimensions = alphaShape.GetNumDimensions();
 
-    ARMNN_ASSERT(inputShapeDimensions > 0);
-    ARMNN_ASSERT(alphaShapeDimensions > 0);
+    if (inputShapeDimensions == 0)
+    {
+        throw armnn::Exception("inputShapeDimensions must be greater than 0.");
+    }
+
+    if (alphaShapeDimensions == 0)
+    {
+       throw armnn::Exception("alphaShapeDimensions must be not be zero (\""
+                              + std::to_string(alphaShapeDimensions) + "\")");
+    }
 
     // The size of the output is the maximum size along each dimension of the input operands,
     // it starts with the trailing dimensions, and works its way forward
@@ -66,8 +78,10 @@ std::vector<TensorShape> PreluLayer::InferOutputShapes(const std::vector<TensorS
         unsigned int alphaDimension = alphaShape[armnn::numeric_cast<unsigned int>(alphaShapeIndex)];
 
         // Check that the inputs are broadcast compatible
-        ARMNN_ASSERT_MSG(inputDimension == alphaDimension || inputDimension == 1 || alphaDimension == 1,
-                         "PreluLayer: Dimensions should either match or one should be of size 1");
+        if (inputDimension != alphaDimension && inputDimension != 1 && alphaDimension != 1)
+        {
+            throw armnn::Exception("PreluLayer: Dimensions should either match or one should be of size 1");
+        }
 
         outputShape[outputShapeIndex] = std::max(inputDimension, alphaDimension);
 
@@ -111,7 +125,12 @@ void PreluLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(1).GetTensorInfo().GetShape()
     });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "PreluLayer");
 }

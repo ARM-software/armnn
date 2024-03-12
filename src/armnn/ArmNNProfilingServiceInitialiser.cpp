@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd. All rights reserved.
+// Copyright © 2022,2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,11 @@ void ArmNNProfilingServiceInitialiser::InitialiseProfilingService(arm::pipe::IPr
                                                                   networkLoads,
                                                                   "The number of networks loaded at runtime",
                                                                   networks);
-        ARMNN_ASSERT(loadedNetworksCounter);
+        if (!loadedNetworksCounter)
+        {
+            throw armnn::NullPointerException("loadedNetworksCounter must not be null.");
+        }
+
         profilingService.InitializeCounterValue(loadedNetworksCounter->m_Uid);
     }
     // Register a counter for the number of unloaded networks
@@ -57,7 +61,7 @@ void ArmNNProfilingServiceInitialiser::InitialiseProfilingService(arm::pipe::IPr
                                                                   networkUnloads,
                                                                   "The number of networks unloaded at runtime",
                                                                   networks);
-        ARMNN_ASSERT(unloadedNetworksCounter);
+
         profilingService.InitializeCounterValue(unloadedNetworksCounter->m_Uid);
     }
     std::string backends("backends");
@@ -75,7 +79,7 @@ void ArmNNProfilingServiceInitialiser::InitialiseProfilingService(arm::pipe::IPr
                                                                   backendsRegistered,
                                                                   "The number of registered backends",
                                                                   backends);
-        ARMNN_ASSERT(registeredBackendsCounter);
+
         profilingService.InitializeCounterValue(registeredBackendsCounter->m_Uid);
 
         // Due to backends being registered before the profiling service becomes active,
@@ -97,7 +101,7 @@ void ArmNNProfilingServiceInitialiser::InitialiseProfilingService(arm::pipe::IPr
                                                                   backendsUnregistered,
                                                                   "The number of unregistered backends",
                                                                   backends);
-        ARMNN_ASSERT(unregisteredBackendsCounter);
+
         profilingService.InitializeCounterValue(unregisteredBackendsCounter->m_Uid);
     }
     // Register a counter for the number of inferences run
@@ -115,7 +119,7 @@ void ArmNNProfilingServiceInitialiser::InitialiseProfilingService(arm::pipe::IPr
                                                                  inferencesRun,
                                                                  "The number of inferences run",
                                                                  inferences);
-        ARMNN_ASSERT(inferencesRunCounter);
+
         profilingService.InitializeCounterValue(inferencesRunCounter->m_Uid);
     }
 }

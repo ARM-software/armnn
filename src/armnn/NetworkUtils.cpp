@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022,2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -125,7 +125,11 @@ std::vector<DebugLayer*> InsertDebugLayerAfter(Graph& graph, Layer& layer, bool 
             graph.InsertNewLayer<DebugLayer>(*outputSlot, debugName.c_str(), toFile);
 
         // Sets output tensor info for the debug layer.
-        ARMNN_ASSERT(debugLayer->GetInputSlot(0).GetConnectedOutputSlot() == &(*outputSlot));
+        if (debugLayer->GetInputSlot(0).GetConnectedOutputSlot() != &(*outputSlot))
+        {
+            throw armnn::Exception("unable to set output tensor info for the debug layer.");
+        }
+
         TensorInfo debugInfo = debugLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetTensorInfo();
 
         debugLayer->GetOutputSlot().SetTensorInfo(debugInfo);

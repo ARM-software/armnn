@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "Layer.hpp"
@@ -33,13 +33,18 @@ void AssertNumberOfInputSlots(Layer& layer)
         case LayerType::DepthwiseConvolution2d:
         case LayerType::FullyConnected:
         {
-            ARMNN_ASSERT(layer.GetNumInputSlots() == 2 ||
-                         layer.GetNumInputSlots() == 3);
+            if (layer.GetNumInputSlots() != 2 && layer.GetNumInputSlots() != 3)
+            {
+                throw armnn::Exception("layer must have either 2 or 3 input slots.");
+            }
             break;
         }
         default:
         {
-            ARMNN_ASSERT(layer.GetNumInputSlots() == 1);
+            if (layer.GetNumInputSlots() != 1)
+            {
+                throw armnn::Exception("layer must have one input slot.");
+            }
             break;
         }
     }
@@ -47,7 +52,10 @@ void AssertNumberOfInputSlots(Layer& layer)
 
 void InputSlot::Insert(Layer& layer)
 {
-    ARMNN_ASSERT(layer.GetNumOutputSlots() == 1);
+    if (layer.GetNumOutputSlots() != 1)
+    {
+        throw armnn::Exception("layer must have one output slot.");
+    }
 
     OutputSlot* const prevSlot = GetConnectedOutputSlot();
 
@@ -105,7 +113,10 @@ bool OutputSlot::IsTensorInfoSet() const
 
 bool OutputSlot::ValidateTensorShape(const TensorShape& shape) const
 {
-    ARMNN_ASSERT_MSG(IsTensorInfoSet(), "TensorInfo must be set in order to validate the shape.");
+    if (!IsTensorInfoSet())
+    {
+        throw armnn::Exception("TensorInfo must be set in order to validate the shape.");
+    }
     return shape == m_OutputHandler.GetTensorInfo().GetShape();
 }
 
@@ -146,8 +157,10 @@ void OutputSlot::MoveAllConnections(OutputSlot& destination)
 {
     while (GetNumConnections() > 0)
     {
-        ARMNN_ASSERT_MSG(m_EdgeStrategies[0] == EdgeStrategy::Undefined,
-            "Cannot move connections once memory strategies have be established.");
+        if (m_EdgeStrategies[0] != EdgeStrategy::Undefined)
+        {
+            throw armnn::Exception("Cannot move connections once memory strategies have be established.");
+        }
 
         InputSlot& connection = *GetConnection(0);
         Disconnect(connection);
@@ -165,7 +178,7 @@ unsigned int OutputSlot::CalculateIndexOnOwner() const
             return i;
         }
     }
-    ARMNN_ASSERT_MSG(false, "Did not find slot on owner.");
+    throw armnn::Exception("Did not find slot on owner.");
     return 0; // Error
 }
 
@@ -257,7 +270,10 @@ void Layer::CollectWorkloadInputs(WorkloadDataCollector& dataCollector) const
     for (auto&& inputSlot : GetInputSlots())
     {
         // The graph must be well-formed at this point.
-        ARMNN_ASSERT(inputSlot.GetConnection());
+        if (!inputSlot.GetConnection())
+        {
+            throw armnn::Exception("input slot must have valid connection.");
+        }
         const OutputHandler& outputHandler = inputSlot.GetConnectedOutputSlot()->GetOutputHandler();
 
         if (inputSlot.IsTensorInfoOverridden() && outputHandler.GetData())
@@ -308,7 +324,10 @@ void Layer::CreateTensorHandles(const TensorHandleFactoryRegistry& registry,
         {
             ITensorHandleFactory* handleFactory;
             handleFactory = registry.GetFactory(factoryId);
-            ARMNN_ASSERT(handleFactory);
+            if (!handleFactory)
+            {
+                throw armnn::NullPointerException("handleFactory must not be null.");
+            }
             handler.CreateTensorHandles(*handleFactory, IsMemoryManaged);
         }
     }
@@ -390,7 +409,10 @@ LayerPriority Layer::GetPriority() const
 
 void Layer::VerifyLayerConnections(unsigned int expectedConnections, const CheckLocation& location) const
 {
-    ARMNN_ASSERT(GetNumInputSlots() == expectedConnections);
+    if (GetNumInputSlots() != expectedConnections)
+    {
+        throw armnn::Exception("input slots must match expected connections.");
+    }
 
     for (unsigned int i=0; i<expectedConnections; ++i)
     {
@@ -409,8 +431,8 @@ void Layer::VerifyLayerConnections(unsigned int expectedConnections, const Check
 
 std::vector<TensorShape> Layer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(GetNumInputSlots() != 0);
-    ARMNN_ASSERT(GetNumOutputSlots() != 0);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(GetNumInputSlots()  != 0, "input slots must not be zero.");
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(GetNumOutputSlots() != 0, "output slots must not be zero.");
 
     // By default we return what we got, meaning the output shape(s) are the same as the input(s).
     // This only works if the number of inputs and outputs are the same. Since we are in the Layer

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -45,19 +45,33 @@ void DetectionPostProcessLayer::ValidateTensorShapesFromInputs()
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
     // on this level constant data should not be released.
-    ARMNN_ASSERT_MSG(m_Anchors != nullptr, "DetectionPostProcessLayer: Anchors data should not be null.");
+    if (!m_Anchors)
+    {
+        throw armnn::LayerValidationException("DetectionPostProcessLayer: Anchors data should not be null.");
+    }
 
-    ARMNN_ASSERT_MSG(GetNumOutputSlots() == 4, "DetectionPostProcessLayer: The layer should return 4 outputs.");
+    if (GetNumOutputSlots() != 4)
+    {
+        throw armnn::LayerValidationException("DetectionPostProcessLayer: The layer should return 4 outputs.");
+    }
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes(
             { GetInputSlot(0).GetTensorInfo().GetShape(),
               GetInputSlot(1).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 4);
-    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
-    ARMNN_ASSERT(inferredShapes[1].GetDimensionality() == Dimensionality::Specified);
-    ARMNN_ASSERT(inferredShapes[2].GetDimensionality() == Dimensionality::Specified);
-    ARMNN_ASSERT(inferredShapes[3].GetDimensionality() == Dimensionality::Specified);
+    if (inferredShapes.size() != 4)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " element(s) - should only have 4.");
+    }
+
+    if (std::any_of(inferredShapes.begin(), inferredShapes.end(), [] (auto&& inferredShape) {
+        return inferredShape.GetDimensionality() != Dimensionality::Specified;
+    }))
+    {
+        throw armnn::Exception("One of inferredShapes' dimensionalities is not specified.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DetectionPostProcessLayer");
 

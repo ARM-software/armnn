@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -60,7 +60,10 @@ void AddLayerStructure(std::unique_ptr<TimelineUtilityMethods>& timelineUtils,
     for (auto&& input : layer.GetInputSlots())
     {
         const IOutputSlot* source = input.GetConnectedOutputSlot();
-        ARMNN_ASSERT(source != NULL);
+        if (!source)
+        {
+            throw armnn::NullPointerException("Null source found on input to layer \"" + layerName + "\".");
+        }
         timelineUtils->CreateConnectionRelationship(ProfilingRelationshipType::RetentionLink,
                                                     source->GetOwningLayerGuid(),
                                                     layer.GetGuid());
@@ -643,7 +646,10 @@ void LoadedNetwork::AllocateAndExecuteConstantWorkloadsAsync()
         {
             const auto& outSlot = layer->GetOutputSlots()[0];
             const auto factoryId = outSlot.GetTensorHandleFactoryId();
-            ARMNN_ASSERT(factoryId != ITensorHandleFactory::LegacyFactoryId);
+            if (factoryId == ITensorHandleFactory::LegacyFactoryId)
+            {
+                throw armnn::Exception("factoryId must not be of type \"Legacy\".");
+            }
             auto& workloadFactory = GetWorkloadFactory(*layer);
 
             layer->CreateTensorHandles(m_TensorHandleFactoryRegistry, workloadFactory);
@@ -710,7 +716,11 @@ TensorInfo LoadedNetwork::GetInputTensorInfo(LayerBindingId layerId) const
 {
     for (auto&& inputLayer : m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetInputLayers())
     {
-        ARMNN_ASSERT_MSG(inputLayer->GetNumOutputSlots() == 1, "Input layer should have exactly 1 output slot");
+        if (inputLayer->GetNumOutputSlots() != 1)
+        {
+            throw armnn::GraphValidationException("Input layer should have exactly 1 output slot");
+        }
+
         if (inputLayer->GetBindingId() == layerId)
         {
             return inputLayer->GetOutputSlot(0).GetTensorInfo();
@@ -724,8 +734,16 @@ TensorInfo LoadedNetwork::GetOutputTensorInfo(LayerBindingId layerId) const
 {
     for (auto&& outputLayer : m_OptimizedNetwork->pOptimizedNetworkImpl->GetGraph().GetOutputLayers())
     {
-        ARMNN_ASSERT_MSG(outputLayer->GetNumInputSlots() == 1, "Output layer should have exactly 1 input slot");
-        ARMNN_ASSERT_MSG(outputLayer->GetInputSlot(0).GetConnection(), "Input slot on Output layer must be connected");
+        if (outputLayer->GetNumInputSlots() != 1)
+        {
+            throw armnn::GraphValidationException("Output layer should have exactly 1 input slot");
+        }
+
+        if (!outputLayer->GetInputSlot(0).GetConnection())
+        {
+            throw armnn::GraphValidationException("Input slot on Output layer must be connected");
+        }
+
         if (outputLayer->GetBindingId() == layerId)
         {
             return outputLayer->GetInputSlot(0).GetTensorInfo();
@@ -750,7 +768,10 @@ const IWorkloadFactory& LoadedNetwork::GetWorkloadFactory(const Layer& layer) co
 
     workloadFactory = it->second.get();
 
-    ARMNN_ASSERT_MSG(workloadFactory, "No workload factory");
+    if (!workloadFactory)
+    {
+        throw armnn::NullPointerException("No workload factory");
+    }
 
     return *workloadFactory;
 }
@@ -962,14 +983,22 @@ Status LoadedNetwork::EnqueueWorkload(const InputTensors& inputTensors,
                     m_IsOutputImported[outputIndex] = true;
                 }
 
-                ARMNN_ASSERT_MSG(inputTensorHandle != nullptr, "Data should have been allocated.");
+                if (!inputTensorHandle)
+                {
+                    throw armnn::NullPointerException("Data should have been allocated.");
+                }
+
                 MemSyncQueueDescriptor syncDesc;
                 syncDesc.m_Inputs.push_back(inputTensorHandle);
                 WorkloadInfo info;
-                info.m_InputTensorInfos.push_back(
-                        outputLayer->GetInputSlot(0).GetTensorInfo());
+                info.m_InputTensorInfos.push_back(outputLayer->GetInputSlot(0).GetTensorInfo());
+
                 auto syncWorkload = std::make_unique<SyncMemGenericWorkload>(syncDesc, info);
-                ARMNN_ASSERT_MSG(syncWorkload, "No sync workload created");
+                if (!syncWorkload)
+                {
+                    throw armnn::NullPointerException("No sync workload created");
+                }
+
                 m_OutputQueue.push_back(std::move(syncWorkload));
                 importedOutputIdIndex++;
             }
@@ -1058,12 +1087,20 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
     inputQueueDescriptor.m_Inputs.push_back(tensorHandle);
     info.m_InputTensorInfos.push_back(tensorInfo);
 
-    ARMNN_ASSERT_MSG(layer.GetNumOutputSlots() == 1, "Can only handle Input Layer with one output");
+    if (layer.GetNumOutputSlots() != 1)
+    {
+        throw armnn::GraphValidationException("Can only handle Input Layer with one output");
+    }
+
     const OutputHandler& handler = layer.GetOutputHandler();
     const TensorInfo& outputTensorInfo = handler.GetTensorInfo();
     ITensorHandle* outputTensorHandle = handler.GetData();
-    ARMNN_ASSERT_MSG(outputTensorHandle != nullptr,
-                     "Data should have been allocated.");
+
+    if (!outputTensorHandle)
+    {
+        throw armnn::NullPointerException("Data should have been allocated.");
+    }
+
     inputQueueDescriptor.m_Outputs.push_back(outputTensorHandle);
     info.m_OutputTensorInfos.push_back(outputTensorInfo);
 
@@ -1090,7 +1127,10 @@ void LoadedNetwork::EnqueueInput(const BindableLayer& layer, ITensorHandle* tens
         // Create a mem copy workload for input since we did not import
         std::unique_ptr<IWorkload> inputWorkload = std::make_unique<CopyMemGenericWorkload>(inputQueueDescriptor, info);
 
-        ARMNN_ASSERT_MSG(inputWorkload, "No input workload created");
+        if (!inputWorkload)
+        {
+            throw armnn::NullPointerException("No input workload created");
+        }
 
         std::unique_ptr<TimelineUtilityMethods> timelineUtils =
                             TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
@@ -1123,14 +1163,20 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
     outputQueueDescriptor.m_Outputs.push_back(tensorHandle);
     info.m_OutputTensorInfos.push_back(tensorInfo);
 
-    ARMNN_ASSERT_MSG(layer.GetNumInputSlots() == 1, "Output Layer should have exactly one input.");
+    if (layer.GetNumInputSlots() != 1)
+    {
+        throw armnn::GraphValidationException("Output Layer should have exactly one input.");
+    }
 
     // Gets the output handler from the previous node.
     const OutputHandler& outputHandler = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOutputHandler();
 
     const TensorInfo& inputTensorInfo = outputHandler.GetTensorInfo();
     ITensorHandle* inputTensorHandle = outputHandler.GetData();
-    ARMNN_ASSERT_MSG(inputTensorHandle != nullptr, "Data should have been allocated.");
+    if (!inputTensorHandle)
+    {
+        throw armnn::NullPointerException("Data should have been allocated.");
+    }
 
     // Try import the output tensor.
     // Note: We can only import the output pointer if all of the following  hold true:
@@ -1160,7 +1206,10 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
                     syncDesc.m_Inputs.push_back(inputTensorHandle);
                     info.m_InputTensorInfos.push_back(inputTensorInfo);
                     auto syncWorkload = std::make_unique<SyncMemGenericWorkload>(syncDesc, info);
-                    ARMNN_ASSERT_MSG(syncWorkload, "No sync workload created");
+                    if (!syncWorkload)
+                    {
+                        throw armnn::NullPointerException("No sync workload created");
+                    }
                     m_OutputQueue.push_back(std::move(syncWorkload));
                 }
                 else
@@ -1178,7 +1227,10 @@ void LoadedNetwork::EnqueueOutput(const BindableLayer& layer, ITensorHandle* ten
 
         std::unique_ptr<IWorkload> outputWorkload =
             std::make_unique<CopyMemGenericWorkload>(outputQueueDescriptor, info);
-        ARMNN_ASSERT_MSG(outputWorkload, "No output workload created");
+        if (!outputWorkload)
+        {
+            throw armnn::NullPointerException("No output workload created");
+        }
 
         std::unique_ptr<TimelineUtilityMethods> timelineUtils =
             TimelineUtilityMethods::GetTimelineUtils(*m_ProfilingService);
@@ -1361,7 +1413,11 @@ void LoadedNetwork::EnqueueInput(const ConstTensor& inputTensor, ITensorHandle* 
 // e) m_IsExportEnabled must be set to true
 void LoadedNetwork::ImportOutputTensor(const Tensor& outputTensor, ITensorHandle* outputTensorHandle)
 {
-    ARMNN_ASSERT_MSG(outputTensorHandle != nullptr, "Data should have been allocated.");
+    if (!outputTensorHandle)
+    {
+        throw armnn::NullPointerException("Data should have been allocated.");
+    }
+
     MemorySourceFlags importFlags = outputTensorHandle->GetImportFlags();
     if (CheckFlag(importFlags, m_NetworkProperties.m_OutputSource))
     {
@@ -1534,7 +1590,10 @@ std::vector<ImportedInputId> LoadedNetwork::ImportInputs(const InputTensors& inp
             const TensorInfo& tensorInfo = outputSlot.GetTensorInfo();
 
             ITensorHandleFactory* handleFactory = m_TensorHandleFactoryRegistry.GetFactory(factoryId);
-            ARMNN_ASSERT(handleFactory);
+            if (!handleFactory)
+            {
+                throw armnn::NullPointerException("handleFactory must not be null.");
+            }
 
             ImportedTensorHandlePin importedTensorHandlePin{layerBindingId,
                                                             handleFactory->CreateTensorHandle(tensorInfo, false)};
@@ -1667,7 +1726,10 @@ std::vector<ImportedOutputId> LoadedNetwork::ImportOutputs(const OutputTensors& 
         const TensorInfo& tensorInfo = inputSlot.GetTensorInfo();
 
         ITensorHandleFactory* handleFactory = m_TensorHandleFactoryRegistry.GetFactory(factoryId);
-        ARMNN_ASSERT(handleFactory);
+        if (!handleFactory)
+        {
+            throw armnn::NullPointerException("handleFactory must not be null.");
+        }
 
         ImportedTensorHandlePin importedTensorHandlePin{layerBindingId,
                                                         handleFactory->CreateTensorHandle(tensorInfo, false)};
@@ -1987,7 +2049,10 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
         else
         {
             ITensorHandleFactory* handleFactory = m_TensorHandleFactoryRegistry.GetFactory(factoryId);
-            ARMNN_ASSERT(handleFactory);
+            if (!handleFactory)
+            {
+                throw armnn::NullPointerException("handleFactory must not be null.");
+            }
             return handleFactory->CreateTensorHandle(tensorInfo, false);
         }
     };
@@ -2098,7 +2163,11 @@ std::unique_ptr<IWorkingMemHandle> LoadedNetwork::CreateWorkingMemHandle(Network
         // so that the next tensor handle with a non overlapping lifetime can share its memory.
         for (auto& slot : layer->GetInputSlots())
         {
-            ARMNN_ASSERT(slot.GetConnection());
+            if (!slot.GetConnection())
+            {
+                throw armnn::GraphValidationException("slot must be a valid input slot.");
+            }
+
             auto outputSlot = slot.GetConnectedOutputSlot();
             auto key = outputSlot->GetOwningLayer().GetGuid();
 

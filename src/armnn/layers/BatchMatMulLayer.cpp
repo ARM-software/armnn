@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "BatchMatMulLayer.hpp"
@@ -32,7 +32,11 @@ BatchMatMulLayer* BatchMatMulLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> BatchMatMulLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::LayerValidationException("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                                              "\" - should be \"2\".");
+    }
 
     TensorShape inputXShape = inputShapes[0];
     TensorShape inputYShape = inputShapes[1];
@@ -102,7 +106,12 @@ void BatchMatMulLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(0).GetTensorInfo().GetShape(),
         GetInputSlot(1).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "BatchMatMulLayer");
 }

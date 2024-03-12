@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "FillLayer.hpp"
@@ -41,7 +41,12 @@ void FillLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::Exception("inferredShapes has "
+                               + std::to_string(inferredShapes.size()) +
+                               " elements - should only have 1.");
+    }
 
     // Cannot validate the output shape from the input shape. but we can validate that the correct dims have been
     // inferred

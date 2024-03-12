@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SplitterLayer.hpp"
@@ -188,7 +188,10 @@ void SplitterLayer::CreateTensorHandles(const TensorHandleFactoryRegistry& regis
     else
     {
         ITensorHandleFactory* handleFactory = registry.GetFactory(factoryId);
-        ARMNN_ASSERT(handleFactory);
+        if (!handleFactory)
+        {
+            throw armnn::NullPointerException("handleFactory is returning a nullptr.");
+        }
         CreateTensors(registry, *handleFactory, isMemoryManaged);
     }
 }
@@ -200,8 +203,14 @@ SplitterLayer* SplitterLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> SplitterLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    IgnoreUnused(inputShapes);
-    ARMNN_ASSERT(inputShapes.size() ==  m_Param.GetNumViews());
+    if (inputShapes.size() != m_Param.GetNumViews())
+    {
+        throw armnn::Exception("inputShapes' and m_NumViews' sizes do not match (\""
+                               + std::to_string(inputShapes.size()) +
+                               "\" vs \""
+                               + std::to_string(m_Param.GetNumViews()) + "\")");
+    }
+
     std::vector<TensorShape> outShapes;
     //Output shapes must match View shapes.
     for (unsigned int viewIdx = 0; viewIdx < m_Param.GetNumViews(); viewIdx++)
@@ -228,7 +237,13 @@ void SplitterLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes(views);
 
-    ARMNN_ASSERT(inferredShapes.size() == m_Param.GetNumViews());
+    if (inferredShapes.size() != m_Param.GetNumViews())
+    {
+        throw armnn::LayerValidationException("inferredShapes' size and m_NumViews do not match (\""
+                                              + std::to_string(inferredShapes.size()) +
+                                              "\" vs \""
+                                              + std::to_string(m_Param.GetNumViews()) + "\")");
+    }
 
     for (unsigned int viewIdx = 0; viewIdx < m_Param.GetNumViews(); viewIdx++)
     {

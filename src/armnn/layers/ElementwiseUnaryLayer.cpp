@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -34,7 +34,12 @@ ElementwiseUnaryLayer* ElementwiseUnaryLayer::Clone(Graph& graph) const
 std::vector<TensorShape> ElementwiseUnaryLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
     // Should return the shape of the input tensor
-    ARMNN_ASSERT(inputShapes.size() == 1);
+    if (inputShapes.size() != 1)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"1\".");
+    }
+
     const TensorShape& input = inputShapes[0];
 
     return std::vector<TensorShape>({ input });
@@ -50,7 +55,13 @@ void ElementwiseUnaryLayer::ValidateTensorShapesFromInputs()
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetTensorInfo().GetShape()});
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::Exception("inferredShapes has "
+                               + std::to_string(inferredShapes.size()) +
+                               " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, GetLayerTypeAsCString(GetType()));
 }

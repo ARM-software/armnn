@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -348,10 +348,13 @@ RuntimeImpl::RuntimeImpl(const IRuntime::CreationOptions& options)
         // Store backend contexts for the supported ones
         try {
             auto factoryFun = BackendRegistryInstance().GetFactory(id);
-            ARMNN_ASSERT(factoryFun != nullptr);
+
+            if (!factoryFun)
+            {
+                throw armnn::NullPointerException("Factory Function should not be null.");
+            }
+
             auto backend = factoryFun();
-            ARMNN_ASSERT(backend != nullptr);
-            ARMNN_ASSERT(backend.get() != nullptr);
 
             auto customAllocatorMapIterator = options.m_CustomAllocatorMap.find(id);
             if (customAllocatorMapIterator != options.m_CustomAllocatorMap.end() &&

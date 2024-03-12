@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "StackLayer.hpp"
@@ -32,15 +32,19 @@ StackLayer* StackLayer::Clone(Graph& graph) const
     return CloneBase<StackLayer>(graph, m_Param, GetName());
 }
 
-std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
+std::vector<TensorShape> StackLayer::InferOutputShapes(const std::vector<TensorShape>&) const
 {
-    IgnoreUnused(inputShapes);
-
     const TensorShape& inputShape = m_Param.m_InputShape;
     const unsigned int inputNumDimensions = inputShape.GetNumDimensions();
     const unsigned int axis = m_Param.m_Axis;
 
-    ARMNN_ASSERT(axis <= inputNumDimensions);
+    if (axis > inputNumDimensions)
+    {
+        throw armnn::Exception("axis must not be greater than input dimensions (\""
+                               + std::to_string(axis) +
+                               "\" vs \""
+                               + std::to_string(inputNumDimensions) + "\").");
+    }
 
     std::vector<unsigned int> dimensionSizes(inputNumDimensions + 1, 0);
     for (unsigned int i = 0; i < axis; ++i)
@@ -90,7 +94,12 @@ void StackLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes(inputShapes);
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "StackLayer");
 }

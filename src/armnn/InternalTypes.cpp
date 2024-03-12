@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,7 +18,7 @@ char const* GetLayerTypeAsCString(LayerType type)
       LIST_OF_LAYER_TYPE
 #undef X
         default:
-            ARMNN_ASSERT_MSG(false, "Unknown layer type");
+            throw armnn::InvalidArgumentException("Unknown layer type");
             return "Unknown";
     }
 }

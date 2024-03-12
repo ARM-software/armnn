@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "SwitchLayer.hpp"
@@ -37,14 +37,22 @@ void SwitchLayer::ValidateTensorShapesFromInputs()
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
-    ARMNN_ASSERT_MSG(GetNumOutputSlots() == 2, "SwitchLayer: The layer should return 2 outputs.");
+    if (GetNumOutputSlots() != 2)
+    {
+        throw armnn::LayerValidationException("SwitchLayer: The layer should return 2 outputs.");
+    }
 
     // Assuming first input is the Input and second input is the Constant
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetTensorInfo().GetShape(),
         GetInputSlot(1).GetTensorInfo().GetShape()});
 
-    ARMNN_ASSERT(inferredShapes.size() == 2);
+    if (inferredShapes.size() != 2)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " element(s) - should only have 2.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "SwitchLayer");
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,12 @@ GatherNdLayer* GatherNdLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> GatherNdLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
+
     const TensorShape& params = inputShapes[0];
     const TensorShape& indices = inputShapes[1];
 
@@ -47,7 +52,13 @@ std::vector<TensorShape> GatherNdLayer::InferOutputShapes(const std::vector<Tens
 
     // last dimension of indices
     unsigned int index_depth = indices[indicesDim - 1];
-    ARMNN_ASSERT(index_depth <= paramsDim);
+    if (index_depth > paramsDim)
+    {
+        throw armnn::Exception("index_depth must not be greater than paramsDim (\""
+                               + std::to_string(index_depth) +
+                               "\" vs \""
+                               + std::to_string(paramsDim) + "\")");
+    }
 
     // all but the last dimension of indices
     std::vector<unsigned int> outer_shape;
@@ -86,9 +97,19 @@ void GatherNdLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inferredShapes = InferOutputShapes(
             {GetInputSlot(0).GetTensorInfo().GetShape(),
              GetInputSlot(1).GetTensorInfo().GetShape()});
-    ARMNN_ASSERT(inferredShapes.size() == 1);
-    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified ||
-                 inferredShapes[0].GetDimensionality() == Dimensionality::Scalar);
+
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
+
+    if (inferredShapes[0].GetDimensionality() != Dimensionality::Specified &&
+        inferredShapes[0].GetDimensionality() != Dimensionality::Scalar)
+    {
+        throw armnn::LayerValidationException("inferredShapes' dimensionality is neither specified nor scalar.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "GatherNdLayer");
 }

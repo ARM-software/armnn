@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -40,7 +40,11 @@ DepthToSpaceLayer* DepthToSpaceLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> DepthToSpaceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 1);
+    if (inputShapes.size() != 1)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"1\".");
+    }
 
     TensorShape inputShape = inputShapes[0];
     TensorShape outputShape(inputShape);
@@ -70,7 +74,12 @@ void DepthToSpaceLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DepthToSpaceLayer");
 }

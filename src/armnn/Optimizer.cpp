@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "Optimizer.hpp"
@@ -29,7 +29,11 @@ void Optimizer::Pass(Graph& graph, const Optimizations& optimizations)
         --it;
         for (auto&& optimization : optimizations)
         {
-            ARMNN_ASSERT(*it);
+            if (!*it)
+            {
+                throw armnn::NullPointerException("Layer must not be null.");
+            }
+
             optimization->Run(graph, **it);
 
             if ((*it)->IsOutputUnconnected())

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "QuantizedLstmLayer.hpp"
@@ -80,7 +80,11 @@ QuantizedLstmLayer* QuantizedLstmLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> QuantizedLstmLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 3);
+    if (inputShapes.size() != 3)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"3\".");
+    }
 
     // Get input values for validation
     unsigned int numBatches = inputShapes[0][0];
@@ -108,35 +112,97 @@ void QuantizedLstmLayer::ValidateTensorShapesFromInputs()
         GetInputSlot(2).GetTensorInfo().GetShape()  // previousOutputIn
     });
 
-    ARMNN_ASSERT(inferredShapes.size() == 2);
+    if (inferredShapes.size() != 2)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " element(s) - should only have 2.");
+    }
 
     // Check weights and bias for nullptr
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToInputWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToInputWeights should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToForgetWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToForgetWeights should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToCellWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToCellWeights should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputToOutputWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputToOutputWeights should not be null.");
+    if (!m_QuantizedLstmParameters.m_InputToInputWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_InputToInputWeights "
+                                              "should not be null.");
+    }
 
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToInputWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToInputWeights should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToForgetWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToForgetWeights should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToCellWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToCellWeights should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_RecurrentToOutputWeights != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_RecurrentToOutputWeights should not be null.");
+    if (!m_QuantizedLstmParameters.m_InputToForgetWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_InputToForgetWeights "
+                                              "should not be null.");
+    }
 
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_InputGateBias != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_InputGateBias should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_ForgetGateBias != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_ForgetGateBias should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_CellBias != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_CellBias should not be null.");
-    ARMNN_ASSERT_MSG(m_QuantizedLstmParameters.m_OutputGateBias != nullptr,
-                     "QuantizedLstmLayer: m_QuantizedLstmParameters.m_OutputGateBias should not be null.");
+    if (!m_QuantizedLstmParameters.m_InputToCellWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_InputToCellWeights "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_InputToOutputWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_InputToOutputWeights "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_RecurrentToInputWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_RecurrentToInputWeights "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_RecurrentToForgetWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_RecurrentToForgetWeights "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_RecurrentToCellWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_RecurrentToCellWeights "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_RecurrentToOutputWeights)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_RecurrentToOutputWeights "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_InputGateBias)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_InputGateBias "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_ForgetGateBias)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_ForgetGateBias "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_CellBias)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_CellBias "
+                                              "should not be null.");
+    }
+
+    if (!m_QuantizedLstmParameters.m_OutputGateBias)
+    {
+        throw armnn::LayerValidationException("QuantizedLstmLayer: "
+                                              "m_QuantizedLstmParameters.m_OutputGateBias "
+                                              "should not be null.");
+    }
 
     // Check output TensorShape(s) match inferred shape
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "QuantizedLstmLayer");

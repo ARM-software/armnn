@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "Profiling.hpp"
@@ -43,7 +43,7 @@ constexpr bool g_WriteReportToStdOutOnProfilerDestruction = false;
 Measurement FindMeasurement(const std::string& name, const Event* event)
 {
 
-    ARMNN_ASSERT(event != nullptr);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(event, "event should not be null.");
 
     // Search though the measurements.
     for (const auto& measurement : event->GetMeasurements())
@@ -61,7 +61,7 @@ Measurement FindMeasurement(const std::string& name, const Event* event)
 
 std::vector<Measurement> FindKernelMeasurements(const Event* event)
 {
-    ARMNN_ASSERT(event != nullptr);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(event, "event should not be null.");
 
     std::vector<Measurement> measurements;
 
@@ -230,13 +230,24 @@ void ProfilerImpl::EndEvent(Event* event)
 {
     event->Stop();
 
-    ARMNN_ASSERT(!m_Parents.empty());
-    ARMNN_ASSERT(event == m_Parents.top());
+    if (!!m_Parents.empty())
+    {
+        throw armnn::Exception("m_Parents must not be empty.");
+    }
+
+    if (event != m_Parents.top())
+    {
+        throw armnn::Exception("event must match the top of m_Parents.");
+    }
+
     m_Parents.pop();
 
     Event* parent = m_Parents.empty() ? nullptr : m_Parents.top();
-    IgnoreUnused(parent);
-    ARMNN_ASSERT(event->GetParentEvent() == parent);
+
+    if (event->GetParentEvent() != parent)
+    {
+        throw armnn::Exception("parent events must match.");
+    }
 
 #if ARMNN_STREAMLINE_ENABLED
     ANNOTATE_CHANNEL_END(uint32_t(m_Parents.size()));
@@ -305,7 +316,7 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
                         JsonChildObject& parentObject,
                         std::map<const Event*, std::vector<const Event*>> descendantsMap)
 {
-    ARMNN_ASSERT(parentEvent);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(parentEvent, "parentEvent must not be null.");
 
     // If profiling GUID is entered, process it
     if (parentEvent->GetProfilingGuid().has_value())
@@ -339,7 +350,10 @@ void ExtractJsonObjects(unsigned int inferenceIndex,
             measurementObject.SetUnit(instrumentMeasurements[measurementIndex].m_Unit);
             measurementObject.SetType(JsonObjectType::Measurement);
 
-            ARMNN_ASSERT(parentObject.NumChildren() == childIdx);
+            if (parentObject.NumChildren() != childIdx)
+            {
+                throw armnn::Exception("parentObject must have the same number of children as childIdx.");
+            }
             parentObject.AddChild(measurementObject);
         }
         else

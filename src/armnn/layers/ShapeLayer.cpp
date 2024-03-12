@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,15 +44,23 @@ void ShapeLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShape = InferOutputShapes({ GetInputSlot(0).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShape.size() == 1);
+    if (inferredShape.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShape has "
+                                              + std::to_string(inferredShape.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShape[0], m_ShapeInferenceMethod, "ShapeLayer");
 }
 
 std::vector<TensorShape> ShapeLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    IgnoreUnused(inputShapes);
-    ARMNN_ASSERT(inputShapes.size() == 1);
+    if (inputShapes.size() != 1)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"1\".");
+    }
 
     TensorShape outputShape({ inputShapes[0].GetNumDimensions()} );
 

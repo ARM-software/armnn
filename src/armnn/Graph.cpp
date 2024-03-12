@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -207,7 +207,8 @@ Status Graph::SerializeToDot(std::ostream& stream)
 Status Graph::AllocateDynamicBuffers()
 {
     // Layers must be sorted in topological order
-    ARMNN_ASSERT(m_LayersInOrder);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_LayersInOrder, "layers must be in order.");
+
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "LoadNetwork_AllocateDynamicBuffers");
 
     std::unordered_set<const ITensorHandle*> preallocatedTensors;
@@ -334,7 +335,10 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
     auto MayNeedCompatibilityLayer = [](const Layer& layer)
     {
         // All layers should have been associated with a valid compute device at this point.
-        ARMNN_ASSERT(layer.GetBackendId() != Compute::Undefined);
+        if (layer.GetBackendId() == Compute::Undefined)
+        {
+            throw armnn::Exception("AddCompatibilityLayers: All layers must be assigned to a backend at this point.");
+        }
         // Does not need another compatibility layer if a copy or import layer is already present.
         return layer.GetType() != LayerType::MemCopy &&
                layer.GetType() != LayerType::MemImport;
@@ -348,7 +352,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
 
     ForEachLayer([this, &backends, &registry, MayNeedCompatibilityLayer, IsCompatibilityStrategy](Layer* srcLayer)
     {
-        ARMNN_ASSERT(srcLayer);
+        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(srcLayer, "source layer must not be null.");
 
         if (!MayNeedCompatibilityLayer(*srcLayer))
         {
@@ -365,11 +369,17 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
             for (unsigned int srcConnectionIndex = 0; srcConnectionIndex < srcConnections.size(); srcConnectionIndex++)
             {
                 InputSlot* dstInputSlot = srcConnections[srcConnectionIndex];
-                ARMNN_ASSERT(dstInputSlot);
+                if (!dstInputSlot)
+                {
+                    throw armnn::Exception("dstInputSlot must not be null.");
+                }
 
                 EdgeStrategy strategy = srcEdgeStrategies[srcConnectionIndex];
-                ARMNN_ASSERT_MSG(strategy != EdgeStrategy::Undefined,
-                                 "Undefined memory strategy found while adding copy layers for compatibility");
+                if (strategy == EdgeStrategy::Undefined)
+                {
+                    throw armnn::Exception("Undefined memory strategy found "
+                                           "while adding copy layers for compatibility");
+                }
 
                 const Layer& dstLayer = dstInputSlot->GetOwningLayer();
                 if (MayNeedCompatibilityLayer(dstLayer) &&
@@ -390,7 +400,11 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
                     }
                     else
                     {
-                        ARMNN_ASSERT_MSG(strategy == EdgeStrategy::ExportToTarget, "Invalid edge strategy found.");
+                        if (strategy != EdgeStrategy::ExportToTarget)
+                        {
+                            throw armnn::Exception("Invalid edge strategy found.");
+                        }
+
                         compLayer = InsertNewLayer<MemImportLayer>(*dstInputSlot, compLayerName.c_str());
                     }
 
@@ -460,7 +474,7 @@ void Graph::AddCompatibilityLayers(std::map<BackendId, std::unique_ptr<IBackendI
 
 void Graph::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer)
 {
-    ARMNN_ASSERT(substituteLayer != nullptr);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(substituteLayer, "substituteLayer should not be null");
 
     // Create a new sub-graph with only the given layer, using
     // the given sub-graph as a reference of which parent graph to use
@@ -491,16 +505,19 @@ void Graph::SubstituteSubgraph(SubgraphView& subgraph, const SubgraphView& subst
 
 void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const SubgraphView& substituteSubgraph)
 {
-    ARMNN_ASSERT_MSG(!substituteSubgraph.GetIConnectableLayers().empty(),
-                     "New sub-graph used for substitution must not be empty");
+    if (substituteSubgraph.GetIConnectableLayers().empty())
+    {
+        throw armnn::Exception("New sub-graph used for substitution must not be empty");
+    }
 
     const SubgraphView::IConnectableLayers& substituteSubgraphLayers = substituteSubgraph.GetIConnectableLayers();
     std::for_each(substituteSubgraphLayers.begin(), substituteSubgraphLayers.end(), [&](IConnectableLayer* layer)
     {
-        IgnoreUnused(layer);
         layer = PolymorphicDowncast<Layer*>(layer);
-        ARMNN_ASSERT_MSG(std::find(m_Layers.begin(), m_Layers.end(), layer) != m_Layers.end(),
-                         "Substitute layer is not a member of graph");
+        if (std::find(m_Layers.begin(), m_Layers.end(), layer) == m_Layers.end())
+        {
+            throw armnn::Exception("Substitute layer is not a member of graph");
+        }
     });
 
     const SubgraphView::IInputSlots& subgraphInputSlots = subgraph.GetIInputSlots();
@@ -512,8 +529,15 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     const SubgraphView::IInputSlots& substituteSubgraphInputSlots = substituteSubgraph.GetIInputSlots();
     const SubgraphView::IOutputSlots& substituteSubgraphOutputSlots = substituteSubgraph.GetIOutputSlots();
 
-    ARMNN_ASSERT(subgraphNumInputSlots == substituteSubgraphInputSlots.size());
-    ARMNN_ASSERT(subgraphNumOutputSlots == substituteSubgraphOutputSlots.size());
+    if (subgraphNumInputSlots != substituteSubgraphInputSlots.size())
+    {
+        throw armnn::Exception("subgraph and substitute subgraph input slot sizes must be the same.");
+    }
+
+    if (subgraphNumOutputSlots != substituteSubgraphOutputSlots.size())
+    {
+        throw armnn::Exception("subgraph and substitute subgraph output slot sizes must be the same.");
+    }
 
     // Disconnect the sub-graph and replace it with the substitute sub-graph
 
@@ -521,7 +545,10 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     for (unsigned int inputSlotIdx = 0; inputSlotIdx < subgraphNumInputSlots; ++inputSlotIdx)
     {
         IInputSlot* subgraphInputSlot = subgraphInputSlots.at(inputSlotIdx);
-        ARMNN_ASSERT(subgraphInputSlot);
+        if (!subgraphInputSlot)
+        {
+            throw armnn::NullPointerException("subgraphInputSlot must not be null.");
+        }
 
         // Only disconnect if the InputSlot has a connection, this might not be the case when
         // dealing with working copies of SubgraphViews
@@ -532,11 +559,19 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
             InputSlot* inputSlot = PolymorphicDowncast<InputSlot*>(subgraphInputSlot);
             bool isOverridden = inputSlot->IsTensorInfoOverridden();
 
-            ARMNN_ASSERT(connectedOutputSlot);
+            if (!connectedOutputSlot)
+            {
+                throw armnn::NullPointerException("connectedOutputSlot must not be null.");
+            }
+
             connectedOutputSlot->Disconnect(*subgraphInputSlot);
 
             IInputSlot* substituteInputSlot = substituteSubgraphInputSlots.at(inputSlotIdx);
-            ARMNN_ASSERT(substituteInputSlot);
+            if (!substituteInputSlot)
+            {
+                throw armnn::NullPointerException("substituteInputSlot must not be null.");
+            }
+
             connectedOutputSlot->Connect(*substituteInputSlot);
 
             if (isOverridden)
@@ -553,11 +588,17 @@ void Graph::ReplaceSubgraphConnections(const SubgraphView& subgraph, const Subgr
     {
         auto subgraphOutputSlot =
                 PolymorphicDowncast<OutputSlot*>(subgraphOutputSlots.at(outputSlotIdx));
-        ARMNN_ASSERT(subgraphOutputSlot);
+        if (!subgraphOutputSlot)
+        {
+            throw armnn::NullPointerException("subgraphOutputSlot must not be null.");
+        }
 
         auto substituteOutputSlot =
                 PolymorphicDowncast<OutputSlot*>(substituteSubgraphOutputSlots.at(outputSlotIdx));
-        ARMNN_ASSERT(substituteOutputSlot);
+        if (!substituteOutputSlot)
+        {
+            throw armnn::NullPointerException("substituteOutputSlot must not be null.");
+        }
 
         subgraphOutputSlot->MoveAllConnections(*substituteOutputSlot);
     }

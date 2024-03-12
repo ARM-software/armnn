@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,14 +24,20 @@ TransposeConvolution2dLayer::TransposeConvolution2dLayer(const TransposeConvolut
 
 std::unique_ptr<IWorkload> TransposeConvolution2dLayer::CreateWorkload(const IWorkloadFactory& factory) const
 {
-    ARMNN_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weights data should not be null.");
+    if (!m_Weight)
+    {
+        throw armnn::NullPointerException("TransposeConvolution2dLayer: Weights data should not be null.");
+    }
 
     TransposeConvolution2dQueueDescriptor descriptor;
     descriptor.m_Weight = m_Weight.get();
 
     if (m_Param.m_BiasEnabled)
     {
-        ARMNN_ASSERT_MSG(m_Bias != nullptr, "TransposeConvolution2dLayer: Bias data should not be null.");
+        if (!m_Bias)
+        {
+            throw armnn::NullPointerException("TransposeConvolution2dLayer: Bias data should not be null.");
+        }
         descriptor.m_Bias = m_Bias.get();
     }
 
@@ -57,11 +63,19 @@ TransposeConvolution2dLayer* TransposeConvolution2dLayer::Clone(Graph& graph) co
 std::vector<TensorShape> TransposeConvolution2dLayer::InferOutputShapes(
     const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
+
     const TensorShape& inputShape  = inputShapes[0];
     const TensorShape& kernelShape = inputShapes[1];
 
-    ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Transpose convolutions will always have 4D input");
+    if (inputShape.GetNumDimensions() != 4)
+    {
+        throw armnn::Exception("Transpose convolutions will always have 4D input");
+    }
 
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
@@ -95,7 +109,10 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
-    ARMNN_ASSERT_MSG(m_Weight != nullptr, "TransposeConvolution2dLayer: Weight data cannot be null.");
+    if (!m_Weight)
+    {
+        throw armnn::LayerValidationException("TransposeConvolution2dLayer: Weight data cannot be null.");
+    }
 
     std::vector<TensorShape> expectedOutputShape;
     std::vector<TensorShape> outputShapeGivenAsInput;
@@ -103,7 +120,12 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
     expectedOutputShape = InferOutputShapes({GetInputSlot(0).GetTensorInfo().GetShape(),
                                              m_Weight->GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(expectedOutputShape.size() == 1);
+    if (expectedOutputShape.size() != 1)
+    {
+        throw armnn::LayerValidationException("expectedOutputShape' size is "
+                                              + std::to_string(expectedOutputShape.size()) +
+                                              " - should be \"1\".");
+    }
 
     // If output_shape was specified then use it rather than calculate an inferred output shape.
     if (m_Param.m_OutputShapeEnabled)
@@ -112,10 +134,19 @@ void TransposeConvolution2dLayer::ValidateTensorShapesFromInputs()
             m_Param.m_OutputShape.data());
         outputShapeGivenAsInput.push_back(shapeAsTensorShape);
 
-        ARMNN_ASSERT(outputShapeGivenAsInput.size() == 1);
-        ARMNN_ASSERT_MSG(expectedOutputShape == outputShapeGivenAsInput,
-                         "TransposeConvolution2dLayer: output calculated by InferOutputShapes and "
-                         "the output given as an input parameter to the layer are not matching");
+        if (outputShapeGivenAsInput.size() != 1)
+        {
+            throw armnn::LayerValidationException("outputShapeGivenAsInput' size is "
+                                                  + std::to_string(outputShapeGivenAsInput.size()) +
+                                                  " - should be \"1\".");
+        }
+
+        if (expectedOutputShape != outputShapeGivenAsInput)
+        {
+            throw armnn::LayerValidationException("TransposeConvolution2dLayer: "
+                                                  "output calculated by InferOutputShapes and the output given "
+                                                  "as an input parameter to the layer are not matching");
+        }
     }
 
     ValidateAndCopyShape(outputShape, expectedOutputShape[0], m_ShapeInferenceMethod, "TransposeConvolution2dLayer");

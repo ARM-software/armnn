@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -64,14 +64,30 @@ DepthwiseConvolution2dLayer* DepthwiseConvolution2dLayer::Clone(Graph& graph) co
 std::vector<TensorShape>
 DepthwiseConvolution2dLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
+
     const TensorShape& inputShape  = inputShapes[0];
     const TensorShape& filterShape = inputShapes[1];
 
-    ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Convolutions will always have 4D input.");
+    if (inputShape.GetNumDimensions() != 4)
+    {
+        throw armnn::Exception("Convolutions will always have 4D input.");
+    }
 
-    ARMNN_ASSERT( m_Param.m_StrideX > 0);
-    ARMNN_ASSERT( m_Param.m_StrideY > 0);
+    if (m_Param.m_StrideX == 0)
+    {
+        throw armnn::Exception("m_StrideX cannot be 0.");
+    }
+
+    if (m_Param.m_StrideY == 0)
+    {
+        throw armnn::Exception("m_StrideY cannot be 0.");
+    }
+
 
     DataLayoutIndexed dataLayoutIndex(m_Param.m_DataLayout);
 
@@ -110,15 +126,22 @@ void DepthwiseConvolution2dLayer::ValidateTensorShapesFromInputs()
 
     VerifyShapeInferenceType(outputShape, m_ShapeInferenceMethod);
 
-    ARMNN_ASSERT_MSG(GetInputSlot(1).GetConnection(),
-                     "DepthwiseConvolution2dLayer: Weights data should not be null.");
+    if (!GetInputSlot(1).GetConnection())
+    {
+        throw armnn::LayerValidationException("DepthwiseConvolution2dLayer: Weights data should not be null.");
+    }
 
     auto inferredShapes = InferOutputShapes({
         GetInputSlot(0).GetTensorInfo().GetShape(),
         GetInputSlot(1).GetTensorInfo().GetShape()
     });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "DepthwiseConvolution2dLayer");
 }

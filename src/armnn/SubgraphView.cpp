@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,14 +27,17 @@ void AssertIfNullsOrDuplicates(const C& container, const std::string& errorMessa
     std::unordered_set<T> duplicateSet;
     std::for_each(container.begin(), container.end(), [&duplicateSet, &errorMessage](const T& i)
     {
-        // Ignore unused for release builds
-        IgnoreUnused(errorMessage);
-
         // Check if the item is valid
-        ARMNN_ASSERT_MSG(i, errorMessage.c_str());
+        if (!i)
+        {
+            throw armnn::GraphValidationException(errorMessage.c_str());
+        }
 
         // Check if a duplicate has been found
-        ARMNN_ASSERT_MSG(duplicateSet.find(i) == duplicateSet.end(), errorMessage.c_str());
+        if (duplicateSet.find(i) != duplicateSet.end())
+        {
+            throw armnn::GraphValidationException(errorMessage.c_str());
+        }
 
         duplicateSet.insert(i);
     });
@@ -493,7 +496,8 @@ SubgraphView SubgraphView::GetWorkingCopy() const
 
 void SubgraphView::SubstituteSubgraph(SubgraphView& subgraph, IConnectableLayer* substituteLayer)
 {
-    ARMNN_ASSERT(substituteLayer != nullptr);
+    ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(substituteLayer, "substituteLayer should not be null");
+
     SubgraphView substituteSubgraph(substituteLayer);
 
     SubstituteSubgraph(subgraph, substituteSubgraph);

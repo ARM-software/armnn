@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ReshapeLayer.hpp"
@@ -48,8 +48,17 @@ void ReshapeLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
-    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
+
+    if (inferredShapes[0].GetDimensionality() != Dimensionality::Specified)
+    {
+        throw armnn::LayerValidationException("inferredShapes' dimensionality has not been specified.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "ReshapeLayer");
 }

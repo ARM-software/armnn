@@ -1,6 +1,6 @@
 //
 // Copyright © 2020 Samsung Electronics Co Ltd and Contributors. All rights reserved.
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -51,8 +51,10 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
 
     const TensorInfo& input = GetInputSlot(0).GetTensorInfo();
 
-    ARMNN_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
-                     "ReduceLayer: Reduce supports up to 4D input.");
+    if (auto inputDims = input.GetNumDimensions(); inputDims != std::clamp(inputDims, 1u, 4u))
+    {
+        throw armnn::LayerValidationException("ReduceLayer: Reduce supports up to 4D input.");
+    }
 
     std::vector<TensorShape> inferredShapes = InferOutputShapes( {input.GetShape() });
 
@@ -61,11 +63,18 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
 
 std::vector<TensorShape> ReduceLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 1);
+    if (inputShapes.size() != 1)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"1\".");
+    }
+
     const TensorShape& input = inputShapes[0];
 
-    ARMNN_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
-                     "ReduceLayer: Reduce supports up to 4D input.");
+    if (auto inputDims = input.GetNumDimensions(); inputDims != std::clamp(inputDims, 1u, 4u))
+    {
+        throw armnn::Exception("ReduceLayer: Reduce supports up to 4D input.");
+    }
 
     unsigned int rank = input.GetNumDimensions();
     unsigned int outputRank = 0;

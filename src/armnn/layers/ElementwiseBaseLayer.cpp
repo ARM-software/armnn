@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2018,2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,7 +22,12 @@ ElementwiseBaseLayer::ElementwiseBaseLayer(unsigned int numInputSlots,
 
 std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
+
     TensorShape input0 = inputShapes[0];
     TensorShape input1 = inputShapes[1];
 
@@ -43,8 +48,10 @@ std::vector<TensorShape> ElementwiseBaseLayer::InferOutputShapes(const std::vect
         unsigned int dim1 = input1[i - shiftedDims];
 
         // Validate inputs are broadcast compatible.
-        ARMNN_ASSERT_MSG(dim0 == dim1 || dim0 == 1 || dim1 == 1,
-                         "Dimensions should either match or one should be of size 1.");
+        if (dim0 != dim1 && dim0 != 1 && dim1 != 1)
+        {
+            throw armnn::Exception("Dimensions should either match or one should be of size 1.");
+        }
 
         dims[i] = std::max(dim0, dim1);
     }
@@ -69,7 +76,12 @@ void ElementwiseBaseLayer::ValidateTensorShapesFromInputs()
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetTensorInfo().GetShape(),
                                               GetInputSlot(1).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, GetLayerTypeAsCString(GetType()));
 }

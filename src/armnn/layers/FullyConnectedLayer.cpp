@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "FullyConnectedLayer.hpp"
@@ -34,7 +34,12 @@ FullyConnectedLayer* FullyConnectedLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> FullyConnectedLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 2);
+    if (inputShapes.size() != 2)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"2\".");
+    }
+
     const TensorShape& inputShape = inputShapes[0];
     const TensorShape weightShape = inputShapes[1];
 
@@ -55,8 +60,17 @@ void FullyConnectedLayer::ValidateTensorShapesFromInputs()
             {GetInputSlot(0).GetTensorInfo().GetShape(),
              GetInputSlot(1).GetTensorInfo().GetShape()});
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
-    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
+
+    if (inferredShapes[0].GetDimensionality() != Dimensionality::Specified)
+    {
+        throw armnn::LayerValidationException("inferredShapes' dimensionality has not been specified.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "FullyConnectedLayer");
 }

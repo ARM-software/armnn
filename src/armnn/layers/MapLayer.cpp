@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "MapLayer.hpp"
@@ -38,7 +38,11 @@ void MapLayer::ValidateTensorShapesFromInputs()
 {
     // validates that the input is connected.
     VerifyLayerConnections(1, CHECK_LOCATION());
-    ARMNN_ASSERT(GetNumOutputSlots() == 0);
+    if (GetNumOutputSlots() != 0)
+    {
+        throw armnn::LayerValidationException("Output slots must be \"0\" - currently \""
+                                              + std::to_string(GetNumOutputSlots()) + "\".");
+    }
 }
 
 void MapLayer::ExecuteStrategy(IStrategy& strategy) const

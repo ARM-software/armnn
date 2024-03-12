@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -52,19 +52,35 @@ void MeanLayer::ValidateTensorShapesFromInputs()
     std::vector<TensorShape> inferredShapes = InferOutputShapes(
             { GetInputSlot(0).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
-    ARMNN_ASSERT(inferredShapes[0].GetDimensionality() == Dimensionality::Specified);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
+
+    if (inferredShapes[0].GetDimensionality() != Dimensionality::Specified)
+    {
+        throw armnn::LayerValidationException("inferredShapes' dimensionality has not been specified.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "MeanLayer");
 }
 
 std::vector<TensorShape> MeanLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 1);
+    if (inputShapes.size() != 1)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"1\".");
+    }
+
     const TensorShape& input = inputShapes[0];
 
-    ARMNN_ASSERT_MSG(input.GetNumDimensions() > 0 && input.GetNumDimensions() <= 4,
-                     "MeanLayer: Mean supports up to 4D input.");
+    if (auto inputDims = input.GetNumDimensions(); inputDims != std::clamp(inputDims, 1u, 4u))
+    {
+        throw armnn::Exception("ReduceLayer: Reduce supports up to 4D input.");
+    }
 
     unsigned int rank = input.GetNumDimensions();
     unsigned int outputRank = 0;

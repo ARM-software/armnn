@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -39,12 +39,20 @@ Pooling2dLayer* Pooling2dLayer::Clone(Graph& graph) const
 
 std::vector<TensorShape> Pooling2dLayer::InferOutputShapes(const std::vector<TensorShape>& inputShapes) const
 {
-    ARMNN_ASSERT(inputShapes.size() == 1);
+    if (inputShapes.size() != 1)
+    {
+        throw armnn::Exception("inputShapes' size is \"" + std::to_string(inputShapes.size()) +
+                               "\" - should be \"1\".");
+    }
+
     const TensorShape& inputShape = inputShapes[0];
     const DataLayoutIndexed dimensionIndices = m_Param.m_DataLayout;
 
     // If we support multiple batch dimensions in the future, then this assert will need to change.
-    ARMNN_ASSERT_MSG(inputShape.GetNumDimensions() == 4, "Pooling2dLayer will always have 4D input.");
+    if (inputShape.GetNumDimensions() != 4)
+    {
+        throw armnn::Exception("Pooling2dLayer will always have 4D input.");
+    }
 
     unsigned int inWidth = inputShape[dimensionIndices.GetWidthIndex()];
     unsigned int inHeight = inputShape[dimensionIndices.GetHeightIndex()];
@@ -56,8 +64,10 @@ std::vector<TensorShape> Pooling2dLayer::InferOutputShapes(const std::vector<Ten
     unsigned int outHeight = 1;
     if (!isGlobalPooling)
     {
-        ARMNN_ASSERT_MSG(m_Param.m_StrideX!=0 && m_Param.m_StrideY!=0,
-                         "Stride can only be zero when performing global pooling");
+        if (!m_Param.m_StrideX || !m_Param.m_StrideY)
+        {
+            throw armnn::Exception("Stride can only be zero when performing global pooling");
+        }
 
         auto CalcSize = [](auto inSize, auto lowPad, auto highPad, auto poolSize, auto stride, auto outputShapeRounding)
             {
@@ -74,7 +84,7 @@ std::vector<TensorShape> Pooling2dLayer::InferOutputShapes(const std::vector<Ten
                         size = static_cast<unsigned int>(floor(div)) + 1;
                         break;
                     default:
-                        ARMNN_ASSERT_MSG(false, "Unsupported Output Shape Rounding");
+                        throw armnn::Exception("Unsupported Output Shape Rounding");
                 }
 
                 // MakeS sure that border operations will start from inside the input and not the padded area.
@@ -112,7 +122,12 @@ void Pooling2dLayer::ValidateTensorShapesFromInputs()
 
     auto inferredShapes = InferOutputShapes({ GetInputSlot(0).GetTensorInfo().GetShape() });
 
-    ARMNN_ASSERT(inferredShapes.size() == 1);
+    if (inferredShapes.size() != 1)
+    {
+        throw armnn::LayerValidationException("inferredShapes has "
+                                              + std::to_string(inferredShapes.size()) +
+                                              " elements - should only have 1.");
+    }
 
     ValidateAndCopyShape(outputShape, inferredShapes[0], m_ShapeInferenceMethod, "Pooling2dLayer");
 }

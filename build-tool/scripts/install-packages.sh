@@ -120,9 +120,6 @@ fi
 echo -e "\n***** $name: Installing system-wide packages required by setup-armnn.sh and build-armnn.sh *****"
 echo -e "\nINFO: This script downloads and builds CMake from source in the current directory from which this script is called"
 echo -e "\nINFO: CMake and other apt packages will be installed system-wide once this script has completed execution"
-echo -e "\nScript execution will begin in 10 seconds..."
-
-sleep 10
 
 install_apt_packages
 

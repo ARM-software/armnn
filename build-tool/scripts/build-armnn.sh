@@ -113,6 +113,11 @@ build_acl()
 
 build_armnn()
 {
+  if [ "$flag_clean" -eq 1 ]; then
+    echo -e "\n***** Clean flag detected: removing existing Arm NN build *****"
+    rm -rf "$ARMNN_BUILD_TARGET"
+  fi
+
   mkdir -p "$ARMNN_BUILD_TARGET"
   cd "$ARMNN_BUILD_TARGET"
 
@@ -148,11 +153,6 @@ build_armnn()
     ;;
   esac
 
-  if [ "$flag_clean" -eq 1 ]; then
-    echo -e "\n***** Clean flag detected: removing existing Arm NN build *****"
-    rm -rf "$ARMNN_BUILD_TARGET"
-  fi
-
   echo -e "\n***** Building Arm NN for $TARGET_ARCH *****"
 
   local flatbuffers_root="$FLATBUFFERS_BUILD_TARGET"
@@ -186,6 +186,7 @@ build_armnn()
         -DFLATC_DIR="$FLATBUFFERS_BUILD_HOST" \
         -DONNX_GENERATED_SOURCES="$ONNX_BUILD_TARGET" \
         -DPROTOBUF_ROOT="$protobuf_root" \
+        -DBUILD_TESTS=1 \
         "$armnn_cmake_args" \
         "$ARMNN_SRC"
 
@@ -233,6 +234,9 @@ build_armnn()
     mkdir -p ./include/armnnDelegate/armnn/delegate/opaque/
     cp -r "$SOURCE_DIR"/armnn/delegate/opaque/include ./include/armnnDelegate/armnn/delegate/opaque/
   fi
+
+  # move ExecuteNetwork to outer directory
+  mv tests/ExecuteNetwork .
 
   echo -e "\n***** Built Arm NN for $TARGET_ARCH *****"
 

@@ -437,7 +437,7 @@ echo -e "\nINFO: Displaying configuration information before execution of $name"
 echo "            target-arch: $TARGET_ARCH"
 echo "              host-arch: $HOST_ARCH"
 echo "tflite-classic-delegate: $flag_tflite_classic_delegate"
-echo "tflite-opaque-delegate : $flag_tflite_opaque_delegate"
+echo " tflite-opaque-delegate: $flag_tflite_opaque_delegate"
 echo "          tflite-parser: $flag_tflite_parser"
 echo "            onnx-parser: $flag_onnx_parser"
 echo "            num-threads: $NUM_THREADS"
@@ -448,10 +448,6 @@ echo "        build directory: $BUILD_DIR"
 if check_if_repository .; then
   echo -e "\n***** WARNING: Running script inside a git repository. To avoid nested repos, call this script from outside of this repo. *****"
 fi
-
-echo -e "\nScript execution will begin in 10 seconds..."
-
-sleep 10
 
 mkdir -p "$SOURCE_DIR"
 mkdir -p "$BUILD_DIR"

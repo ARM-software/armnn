@@ -214,11 +214,8 @@ build_armnn()
   rm -rf include
   cp -r "$SOURCE_DIR"/armnn/include .
 
+  # Copy all delegate header files to ./include/armnnDelegate
   if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ]; then
-    mv delegate/libarmnn* .  # move .so files to outer directory
-    mv delegate/*UnitTests . # move UnitTest files to outer directory
-    rm -rf delegate
-
     mkdir -p ./include/armnnDelegate/
     cp -r "$SOURCE_DIR"/armnn/delegate/include/* ./include/armnnDelegate/
 

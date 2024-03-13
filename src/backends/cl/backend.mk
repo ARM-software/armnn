@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2023 ARM Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2024 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -81,6 +81,7 @@ BACKEND_SOURCES := \
         workloads/ClResizeWorkload.cpp \
         workloads/ClReverseV2Workload.cpp \
         workloads/ClRsqrtWorkload.cpp \
+        workloads/ClScatterNdWorkload.cpp \
         workloads/ClSinWorkload.cpp \
         workloads/ClSliceWorkload.cpp \
         workloads/ClSoftmaxWorkload.cpp \

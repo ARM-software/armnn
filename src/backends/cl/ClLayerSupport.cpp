@@ -73,6 +73,7 @@
 #include "workloads/ClResizeWorkload.hpp"
 #include "workloads/ClReverseV2Workload.hpp"
 #include "workloads/ClRsqrtWorkload.hpp"
+#include "workloads/ClScatterNdWorkload.hpp"
 #include "workloads/ClSinWorkload.hpp"
 #include "workloads/ClSliceWorkload.hpp"
 #include "workloads/ClSoftmaxWorkload.hpp"
@@ -577,6 +578,13 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
             return IsReverseV2Supported(infos[0],
                                         infos[1],
                                         infos[2],
+                                        reasonIfUnsupported);
+        case LayerType::ScatterNd:
+            return IsScatterNdSupported(infos[0], // input/shape
+                                        infos[1], // indices
+                                        infos[2], // updates
+                                        infos[3], // output
+                                        *(PolymorphicDowncast<const ScatterNdDescriptor*>(&descriptor)),
                                         reasonIfUnsupported);
         case LayerType::Shape:
             return LayerSupportBase::IsShapeSupported(infos[0],
@@ -1440,6 +1448,22 @@ bool ClLayerSupport::IsReverseV2Supported(const TensorInfo& input,
                                    input,
                                    axis,
                                    output);
+}
+
+bool ClLayerSupport::IsScatterNdSupported(const TensorInfo& input,
+                                          const TensorInfo& indices,
+                                          const TensorInfo& updates,
+                                          const TensorInfo& output,
+                                          const ScatterNdDescriptor& descriptor,
+                                          Optional<std::string&> reasonIfUnsupported) const
+{
+    FORWARD_WORKLOAD_VALIDATE_FUNC(ClScatterNdWorkloadValidate,
+                                   reasonIfUnsupported,
+                                   input,
+                                   indices,
+                                   updates,
+                                   output,
+                                   descriptor);
 }
 
 bool ClLayerSupport::IsSliceSupported(const TensorInfo& input,

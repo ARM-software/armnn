@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -12,6 +12,7 @@
 #include <arm_compute/core/ITensor.h>
 #include <arm_compute/core/TensorInfo.h>
 #include <arm_compute/core/Types.h>
+#include <arm_compute/function_info/ScatterInfo.h>
 
 #include <Half.hpp>
 
@@ -107,6 +108,9 @@ arm_compute::PixelValue GetPixelValue(const arm_compute::ITensorInfo* tensorInfo
 unsigned int ComputeDepthwiseConv2dDepthMultiplier(armnn::DataLayout layout,
                                                    const arm_compute::TensorShape& weightsShape,
                                                    const arm_compute::TensorShape& inputShape);
+
+/// Utility function used to setup an arm_compute::ScatterInfo from ArmNN ScatterNd descriptor
+arm_compute::ScatterInfo BuildArmComputeScatterInfo(const ScatterNdDescriptor& descriptor);
 
 /// Utility function used to setup an arm_compute::PadStrideInfo object from an ArmNN layer descriptor.
 template <typename Descriptor>

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -57,6 +57,7 @@
 #include "ClResizeWorkload.hpp"
 #include "ClReverseV2Workload.hpp"
 #include "ClRsqrtWorkload.hpp"
+#include "ClScatterNdWorkload.hpp"
 #include "ClSinWorkload.hpp"
 #include "ClSliceWorkload.hpp"
 #include "ClSoftmaxWorkload.hpp"

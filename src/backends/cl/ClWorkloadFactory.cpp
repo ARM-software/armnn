@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "ClWorkloadFactory.hpp"
@@ -715,6 +715,11 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
         {
             auto reverseV2QueueDescriptor = PolymorphicDowncast<const ReverseV2QueueDescriptor*>(&descriptor);
             return MakeWorkload<ClReverseV2Workload>(*reverseV2QueueDescriptor, info, m_CLCompileContext);
+        }
+        case LayerType::ScatterNd :
+        {
+            auto scatterNdQueueDescriptor = PolymorphicDowncast<const ScatterNdQueueDescriptor*>(&descriptor);
+            return MakeWorkload<ClScatterNdWorkload>(*scatterNdQueueDescriptor, info, m_CLCompileContext);
         }
         case LayerType::Slice :
         {

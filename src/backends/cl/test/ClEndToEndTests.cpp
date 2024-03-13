@@ -25,6 +25,7 @@
 #include <backendsCommon/test/ReshapeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ResizeEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ReverseV2EndToEndTestImpl.hpp>
+#include <backendsCommon/test/ScatterNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
@@ -320,6 +321,27 @@ TEST_CASE("DequantizeEndToEndSimpleTest")
 TEST_CASE("DequantizeEndToEndOffsetTest")
 {
     DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(clDefaultBackends);
+}
+
+// ScatterNd
+TEST_CASE("ClScatterNd1DInputEndToEndFloat32Test")
+{
+    ScatterNd1DimUpdateWithInputEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClScatterNd1DNoInputEndToEndFloat32Test")
+{
+    ScatterNd1DimUpdateNoInputEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClScatterNd2DInputEndToEndFloat32Test")
+{
+    ScatterNd2DimUpdateWithInputEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClScatterNd2DNoInputEndToEndFloat32Test")
+{
+    ScatterNd2DimUpdateNoInputEndToEnd<armnn::DataType::Float32>(clDefaultBackends);
 }
 
 // Slice

@@ -459,5 +459,31 @@ unsigned int ComputeDepthwiseConv2dDepthMultiplier(armnn::DataLayout layout,
     return depthMultiplier;
 }
 
+arm_compute::ScatterInfo BuildArmComputeScatterInfo(const ScatterNdDescriptor& descriptor)
+{
+    arm_compute::ScatterFunction scatterFunction;
+    switch(descriptor.m_Function)
+    {
+        case ScatterNdFunction::Update:
+            scatterFunction = arm_compute::ScatterFunction::Update;
+            break;
+        case ScatterNdFunction::Add:
+            scatterFunction = arm_compute::ScatterFunction::Add;
+            break;
+        case ScatterNdFunction::Sub:
+            scatterFunction = arm_compute::ScatterFunction::Sub;
+            break;
+        case ScatterNdFunction::Max:
+            scatterFunction = arm_compute::ScatterFunction::Max;
+            break;
+        case ScatterNdFunction::Min:
+            scatterFunction = arm_compute::ScatterFunction::Min;
+            break;
+        default: throw InvalidArgumentException("Unknown ArmNN::ScatterNd Function: [" +
+                                                std::to_string(static_cast<int>(descriptor.m_Function)) + "]");
+    }
+
+    return arm_compute::ScatterInfo(scatterFunction, !descriptor.m_InputEnabled);
+}
 } // namespace armcomputetensorutils
 } // namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1530,6 +1530,93 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleSoftmaxBeta2Uint8, ClContextControlFixtur
 
 // LogSoftmax
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(LogSoftmaxFloat32_1, ClContextControlFixture, LogSoftmaxTest1<DataType::Float32>)
+
+// ScatterNd
+// With Input tensor
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd1DUpdateTestWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd1DimUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DUpdateTestWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2Dim1Outter1InnerUpdateWithInputFloat32,
+                                ClContextControlFixture,
+                                ScatterNd2Dim1Outter1InnerUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3DimUpdateWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd3DimUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3Dim1Outter2InnerUpdateWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd3Dim1Outter2InnerUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3Dim2Outter1InnerUpdateWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd3Dim2Outter1InnerUpdateWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd4DimUpdateWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd4DimUpdateWithInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimAddWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimAddWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimSubWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimSubWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimMaxWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimMaxWithInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimMinWithInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimMinWithInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3DimUpdateWithInputFloat16,
+                                 ClContextControlFixture,
+                                 ScatterNd3DimUpdateWithInput<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3DimUpdateWithInputSigned32,
+                                 ClContextControlFixture,
+                                 ScatterNd3DimUpdateWithInput<DataType::Signed32>)
+
+// No input tensor, only shape provided
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd1DUpdateTestNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd1DimUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimUpdateTestNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2Dim1Outter1InnerUpdateNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2Dim1Outter1InnerUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3DimUpdateNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd3DimUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3Dim1Outter2InnerUpdateNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd3Dim1Outter2InnerUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3Dim2Outter1InnerUpdateNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd3Dim2Outter1InnerUpdateNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd4DimUpdateNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd4DimUpdateNoInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimAddNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimAddNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimSubNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimSubNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimMaxNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimMaxNoInput<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd2DimMinNoInputFloat32,
+                                 ClContextControlFixture,
+                                 ScatterNd2DimMinNoInput<DataType::Float32>)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3DimUpdateNoInputFloat16,
+                                 ClContextControlFixture,
+                                 ScatterNd3DimUpdateNoInput<DataType::Float16>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ScatterNd3DimUpdateNoInputSigned32,
+                                 ClContextControlFixture,
+                                 ScatterNd3DimUpdateNoInput<DataType::Signed32>)
 
 // Space To Batch Nd
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToBatchNdSimpleFloat32, ClContextControlFixture, SpaceToBatchNdSimpleFloat32Test)

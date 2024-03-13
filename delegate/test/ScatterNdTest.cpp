@@ -275,13 +275,13 @@ TEST_SUITE("ScatterNdDelegateTests")
 
 TEST_CASE ("ScatterNd_1Dim_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd1DimTest<float>(tflite::TensorType_FLOAT32, backends);
 }
 
 TEST_CASE ("ScatterNd_1Dim_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd1DimTest<int32_t>(tflite::TensorType_INT32, backends);
 }
 
@@ -299,13 +299,13 @@ TEST_CASE ("ScatterNd_1Dim_UINT8_Test")
 
 TEST_CASE ("ScatterNd_2Dim_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd2DimTest<float>(tflite::TensorType_FLOAT32, backends);
 }
 
 TEST_CASE ("ScatterNd_2Dim_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd2DimTest<int32_t>(tflite::TensorType_INT32, backends);
 }
 
@@ -323,13 +323,13 @@ TEST_CASE ("ScatterNd_2Dim_UINT8_Test")
 
 TEST_CASE ("ScatterNd_2Dim_1Outter_1Inner_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd2Dim1Outter1InnerTest<float>(tflite::TensorType_FLOAT32, backends);
 }
 
 TEST_CASE ("ScatterNd_2Dim_1Outter_1Inner_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd2Dim1Outter1InnerTest<int32_t>(tflite::TensorType_INT32, backends);
 }
 
@@ -347,13 +347,13 @@ TEST_CASE ("ScatterNd_2Dim_1Outter_1Inner_UINT8_Test")
 
 TEST_CASE ("ScatterNd_3Dim_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd3DimTest<float>(tflite::TensorType_FLOAT32, backends);
 }
 
 TEST_CASE ("ScatterNd_3Dim_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd3DimTest<int32_t>(tflite::TensorType_INT32, backends);
 }
 
@@ -371,13 +371,13 @@ TEST_CASE ("ScatterNd_3Dim_UINT8_Test")
 
 TEST_CASE ("ScatterNd_3Dim_1Outter_2Inner_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd3Dim1Outter2InnerTest<float>(tflite::TensorType_FLOAT32, backends);
 }
 
 TEST_CASE ("ScatterNd_3Dim_1Outter_2Inner_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd3Dim1Outter2InnerTest<int32_t>(tflite::TensorType_INT32, backends);
 }
 
@@ -395,13 +395,13 @@ TEST_CASE ("ScatterNd_3Dim_1Outter_2Inner_UINT8_Test")
 
 TEST_CASE ("ScatterNd_3Dim_2Outter_1Inner_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd3Dim2Outter1InnerTest<float>(tflite::TensorType_FLOAT32, backends);
 }
 
 TEST_CASE ("ScatterNd_3Dim_2Outter_1Inner_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNd3Dim2Outter1InnerTest<int32_t>(tflite::TensorType_INT32, backends);
 }
 
@@ -419,13 +419,13 @@ TEST_CASE ("ScatterNd_3Dim_2Outter_1Inner_UINT8_Test")
 
 TEST_CASE ("ScatterNd_4Dim_FP32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNdDim4<float>(tflite::TensorType_FLOAT32, backends);
 }
 
 TEST_CASE ("ScatterNd_4Dim_INT32_Test")
 {
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
+    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef, armnn::Compute::GpuAcc };
     ScatterNdDim4<int32_t>(tflite::TensorType_INT32, backends);
 }
 

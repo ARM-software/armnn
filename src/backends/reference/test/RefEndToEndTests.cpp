@@ -1354,7 +1354,6 @@ TEST_CASE("QuantizationEndToEndFloat16_S16Test")
 }
 
 // ScatterNd
-
 TEST_CASE("RefScatterNd1DInputEndToEndFloat32Test")
 {
     ScatterNd1DimUpdateWithInputEndToEnd<armnn::DataType::Float32>(defaultBackends);
@@ -1394,7 +1393,6 @@ TEST_CASE("RefScatterNd2DNoInputEndToEndInt8Test")
 {
     ScatterNd2DimUpdateNoInputEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
 }
-
 
 // SpaceToDepth
 TEST_CASE("RefSpaceToDepthNhwcEndToEndTest1")

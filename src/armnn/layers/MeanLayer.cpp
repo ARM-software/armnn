@@ -78,7 +78,7 @@ std::vector<TensorShape> MeanLayer::InferOutputShapes(const std::vector<TensorSh
     const TensorShape& input = inputShapes[0];
 
     auto inputDims = input.GetNumDimensions();
-    if (inputDims != std::clamp(inputDims, 1u, 4u))
+    if (inputDims < 1 || inputDims > 4)
     {
         throw armnn::Exception("ReduceLayer: Reduce supports up to 4D input.");
     }

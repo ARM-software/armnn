@@ -52,7 +52,7 @@ void ReduceLayer::ValidateTensorShapesFromInputs()
     const TensorInfo& input = GetInputSlot(0).GetTensorInfo();
 
     auto inputDims = input.GetNumDimensions();
-    if (inputDims != std::clamp(inputDims, 1u, 4u))
+    if (inputDims < 1 || inputDims > 4)
     {
         throw armnn::LayerValidationException("ReduceLayer: Reduce supports up to 4D input.");
     }
@@ -73,7 +73,7 @@ std::vector<TensorShape> ReduceLayer::InferOutputShapes(const std::vector<Tensor
     const TensorShape& input = inputShapes[0];
 
     auto inputDims = input.GetNumDimensions();
-    if (inputDims != std::clamp(inputDims, 1u, 4u))
+    if (inputDims < 1 || inputDims > 4)
     {
         throw armnn::Exception("ReduceLayer: Reduce supports up to 4D input.");
     }

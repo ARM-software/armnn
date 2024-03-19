@@ -2,9 +2,8 @@
 The **_Arm NN Build Tool_** provides a collection of **parameterized bash scripts** accompanied by a **Dockerfile** for building Arm NN and its dependencies, including **[Arm Compute Library (ACL)](https://github.com/ARM-software/ComputeLibrary/)**.
 This tool replaces/supersedes the majority of the existing Arm NN build guides as a user-friendly way to build Arm NN from scratch.
 The main benefit of building Arm NN from scratch is the ability to **exactly choose which components to build, targeted for your ML project**.<br>
-The Arm NN Build Tool is tested on **x86_64 (Intel) and aarch64 (Arm) build hosts** for the **Ubuntu** platform.
-Other host platforms such as Windows and Mac **should** work (with Docker installed), but have not been officially tested.<br>
-At present, the tool supports **targeting Linux devices (Ubuntu 20.04) on x86_64, aarch64 and android64** architectures.<br>
+The Arm NN Build Tool is tested on **x86_64 (Intel) and aarch64 (Arm) build hosts** for the **Ubuntu** platform and on **arm64 (Apple Silicon)**.
+At present, the tool supports **targeting Linux devices (Ubuntu 20.04) and macOS (Mac with Apple silicon). In Linux it supports building on x86_64, aarch64 and android64** architectures.<br>
 We recommend using the Arm NN Build Tool through the use of Docker. However, the scripts may be [executed directly on your machine](#build-arm-nn-without-docker) if desired.
 
 **If you already have Docker installed** and want to quickly build the Arm NN Dockerfile with some default build arguments, please follow the [Docker Build Steps](#docker-build-steps).
@@ -13,7 +12,8 @@ We recommend using the Arm NN Build Tool through the use of Docker. However, the
 * [System Requirements](#system-requirements)
 * [Install Docker](#install-docker)
   * [Ubuntu / Linux](#ubuntu--linux)
-  * [Windows and Mac](#windows-and-mac)
+  * [Mac](#mac)
+  * [Windows](#windows)
 * [Docker Build Arguments Reference](#docker-build-arguments-reference)
   * [SETUP_ARGS](#setup_args)
   * [BUILD_ARGS](#build_args)
@@ -91,7 +91,8 @@ beyond 6GB. The ```docker images``` command shows the disk usage of each Docker 
 Docker Images and Docker Containers, use the command ```docker system df```.
 
 This Dockerfile was built on a **Ubuntu 20.04 host machine with Docker version 20.10.14**. Other Linux distros such as **Debian** should also work as
-long as the Docker version is similar to **20.10.14**.
+long as the Docker version is similar to **20.10.14**. This should also work on Mac with Apple silicon but needs some manual setup to be done.
+Please find the steps in ```install-packages.sh```.
 
 The build outputs from this Dockerfile have been tested on an **Odroid N2+ target device with Ubuntu 20.04** installed. The build outputs
 should also work on newer versions of Ubuntu (and Debian) but this has not been exhaustively tested.
@@ -101,8 +102,8 @@ To view the system packages that are installed during ```docker build```, please
 <br>
 
 ## Install Docker
-Builds of the official Arm NN Dockerfile have been tested on the **Ubuntu 20.04** host platform.
-Whilst other platforms have not been tested, Docker should be able to build the Arm NN Dockerfile on other platforms such as Windows and Mac.
+Builds of the official Arm NN Dockerfile have been tested on the **Ubuntu 20.04** and Mac with Apple silicon host platforms.
+Whilst other platforms have not been tested, Docker should be able to build the Arm NN Dockerfile on other platforms such as Windows.
 On **Linux**, we recommend using **Docker Engine** which is used through the command-line interface (CLI).
 For **Windows and Mac** users, **Docker Desktop** is available which allows the use of the CLI plus a graphical interface.<br>
 This guide will **only** provide steps on using Docker through the use of the CLI and not Docker Desktop.
@@ -115,11 +116,14 @@ For Ubuntu users, we recommend installing **Docker Engine** with the following s
 
 Similar steps for installing Docker Engine on other Linux distributions can be found by clicking on your distro under the Server table on [this page](https://docs.docker.com/engine/install/#server).
 
-### Windows and Mac
-We do not officially test the building of the Arm NN Dockerfile on Windows or Mac. However, it's likely that it will work if your system supports Docker.
+### Mac
+The Dockerfile will also work on Mac with Apple silicon. But we haven't tested this using Docker Desktop.
+For **Mac** users, please use the Docker Desktop download link on [this page](https://docs.docker.com/desktop/install/mac-install/).
+
+### Windows
+We do not officially test the building of the Arm NN Dockerfile on Windows. However, it's likely that it will work if your system supports Docker.
 For **Windows**, use the Docker Desktop download link on [this page](https://docs.docker.com/desktop/install/windows-install/).
-For **Mac** users, please use the Docker Desktop download link on [this page](https://docs.docker.com/desktop/install/mac-install/). <br>
-**Note:** we unfortunately cannot provide support for the installation of Docker and/or the use of the Arm NN Dockerfile on Windows and Mac platforms.
+**Note:** we unfortunately cannot provide support for the installation of Docker and/or the use of the Arm NN Dockerfile on Windows.
 
 <br>
 

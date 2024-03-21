@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_02" # Release 24.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="3e4b193f783c2d43547123518cadd1b2a9b11055" #11310: Fix quant. gemv kernel driver by adding set_quantized_bias()
+DEFAULT_CLFRAMEWORKREVISION="d2191150736dde66d79eb97e0c8ee506eef3c8fc" #11316: Make Cpu/Gpu/Ref scalar/vectoral S32 division consistent
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

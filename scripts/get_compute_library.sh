@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_02" # Release 24.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="d2191150736dde66d79eb97e0c8ee506eef3c8fc" #11316: Make Cpu/Gpu/Ref scalar/vectoral S32 division consistent
+DEFAULT_CLFRAMEWORKREVISION="6a827871d5cc3f3119ffd6c5c78900a1c61971cd" #11329: Workaround to enable cross-compiling from macOS® to Android™
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

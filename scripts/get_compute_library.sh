@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_02" # Release 24.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="6a827871d5cc3f3119ffd6c5c78900a1c61971cd" #11329: Workaround to enable cross-compiling from macOS® to Android™
+DEFAULT_CLFRAMEWORKREVISION="4908981a4db9da7ec51fd0c2900a25bd91b2926a" #11338: [ONCPUML-1451] Guard bf16 to bf16 tests with ARM_COMPUTE_ENABLE_FIXED_FORMAT_KERNELS
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -87,6 +87,11 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
     {
         ARMNN_LOG(info) << "Printing outputs to console is disabled.";
     }
+}
+
+ArmNNExecutor::~ArmNNExecutor()
+{
+    m_Runtime->UnloadNetwork(m_NetworkId);
 }
 
 void ArmNNExecutor::ExecuteAsync()

@@ -38,13 +38,18 @@ class ArmNNExecutor : public IExecutor
 {
 public:
     ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime::CreationOptions runtimeOptions);
+    ~ArmNNExecutor();
+    ArmNNExecutor(const ArmNNExecutor&) = delete; // No copy constructor.
+    ArmNNExecutor & operator=(const ArmNNExecutor&) = delete; // No Copy operator.
 
     std::vector<const void* > Execute() override;
     void PrintNetworkInfo() override;
     void CompareAndPrintResult(std::vector<const void*> otherOutput) override;
 
 private:
-
+    ArmNNExecutor(ArmNNExecutor&&); // No move constructor.
+    ArmNNExecutor& operator=(ArmNNExecutor&&);  // No move operator.
+    
     /**
      * Returns a pointer to the armnn::IRuntime* this will be shared by all ArmNNExecutors.
      */

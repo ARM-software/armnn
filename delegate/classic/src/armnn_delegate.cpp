@@ -95,12 +95,12 @@ TfLiteStatus DoPrepare(TfLiteContext* tfLiteContext, TfLiteDelegate* tfLiteDeleg
                 tfLiteContext, parameters, static_cast<::armnnDelegate::Delegate*>(parameters->delegate->data_)));
         },
         // ArmnnSubgraph Free
-        .free = [](TfLiteContext* tfLiteContext, void* buffer) -> void {
-            armnn::IgnoreUnused(tfLiteContext);
+        .free = [](TfLiteContext*, void* buffer) -> void {
             if (buffer != nullptr)
             {
                 delete static_cast<ArmnnSubgraph*>(buffer);
             }
+
         },
         // ArmnnSubgraph Prepare
         .prepare = [](TfLiteContext* tfLiteContext, TfLiteNode* tfLiteNode) -> TfLiteStatus {
@@ -276,6 +276,8 @@ const std::string Delegate::GetVersion()
 
 ArmnnSubgraph::~ArmnnSubgraph()
 {
+    // We're finished with the network.
+    m_Runtime->UnloadNetwork(m_NetworkId);
     // The delegate holds its own Arm NN runtime so this is our last chance to print internal profiling data.
     std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
     if (profiler && profiler->IsProfilingEnabled())

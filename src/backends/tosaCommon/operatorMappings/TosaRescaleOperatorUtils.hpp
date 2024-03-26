@@ -33,7 +33,9 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
                                    shifts,
                                    scale32,
                                    double_round,
-                                   false);
+                                   false,  // per_channel
+                                   false,  // input_unsigned
+                                   false); // output_unsigned
 
     // op
     *op = new TosaSerializationOperator(Op_RESCALE, Attribute_RescaleAttribute, &attribute, {inputName}, {outputName});

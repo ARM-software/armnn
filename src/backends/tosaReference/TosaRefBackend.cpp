@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -92,15 +92,15 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
     std::vector<TosaSerializationOperator*> operators;
     std::vector<TosaSerializationTensor*> tensors;
 
-    auto it = subgraph.end();
-    while (it != subgraph.begin())
+    auto it = subgraph.begin();
+    while (it != subgraph.end())
     {
-        --it;
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));
 
         if(base.GetType() == armnn::LayerType::Input ||
            base.GetType() == armnn::LayerType::Output)
         {
+            ++it;
             continue;
         }
 
@@ -108,10 +108,8 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
 
         // Loop through inputs to see if there are any graph inputs, if so save them.
         // If it's an input to the graph "input" can be found in the string.
-        for (uint32_t i = 0; i < mappings->GetInputs().size(); i++)
+        for (const std::string& blockInputName : mappings->GetInputs())
         {
-            std::basic_string<char> blockInputName = mappings->GetInputs()[i];
-
             if (blockInputName.find("input") != std::string::npos)
             {
                 graphInputs.push_back(blockInputName);
@@ -120,10 +118,8 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
 
         // Loop through outputs to see if there are any graph outputs, if so save them.
         // If it's an output to the graph "output" can be found in the string.
-        for (uint32_t i = 0; i < mappings->GetOutputs().size(); i++)
+        for (const std::string& blockOutputName : mappings->GetOutputs())
         {
-            std::basic_string<char> blockOutputName = mappings->GetOutputs()[i];
-
             if (blockOutputName.find("output") != std::string::npos)
             {
                 graphOutputs.push_back(blockOutputName);
@@ -135,6 +131,8 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
 
         auto blockTensors = mappings->GetTensors();
         tensors.insert(tensors.end(), blockTensors.begin(), blockTensors.end());
+
+        ++it;
     }
 
     // Add all mappings to main block.

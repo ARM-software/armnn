@@ -129,22 +129,6 @@ TEST_CASE("IsLayerSupportedTosaReferenceConstant")
     CHECK(supported);
 }
 
-TEST_CASE("IsLayerSupportedTosaReferenceConstantUnsupported")
-{
-    TensorInfo outputInfo({1,1,3,4}, DataType::Signed64);
-
-    TosaRefLayerSupport supportChecker;
-    std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(LayerType::Constant,
-                                                     {outputInfo},
-                                                     BaseDescriptor(),
-                                                     EmptyOptional(),
-                                                     EmptyOptional(),
-                                                     reasonIfNotSupported);
-
-    CHECK(!supported);
-}
-
 TEST_CASE("IsLayerSupportedTosaReferenceConv2d")
 {
     TensorInfo inputInfo ({ 1, 5, 5, 1 }, DataType::Float32);

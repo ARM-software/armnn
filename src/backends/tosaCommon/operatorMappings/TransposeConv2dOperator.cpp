@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -143,7 +143,7 @@ TosaSerializationBasicBlock* ConvertTransposeConv2dToTosaOperator(const Layer* l
         }
     }
 
-    TosaTransposeConvAttribute attribute(pad, stride, outputShape, 0, 0);
+    TosaTransposeConvAttribute attribute(pad, stride, outputShape, 0, 0, false); // input_zp, weight_zp, local_bound
 
     auto* op = new TosaSerializationOperator(Op_TRANSPOSE_CONV2D,
                                              Attribute_TransposeConvAttribute,

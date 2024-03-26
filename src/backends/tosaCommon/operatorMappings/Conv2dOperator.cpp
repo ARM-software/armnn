@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -114,7 +114,7 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                static_cast<int>(conv2dDescriptor->m_StrideX)};
     std::vector<int> dilation = {static_cast<int>(conv2dDescriptor->m_DilationY),
                                  static_cast<int>(conv2dDescriptor->m_DilationX)};
-    TosaConvAttribute attribute(pad, stride, dilation, 0, 0);
+    TosaConvAttribute attribute(pad, stride, dilation, 0, 0, false); // input_zp, weight_zp, local_bound
 
     auto* op = new TosaSerializationOperator(Op_CONV2D,
                                              Attribute_ConvAttribute,

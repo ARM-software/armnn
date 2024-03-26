@@ -131,6 +131,8 @@ inline std::string TosaDTypeToString(DType tosaDType)
             return "DType_FP16";
         case DType_BF16:
             return "DType_BF16";
+        case DType_SHAPE:
+            return "DType_SHAPE";
     }
     return "";
 }
@@ -282,6 +284,10 @@ inline std::string TosaOpToString(Op tosaOp)
             return "Op_FFT2D";
         case Op_RFFT2D:
             return "Op_RFFT2D";
+        case Op_ERF:
+            return "Op_ERF";
+        case Op_DIM: // = Op_MAX
+            return "Op_DIM";
     }
     return "";
 }

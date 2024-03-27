@@ -72,6 +72,12 @@ int main(int argc, const char* argv[])
     }
 
     executor->PrintNetworkInfo();
+
+    if (programOptions.m_ExNetParams.m_OutputDetailsOnlyToStdOut)
+    {
+        return EXIT_SUCCESS;
+    }
+
     outputResults = executor->Execute();
 
     if (!programOptions.m_ExNetParams.m_ComparisonComputeDevices.empty() ||

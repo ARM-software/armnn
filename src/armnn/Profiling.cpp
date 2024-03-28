@@ -485,6 +485,11 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     // Restores previous precision settings.
     outStream.flags(oldFlags);
     outStream.precision(oldPrecision);
+
+    if (m_DetailsToStdOutMethod == ProfilingDetailsMethod::DetailsOnly)
+    {
+        exit(0);
+    }
 }
 
 void ProfilerImpl::AnalyzeEventsAndWriteResults(std::ostream& outStream) const

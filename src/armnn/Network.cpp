@@ -818,16 +818,6 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
                     throw InvalidArgumentException("Per Axis Quantization is not supported in "
                                                    "Asymmetric Quantization Datatype.");
                 }
-                if ((!info.HasPerAxisQuantization() && info.GetQuantizationScale() == 0.f)
-                    || (info.HasPerAxisQuantization() && (quantizationScales.end() !=
-                    std::find(quantizationScales.begin(), quantizationScales.end(), 0.f)))) {
-                    noErrors = false;
-                    std::stringstream ss;
-                    ss << "output " << i << " of layer " << GetLayerTypeAsCString(layer->GetType())
-                       << " (" << layer->GetNameStr() << ") is of type"
-                       << " Quantized value but the scale parameter has not been set";
-                    ReportError(ss.str(), errMessages);
-                }
                 // Softmax under QuantisedAsymm8 must always be scale (1.0f/256.0f) and offset 0
                 if (!info.HasPerAxisQuantization() && quantizationDataType == DataType::QAsymmU8 &&
                     (info.GetQuantizationScale() != (1.0f / 256.0f) ||
@@ -841,6 +831,7 @@ bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string
                     info.SetQuantizationScale((1.0f / 256.0f));
                     info.SetQuantizationOffset(0);
                     outputSlot.SetTensorInfo(info);
+                    ReportError(ss.str(), errMessages);
                 }
                 break;
             default:

@@ -540,20 +540,12 @@ TEST_CASE("IVGCVSW_1929_QuantizedSoftmaxIssue")
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
     std::vector<std::string>      errMessages;
 
-    try
-    {
-        armnn::IOptimizedNetworkPtr optNet = Optimize(*net,
-                                                      backends,
-                                                      runtime->GetDeviceSpec(),
-                                                      OptimizerOptionsOpaque(),
-                                                      errMessages);
-        FAIL("An exception should have been thrown");
-    }
-    catch (const armnn::InvalidArgumentException&)
-    {
-        // Different exceptions are thrown on different backends
-    }
+    // We expect optimize to work but the errMessages should contain something.
+    CHECK_NOTHROW(armnn::IOptimizedNetworkPtr optNet =
+                      Optimize(*net, backends, runtime->GetDeviceSpec(), OptimizerOptionsOpaque(), errMessages));
     CHECK(errMessages.size() > 0);
+    // Should contain "updated to Scale"
+    CHECK(errMessages[0].find("updated to Scale") != std::string::npos);
 }
 
 TEST_CASE("RuntimeBackendOptions")

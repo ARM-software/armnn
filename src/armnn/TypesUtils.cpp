@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/TypesUtils.hpp>
@@ -32,10 +32,6 @@ QuantizedType armnn::Quantize(float value, float scale, int32_t offset)
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
     constexpr QuantizedType max = std::numeric_limits<QuantizedType>::max();
     constexpr QuantizedType min = std::numeric_limits<QuantizedType>::lowest();
-    if (scale == 0.f)
-    {
-        throw armnn::InvalidArgumentException("Quantize: Scale cannot be 0.f");
-    }
     if (std::isnan(value))
     {
         throw armnn::InvalidArgumentException("Quantize: Value is NaN");
@@ -52,10 +48,6 @@ template <typename QuantizedType>
 float armnn::Dequantize(QuantizedType value, float scale, int32_t offset)
 {
     static_assert(IsQuantizedType<QuantizedType>(), "Not an integer type.");
-    if (scale == 0.f)
-    {
-        throw armnn::InvalidArgumentException("Dequantize: Scale cannot be 0.f");
-    }
     if (std::isnan(value))
     {
         throw armnn::InvalidArgumentException("Dequantize: Value is NaN");

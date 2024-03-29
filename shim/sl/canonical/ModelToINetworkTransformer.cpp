@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -31,7 +31,8 @@ ModelToINetworkTransformer::ModelToINetworkTransformer(
     catch (std::exception& e)
     {
         m_ConversionResult = ConversionResult::UnsupportedFeature;
-        VLOG(DRIVER) << "ModelToINetworkTransformer: Unexpected exception: " << e.what();
+        VLOG(DRIVER) << "ModelToINetworkTransformer: Unexpected exception: " << e.what() << " Model was: "
+                     << GetModelSummary(model);
         assert(false);
     }
 }

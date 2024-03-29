@@ -465,8 +465,15 @@ float TensorInfo::GetQuantizationScale() const
         // NOTE: old default for backward compatibility
         return 1.0f;
     }
-
+    // If this tensor includes multiples scales then you should be calling GetQuantizationScales.
+    // This should be an exception not an assert but unfortunately it breaks many tests.
+    // ToDo: IVGCVSW-8323
     ARMNN_ASSERT(!HasMultipleQuantizationScales());
+//    if (HasMultipleQuantizationScales())
+//    {
+//        throw RuntimeException("Invalid call to GetQuantizationScale on a tensor with multiple scale values. Use "
+//                               "GetQuantizationScales instead.");
+//    }
     return m_Quantization.m_Scales[0];
 }
 

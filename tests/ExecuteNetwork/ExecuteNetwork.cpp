@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -93,6 +93,11 @@ int main(int argc, const char* argv[])
         }
 
         comparisonExecutor->PrintNetworkInfo();
+
+        if (programOptions.m_ExNetParams.m_OutputDetailsOnlyToStdOut)
+        {
+            return EXIT_SUCCESS;
+        }
         comparisonExecutor->Execute();
 
         comparisonExecutor->CompareAndPrintResult(outputResults);

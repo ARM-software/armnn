@@ -91,7 +91,12 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
 
 ArmNNExecutor::~ArmNNExecutor()
 {
-    m_Runtime->UnloadNetwork(m_NetworkId);
+    std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
+    // If profiling is enabled print out the results
+    if (profiler && profiler->IsProfilingEnabled())
+    {
+        profiler->Print(std::cout);
+    }
 }
 
 void ArmNNExecutor::ExecuteAsync()
@@ -193,12 +198,6 @@ void ArmNNExecutor::ExecuteSync()
         }
 
         const auto inferenceDuration = armnn::GetTimeDuration(start_time);
-
-        // If profiling is enabled print out the results
-        if(profiler && profiler->IsProfilingEnabled() && x == (m_Params.m_Iterations - 1))
-        {
-            profiler->Print(std::cout);
-        }
 
         if(ret == armnn::Status::Failure)
         {

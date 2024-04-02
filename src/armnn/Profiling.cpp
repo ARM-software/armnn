@@ -486,12 +486,7 @@ void ProfilerImpl::Print(std::ostream& outStream) const
     outStream.flags(oldFlags);
     outStream.precision(oldPrecision);
 
-    if (m_DetailsToStdOutMethod == ProfilingDetailsMethod::DetailsOnly)
-    {
-        exit(0);
-    }
 }
-
 void ProfilerImpl::AnalyzeEventsAndWriteResults(std::ostream& outStream) const
 {
     // Stack should be empty now.

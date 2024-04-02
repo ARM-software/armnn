@@ -276,14 +276,14 @@ const std::string Delegate::GetVersion()
 
 ArmnnSubgraph::~ArmnnSubgraph()
 {
-    // We're finished with the network.
-    m_Runtime->UnloadNetwork(m_NetworkId);
-    // The delegate holds its own Arm NN runtime so this is our last chance to print internal profiling data.
     std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
     if (profiler && profiler->IsProfilingEnabled())
     {
         profiler->Print(std::cout);
     }
+
+    // We're finished with the network.
+    m_Runtime->UnloadNetwork(m_NetworkId);
 }
 
 TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,

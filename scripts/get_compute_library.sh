@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_02" # Release 24.02
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="473b8291a7dc126586d19b82d6c84b4c7a6e44a6" #11339: [COMPMID-6890] Adds Tests and reference implementation for scatter operator with 1D tensors.
+DEFAULT_CLFRAMEWORKREVISION="905786ea0c1abb2b8df36c56eae93a97823cace1" #11354: https://review.mlplatform.org/c/ml/ComputeLibrary/+/11354
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

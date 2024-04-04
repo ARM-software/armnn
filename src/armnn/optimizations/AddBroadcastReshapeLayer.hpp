@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -7,7 +7,6 @@
 #include "Optimization.hpp"
 
 #include <armnn/backends/TensorHandle.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 
 namespace armnn
@@ -18,7 +17,8 @@ namespace optimizations
 static const std::set<armnn::LayerType> broadcastOps{ LayerType::Addition,       LayerType::Division,
                                                       LayerType::Maximum,        LayerType::Minimum,
                                                       LayerType::Multiplication, LayerType::Prelu,
-                                                      LayerType::Subtraction,    LayerType::ElementwiseBinary };
+                                                      LayerType::Subtraction,    LayerType::ElementwiseBinary,
+                                                      LayerType::Comparison,     LayerType::LogicalBinary};
 
 class AddBroadcastReshapeLayerImpl
 {

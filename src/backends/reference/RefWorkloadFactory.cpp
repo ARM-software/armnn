@@ -77,6 +77,10 @@ bool IsQAsymmU8(const WorkloadInfo& info)
 {
     return IsDataType<DataType::QAsymmU8>(info);
 }
+bool IsBoolean(const WorkloadInfo& info)
+{
+    return IsDataType<DataType::Boolean>(info);
+}
 
 RefWorkloadFactory::RefWorkloadFactory(const std::shared_ptr<RefMemoryManager>& memoryManager)
     : m_MemoryManager(memoryManager)
@@ -270,6 +274,10 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
             if (IsSigned64(info))
             {
                 return std::make_unique<RefDebugSigned64Workload>(*debugQueueDescriptor, info);
+            }
+            if (IsBoolean(info))
+            {
+                return std::make_unique<RefDebugBooleanWorkload>(*debugQueueDescriptor, info);
             }
             return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymmU8Workload>(*debugQueueDescriptor, info);
         }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -66,5 +66,6 @@ template class RefDebugWorkload<DataType::QSymmS16>;
 template class RefDebugWorkload<DataType::QSymmS8>;
 template class RefDebugWorkload<DataType::Signed32>;
 template class RefDebugWorkload<DataType::Signed64>;
+template class RefDebugWorkload<DataType::Boolean>;
 
 } // namespace armnn

@@ -19,6 +19,7 @@
 #if defined(ARMCOMPUTENEON_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <backendsCommon/WorkloadUtils.hpp>
 #include "workloads/NeonAbsWorkload.hpp"
 #include "workloads/NeonAdditionWorkload.hpp"
 #include "workloads/NeonActivationWorkload.hpp"

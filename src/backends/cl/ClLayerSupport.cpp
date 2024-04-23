@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,6 +18,7 @@
 #if defined(ARMCOMPUTECL_ENABLED)
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <aclCommon/ArmComputeTensorUtils.hpp>
+#include <backendsCommon/WorkloadUtils.hpp>
 #include "workloads/ClAbsWorkload.hpp"
 #include "workloads/ClAdditionWorkload.hpp"
 #include "workloads/ClActivationWorkload.hpp"

@@ -139,8 +139,11 @@ TEST_CASE("GetTosaMapping_SplitLayer")
     armnn::TensorInfo inputTensorInfo({1, 18, 4, 4}, DataType::Float32);
     armnn::TensorInfo outputTensorInfo({1, 6, 4, 4}, DataType::Float32);
 
-    TosaSerializationBasicBlock* basicBlock =
-            GetTosaMapping(nullptr, LayerType::Splitter, {&inputTensorInfo}, {&outputTensorInfo}, descriptor);
+    TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
+                                                             LayerType::Splitter,
+                                                             {&inputTensorInfo},
+                                                             {&outputTensorInfo, &outputTensorInfo, &outputTensorInfo},
+                                                             descriptor);
 
     VerifySplit(basicBlock,
                 inShape,

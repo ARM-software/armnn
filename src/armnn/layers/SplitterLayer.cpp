@@ -9,6 +9,7 @@
 #include <armnn/TypesUtils.hpp>
 #include <armnn/backends/WorkloadData.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
+#include <backendsCommon/WorkloadUtils.hpp>
 
 namespace armnn
 {
@@ -56,26 +57,6 @@ void SplitterLayer::CreateTensors(const TensorHandleFactoryRegistry& registry,
 
         // check if split is along the x or y (2 innermost dimensions)
         auto numberOfDimensions = m_Param.GetNumDimensions();
-
-        // Compute split axis within class as aclCommon function causes header issues when included
-        auto ComputeSplitAxis = [&](const armnn::SplitterDescriptor& desc, const TensorShape& input)
-        {
-            unsigned int numSplit = desc.GetNumViews();
-            unsigned int numDimensions = desc.GetNumDimensions();
-            std::set<unsigned int> splitAxis;
-
-            for (unsigned int i = 0; i < numSplit; ++i)
-            {
-                for (unsigned int dimIdx = 0; dimIdx < numDimensions; ++dimIdx)
-                {
-                    if (desc.GetViewSizes(i)[dimIdx] != input[dimIdx])
-                    {
-                        splitAxis.insert(dimIdx);
-                    }
-                }
-            }
-            return splitAxis;
-        };
 
         std::set<unsigned int> axis = ComputeSplitAxis(m_Param, parentInfo.GetShape());
         std::set<unsigned int>::iterator axisIt = axis.begin();

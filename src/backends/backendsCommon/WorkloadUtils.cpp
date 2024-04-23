@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,6 +8,7 @@
 #include <armnn/Utils.hpp>
 #include <armnn/utility/NumericCast.hpp>
 #include <armnnUtils/DataLayoutIndexed.hpp>
+#include <armnnUtils/TensorUtils.hpp>
 
 #include <fmt/format.h>
 #include <numeric>
@@ -371,6 +372,31 @@ armnn::PermutationVector GeneratePermutationVectorOnLastTwoDimensions(unsigned i
             throw Exception("Invalid number of dimensions.");
     }
     return permutationVector;
+}
+
+std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& desc, const TensorShape& input)
+{
+    unsigned int numSplit = desc.GetNumViews();
+    unsigned int numDimensions = desc.GetNumDimensions();
+    std::set<unsigned int> splitAxis;
+    if (desc.HasAxis())
+    {
+        splitAxis.insert(armnnUtils::GetUnsignedAxis(desc.GetNumDimensions(), desc.GetAxis()));
+    }
+    else
+    {
+        for (unsigned int i = 0; i < numSplit; ++i)
+        {
+            for (unsigned int dimIdx = 0; dimIdx < numDimensions; ++dimIdx)
+            {
+                if (desc.GetViewSizes(i)[dimIdx] != input[dimIdx])
+                {
+                    splitAxis.insert(dimIdx);
+                }
+            }
+        }
+    }
+    return splitAxis;
 }
 
 } // namespace armnn

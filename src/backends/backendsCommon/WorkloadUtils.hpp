@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -278,5 +278,12 @@ std::map<std::string, unsigned int> CalculateGatherNdKeyIndices(TensorInfo input
 /// \param rank - Tensor rank, i.e. number of dimensions in the tensors
 /// \return - A permutation vector that permutes the 2 last dimensions
 armnn::PermutationVector GeneratePermutationVectorOnLastTwoDimensions(unsigned int rank);
+
+/// Calculates the axis values for split operation.
+///
+/// \param desc - Splitter Descriptor
+/// \param input - Input tensor shape
+/// \return - A set containing axis values of slitter operation
+    std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& desc, const TensorShape& input);
 
 }  //namespace armnn

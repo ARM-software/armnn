@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,6 +11,7 @@
 #include <aclCommon/ArmComputeUtils.hpp>
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/backends/TensorHandle.hpp>
+#include <backendsCommon/WorkloadUtils.hpp>
 #include <cl/ClTensorHandle.hpp>
 
 

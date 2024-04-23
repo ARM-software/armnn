@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,6 +12,7 @@
 #include <armnn/utility/PolymorphicDowncast.hpp>
 #include <armnn/backends/TensorHandle.hpp>
 #include <neon/NeonTensorHandle.hpp>
+#include <backendsCommon/WorkloadUtils.hpp>
 
 #include "NeonWorkloadUtils.hpp"
 

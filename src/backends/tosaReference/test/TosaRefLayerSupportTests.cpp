@@ -523,7 +523,7 @@ TEST_CASE("IsLayerSupportedTosaReferenceSplit")
     TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
     auto supported = supportChecker.IsLayerSupported(LayerType::Splitter,
-                                                     {in, out},
+                                                     {in, out, out, out},
                                                      descriptor,
                                                      EmptyOptional(),
                                                      EmptyOptional(),
@@ -547,7 +547,7 @@ TEST_CASE("IsLayerSupportedTosaReferenceSplitUnsupported")
     TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
     auto supported = supportChecker.IsLayerSupported(LayerType::Splitter,
-                                                     {in, out},
+                                                     {in, out, out, out},
                                                      descriptor,
                                                      EmptyOptional(),
                                                      EmptyOptional(),

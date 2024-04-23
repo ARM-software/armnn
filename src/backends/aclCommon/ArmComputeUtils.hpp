@@ -242,32 +242,6 @@ inline T ComputeSoftmaxAclAxis(const SoftmaxDescriptor& softmaxDesc, const armnn
     return aclAxis;
 }
 
-inline std::set<unsigned int> ComputeSplitAxis(const armnn::SplitterDescriptor& desc, const TensorShape& input)
-{
-    unsigned int numSplit = desc.GetNumViews();
-    unsigned int numDimensions = desc.GetNumDimensions();
-    std::set<unsigned int> splitAxis;
-
-    if (desc.HasAxis())
-    {
-        splitAxis.insert(armnnUtils::GetUnsignedAxis(desc.GetNumDimensions(), desc.GetAxis()));
-    }
-    else
-    {
-        for (unsigned int i = 0; i < numSplit; ++i)
-        {
-            for (unsigned int dimIdx = 0; dimIdx < numDimensions; ++dimIdx)
-            {
-                if (desc.GetViewSizes(i)[dimIdx] != input[dimIdx])
-                {
-                    splitAxis.insert(dimIdx);
-                }
-            }
-        }
-    }
-    return splitAxis;
-}
-
 /// Function to convert ArmNN axis (left to right) to ACL axis (right to left) ranging from [-rank, rank)
 inline int ComputeAclAxis(const int& armnnAxis, const armnn::TensorInfo& tensor)
 {

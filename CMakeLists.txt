@@ -528,6 +528,10 @@ install(DIRECTORY profiling/common/include/ DESTINATION ${CMAKE_INSTALL_INCLUDED
 install(DIRECTORY profiling/client/include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/armnn/profiling/client/include)
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
+    if (BUILD_ACL_OPENMP)
+        target_link_libraries(armnn PUBLIC -fopenmp -static-openmp )
+        target_compile_options(armnn PUBLIC -fopenmp)
+    endif()
     target_link_libraries(armnn PUBLIC ${ARMCOMPUTE_LIBRARIES})
 endif()
 

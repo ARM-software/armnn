@@ -45,6 +45,8 @@ option(BUILD_BARE_METAL "Disable features requiring operating system support" OF
 option(BUILD_SHARED_LIBS "Determines if Armnn will be built statically or dynamically.
                           This is an experimental feature and not fully supported.
                           Only the ArmNN core and the Delegate can be built statically." ON)
+option(BUILD_ACL_OPENMP "If enabled statically link the OpenMP scheduler for ACL.
+                        Note: ACL must already be built with openmp=1 cppthreads=0" OFF)
 option(EXECUTE_NETWORK_STATIC " This is a limited experimental build that is entirely static.
                                 It currently only supports being set by changing the current CMake default options like so:
                                 BUILD_TF_LITE_PARSER=1/0

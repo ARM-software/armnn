@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -103,6 +103,26 @@ void QuantizationEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
                                                                  expectedOutputData,
                                                                  qScale,
                                                                  qOffset);
+};
+
+inline void QuantizationEndToEndInt8(const std::vector<armnn::BackendId>& backends)
+{
+    using namespace armnn;
+
+    const TensorShape tensorShape({ 1, 1, 1, 5 });
+
+    std::vector<int8_t> inputData = { 113, 16, 13, 101, 13 };
+    std::vector<int8_t> expectedOutputData = { 127, 45, 41, 127, 41 };
+
+    float qScale = 0.75f;
+    int32_t qOffset = 24;
+
+    QuantizeEndToEndLayerTestImpl<DataType::QSymmS8, DataType::QSymmS8>(backends,
+                                                                        tensorShape,
+                                                                        inputData,
+                                                                        expectedOutputData,
+                                                                        qScale,
+                                                                        qOffset);
 };
 
 }

@@ -48,6 +48,33 @@ inline DType ArmNNToDType(const DataType& type)
     }
 }
 
+// Function to return ArmNN datatype from input Tosa datatype.
+inline DataType DtypeToArmNN(const DType type)
+{
+    switch (type)
+    {
+        case DType_FP16:
+            return DataType::Float16;
+        case DType_BF16:
+            return DataType::BFloat16;
+        case DType_FP32:
+            return DataType::Float32;
+        case DType_UINT8:
+            return DataType::QAsymmU8;
+        case DType_INT8:
+            return DataType::QSymmS8;
+        case DType_INT16:
+            return DataType::QSymmS16;
+        case DType_INT32:
+            return DataType::Signed32;
+        case DType_BOOL:
+            return DataType::Boolean;
+        default:
+            throw armnn::Exception("DtypeToArmNN: Unsupported tosa::DType in ArmNN.");
+            return DataType::Boolean;
+    }
+}
+
 // Function to return Tosa tensor shape from input ArmNN tensor shape.
 inline std::vector<int32_t> GetTosaTensorShape(const TensorShape& shape)
 {

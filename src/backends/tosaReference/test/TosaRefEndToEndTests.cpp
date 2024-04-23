@@ -95,6 +95,20 @@ TEST_CASE("TosaRefConv2dWithoutBiasEndtoEndTestFloat32")
     Convolution2dEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
 }
 
+TEST_CASE("TosaRefConv2dEndtoEndTestInt8")
+{
+    Convolution2dEndToEnd<armnn::DataType::QSymmS8,
+                          armnn::DataType::QSymmS8,
+                          armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefConv2dWithoutBiasEndtoEndTestInt8")
+{
+    Convolution2dEndToEnd<armnn::DataType::QSymmS8,
+                          armnn::DataType::QSymmS8,
+                          armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
+}
+
 // Maximum
 TEST_CASE("TosaRefMaximumEndtoEndTestInt8")
 {

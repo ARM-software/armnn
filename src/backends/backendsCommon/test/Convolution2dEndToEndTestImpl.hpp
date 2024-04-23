@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -49,46 +49,51 @@ armnn::INetworkPtr CreateConstConvolution2dNetwork(const armnn::Convolution2dDes
     return network;
 }
 
-template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+template<DataType ArmnnIType, DataType ArmnnWType = ArmnnIType, DataType ArmnnBType = ArmnnIType,
+        DataType ArmnnOType = ArmnnIType>
 void Convolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
                            armnn::DataLayout dataLayout,
                            bool biasEnabled = true)
 {
     using namespace armnn;
+    using IT = ResolveType<ArmnnIType>;
+    using WT = ResolveType<ArmnnWType>;
+    using BT = ResolveType<ArmnnBType>;
+    using OT = ResolveType<ArmnnOType>;
 
-    const float   qScale  = IsQuantizedType<T>() ? 0.25f : 1.0f;
-    const int32_t qOffset = IsQuantizedType<T>() ? 50    : 0;
+    const float   qScale  = 1.0f;
+    const int32_t qOffset = IsQuantizedType<IT>() ? 10 : 0; // offset must be zero for non-quantized types
 
-    TensorInfo inputInfo({ 1, 5, 5, 1 }, ArmnnType, qScale, qOffset, true);
-    TensorInfo outputInfo({ 1, 3, 3, 1 }, ArmnnType, qScale, qOffset);
-    TensorInfo weightsInfo({ 1, 3, 3, 1 }, ArmnnType, qScale, qOffset, true);
-    TensorInfo biasesInfo({ 1 }, ArmnnType, qScale * qScale, 0, true);
+    TensorInfo inputInfo(  { 1, 5, 5, 1 }, ArmnnIType, qScale,          qOffset, true);
+    TensorInfo weightsInfo({ 1, 3, 3, 1 }, ArmnnWType, qScale,          qOffset, true);
+    TensorInfo biasesInfo( { 1 },          ArmnnBType, qScale * qScale, 0,       true);
+    TensorInfo outputInfo( { 1, 3, 3, 1 }, ArmnnOType, qScale,          qOffset);
 
     std::vector<float> inputData =
-    {
-        1.0f, 5.0f, 2.0f, 3.0f, 5.0f,
-        8.0f, 7.0f, 3.0f, 6.0f, 3.0f,
-        3.0f, 3.0f, 9.0f, 1.0f, 9.0f,
-        4.0f, 1.0f, 8.0f, 1.0f, 3.0f,
-        6.0f, 8.0f, 1.0f, 9.0f, 2.0f
-    };
+            {
+                    1, 5, 2, 3, 5,
+                    8, 7, 3, 6, 3,
+                    3, 3, 9, 1, 9,
+                    4, 1, 8, 1, 3,
+                    6, 8, 1, 9, 2
+            };
 
     std::vector<float> weightsData =
-    {
-        4.0f, 5.0f, 6.0f,
-        0.0f, 0.0f, 0.0f,
-        3.0f, 2.0f, 1.0f
-    };
+            {
+                    4, 5, 6,
+                    0, 0, 0,
+                    3, 2, 1
+            };
 
-    std::vector<float> biasesData = { 1.0f };
+    std::vector<float> biasesData = { 1 };
+    float bias = biasEnabled ? biasesData[0] : 0;
 
-    float bias = biasEnabled ? biasesData[0] : 0.0f;
     std::vector<float> expectedOutputData =
-    {
-        65.0f + bias,  76.0f + bias,  91.0f + bias,
-        107.0f + bias, 99.0f + bias,  89.0f + bias,
-        116.0f + bias, 98.0f + bias,  118.0f + bias,
-    };
+            {
+                    65 + bias, 76 + bias,  91 + bias,
+                    107 + bias, 99 + bias,  89 + bias,
+                    116 + bias, 98 + bias, 118 + bias
+            };
 
     Convolution2dDescriptor descriptor;
     descriptor.m_PadLeft     = 0;
@@ -102,16 +107,16 @@ void Convolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
 
     if (dataLayout == DataLayout::NCHW)
     {
-        PermuteTensorNhwcToNchw(inputInfo, inputData);
+        PermuteTensorNhwcToNchw(inputInfo,   inputData);
         PermuteTensorNhwcToNchw(weightsInfo, weightsData);
-        PermuteTensorNhwcToNchw(outputInfo, expectedOutputData);
+        PermuteTensorNhwcToNchw(outputInfo,  expectedOutputData);
     }
 
-    // Quantize data
-    std::vector<T> qInputData          = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
-    std::vector<T> qWeightsData        = armnnUtils::QuantizedVector<T>(weightsData, qScale, qOffset);
-    std::vector<T> qExpectedOutputData = armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset);
-    std::vector<T> qBiasesData         = armnnUtils::QuantizedVector<T>(biasesData, qScale * qScale, 0);
+    // Convert data
+    std::vector<IT> qInputData = armnnUtils::QuantizedVector<IT>(inputData, qScale, qOffset);
+    std::vector<WT> qWeightsData = armnnUtils::QuantizedVector<WT>(weightsData, qScale, qOffset);
+    std::vector<BT> qBiasesData = armnnUtils::QuantizedVector<BT>(biasesData, qScale * qScale, 0);
+    std::vector<OT> qExpectedOutputData = armnnUtils::QuantizedVector<OT>(expectedOutputData, qScale, qOffset);
 
     ConstTensor weights(weightsInfo, qWeightsData);
     ConstTensor biases(biasesInfo, qBiasesData);
@@ -125,10 +130,10 @@ void Convolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
                                                           biases,
                                                           biasEnabled);
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
-                                                {{ 0, qInputData }},
-                                                {{ 0, qExpectedOutputData }},
-                                                backends);
+    EndToEndLayerTestImpl<ArmnnIType, ArmnnOType>(std::move(network),
+                                                  {{ 0, qInputData }},
+                                                  {{ 0, qExpectedOutputData }},
+                                                  backends);
 }
 
 } // anonymous namespace

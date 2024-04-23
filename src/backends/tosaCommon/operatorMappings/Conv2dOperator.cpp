@@ -4,6 +4,8 @@
 //
 
 #include "Conv2dOperator.hpp"
+#include "TosaRescaleOperatorUtils.hpp"
+#include <ResolveType.hpp>
 
 TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                                          const std::vector<const TensorInfo*>& inputs,
@@ -13,6 +15,9 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     std::vector<std::string> inputNames;
     std::string outputName = std::string("output0_");
     std::string blockName  = std::string("Op_CONV2D_block_") + GetUniqueTosaMappingID();
+
+    DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
+    DType outputDType0 = ArmNNToDType(outputs[0]->GetDataType());
 
     // Set input names for validation purposes only.
     if(layer == nullptr)
@@ -52,7 +57,6 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     if(inputNames[0].find("input0_") != std::string::npos)
     {
         std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
-        DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
 
         tensors.push_back(new TosaSerializationTensor(inputNames[0], inputShape0, inputDType0, {}));
     }
@@ -87,23 +91,32 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
         // The size of the bias must match the channels dimension, so get the correct index.
         unsigned int index = (conv2dDescriptor->m_DataLayout == DataLayout::NHWC) ? 3 : 1;
 
-        std::vector<uint8_t> uint8Data;
-        std::vector<float> data(outputs[0]->GetShape()[index], 0.0f);
+        const DType dType = (inputDType0 == DType_INT8) ? DType_INT32 : outputDType0;
+        std::vector<float> data(outputs[0]->GetShape()[index], 0);
 
+        std::vector<uint8_t> uint8Data;
         TosaSerializationHandler::ConvertF32toU8(data, uint8Data);
 
         tensors.push_back(new TosaSerializationTensor(constantName,
                                                       {static_cast<int32_t>(outputs[0]->GetShape()[index])},
-                                                      DType_FP32,
+                                                      dType,
                                                       uint8Data));
         inputNames.emplace_back(constantName);
     }
 
     // Setup Output Tensor
-    std::vector<int32_t> outputShape0 = GetTosaTensorShape(outputs[0]->GetShape());
-    DType outputDType0 = ArmNNToDType(outputs[0]->GetDataType());
-
-    tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
+    std::vector<int32_t> outputShape0 = {GetTosaTensorShape(outputs[0]->GetShape())};
+    std::string outputConv2dName;
+    bool isInputInt8 = (inputDType0 == DType_INT8);
+    if (isInputInt8)
+    {
+        outputConv2dName = std::string("intermediate0_") + GetUniqueTosaMappingID();
+        tensors.push_back(new TosaSerializationTensor(outputConv2dName, outputShape0, DType_INT32, {}));
+    }
+    else
+    {
+        tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
+    }
 
     // Set up CONV2D operator
     std::vector<int> pad = {static_cast<int>(conv2dDescriptor->m_PadTop),
@@ -114,15 +127,45 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                static_cast<int>(conv2dDescriptor->m_StrideX)};
     std::vector<int> dilation = {static_cast<int>(conv2dDescriptor->m_DilationY),
                                  static_cast<int>(conv2dDescriptor->m_DilationX)};
-    TosaConvAttribute attribute(pad, stride, dilation, 0, 0, false); // input_zp, weight_zp, local_bound
+    TosaConvAttribute attribute(pad, stride, dilation,
+                                inputs[0]->GetQuantizationOffset(), // input_zp
+                                inputs[1]->GetQuantizationOffset(), // weight_zp
+                                false); // local_bound
 
-    auto* op = new TosaSerializationOperator(Op_CONV2D,
-                                             Attribute_ConvAttribute,
-                                             &attribute,
-                                             inputNames,
-                                             {outputName});
-    operators.push_back(op);
+    std::string& convOutStr = isInputInt8 ? outputConv2dName : outputName;
+    auto* conv2d_op = new TosaSerializationOperator(Op_CONV2D,
+                                                    Attribute_ConvAttribute,
+                                                    &attribute,
+                                                    inputNames,
+                                                    {convOutStr});
+    operators.push_back(conv2d_op);
 
+
+    if (isInputInt8)
+    {
+        int32_t output_zp = outputs[0]->GetQuantizationOffset();
+        double output_scale = outputs[0]->GetQuantizationScales()[0];
+        double input_scale = inputs[0]->GetQuantizationScales()[0];
+        const std::vector<float>& weight_scales = inputs[1]->GetQuantizationScales();
+
+        TosaSerializationOperator* rescaleOp = nullptr;
+        TosaSerializationTensor* rescaleTensor = nullptr;
+        CreateRescaleTosaOperatorPerChannel(outputConv2dName,
+                                            outputName,
+                                            DType_INT8,
+                                            outputShape0,
+                                            0,
+                                            output_zp,
+                                            true,
+                                            true,
+                                            input_scale,
+                                            output_scale,
+                                            weight_scales,
+                                            &rescaleOp,
+                                            &rescaleTensor);
+        operators.push_back(rescaleOp);
+        tensors.push_back(rescaleTensor);
+    }
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName,     // name

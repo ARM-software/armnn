@@ -626,6 +626,13 @@ TEST_CASE("RefConvolution2dFloat16Test")
     Convolution2dEndToEnd<armnn::DataType::Float16>(defaultBackends, armnn::DataLayout::NHWC);
 }
 
+TEST_CASE("RefConvolution2dInt8Test")
+{
+    Convolution2dEndToEnd<armnn::DataType::QSymmS8,
+                          armnn::DataType::QSymmS8,
+                          armnn::DataType::Signed32>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
 TEST_CASE("RefConvolution3dFloat32Test")
 {
     Convolution3dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(defaultBackends,
@@ -816,6 +823,12 @@ TEST_CASE("DepthToSpaceEndToEndNhwcUint8")
 TEST_CASE("DepthToSpaceEndToEndNhwcInt16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(defaultBackends, armnn::DataLayout::NHWC);
+}
+
+// Quantization
+TEST_CASE("RefQuantizeInt8")
+{
+    QuantizationEndToEndInt8(defaultBackends);
 }
 
 // Dequantize

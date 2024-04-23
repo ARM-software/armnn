@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 // Copyright © 2020 The TensorFlow Authors. All Rights Reserved.
@@ -7,6 +7,8 @@
 //
 
 #include "QuantizeOperator.hpp"
+
+#include "TosaRescaleOperatorUtils.hpp"
 
 // This function is paraphrased from:
 // tensorflow/compiler/mlir/tosa/transforms/legalize_common.cc from function convertQuantizeOp
@@ -20,10 +22,6 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
                                          "ConvertQuantizeToTosaOperator: Quantize must have only one output" );
 
     std::string inputName           = std::string("input0_");
-    std::string outputNameZeroPoint = std::string("intermediate0_") + GetUniqueTosaMappingID();
-    std::string outputNameScale     = std::string("intermediate1_") + GetUniqueTosaMappingID();
-    std::string outputNameMul       = std::string("intermediate2_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd       = std::string("intermediate3_") + GetUniqueTosaMappingID();
     std::string outputName          = std::string("output0_");
     std::string blockName           = std::string("Op_QUANTIZE_block_") + GetUniqueTosaMappingID();
 
@@ -55,85 +53,121 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
 
     std::vector<TosaSerializationTensor*> tensors;
 
+    std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputInfo.GetShape());
+    DType inputDType0 = ArmNNToDType(inputInfo.GetDataType());
+    float isFloatInput = inputDType0 == DType::DType_FP16 || inputDType0 == DType::DType_FP32;
+
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    std::vector<int32_t> inputShape0;
-    DType inputDType0 =  DType::DType_UNKNOWN;
     if(inputName.find("input0_") != std::string::npos)
     {
-        inputShape0 = GetTosaTensorShape(inputInfo.GetShape());
-        inputDType0 = ArmNNToDType(inputInfo.GetDataType());
-        ARMNN_THROW_INVALIDARG_MSG_IF_FALSE( inputDType0 == DType::DType_FP16 || inputDType0 == DType::DType_FP32,
-                                             "ConvertQuantizeToTosaOperator: Quantize input must be of type Float" );
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape0, inputDType0, {}));
     }
 
     std::vector<int32_t> outputShape0 = GetTosaTensorShape(outputInfo.GetShape());
     DType outputDType0 = ArmNNToDType(outputInfo.GetDataType());
 
-    // quantize:
-    // const_zeroPoint = constant(zeroPoint)
-    // const_scale = constant(scale)
-    // out_mul = mul(input, const_scale)
-    // out_add = add(out_mul, const_zeroPoint)
-    // output = cast<output_type>(out_add)
+    if (isFloatInput)
+    {
+        // quantize:
+        // const_zeroPoint = constant(zeroPoint)
+        // const_scale = constant(scale)
+        // out_mul = mul(input, const_scale)
+        // out_add = add(out_mul, const_zeroPoint)
+        // output = cast<output_type>(out_add)
 
-    // const_zeroPoint
-    TosaSerializationOperator* zeroPointOp = nullptr;
-    TosaSerializationTensor* zeroPointTensor = nullptr;
-    CreateConstTosaOperator<float>(outputNameZeroPoint,
-                                   zeroPoint,
-                                   inputDType0,
-                                   inputShape0,
-                                   zeroPointOp,
-                                   zeroPointTensor);
-    tensors.push_back(zeroPointTensor);
+        std::string outputNameScale     = std::string("input1_") + GetUniqueTosaMappingID();
+        std::string outputNameZeroPoint = std::string("input2_") + GetUniqueTosaMappingID();
+        std::string outputNameMul       = std::string("intermediate0_") + GetUniqueTosaMappingID();
+        std::string outputNameAdd       = std::string("intermediate1_") + GetUniqueTosaMappingID();
 
-    // const_scale
-    TosaSerializationOperator *scaleOp = nullptr;
-    TosaSerializationTensor* scaleTensor = nullptr;
-    CreateConstTosaOperator<float>(outputNameScale,
-                                   scale,
-                                   inputDType0,
-                                   inputShape0,
-                                   scaleOp,
-                                   scaleTensor);
-    tensors.push_back(scaleTensor);
+        // const_zeroPoint
+        TosaSerializationOperator* zeroPointOp = nullptr;
+        TosaSerializationTensor* zeroPointTensor = nullptr;
+        CreateConstTosaOperator<float>(outputNameZeroPoint,
+                                       zeroPoint,
+                                       inputDType0,
+                                       inputShape0,
+                                       zeroPointOp,
+                                       zeroPointTensor);
+        tensors.push_back(zeroPointTensor);
 
-    // mul
-    int32_t shift = 0;
-    TosaMulAttribute mulAttribute(shift);
-    TosaSerializationOperator* mulOp = new TosaSerializationOperator(Op_MUL,
-                                                                     Attribute_MulAttribute,
-                                                                     &mulAttribute,
-                                                                     {inputName, outputNameScale},
-                                                                     {outputNameMul});
-    tensors.push_back(new TosaSerializationTensor(outputNameMul, inputShape0, inputDType0, {}));
+        // const_scale
+        TosaSerializationOperator *scaleOp = nullptr;
+        TosaSerializationTensor* scaleTensor = nullptr;
+        CreateConstTosaOperator<float>(outputNameScale,
+                                       scale,
+                                       inputDType0,
+                                       inputShape0,
+                                       scaleOp,
+                                       scaleTensor);
+        tensors.push_back(scaleTensor);
 
-    // add
-    TosaSerializationOperator* addOp = new TosaSerializationOperator(Op_ADD,
-                                                                     Attribute_NONE,
-                                                                     nullptr,
-                                                                     {outputNameMul, outputNameZeroPoint},
-                                                                     {outputNameAdd});
-    tensors.push_back(new TosaSerializationTensor(outputNameAdd, inputShape0, inputDType0, {}));
+        // mul
+        int32_t shift = 0;
+        TosaMulAttribute mulAttribute(shift);
+        TosaSerializationOperator* mulOp = new TosaSerializationOperator(Op_MUL,
+                                                                         Attribute_MulAttribute,
+                                                                         &mulAttribute,
+                                                                         {inputName, outputNameScale},
+                                                                         {outputNameMul});
+        tensors.push_back(new TosaSerializationTensor(outputNameMul, inputShape0, inputDType0, {}));
 
-    // cast
-    TosaSerializationOperator* castOp = new TosaSerializationOperator(Op_CAST,
-                                                                      Attribute_NONE,
-                                                                      nullptr,
-                                                                      {outputNameAdd},
-                                                                      {outputName});
+        // add
+        TosaSerializationOperator* addOp = new TosaSerializationOperator(Op_ADD,
+                                                                         Attribute_NONE,
+                                                                         nullptr,
+                                                                         {outputNameMul, outputNameZeroPoint},
+                                                                         {outputNameAdd});
+        tensors.push_back(new TosaSerializationTensor(outputNameAdd, inputShape0, inputDType0, {}));
 
-    tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
+        // cast
+        TosaSerializationOperator* castOp = new TosaSerializationOperator(Op_CAST,
+                                                                          Attribute_NONE,
+                                                                          nullptr,
+                                                                          {outputNameAdd},
+                                                                          {outputName});
 
-    // operatorInputNames/operatorOutputNames ends up being the same as
-    // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
-    return new TosaSerializationBasicBlock(blockName,                                       // name
-                                           mainName,                                        // region name
-                                           {zeroPointOp, scaleOp, mulOp, addOp, castOp},    // operators
-                                           tensors,                                         // tensors
-                                           {inputName},                                     // inputs
-                                           {outputName});                                   // outputs
+        tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
+
+        // operatorInputNames/operatorOutputNames ends up being the same as
+        // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
+        return new TosaSerializationBasicBlock(blockName,                                       // name
+                                               mainName,                                        // region name
+                                               {zeroPointOp, scaleOp, mulOp, addOp, castOp},    // operators
+                                               tensors,                                         // tensors
+                                               {inputName},                                     // inputs
+                                               {outputName});                                   // outputs
+    }
+    else
+    {
+        double scale_alpha      = inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
+        int32_t input_zp        = inputs[0]->GetQuantizationOffset();
+        int32_t output_zp       = outputs[0]->GetQuantizationOffset();
+
+        TosaSerializationOperator* rescaleOp = nullptr;
+        TosaSerializationTensor* rescaleTensor = nullptr;
+        CreateRescaleTosaOperator(inputName,
+                                  outputName,
+                                  outputDType0,
+                                  inputShape0,
+                                  scale_alpha,
+                                  input_zp,
+                                  output_zp,
+                                  true,
+                                  true,
+                                  &rescaleOp,
+                                  &rescaleTensor);
+        tensors.push_back(rescaleTensor);
+
+        // operatorInputNames/operatorOutputNames ends up being the same as
+        // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
+        return new TosaSerializationBasicBlock(blockName,      // name
+                                               mainName,       // region name
+                                               {rescaleOp},    // operators
+                                               tensors,        // tensors
+                                               {inputName},    // inputs
+                                               {outputName});  // outputs
+    }
 }

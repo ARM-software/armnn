@@ -200,17 +200,9 @@ TEST_CASE("GetTosaMapping_ActivationFloat32")
     ActivationEndToEndTest<DataType::Float32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
 }
 
-TEST_CASE("UNSUPPORTED_GetTosaMapping_ActivationFloat16")
+TEST_CASE("GetTosaMapping_ActivationFloat16")
 {
-    try
-    {
-        ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
-        FAIL("An exception should have been thrown");
-    }
-    catch (armnn::Exception& e)
-    {
-        CHECK_EQ(std::string(e.what()), "Failed to assign a backend to each layer");
-    }
+    ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
 }
 
 TEST_CASE("GetTosaMapping_ActivationInt32")

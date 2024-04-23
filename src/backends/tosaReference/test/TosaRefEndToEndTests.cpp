@@ -5,6 +5,7 @@
 
 #include "backendsCommon/test/EndToEndTestImpl.hpp"
 
+#include "backendsCommon/test/ActivationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
@@ -26,6 +27,25 @@
 TEST_SUITE("TosaRefEndToEnd")
 {
 static std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
+
+// Activation
+//LeakyRelu
+TEST_CASE("TosaRefLeakyReluActivationFloat32")
+{
+    ActivationEndToEndTest<DataType::Float32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
+}
+TEST_CASE("TosaRefLeakyReluActivationFloat16")
+{
+    ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.3f, 5, 0.01f);
+}
+TEST_CASE("TosaRefLeakyReluActivationInt8")
+{
+    ActivationEndToEndTest<DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.6f, 7, 0.01f);
+}
+TEST_CASE("TosaRefLeakyReluActivationInt16")
+{
+    ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
+}
 
 // Addition
 TEST_CASE("TosaRefAdditionEndtoEndTestFloat32")

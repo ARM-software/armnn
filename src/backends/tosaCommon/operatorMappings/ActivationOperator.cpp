@@ -68,7 +68,8 @@ TosaSerializationBasicBlock* ConvertActivationToTosaOperator(const Layer* layer,
 #if TOSA_COMPAT_VERSION(0, 60, 0)
     std::string outputNameMAXMIN= std::string("intermediate3_") + GetUniqueTosaMappingID();
 
-    if (inputDType0 == DType::DType_FP32)
+    if (inputDType0 == DType::DType_FP32 ||
+        inputDType0 == DType::DType_FP16)
     {
         // const_alpha
         TosaSerializationOperator* alphaOp = nullptr;

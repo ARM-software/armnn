@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -284,20 +284,20 @@ inline void AssertTosaOneToOneMappingBasicBlock(TosaSerializationBasicBlock* bas
     CHECK(op->GetInputTensorNames().size() == numInputTensors);
     CHECK(op->GetOutputTensorNames().size() == numOutputs);
 
-    for (uint32_t i = 0; i < numInputs; i++)
+    for (uint32_t i = 0; i < numInputs; ++i)
     {
         std::basic_string<char> blockInputName = basicBlock->GetInputs()[i];
         std::basic_string<char> operatorInputName  = op->GetInputTensorNames()[i];
         std::basic_string<char> tensorName = basicBlock->GetTensors()[i]->GetName();
 
-        std::string opStr = "input" + std::to_string(i) + "_";
+        std::string opStr = "input_";
 
         CHECK(blockInputName == operatorInputName);
         CHECK(tensorName == operatorInputName);
         CHECK(blockInputName.find(opStr) != std::string::npos);
     }
 
-    for (uint32_t i = 0; i < numOutputs; i++)
+    for (uint32_t i = 0; i < numOutputs; ++i)
     {
         std::basic_string<char> blockOutputName = basicBlock->GetOutputs()[i];
         std::basic_string<char> operatorOutputName  = op->GetOutputTensorNames()[i];

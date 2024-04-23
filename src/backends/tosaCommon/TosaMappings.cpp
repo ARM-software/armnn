@@ -127,7 +127,7 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
     }
 }
 
-TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer)
+TosaSerializationBasicBlock* GetTosaMappingFromLayer(const Layer* layer)
 {
     std::vector<const TensorInfo*> inputs;
     for (auto inputSlot : layer->GetInputSlots())

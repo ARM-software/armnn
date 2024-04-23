@@ -10,7 +10,7 @@ TosaSerializationBasicBlock* ConvertElementwiseUnaryOperator(const Layer* layer,
                                                              const std::vector<const TensorInfo*>& outputs,
                                                              const ElementwiseUnaryDescriptor* unaryDescriptor)
 {
-    std::string input0Name = std::string("input0_");
+    std::string input0Name = std::string("input_");
     std::string outputName = std::string("output0_");
     std::string blockName  = std::string("Op_ELEMENTWISEUNARY_block_") + GetUniqueTosaMappingID();
 
@@ -19,12 +19,8 @@ TosaSerializationBasicBlock* ConvertElementwiseUnaryOperator(const Layer* layer,
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layer connected to the input slot and determine unique the tensor name.
-        Layer& connectedLayer0 = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
-        input0Name = GenerateUniqueName(connectedLayer0, 0);
-
-        // Determine unique output tensor name.
-        outputName = GenerateUniqueOutputName(*layer, 0);
+        input0Name = GenerateUniqueInputName(layer->GetInputSlot(0));
+        outputName = GenerateUniqueOutputName(*layer);
     }
 
     TosaSerializationOperator* op = nullptr;
@@ -48,7 +44,7 @@ TosaSerializationBasicBlock* ConvertElementwiseUnaryOperator(const Layer* layer,
     // Only add input tensor if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    if(input0Name.find("input0_") != std::string::npos)
+    if(input0Name.find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
         DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());

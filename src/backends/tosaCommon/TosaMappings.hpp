@@ -27,4 +27,4 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
 
 // Function called in armnn::OptimizeSubgraphView() when access to armnn::Layer is available
 // and there is an option to set TOSA basic block data from constant layer tensors available from the input layer.
-TosaSerializationBasicBlock* GetTosaMappingFromLayer(Layer* layer);
+TosaSerializationBasicBlock* GetTosaMappingFromLayer(const Layer* layer);

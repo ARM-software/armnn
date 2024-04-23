@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -10,7 +10,7 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
                                                                        const std::vector<const TensorInfo*>& outputs,
                                                                        const Pooling2dDescriptor* poolDescriptor)
 {
-    std::string padInputName   = std::string("input0_");
+    std::string padInputName   = std::string("input_");
     std::string padOutputName  = std::string("intermediate0_") + GetUniqueTosaMappingID();
     std::string poolOutputName = std::string("output0_");
     std::string blockName      = std::string("Op_AVG_POOL2D_block_") + GetUniqueTosaMappingID();
@@ -19,12 +19,8 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique tensors names.
-        Layer& connectedInputLayer = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
-        padInputName = GenerateUniqueName(connectedInputLayer, 0);
-
-        // Determine unique output tensor name.
-        poolOutputName = GenerateUniqueOutputName(*layer, 0);
+        padInputName   = GenerateUniqueInputName(layer->GetInputSlot(0));
+        poolOutputName = GenerateUniqueOutputName(*layer);
     }
 
     std::vector<int> paddings;
@@ -81,7 +77,7 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    if(padInputName.find("input0_") != std::string::npos)
+    if(padInputName.find("input_") != std::string::npos)
     {
         tensors.push_back(new TosaSerializationTensor(padInputName, inputShape, inputDType, {}));
     }

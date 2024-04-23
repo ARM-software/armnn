@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 // Copyright © 2020, 2023 The TensorFlow Authors. All Rights Reserved.
@@ -37,7 +37,7 @@ TosaSerializationBasicBlock* ConvertResizeToTosaOperator(const Layer* layer,
         throw armnn::InvalidArgumentException("ConvertResizeToTosaOperator: Unsupported Resize method.");
     }
 
-    std::string inputName = std::string("input0_");
+    std::string inputName = std::string("input_");
     std::string outputName = std::string("output0_");
     std::string blockName  = std::string("Op_RESIZE_block_") + GetUniqueTosaMappingID();
 
@@ -45,12 +45,8 @@ TosaSerializationBasicBlock* ConvertResizeToTosaOperator(const Layer* layer,
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique tensor names.
-        Layer& connectedLayer = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
-        inputName = GenerateUniqueName(connectedLayer, 0);
-
-        // Determine unique output tensor name.
-        outputName = GenerateUniqueOutputName(*layer, 0);
+        inputName  = GenerateUniqueInputName(layer->GetInputSlot(0));
+        outputName = GenerateUniqueOutputName(*layer);
     }
 
     int32_t inputHeight = static_cast<int32_t>(inputs[0]->GetShape()[1]);
@@ -149,7 +145,7 @@ TosaSerializationBasicBlock* ConvertResizeToTosaOperator(const Layer* layer,
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    if(inputName.find("input0_") != std::string::npos)
+    if(inputName.find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
         DType inputDType = ArmNNToDType(inputs[0]->GetDataType());

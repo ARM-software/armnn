@@ -11,8 +11,8 @@ TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer*
                                                                     const std::vector<const TensorInfo*>& outputs,
                                                                     const ElementwiseBinaryDescriptor* descriptor)
 {
-    std::string input0Name = std::string("input0_");
-    std::string input1Name = std::string("input1_");
+    std::string input0Name = std::string("input_0");
+    std::string input1Name = std::string("input_1");
     std::string outputName = std::string("output0_");
     std::string blockName;
 
@@ -20,15 +20,9 @@ TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer*
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique tensor names.
-        Layer& connectedLayer0 = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
-        input0Name = GenerateUniqueName(connectedLayer0, 0);
-
-        Layer& connectedLayer1 = layer->GetInputSlot(1).GetConnectedOutputSlot()->GetOwningLayer();
-        input1Name = GenerateUniqueName(connectedLayer1, 1);
-
-        // Determine unique output tensor name.
-        outputName = GenerateUniqueOutputName(*layer, 0);
+        input0Name = GenerateUniqueInputName(layer->GetInputSlot(0));
+        input1Name = GenerateUniqueInputName(layer->GetInputSlot(1));
+        outputName = GenerateUniqueOutputName(*layer);
     }
 
     TosaSerializationOperator* op = nullptr;
@@ -93,13 +87,13 @@ TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer*
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    if(input0Name.find("input0_") != std::string::npos)
+    if(input0Name.find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
         DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
         tensors.push_back(new TosaSerializationTensor(input0Name, inputShape0, inputDType0, {}));
     }
-    if(input1Name.find("input1_") != std::string::npos)
+    if(input1Name.find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape1 = GetTosaTensorShape(inputs[1]->GetShape());
         DType inputDType1 = ArmNNToDType(inputs[1]->GetDataType());

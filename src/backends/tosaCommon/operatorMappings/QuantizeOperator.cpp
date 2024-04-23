@@ -21,7 +21,7 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
     ARMNN_THROW_INVALIDARG_MSG_IF_FALSE( outputs.size() == 1,
                                          "ConvertQuantizeToTosaOperator: Quantize must have only one output" );
 
-    std::string inputName           = std::string("input0_");
+    std::string inputName           = std::string("input_");
     std::string outputName          = std::string("output0_");
     std::string blockName           = std::string("Op_QUANTIZE_block_") + GetUniqueTosaMappingID();
 
@@ -29,12 +29,8 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique tensor names.
-        Layer& connectedLayer = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
-        inputName = GenerateUniqueName(connectedLayer, 0);
-
-        // Determine unique output tensor name.
-        outputName = GenerateUniqueOutputName(*layer, 0);
+        inputName  = GenerateUniqueInputName(layer->GetInputSlot(0));
+        outputName = GenerateUniqueOutputName(*layer);
     }
 
     const TensorInfo inputInfo = *inputs[0];
@@ -60,7 +56,7 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    if(inputName.find("input0_") != std::string::npos)
+    if(inputName.find("input_") != std::string::npos)
     {
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape0, inputDType0, {}));
     }

@@ -27,7 +27,7 @@ TosaSerializationBasicBlock* ConvertSplitToTosaOperator(const Layer* layer,
         throw armnn::Exception("ConvertSplitToTosaOperator: Dynamic input dimensions are unsupported.");
     }
 
-    std::string inputName = std::string("input0_");
+    std::string inputName = std::string("input_");
     std::vector<std::string> outputNames;
     std::string blockName  = std::string("Op_SPLIT_block_") + GetUniqueTosaMappingID();
 
@@ -36,9 +36,7 @@ TosaSerializationBasicBlock* ConvertSplitToTosaOperator(const Layer* layer,
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
     if(layer != nullptr)
     {
-        // Get the layers connected to the input slots and determine unique tensor names.
-        Layer& connectedLayer = layer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer();
-        inputName = GenerateUniqueName(connectedLayer, 0);
+        inputName = GenerateUniqueInputName(layer->GetInputSlot(0));
 
         for (unsigned int i=0; i < numSplit; ++i)
         {
@@ -87,7 +85,7 @@ TosaSerializationBasicBlock* ConvertSplitToTosaOperator(const Layer* layer,
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    if(inputName.find("input0_") != std::string::npos)
+    if(inputName.find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
         DType inputDType = ArmNNToDType(inputs[0]->GetDataType());

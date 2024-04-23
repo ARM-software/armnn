@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022,2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -39,7 +39,7 @@ void VerifyAvgPool2DIgnoreValue(TosaSerializationBasicBlock* basicBlock,
         std::basic_string<char> blockInputName = basicBlock->GetInputs()[i];
         std::basic_string<char> operatorInputName  = padOp->GetInputTensorNames()[i];
 
-        std::string opStr = "input" + std::to_string(i) + "_";
+        std::string opStr = "input_";
 
         CHECK(blockInputName == operatorInputName);
         CHECK(basicBlock->GetTensorByName(blockInputName));

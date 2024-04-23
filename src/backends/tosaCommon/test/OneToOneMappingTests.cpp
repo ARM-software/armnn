@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -786,7 +786,7 @@ TEST_CASE("GetTosaMapping_TransposeConv2dLayer")
     CHECK(basicBlock->GetOperators().size() == 3);
     CHECK(basicBlock->GetTensors().size() == 4);
 
-    CHECK(basicBlock->GetInputs()[0].find("input0_") != std::string::npos);
+    CHECK(basicBlock->GetInputs()[0].find("input_") != std::string::npos);
     CHECK(basicBlock->GetInputs()[1].find("constant_") != std::string::npos);
     CHECK(basicBlock->GetInputs()[2].find("constant_") != std::string::npos);
     CHECK(basicBlock->GetOutputs()[0].find("output0_") != std::string::npos);
@@ -848,7 +848,7 @@ TEST_CASE("GetTosaMappingFromLayer_TransposeConv2dLayer")
     CHECK(basicBlock->GetOperators().size() == 3);
     CHECK(basicBlock->GetTensors().size() == 4);
 
-    CHECK(basicBlock->GetInputs()[0].find("input0_") != std::string::npos);
+    CHECK(basicBlock->GetInputs()[0].find("input_") != std::string::npos);
     CHECK(basicBlock->GetInputs()[1].find("constant_") != std::string::npos);
     CHECK(basicBlock->GetInputs()[2].find("constant_") != std::string::npos);
     CHECK(basicBlock->GetOutputs()[0].find("output0_") != std::string::npos);

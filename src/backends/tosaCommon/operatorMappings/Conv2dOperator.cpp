@@ -22,11 +22,11 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     // Set input names for validation purposes only.
     if(layer == nullptr)
     {
-        inputNames.emplace_back("input0_");
-        inputNames.emplace_back("input1_");
+        inputNames.emplace_back("input_0");
+        inputNames.emplace_back("input_1");
         if(conv2dDescriptor->m_BiasEnabled)
         {
-            inputNames.emplace_back("input2_");
+            inputNames.emplace_back("input_2");
         }
     }
     // If a layer is present then the block will be used for execution, so input and output names need to be
@@ -37,14 +37,12 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
         // Get the layer connected to the input slot and determine unique tensor names.
         for (uint32_t i = 0; i < inputs.size(); ++i)
         {
-            Layer& connectedLayer = layer->GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
-
-            std::string inputName = GenerateUniqueName(connectedLayer, i);
+            std::string inputName = GenerateUniqueInputName(layer->GetInputSlot(i));
             inputNames.push_back(inputName);
         }
 
         // Determine unique output tensor name.
-        outputName = GenerateUniqueOutputName(*layer, 0);
+        outputName = GenerateUniqueOutputName(*layer);
     }
 
     std::vector<TosaSerializationTensor*> tensors;
@@ -54,7 +52,7 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     // Only add tensor if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensors.
-    if(inputNames[0].find("input0_") != std::string::npos)
+    if(inputNames[0].find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
 

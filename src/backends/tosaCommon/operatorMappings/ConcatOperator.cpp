@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,7 +21,7 @@ TosaSerializationBasicBlock* ConvertConcatToTosaOperator(const Layer* layer,
     {
         for (uint32_t i = 0; i < numInputs; ++i)
         {
-            inputNames.push_back("input"+ std::to_string(i) +"_");
+            inputNames.push_back("input_"+ std::to_string(i));
         }
     }
     // If a layer is present then the block will be used for execution, so input and output names need to be determined
@@ -31,14 +31,12 @@ TosaSerializationBasicBlock* ConvertConcatToTosaOperator(const Layer* layer,
         // Get the layers connected to the input slots and determine unique tensor names.
         for (uint32_t i = 0; i < numInputs; ++i)
         {
-            Layer& connectedLayer = layer->GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
-
-            std::string inputName = GenerateUniqueName(connectedLayer, i);
+            std::string inputName = GenerateUniqueInputName(layer->GetInputSlot(i));
             inputNames.push_back(inputName);
         }
 
         // Determine unique output tensor name.
-        outputName = GenerateUniqueOutputName(*layer, 0);
+        outputName = GenerateUniqueOutputName(*layer);
     }
 
     auto axis = static_cast<int32_t>(concatDescriptor->GetConcatAxis());
@@ -51,8 +49,7 @@ TosaSerializationBasicBlock* ConvertConcatToTosaOperator(const Layer* layer,
                                                                   {outputName});
 
     std::vector<TosaSerializationTensor*> tensors;
-    tensors.reserve(numInputs);
-
+    tensors.reserve(numInputs + 1);
     for (uint32_t i = 0; i < numInputs; ++i)
     {
         // Only add input tensors for validation or when the connected layer is an input layer.

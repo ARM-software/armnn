@@ -87,7 +87,7 @@ inline std::vector<int32_t> GetTosaTensorShape(const TensorShape& shape)
 }
 
 // Function that generates unique name using the layer type, input slot and layer guid.
-inline std::string GenerateUniqueName(const Layer& layer, uint32_t layerSlot)
+static std::string GenerateUniqueName(const Layer& layer, uint32_t layerSlot)
 {
     std::string guid        = std::to_string(layer.GetGuid());
     std::string slotAndGuid = std::to_string(layerSlot) + "_" + guid;
@@ -95,7 +95,7 @@ inline std::string GenerateUniqueName(const Layer& layer, uint32_t layerSlot)
     switch (layer.GetType())
     {
         case LayerType::Input:
-            return "input" + slotAndGuid;
+            return "input_" + guid;
         case LayerType::Output:
             return "output" + slotAndGuid;
         case LayerType::Constant:
@@ -105,8 +105,19 @@ inline std::string GenerateUniqueName(const Layer& layer, uint32_t layerSlot)
     }
 }
 
+// Function that generates unique name for the parent layer from the child layer input slot.
+inline std::string GenerateUniqueInputName(const armnn::InputSlot& slot)
+{
+    // Get the layers connected to the input slots and determine unique tensor names.
+    Layer& connectedLayer = slot.GetConnectedOutputSlot()->GetOwningLayer();
+    // For layer input, we want to ensure we get the correct output slot of the parent layer.
+    // For example, if parent layer is split, the parent output slot could be 0 or 1 index.
+    uint32_t connectedOutputSlotIdx = slot.GetConnectedOutputSlot()->CalculateIndexOnOwner();
+    return GenerateUniqueName(connectedLayer, connectedOutputSlotIdx);
+}
+
 // Function that generates unique output name using the layer type, input slot and layer guid.
-inline std::string GenerateUniqueOutputName(const Layer& layer, uint32_t layerSlot)
+inline std::string GenerateUniqueOutputName(const Layer& layer, uint32_t layerSlot = 0)
 {
     Layer& connectedLayer = layer.GetOutputSlot().GetConnection(0)->GetOwningLayer();
 
@@ -441,6 +452,12 @@ inline std::vector<uint8_t> CreateConstTosaData(const void* value,
         {
             std::vector<int8_t> data(numElements, *static_cast<const int8_t*>(value));
             error = TosaSerializationHandler::ConvertI8toU8(data, uint8Data);
+            break;
+        }
+        case DType::DType_UINT8:
+        {
+            const int8_t* copy_data = static_cast<const int8_t*>(value);
+            uint8Data.assign(copy_data, copy_data + numElements);
             break;
         }
         case DType::DType_INT4:

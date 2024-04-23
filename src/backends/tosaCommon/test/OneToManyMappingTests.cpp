@@ -77,8 +77,7 @@ TEST_CASE("GetTosaMappingFromLayer_AvgPool2DIgnoreValueLayer")
     input0->GetOutputSlot(0).SetTensorInfo(inputTensorInfo);
     pool->GetOutputSlot(0).SetTensorInfo(outputTensorInfo);
 
-    TosaSerializationBasicBlock* basicBlock =
-        GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(pool));
+    TosaSerializationBasicBlock* basicBlock = GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(pool));
     VerifyAvgPool2DIgnoreValue(basicBlock,
                               inputShape,
                               outputShape,

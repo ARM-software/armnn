@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,7 +38,7 @@ void VerifySplit(TosaSerializationBasicBlock* splitBlock,
         std::basic_string<char> blockInputName = splitBlock->GetInputs()[0];
         std::basic_string<char> operatorInputName = sliceOp->GetInputTensorNames()[0];
 
-        std::string opInputStr = "input" + std::to_string(0) + "_";
+        std::string opInputStr = "input_";
 
         CHECK(blockInputName == operatorInputName);
         CHECK(splitBlock->GetTensorByName(blockInputName));

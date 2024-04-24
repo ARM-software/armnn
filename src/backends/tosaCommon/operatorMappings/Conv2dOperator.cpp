@@ -140,7 +140,6 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                                     {convOutStr});
     operators.push_back(conv2d_op);
 
-
     if (isInputInt8)
     {
         int32_t output_zp = outputs[0]->GetQuantizationOffset();
@@ -149,11 +148,8 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
         const std::vector<float>& weight_scales = inputs[1]->GetQuantizationScales();
 
         TosaSerializationOperator* rescaleOp = nullptr;
-        TosaSerializationTensor* rescaleTensor = nullptr;
         CreateRescaleTosaOperatorPerChannel(outputConv2dName,
                                             outputName,
-                                            DType_INT8,
-                                            outputShape0,
                                             0,
                                             output_zp,
                                             true,
@@ -161,11 +157,13 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                             input_scale,
                                             output_scale,
                                             weight_scales,
-                                            &rescaleOp,
-                                            &rescaleTensor);
+                                            &rescaleOp);
         operators.push_back(rescaleOp);
-        tensors.push_back(rescaleTensor);
+        tensors.push_back(new TosaSerializationTensor(outputName,
+                                                      outputShape0,
+                                                      DType_INT8, {}));
     }
+
     // operatorInputNames/operatorOutputNames ends up being the same as
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName,     // name

@@ -55,7 +55,7 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
 
     std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputInfo.GetShape());
     DType inputDType0 = ArmNNToDType(inputInfo.GetDataType());
-    float isFloatInput = inputDType0 == DType::DType_FP16 || inputDType0 == DType::DType_FP32;
+    bool isFloatInput = inputDType0 == DType::DType_FP16 || inputDType0 == DType::DType_FP32;
 
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
@@ -147,19 +147,17 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
         int32_t output_zp       = outputs[0]->GetQuantizationOffset();
 
         TosaSerializationOperator* rescaleOp = nullptr;
-        TosaSerializationTensor* rescaleTensor = nullptr;
         CreateRescaleTosaOperator(inputName,
                                   outputName,
-                                  outputDType0,
-                                  inputShape0,
                                   scale_alpha,
                                   input_zp,
                                   output_zp,
                                   true,
                                   true,
-                                  &rescaleOp,
-                                  &rescaleTensor);
-        tensors.push_back(rescaleTensor);
+                                  &rescaleOp);
+        tensors.push_back(new TosaSerializationTensor(outputName,
+                                                      inputShape0,
+                                                      outputDType0, {}));
 
         // operatorInputNames/operatorOutputNames ends up being the same as
         // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings

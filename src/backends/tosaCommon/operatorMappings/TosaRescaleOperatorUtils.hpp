@@ -9,8 +9,6 @@
 
 inline void CreateRescaleTosaOperator(const std::string& inputName,
                                       const std::string& outputName,
-                                      DType output_type,
-                                      const std::vector<int32_t>& shape,
                                       const std::vector<int32_t>& multipliers,
                                       const std::vector<int32_t>& shifts,
                                       int32_t input_zp,
@@ -18,8 +16,7 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
                                       bool double_round,
                                       bool scale32,
                                       bool per_channel,
-                                      TosaSerializationOperator** op,
-                                      TosaSerializationTensor** tensor)
+                                      TosaSerializationOperator** op)
 {
     if (!op)
     {
@@ -42,21 +39,10 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
     {
         throw armnn::Exception("CreateRescaleTosaOperator: failed to created operator");
     }
-    if (tensor != nullptr)
-    {
-        // tensor
-        *tensor = new TosaSerializationTensor(outputName, shape, output_type, {});
-        if (! (*tensor))
-        {
-            throw armnn::Exception("CreateRescaleTosaOperator: failed to created tensor");
-        }
-    }
 }
 
 inline void CreateRescaleTosaOperator(const std::string& inputName,
                                       const std::string& outputName,
-                                      DType output_type,
-                                      const std::vector<int32_t>& shape,
                                       int32_t scale_multiplier,
                                       int32_t scale_shift,
                                       int32_t input_zp,
@@ -64,13 +50,12 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
                                       bool double_round,
                                       bool scale32,
                                       bool per_channel,
-                                      TosaSerializationOperator** op,
-                                      TosaSerializationTensor** tensor)
+                                      TosaSerializationOperator** op)
 {
     const std::vector<int32_t> multipliers{scale_multiplier};
     const std::vector<int32_t> shifts{scale_shift};
-    CreateRescaleTosaOperator(inputName, outputName, output_type, shape, multipliers, shifts,
-                              input_zp, output_zp, double_round, scale32, per_channel, op, tensor);
+    CreateRescaleTosaOperator(inputName, outputName, multipliers, shifts,
+                              input_zp, output_zp, double_round, scale32, per_channel, op);
 }
 
 /// The following is taken from mlir/lib/Dialect/Tosa/Utils/QuantUtils.cpp in the LLVM project
@@ -165,15 +150,12 @@ static void ComputeMultiplierAndShiftTosaScale16(double scale,
 
 inline void CreateRescaleTosaOperator(const std::string& inputName,
                                       const std::string& outputName,
-                                      DType output_type,
-                                      const std::vector<int32_t>& shape,
                                       double scale,
                                       int32_t input_zp,
                                       int32_t output_zp,
                                       bool double_round,
                                       bool scale32,
-                                      TosaSerializationOperator** op,
-                                      TosaSerializationTensor** tensor)
+                                      TosaSerializationOperator** op)
 {
     int32_t multiplier;
     int32_t shift;
@@ -187,14 +169,12 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
         ComputeMultiplierAndShiftTosaScale16(scale, multiplier, shift);
     }
 
-    CreateRescaleTosaOperator(inputName, outputName, output_type, shape, multiplier, shift,
-                              input_zp, output_zp, double_round, scale32, false, op, tensor);
+    CreateRescaleTosaOperator(inputName, outputName, multiplier, shift,
+                              input_zp, output_zp, double_round, scale32, false, op);
 }
 
 inline void CreateRescaleTosaOperatorPerChannel(const std::string& inputName,
                                                 const std::string& outputName,
-                                                DType output_type,
-                                                const std::vector<int32_t>& shape,
                                                 int32_t input_zp,
                                                 int32_t output_zp,
                                                 bool double_round,
@@ -202,8 +182,7 @@ inline void CreateRescaleTosaOperatorPerChannel(const std::string& inputName,
                                                 double input_scale,
                                                 double output_scale,
                                                 const std::vector<float>& weight_scales,
-                                                TosaSerializationOperator** op,
-                                                TosaSerializationTensor** tensor)
+                                                TosaSerializationOperator** op)
 {
     std::vector<int32_t> op_tensor_multipliers;
     std::vector<int32_t> op_tensor_shifts;
@@ -229,19 +208,16 @@ inline void CreateRescaleTosaOperatorPerChannel(const std::string& inputName,
         op_tensor_shifts.push_back(shift);
     }
 
-    CreateRescaleTosaOperator(inputName, outputName, output_type, shape, op_tensor_multipliers, op_tensor_shifts,
-                              input_zp, output_zp, double_round, scale32, true, op, tensor);
+    CreateRescaleTosaOperator(inputName, outputName, op_tensor_multipliers, op_tensor_shifts,
+                              input_zp, output_zp, double_round, scale32, true, op);
 }
 
 inline void CreateFromInt32RescaleTosaOperator(const std::string& inputName,
                                                const std::string& outputName,
-                                               DType output_type,
-                                               const std::vector<int32_t>& shape,
                                                double output_scale,
                                                int32_t output_zp,
-                                               TosaSerializationOperator** op,
-                                               TosaSerializationTensor** tensor)
+                                               TosaSerializationOperator** op)
 {
-    CreateRescaleTosaOperator(inputName, outputName, output_type, shape, output_scale,
-                              0, output_zp, true, true, op, tensor);
+    CreateRescaleTosaOperator(inputName, outputName, output_scale,
+                              0, output_zp, true, true, op);
 }

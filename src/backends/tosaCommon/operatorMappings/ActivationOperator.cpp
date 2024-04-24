@@ -126,49 +126,43 @@ TosaSerializationBasicBlock* ConvertActivationToTosaOperator(const Layer* layer,
         std::string outputNameRescaleIdentity   = std::string("intermediate4_") + GetUniqueTosaMappingID();
         std::string outputNameRescaleMaxMin     = std::string("intermediate5_") + GetUniqueTosaMappingID();
 
-        DType rescale_type      = DType::DType_INT32;
-        float alpha             = activationDescriptor->m_A;
-        double scale_alpha      = inputs[0]->GetQuantizationScale() * alpha / outputs[0]->GetQuantizationScale();
-        double scale_identity   = inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
-        int32_t input_zp        = inputs[0]->GetQuantizationOffset();
-        int32_t output_zp       = outputs[0]->GetQuantizationOffset();
+        DType rescale_type    = DType::DType_INT32;
+        float alpha           = activationDescriptor->m_A;
+        double scale_alpha    = inputs[0]->GetQuantizationScale() * alpha / outputs[0]->GetQuantizationScale();
+        double scale_identity = inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
+        int32_t input_zp      = inputs[0]->GetQuantizationOffset();
+        int32_t output_zp     = outputs[0]->GetQuantizationOffset();
 
         // Value op_rescale_alpha_in =
         //        buildRescale(rewriter, op, rescale_type, input, scale_alpha,
         //                     input_qtype.getZeroPoint(), 0, true, true);
         TosaSerializationOperator* rescaleAlphaOp = nullptr;
-        TosaSerializationTensor* rescaleAlphaTensor = nullptr;
         CreateRescaleTosaOperator(inputName,
                                   outputNameRescaleAlpha,
-                                  rescale_type,
-                                  inputShape0,
                                   scale_alpha,
                                   input_zp,
                                   0,
                                   true,
                                   true,
-                                  &rescaleAlphaOp,
-                                  &rescaleAlphaTensor);
-        tensors.push_back(rescaleAlphaTensor);
-
+                                  &rescaleAlphaOp);
+        tensors.push_back(new TosaSerializationTensor(outputNameRescaleAlpha,
+                                                      GetTosaTensorShape(inputs[0]->GetShape()),
+                                                      rescale_type, {}));
         // Value op_rescale_identity_in =
         //       buildRescale(rewriter, op, rescale_type, input, scale_identity,
         //                    input_qtype.getZeroPoint(), 0, true, true);
         TosaSerializationOperator* rescaleIdentityOp = nullptr;
-        TosaSerializationTensor* rescaleIdentityTensor = nullptr;
         CreateRescaleTosaOperator(inputName,
                                   outputNameRescaleIdentity,
-                                  rescale_type,
-                                  inputShape0,
                                   scale_identity,
                                   input_zp,
                                   0,
                                   true,
                                   true,
-                                  &rescaleIdentityOp,
-                                  &rescaleIdentityTensor);
-        tensors.push_back(rescaleIdentityTensor);
-
+                                  &rescaleIdentityOp);
+        tensors.push_back(new TosaSerializationTensor(outputNameRescaleIdentity,
+                                                      GetTosaTensorShape(inputs[0]->GetShape()),
+                                                      rescale_type, {}));
         // Value result_int32;
         // if (alpha <= 1.0) {
         //    auto max_op = CreateOpAndInfer<tosa::MaximumOp>(
@@ -199,19 +193,18 @@ TosaSerializationBasicBlock* ConvertActivationToTosaOperator(const Layer* layer,
                                                {outputNameRescaleMaxMin});
 
         }
-        tensors.push_back(new TosaSerializationTensor(outputNameRescaleMaxMin, inputShape0, rescale_type, {}));
+        tensors.push_back(new TosaSerializationTensor(outputNameRescaleMaxMin,
+                                                      GetTosaTensorShape(inputs[0]->GetShape()),
+                                                      rescale_type, {}));
 
         // Value output = buildRescaleFromInt32(rewriter, op, output_type, result_int32,
         //                                      1.0, output_qtype.getZeroPoint());
         TosaSerializationOperator* rescaleOutputOp = nullptr;
         CreateFromInt32RescaleTosaOperator(outputNameRescaleMaxMin,
                                            outputName,
-                                           outputDType0,
-                                           outputShape0,
                                            1.0,
                                            output_zp,
-                                           &rescaleOutputOp,
-                                           nullptr);
+                                           &rescaleOutputOp);
 
         // operatorInputNames/operatorOutputNames ends up being the same as
         // blockInputNames/blockOutputNames for one-to-one ArmNN to Tosa mappings

@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_04" # Release 24.04
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_04" # Release 24.04
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="1322065a3fbd15b00dbfb0969d6b438b5ba15530" #11399: Specify absolute tolerance
+DEFAULT_CLFRAMEWORKREVISION="499b5bca1a897461d4105ba52e4c766ddb5f564a" #Disable SME2 Gemm kernel selection in case results needs to be accumulated
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

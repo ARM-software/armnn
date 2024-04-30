@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_04" # Release 24.04
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="499b5bca1a897461d4105ba52e4c766ddb5f564a" #Disable SME2 Gemm kernel selection in case results needs to be accumulated
+DEFAULT_CLFRAMEWORKREVISION="301e33f8f94be6427bf2377570388c379d8c8466" #Add fp16 and integer data type support for ScatterNd in Gpu
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

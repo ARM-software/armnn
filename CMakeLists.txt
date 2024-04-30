@@ -529,8 +529,12 @@ install(DIRECTORY profiling/client/include/ DESTINATION ${CMAKE_INSTALL_INCLUDED
 
 if(ARMCOMPUTENEON OR ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
     if (BUILD_ACL_OPENMP)
-        target_link_libraries(armnn PUBLIC -fopenmp -static-openmp )
-        target_compile_options(armnn PUBLIC -fopenmp)
+        if (("${CMAKE_SYSTEM_NAME}" STREQUAL Android))
+            target_link_libraries(armnn PUBLIC -fopenmp -static-openmp)
+        else() # Assumes GCC on aarch64.
+            target_compile_options(armnn PUBLIC -fopenmp)
+            target_link_libraries(armnn PUBLIC -lgomp)
+        endif()
     endif()
     target_link_libraries(armnn PUBLIC ${ARMCOMPUTE_LIBRARIES})
 endif()

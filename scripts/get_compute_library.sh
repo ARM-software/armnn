@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_04" # Release 24.04
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="301e33f8f94be6427bf2377570388c379d8c8466" #Add fp16 and integer data type support for ScatterNd in Gpu
+DEFAULT_CLFRAMEWORKREVISION="0c5ba9ee5ad36aeb6d684c20d473a27f482e83fb" #11421: Change reorder implementation to be vector length agnostic for OHWIo8 reorder
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_04" # Release 24.04
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="0c5ba9ee5ad36aeb6d684c20d473a27f482e83fb" #11421: Change reorder implementation to be vector length agnostic for OHWIo8 reorder
+DEFAULT_CLFRAMEWORKREVISION="c22e1263ba3a6945ceb1fdccb33eac512fd156fb" #11520: arm_gemm: fix SVE check on fast mode kernels.
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -9,11 +9,13 @@
 
 #include <AsyncExecutionCallback.hpp>
 #include <armnn/IAsyncExecutionCallback.hpp>
+#if defined(ARMNN_SERIALIZER)
 #include <armnnSerializer/ISerializer.hpp>
-
+#endif
 using namespace armnn;
 using namespace std::chrono;
 
+#if defined(ARMNN_SERIALIZER)
 /**
  * Given a reference to an INetwork and a target directory, serialize the network to a file
  * called "<timestamp>_network.armnn"
@@ -121,6 +123,7 @@ std::string SerializeNetworkToDotFile(const armnn::IOptimizedNetwork& optimizedN
     fileStream.close();
     return fileName;
 }
+#endif
 
 ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime::CreationOptions runtimeOptions)
     : m_Params(params)
@@ -139,6 +142,7 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
     // If the user has asked for detailed data write out the .armnn amd .dot files.
     if (params.m_SerializeToArmNN)
     {
+#if defined(ARMNN_SERIALIZER)
         // .armnn first.
         // This could throw multiple exceptions if the directory cannot be created or the file cannot be written.
         std::string targetDirectory(armnnUtils::Filesystem::CreateDirectory("/ArmNNSerializeNetwork"));
@@ -150,8 +154,10 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
         fileName =
             SerializeNetworkToDotFile(*optNet, targetDirectory);
         ARMNN_LOG(info) << "The optimized network has been serialized to:" << fileName;
+#else
+        ARMNN_LOG(info) << "Arm NN has not been built with ARMNN_SERIALIZER enabled.";
+#endif
     }
-
     m_IOInfo = GetIOInfo(optNet.get());
 
     armnn::ProfilingDetailsMethod profilingDetailsMethod = ProfilingDetailsMethod::Undefined;

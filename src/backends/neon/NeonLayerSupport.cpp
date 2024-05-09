@@ -102,11 +102,22 @@ const TensorInfo OverrideDataType(const TensorInfo& info, Optional<DataType> typ
     {
         return info;
     }
-    return TensorInfo(info.GetShape(),
-                      type.value(),
-                      info.GetQuantizationScale(),
-                      info.GetQuantizationOffset(),
-                      info.IsConstant());
+    if (info.HasMultipleQuantizationScales())
+    {
+        return TensorInfo(info.GetShape(),
+                          type.value(),
+                          info.GetQuantizationScales(),
+                          info.GetQuantizationDim().value(),
+                          info.IsConstant());
+    }
+    else
+    {
+        return TensorInfo(info.GetShape(),
+                          type.value(),
+                          info.GetQuantizationScale(),
+                          info.GetQuantizationOffset(),
+                          info.IsConstant());
+    }
 }
 
 template< typename ... Args>

@@ -3,6 +3,10 @@
 // SPDX-License-Identifier: MIT
 //
 
+// Do not include flatbuffers::ClassicLocale which can cause abort when destroyed
+// This define must be added before the include or it causes a macro redefine error
+#define FLATBUFFERS_LOCALE_INDEPENDENT 0
+
 #include "TfLiteParser.hpp"
 
 #include "armnnTfLiteParser/Version.hpp"

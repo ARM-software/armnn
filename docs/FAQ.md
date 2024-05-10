@@ -78,3 +78,16 @@ Running multiple inferences in multiple threads concurrently is not supported, b
 ArmNN supports multithreading at kernel level and this is implemented in Arm Compute Library (ACL) (https://github.com/ARM-software/ComputeLibrary/).
 During inference, at the operator level, the main thread will create multiple threads and execute the same kernel on different parts of the data. At runtime ACL will detect the number of CPU cores in the system and use one thread per cpu core for each kernel.
 Multithreading at operator level is not supported due to limitations in ACL, for more information please refer to https://arm-software.github.io/ComputeLibrary/latest/architecture.xhtml#architecture_thread_safety
+
+On Android, Executables containing Arm NN delegate or Arm NN TfLite Parser occasionally SIGABORT during destruction of Flatbuffers.
+------------------------------
+Unloading some TfLite models occasionally throws a SIGABORT. The error looks similar to this:
+~~~
+#0  0x0000007ff22df5c4 in abort () from target:/apex/com.android.runtime/lib64/bionic/libc.so
+#1  0x0000007ff22ca61c in scudo::die() () from target:/apex/com.android.runtime/lib64/bionic/libc.so
+#2  0x0000007ff22cb244 in scudo::ScopedErrorReport::~ScopedErrorReport() () from target:/apex/com.android.runtime/lib64/bionic/libc.so
+#3  0x0000007ff22cb768 in scudo::reportInvalidChunkState(scudo::AllocatorAction, void*) () from target:/apex/com.android.runtime/lib64/bionic/libc.so
+#4  0x0000007ff22cd520 in scudo::Allocator<scudo::AndroidConfig, &scudo_malloc_postinit>::deallocate(void*, scudo::Chunk::Origin, unsigned long, unsigned long) () from target:/apex/com.android.runtime/lib64/bionic/libc.so
+#5  0x0000007fee6f96f8 in flatbuffers::ClassicLocale::~ClassicLocale() () from target:/data/local/tmp/build.android.aarch64/armnn/libarmnnTfLiteParser.so
+~~~
+The solution to set the flag "-DFLATBUFFERS_LOCALE_INDEPENDENT=0" in the build. By default, this is already done for our internal executables, for example, ExecuteNetwork.

@@ -17,6 +17,9 @@ option(BUILD_SHARED_LIBS "Build share libs" ON)
 option(BUILD_DELEGATE_JNI_INTERFACE "Builds a library to allow accessing the Arm NN delegate from Java code.
                                      This is an experimental feature." ON)
 
+## Do not include flatbuffers::ClassicLocale which can cause abort when destroyed
+add_definitions(-DFLATBUFFERS_LOCALE_INDEPENDENT=0)
+
 set(armnnDelegate_sources)
 list(APPEND armnnDelegate_sources
         common/include/DelegateOptions.hpp

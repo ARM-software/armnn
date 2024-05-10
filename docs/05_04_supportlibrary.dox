@@ -11,6 +11,8 @@ namespace armnn
 
 @section supportlibraryintro About the NNAPI Support Library
 
+## Note: Arm NN will be dropping support for NNAPI Support Library in 24.08.
+
 If you need help building the Arm NN NNAPI Support Library, please take a look at our [build guide](shim/BuildGuideShimSupportLibrary.md).
 
 @section sloptions Support Library Options

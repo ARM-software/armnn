@@ -279,7 +279,7 @@ std::unique_ptr<IWorkload> RefWorkloadFactory::CreateWorkload(LayerType type,
             {
                 return std::make_unique<RefDebugBooleanWorkload>(*debugQueueDescriptor, info);
             }
-            return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymmU8Workload>(*debugQueueDescriptor, info);
+                return MakeWorkload<RefDebugFloat32Workload, RefDebugQAsymmU8Workload>(*debugQueueDescriptor, info);
         }
         case LayerType::DepthToSpace:
         {

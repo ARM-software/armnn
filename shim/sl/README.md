@@ -1,6 +1,7 @@
 # Arm NN Support Library Neural Networks driver
 
 This directory contains the Arm NN Support Library for the Android Neural Networks API.
+### Note: Arm NN will be dropping support for Support Library in 24.08.
 
 # Passing parameters to the support library runtime.
 

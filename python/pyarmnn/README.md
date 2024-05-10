@@ -1,5 +1,6 @@
 # PyArmNN
 
+## Note: Arm NN will be dropping support for PyArmNN in 24.08.
 PyArmNN is a python extension for [Arm NN SDK](https://developer.arm.com/ip-products/processors/machine-learning/arm-nn).
 PyArmNN provides interface similar to Arm NN C++ Api.
 Before you proceed with the project setup, you will need to checkout and build a corresponding Arm NN version.

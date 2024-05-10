@@ -1,5 +1,6 @@
 # How to use the Android NDK to build Arm NN
 
+- [Deprecation Notice](#deprecation-notice)
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
 - [Download Arm NN](#download-arm-nn)
@@ -9,6 +10,9 @@
 - [Build Arm NN Shim](#build-arm-nn-shim)
 
 
+## Deprecation Notice
+Arm NN will be dropping support for support library in 24.08.
+
 ## Introduction
 These are step by step instructions for building the Arm NN shim and support library for NNAPI.
 This work is currently in an experimental phase.
@@ -16,7 +20,7 @@ This work is currently in an experimental phase.
 ## Prerequisites
 
 The following are required to build the Arm NN support library
-* Android NDK r25
+* Android NDK r26b
   * Detailed setup can be found in [BuildGuideAndroidNDK.md](../BuildGuideAndroidNDK.md)
 * Flatbuffer version 23.5.26
   * Detailed setup can be found in [BuildGuideCrossCompilation.md](../BuildGuideCrossCompilation.md)
@@ -33,7 +37,7 @@ export WORKING_DIR=<path to where the Arm NN source code, clframework and aosp r
 export AOSP_ROOT=<path to the root of Android tree where the shim will be built>
 export AOSP_MODULES_ROOT=<path to where AOSP modules will be cloned i.e. $WORKING_DIR/aosp>
 export ARMNN_BUILD_DIR=<path to the Arm NN build directory i.e. $WORKING_DIR/build>
-export NDK=<path to>android-ndk-r25
+export NDK=<path to>android-ndk-r26b
 export NDK_TOOLCHAIN_ROOT=$NDK/toolchains/llvm/prebuilt/linux-x86_64
 export PATH=$NDK_TOOLCHAIN_ROOT/bin/:$PATH
 export FLATBUFFERS_ANDROID_BUILD=<path to flatbuffers target android build>
@@ -68,7 +72,7 @@ cd ${WORKING_DIR}/clframework
 
 scons arch=arm64-v8a \
 toolchain_prefix=aarch64-linux-android- \
-compiler_prefix=aarch64-linux-android29- \
+compiler_prefix=aarch64-linux-android${ANDROID_API}- \
 neon=1 opencl=1 \
 embed_kernels=1 \
 build_dir=android-arm64v8a \
@@ -76,6 +80,7 @@ extra_cxx_flags="-Wno-parentheses-equality -Wno-missing-braces -fPIC" \
 Werror=0 embed_kernels=1 examples=0 \
 validation_tests=0 benchmark_tests=0 benchmark_examples=0 os=android -j16
 ```
+Note: ANDROID_API is the Android API version you want to build.
 
 ## Build Arm NN and Serializer
 
@@ -83,12 +88,12 @@ validation_tests=0 benchmark_tests=0 benchmark_examples=0 os=android -j16
   (Requires CMake if not previously installed: `sudo apt install cmake`)
 ```bash
 cd $ARMNN_BUILD_DIR
-CXX=aarch64-linux-android29-clang++ \
-CC=aarch64-linux-android29-clang \
+CXX=aarch64-linux-android${ANDROID_API}-clang++ \
+CC=aarch64-linux-android${ANDROID_API}-clang \
 CXX_FLAGS="-fPIE -fPIC" cmake ${WORKING_DIR}/armnn \
 -DCMAKE_ANDROID_NDK=$NDK \
 -DCMAKE_SYSTEM_NAME=Android \
--DCMAKE_SYSTEM_VERSION=29 \
+-DCMAKE_SYSTEM_VERSION=$ANDROID_API \
 -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
 -DCMAKE_EXE_LINKER_FLAGS="-pie -llog -lz" \
 -DARMCOMPUTE_ROOT=$WORKING_DIR/clframework/ \
@@ -125,7 +130,7 @@ CMARGS="$CMARGS \
 -DANDROID_ABI=arm64-v8a \
 -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
 -DCMAKE_ANDROID_NDK=$NDK \
--DANDROID_PLATFORM=android-29 \
+-DANDROID_PLATFORM=android-$ANDROID_API \
 -DAOSP_MODULES_ROOT=$AOSP_MODULES_ROOT \
 -DARMNN_SOURCE_DIR=$WORKING_DIR/armnn \
 -DArmnn_DIR=$ARMNN_BUILD_DIR "
@@ -133,8 +138,8 @@ CMARGS="$CMARGS \
 mkdir ${WORKING_DIR}/armnn/shim/sl/build
 cd ${WORKING_DIR}/armnn/shim/sl/build
 
-CXX=aarch64-linux-android29-clang++ \
-CC=aarch64-linux-android29-clang \
+CXX=aarch64-linux-android$ANDROID_API-clang++ \
+CC=aarch64-linux-android$ANDROID_API-clang \
 cmake $CMARGS ../
 make
 ```

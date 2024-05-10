@@ -899,6 +899,7 @@ where N = batches, C = channels, H = height, W = width
       <table>
        <tr><th>
        <tr><td>BFLOAT16
+       <tr><td>BOOLEAN
        <tr><td>FLOAT16
        <tr><td>FLOAT32
        <tr><td>QASYMMS8
@@ -2975,10 +2976,6 @@ where N = batches, C = channels, H = height, W = width
     <tr><th>
     <tr><td>FLOAT16
     <tr><td>FLOAT32
-    <tr><td>QASYMMS8
-    <tr><td>QASYMMU8
-    <tr><td>QSYMMS8
-    <tr><td>QSYMMS16
     <tr><td>SIGNED32
     </table>
 <tr>

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -23,6 +23,7 @@ namespace armnn_driver
 class ArmnnDriverImpl
 {
 public:
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The Shim and support library will be removed from Arm NN in 24.08", "24.08")
     static GeneralResult<SharedPreparedModel> PrepareArmnnModel(
         const armnn::IRuntimePtr& runtime,
         const armnn::IGpuAccTunedParametersPtr& clTunedParameters,
@@ -34,6 +35,7 @@ public:
         bool float32ToFloat16 = false,
         Priority priority = Priority::MEDIUM);
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The Shim and support library will be removed from Arm NN in 24.08", "24.08")
     static GeneralResult<SharedPreparedModel> PrepareArmnnModelFromCache(
         const armnn::IRuntimePtr& runtime,
         const armnn::IGpuAccTunedParametersPtr& clTunedParameters,

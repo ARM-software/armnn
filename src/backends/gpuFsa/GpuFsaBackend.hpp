@@ -50,11 +50,13 @@ const BackendCapabilities gpuFsaCapabilities("GpuFsa",
                                                      {"MultiAxisPacking", false},
                                                      {"SingleAxisPacking", false}
                                              });
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 class GpuFsaBackend : public IBackendInternal
 {
 public:
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The GpuFsa backend will be removed from Arm NN in 24.08", "24.08")
     GpuFsaBackend() : m_CustomAllocator(nullptr) {};
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The GpuFsa backend will be removed from Arm NN in 24.08", "24.08")
     GpuFsaBackend(std::shared_ptr<ICustomAllocator> allocator)
     {
         UseCustomMemoryAllocator(allocator, armnn::EmptyOptional());
@@ -301,5 +303,6 @@ public:
     std::shared_ptr<GpuFsaBackendCustomAllocatorWrapper> m_CustomAllocator;
     bool m_UsingCustomAllocator = false;
 };
+ARMNN_NO_DEPRECATE_WARN_END
 
 } // namespace armnn

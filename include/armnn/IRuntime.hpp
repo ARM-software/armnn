@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -258,6 +258,7 @@ public:
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors.
     /// This function performs a thread safe execution of the network. Returns once execution is complete.
     /// Will block until this and any other thread using the same workingMem object completes.
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The Async interface will be removed from Arm NN in 24.08", "24.08")
     Status Execute(IWorkingMemHandle& workingMemHandle,
                    const InputTensors& inputTensors,
                    const OutputTensors& outputTensors,

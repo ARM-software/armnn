@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 #include <doctest/doctest.h>
 
 #include "google/protobuf/stubs/logging.h"
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 
 TEST_SUITE("OnnxParser_CreateNetwork")
 {
@@ -62,3 +63,4 @@ TEST_CASE("CreateNetworkWithInvalidString")
 }
 
 }
+ARMNN_NO_DEPRECATE_WARN_END

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <armnn/Logging.hpp>
@@ -292,6 +292,7 @@ private:
 #endif
 
 #if defined(ARMNN_ONNX_PARSER)
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     bool CreateNetwork (ParserType<armnnOnnxParser::IOnnxParser>)
     {
         // Create a network from a file on disk
@@ -318,6 +319,7 @@ private:
 
         return m_NetworkPtr.get() != nullptr;
     }
+ARMNN_NO_DEPRECATE_WARN_END
 #endif
 
 };

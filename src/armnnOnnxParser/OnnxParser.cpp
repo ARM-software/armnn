@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "OnnxParser.hpp"
@@ -37,7 +37,9 @@ IOnnxParser* IOnnxParser::CreateRaw()
 
 IOnnxParserPtr IOnnxParser::Create()
 {
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     return IOnnxParserPtr(CreateRaw(), &IOnnxParser::Destroy);
+ARMNN_NO_DEPRECATE_WARN_END
 }
 
 void IOnnxParser::Destroy(IOnnxParser* parser)

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #if !defined(ARMNN_DISABLE_THREADS)
@@ -188,11 +188,12 @@ void Threadpool::ProcessExecPriorities(uint32_t index)
         try // executing the inference
         {
             IWorkingMemHandle& memHandle = *(m_WorkingMemHandleMap.at(networkId))[index];
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
             // Execute and populate the time at end of inference in the callback
             m_RuntimePtr->Execute(memHandle, inputTensors, outputTensors) == Status::Success ?
             cb->Notify(Status::Success, std::make_pair(startTime, armnn::GetTimeNow())) :
             cb->Notify(Status::Failure, std::make_pair(startTime, armnn::GetTimeNow()));
+ARMNN_NO_DEPRECATE_WARN_END
         }
         catch (const RuntimeException&)
         {

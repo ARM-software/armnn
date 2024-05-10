@@ -216,7 +216,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
 
                 ("m,model-path",
                  "Path to model file, e.g. .armnn, .tflite, .onnx. "
-                 "DEPRECATED: .pb and .prototxt model files no longer load and are deprecated.",
+                 "DEPRECATED: .pb and .prototxt model files no longer loaded and are deprecated."
+                 "DEPRECATED: .onnx model files will no longer loaded from 24.08 onwards.",
                  cxxopts::value<std::string>(m_ExNetParams.m_ModelPath));
 
         m_CxxOptions.add_options("b) Ordering")
@@ -237,7 +238,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  cxxopts::value<std::string>(m_RuntimeOptions.m_DynamicBackendsPath))
 
                 ("P, thread-pool-size",
-                 "Run the network using the Arm NN thread pool with the number of threads provided. ",
+                 "Run the network using the Arm NN thread pool with the number of threads provided. "
+                 "DECRECATED: The asynchronous execution interface will be removed in 24.08",
                  cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("0"))
 
                 ("d,input-tensor-data",

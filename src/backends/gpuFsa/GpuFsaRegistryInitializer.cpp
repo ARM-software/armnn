@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,7 +15,9 @@ static BackendRegistry::StaticRegistryInitializer g_RegisterHelper
     GpuFsaBackend::GetIdStatic(),
     []()
     {
-        return IBackendInternalUniquePtr(new GpuFsaBackend);
+ARMNN_NO_DEPRECATE_WARN_BEGIN
+            return IBackendInternalUniquePtr(new GpuFsaBackend);
+ARMNN_NO_DEPRECATE_WARN_END
     }
 };
 } // Anonymous namespace

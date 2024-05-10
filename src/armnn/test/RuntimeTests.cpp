@@ -116,7 +116,9 @@ TEST_CASE("RuntimePreImportInputs")
 
     auto memHandle = runtime->CreateWorkingMemHandle(networkId);
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}}, {0 /* pre-imported id */});
+ARMNN_NO_DEPRECATE_WARN_END
     for (auto val: output) {
         CHECK(val == 30);
     }
@@ -125,12 +127,16 @@ TEST_CASE("RuntimePreImportInputs")
     CHECK(importedInputVec2.size() == 1);
     CHECK(importedInputVec2[0] == 1);
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     runtime->Execute(*memHandle.get(), {{0, inputTensor1}}, {{2, outputTensor}}, {1 /* pre-imported id */});
+ARMNN_NO_DEPRECATE_WARN_END
     for (auto val: output) {
         CHECK(val == 30);
     }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0, 1});
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     for (auto val: output) {
         CHECK(val == 30);
     }

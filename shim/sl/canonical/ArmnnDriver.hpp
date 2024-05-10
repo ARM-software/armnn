@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,6 +33,7 @@ class ArmnnDriver : public IDevice
 private:
     std::unique_ptr<ArmnnDevice> m_Device;
 public:
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The Shim and support library will be removed from Arm NN in 24.08", "24.08")
     ArmnnDriver(DriverOptions options)
     {
         try
@@ -212,7 +213,7 @@ public:
         if (hasDeadlinePassed(deadline)) {
             return NN_ERROR(ErrorStatus::MISSED_DEADLINE_PERSISTENT);
         }
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
         return ArmnnDriverImpl::PrepareArmnnModel(m_Device->m_Runtime,
             m_Device->m_ClTunedParameters,
             m_Device->m_Options,
@@ -222,6 +223,7 @@ public:
             token,
             model.relaxComputationFloat32toFloat16 && m_Device->m_Options.GetFp16Enabled(),
             priority);
+ARMNN_NO_DEPRECATE_WARN_END
     }
 
     GeneralResult<SharedPreparedModel> prepareModelFromCache(OptionalTimePoint deadline,
@@ -239,6 +241,7 @@ public:
             return NN_ERROR(ErrorStatus::MISSED_DEADLINE_PERSISTENT);
         }
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
         return ArmnnDriverImpl::PrepareArmnnModelFromCache(
                      m_Device->m_Runtime,
                      m_Device->m_ClTunedParameters,
@@ -247,6 +250,7 @@ public:
                      dataCache,
                      token,
                      m_Device->m_Options.GetFp16Enabled());
+ARMNN_NO_DEPRECATE_WARN_END
     }
 
     GeneralResult<SharedBuffer> allocate(const BufferDesc&,

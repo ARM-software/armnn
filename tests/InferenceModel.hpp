@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -276,6 +276,7 @@ public:
 #endif
 
 #if defined(ARMNN_ONNX_PARSER)
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 template <>
 struct CreateNetworkImpl<armnnOnnxParser::IOnnxParser>
 {
@@ -343,6 +344,7 @@ public:
         return network;
     }
 };
+ARMNN_NO_DEPRECATE_WARN_END
 #endif
 
 
@@ -660,11 +662,11 @@ public:
 
         // Start timer to record inference time in EnqueueWorkload (in milliseconds)
         const auto start_time = armnn::GetTimeNow();
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
         armnn::Status ret = m_Runtime->Execute(workingMemHandleRef,
                                                MakeInputTensors(inputContainers),
                                                MakeOutputTensors(outputContainers));
-
+ARMNN_NO_DEPRECATE_WARN_END
         const auto duration = armnn::GetTimeDuration(start_time);
 
         // if profiling is enabled print out the results

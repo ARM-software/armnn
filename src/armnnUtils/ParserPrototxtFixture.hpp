@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -23,12 +23,14 @@ namespace armnnUtils
 template<typename TParser>
 struct ParserPrototxtFixture
 {
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     ParserPrototxtFixture()
         : m_Parser(TParser::Create())
         , m_Runtime(armnn::IRuntime::Create(armnn::IRuntime::CreationOptions()))
         , m_NetworkIdentifier(-1)
     {
     }
+ARMNN_NO_DEPRECATE_WARN_END
 
     /// Parses and loads the network defined by the m_Prototext string.
     /// @{
@@ -140,7 +142,7 @@ template<typename TParser>
 void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::TensorShape>& inputShapes)
 {
     std::string errorMessage;
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::INetworkPtr network =
         m_Parser->CreateNetworkFromString(m_Prototext.c_str(), inputShapes);
     auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
@@ -151,13 +153,14 @@ void ParserPrototxtFixture<TParser>::Setup(const std::map<std::string, armnn::Te
                                            errorMessage,
                                            CHECK_LOCATION().AsString()));
     }
+ARMNN_NO_DEPRECATE_WARN_END
 }
 
 template<typename TParser>
 void ParserPrototxtFixture<TParser>::Setup()
 {
     std::string errorMessage;
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     armnn::INetworkPtr network =
         m_Parser->CreateNetworkFromString(m_Prototext.c_str());
     auto optimized = Optimize(*network, { armnn::Compute::CpuRef }, m_Runtime->GetDeviceSpec());
@@ -168,6 +171,7 @@ void ParserPrototxtFixture<TParser>::Setup()
                                            errorMessage,
                                            CHECK_LOCATION().AsString()));
     }
+ARMNN_NO_DEPRECATE_WARN_END
 }
 
 template<typename TParser>

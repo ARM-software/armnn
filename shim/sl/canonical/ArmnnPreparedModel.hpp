@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -39,6 +39,7 @@ class ArmnnPreparedModel final : public IPreparedModel,
                                  public std::enable_shared_from_this<ArmnnPreparedModel>
 {
 public:
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The Shim and support library will be removed from Arm NN in 24.08", "24.08")
     ArmnnPreparedModel(armnn::NetworkId networkId,
                        armnn::IRuntime* runtime,
                        const Model& model,
@@ -46,6 +47,7 @@ public:
                        const bool gpuProfilingEnabled,
                        Priority priority = Priority::MEDIUM);
 
+    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The Shim and support library will be removed from Arm NN in 24.08", "24.08")
     ArmnnPreparedModel(armnn::NetworkId networkId,
                        armnn::IRuntime* runtime,
                        const std::string& requestInputsAndOutputsDumpDir,

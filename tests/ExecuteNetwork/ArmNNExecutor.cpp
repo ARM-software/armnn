@@ -936,6 +936,7 @@ armnn::BindingPointInfo ArmNNExecutor::TfliteParser::GetOutputBindingPointInfo(s
 
 
 #if defined(ARMNN_ONNX_PARSER)
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 ArmNNExecutor::OnnxParser::OnnxParser() : m_Parser(armnnOnnxParser::IOnnxParser::Create()){}
 
 armnn::INetworkPtr ArmNNExecutor::OnnxParser::CreateNetwork(const ExecuteNetworkParams& params)
@@ -979,4 +980,5 @@ armnn::BindingPointInfo ArmNNExecutor::OnnxParser::GetOutputBindingPointInfo(siz
 {
     return m_Parser->GetNetworkOutputBindingInfo(outputName);
 }
+ARMNN_NO_DEPRECATE_WARN_END
 #endif

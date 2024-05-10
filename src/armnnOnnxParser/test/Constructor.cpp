@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,7 @@
 
 #include <doctest/doctest.h>
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 TEST_SUITE("OnnxParser_Constructor")
 {
 TEST_CASE("Create")
@@ -15,3 +16,4 @@ TEST_CASE("Create")
 }
 
 }
+ARMNN_NO_DEPRECATE_WARN_END

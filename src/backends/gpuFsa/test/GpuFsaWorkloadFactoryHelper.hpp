@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,9 +13,9 @@
 #include <gpuFsa/GpuFsaWorkloadFactory.hpp>
 #include "gpuFsa/GpuFsaTensorHandleFactory.hpp"
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
 namespace
 {
-
 template<>
 struct WorkloadFactoryHelper<armnn::GpuFsaWorkloadFactory>
 {
@@ -43,3 +43,4 @@ struct WorkloadFactoryHelper<armnn::GpuFsaWorkloadFactory>
 using GpuFsaWorkloadFactoryHelper = WorkloadFactoryHelper<armnn::GpuFsaWorkloadFactory>;
 
 } // anonymous namespace
+ARMNN_NO_DEPRECATE_WARN_END

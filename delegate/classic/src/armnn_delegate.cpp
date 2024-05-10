@@ -48,7 +48,6 @@
 
 #include <armnnUtils/Filesystem.hpp>
 #include <armnn/utility/Timer.hpp>
-#include <flatbuffers/flatbuffers.h>
 #include <tensorflow/lite/context_util.h>
 #include <tensorflow/lite/schema/schema_generated.h>
 

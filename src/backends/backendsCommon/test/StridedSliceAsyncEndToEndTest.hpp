@@ -90,11 +90,12 @@ void AsyncThreadedEndToEndTestImpl(INetworkPtr network,
         InputTensors& inputTensors = inputTensorsVec[i];
         OutputTensors& outputTensors = outputTensorsVec[i];
         IWorkingMemHandle& workingMemHandle = *workingMemHandles[i].get();
-
         threads.emplace_back([&]()
         {
+ARMNN_NO_DEPRECATE_WARN_BEGIN
             // Run the async network
             runtime->Execute(workingMemHandle, inputTensors, outputTensors);
+ARMNN_NO_DEPRECATE_WARN_END
         });
     }
 
@@ -184,9 +185,10 @@ void AsyncEndToEndTestImpl(INetworkPtr network,
         // Create WorkingMemHandle for this async network
         std::unique_ptr<IWorkingMemHandle> workingMemHandle = runtime->CreateWorkingMemHandle(networkId);
         IWorkingMemHandle& workingMemHandleRef = *workingMemHandle.get();
-
+ARMNN_NO_DEPRECATE_WARN_BEGIN
         // Run the async network
         runtime->Execute(workingMemHandleRef, inputTensors, outputTensorsVec[0]);
+ARMNN_NO_DEPRECATE_WARN_END
     }
     else
     {

@@ -597,6 +597,20 @@ public:
 
 
     %feature("docstring",
+             "
+    Adds a Broadcast_To layer to the network.
+
+        Args:
+            broadcastToDescriptor (BroadcastToDescriptor): Descriptor for the explicit broadcat operation.
+            name (str): Optional name for the layer.
+
+            Returns:
+                IConnectableLayer: Interface for configuring the layer.
+    ") AddBroadcastToLayer;
+    armnn::IConnectableLayer* AddBroadcastToLayer(const armnn::BroadcastToDescriptor& broadcastToDescriptor,
+                                                  const char* name = nullptr);
+
+    %feature("docstring",
         "
         Adds a Division layer to the network.
 
@@ -1148,6 +1162,20 @@ public:
                                                      const char* name = nullptr);
 
     %feature("docstring",
+             "
+    Adds a Fused layer to the network. This is a precompiled layer for fused operator that merges Add + Mul + Add.
+
+        Args:
+            fusedDescriptor (FusedDescriptor): Description of the fused layer.
+            name (str): Optional name for the layer.
+
+            Returns:
+    IConnectableLayer: Interface for configuring the layer.
+    ") AddFusedLayer;
+    armnn::IConnectableLayer* AddFusedLayer(const armnn::FusedDescriptor& fusedDescriptor,
+                                            const char* name = nullptr);
+
+    %feature("docstring",
         "
         Adds a LogicalBinary layer to the network.
 
@@ -1160,6 +1188,20 @@ public:
         ") AddLogicalBinaryLayer;
     armnn::IConnectableLayer* AddLogicalBinaryLayer(const armnn::LogicalBinaryDescriptor& logicalBinaryDescriptor,
                                                     const char* name = nullptr);
+
+    %feature("docstring",
+             "
+    Adds a ScatterND layer to the network.
+
+            Args:
+    scatterndDescriptor (ScatterNdDescriptor): Description of the tile layer.
+            name (str): Optional name for the layer.
+
+            Returns:
+    IConnectableLayer: Interface for configuring the layer.
+    ") AddScatterNdLayer;
+    armnn::IConnectableLayer* AddScatterNdLayer(const armnn::ScatterNdDescriptor& scatterndDescriptor,
+                                                const char* name = nullptr);
 
     %feature("docstring",
         "

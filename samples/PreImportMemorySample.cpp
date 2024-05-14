@@ -88,7 +88,9 @@ int main()
     // This function performs a thread safe execution of the network. Returns once execution is complete.
     // Will block until this and any other thread using the same workingMem object completes.
     // Execute with PreImported inputTensor1 as well as Non-PreImported inputTensor2
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     runtime->Execute(*memHandle.get(), {}, {{2, outputTensor1}}, importedInputVec /* pre-imported ids */);
+ARMNN_NO_DEPRECATE_WARN_END
 
     // ImportOutputs separates the importing and mapping of OutputTensors from network execution.
     // Allowing for a set of OutputTensors to be imported and mapped once, but used in execution many times.
@@ -99,8 +101,10 @@ int main()
     // PreImport outputTensor1
     std::vector<ImportedOutputId> importedOutputVec = runtime->ImportOutputs(networkIdentifier1, {output1});
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     // Execute with Non-PreImported inputTensor1 as well as PreImported inputTensor2
     runtime->Execute(*memHandle.get(), {{0, inputTensor1}}, {{2, outputTensor1}}, {1 /* pre-imported id */});
+ARMNN_NO_DEPRECATE_WARN_END
 
     // Clear the previously PreImportedInput with the network Id and inputIds returned from ImportInputs()
     // Note: This will happen automatically during destructor of armnn::LoadedNetwork
@@ -110,8 +114,10 @@ int main()
     // Note: This will happen automatically during destructor of armnn::LoadedNetwork
     runtime->ClearImportedOutputs(networkIdentifier1, importedOutputVec);
 
+ARMNN_NO_DEPRECATE_WARN_BEGIN
     // Execute with Non-PreImported inputTensor1, inputTensor2 and the PreImported outputTensor1
     runtime->Execute(*memHandle.get(), {{0, inputTensor1}, {1, inputTensor2}}, {{2, outputTensor1}});
+ARMNN_NO_DEPRECATE_WARN_END
 
     std::cout << "Your number was " << outputData1.data()[0] << std::endl;
 

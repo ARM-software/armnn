@@ -120,8 +120,10 @@ int main()
     // Lambda function to execute the network. We use it as thread function.
     auto execute = [&](unsigned int executionIndex)
     {
+ARMNN_NO_DEPRECATE_WARN_BEGIN
         auto memHandle = run->CreateWorkingMemHandle(networkIdentifier);
         run->Execute(*memHandle, inputTensors[executionIndex], outputTensors[executionIndex]);
+ARMNN_NO_DEPRECATE_WARN_END
     };
 
     // Prepare some threads and let each execute the network with a different input

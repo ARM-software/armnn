@@ -1,0 +1,9 @@
+<map id="src/backends/tosaCommon/operatorMappings/SliceOperator.hpp" name="src/backends/tosaCommon/operatorMappings/SliceOperator.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="141,5,404,47"/>
+<area shape="rect" id="node2" href="$_slice_operator_8cpp.html" title=" " alt="" coords="5,102,268,143"/>
+<area shape="rect" id="node3" href="$_tosa_common_operators_8hpp.html" title=" " alt="" coords="292,95,528,151"/>
+<area shape="rect" id="node4" href="$_tosa_mappings_8hpp.html" title=" " alt="" coords="311,199,509,240"/>
+<area shape="rect" id="node5" href="$_tosa_mappings_8cpp.html" title=" " alt="" coords="86,288,283,329"/>
+<area shape="rect" id="node6" href="$_tosa_ref_backend_8cpp.html" title=" " alt="" coords="308,288,512,329"/>
+<area shape="rect" id="node7" href="$_tosa_ref_layer_support_8cpp.html" title=" " alt="" coords="536,288,740,329"/>
+</map>

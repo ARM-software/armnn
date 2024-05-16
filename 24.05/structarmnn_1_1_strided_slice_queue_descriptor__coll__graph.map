@@ -1,0 +1,8 @@
+<map id="StridedSliceQueueDescriptor" name="StridedSliceQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="931,47,1139,73"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="647,39,881,81"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="185,39,420,81"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_strided_slice_descriptor.html" title="A StridedSliceDescriptor for the StridedSliceLayer." alt="" coords="219,105,386,132"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="10,105,131,132"/>
+</map>

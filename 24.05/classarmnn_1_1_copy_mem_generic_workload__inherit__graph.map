@@ -1,0 +1,6 @@
+<map id="CopyMemGenericWorkload" name="CopyMemGenericWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="25,261,224,288"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="5,171,244,212"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="76,5,163,32"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="141,81,396,108"/>
+</map>

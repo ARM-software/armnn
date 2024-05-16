@@ -1,0 +1,4 @@
+<map id="TransposeConvolution2dDescriptor" name="TransposeConvolution2dDescriptor">
+<area shape="rect" id="node1" title="A TransposeConvolution2dDescriptor for the TransposeConvolution2dLayer." alt="" coords="5,80,253,107"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="69,5,190,32"/>
+</map>

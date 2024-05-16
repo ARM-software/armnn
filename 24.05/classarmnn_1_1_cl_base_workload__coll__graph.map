@@ -1,0 +1,6 @@
+<map id="ClBaseWorkload&lt; QueueDescriptor &gt;" name="ClBaseWorkload&lt; QueueDescriptor &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="5,171,272,197"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="11,95,266,121"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="29,5,115,32"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="140,5,271,32"/>
+</map>

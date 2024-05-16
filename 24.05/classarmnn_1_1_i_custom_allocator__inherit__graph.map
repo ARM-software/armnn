@@ -1,0 +1,6 @@
+<map id="ICustomAllocator" name="ICustomAllocator">
+<area shape="rect" id="node1" title="Custom Allocator interface." alt="" coords="223,5,357,32"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_cl_backend_default_allocator.html" title="Default Memory Allocator class returned from IBackendInternal::GetDefaultAllocator(MemorySource)" alt="" coords="5,80,201,107"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_default_allocator.html" title="Default Memory Allocator class returned from IBackendInternal::GetDefaultAllocator(MemorySource)" alt="" coords="226,80,354,107"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_gpu_fsa_backend_default_allocator.html" title="Default Memory Allocator class returned from IBackendInternal::GetDefaultAllocator(MemorySource)" alt="" coords="378,80,610,107"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="MultiTypedWorkload&lt; QueueDescriptor, InputDataType, OutputDataType &gt;" name="MultiTypedWorkload&lt; QueueDescriptor, InputDataType, OutputDataType &gt;">
+<area shape="rect" id="node1" title=" " alt="" coords="443,162,661,218"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_cl_convert_fp16_to_fp32_workload.html" title=" " alt="" coords="709,5,1000,47"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_cl_convert_fp32_to_fp16_workload.html" title=" " alt="" coords="709,71,1000,112"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_neon_convert_fp16_to_fp32_workload.html" title=" " alt="" coords="709,136,1000,177"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_neon_convert_fp32_to_fp16_workload.html" title=" " alt="" coords="709,201,1000,243"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_ref_convert_fp16_to_fp32_workload.html" title=" " alt="" coords="709,267,1000,308"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_ref_convert_fp32_to_fp16_workload.html" title=" " alt="" coords="709,332,1000,373"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="140,177,395,203"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="5,177,92,203"/>
+</map>

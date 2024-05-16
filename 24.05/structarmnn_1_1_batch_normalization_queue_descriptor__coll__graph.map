@@ -1,0 +1,10 @@
+<map id="BatchNormalizationQueueDescriptor" name="BatchNormalizationQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="1072,95,1332,121"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="699,42,947,83"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="185,39,420,81"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_batch_normalization_descriptor.html" title="A BatchNormalizationDescriptor for the BatchNormalizationLayer." alt="" coords="193,105,412,132"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="10,105,131,132"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_const_tensor_handle.html" title=" " alt="" coords="749,141,896,168"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="245,156,360,183"/>
+</map>

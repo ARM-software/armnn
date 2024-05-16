@@ -1,0 +1,10 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classarmnn_1_1_i_workload_factory.html" title=" " alt="" coords="5,107,140,133"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_gpu_fsa_workload_factory.html" title=" " alt="" coords="217,5,396,32"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_ref_workload_factory.html" title=" " alt="" coords="231,56,383,83"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_tosa_ref_workload_factory.html" title=" " alt="" coords="216,107,397,133"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_workload_factory_base.html" title=" " alt="" coords="225,157,388,184"/>
+<area shape="rect" id="node8" href="$classsdb_1_1_sample_dynamic_workload_factory.html" title=" " alt="" coords="188,208,425,235"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_cl_workload_factory.html" title=" " alt="" coords="484,132,627,159"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_neon_workload_factory.html" title=" " alt="" coords="473,183,637,209"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="ClBatchNormalizationFloatWorkload" name="ClBatchNormalizationFloatWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="37,261,234,303"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_typed_workload.html" title=" " alt="" coords="5,171,265,212"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="8,95,263,121"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="25,5,112,32"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="137,5,267,32"/>
+</map>

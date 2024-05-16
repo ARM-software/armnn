@@ -1,0 +1,24 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="5,360,120,387"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_const_tensor_handle.html" title=" " alt="" coords="175,56,322,83"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_i_acl_tensor_handle.html" title=" " alt="" coords="181,309,316,336"/>
+<area shape="rect" id="node19" href="$classarmnn_1_1_ref_tensor_handle.html" title=" " alt="" coords="183,360,315,387"/>
+<area shape="rect" id="node21" href="$classarmnn_1_1_tosa_ref_tensor_handle.html" title=" " alt="" coords="168,411,329,437"/>
+<area shape="rect" id="node22" href="$classsdb_1_1_sample_tensor_handle.html" title=" " alt="" coords="169,461,328,488"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_const_passthrough_tensor_handle.html" title=" " alt="" coords="377,5,604,32"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_tensor_handle.html" title=" " alt="" coords="435,56,546,83"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_passthrough_tensor_handle.html" title=" " alt="" coords="653,5,842,32"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_scoped_tensor_handle.html" title=" " alt="" coords="669,56,826,83"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_i_cl_tensor_handle.html" title=" " alt="" coords="427,233,554,260"/>
+<area shape="rect" id="node16" href="$classarmnn_1_1_neon_sub_tensor_handle.html" title=" " alt="" coords="407,284,575,311"/>
+<area shape="rect" id="node17" href="$classarmnn_1_1_neon_tensor_handle.html" title=" " alt="" coords="419,335,563,361"/>
+<area shape="rect" id="node18" href="$classarmnn_1_1_neon_tensor_handle_decorator.html" title=" " alt="" coords="387,385,595,412"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_cl_import_sub_tensor_handle.html" title=" " alt="" coords="652,107,843,133"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_cl_import_tensor_handle.html" title=" " alt="" coords="664,157,831,184"/>
+<area shape="rect" id="node11" href="$classarmnn_1_1_cl_sub_tensor_handle.html" title=" " alt="" coords="674,208,821,235"/>
+<area shape="rect" id="node12" href="$classarmnn_1_1_cl_tensor_handle.html" title=" " alt="" coords="686,259,809,285"/>
+<area shape="rect" id="node13" href="$classarmnn_1_1_cl_tensor_handle_decorator.html" title=" " alt="" coords="654,309,841,336"/>
+<area shape="rect" id="node14" href="$classarmnn_1_1_gpu_fsa_sub_tensor_handle.html" title=" " alt="" coords="656,360,839,387"/>
+<area shape="rect" id="node15" href="$classarmnn_1_1_gpu_fsa_tensor_handle.html" title=" " alt="" coords="668,411,827,437"/>
+<area shape="rect" id="node20" href="$classarmnn_1_1_ref_tensor_handle_decorator.html" title=" " alt="" coords="393,436,589,463"/>
+</map>

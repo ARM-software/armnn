@@ -1,0 +1,7 @@
+<map id="ActivationLayer" name="ActivationLayer">
+<area shape="rect" id="node1" title="This layer represents an activation operation with the specified activation function." alt="" coords="36,352,160,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,191,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="63,81,122,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="114,157,277,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="21,5,164,32"/>
+</map>

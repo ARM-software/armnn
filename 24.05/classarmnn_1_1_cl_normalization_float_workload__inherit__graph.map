@@ -1,0 +1,6 @@
+<map id="ClNormalizationFloatWorkload" name="ClNormalizationFloatWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="22,244,243,271"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_typed_workload.html" title=" " alt="" coords="21,155,244,196"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="5,80,260,107"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="89,5,176,32"/>
+</map>

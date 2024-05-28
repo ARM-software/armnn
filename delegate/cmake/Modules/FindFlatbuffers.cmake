@@ -1,5 +1,5 @@
 #
-# Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020, 2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -11,7 +11,7 @@ find_path(Flatbuffers_INCLUDE_DIR
         HINTS
             ${FLATBUFFERS_ROOT}/include
             /usr/local/include
-            /usr/include)
+            /usr/include NO_CMAKE_FIND_ROOT_PATH)
 
 find_library(Flatbuffers_LIB
         NAMES
@@ -20,7 +20,7 @@ find_library(Flatbuffers_LIB
         HINTS
             ${FLATBUFFERS_ROOT}/lib
             /usr/local/lib
-            /usr/lib)
+            /usr/lib NO_CMAKE_FIND_ROOT_PATH)
 
 ## Set FLATBUFFERS_FOUND
 find_package_handle_standard_args(Flatbuffers DEFAULT_MSG Flatbuffers_INCLUDE_DIR Flatbuffers_LIB)

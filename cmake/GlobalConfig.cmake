@@ -1,5 +1,5 @@
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -255,14 +255,17 @@ endif()
 # Flatbuffers support for TF Lite, Armnn Serializer or the TOSA backend.
 if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER OR ARMNNTOSAREF)
     # verify we have a valid flatbuffers include path
-    find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
-              HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
+    find_path(FLATBUFFERS_INCLUDE_PATH
+              flatbuffers/flatbuffers.h
+              PATHS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include
+              NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
     message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
 
     find_library(FLATBUFFERS_LIBRARY
                  NAMES libflatbuffers.a flatbuffers
-                 HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib)
+                 PATHS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib
+                 NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
     message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
 endif()
@@ -271,7 +274,8 @@ endif()
 if(BUILD_TF_LITE_PARSER)
     find_path(TF_LITE_SCHEMA_INCLUDE_PATH
               schema_generated.h
-              HINTS ${TF_LITE_GENERATED_PATH})
+              PATHS ${TF_LITE_GENERATED_PATH}
+              NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
     message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
 

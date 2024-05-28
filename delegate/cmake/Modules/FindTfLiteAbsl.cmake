@@ -1,5 +1,5 @@
 #
-# Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2023, 2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -9,38 +9,39 @@ unset(TFLITEABSL_FOUND)
 find_path(TfLite_ABSL_SYNC_HEADERS
         NAMES
             absl
-        HINTS
-            ${TFLITE_LIB_ROOT}/abseil-cpp)
+        PATHS
+            ${TFLITE_LIB_ROOT}/abseil-cpp
+            NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
 # First look for the static version of tensorflow lite
-find_library(TfLite_LIB NAMES "libtensorflow-lite.a" HINTS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite)
+find_library(TfLite_LIB NAMES "libtensorflow-lite.a" PATHS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH )
 
 # If the static library was found, gather extra absl libraries for opaque delegate
 if (TfLite_LIB MATCHES .a$)
-    find_library(TfLite_abseil_base_LIB "libabsl_base.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base)
-    find_library(TfLite_abseil_log_severity_LIB "libabsl_log_severity.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base)
-    find_library(TfLite_abseil_spinlock_wait_LIB "libabsl_spinlock_wait.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base)
-    find_library(TfLite_abseil_malloc_internal_LIB "libabsl_malloc_internal.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base)
-    find_library(TfLite_abseil_raw_logging_internal_LIB "libabsl_raw_logging_internal.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base)
-    find_library(TfLite_abseil_stacktrace_LIB "libabsl_stacktrace.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging)
-    find_library(TfLite_abseil_debugging_internal_LIB "libabsl_debugging_internal.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging)
-    find_library(TfLite_abseil_symbolize_LIB "libabsl_symbolize.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging)
-    find_library(TfLite_abseil_demangle_internal_LIB "libabsl_demangle_internal.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging)
-    find_library(TfLite_abseil_time_LIB "libabsl_time.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/time)
-    find_library(TfLite_abseil_time_zone_LIB "libabsl_time_zone.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/time)
-    find_library(TfLite_abseil_int128_LIB "libabsl_int128.a" PATH
-                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/numeric)
+    find_library(TfLite_abseil_base_LIB "libabsl_base.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH )
+    find_library(TfLite_abseil_log_severity_LIB "libabsl_log_severity.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_spinlock_wait_LIB "libabsl_spinlock_wait.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_malloc_internal_LIB "libabsl_malloc_internal.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_raw_logging_internal_LIB "libabsl_raw_logging_internal.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_stacktrace_LIB "libabsl_stacktrace.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_debugging_internal_LIB "libabsl_debugging_internal.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_symbolize_LIB "libabsl_symbolize.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_demangle_internal_LIB "libabsl_demangle_internal.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/debugging NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_time_LIB "libabsl_time.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/time NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_time_zone_LIB "libabsl_time_zone.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/time NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_int128_LIB "libabsl_int128.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/numeric NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
     ## Set TFLITEABSL_FOUND
     find_package_handle_standard_args(TfLiteAbsl DEFAULT_MSG TfLite_ABSL_SYNC_HEADERS TfLite_abseil_base_LIB

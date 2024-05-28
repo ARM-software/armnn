@@ -108,6 +108,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         case LayerType::Reshape:
         case LayerType::Resize:
         case LayerType::Slice:
+        case LayerType::Softmax:
         case LayerType::Transpose:
         {
             inputInfos.push_back(&infos[0]);

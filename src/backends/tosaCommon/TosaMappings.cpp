@@ -183,6 +183,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto sliceDesc = PolymorphicDowncast<const SliceDescriptor*>(&descriptor);
             return ConvertSliceToTosaOperator(layer, inputs, outputs, sliceDesc);
         }
+        case LayerType::Softmax:
+        {
+            auto softmaxDesc = PolymorphicDowncast<const SoftmaxDescriptor*>(&descriptor);
+            return ConvertSoftmaxToTosaOperator(layer, inputs, outputs, softmaxDesc);
+        }
         case LayerType::Splitter:
         {
             auto splitDesc = PolymorphicDowncast<const SplitterDescriptor*>(&descriptor);

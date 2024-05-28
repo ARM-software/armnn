@@ -46,10 +46,13 @@ list(APPEND armnnTosaBackendOperators_sources
         ResizeOperator.cpp
         SliceOperator.hpp
         SliceOperator.cpp
+        SoftmaxOperator.hpp
+        SoftmaxOperator.cpp
         SplitOperator.hpp
         SplitOperator.cpp
         TosaOperatorUtils.hpp
         TosaRescaleOperatorUtils.hpp
+        TosaSoftmaxOperatorUtils.hpp
         TransposeConv2dOperator.hpp
         TransposeConv2dOperator.cpp
         TransposeOperator.hpp

@@ -23,6 +23,7 @@
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
+#include "backendsCommon/test/SoftmaxEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SplitterEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
@@ -832,6 +833,17 @@ TEST_CASE("TosaRefSliceEndtoEndTestInt32")
 TEST_CASE("TosaRefSliceEndtoEndTestFloat16")
 {
     SliceEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+// Softmax
+TEST_CASE("TosaRef3DSoftmaxQuantizedInt8")
+{
+    QSoftmax3DEndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRef1DSoftmaxQuantizedInt8")
+{
+    QSoftmax1DEndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
 }
 
 // Split

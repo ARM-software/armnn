@@ -6,6 +6,7 @@
 #include "AvgPool2DIgnoreValueChecker.hpp"
 #include "FullyConnectedChecker.hpp"
 #include "QuantizeChecker.hpp"
+#include "SoftmaxChecker.hpp"
 #include "SplitChecker.hpp"
 #include "CommonTestUtils.hpp"
 
@@ -215,6 +216,30 @@ TEST_CASE("GetTosaMappingFromLayer_QuantizeLayer")
 
     TosaSerializationBasicBlock* basicBlock = GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(quantize));
     VerifyQuantize(basicBlock, shape, ArmNNToDType(DataType::Float32), ArmNNToDType(outputDataType));
+}
+
+TEST_CASE("GetTosaMapping_SoftmaxLayer")
+{
+    armnn::TensorInfo inputInfo({ 1, 1, 1, 4 }, DataType::QSymmS8);
+    armnn::TensorInfo outputInfo({ 1, 1, 1, 4 }, DataType::QSymmS8);
+
+    std::vector<std::vector<int32_t>> inputShape = { { 1, 1, 1, 4 } };
+    std::vector<std::vector<int32_t>> outputShape = { { 1, 1, 1, 4 } };
+
+    inputInfo.SetQuantizationOffset(0);
+    inputInfo.SetQuantizationScale(1.0f);
+
+    armnn::SoftmaxDescriptor descriptor;
+    descriptor.m_Beta = 1.0f;
+    descriptor.m_Axis = 1;
+
+    TosaSerializationBasicBlock* basicBlock =
+            GetTosaMapping(nullptr, LayerType::Softmax, {&inputInfo}, {&outputInfo}, descriptor);
+
+    VerifySoftmax(basicBlock,
+                  inputShape,
+                  outputShape,
+                  descriptor);
 }
 
 TEST_CASE("GetTosaMapping_SplitLayer")

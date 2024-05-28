@@ -427,6 +427,7 @@ list(APPEND armnn_sources
     src/armnn/optimizations/SquashEqualSiblings.hpp
     src/armnn/optimizations/DeleteBroadcastTo.hpp
     third-party/cxxopts/cxxopts.hpp
+    third-party/gemmlowp/fixedpoint.h
     third-party/ghc/filesystem.hpp
     third-party/half/half.hpp
     third-party/mapbox/optional.hpp

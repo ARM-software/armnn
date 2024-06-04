@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
+#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
 #
 # For pinning to a revision use this:
-#DEFAULT_CLFRAMEWORKREVISION="c22e1263ba3a6945ceb1fdccb33eac512fd156fb" #11520: arm_gemm: fix SVE check on fast mode kernels.
+DEFAULT_CLFRAMEWORKREVISION="f1723a0f1fb04ab1dc34f3d36b32f73e8817822d" #11575: Fix OpenMP thread scheduling for large machines.
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

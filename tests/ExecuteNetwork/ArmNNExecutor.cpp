@@ -227,6 +227,9 @@ ArmNNExecutor::~ArmNNExecutor()
     {
         profiler->Print(std::cout);
     }
+
+    // We're finished with the network.
+    m_Runtime->UnloadNetwork(m_NetworkId);
 }
 
 void ArmNNExecutor::ExecuteAsync()

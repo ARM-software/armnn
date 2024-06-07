@@ -385,6 +385,9 @@ ArmnnSubgraph::~ArmnnSubgraph()
     {
         profiler->Print(std::cout);
     }
+
+    // We're finished with the network.
+    m_Runtime->UnloadNetwork(m_NetworkId);
 }
 
 TfLiteStatus ArmnnSubgraph::AddInputLayer(DelegateData& delegateData,

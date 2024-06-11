@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="f1723a0f1fb04ab1dc34f3d36b32f73e8817822d" #11575: Fix OpenMP thread scheduling for large machines.
+DEFAULT_CLFRAMEWORKREVISION="d7230761a65ff4d559eb28945b0d4e3dfb46926f" #11677: Enable FP16 in multi_isa+v8a.
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

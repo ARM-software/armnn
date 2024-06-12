@@ -9,7 +9,9 @@
 
 #include <tensorflow/lite/core/c/c_api.h>
 #include "TfliteExecutor.hpp"
-#include "tensorflow/lite/kernels/kernel_util.h"
+#include <tensorflow/lite/kernels/kernel_util.h>
+
+#include <../delegate/common/src/DelegateUtils.hpp>
 
 #include <chrono>
 #include <string>
@@ -256,29 +258,44 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     }
                     else
                     {
-                        ARMNN_LOG(info) << "Writing output " << outputIndex << "' of iteration: " << x + 1
+                        ARMNN_LOG(info) << "Writing output " << outputIndex << " of iteration: " << x + 1
                                         << " to file: '" << m_Params.m_OutputTensorFiles[outputIndex] << "'";
                     }
                 }
+
                 long outputSize = 1;
                 for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
                 {
                     outputSize *= outputDims->data[dim];
                 }
 
+                bool isNumpyOutput = m_Params.m_OutputTensorFiles[outputIndex].find(".npy") != std::string::npos;
+                armnn::TensorShape shape(static_cast<unsigned int>(outputDims->size), outputDims->data);
+                armnn::DataType dataType(GetDataType(*m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)));
+
                 std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
                 switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
                 {
-
                     case kTfLiteFloat32:
                     {
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(
                                 tfLiteDelegateOutputId);
                         results.push_back(tfLiteDelegateOutputData);
 
-                        for (int i = 0; i < outputSize; ++i)
+                        if (isNumpyOutput)
                         {
-                            fprintf(outputTensorFile, "%f ", tfLiteDelegateOutputData[i]);
+                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                         tfLiteDelegateOutputData,
+                                                         outputSize,
+                                                         dataType,
+                                                         shape);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < outputSize; ++i)
+                            {
+                                fprintf(outputTensorFile, "%f ", tfLiteDelegateOutputData[i]);
+                            }
                         }
                         break;
                     }
@@ -287,10 +304,23 @@ std::vector<const void *> TfLiteExecutor::Execute()
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(
                                 tfLiteDelegateOutputId);
                         results.push_back(tfLiteDelegateOutputData);
-                        for (int i = 0; i < outputSize; ++i)
+
+                        if (isNumpyOutput)
                         {
-                            fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                         tfLiteDelegateOutputData,
+                                                         outputSize,
+                                                         dataType,
+                                                         shape);
                         }
+                        else
+                        {
+                            for (int i = 0; i < outputSize; ++i)
+                            {
+                                fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                            }
+                        }
+
                         break;
                     }
                     case kTfLiteUInt8:
@@ -298,10 +328,23 @@ std::vector<const void *> TfLiteExecutor::Execute()
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(
                                 tfLiteDelegateOutputId);
                         results.push_back(tfLiteDelegateOutputData);
-                        for (int i = 0; i < outputSize; ++i)
+
+                        if (isNumpyOutput)
                         {
-                            fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                         tfLiteDelegateOutputData,
+                                                         outputSize,
+                                                         dataType,
+                                                         shape);
                         }
+                        else
+                        {
+                            for (int i = 0; i < outputSize; ++i)
+                            {
+                                fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+                            }
+                        }
+
                         break;
                     }
                     case kTfLiteInt8:
@@ -309,10 +352,23 @@ std::vector<const void *> TfLiteExecutor::Execute()
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(
                                 tfLiteDelegateOutputId);
                         results.push_back(tfLiteDelegateOutputData);
-                        for (int i = 0; i < outputSize; ++i)
+
+                        if (isNumpyOutput)
                         {
-                            fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                         tfLiteDelegateOutputData,
+                                                         outputSize,
+                                                         dataType,
+                                                         shape);
                         }
+                        else
+                        {
+                            for (int i = 0; i < outputSize; ++i)
+                            {
+                                fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                            }
+                        }
+
                         break;
                     }
                     case kTfLiteBool:
@@ -320,8 +376,21 @@ std::vector<const void *> TfLiteExecutor::Execute()
                         auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<bool>(
                                 tfLiteDelegateOutputId);
                         results.push_back(tfLiteDelegateOutputData);
-                        for (int i = 0; i < outputSize; ++i) {
-                            fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+
+                        if (isNumpyOutput)
+                        {
+                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                         tfLiteDelegateOutputData,
+                                                         outputSize,
+                                                         dataType,
+                                                         shape);
+                        }
+                        else
+                        {
+                            for (int i = 0; i < outputSize; ++i)
+                            {
+                                fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+                            }
                         }
                         break;
                     }

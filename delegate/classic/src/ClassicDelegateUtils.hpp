@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -357,50 +357,6 @@ armnn::IConnectableLayer* AddReshapeLayer(TfLiteContext* tfLiteContext,
                 tfLiteNode->outputs->data[outputIndex])] = &outputSlot;
     }
     return reshapeLayer;
-}
-
-armnn::DataType GetDataType(const TfLiteTensor& tfLiteTensor)
-{
-    switch (tfLiteTensor.type)
-    {
-        case kTfLiteBool:
-            return armnn::DataType::Boolean;
-        case kTfLiteFloat32:
-            return armnn::DataType::Float32;
-        case kTfLiteFloat16:
-            return armnn::DataType::Float16;
-        case kTfLiteUInt8:
-            return armnn::DataType::QAsymmU8;
-        case kTfLiteInt8:
-        {
-            auto quantizationInfo = tfLiteTensor.quantization;
-            if (quantizationInfo.type == kTfLiteAffineQuantization)
-            {
-                auto* quantization =
-                    reinterpret_cast<TfLiteAffineQuantization*>(tfLiteTensor.quantization.params);
-                if (quantization->zero_point != nullptr && quantization->zero_point->size == 1)
-                {
-                    return armnn::DataType::QAsymmS8;
-                }
-                else
-                {
-                    return armnn::DataType::QSymmS8;
-                }
-            }
-            else
-            {
-                return armnn::DataType::QAsymmS8;
-            }
-        }
-        case kTfLiteInt16:
-            return armnn::DataType::QSymmS16;
-        case kTfLiteInt32:
-            return armnn::DataType::Signed32;
-        case kTfLiteInt64:
-            return armnn::DataType::Signed64;
-        default:
-            throw armnn::Exception(&"TfLiteArmnnDelegate: Unsupported data type: " [ tfLiteTensor.type]);
-    }
 }
 
 armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor, bool isOutput = false)

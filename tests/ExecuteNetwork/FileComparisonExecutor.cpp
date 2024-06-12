@@ -1,13 +1,17 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "FileComparisonExecutor.hpp"
 #include <NetworkExecutionUtils/NetworkExecutionUtils.hpp>
+#include <armnn/Numpy.hpp>
 #include <algorithm>
 #include <ghc/filesystem.hpp>
 #include <iterator>
+
+// File limit size of 1Mb
+constexpr uint32_t MAX_FILE_SIZE = 1048576;
 
 using namespace armnn;
 
@@ -173,11 +177,10 @@ Tensor ReadTensorFromFile(const std::string fileName)
     {
         throw FileNotFoundException("The file \"" + fileName + "\" could not be found.");
     }
-    // The format we are reading in is based on NetworkExecutionUtils::WriteToFile. This could potentially
-    // be an enormous tensor. We'll limit what we can read in to 1Mb.
-    std::uintmax_t maxFileSize = 1048576;
-    std::uintmax_t fileSize    = ghc::filesystem::file_size(fileName);
-    if (fileSize > maxFileSize)
+    // The format we are reading in is based on NetworkExecutionUtils::WriteToFile.
+    // This could potentially be an enormous tensor.
+    std::uintmax_t fileSize = ghc::filesystem::file_size(fileName);
+    if (fileSize > MAX_FILE_SIZE)
     {
         throw InvalidArgumentException("The file \"" + fileName + "\" exceeds max size of 1 Mb.");
     }
@@ -245,6 +248,75 @@ Tensor ReadTensorFromFile(const std::string fileName)
     return result;
 }
 
+/**
+ * Open the given file and read the data out of it to construct a Tensor. This could throw FileNotFoundException
+ * or InvalidArgumentException
+ *
+ * @param fileName the file to be read.
+ * @return a populated tensor.
+ */
+Tensor ReadTensorFromNumpyFile(const std::string fileName)
+{
+    if (!ghc::filesystem::exists(fileName))
+    {
+        throw FileNotFoundException("The file \"" + fileName + "\" could not be found.");
+    }
+    // The format we are reading in is based on NetworkExecutionUtils::WriteToFile. This could potentially
+    // be an enormous tensor. We'll limit what we can read in to 1Mb.
+    std::uintmax_t fileSize = ghc::filesystem::file_size(fileName);
+    if (fileSize > MAX_FILE_SIZE)
+    {
+        throw InvalidArgumentException("The file \"" + fileName + "\" exceeds max size of 1 Mb.");
+    }
+
+    std::ifstream ifStream(fileName, std::ios::binary);
+    armnnNumpy::HeaderInfo headerInfo;
+    armnnNumpy::Header header;
+
+    CreateHeaderInfo(ifStream, headerInfo);
+    CreateHeader(ifStream, headerInfo, header);
+    uint32_t numElements = armnnNumpy::getNumElements(header);
+
+    switch (armnnNumpy::getArmNNDataType(header.m_DescrString))
+    {
+        case DataType::Float32: {
+            float* floats = new float[numElements];
+            armnnNumpy::ReadData<float>(ifStream, floats, numElements);
+            TensorInfo info({ numElements, 1, 1, 1 }, DataType::Float32);
+            return Tensor(info, floats);
+        }
+        case DataType::Signed32: {
+            int* ints = new int[numElements];
+            armnnNumpy::ReadData<int>(ifStream, ints, numElements);
+            TensorInfo info({ numElements, 1, 1, 1 }, DataType::Signed32);
+            return Tensor(info, ints);
+        }
+        case DataType::QSymmS8: {
+            int8_t* ints = new int8_t[numElements];
+            armnnNumpy::ReadData<int8_t>(ifStream, ints, numElements);
+            TensorInfo info({ numElements, 1, 1, 1 }, DataType::QSymmS8);
+            return Tensor(info, ints);
+        }
+        case DataType::QAsymmS8: {
+            int8_t* ints = new int8_t[numElements];
+            armnnNumpy::ReadData<int8_t>(ifStream, ints, numElements);
+            TensorInfo info({ numElements, 1, 1, 1 }, DataType::QAsymmS8);
+            return Tensor(info, ints);
+        }
+        case DataType::QAsymmU8: {
+            uint8_t* ints = new uint8_t[numElements];
+            armnnNumpy::ReadData<uint8_t>(ifStream, ints, numElements);
+            TensorInfo info({ numElements, 1, 1, 1 }, DataType::QAsymmU8);
+            return Tensor(info, ints);
+        }
+        default:
+            throw InvalidArgumentException("The tensor data could not be read from \"" + fileName + "\"");
+    }
+
+    Tensor result;
+    return result;
+}
+
 FileComparisonExecutor::FileComparisonExecutor(const ExecuteNetworkParams& params)
     : m_Params(params)
 {}
@@ -284,7 +356,16 @@ std::vector<const void*> FileComparisonExecutor::Execute()
     std::vector<const void*> results;
     for (auto file : fileNames)
     {
-        Tensor t = ReadTensorFromFile(file);
+        Tensor t;
+        if (file.find(".npy") == std::string::npos)
+        {
+            t = ReadTensorFromFile(file);
+        }
+        else
+        {
+            t = ReadTensorFromNumpyFile(file);
+        }
+
         outputs.push_back({ 0, Tensor(t.GetInfo(), t.GetMemoryArea()) });
         results.push_back(t.GetMemoryArea());
     }

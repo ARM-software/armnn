@@ -1,5 +1,5 @@
 //
-// Copyright © 2022, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,6 +13,7 @@
 #include <armnn/Optional.hpp>             // for Optional, EmptyOptional
 #include <armnn/Tensor.hpp>               // for Tensor, TensorInfo
 #include <armnn/TypesUtils.hpp>           // for Dequantize
+#include <armnn/Numpy.hpp>                // for Numpy
 #include <chrono>                         // for duration
 #include <functional>                     // for function
 #include <fstream>
@@ -132,51 +133,75 @@ void PopulateTensorWithData(T* tensor,
 {
     const bool readFromFile = dataFile.has_value() && !dataFile.value().empty();
 
-    std::ifstream inputTensorFile;
     if (!readFromFile)
     {
         std::fill(tensor, tensor + numElements, 0);
         return;
     }
-    else
-    {
-        inputTensorFile = std::ifstream(dataFile.value());
-    }
 
-    auto parseElementFunc = GetParseElementFunc<T>();
-    std::string line;
-    unsigned int index = 0;
-    while (std::getline(inputTensorFile, line))
+    if (dataFile.value().find(".npy") == std::string::npos)
     {
-        std::vector<std::string> tokens = armnn::stringUtils::StringTokenizer(line, "\t ,:");
-        for (const std::string& token : tokens)
+        std::ifstream inputTensorFile;
+        inputTensorFile = std::ifstream(dataFile.value());
+
+        auto parseElementFunc = GetParseElementFunc<T>();
+        std::string line;
+        unsigned int index = 0;
+        while (std::getline(inputTensorFile, line))
         {
-            if (!token.empty()) // See https://stackoverflow.com/questions/10437406/
+            std::vector<std::string> tokens = armnn::stringUtils::StringTokenizer(line, "\t ,:");
+            for (const std::string &token: tokens)
             {
-                try
+                if (!token.empty()) // See https://stackoverflow.com/questions/10437406/
                 {
-                    if (index == numElements)
+                    try
                     {
-                        ARMNN_LOG(error) << "Number of elements: " << (index +1) << " in file \"" << dataFile.value()
-                                         << "\" does not match number of elements: " << numElements
-                                         << " for input \"" << inputName << "\".";
+                        if (index == numElements)
+                        {
+                            ARMNN_LOG(error) << "Number of elements: " << (index + 1) << " in file \""
+                                             << dataFile.value()
+                                             << "\" does not match number of elements: " << numElements
+                                             << " for input \"" << inputName << "\".";
+                        }
+                        *(tensor + index) = parseElementFunc(token);
+                        index++;
                     }
-                    *(tensor + index) = parseElementFunc(token);
-                    index++;
-                }
-                catch (const std::exception&)
-                {
-                    ARMNN_LOG(error) << "'" << token << "' is not a valid number. It has been ignored.";
+                    catch (const std::exception &)
+                    {
+                        ARMNN_LOG(error) << "'" << token << "' is not a valid number. It has been ignored.";
+                    }
                 }
             }
         }
-    }
 
-    if (index != numElements)
+        if (index != numElements)
+        {
+            ARMNN_LOG(error) << "Number of elements: " << (index + 1) << " in file \"" << inputName
+                             << "\" does not match number of elements: " << numElements
+                             << " for input \"" << inputName << "\".";
+        }
+    }
+    else
     {
-        ARMNN_LOG(error) << "Number of elements: " << (index +1) << " in file \"" << inputName
-                         << "\" does not match number of elements: " << numElements
-                         << " for input \"" << inputName << "\".";
+        std::ifstream ifStream(dataFile.value(), std::ifstream::binary);
+
+        armnnNumpy::HeaderInfo headerInfo;
+        armnnNumpy::Header header;
+
+        CreateHeaderInfo(ifStream, headerInfo);
+        CreateHeader(ifStream, headerInfo, header);
+
+        if (!armnnNumpy::compareCTypes<T>(header.m_DescrString))
+        {
+            ARMNN_LOG(error) << "Data type in numpy file " << inputName << " does not match expected data type.";
+        }
+        else if(numElements != armnnNumpy::getNumElements(header))
+        {
+            ARMNN_LOG(error) << "Number of elements in numpy " << inputName
+                             << " does not match expected number of elements.";
+        }
+
+        armnnNumpy::ReadData<T>(ifStream, tensor, numElements);
     }
 }
 
@@ -220,11 +245,22 @@ void PrintTensor(OutputWriteInfo& info, const char* formatString)
 
     if (info.m_OutputTensorFile.has_value())
     {
-        WriteToFile(info.m_OutputTensorFile.value(),
-                    info.m_OutputName,
-                    array,
-                    info.m_Tensor.GetNumElements(),
-                    info.m_DataType);
+        if (info.m_OutputTensorFile.value().find(".npy") == std::string::npos)
+        {
+            WriteToFile(info.m_OutputTensorFile.value(),
+                        info.m_OutputName,
+                        array,
+                        info.m_Tensor.GetNumElements(),
+                        info.m_DataType);
+        }
+        else
+        {
+            armnnNumpy::WriteToNumpyFile(info.m_OutputTensorFile.value(),
+                                         array,
+                                         info.m_Tensor.GetNumElements(),
+                                         info.m_DataType,
+                                         info.m_Tensor.GetInfo().GetShape());
+        }
     }
 
     if (info.m_PrintTensor)
@@ -233,34 +269,6 @@ void PrintTensor(OutputWriteInfo& info, const char* formatString)
         {
             printf(formatString, array[i]);
         }
-    }
-}
-
-template <typename T>
-void PrintQuantizedTensor(OutputWriteInfo& info)
-{
-    std::vector<float> dequantizedValues;
-    auto tensor = info.m_Tensor;
-    dequantizedValues = DequantizeArray<T>(tensor.GetMemoryArea(),
-                                           tensor.GetNumElements(),
-                                           tensor.GetInfo().GetQuantizationScale(),
-                                           tensor.GetInfo().GetQuantizationOffset());
-
-    if (info.m_OutputTensorFile.has_value())
-    {
-        WriteToFile(info.m_OutputTensorFile.value(),
-                    info.m_OutputName,
-                    dequantizedValues.data(),
-                    tensor.GetNumElements(),
-                    info.m_DataType);
-    }
-
-    if (info.m_PrintTensor)
-    {
-        std::for_each(dequantizedValues.begin(), dequantizedValues.end(), [&](float value)
-        {
-            printf("%f ", value);
-        });
     }
 }
 

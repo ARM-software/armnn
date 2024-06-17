@@ -109,7 +109,7 @@ void ExecuteNetworkParams::ValidateParams()
     }
 }
 
-#if defined(ARMNN_TFLITE_DELEGATE)
+#if defined(ARMNN_TFLITE_DELEGATE)||defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
 /**
  * A utility method that populates a DelegateOptions object from this ExecuteNetworkParams.
  *

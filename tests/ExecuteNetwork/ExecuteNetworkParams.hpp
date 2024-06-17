@@ -8,7 +8,7 @@
 #include <armnn/BackendId.hpp>
 #include <armnn/Tensor.hpp>
 
-#if defined(ARMNN_TFLITE_DELEGATE)
+#if defined(ARMNN_TFLITE_DELEGATE)||defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
 #include <DelegateOptions.hpp>
 #endif
 
@@ -71,7 +71,7 @@ struct ExecuteNetworkParams
     // Ensures that the parameters for ExecuteNetwork fit together
     void ValidateParams();
 
-#if defined(ARMNN_TFLITE_DELEGATE)
+#if defined(ARMNN_TFLITE_DELEGATE)||defined(ARMNN_TFLITE_OPAQUE_DELEGATE)
     /// A utility method that populates a DelegateOptions object from this ExecuteNetworkParams.
     armnnDelegate::DelegateOptions ToDelegateOptions() const;
 #endif

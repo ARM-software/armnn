@@ -248,8 +248,10 @@ std::vector<const void *> TfLiteExecutor::Execute()
                 TfLiteIntArray* outputDims = m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
                 // If we've been asked to write to a file then set a file output stream. Otherwise use stdout.
                 FILE* outputTensorFile = stdout;
+                bool isNumpyOutput = false;
                 if (!m_Params.m_OutputTensorFiles.empty())
                 {
+                    isNumpyOutput = m_Params.m_OutputTensorFiles[outputIndex].find(".npy") != std::string::npos;
                     outputTensorFile = fopen(m_Params.m_OutputTensorFiles[outputIndex].c_str(), "w");
                     if (outputTensorFile == NULL)
                     {
@@ -269,7 +271,6 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     outputSize *= outputDims->data[dim];
                 }
 
-                bool isNumpyOutput = m_Params.m_OutputTensorFiles[outputIndex].find(".npy") != std::string::npos;
                 armnn::TensorShape shape(static_cast<unsigned int>(outputDims->size), outputDims->data);
                 armnn::DataType dataType(GetDataType(*m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)));
 

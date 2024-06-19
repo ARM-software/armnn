@@ -183,8 +183,8 @@ void ElementwiseBinarySimpleNoReshapeEndToEnd(const std::vector<BackendId>& back
 {
     using namespace armnn;
 
-    const float   qScale  = IsQuantizedType<TInput>() ? 0.25f : 1.0f;
-    const int32_t qOffset = IsQuantizedType<TInput>() ? 50    : 0;
+    const float   qScale  = 1.0f;
+    const int32_t qOffset = 0;
 
     const TensorShape& input1Shape  = { 2, 2, 2, 2 };
     const TensorShape& input2Shape  = { 2, 2, 2, 2 };

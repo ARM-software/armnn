@@ -129,11 +129,57 @@ TEST_CASE("TosaRefConv2dWithoutBiasEndtoEndTestInt8")
                           armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
 }
 
+// Elementwise Binary
+//Add
+TEST_CASE("TosaRefAddEndtoEndTestInt32")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
+                                                                 armnn::BinaryOperation::Add);
+}
+
+TEST_CASE("TosaRefAddEndtoEndTestInt8")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
+                                                                armnn::BinaryOperation::Add);
+}
+
 // Maximum
-TEST_CASE("TosaRefMaximumEndtoEndTestInt8")
+TEST_CASE("TosaRefMaximumEndtoEndTestInt32")
 {
     ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
                                                                  armnn::BinaryOperation::Maximum);
+}
+
+TEST_CASE("TosaRefMaximumEndtoEndTestInt8")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
+                                                                 armnn::BinaryOperation::Maximum);
+}
+
+//Mul
+TEST_CASE("TosaRefMulEndtoEndTestInt32")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
+                                                                 armnn::BinaryOperation::Mul);
+}
+
+TEST_CASE("TosaRefMulEndtoEndTestInt8")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
+                                                                armnn::BinaryOperation::Mul);
+}
+
+//Sub
+TEST_CASE("TosaRefMulEndtoEndTestInt32")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
+                                                                 armnn::BinaryOperation::Sub);
+}
+
+TEST_CASE("TosaRefSubEndtoEndTestInt8")
+{
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
+                                                                armnn::BinaryOperation::Sub);
 }
 
 // Pooling

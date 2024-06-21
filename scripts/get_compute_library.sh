@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="cbc27ff3ebd93f9939a6c2248626b87898545069" # Fix out-of-bound memory write
+DEFAULT_CLFRAMEWORKREVISION="4d5838ced3edbff2175a9b3e6cae33023c6249e8" #Separate data type for accumulator in DConv3D test
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

@@ -52,6 +52,8 @@ list(APPEND armnnTosaBackendOperators_sources
         SliceOperator.cpp
         SoftmaxOperator.hpp
         SoftmaxOperator.cpp
+        StridedSliceOperator.hpp
+        StridedSliceOperator.cpp
         SplitOperator.hpp
         SplitOperator.cpp
         TanhOperator.hpp

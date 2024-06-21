@@ -10,4 +10,3 @@
 #include <tosaReference/TosaRefWorkloadFactory.hpp>
 
 #include <UnitTests.hpp>
-

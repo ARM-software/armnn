@@ -44,6 +44,7 @@
 #include <backendsCommon/test/SoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/StridedSliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
 #include <backendsCommon/test/TileEndToEndTestImpl.hpp>
@@ -2488,6 +2489,17 @@ TEST_CASE("RefSliceEndtoEndTestFloat16")
     SliceEndToEndFloat16<DataType::Float16>(defaultBackends);
 }
 
+// StridedSlice
+TEST_CASE("RefStridedSlice4DEndToEndTest")
+{
+    StridedSlice4DEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStridedSlice3DMaskedEndToEndTest")
+{
+    StridedSlice3DMaskedEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
 TEST_CASE("RefStridedSliceInvalidSliceEndToEndTest")
 {
     StridedSliceInvalidSliceEndToEndTest(defaultBackends);
@@ -2495,7 +2507,7 @@ TEST_CASE("RefStridedSliceInvalidSliceEndToEndTest")
 
 TEST_CASE("RefThreadSafeFP32StridedSlicedEndToEndTest")
 {
-    armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends, 1);
+    StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends, 1);
 }
 
 TEST_CASE("RefAsyncFP32StridedSlicedMultiThreadedEndToEndTest")
@@ -2636,4 +2648,5 @@ TEST_CASE("RefBroadcastToEndToEndWithSubtractionFloat32")
     BroadcastToEndToEndElementWiseBinary<armnn::DataType::Float32>(defaultBackends,
                                                                    BinaryOperation::Sub);
 }
+
 }

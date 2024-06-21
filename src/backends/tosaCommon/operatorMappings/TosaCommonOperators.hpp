@@ -27,6 +27,7 @@
 #include "SigmoidOperator.hpp"
 #include "SliceOperator.hpp"
 #include "SoftmaxOperator.hpp"
+#include "StridedSliceOperator.hpp"
 #include "SplitOperator.hpp"
 #include "TanhOperator.hpp"
 #include "TransposeConv2dOperator.hpp"

@@ -29,6 +29,7 @@
 #include <backendsCommon/test/SliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/StridedSliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
 #include <backendsCommon/test/TileEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>

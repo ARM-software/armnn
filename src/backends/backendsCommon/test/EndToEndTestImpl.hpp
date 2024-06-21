@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -178,7 +178,7 @@ void EndToEndLayerTestImpl(INetworkPtr network,
         for (unsigned int i = 0; i < out.size(); ++i)
         {
             CHECK_MESSAGE(Compare<ArmnnOType>(it.second[i], out[i], tolerance) == true,
-                    "Actual output: " << out[i] << ". Expected output:" << it.second[i]);
+                "Actual output: " << out[i] << ". Expected output:" << it.second[i]);
 
         }
     }
@@ -792,42 +792,6 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
                                   expectedOutput.begin(), expectedOutput.end()));
     CHECK(std::equal(outputData1.begin(), outputData1.end(),
                                   expectedOutput.begin(), expectedOutput.end()));
-}
-
-inline void StridedSliceInvalidSliceEndToEndTest(std::vector<BackendId> backends)
-{
-    using namespace armnn;
-
-    // Create runtime in which test will run
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(armnn::IRuntime::Create(options));
-
-    // build up the structure of the network
-    INetworkPtr net(INetwork::Create());
-
-    IConnectableLayer* input = net->AddInputLayer(0);
-
-    // Configure a strided slice with a stride the same size as the input but with a ShrinkAxisMask on the first
-    // dim of the output to make it too small to hold the specified slice.
-    StridedSliceDescriptor descriptor;
-    descriptor.m_Begin          = {0, 0};
-    descriptor.m_End            = {2, 3};
-    descriptor.m_Stride         = {1, 1};
-    descriptor.m_BeginMask      = 0;
-    descriptor.m_EndMask        = 0;
-    descriptor.m_ShrinkAxisMask = 1;
-    IConnectableLayer* stridedSlice = net->AddStridedSliceLayer(descriptor);
-
-    IConnectableLayer* output0 = net->AddOutputLayer(0);
-
-    input->GetOutputSlot(0).Connect(stridedSlice->GetInputSlot(0));
-    stridedSlice->GetOutputSlot(0).Connect(output0->GetInputSlot(0));
-
-    input->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 2, 3 }, DataType::Float32, 0.0f, 0, true));
-    stridedSlice->GetOutputSlot(0).SetTensorInfo(TensorInfo({ 3 }, DataType::Float32));
-
-    // Attempt to optimize the network and check that the correct exception is thrown
-    CHECK_THROWS_AS(Optimize(*net, backends, runtime->GetDeviceSpec()), armnn::LayerValidationException);
 }
 
 inline void ForceImportWithAlignedBuffersEndToEndTest(std::vector<BackendId> backends)

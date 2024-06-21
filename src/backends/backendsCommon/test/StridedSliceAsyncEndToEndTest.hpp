@@ -283,6 +283,7 @@ template<armnn::DataType ArmnnType>
 void StridedSlicedEndToEndTest(const std::vector<BackendId>& backends, size_t numThreads)
 {
     using namespace armnn;
+
     using T = ResolveType<ArmnnType>;
 
     const TensorShape& inputShape = {3, 2, 3, 1};

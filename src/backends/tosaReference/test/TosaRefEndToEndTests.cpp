@@ -25,6 +25,7 @@
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SoftmaxEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SplitterEndToEndTestImpl.hpp"
+#include "backendsCommon/test/StridedSliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeEndToEndTestImpl.hpp"
@@ -900,6 +901,22 @@ TEST_CASE("TosaRef3DSoftmaxQuantizedInt8")
 TEST_CASE("TosaRef1DSoftmaxQuantizedInt8")
 {
     QSoftmax1DEndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+// StridedSlice
+TEST_CASE("TosaRefStridedSliceInvalidSliceEndToEndTest")
+{
+    StridedSliceInvalidSliceEndToEndTest(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStridedSlice4DEndToEndTest")
+{
+    StridedSlice4DEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStridedSlice3DMaskedEndToEndTest")
+{
+    StridedSlice3DMaskedEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
 }
 
 // Split

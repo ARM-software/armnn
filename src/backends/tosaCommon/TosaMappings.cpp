@@ -58,12 +58,29 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         }
         case LayerType::Constant:
         {
-            return ConvertConstantToTosaOperator(layer, outputs);
+            bool isDepthwiseConv2dWeights = false;
+            if(layer)
+            {
+                // The difference in layout of weights in Tensorflow/ArmNN and the layout
+                // described in TOSA means we must permute the weights from [1, H, W, C * M] to [H, W, C, M].
+                unsigned int slotIdx = layer->GetOutputSlot().GetConnection(0)->GetSlotIndex();
+                LayerType type = layer->GetOutputSlot().GetConnection(0)->GetOwningLayer().GetType();
+                if(type == LayerType::DepthwiseConvolution2d && slotIdx == 1)
+                {
+                    isDepthwiseConv2dWeights = true;
+                }
+            }
+            return ConvertConstantToTosaOperator(layer, outputs, isDepthwiseConv2dWeights);
         }
         case LayerType::Convolution2d:
         {
             auto conv2dDesc = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor);
             return ConvertConv2dToTosaOperator(layer, inputs, outputs, conv2dDesc);
+        }
+        case LayerType::DepthwiseConvolution2d:
+        {
+            auto conv2dDesc = PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&descriptor);
+            return ConvertDepthwiseConv2dToTosaOperator(layer, inputs, outputs, conv2dDesc);
         }
         case LayerType::Pooling2d:
         {

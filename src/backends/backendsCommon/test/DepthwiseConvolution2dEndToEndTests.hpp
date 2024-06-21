@@ -45,7 +45,7 @@ armnn::INetworkPtr CreateDepthwiseConvolution2dNetwork(const armnn::DepthwiseCon
 
 } // anonymous namespace
 
-template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType>
+template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType = ArmnnType>
 void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
                                     armnn::DataLayout dataLayout)
 {
@@ -168,6 +168,7 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     {
         PermuteTensorNhwcToNchw(inputInfo, inputData);
         PermuteTensorNhwcToNchw(outputInfo, expectedOutputData);
+        PermuteTensorNhwcToNchw(weightsInfo, weightsData);
     }
 
     // Quantize data

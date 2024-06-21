@@ -9,6 +9,7 @@
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
+#include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
@@ -127,6 +128,13 @@ TEST_CASE("TosaRefConv2dWithoutBiasEndtoEndTestInt8")
     Convolution2dEndToEnd<armnn::DataType::QSymmS8,
                           armnn::DataType::QSymmS8,
                           armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
+}
+
+// DepthwiseConv2d
+TEST_CASE("TosaRefDepthwiseConv2dEndtoEndTestInt8")
+{
+    DepthwiseConvolution2dEndToEnd<armnn::DataType::QSymmS8,
+                                   armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
 }
 
 // Elementwise Binary

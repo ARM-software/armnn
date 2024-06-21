@@ -208,8 +208,9 @@ inline void CreateRescaleTosaOperatorPerChannel(const std::string& inputName,
         op_tensor_shifts.push_back(shift);
     }
 
+    bool per_channel = weight_scales.size() == 1 ? false : true;
     CreateRescaleTosaOperator(inputName, outputName, op_tensor_multipliers, op_tensor_shifts,
-                              input_zp, output_zp, double_round, scale32, true, op);
+                              input_zp, output_zp, double_round, scale32, per_channel, op);
 }
 
 inline void CreateFromInt32RescaleTosaOperator(const std::string& inputName,

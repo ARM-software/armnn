@@ -14,6 +14,8 @@ list(APPEND armnnTosaBackendOperators_sources
         ConstantOperator.cpp
         Conv2dOperator.hpp
         Conv2dOperator.cpp
+        DepthwiseConv2dOperator.hpp
+        DepthwiseConv2dOperator.cpp
         ElementwiseBinaryOperator.hpp
         ElementwiseBinaryOperator.cpp
         ElementwiseUnaryOperator.cpp

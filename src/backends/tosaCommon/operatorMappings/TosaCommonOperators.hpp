@@ -10,6 +10,7 @@
 #include "ConcatOperator.hpp"
 #include "ConstantOperator.hpp"
 #include "Conv2dOperator.hpp"
+#include "DepthwiseConv2dOperator.hpp"
 #include "ElementwiseBinaryOperator.hpp"
 #include "ElementwiseUnaryOperator.hpp"
 #include "Pooling2DOperator.hpp"

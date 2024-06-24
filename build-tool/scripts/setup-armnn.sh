@@ -113,6 +113,7 @@ build_protobuf()
             -DCMAKE_SYSTEM_VERSION="$ANDROID_API_VERSION" \
             -DCMAKE_ANDROID_ARCH_ABI="$ANDROID_ARM_ARCH" \
             -DCMAKE_CXX_FLAGS=--std=c++14 \
+            -DCMAKE_CXX_STANDARD_LIBRARIES=" -llog" \
             -Dprotobuf_BUILD_TESTS=OFF \
             -Dprotobuf_BUILD_SHARED_LIBS=ON \
             -Dprotobuf_WITH_ZLIB=OFF \

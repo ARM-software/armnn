@@ -90,7 +90,7 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
         tensors.push_back(zeroPointTensor);
 
         // const_scale
-        TosaSerializationOperator *scaleOp = nullptr;
+        TosaSerializationOperator* scaleOp = nullptr;
         TosaSerializationTensor* scaleTensor = nullptr;
         CreateConstTosaOperator<float>(outputNameScale,
                                        scale,
@@ -138,9 +138,9 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
     }
     else
     {
-        double scale_alpha      = inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
-        int32_t input_zp        = inputs[0]->GetQuantizationOffset();
-        int32_t output_zp       = outputs[0]->GetQuantizationOffset();
+        double scale_alpha = inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
+        int32_t input_zp   = inputs[0]->GetQuantizationOffset();
+        int32_t output_zp  = outputs[0]->GetQuantizationOffset();
 
         TosaSerializationOperator* rescaleOp = nullptr;
         CreateRescaleTosaOperator(inputName,

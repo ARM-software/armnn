@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -159,6 +159,128 @@ armnn::INetworkPtr CreateFullyConnectedNetworkNoConnectedBiasExplicit(const armn
     Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
 
     return network;
+}
+
+armnn::INetworkPtr CreateFullyConnectedNetworkConstantWeightsAndBias(const armnn::TensorInfo& inputTensorInfo,
+                                                                     const armnn::TensorInfo& outputTensorInfo,
+                                                                     const armnn::TensorInfo& weightsTensorInfo,
+                                                                     const armnn::ConstTensor& weightsConstantTensor,
+                                                                     const armnn::TensorInfo& biasTensorInfo,
+                                                                     const armnn::ConstTensor& biasConstantTensor,
+                                                                     armnn::FullyConnectedDescriptor descriptor)
+{
+    armnn::INetworkPtr network(armnn::INetwork::Create());
+
+    armnn::IConnectableLayer* inputLayer  = network->AddInputLayer(0, "Input");
+    armnn::IConnectableLayer* weightsLayer  = network->AddConstantLayer(weightsConstantTensor, "Weights");
+    armnn::IConnectableLayer* fullyConnectedLayer = network->AddFullyConnectedLayer(descriptor, "Fully_Connected");
+    armnn::IConnectableLayer* outputLayer = network->AddOutputLayer(0, "Output");
+
+    Connect(inputLayer, fullyConnectedLayer, inputTensorInfo, 0, 0);
+    Connect(weightsLayer, fullyConnectedLayer, weightsTensorInfo, 0, 1);
+    Connect(fullyConnectedLayer, outputLayer, outputTensorInfo, 0, 0);
+
+    if (descriptor.m_BiasEnabled)
+    {
+        armnn::IConnectableLayer* biasLayer  = network->AddConstantLayer(biasConstantTensor, "Bias");
+        Connect(biasLayer, fullyConnectedLayer, biasTensorInfo, 0, 2);
+    }
+
+    return network;
+}
+
+template<DataType ArmnnIType, DataType ArmnnWType = ArmnnIType, DataType ArmnnBType = ArmnnIType,
+        DataType ArmnnOType = ArmnnIType>
+void FullyConnectedConstantWeightsAndBiasEndToEnd(const std::vector<armnn::BackendId>& backends, const bool biasEnabled)
+{
+    using namespace armnn;
+
+    unsigned int inputWidth = 1;
+    unsigned int inputHeight = 1;
+    unsigned int inputChannels = 5;
+    unsigned int inputNum = 2;
+
+    unsigned int outputChannels = 3;
+    unsigned int outputNum = 2;
+
+    unsigned int inputShape[] = { inputNum, inputChannels, inputHeight, inputWidth };
+    unsigned int outputShape[] = { outputNum, outputChannels };
+    unsigned int weightsShape[] = { outputChannels, inputChannels };
+    unsigned int biasShape[] = { outputChannels };
+
+    using IT = ResolveType<ArmnnIType>;
+    using WT = ResolveType<ArmnnWType>;
+    using BT = ResolveType<ArmnnBType>;
+    using OT = ResolveType<ArmnnOType>;
+
+    const float   qScale  = IsQuantizedType<IT>() ? 0.5f : 1.0f;
+    const int32_t qOffset = IsQuantizedType<IT>() ? 2 : 0;
+
+    armnn::TensorInfo inputTensorInfo(4, inputShape, ArmnnIType, qScale, qOffset, true);
+    armnn::TensorInfo weightsTensorInfo(2, weightsShape, ArmnnWType, qScale, qOffset, true);
+    armnn::TensorInfo biasTensorInfo(1, biasShape, ArmnnBType, qScale * qScale, 0, true);
+    armnn::TensorInfo outputTensorInfo(2, outputShape, ArmnnOType, qScale, qOffset);
+
+    FullyConnectedDescriptor descriptor;
+    descriptor.m_ConstantWeights = true;
+    descriptor.m_BiasEnabled = biasEnabled;
+    descriptor.m_TransposeWeightMatrix = true;
+
+    std::vector<float> floatInputData =
+    {
+            1.0f, 2.0f, 3.0f, 4.0f, 5.0f,
+            5.0f, 4.0f, 3.0f, 2.0f, 1.0f
+    };
+
+    std::vector<float> floatWeightsData =
+    {
+            .5f, .5f, .5f, .5f, .5f,
+            2.f, 2.f, 2.f, 2.f, 2.f,
+            .5f, 1.f, 2.f, 3.f, 4.f
+    };
+
+    std::vector<float> floatBiasData = biasEnabled ? std::vector<float>({10.f, 20.f, 30.f})
+                                                   : std::vector<float>({0.f, 0.f, 0.f});
+
+    std::vector<float> floatOutputData =
+    {
+            0.5f + 1.0f + 1.5f + 2.0f + 2.5f + floatBiasData[0], // 7.5  or 17.5
+            2.0f + 4.0f + 6.0f + 8.0f + 10.f + floatBiasData[1], // 30   or 50
+            0.5f + 2.0f + 6.0f + 12.f + 20.f + floatBiasData[2], // 40.5 or 70.5
+
+            2.5f + 2.0f + 1.5f + 1.0f + 0.5f + floatBiasData[0], // 7.5  or 17.5
+            10.0f + 8.0f + 6.0f + 4.0f + 2.f + floatBiasData[1], // 30   or 50
+            2.5f + 4.0f + 6.0f + 6.f + 4.f   + floatBiasData[2]  // 22.5 or 52.5
+    };
+
+    std::vector<IT> inputData = armnnUtils::QuantizedVector<IT>(floatInputData, qScale, qOffset);
+    std::vector<WT> weightsData = armnnUtils::QuantizedVector<WT>(floatWeightsData, qScale, qOffset);
+    std::vector<BT> biasData = armnnUtils::QuantizedVector<BT>(floatBiasData, qScale * qScale);
+    std::vector<OT> expectedOutputData = armnnUtils::QuantizedVector<OT>(floatOutputData, qScale, qOffset);
+
+    ConstTensor weightsConstantTensor(weightsTensorInfo, weightsData.data());
+    ConstTensor biasConstantTensor(biasTensorInfo, biasData.data());
+
+    armnn::INetworkPtr network = CreateFullyConnectedNetworkConstantWeightsAndBias(inputTensorInfo,
+                                                                                   outputTensorInfo,
+                                                                                   weightsTensorInfo,
+                                                                                   weightsConstantTensor,
+                                                                                   biasTensorInfo,
+                                                                                   biasConstantTensor,
+                                                                                   descriptor);
+
+    CHECK(network);
+
+    std::map<int, std::vector<IT>> inputTensorData    = {{ 0, inputData }};
+    std::map<int, std::vector<OT>> expectedOutputTensorData = {{ 0, expectedOutputData }};
+
+    const float tolerance = IsQuantizedType<IT>() ? 1.0f: 0.000001f;
+
+    EndToEndLayerTestImpl<ArmnnIType, ArmnnOType>(std::move(network),
+                                                  inputTensorData,
+                                                  expectedOutputTensorData,
+                                                  backends,
+                                                  tolerance);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

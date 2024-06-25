@@ -254,6 +254,7 @@ TEST_CASE("GetTosaMappingFromLayer_Conv2dLayer")
     AssertTosaOneToOneMappingBasicBlock(
         basicBlock, inputShape, outputShape, Op_CONV2D, Attribute_ConvAttribute, descriptor, LayerType::Convolution2d);
 }
+
 TEST_CASE("GetTosaMapping_ElementwiseUnaryLayerRsqrt")
 {
     TensorInfo inputInfo  = TensorInfo({ 2, 2 }, DataType::Float32, 0.0f, 0, true);

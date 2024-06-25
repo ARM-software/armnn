@@ -86,6 +86,18 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             }
             break;
         }
+        case LayerType::FullyConnected:
+        {
+            inputInfos.push_back(&infos[0]); // input
+            outputInfos.push_back(&infos[1]); // output
+            inputInfos.push_back(&infos[2]); // weights
+            auto fullyConnectedDesc = PolymorphicDowncast<const FullyConnectedDescriptor*>(&descriptor);
+            if(fullyConnectedDesc->m_BiasEnabled)
+            {
+                inputInfos.push_back(&infos[3]); // bias
+            }
+            break;
+        }
         case LayerType::ElementwiseUnary:
         case LayerType::Pooling2d:
         case LayerType::Quantize:

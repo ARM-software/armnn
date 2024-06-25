@@ -1074,6 +1074,7 @@ void FullyConnectedQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) c
         DataType::Float32,
         DataType::Float16,
         DataType::QAsymmS8,
+        DataType::QSymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16
     };

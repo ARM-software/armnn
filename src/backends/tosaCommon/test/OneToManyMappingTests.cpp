@@ -4,9 +4,11 @@
 //
 
 #include "AvgPool2DIgnoreValueChecker.hpp"
+#include "FullyConnectedChecker.hpp"
 #include "QuantizeChecker.hpp"
 #include "SplitChecker.hpp"
-#include <backendsCommon/test/ActivationEndToEndTestImpl.hpp>
+#include "CommonTestUtils.hpp"
+
 #include <armnn/IRuntime.hpp>
 
 using namespace armnn;
@@ -85,6 +87,95 @@ TEST_CASE("GetTosaMappingFromLayer_AvgPool2DIgnoreValueLayer")
                               descriptor);
 }
 
+TEST_CASE("GetTosaMapping_FullyConnectedLayer")
+{
+    FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = true;
+
+    constexpr static unsigned int inputWidth = 3u;
+    constexpr static unsigned int inputHeight = 2u;
+    constexpr static unsigned int inputChannels = 1u;
+    constexpr static unsigned int inputSize = inputWidth * inputHeight * inputChannels;
+    constexpr static unsigned int outputChannels = 2u;
+
+    const armnn::TensorInfo inputInfo({ 1, inputChannels, inputHeight, inputWidth }, DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, outputChannels }, DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ outputChannels, inputSize }, DataType::Float32, 1.0, 0, true);
+    const armnn::TensorInfo biasesInfo({ outputChannels }, DataType::Float32, 1.0, 0, true);
+
+    std::vector<std::vector<int32_t>> inputShapes  = {{ 1, inputChannels, inputHeight, inputWidth },
+                                                      { outputChannels, inputSize },
+                                                      { outputChannels }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, outputChannels }};
+
+
+    TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
+                                                             LayerType::FullyConnected,
+                                                             {&inputInfo, &weightsInfo, &biasesInfo},
+                                                             {&outputInfo},
+                                                             descriptor);
+
+    VerifyFullyConnected(basicBlock,
+                         inputShapes,
+                         outputShape,
+                         descriptor);
+}
+
+TEST_CASE("GetTosaMappingFromLayer_FullyConnectedLayer")
+{
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
+
+    FullyConnectedDescriptor descriptor;
+    descriptor.m_BiasEnabled = true;
+
+    constexpr static unsigned int inputWidth = 3u;
+    constexpr static unsigned int inputHeight = 2u;
+    constexpr static unsigned int inputChannels = 1u;
+    constexpr static unsigned int inputSize = inputWidth * inputHeight * inputChannels;
+    constexpr static unsigned int outputChannels = 2u;
+
+    const armnn::TensorInfo inputInfo({ 1, inputChannels, inputHeight, inputWidth }, DataType::Float32);
+    const armnn::TensorInfo outputInfo({ 1, outputChannels }, DataType::Float32);
+    const armnn::TensorInfo weightsInfo({ outputChannels, inputSize }, DataType::Float32, 1.0, 0, true);
+    const armnn::TensorInfo biasesInfo({ outputChannels }, DataType::Float32, 1.0, 0, true);
+
+    std::vector<std::vector<int32_t>> inputShapes = {{ 1, inputChannels, inputHeight, inputWidth }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, outputChannels }};
+
+    std::vector<float> weightsData = GenerateRandomData<float>(weightsInfo.GetNumElements());
+    ConstTensor weights(weightsInfo, weightsData);
+
+    std::vector<float> biasesData = GenerateRandomData<float>(biasesInfo.GetNumElements());
+    ConstTensor biases(biasesInfo, biasesData);
+
+    IConnectableLayer* const inputLayer  = net->AddInputLayer(0, "input");
+    IConnectableLayer* const weightsLayer = net->AddConstantLayer(weights, "weights");
+    IConnectableLayer* const biasesLayer = net->AddConstantLayer(biases, "biases");
+    IConnectableLayer* const fullyConnectedLayer = net->AddFullyConnectedLayer(descriptor, "fully_connected");
+    IConnectableLayer* const outputLayer = net->AddOutputLayer(0);
+
+    inputLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(0));
+    weightsLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(1));
+    biasesLayer->GetOutputSlot(0).Connect(fullyConnectedLayer->GetInputSlot(2));
+    fullyConnectedLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+
+    inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    weightsLayer->GetOutputSlot(0).SetTensorInfo(weightsInfo);
+    biasesLayer->GetOutputSlot(0).SetTensorInfo(biasesInfo);
+    fullyConnectedLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    TosaSerializationBasicBlock* basicBlock = GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(fullyConnectedLayer));
+
+    VerifyFullyConnected(basicBlock,
+                         inputShapes,
+                         outputShape,
+                         descriptor);
+}
+
 TEST_CASE("GetTosaMapping_QuantizeLayer")
 {
     NullDescriptor descriptor;
@@ -98,6 +189,7 @@ TEST_CASE("GetTosaMapping_QuantizeLayer")
             GetTosaMapping(nullptr, LayerType::Quantize, {&inputTensorInfo}, {&outputTensorInfo}, descriptor);
     VerifyQuantize(basicBlock, shape, ArmNNToDType(DataType::Float32), ArmNNToDType(outputDataType));
 }
+
 TEST_CASE("GetTosaMappingFromLayer_QuantizeLayer")
 {
     IRuntime::CreationOptions options;
@@ -193,45 +285,4 @@ TEST_CASE("GetTosaMappingFromLayer_SplitLayer")
                 descriptor);
 }
 
-// Activation
-
-static std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
-
-TEST_CASE("GetTosaMapping_ActivationFloat32")
-{
-    ActivationEndToEndTest<DataType::Float32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
-}
-
-TEST_CASE("GetTosaMapping_ActivationFloat16")
-{
-    ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
-}
-
-TEST_CASE("GetTosaMapping_ActivationInt32")
-{
-    ActivationEndToEndTest<DataType::Signed32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
-}
-
-TEST_CASE("GetTosaMapping_ActivationInt16")
-{
-    ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.35f, 0, 0.01f);
-}
-
-TEST_CASE("GetTosaMapping_ActivationInt8")
-{
-    ActivationEndToEndTest<DataType::QSymmS8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.75f, 0, 0.01f);
-}
-
-TEST_CASE("UNSUPPORTED_GetTosaMapping_ActivationUInt8")
-{
-    try
-    {
-        ActivationEndToEndTest<DataType::QAsymmU8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
-        FAIL("An exception should have been thrown");
-    }
-    catch (armnn::Exception& e)
-    {
-        CHECK_EQ(std::string(e.what()), "Failed to assign a backend to each layer");
-    }
-}
 }

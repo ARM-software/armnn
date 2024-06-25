@@ -22,6 +22,8 @@ list(APPEND armnnTosaBackendOperators_sources
         ElementwiseBinaryOperator.cpp
         ElementwiseUnaryOperator.cpp
         ElementwiseUnaryOperator.hpp
+        FullyConnectedOperator.cpp
+        FullyConnectedOperator.hpp
         Pooling2DOperator.hpp
         Pooling2DOperator.cpp
         QuantizeOperator.hpp

@@ -12,6 +12,7 @@
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
+#include "backendsCommon/test/FullyConnectedEndToEndTestImpl.hpp"
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/QuantizationEndToEndTestImpl.hpp"
@@ -41,14 +42,32 @@ TEST_CASE("TosaRefLeakyReluActivationFloat16")
     ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.3f, 5, 0.01f);
 }
 
+TEST_CASE("TosaRefLeakyReluActivationInt32")
+{
+    ActivationEndToEndTest<DataType::Signed32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
+}
+
+TEST_CASE("TosaRefLeakyReluActivationInt16")
+{
+    ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.35f, 0, 0.01f);
+}
+
 TEST_CASE("TosaRefLeakyReluActivationInt8")
 {
     ActivationEndToEndTest<DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.6f, 7, 0.01f);
 }
 
-TEST_CASE("TosaRefLeakyReluActivationInt16")
+TEST_CASE("UNSUPPORTED_ActivationUInt8")
 {
-    ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
+    try
+    {
+        ActivationEndToEndTest<DataType::QAsymmU8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
+        FAIL("An exception should have been thrown");
+    }
+    catch (armnn::Exception& e)
+    {
+        CHECK_EQ(std::string(e.what()), "Failed to assign a backend to each layer");
+    }
 }
 
 // Relu
@@ -237,6 +256,49 @@ TEST_CASE("TosaRefSubEndtoEndTestInt8")
 {
     ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
                                                                 armnn::BinaryOperation::Sub);
+}
+
+// FullyConnected
+TEST_CASE("TosaRefFullyConnectedEndToEndTestFloat32")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, true);
+}
+
+TEST_CASE("TosaRefFullyConnectedEndToEndTestNoBiasFloat32")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, false);
+}
+
+TEST_CASE("TosaRefFullyConnectedEndToEndTestInt8")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QAsymmS8>(tosaDefaultBackends, true);
+}
+
+TEST_CASE("TosaRefFullyConnectedEndToEndTestNoBiasInt8")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QAsymmS8>(tosaDefaultBackends, false);
+}
+
+TEST_CASE("TosaRefFullyConnectedEndToEndTestInt8Symm")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QSymmS8,
+                                                 armnn::DataType::QSymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QSymmS8>(tosaDefaultBackends, true);
+}
+
+TEST_CASE("TosaRefFullyConnectedEndToEndTestNoBiasInt8Symm")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QSymmS8,
+                                                 armnn::DataType::QSymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QSymmS8>(tosaDefaultBackends, false);
 }
 
 // Pooling

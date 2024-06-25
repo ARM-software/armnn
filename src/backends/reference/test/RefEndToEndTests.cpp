@@ -684,7 +684,66 @@ TEST_CASE("RefFillEndToEndTestInt32")
     FillEndToEnd<armnn::DataType::Signed32>(defaultBackends);
 }
 
+// Fully Connected
 TEST_CASE("RefFullyConnectedEndToEndTestFloat32")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::Float32>(defaultBackends, true);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestNoBiasFloat32")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::Float32>(defaultBackends, false);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestInt8")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QAsymmS8>(defaultBackends, true);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestNoBiasInt8")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::QAsymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QAsymmS8>(defaultBackends, false);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestInt8Symm")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QSymmS8,
+                                                 armnn::DataType::QSymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QSymmS8>(defaultBackends, true);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestNoBiasInt8Symm")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QSymmS8,
+                                                 armnn::DataType::QSymmS8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QSymmS8>(defaultBackends, false);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestUint8")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QAsymmU8,
+                                                 armnn::DataType::QAsymmU8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QAsymmU8>(defaultBackends, true);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestNoBiasUint8")
+{
+    FullyConnectedConstantWeightsAndBiasEndToEnd<armnn::DataType::QAsymmU8,
+                                                 armnn::DataType::QAsymmU8,
+                                                 armnn::DataType::Signed32,
+                                                 armnn::DataType::QAsymmU8>(defaultBackends, false);
+}
+
+TEST_CASE("RefFullyConnectedEndToEndTestNoBiasOtherFloat32")
 {
     FullyConnectedWithDynamicWeightsEndToEnd<armnn::DataType::Float32>(defaultBackends);
 }
@@ -724,6 +783,7 @@ TEST_CASE("RefFullyConnectedEndToEndTestBiasDisabledConnectBias")
     FullyConnectedErrorChecking<armnn::DataType::Float32>(defaultBackends, true, false, false, true, true);
 }
 
+// Gather
 TEST_CASE("RefGatherFloatTest")
 {
     GatherEndToEnd<armnn::DataType::Float32>(defaultBackends);

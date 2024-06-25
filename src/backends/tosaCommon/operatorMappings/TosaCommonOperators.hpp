@@ -14,6 +14,7 @@
 #include "DepthwiseConv2dOperator.hpp"
 #include "ElementwiseBinaryOperator.hpp"
 #include "ElementwiseUnaryOperator.hpp"
+#include "FullyConnectedOperator.hpp"
 #include "Pooling2DOperator.hpp"
 #include "QuantizeOperator.hpp"
 #include "ReshapeOperator.hpp"

@@ -87,6 +87,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto conv2dDesc = PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&descriptor);
             return ConvertDepthwiseConv2dToTosaOperator(layer, inputs, outputs, conv2dDesc);
         }
+        case LayerType::FullyConnected:
+        {
+            auto fullyConnectedDesc = PolymorphicDowncast<const FullyConnectedDescriptor*>(&descriptor);
+            return ConvertFullyConnectedToTosaOperator(layer, inputs, outputs, fullyConnectedDesc);
+        }
         case LayerType::Pooling2d:
         {
             auto poolDesc = PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor);

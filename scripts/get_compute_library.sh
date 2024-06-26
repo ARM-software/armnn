@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c2237ec4094c7824f8f7e61bc89504d01c5b59ff" #11743: Disable fix for long path on Windows(R) OS
+DEFAULT_CLFRAMEWORKREVISION="e6836523ed6672ee1d622f240038a1173d57923c" #11762: Optimize memory management of CPU operators
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

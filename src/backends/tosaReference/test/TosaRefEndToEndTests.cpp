@@ -30,25 +30,28 @@ TEST_SUITE("TosaRefEndToEnd")
 static std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
 
 // Activation
-//LeakyRelu
+// LeakyRelu
 TEST_CASE("TosaRefLeakyReluActivationFloat32")
 {
     ActivationEndToEndTest<DataType::Float32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
 }
+
 TEST_CASE("TosaRefLeakyReluActivationFloat16")
 {
     ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.3f, 5, 0.01f);
 }
+
 TEST_CASE("TosaRefLeakyReluActivationInt8")
 {
     ActivationEndToEndTest<DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.6f, 7, 0.01f);
 }
+
 TEST_CASE("TosaRefLeakyReluActivationInt16")
 {
     ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
 }
 
-//Relu
+// Relu
 TEST_CASE("TosaRefReLuEndToEndTestQAsymmS8")
 {
     ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::ReLu);
@@ -67,6 +70,31 @@ TEST_CASE("TosaRefReLuEndToEndTestFloat16")
 TEST_CASE("TosaRefReLuEndToEndTestQSymmS16")
 {
     ActivationEndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::ReLu);
+}
+
+// BoundedRelu
+TEST_CASE("TosaRefBoundedReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(
+        tosaDefaultBackends, ActivationFunction::BoundedReLu, 1.0f, 0, 6.0f, 0.0f);
+}
+
+TEST_CASE("TosaRefBoundedReLuEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(
+        tosaDefaultBackends, ActivationFunction::BoundedReLu, 1.0f, 0, 6.0f, 0.0f);
+}
+
+TEST_CASE("TosaRefBoundedReLuEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(
+        tosaDefaultBackends, ActivationFunction::BoundedReLu, 1.0f, 0, 6.0f, 0.0f);
+}
+
+TEST_CASE("TosaRefBoundedReLuEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(
+        tosaDefaultBackends, ActivationFunction::BoundedReLu, 1.0f, 0, 6.0f, 0.0f);
 }
 
 // Addition

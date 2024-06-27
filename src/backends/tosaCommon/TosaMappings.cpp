@@ -30,7 +30,8 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             {
                 return ConvertLeakyReluToTosaOperator(layer, inputs, outputs, activationDesc);
             }
-            if (activationDesc->m_Function == ActivationFunction::ReLu)
+            if (activationDesc->m_Function == ActivationFunction::ReLu ||
+                activationDesc->m_Function == ActivationFunction::BoundedReLu)
             {
                 return ConvertReluToTosaOperator(layer, inputs, outputs, activationDesc);
             }

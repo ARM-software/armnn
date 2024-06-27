@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,6 +16,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
                               int nodeIndex,
                               int32_t tfLitePadOperatorCode)
 {
+
     switch(tfLitePadOperatorCode)
     {
         case kTfLiteBuiltinMirrorPad:
@@ -32,6 +33,7 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     // Inputs
     int numInputs = 0;
     const int* inputTensors;
+
     if (TfLiteOpaqueNodeInputs(tfLiteNode, &inputTensors, &numInputs) != kTfLiteOk)
     {
         TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
@@ -44,12 +46,18 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     const TfLiteOpaqueTensor* tfLiteInputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[0]);
     if (!IsValid(tfLiteContext, tfLiteInputTensor, tfLitePadOperatorCode, nodeIndex))
     {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(tfLiteContext,
+                                        "TfLiteArmnnOpaqueDelegate: Invalid input tensor at node #%d: ",
+                                        nodeIndex);
         return kTfLiteError;
     }
 
     const TfLiteOpaqueTensor* tfLitePaddingTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[1]);
     if (!IsValid(tfLiteContext, tfLitePaddingTensor, tfLitePadOperatorCode, nodeIndex))
     {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(tfLiteContext,
+                                        "TfLiteArmnnOpaqueDelegate: Invalid padding tensor at node #%d: ",
+                                        nodeIndex);
         return kTfLiteError;
     }
 
@@ -70,6 +78,8 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     const TfLiteOpaqueTensor* tfLiteOutputTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[0]);
     if (!IsValid(tfLiteContext, tfLiteOutputTensor, tfLitePadOperatorCode, nodeIndex))
     {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(tfLiteContext,
+                                        "TfLiteArmnnOpaqueDelegate: Invalid output tensor at node #%d: ", nodeIndex);
         return kTfLiteError;
     }
 
@@ -77,25 +87,45 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     const armnn::TensorInfo& paddingTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLitePaddingTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
 
-    // Get the padding data from the input tensor
-    auto* paddingData = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLitePaddingTensor));
-
-    size_t step = 2;
     armnn::PadDescriptor descriptor;
-    for (unsigned int i = 0; i < paddingTensorInfo.GetNumElements() / step; ++i)
+
+    // Get the padding size from the input tensor 1
+    size_t step = 2;
+    if(paddingTensorInfo.GetDataType() == armnn::DataType::Signed64)
     {
-        descriptor.m_PadList.emplace_back(paddingData[i * step], paddingData[i * step + 1]);
+        auto* paddingData = static_cast<int64_t*>(TfLiteOpaqueTensorData(tfLitePaddingTensor));
+        for (uint16_t i = 0; i < paddingTensorInfo.GetNumElements() / step; ++i)
+        {
+            descriptor.m_PadList.emplace_back(paddingData[i * step], paddingData[i * step + 1]);
+        }
+    }
+    else
+    {
+        auto* paddingData = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLitePaddingTensor));
+        for (uint16_t i = 0; i < paddingTensorInfo.GetNumElements() / step; ++i)
+        {
+            descriptor.m_PadList.emplace_back(paddingData[i * step], paddingData[i * step + 1]);
+        }
     }
 
+    // Get the padding value from input tensor 2
     if (tfLitePadOperatorCode == kTfLiteBuiltinPad && inputTensorInfo.IsQuantized())
     {
         descriptor.m_PadValue = inputTensorInfo.GetQuantizationOffset();
     }
     else if (tfLitePadOperatorCode == kTfLiteBuiltinPadv2)
     {
-        const TfLiteOpaqueTensor* tfLitepaddingValue = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext,
+        const TfLiteOpaqueTensor* tfLitePaddingValue = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext,
                                                                                           inputTensors[2]);
-        armnn::TensorInfo paddingValueTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLitepaddingValue);
+        if (!IsValid(tfLiteContext, tfLitePaddingValue, tfLitePadOperatorCode, nodeIndex))
+        {
+            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(tfLiteContext,
+                                            "TfLiteArmnnOpaqueDelegate: Invalid padding value at node #%d: ",
+                                            nodeIndex);
+            return kTfLiteError;
+        }
+
+        armnn::TensorInfo paddingValueTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLitePaddingValue);
         if (paddingValueTensorInfo.GetNumElements() != 1)
         {
             TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
@@ -104,17 +134,21 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
                     tfLitePadOperatorCode, nodeIndex);
             return kTfLiteError;
         }
+
         // Get the padding value from the input tensor
-        switch (TfLiteOpaqueTensorType(tfLitepaddingValue))
+        switch (TfLiteOpaqueTensorType(tfLitePaddingValue))
         {
             case kTfLiteFloat32:
-                descriptor.m_PadValue = static_cast<float*>(TfLiteOpaqueTensorData(tfLitepaddingValue))[0];
+                descriptor.m_PadValue = *static_cast<float*>(TfLiteOpaqueTensorData(tfLitePaddingValue));
+                break;
+            case kTfLiteInt32:
+                descriptor.m_PadValue = *static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLitePaddingValue));
                 break;
             case kTfLiteUInt8:
-                descriptor.m_PadValue = static_cast<uint8_t*>(TfLiteOpaqueTensorData(tfLitepaddingValue))[0];
+                descriptor.m_PadValue = *static_cast<uint8_t*>(TfLiteOpaqueTensorData(tfLitePaddingValue));
                 break;
             case kTfLiteInt8:
-                descriptor.m_PadValue = static_cast<int8_t*>(TfLiteOpaqueTensorData(tfLitepaddingValue))[0];
+                descriptor.m_PadValue = *static_cast<int8_t*>(TfLiteOpaqueTensorData(tfLitePaddingValue));
                 break;
             default:
                 TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
@@ -166,9 +200,9 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     }
 
     armnn::BackendId setBackend;
-    if (!delegateData.m_Network)
+    bool isSupported = false;
+    auto validateFunc = [&](const armnn::TensorInfo& outputTensorInfo)
     {
-        bool isSupported = false;
         FORWARD_LAYER_OPAQUE_SUPPORT_FUNC("PAD",
                                           tfLiteContext,
                                           IsPadSupported,
@@ -178,7 +212,11 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
                                           inputTensorInfo,
                                           outputTensorInfo,
                                           descriptor);
+    };
 
+    if (!delegateData.m_Network)
+    {
+        validateFunc(outputTensorInfo);
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
@@ -189,6 +227,11 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
 
     armnn::IOutputSlot& outputSlot = padLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
+
+    if (ProcessInputs(padLayer, delegateData, tfLiteContext, tfLiteNode, nodeIndex) != kTfLiteOk)
+    {
+        return kTfLiteError;
+    }
 
     return Connect(padLayer, tfLiteContext, tfLiteNode, delegateData);
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -63,7 +63,9 @@ void Pad(const TensorInfo& inputInfo,
     unsigned int inputChannels = 0;
     unsigned int inputHeight   = 0;
     unsigned int inputWidth    = 0;
+    unsigned int inputDim5     = 0;
 
+    unsigned int outputBatches  = 0;
     unsigned int outputChannels = 0;
     unsigned int outputHeight   = 0;
     unsigned int outputWidth    = 0;
@@ -76,6 +78,7 @@ void Pad(const TensorInfo& inputInfo,
     {
         // For Quantized types Pad Value should not be quantized with scale and offset of the tensor info
         auto temporaryInfo = TensorInfo(outputInfo.GetShape(), outputInfo.GetDataType(), 1.0f, 0);
+
         auto outputData = MakeEncoder<float>(temporaryInfo, outputHandle->Map());
         FillOutputWithPadValue(*outputData, padValue, numOutputElements);
     }
@@ -95,13 +98,13 @@ void Pad(const TensorInfo& inputInfo,
             {
                 input[w];
                 auto inputValue = input.Get();
-                auto outputIndex = w + std::get<0>(padList[0]);
+                auto outputIndex = w + padList[0].first;
                 output[outputIndex];
                 output.Set(inputValue);
             }
 
             break;
-        case 2  :
+        case 2:
             inputHeight = inputShape[0];
             inputWidth  = inputShape[1];
             outputWidth = outputShape[1];
@@ -112,14 +115,14 @@ void Pad(const TensorInfo& inputInfo,
                 {
                     input[h * inputWidth + w];
                     auto inputValue  = input.Get();
-                    auto outputIndex = (h + std::get<0>(padList[0])) * outputWidth + (w + std::get<0>(padList[1]));
+                    auto outputIndex = (h + padList[0].first) * outputWidth + (w + padList[1].first);
                     output[outputIndex];
                     output.Set(inputValue);
                 }
             }
 
             break;
-        case 3  :
+        case 3:
             inputChannels = inputShape[0];
             inputHeight   = inputShape[1];
             inputWidth    = inputShape[2];
@@ -134,9 +137,9 @@ void Pad(const TensorInfo& inputInfo,
                     {
                         input[c * inputHeight * inputWidth + h * inputWidth + w];
                         auto inputValue  = input.Get();
-                        auto outputIndex = (c + std::get<0>(padList[0])) * outputHeight * outputWidth
-                                           + (h + std::get<0>(padList[1])) * outputWidth
-                                           + (w + std::get<0>(padList[2]));
+                        auto outputIndex = (c + padList[0].first) * outputHeight * outputWidth
+                                           + (h + padList[1].first) * outputWidth
+                                           + (w + padList[2].first);
                         output[outputIndex];
                         output.Set(inputValue);
                     }
@@ -144,7 +147,7 @@ void Pad(const TensorInfo& inputInfo,
             }
 
             break;
-        case 4  :
+        case 4:
             inputBatches   = inputShape[0];
             inputChannels  = inputShape[1];
             inputHeight    = inputShape[2];
@@ -162,24 +165,69 @@ void Pad(const TensorInfo& inputInfo,
                         for (unsigned int w = 0; w < inputWidth ; w++)
                         {
                             input[b * inputChannels * inputHeight * inputWidth
-                                      + c * inputHeight * inputWidth
-                                      + h * inputWidth
-                                      + w];
+                                    + c * inputHeight * inputWidth
+                                    + h * inputWidth
+                                    + w];
                             auto inputValue  = input.Get();
-                            auto outputIndex = (b + std::get<0>(padList[0]))
+                            auto outputIndex = (b + padList[0].first)
                                                * outputChannels * outputHeight * outputWidth
-                                               + (c + std::get<0>(padList[1])) * outputHeight * outputWidth
-                                               + (h + std::get<0>(padList[2])) * outputWidth
-                                               + (w + std::get<0>(padList[3]));
+                                               + (c + padList[1].first) * outputHeight * outputWidth
+                                               + (h + padList[2].first) * outputWidth
+                                               + (w + padList[3].first);
                             output[outputIndex];
                             output.Set(inputValue);
                         }
                     }
                 }
             }
-
             break;
-        default :
+
+        case 5:
+            inputBatches   = inputShape[0];
+            inputChannels  = inputShape[1];
+            inputHeight    = inputShape[2];
+            inputWidth     = inputShape[3];
+            inputDim5      = inputShape[4];
+
+            outputBatches  = outputShape[1];
+            outputChannels = outputShape[2];
+            outputHeight   = outputShape[3];
+            outputWidth    = outputShape[4];
+
+            for (unsigned int b = 0; b < inputBatches; ++b)
+            {
+                for (unsigned int c = 0; c < inputChannels; ++c)
+                {
+                    for (unsigned int h = 0; h < inputHeight; ++h)
+                    {
+                        for (unsigned int w = 0; w < inputWidth ; ++w)
+                        {
+                            for (unsigned int d = 0; d < inputDim5 ; ++d)
+                            {
+                                input[b * inputChannels * inputHeight * inputWidth * inputDim5
+                                      + c * inputHeight * inputWidth * inputDim5
+                                      + h * inputWidth * inputDim5
+                                      + d];
+
+                                auto inputValue  = input.Get();
+
+                                auto outputIndex = (b + padList[0].first)
+                                                   * outputBatches * outputChannels * outputHeight * outputWidth
+                                                   + (c + padList[1].first) * outputChannels * outputHeight*outputWidth
+                                                   + (h + padList[2].first) * outputHeight * outputWidth
+                                                   + (w + padList[3].first) * outputWidth
+                                                   + (d + padList[4].first);
+
+                                output[outputIndex];
+                                output.Set(inputValue);
+                            }
+                        }
+                    }
+                }
+            }
+            break;
+
+        default:
             break;
     }
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017,2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,6 +38,15 @@ LayerTestResult<T, 4> Pad4dTestCommon(
     const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale,
     int32_t qOffset);
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 5> Pad5dTestCommon(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory,
+    float qScale,
+    int32_t qOffset,
+    const float customPaddingValue = 0.0f);
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 2> PadQAsymmTestCommon(
@@ -84,6 +93,11 @@ LayerTestResult<float, 3> PadFloat323dTest(
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 LayerTestResult<float, 4> PadFloat324dTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+LayerTestResult<float, 5> PadFloat325dTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);

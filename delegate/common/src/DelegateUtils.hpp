@@ -300,4 +300,19 @@ armnn::TensorInfo OutputShapeOfSqueeze(std::vector<uint32_t> squeezeDims,
     return outTensorInfo;
 }
 
+bool ZeroDimPresent(std::initializer_list<armnn::TensorInfo> tensorInfoList)
+{
+    for (armnn::TensorInfo tensorInfo : tensorInfoList)
+    {
+        for (unsigned int i = 0; i < tensorInfo.GetNumDimensions(); ++i)
+        {
+            if (tensorInfo.GetShape()[i] == 0)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 } // namespace anonymous

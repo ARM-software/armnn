@@ -1,11 +1,12 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/utility/IgnoreUnused.hpp>
+#include <DelegateUtils.hpp>
 
 #include <tensorflow/lite/builtin_ops.h>
 #include <tensorflow/lite/c/builtin_op_data.h>
@@ -82,6 +83,15 @@ namespace armnnDelegate
 
         const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
         const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+
+        if (ZeroDimPresent({inputTensorInfo, outputTensorInfo}))
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Zero dimension tensors are not supported in operator #%d node #%d: ",
+                broadcastToOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
 
         auto* shapeData = tflite::GetTensorData<int32_t>(&tfLiteShapeTensor);
         auto shapeTensorNum = tfLiteShapeTensor.dims->data[0];

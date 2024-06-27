@@ -5,7 +5,8 @@
 
 #pragma once
 
-#include "ActivationOperator.hpp"
+#include "ReluOperator.hpp"
+#include "LeakyReluOperator.hpp"
 #include "AvgPool2DIgnoreValueOperator.hpp"
 #include "ConcatOperator.hpp"
 #include "ConstantOperator.hpp"

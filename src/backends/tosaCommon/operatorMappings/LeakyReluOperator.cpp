@@ -7,33 +7,33 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-#include "ActivationOperator.hpp"
+#include "LeakyReluOperator.hpp"
 #include "TosaRescaleOperatorUtils.hpp"
 
 #include <layers/ActivationLayer.hpp>
 
 // This function is paraphrased from:
 // tensorflow/compiler/mlir/tosa/transforms/legalize_tfl.cc from function ConvertTFLLeakyReluOp
-TosaSerializationBasicBlock* ConvertActivationToTosaOperator(const Layer* layer,
-                                                             const std::vector<const TensorInfo*>& inputs,
-                                                             const std::vector<const TensorInfo*>& outputs,
-                                                             const ActivationDescriptor* activationDescriptor)
+TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
+                                                            const std::vector<const TensorInfo*>& inputs,
+                                                            const std::vector<const TensorInfo*>& outputs,
+                                                            const ActivationDescriptor* activationDescriptor)
 {
     if (inputs.size() != 1)
     {
-        throw armnn::Exception("ConvertActivationToTosaOperator: 1 input tensors required.");
+        throw armnn::Exception("ConvertLeakyReluToTosaOperator: 1 input tensors required.");
     }
 
     if (outputs.size() != 1)
     {
-        throw armnn::Exception("ConvertActivationToTosaOperator: 1 output tensor required.");
+        throw armnn::Exception("ConvertLeakyReluToTosaOperator: 1 output tensor required.");
     }
 
     std::string inputName       = std::string("input_");
     std::string outputNameAlpha = std::string("intermediate1_") + GetUniqueTosaMappingID();
     std::string outputNameMul   = std::string("intermediate2_") + GetUniqueTosaMappingID();
     std::string outputName      = std::string("output0_");
-    std::string blockName       = std::string("Op_ACTIVATION_block_") + GetUniqueTosaMappingID();
+    std::string blockName       = std::string("Op_LEAKY_RELU_block_") + GetUniqueTosaMappingID();
 
     // If a layer is present then the block will be used for execution, so input and output names need to be determined
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
@@ -61,7 +61,6 @@ TosaSerializationBasicBlock* ConvertActivationToTosaOperator(const Layer* layer,
     DType outputDType0 = ArmNNToDType(outputs[0]->GetDataType());
     tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
 
-#if TOSA_COMPAT_VERSION(0, 60, 0)
     std::string outputNameMAXMIN= std::string("intermediate3_") + GetUniqueTosaMappingID();
 
     if (inputDType0 == DType::DType_FP32 ||
@@ -211,64 +210,4 @@ TosaSerializationBasicBlock* ConvertActivationToTosaOperator(const Layer* layer,
                                                {inputName},            // inputs
                                                {outputName});          // outputs
     }
-#else
-    std::string outputNameZero  = std::string("intermediate3_") + GetUniqueTosaMappingID();
-    std::string outputNameGE    = std::string("intermediate4_") + GetUniqueTosaMappingID();
-
-    // const_zero
-    TosaSerializationOperator* zeroOp = nullptr;
-    TosaSerializationTensor* zeroTensor = nullptr;
-    CreateConstTosaOperator<float>(outputNameZero,
-                                   0.0f,
-                                   inputDType0,
-                                   inputShape0,
-                                   zeroOp,
-                                   zeroTensor);
-    tensors.push_back(zeroTensor);
-
-    // const_alpha
-    TosaSerializationOperator* alphaOp = nullptr;
-    TosaSerializationTensor* alphaTensor = nullptr;
-    CreateConstTosaOperator<float>(outputNameAlpha,
-                                   activationDescriptor->m_A,
-                                   inputDType0,
-                                   inputShape0,
-                                   alphaOp,
-                                   alphaTensor);
-    tensors.push_back(alphaTensor);
-
-    // mul
-    int32_t shift = 0;
-    TosaMulAttribute mulAttribute(shift);
-    TosaSerializationOperator* mulOp = new TosaSerializationOperator(Op_MUL,
-                                                                     Attribute_MulAttribute,
-                                                                     &mulAttribute,
-                                                                     {inputName, outputNameAlpha},
-                                                                     {outputNameMul});
-    tensors.push_back(new TosaSerializationTensor(outputNameMul, inputShape0, inputDType0, {}));
-
-    // greater_equal
-    TosaSerializationOperator* geOp = new TosaSerializationOperator(Op_GREATER_EQUAL,
-                                                                    Attribute_NONE,
-                                                                    nullptr,
-                                                                    {inputName, outputNameZero},
-                                                                    {outputNameGE});
-    tensors.push_back(new TosaSerializationTensor(outputNameGE, outputShape0, DType::DType_BOOL, {}));
-
-    // select
-    TosaSerializationOperator* selOp = new TosaSerializationOperator(Op_SELECT,
-                                                                     Attribute_NONE,
-                                                                     nullptr,
-                                                                     {outputNameGE, inputName, outputNameMul},
-                                                                     {outputName});
-
-    // operatorInputNames/operatorOutputNames ends up being the same as
-    // blockInputNames/blockOutputNames for one-to-one ArmNN to Tosa mappings
-    return new TosaSerializationBasicBlock(blockName,                               // name
-                                           mainName,                                // region name
-                                           {zeroOp, alphaOp, mulOp, geOp, selOp},   // operators
-                                           tensors,                                 // tensors
-                                           {inputName},                             // inputs
-                                           {outputName});                           // outputs
-#endif
 }

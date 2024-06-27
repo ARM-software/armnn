@@ -28,7 +28,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto activationDesc = PolymorphicDowncast<const ActivationDescriptor*>(&descriptor);
             if (activationDesc->m_Function == ActivationFunction::LeakyReLu)
             {
-                return ConvertActivationToTosaOperator(layer, inputs, outputs, activationDesc);
+                return ConvertLeakyReluToTosaOperator(layer, inputs, outputs, activationDesc);
+            }
+            if (activationDesc->m_Function == ActivationFunction::ReLu)
+            {
+                return ConvertReluToTosaOperator(layer, inputs, outputs, activationDesc);
             }
             else
             {

@@ -4,8 +4,10 @@
 #
 
 list(APPEND armnnTosaBackendOperators_sources
-        ActivationOperator.hpp
-        ActivationOperator.cpp
+        LeakyReluOperator.hpp
+        LeakyReluOperator.cpp
+        ReluOperator.hpp
+        ReluOperator.cpp
         AvgPool2DIgnoreValueOperator.hpp
         AvgPool2DIgnoreValueOperator.cpp
         ConcatOperator.hpp

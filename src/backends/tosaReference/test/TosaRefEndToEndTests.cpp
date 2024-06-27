@@ -48,6 +48,27 @@ TEST_CASE("TosaRefLeakyReluActivationInt16")
     ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
 }
 
+//Relu
+TEST_CASE("TosaRefReLuEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("TosaRefReLuEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("TosaRefReLuEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(tosaDefaultBackends, ActivationFunction::ReLu);
+}
+
+TEST_CASE("TosaRefReLuEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::ReLu);
+}
+
 // Addition
 TEST_CASE("TosaRefAdditionEndtoEndTestFloat32")
 {

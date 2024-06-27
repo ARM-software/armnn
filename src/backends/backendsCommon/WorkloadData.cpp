@@ -3643,9 +3643,9 @@ void SliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
     ValidateTensorDataTypesMatch(inputTensorInfo, outputTensorInfo, descriptorName, "input", "output");
 
     const unsigned int rank = inputTensorInfo.GetNumDimensions();
-    if (rank > 4)
+    if (rank > 5)
     {
-        throw InvalidArgumentException(descriptorName + ": Input tensors with rank greater than 4 are not supported.");
+        throw InvalidArgumentException(descriptorName + ": Input tensors with rank greater than 5 are not supported.");
     }
 
     ValidateTensorNumDimensions(outputTensorInfo, descriptorName, rank, "output");

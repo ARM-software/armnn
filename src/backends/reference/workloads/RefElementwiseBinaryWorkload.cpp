@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -26,7 +26,8 @@ namespace armnn
 template<typename DataType>
 void ExecuteFunction(std::vector<ITensorHandle*> inputs,
                      std::vector<ITensorHandle*> outputs,
-                     BinaryOperation operation)
+                     BinaryOperation operation,
+                     const std::string& layerName = "")
 {
     const TensorInfo& inputInfo0 = GetTensorInfo(inputs[0]);
     const TensorInfo& inputInfo1 = GetTensorInfo(inputs[1]);
@@ -42,12 +43,14 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
 
     using AddFunction     = ElementwiseBinaryFunction<std::plus<DataType>>;
     using DivFunction     = ElementwiseBinaryFunction<std::divides<DataType>>;
+    using FloorDivFunction = ElementwiseBinaryFunction<armnn::floorDiv<DataType>>;
     using MaximumFunction = ElementwiseBinaryFunction<armnn::maximum<DataType>>;
     using MinimumFunction = ElementwiseBinaryFunction<armnn::minimum<DataType>>;
     using MulFunction     = ElementwiseBinaryFunction<std::multiplies<DataType>>;
     using SubFunction     = ElementwiseBinaryFunction<std::minus<DataType>>;
     using SqDiffFunction  = ElementwiseBinaryFunction<armnn::squaredDifference<DataType>>;
     using PowerFunction   = ElementwiseBinaryFunction<armnn::power<DataType>>;
+
 
     switch (operation)
     {
@@ -58,7 +61,14 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
         }
         case BinaryOperation::Div:
         {
-            DivFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
+            if(!layerName.empty() && layerName.find("FloorDiv") != std::string::npos)
+            {
+                FloorDivFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
+            }
+            else
+            {
+                DivFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
+            }
             break;
         }
         case BinaryOperation::Maximum:
@@ -123,11 +133,11 @@ void RefElementwiseBinaryWorkload::Execute(std::vector<ITensorHandle*> inputs,
 
     if (GetTensorInfo(inputs[0]).GetDataType() == DataType::Signed32)
     {
-        ExecuteFunction<int32_t>(inputs, outputs, m_Data.m_Parameters.m_Operation);
+        ExecuteFunction<int32_t>(inputs, outputs, m_Data.m_Parameters.m_Operation, m_Name);
     }
     else
     {
-        ExecuteFunction<float>(inputs, outputs, m_Data.m_Parameters.m_Operation);
+        ExecuteFunction<float>(inputs, outputs, m_Data.m_Parameters.m_Operation, m_Name);
     }
 }
 

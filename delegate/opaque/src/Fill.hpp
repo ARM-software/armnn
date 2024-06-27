@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -48,6 +48,16 @@ namespace armnnOpaqueDelegate
 
         const TfLiteOpaqueTensor* tfLiteFillTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext,
                                                                                         inputTensors[1]);
+
+        if(TfLiteOpaqueTensorGetAllocationType(tfLiteFillTensor) != kTfLiteMmapRo)
+        {
+            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: FILL tensor must be constant - not supported in operator #%d node #%d: ",
+                tfLiteFillOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+
         if (!IsValid(tfLiteContext, tfLiteFillTensor, tfLiteFillOperatorCode, nodeIndex))
         {
             return kTfLiteError;

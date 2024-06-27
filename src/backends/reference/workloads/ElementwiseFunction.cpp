@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -67,6 +67,7 @@ template struct armnn::ElementwiseBinaryFunction<std::plus<float>>;
 template struct armnn::ElementwiseBinaryFunction<std::minus<float>>;
 template struct armnn::ElementwiseBinaryFunction<std::multiplies<float>>;
 template struct armnn::ElementwiseBinaryFunction<std::divides<float>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::floorDiv<float>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::maximum<float>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::minimum<float>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::power<float>>;
@@ -76,6 +77,7 @@ template struct armnn::ElementwiseBinaryFunction<std::plus<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<std::minus<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<std::multiplies<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<std::divides<int32_t>>;
+template struct armnn::ElementwiseBinaryFunction<armnn::floorDiv<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::maximum<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::minimum<int32_t>>;
 template struct armnn::ElementwiseBinaryFunction<armnn::power<int32_t>>;

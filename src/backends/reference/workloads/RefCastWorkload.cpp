@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,16 +12,53 @@
 
 namespace
 {
-    void Cast(armnn::Decoder<float>& in, armnn::Encoder<float>& out, const uint32_t numElements )
+    void Cast(armnn::Decoder<float>& in, armnn::Encoder<float>& out,
+              const uint32_t numElements, const armnn::DataType OutputDataType)
     {
-        for (unsigned int i = 0; i < numElements; i++)
+        for (unsigned int i = 0; i < numElements; ++i)
+        {
+            switch (OutputDataType)
+            {
+                case armnn::DataType::Float32:
+                case armnn::DataType::Float16:
+                case armnn::DataType::BFloat16:
+                    out.Set(in.Get());
+                    break;
+                default:
+                    out.Set(std::floor(in.Get()));
+                    break;
+            }
+            ++in;
+            ++out;
+        }
+    }
+
+
+    // Cast Float to Int64
+    void Cast(armnn::Decoder<float>& in, armnn::Encoder<double_t>& out,
+              const uint32_t numElements, const armnn::DataType)
+    {
+        for (unsigned int i = 0; i < numElements; ++i)
         {
             out.Set(in.Get());
             ++in;
             ++out;
         }
     }
+
+    // Cast Int64 To Float
+    void Cast(armnn::Decoder<double_t>& in, armnn::Encoder<float>& out,
+              const uint32_t numElements, const armnn::DataType)
+    {
+        for (unsigned int i = 0; i < numElements; ++i)
+        {
+            out.Set(static_cast<float>(in.Get()));
+            ++in;
+            ++out;
+        }
+    }
 }
+
 
 namespace armnn
 {
@@ -56,9 +93,27 @@ void RefCastWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<IT
         outputTensorInfo.SetQuantizationOffset(0);
     }
 
-    Cast(*MakeDecoder<float>(inputTensorInfo, inputs[0]->Map()),
-         *MakeEncoder<float>(outputTensorInfo, outputs[0]->Map()),
-         inputTensorInfo.GetNumElements());
+    if(inputTensorInfo.GetDataType() == DataType::Signed64)
+    {
+        Cast(*MakeDecoder<double_t>(inputTensorInfo, inputs[0]->Map()),
+             *MakeEncoder<float>(outputTensorInfo, outputs[0]->Map()),
+             inputTensorInfo.GetNumElements(),
+             outputTensorInfo.GetDataType());
+    }
+    else if(outputTensorInfo.GetDataType() == DataType::Signed64)
+    {
+        Cast(*MakeDecoder<float>(inputTensorInfo, inputs[0]->Map()),
+             *MakeEncoder<double_t>(outputTensorInfo, outputs[0]->Map()),
+             inputTensorInfo.GetNumElements(),
+             outputTensorInfo.GetDataType());
+    }
+    else
+    {
+        Cast(*MakeDecoder<float>(inputTensorInfo, inputs[0]->Map()),
+             *MakeEncoder<float>(outputTensorInfo, outputs[0]->Map()),
+             inputTensorInfo.GetNumElements(),
+             outputTensorInfo.GetDataType());
+    }
 }
 
 } //namespace armnn

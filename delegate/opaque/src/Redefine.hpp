@@ -336,18 +336,21 @@ TfLiteStatus VisitSqueezeOperator(DelegateData& delegateData,
     std::vector<uint32_t> squeezeDim;
     // A single negative dim index is interpreted as a negative index in python
     // Meaning the index will be the shape size plus the negative index value
-    if (options->num_squeeze_dims == 1 && options->squeeze_dims[0] < 0)
+
+    for (int32_t i = 0; i < options->num_squeeze_dims; ++i)
     {
-        int32_t dim = static_cast<int32_t>(inputTensorInfo.GetShape().GetNumDimensions()) + options->squeeze_dims[0];
-        squeezeDim.push_back(static_cast<uint32_t>(dim));
-    }
-    else
-    {
-        for (int32_t i = 0; i < options->num_squeeze_dims; ++i)
+        int32_t dim = options->squeeze_dims[i];
+        if(dim < 0)
         {
-            squeezeDim.push_back(static_cast<uint32_t>(options->squeeze_dims[i]));
+            dim += static_cast<int32_t>(inputTensorInfo.GetShape().GetNumDimensions());
+            squeezeDim.emplace_back(dim);
+        }
+        else
+        {
+            squeezeDim.emplace_back(static_cast<uint32_t>(options->squeeze_dims[i]));
         }
     }
+
 
     armnn::TensorInfo outputTensorInfo = OutputShapeOfSqueeze(squeezeDim, inputTensorInfo);
 

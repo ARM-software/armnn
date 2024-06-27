@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd. All rights reserved.
+// Copyright © 2019,2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -20,7 +20,7 @@ void Slice(const TensorInfo& inputInfo,
     const TensorShape& inputShape = inputInfo.GetShape();
     const unsigned int numDims    = inputShape.GetNumDimensions();
 
-    constexpr unsigned int maxNumDims = 4;
+    constexpr unsigned int maxNumDims = 5;
     if (descriptor.m_Begin.size() != numDims)
     {
         std::stringstream msg;
@@ -43,9 +43,9 @@ void Slice(const TensorInfo& inputInfo,
         throw InvalidArgumentException(msg.str());
     }
 
-    std::vector<unsigned int> paddedInput(4);
-    std::vector<unsigned int> paddedBegin(4);
-    std::vector<unsigned int> paddedSize (4);
+    std::vector<unsigned int> paddedInput(5);
+    std::vector<unsigned int> paddedBegin(5);
+    std::vector<unsigned int> paddedSize (5);
 
     const unsigned int numPaddingDims = maxNumDims - numDims;
     for (unsigned int i = 0u; i < maxNumDims; ++i)
@@ -69,16 +69,19 @@ void Slice(const TensorInfo& inputInfo,
     unsigned int dim1 = paddedInput[1];
     unsigned int dim2 = paddedInput[2];
     unsigned int dim3 = paddedInput[3];
+    unsigned int dim4 = paddedInput[4];
 
     unsigned int begin0 = paddedBegin[0];
     unsigned int begin1 = paddedBegin[1];
     unsigned int begin2 = paddedBegin[2];
     unsigned int begin3 = paddedBegin[3];
+    unsigned int begin4 = paddedBegin[4];
 
     unsigned int size0  = paddedSize[0];
     unsigned int size1  = paddedSize[1];
     unsigned int size2  = paddedSize[2];
     unsigned int size3  = paddedSize[3];
+    unsigned int size4  = paddedSize[4];
 
     if (begin0 + size0 > dim0)
     {
@@ -129,11 +132,14 @@ void Slice(const TensorInfo& inputInfo,
             {
                 for (unsigned int idx3 = begin3; idx3 < begin3 + size3; ++idx3)
                 {
-                    const unsigned int inputOffset =
-                        (((idx0 * dim1 + idx1) * dim2 + idx2) * dim3 + idx3) * dataTypeSize;
+                    for (unsigned int idx4 = begin4; idx4 < begin4 + size4; ++idx4)
+                    {
+                        const unsigned int inputOffset =
+                            ((((idx0 * dim1 + idx1) * dim2 + idx2) * dim3 + idx3) * dim4 + idx4) * dataTypeSize;
 
-                    ::memcpy(output, input + inputOffset, dataTypeSize);
-                    output += dataTypeSize;
+                        ::memcpy(output, input + inputOffset, dataTypeSize);
+                        output += dataTypeSize;
+                    }
                 }
             }
         }

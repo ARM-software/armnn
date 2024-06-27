@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -52,7 +52,17 @@ TfLiteStatus VisitFillOperator(DelegateData& delegateData,
     }
 
     armnn::TensorInfo inputTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
+    armnn::TensorInfo fillTensorInfo  = GetTensorInfoForTfLiteTensor(tfLiteFillTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+    if(!fillTensorInfo.IsConstant())
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnDelegate: FILL tensor must be a constant input in operator #%d node #%d: ",
+            tfLiteFillOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     armnn::FillDescriptor descriptor;
     switch (tfLiteFillTensor.type)

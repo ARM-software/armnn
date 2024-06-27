@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -254,9 +254,10 @@ std::pair<armnn::IConnectableLayer*, armnn::IConnectableLayer*> AddFloorDivLayer
         const armnn::TensorInfo& outputTensorInfo,
         int nodeIndex)
 {
-    auto divName = GetLayerName(armnn::BinaryOperation::Div, nodeIndex);
+    auto layerName = "FloorDiv:" +  std::to_string(nodeIndex);
     armnn::IConnectableLayer* divisionLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-            armnn::BinaryOperation::Div, divName.c_str());
+            armnn::BinaryOperation::Div, layerName.c_str());
+
     // if the output of the div is Signed32 the Floor layer is not required
     if (armnn::DataType::Signed32 == outputTensorInfo.GetDataType())
     {
@@ -264,7 +265,8 @@ std::pair<armnn::IConnectableLayer*, armnn::IConnectableLayer*> AddFloorDivLayer
     }
     armnn::IOutputSlot& outputSlot = divisionLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);
-    auto floorName = GetLayerName(armnn::LayerType::Floor, nodeIndex);
+
+    auto floorName = GetLayerName(armnn::BinaryOperation::Div, nodeIndex);
     armnn::IConnectableLayer* floorLayer = delegateData.m_Network->AddFloorLayer(floorName.c_str());
     outputSlot.Connect(floorLayer->GetInputSlot(0));
     return std::make_pair(divisionLayer, floorLayer);

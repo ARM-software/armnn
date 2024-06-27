@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -72,6 +72,16 @@ TfLiteStatus VisitFullyConnectedOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo   = GetTensorInfoForTfLiteOpaqueTensor(tfLiteInputTensor);
     const armnn::TensorInfo& weightsTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteWeightsTensor);
     const armnn::TensorInfo& outputTensorInfo  = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
+
+    // Check for zero dimension in input and output tensors
+    if(ZeroDimPresent({inputTensorInfo, outputTensorInfo}))
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d: ",
+            operatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     // Check that we support fused activation before we attempt to create a layer
     auto* tfLiteNodeParameters =

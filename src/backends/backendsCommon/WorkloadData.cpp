@@ -4305,7 +4305,7 @@ void BatchMatMulQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) cons
     auto axesXToMul = BatchMatMulDescriptor::GetAxesToMul(m_Parameters.m_DataLayoutX,
         inputXInfoAfterParams.GetShape());
     auto axesYToMul = BatchMatMulDescriptor::GetAxesToMul(m_Parameters.m_DataLayoutY,
-        inputXInfoBeforeParams.GetShape());
+        inputYInfoBeforeParams.GetShape());
 
     if(inputXInfoAfterParams.GetShape()[axesXToMul.second]
        != inputYInfoAfterParams.GetShape()[axesYToMul.first])

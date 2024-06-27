@@ -42,12 +42,15 @@ void BatchMatMul::ApplyBatchMatMul()
                                                           inputXInfo.GetShape());
     auto axesYToMul = BatchMatMulDescriptor::GetAxesToMul(params.m_DataLayoutY,
                                                           inputYInfo.GetShape());
+
+    // the inputYRowSize (or inputXColSize) needs to be obtained using the original (unadjusted) axis value,
+    // because it's obtained from the original tensor shape
+    unsigned int inputYRowSize = inputYInfo.GetShape()[axesYToMul.first];
+
     AdjustAxesToMulForUnequalRanks(axesXToMul, axesYToMul);
 
     unsigned int inputXColDim = axesXToMul.second;
     unsigned int inputYRowDim = axesYToMul.first;
-
-    unsigned int inputYRowSize = inputYInfo.GetShape()[inputYRowDim];
 
     auto batchMatMulOperation = [&](const std::vector<unsigned int>& curIdx)
     {
@@ -437,10 +440,11 @@ unsigned int BatchMatMul::CalcFlatIdx(DataSlot type, const std::vector<unsigned 
 {
     unsigned int result = idx[idx.size()-1];
     unsigned int dimMultiplier = 1;
-    unsigned int offset;
+    unsigned int offset = 0;
 
     // -2 because final dim is already accounted for in the multiplier (last dim is just a multiplier of 1x)
-    for(unsigned int i = static_cast<unsigned int>(idx.size()-2); static_cast<int>(i) >= 0; i--)
+    // Check offset in relation to i, to stop calculating flat index once all input shape fields considered
+    for(unsigned int i = static_cast<unsigned int>(idx.size()-2); static_cast<int>(i) >= 0 && (i + 1) > offset; i--)
     {
         switch(type)
         {

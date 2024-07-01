@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -78,6 +78,19 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     else if (tfLitePadOperatorCode == kTfLiteBuiltinPadv2)
     {
         const TfLiteTensor& tfLitepaddingValue = tfLiteTensors[tfLiteNode->inputs->data[2]];
+
+        // Fall back to TFLite if the padding value input is passed through a non-constant tensor,
+        // as the armnn delegate doesn't handle non-constant but non-network tensor input well
+        if(tfLitepaddingValue.allocation_type != kTfLiteMmapRo)
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Unsupported padding input through non-const tensor "
+                "in operator #%d node #%d",
+                tfLitePadOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+
         armnn::TensorInfo paddingValueTensorInfo = GetTensorInfoForTfLiteTensor(tfLitepaddingValue);
         if (paddingValueTensorInfo.GetNumElements() != 1)
         {

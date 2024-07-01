@@ -125,6 +125,18 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
             return kTfLiteError;
         }
 
+        // Fall back to TFLite if the padding value input is passed through a non-constant tensor,
+        // as the armnn delegate doesn't handle non-constant but non-network tensor input well
+        if(TfLiteOpaqueTensorGetAllocationType(tfLitePaddingValue) != kTfLiteMmapRo)
+        {
+            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Unsupported padding input through non-const tensor "
+                "in operator #%d node #%d",
+                tfLitePadOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+
         armnn::TensorInfo paddingValueTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLitePaddingValue);
         if (paddingValueTensorInfo.GetNumElements() != 1)
         {

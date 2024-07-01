@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -69,6 +69,16 @@ TfLiteStatus VisitReduceOperator(DelegateData& delegateData,
     // Get const axis value from model and set it to descriptor.
     const armnn::TensorInfo& axisTensorInfo =   GetTensorInfoForTfLiteOpaqueTensor(tfLiteAxisTensor);
     auto* axisTensorData = static_cast<int*>(TfLiteOpaqueTensorData(tfLiteAxisTensor));
+
+    // Check for unsupported 0-size dimensions in the tensor shapes
+    if(ZeroDimPresent({inputTensorInfo, axisTensorInfo, outputTensorInfo}))
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d",
+            reduceOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     std::vector<int32_t> axis;
     // Add axis data to vector to be converter to unsigned int and assigned to descriptor axis.

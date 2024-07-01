@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -228,6 +228,16 @@ TfLiteStatus VisitMeanOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo =  GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& axisTensorInfo =   GetTensorInfoForTfLiteTensor(tfLiteAxisTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+    // Check for unsupported 0-size dimensions in the tensor shapes
+    if(ZeroDimPresent({inputTensorInfo, axisTensorInfo, outputTensorInfo}))
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d",
+            tfLiteMeanOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     auto* axisTensorData = tflite::GetTensorData<int32_t>(&tfLiteAxisTensor);
 

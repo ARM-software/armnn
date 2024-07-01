@@ -475,10 +475,24 @@ TEST_CASE("TosaRefReshapeEndtoEndTestFloat16")
     ReshapeEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
 }
 
+// Rsqrt
 TEST_CASE("TosaRefRsqrtEndtoEndTestFloat32")
 {
     ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends,
                                                              UnaryOperation::Rsqrt);
+}
+
+// Exp
+TEST_CASE("TosaRefExpEndToEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends,
+                                                             UnaryOperation::Exp);
+}
+
+TEST_CASE("TosaRefExpEndToEndTestInt8")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends,
+                                                              UnaryOperation::Exp);
 }
 
 // Resize

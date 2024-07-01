@@ -36,6 +36,9 @@ TosaSerializationBasicBlock* ConvertElementwiseUnaryOperator(const Layer* layer,
             blockName = std::string("Op_RSQRT_block_") + GetUniqueTosaMappingID();
             break;
         }
+        case UnaryOperation::Exp:
+            throw armnn::Exception(
+                "ConvertElementwiseUnaryToTosaOperator: Unexpected operation Exp. Use ConvertExpOperator() instead.");
         default:
             throw armnn::Exception("ConvertElementwiseUnaryToTosaOperator: Unsupported layer type.");
     }

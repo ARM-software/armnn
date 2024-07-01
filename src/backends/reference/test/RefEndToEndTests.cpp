@@ -93,6 +93,31 @@ TEST_CASE("RefRsqrtEndToEndTestInt16")
                                                               UnaryOperation::Rsqrt);
 }
 
+// Exp
+TEST_CASE("RefExpEndToEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
+                                                             UnaryOperation::Exp);
+}
+
+TEST_CASE("RefExpEndToEndTestUint8")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
+                                                              UnaryOperation::Exp);
+}
+
+TEST_CASE("RefExpEndToEndTestInt8")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends,
+                                                              UnaryOperation::Exp);
+}
+
+TEST_CASE("RefExpEndToEndTestInt16")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QSymmS16>(defaultBackends,
+                                                              UnaryOperation::Exp);
+}
+
 // Addition
 TEST_CASE("RefAdditionEndtoEndFloat32")
 {

@@ -26,18 +26,21 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         case LayerType::Activation:
         {
             auto activationDesc = PolymorphicDowncast<const ActivationDescriptor*>(&descriptor);
-            if (activationDesc->m_Function == ActivationFunction::LeakyReLu)
+            switch (activationDesc->m_Function)
             {
-                return ConvertLeakyReluToTosaOperator(layer, inputs, outputs, activationDesc);
-            }
-            if (activationDesc->m_Function == ActivationFunction::ReLu ||
-                activationDesc->m_Function == ActivationFunction::BoundedReLu)
-            {
-                return ConvertReluToTosaOperator(layer, inputs, outputs, activationDesc);
-            }
-            else
-            {
-                return CreateEmptyTosaSerializationBasicBlock();
+                case ActivationFunction::LeakyReLu:
+                {
+                    return ConvertLeakyReluToTosaOperator(layer, inputs, outputs, activationDesc);
+                }
+                case ActivationFunction::ReLu:
+                case ActivationFunction::BoundedReLu:
+                {
+                    return ConvertReluToTosaOperator(layer, inputs, outputs, activationDesc);
+                }
+                default:
+                {
+                    return CreateEmptyTosaSerializationBasicBlock();
+                }
             }
         }
         case LayerType::Addition:
@@ -54,7 +57,21 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         case LayerType::ElementwiseUnary:
         {
             auto unaryDesc = PolymorphicDowncast<const ElementwiseUnaryDescriptor*>(&descriptor);
-            return ConvertElementwiseUnaryOperator(layer, inputs, outputs, unaryDesc);
+            switch(unaryDesc->m_Operation)
+            {
+                case UnaryOperation::Rsqrt:
+                {
+                    return ConvertElementwiseUnaryOperator(layer, inputs, outputs, unaryDesc);
+                }
+                case UnaryOperation::Exp:
+                {
+                    return ConvertExpOperator(layer, inputs, outputs, unaryDesc);
+                }
+                default:
+                {
+                    return CreateEmptyTosaSerializationBasicBlock();
+                }
+            }
         }
         case LayerType::BatchMatMul:
         {

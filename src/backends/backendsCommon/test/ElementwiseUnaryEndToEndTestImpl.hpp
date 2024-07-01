@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2021, 2023 Arm Ltd. All rights reserved.
+// Copyright © 2020-2021, 2023-2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -77,6 +77,13 @@ void ElementwiseUnarySimpleEndToEnd(const std::vector<BackendId>& backends,
                       3, 3, 3, 3,  4, 4, 4, 4 };
             expectedOutput = { 1.f, 1.f, 1.f, 1.f, 0.447214f, 0.447214f, 0.447214f, 0.447214f,
                                0.57735f, 0.57735f, 0.57735f, 0.57735f, 0.5f, 0.5f, 0.5f, 0.5f };
+            break;
+        case UnaryOperation::Exp:
+            input = { 1, -1, 1, 1,  5, -5, 5, 5,
+                      -3, 3, 3, 3,  4, 4, -4, 4 };
+            expectedOutput =
+                { 2.718282f, 0.367879f, 2.718282f, 2.718282f, 148.413162f, 0.006738f, 148.413162f, 148.413162f,
+                  0.049787f, 20.085537f, 20.085537f, 20.085537f, 54.598148f, 54.598148f, 0.018316f, 54.598148f };
             break;
         default:
             input = { 1, -1, 1, 1,  5, -5, 5, 5,

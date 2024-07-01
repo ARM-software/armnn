@@ -24,3 +24,4 @@
 #include "SplitOperator.hpp"
 #include "TransposeConv2dOperator.hpp"
 #include "TransposeOperator.hpp"
+#include "ExpOperator.hpp"

@@ -326,7 +326,25 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
     armnn::TensorInfo inputTensorInfo1 = GetTensorInfoForTfLiteOpaqueTensor(tfLiteInputTensor1);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
 
+    // Check for unspecified dimensions in the output tensor
+    if (outputTensorInfo.GetShape().GetDimensionality() == armnn::Dimensionality::NotSpecified)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Shape dimensionality is not specified in operator #%d node #%d: ",
+            elementwiseBinaryOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
+    // Check for unsupported 0-size dimensions in the tensor shapes
+    if(ZeroDimPresent({inputTensorInfo0, inputTensorInfo1, outputTensorInfo}))
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d",
+            elementwiseBinaryOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     // Check if we need to expand the dims of the input tensor infos.
     // This is required for a few of the backends.

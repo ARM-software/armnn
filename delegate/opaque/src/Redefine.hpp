@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -146,6 +146,16 @@ TfLiteStatus VisitReshapeOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo0 = GetTensorInfoForTfLiteOpaqueTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
+
+    // Check for unsupported 0-size dimensions in the input/output tensor shapes
+    if(ZeroDimPresent({inputTensorInfo0, outputTensorInfo}))
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d",
+            operatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     armnn::ReshapeDescriptor reshapeDesc;
     std::vector<int32_t> targetShape;

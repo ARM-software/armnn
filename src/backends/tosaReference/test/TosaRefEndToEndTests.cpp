@@ -522,6 +522,19 @@ TEST_CASE("TosaRefExpEndToEndTestInt8")
                                                               UnaryOperation::Exp);
 }
 
+// Log
+TEST_CASE("TosaRefLogEndToEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends,
+                                                             UnaryOperation::Log);
+}
+
+TEST_CASE("TosaRefLogEndToEndTestSint8")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends,
+                                                              UnaryOperation::Log);
+}
+
 // Resize
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat32AlignCornersNhwcTest")
 {

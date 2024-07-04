@@ -7,22 +7,22 @@
 // SPDX-License-Identifier: Apache-2.0
 //
 
-#include "ExpOperator.hpp"
+#include "LogOperator.hpp"
 #include "TosaTableUtils.hpp"
 
-TosaSerializationBasicBlock* ConvertExpOperator(const Layer* layer,
+TosaSerializationBasicBlock* ConvertLogOperator(const Layer* layer,
                                                 const std::vector<const TensorInfo*>& inputs,
                                                 const std::vector<const TensorInfo*>& outputs,
                                                 const ElementwiseUnaryDescriptor* unaryDescriptor)
 {
-    if (unaryDescriptor->m_Operation != UnaryOperation::Exp)
+    if (unaryDescriptor->m_Operation != UnaryOperation::Log)
     {
-        throw armnn::Exception("ConvertExpOperator: Unsupported elementwise unary operation in descriptor.");
+        throw armnn::Exception("ConvertLogOperator: Unsupported elementwise unary operation in descriptor.");
     }
 
     std::string inputName = std::string("input_");
     std::string outputName = std::string("output0_");
-    std::string blockName  = std::string("Op_EXP_block_") + GetUniqueTosaMappingID();
+    std::string blockName  = std::string("Op_LOG_block_") + GetUniqueTosaMappingID();
 
     // If a layer is present then the block will be used for execution, so input and output names need to be determined
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
@@ -40,12 +40,23 @@ TosaSerializationBasicBlock* ConvertExpOperator(const Layer* layer,
     int32_t input_zp = inputs[0]->GetQuantizationOffset();
     int32_t output_zp = outputs[0]->GetQuantizationOffset();
     DataType inputDType = inputs[0]->GetDataType();
+
     if (inputDType == DataType::QAsymmS8 ||
         inputDType == DataType::QSymmS8)
     {
-        auto exp_func = [](float x) -> float { return std::exp(x); };
+        const float output_min = static_cast<float>(-128 - output_zp) * output_scale;
+
+        auto log_func = [&](float x) -> float
+        {
+            if (x <= 0.0f) 
+            {
+                return output_min;
+            }
+            return std::log(x);
+        };
+
         TosaTableAttribute attribute(
-            getTosaConst8bitTable(input_scale, input_zp, output_scale, output_zp, exp_func));
+            getTosaConst8bitTable(input_scale, input_zp, output_scale, output_zp, log_func));
         operators.push_back(new TosaSerializationOperator(tosa::Op_TABLE,
                                                           Attribute_TableAttribute,
                                                           &attribute,
@@ -54,17 +65,25 @@ TosaSerializationBasicBlock* ConvertExpOperator(const Layer* layer,
     }
     else if (inputDType == DataType::QSymmS16)
     {
-        throw Exception("ConvertExpOperator() unsupported int 16 not implemented yet.");
-        // The following generates the table, tosa attribute and operator for int16 exponential.
-        // However, running the int16 EXP EndToEnd test causes incorrect output values.
-        // At the time of writing the EXP operator there is no requirment for int16 support.
+        throw Exception("ConvertLogOperator() unsupported int 16 not implemented yet.");
+        // The following generates the table, tosa attribute and operator for int16 log.
+        // However, running the int16 LOG EndToEnd test causes incorrect output values.
+        // At the time of writing the LOG operator there is no requirment for int16 support.
         // Points to enable int16 in the future:
-        //     - TOSA specifies EXP int16 input must have int32 output
-        //     - We potentially need a rescale after the int32 EXP output to convert back to int16.
+        //     - TOSA specifies LOG int16 input must have int32 output
+        //     - We potentially need a rescale after the int32 LOG output to convert back to int16.
         /*
-        auto exp_func = [](float x) -> float { return std::exp(x); };
+        const float output_min = (-32768 - output_zp) * static_cast<float>(output_scale);
+
+        auto log_func = [&](float x) -> float {
+        if (x <= 0.0f) {
+            return output_min;
+        }
+        return std::log(x);
+        };
+
         TosaTableAttribute attribute(
-            getTosaConst16bitTable<float>(input_scale, input_zp, output_scale, output_zp, exp_func));
+            getTosaConst16bitTable<float>(input_scale, input_zp, output_scale, output_zp, log_func));
         operators.push_back(new TosaSerializationOperator(tosa::Op_TABLE,
                                                           Attribute_TableAttribute,
                                                           &attribute,
@@ -76,12 +95,12 @@ TosaSerializationBasicBlock* ConvertExpOperator(const Layer* layer,
              inputDType == DataType::Signed64)
     {
         throw Exception(
-            "ConvertExpOperator() unsupported int 32. Only int 8 and int 16 quantized types are supported.");
+            "ConvertLogOperator() unsupported int 32. Only int 8 and int 16 quantized types are supported.");
     }
-    // Floating point EXP operator
+    // Floating point LOG operator
     else
     {
-        operators.push_back(new TosaSerializationOperator(tosa::Op_EXP,
+        operators.push_back(new TosaSerializationOperator(tosa::Op_LOG,
                                                           Attribute_NONE,
                                                           nullptr,
                                                           {inputName},
@@ -100,7 +119,7 @@ TosaSerializationBasicBlock* ConvertExpOperator(const Layer* layer,
 
     std::vector<int32_t> outputShape0 = GetTosaTensorShape(outputs[0]->GetShape());
 
-    // Re-enable below line for int16 EXP support which requires int32 output in TOSA and remove second line.
+    // Re-enable below line for int16 LOG support which requires int32 output in TOSA and remove second line.
     // DType outputDType0 =
     //     (inputDType == DataType::QSymmS16) ? DType::DType_INT32 : ArmNNToDType(outputs[0]->GetDataType());
     DType outputDType0 = ArmNNToDType(outputs[0]->GetDataType());

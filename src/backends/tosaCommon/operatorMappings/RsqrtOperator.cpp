@@ -3,17 +3,21 @@
 // SPDX-License-Identifier: MIT
 //
 
-#include "ElementwiseUnaryOperator.hpp"
+#include "RsqrtOperator.hpp"
 
-TosaSerializationBasicBlock* ConvertElementwiseUnaryOperator(const Layer* layer,
-                                                             const std::vector<const TensorInfo*>& inputs,
-                                                             const std::vector<const TensorInfo*>& outputs,
-                                                             const ElementwiseUnaryDescriptor* unaryDescriptor)
+TosaSerializationBasicBlock* ConvertRsqrtOperator(const Layer* layer,
+                                                  const std::vector<const TensorInfo*>& inputs,
+                                                  const std::vector<const TensorInfo*>& outputs,
+                                                  const ElementwiseUnaryDescriptor* unaryDescriptor)
 {
+    if (unaryDescriptor->m_Operation != UnaryOperation::Rsqrt)
+    {
+        throw armnn::Exception("ConvertRsqrtOperator: Unsupported elementwise unary operation in descriptor.");
+    }
+
     std::string input0Name = std::string("input_");
     std::string outputName = std::string("output0_");
-    std::string blockName  = std::string("Op_ELEMENTWISEUNARY_block_") + GetUniqueTosaMappingID();
-
+    std::string blockName  = std::string("Op_RSQRT_block_") + GetUniqueTosaMappingID();
 
     // If a layer is present then the block will be used for execution, so input and output names need to be determined
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
@@ -23,25 +27,11 @@ TosaSerializationBasicBlock* ConvertElementwiseUnaryOperator(const Layer* layer,
         outputName = GenerateUniqueOutputName(*layer);
     }
 
-    TosaSerializationOperator* op = nullptr;
-    switch(unaryDescriptor->m_Operation)
-    {
-        case UnaryOperation::Rsqrt:
-        {
-            op = new TosaSerializationOperator(tosa::Op_RSQRT,
-                                               Attribute_NONE,
-                                               nullptr,
-                                               {input0Name},
-                                               {outputName});
-            blockName = std::string("Op_RSQRT_block_") + GetUniqueTosaMappingID();
-            break;
-        }
-        case UnaryOperation::Exp:
-            throw armnn::Exception(
-                "ConvertElementwiseUnaryToTosaOperator: Unexpected operation Exp. Use ConvertExpOperator() instead.");
-        default:
-            throw armnn::Exception("ConvertElementwiseUnaryToTosaOperator: Unsupported layer type.");
-    }
+    auto* op = new TosaSerializationOperator(tosa::Op_RSQRT,
+                                             Attribute_NONE,
+                                             nullptr,
+                                             {input0Name},
+                                             {outputName});
 
     std::vector<TosaSerializationTensor*> tensors;
     // Only add input tensor if connected layer is an input layer.

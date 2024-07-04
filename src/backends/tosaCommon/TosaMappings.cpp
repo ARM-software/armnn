@@ -61,11 +61,15 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             {
                 case UnaryOperation::Rsqrt:
                 {
-                    return ConvertElementwiseUnaryOperator(layer, inputs, outputs, unaryDesc);
+                    return ConvertRsqrtOperator(layer, inputs, outputs, unaryDesc);
                 }
                 case UnaryOperation::Exp:
                 {
                     return ConvertExpOperator(layer, inputs, outputs, unaryDesc);
+                }
+                case UnaryOperation::Log:
+                {
+                    return ConvertLogOperator(layer, inputs, outputs, unaryDesc);
                 }
                 default:
                 {

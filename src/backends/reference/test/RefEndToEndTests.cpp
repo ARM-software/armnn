@@ -119,6 +119,31 @@ TEST_CASE("RefExpEndToEndTestInt16")
                                                               UnaryOperation::Exp);
 }
 
+// Log
+TEST_CASE("RefLogEndToEndTestFloat32")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::Float32>(defaultBackends,
+                                                             UnaryOperation::Log);
+}
+
+TEST_CASE("RefLogEndToEndTestUint8")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmU8>(defaultBackends,
+                                                              UnaryOperation::Log);
+}
+
+TEST_CASE("RefLogEndToEndTestSint8")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends,
+                                                              UnaryOperation::Log);
+}
+
+TEST_CASE("RefLogEndToEndTestInt16")
+{
+    ElementwiseUnarySimpleEndToEnd<armnn::DataType::QSymmS16>(defaultBackends,
+                                                              UnaryOperation::Log);
+}
+
 // Addition
 TEST_CASE("RefAdditionEndtoEndFloat32")
 {

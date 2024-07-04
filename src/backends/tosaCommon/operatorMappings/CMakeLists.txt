@@ -22,12 +22,14 @@ list(APPEND armnnTosaBackendOperators_sources
         DepthwiseConv2dOperator.cpp
         ElementwiseBinaryOperator.hpp
         ElementwiseBinaryOperator.cpp
-        ElementwiseUnaryOperator.cpp
-        ElementwiseUnaryOperator.hpp
-        ExpOperator.cpp
-        ExpOperator.hpp
         FullyConnectedOperator.cpp
         FullyConnectedOperator.hpp
+        RsqrtOperator.cpp
+        RsqrtOperator.hpp
+        ExpOperator.cpp
+        ExpOperator.hpp
+        LogOperator.cpp
+        LogOperator.hpp
         PadOperator.cpp
         PadOperator.hpp
         Pooling2DOperator.hpp

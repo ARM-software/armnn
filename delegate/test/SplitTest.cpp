@@ -4,7 +4,7 @@
 //
 
 #include "SplitTestHelper.hpp"
-
+#include <common/src/DelegateUtils.hpp>
 #include <doctest/doctest.h>
 
 namespace armnnDelegate
@@ -161,6 +161,33 @@ void SplitVFp32Test()
                       numSplits);
 }
 
+void SplitVFp32ZeroDimTest()
+{
+    uint32_t inputShape[] =  { 1 };
+
+    uint32_t outputShape0[] = { 1 };
+    uint32_t outputShape1[] = { 1 };
+    uint32_t outputShape2[] = { 1 };
+    uint32_t outputShape3[] = { 1 };
+    uint32_t outputShape4[] = { 1 };
+    uint32_t outputShape5[] = { 1 };
+    uint32_t outputShape6[] = { 2 };
+    uint32_t outputShape7[] = { 0 };
+
+    armnn::TensorInfo inputTensor   = armnn::TensorInfo(1, inputShape, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor0 = armnn::TensorInfo(1, outputShape0, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor1 = armnn::TensorInfo(1, outputShape1, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor2 = armnn::TensorInfo(1, outputShape2, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor3 = armnn::TensorInfo(1, outputShape3, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor4 = armnn::TensorInfo(1, outputShape4, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor5 = armnn::TensorInfo(1, outputShape5, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor6 = armnn::TensorInfo(1, outputShape6, armnn::DataType::Float32);
+    armnn::TensorInfo outputTensor7 = armnn::TensorInfo(1, outputShape7, armnn::DataType::Float32);
+
+    CHECK(ZeroDimPresent({inputTensor, outputTensor0, outputTensor1, outputTensor2, outputTensor3,
+                          outputTensor4, outputTensor5, outputTensor6, outputTensor7}) == true);
+}
+
 // SPLIT_V Test Suite
 TEST_SUITE("SPLIT_VTests")
 {
@@ -168,6 +195,11 @@ TEST_SUITE("SPLIT_VTests")
 TEST_CASE ("SPLIT_V_Uint8_Test")
 {
     SplitVUint8Test();
+}
+
+TEST_CASE ("SPLIT_V_Fp32_ZeroDim_Test")
+{
+    SplitVFp32ZeroDimTest();
 }
 
 TEST_CASE ("SPLIT_V_Fp32_Test")

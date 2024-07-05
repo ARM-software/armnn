@@ -233,7 +233,14 @@ std::vector<char> CreateSplitVTfLiteModel(tflite::TensorType tensorType,
     flatbuffers::Offset<void> operatorBuiltinOptions = CreateSplitVOptions(flatBufferBuilder, numSplits).Union();
 
     const std::vector<int> operatorInputs{ {0, 1, 2} };
-    const std::vector<int> operatorOutputs{ {3, 4} };
+    std::vector<int> operatorOutputs;
+
+    for (uint32_t i = 0; i< outputTensorShapes.size(); ++i)
+    {
+        operatorOutputs.emplace_back(i+3);
+    }
+
+
     flatbuffers::Offset <Operator> controlOperator =
             CreateOperator(flatBufferBuilder,
                            0,
@@ -243,7 +250,13 @@ std::vector<char> CreateSplitVTfLiteModel(tflite::TensorType tensorType,
                            operatorBuiltinOptions);
 
     const std::vector<int> subgraphInputs{ {0, 1, 2} };
-    const std::vector<int> subgraphOutputs{ {3, 4} };
+    std::vector<int> subgraphOutputs;
+
+    for (uint32_t i = 0; i< outputTensorShapes.size(); ++i)
+    {
+        subgraphOutputs.emplace_back(i+3);
+    }
+
     flatbuffers::Offset <SubGraph> subgraph =
             CreateSubGraph(flatBufferBuilder,
                            flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),

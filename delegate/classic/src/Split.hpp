@@ -1,5 +1,5 @@
 //
-// Copyright © 2020,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020,2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -70,11 +70,23 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
     for (unsigned int i = 0; i < numSplits; ++i)
     {
         const TfLiteTensor& tfLiteOutputTensor = tfLiteTensors[tfLiteNode->outputs->data[i]];
+
+        const armnn::TensorInfo& outputTensorShape = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+        if (ZeroDimPresent({outputTensorShape}))
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Zero dimension tensors are not supported in operator #%d node #%d: ",
+                tfLiteSplitOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+
         if (!IsValid(tfLiteContext, tfLiteOutputTensor, tfLiteSplitOperatorCode, nodeIndex))
         {
             return kTfLiteError;
         }
-        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true));
+        outputs.push_back(outputTensorShape);
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 
@@ -242,7 +254,19 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
         {
             return kTfLiteError;
         }
-        outputs.push_back(GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true));
+
+        const armnn::TensorInfo& outputTensorShape = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+        if (ZeroDimPresent({outputTensorShape}))
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Zero dimension tensors are not supported in operator #%d node #%d: ",
+                tfLiteSplitVOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+
+        outputs.push_back(outputTensorShape);
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 

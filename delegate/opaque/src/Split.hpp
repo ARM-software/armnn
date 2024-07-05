@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -100,7 +100,19 @@ TfLiteStatus VisitSplitOperator(DelegateData& delegateData,
         {
             return kTfLiteError;
         }
-        outputs.push_back(GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true));
+
+        const armnn::TensorInfo& outputTensorShape = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
+
+        if (ZeroDimPresent({outputTensorShape}))
+        {
+            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d: ",
+                tfLiteSplitOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+
+        outputs.push_back(outputTensorShape);
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 
@@ -294,16 +306,30 @@ TfLiteStatus VisitSplitVOperator(DelegateData& delegateData,
                 nodeIndex);
         return kTfLiteError;
     }
+
     std::vector<armnn::TensorInfo> outputs;
     for (int i = 0; i < numSplits; ++i)
     {
         const TfLiteOpaqueTensor* tfLiteOutputTensor =
                 TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, outputTensors[i]);
+
         if (!IsValid(tfLiteContext, tfLiteOutputTensor, tfLiteSplitVOperatorCode, nodeIndex))
         {
             return kTfLiteError;
         }
-        outputs.push_back(GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true));
+
+        const armnn::TensorInfo& outputTensorShape = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
+
+        if (ZeroDimPresent({outputTensorShape}))
+        {
+            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d: ",
+                tfLiteSplitVOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+
+        outputs.push_back(outputTensorShape);
     }
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());
 

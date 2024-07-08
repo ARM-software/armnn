@@ -1,18 +1,23 @@
 # Evaluate Tensorflow Lite script.
 
-This script will run a TfLite model through ExecuteNetwork evaluating its performance and accuracy on all available backends and with some available performance options. This script is designed to be used on an aarch64 Linux target.
+This script will run a TfLite model through ExecuteNetwork evaluating its performance and accuracy on all available backends and with some available performance options. This script is designed to be used on aarch64 Linux and Android targets.
 
 ## Usage
-__evaluate_network.sh -e \<Path to ExecuteNetwork> -m \<Tflite model to test>__
+__evaluate_network.sh -e \<Path to ExecuteNetwork> -m \<Tflite model to test> [-a]__
 
-The script takes two mandatory parameters. The first, -e, is the directory containing the prebuilt execute network binary. The second, -m, is the path to the Tf Lite model to be evaluated. For example:
+The script takes two mandatory parameters. The first, -e, is the directory containing the prebuilt execute network binary. The second, -m, is the path to the Tf Lite model to be evaluated. A third optional parameter, -a, indicates the script should use Android debug bridge to connect to an Android device. For example:
 
 ```bash
 evaluate_network.sh -e ./build/release/armnn/test -m ./my_tflite_model.tflite
 ```
+or
+```bash
+evaluate_network.sh -e /data/local/tmp -m /data/local/tmp/my_tflite_model.tflite -a
+```
+
 ## Prerequisites of your built execute network binary
 
-* Built for a Linux target (Android is not yet supported by this script)
+* Built for an Aarch64 Linux or Android target
 * CpuRef must be enabled (-DARMNNREF=1)
 * The TfLite delegate must be enabled (-DBUILD_CLASSIC_DELEGATE=1)
 * The TfLite parser must be enabled (-DBUILD_TF_LITE_PARSER=1)
@@ -21,11 +26,19 @@ evaluate_network.sh -e ./build/release/armnn/test -m ./my_tflite_model.tflite
 ## Prerequisites of the model
 * The model must be fully supported by Arm NN.
 
+## Prerequisites of the Android environment
+
+* Should be accessible via Android debug bridge.
+* The adb executable should be in the path.
+* The path to the ExecuteNetwork executable should
+  * Also contain the Arm NN shared libraries.
+  * Should be writable if you intend to use the GpuAcc backend.
+
 ## What tests are performed?
 
 * Initial validation
   * Checks that the mandatory parameters point to valid locations.
-  * Determines what backends are both built into the Execute Network binary and can execute on the current platform.
+  * Determines what backends are both built into the Execute Network binary and can execute on the target platform.
   * Checks that the TfLite delegate is supported by the binary.
   * Checks that the model is fully supported by Arm NN.
 * Accuracy: for each available backend it will
@@ -160,3 +173,55 @@ Now tryng "tuning-level/tuning-path".
  "--tuning-level 3" did not result in a faster average inference time. (222.958 v 220.274)
 ```
 Again for this model CpuAcc with --number-of-threads 9 produced the fastest inference. However, you can see how adding --fp16-turbo-mode to GpuAcc almost brings it to the same performance level as CpuAcc.
+
+## Android worked example
+
+The following example was run on an HiKey 960 (4 Cortex A73 + 4 Cortex A53, Mali G71 GPU).
+
+```
+~/$ ./evaluate_network_android.sh -e /data/local/tmp/ -m /data/local/tmp/resnet50_v2_batch_fixed_fp32.tflite -a
+Using adb from					: /usr/bin/adb
+Using Execute Network from			: /data/local/tmp/ExecuteNetwork
+Available backends on this executable		: GpuAcc CpuAcc CpuRef 
+Looking for 64bit libOpenCL.so			: /vendor/lib64
+Looking for 64bit libGLES_mali.so		: /vendor/lib64/egl
+Is the delegate supported on this executable?	: Yes
+Is the model fully supported by Arm NN?		: Yes
+Arm NN ABI version is				: v33.1.0
+===================================================================================
+BACKEND		ACCURACY	MODEL LOAD(ms)	OPTIMIZATION(ms)	INITIAL INFERENCE(ms)	AVERAGE INFERENCE(ms)
+GpuAcc		OK 		30.30		18.51			691.39			142.226	
+CpuAcc		OK 		33.33		19.20			1307.41			207.134	
+CpuRef		OK 		29.53		7.94			36039.98			36039.8	
+
+CpuAcc optimizations.
+============================
+The value of "number-of-threads" parameter by default is decided on by the backend.
+Cycle through number-of-threads=1 -> 12 and see if any are faster than the default.
+
+No value of "number-of-threads" was faster than the default.
+
+Now trying to enable fp16-turbo-mode. This will only have positive results with fp32 models.
+ACCURACY	MODEL LOAD(ms)	OPTIMIZATION(ms)	INITIAL INFERENCE(ms)	AVERAGE INFERENCE(ms)		DELTA(ms)
+OK 		26.63		19.34			1504.11			242.78				**No improvment**
+
+Now trying "enable-fast-math".
+ACCURACY	MODEL LOAD(ms)	OPTIMIZATION(ms)	INITIAL INFERENCE(ms)	AVERAGE INFERENCE(ms)		DELTA(ms)
+OK 		27.43		19.41			1475.96			245.296				**No improvment**
+
+GpuAcc optimizations.
+============================
+
+Now trying to enable fp16-turbo-mode. This will only have positive results with fp32 models.
+ACCURACY	MODEL LOAD(ms)	OPTIMIZATION(ms)	INITIAL INFERENCE(ms)	AVERAGE INFERENCE(ms)		DELTA(ms)
+OK 		30.40		302.67			192.75			136.1				6.126  (136.1 v 142.226)
+
+Now trying "enable-fast-math".
+ACCURACY	MODEL LOAD(ms)	OPTIMIZATION(ms)	INITIAL INFERENCE(ms)	AVERAGE INFERENCE(ms)		DELTA(ms)
+OK 		27.21		18.58			742.81			142.628				**No improvment**
+
+Now trying "tuning-level/tuning-path".
+ "--tuning-level 1" did not result in a faster average inference time. (142.342 v 142.226)
+ "--tuning-level 2" did not result in a faster average inference time. (144.034 v 142.226)
+ "--tuning-level 3" resulted in a faster average inference by -.602 ms. (141.624 v 142.226)
+```

@@ -271,7 +271,11 @@ std::vector<const void *> TfLiteExecutor::Execute()
                     outputSize *= outputDims->data[dim];
                 }
 
-                armnn::TensorShape shape(static_cast<unsigned int>(outputDims->size), outputDims->data);
+                // outputDims->data can be a Flexible Array Member (int data[];) in a C extern code in TF common.h
+                // TensorShape constructor argument is an unsigned int *
+                // so reinterpret_cast is used here to ensure the correct type of data is passed
+                armnn::TensorShape shape(static_cast<unsigned int>(outputDims->size),
+                                            reinterpret_cast<unsigned int *>(outputDims->data));
                 armnn::DataType dataType(GetDataType(*m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)));
 
                 std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";

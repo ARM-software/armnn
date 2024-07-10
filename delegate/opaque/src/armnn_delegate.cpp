@@ -110,8 +110,8 @@ armnnDelegate::DelegateOptions ParseArmNNSettings(const tflite::TFLiteSettings* 
 
     // Build the key and value lists to pass into the constructor of the DelegateOptions
     size_t num_options = options.size();
-    std::unique_ptr<const char*> options_keys   = std::unique_ptr<const char*>(new const char*[num_options + 1]);
-    std::unique_ptr<const char*> options_values = std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_keys   = std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_values = std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
 
     for (size_t i=0; i<num_options; ++i)
     {

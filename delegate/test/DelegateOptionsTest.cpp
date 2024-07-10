@@ -148,10 +148,10 @@ TEST_CASE ("ArmnnDelegateStringParsingOptionDisableTfLiteRuntimeFallback")
 
     // Create options_keys and options_values char array
     size_t num_options = keys.size();
-    std::unique_ptr<const char*> options_keys =
-            std::unique_ptr<const char*>(new const char*[num_options + 1]);
-    std::unique_ptr<const char*> options_values =
-            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_keys =
+            std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_values =
+            std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
     for (size_t i=0; i<num_options; ++i)
     {
         options_keys.get()[i]   = keys[i].c_str();
@@ -183,10 +183,10 @@ TEST_CASE ("ArmnnDelegateStringParsingOptionEnableTfLiteRuntimeFallback")
 
     // Create options_keys and options_values char array
     size_t num_options = keys.size();
-    std::unique_ptr<const char*> options_keys =
-            std::unique_ptr<const char*>(new const char*[num_options + 1]);
-    std::unique_ptr<const char*> options_values =
-            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_keys =
+            std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_values =
+            std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
     for (size_t i=0; i<num_options; ++i)
     {
         options_keys.get()[i]   = keys[i].c_str();
@@ -299,10 +299,10 @@ void CreateFp16StringParsingTestRun(std::vector<std::string>& keys,
 
     // Create options_keys and options_values char array
     size_t num_options = keys.size();
-    std::unique_ptr<const char*> options_keys =
-            std::unique_ptr<const char*>(new const char*[num_options + 1]);
-    std::unique_ptr<const char*> options_values =
-            std::unique_ptr<const char*>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_keys =
+            std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
+    std::unique_ptr<const char*[]> options_values =
+            std::unique_ptr<const char*[]>(new const char*[num_options + 1]);
     for (size_t i=0; i<num_options; ++i)
     {
         options_keys.get()[i]   = keys[i].c_str();

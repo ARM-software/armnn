@@ -42,6 +42,37 @@ void UnpackAxis0Num4Test(tflite::TensorType tensorType)
 }
 
 template <typename T>
+void UnpackAxis0Output0ShapeTest(tflite::TensorType tensorType)
+{
+    std::vector<int32_t> inputShape { 5 };
+    std::vector<int32_t> expectedOutputShape {};
+
+    std::vector<T> inputValues { 2, 4, 6, 8, 10 };
+
+    std::vector<T> expectedOutputValues0 { 2 };
+    std::vector<T> expectedOutputValues1 { 4 };
+    std::vector<T> expectedOutputValues2 { 6 };
+    std::vector<T> expectedOutputValues3 { 8 };
+    std::vector<T> expectedOutputValues4 { 10 };
+
+    std::vector<std::vector<T>> expectedOutputValues{ expectedOutputValues0,
+                                                      expectedOutputValues1,
+                                                      expectedOutputValues2,
+                                                      expectedOutputValues3,
+                                                      expectedOutputValues4
+                                                    };
+
+    UnpackTest<T>(tflite::BuiltinOperator_UNPACK,
+                  tensorType,
+                  inputShape,
+                  expectedOutputShape,
+                  inputValues,
+                  expectedOutputValues,
+                  {},
+                  0);
+}
+
+template <typename T>
 void UnpackAxis2Num6Test(tflite::TensorType tensorType)
 {
     std::vector<int32_t> inputShape { 4, 1, 6 };
@@ -90,6 +121,11 @@ TEST_CASE ("Unpack_Fp32_Axis2_Num6_Test")
 UnpackAxis2Num6Test<float>(tflite::TensorType_FLOAT32);
 }
 
+TEST_CASE ("Unpack_Fp32_Axis0_Output0Shape_Test")
+{
+UnpackAxis0Output0ShapeTest<float>(tflite::TensorType_FLOAT32);
+}
+
 // Uint8
 TEST_CASE ("Unpack_Uint8_Axis0_Num4_Test")
 {
@@ -99,6 +135,10 @@ UnpackAxis0Num4Test<uint8_t>(tflite::TensorType_UINT8);
 TEST_CASE ("Unpack_Uint8_Axis2_Num6_Test")
 {
 UnpackAxis2Num6Test<uint8_t>(tflite::TensorType_UINT8);
+}
+TEST_CASE ("Unpack_Uint8_Axis0_Output0Shape_Test")
+{
+    UnpackAxis0Output0ShapeTest<uint8_t>(tflite::TensorType_UINT8);
 }
 
 }

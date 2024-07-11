@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -131,7 +131,16 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
             return kTfLiteError;
         }
 
-        outputs.push_back(GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true));
+        armnn::TensorInfo outputTensorInfo = GetTensorInfoForTfLiteOpaqueTensor(tfLiteOutputTensor, true);
+        armnn::TensorShape shape = outputTensorInfo.GetShape();
+        if (shape.GetDimensionality() == armnn::Dimensionality::NotSpecified)
+        {
+            shape.SetNumDimensions(1, true);
+            shape.SetDimensionSize(0, 1);
+            outputTensorInfo.SetShape(shape);
+        }
+
+        outputs.push_back(outputTensorInfo);
     }
 
     const std::vector<std::reference_wrapper<armnn::TensorInfo>> outputTensorInfos(outputs.begin(), outputs.end());

@@ -290,7 +290,7 @@ void ArmNNExecutor::ExecuteAsync()
         if(!m_Params.m_DontPrintOutputs)
         {
             const armnn::OutputTensors* out = inferenceOutputMap[cb->GetInferenceId()];
-            PrintOutputTensors(out, iteration);
+            PrintOutputTensors(out, static_cast<unsigned>(iteration));
         }
     }
 
@@ -342,7 +342,7 @@ void ArmNNExecutor::ExecuteSync()
 
         if(!m_Params.m_DontPrintOutputs)
         {
-            PrintOutputTensors(&m_OutputTensorsVec[x],  x);
+            PrintOutputTensors(&m_OutputTensorsVec[x], static_cast<unsigned>(x));
         }
 
         // If thresholdTime == 0.0 (default), then it hasn't been supplied at command line
@@ -441,14 +441,14 @@ void ArmNNExecutor::PrintNetworkInfo()
 
 void ArmNNExecutor::SetupInputsAndOutputs()
 {
-    const unsigned int noOfInputs = m_IOInfo.m_InputNames.size();
+    const unsigned int noOfInputs = static_cast<unsigned>(m_IOInfo.m_InputNames.size());
 
     if (m_Params.m_InputNames.size() != 0 && m_Params.m_InputNames.size() != noOfInputs)
     {
         LogAndThrow("Number of input names does not match number of inputs");
     }
 
-    const unsigned int inputFilePaths = m_Params.m_InputTensorDataFilePaths.size();
+    const unsigned int inputFilePaths = static_cast<unsigned>(m_Params.m_InputTensorDataFilePaths.size());
     const std::vector<std::string>& inputNames = m_Params.m_InputNames.size() != 0 ?
                                                  m_Params.m_InputNames :
                                                  m_IOInfo.m_InputNames;
@@ -468,8 +468,8 @@ void ArmNNExecutor::SetupInputsAndOutputs()
         }
     }
 
-    const unsigned int noOfOutputs = m_IOInfo.m_OutputNames.size();
-    const unsigned int outputFilePaths = m_Params.m_OutputTensorFiles.size();
+    const unsigned int noOfOutputs = static_cast<unsigned>(m_IOInfo.m_OutputNames.size());
+    const unsigned int outputFilePaths = static_cast<unsigned>(m_Params.m_OutputTensorFiles.size());
     unsigned int noOutputSets = 1;
 
     if (outputFilePaths != 0)
@@ -491,7 +491,7 @@ void ArmNNExecutor::SetupInputsAndOutputs()
     {
         // The current implementation of the Threadpool does not allow binding of outputs to a thread
         // So to ensure no two threads write to the same output at the same time, no output can be reused
-        noOutputSets = m_Params.m_Iterations;
+        noOutputSets = static_cast<unsigned>(m_Params.m_Iterations);
     }
 
     if (m_Params.m_InputTensorDataFilePaths.size() > noOfInputs)
@@ -604,8 +604,8 @@ void ArmNNExecutor::SetupInputsAndOutputs()
 
     // If iterations > noSets fill the remaining iterations repeating the given files
     // If iterations < noSets just ignore the extra files
-    const unsigned int remainingInputSets = (m_Params.m_Iterations > noInputSets)
-                                          ? m_Params.m_Iterations - noInputSets
+    const unsigned int remainingInputSets = (static_cast<unsigned>(m_Params.m_Iterations) > noInputSets)
+                                          ? static_cast<unsigned>(m_Params.m_Iterations) - noInputSets
                                           : 0;
     for (unsigned int i = 0; i < remainingInputSets; ++i)
     {
@@ -616,8 +616,8 @@ void ArmNNExecutor::SetupInputsAndOutputs()
         }
     }
 
-    const unsigned int remainingOutputSets = (m_Params.m_Iterations > noOutputSets)
-                                           ? m_Params.m_Iterations - noOutputSets
+    const unsigned int remainingOutputSets = (static_cast<unsigned>(m_Params.m_Iterations) > noOutputSets)
+                                           ? static_cast<unsigned>(m_Params.m_Iterations) - noOutputSets
                                            : 0;
     for (unsigned int i = 0; i < remainingOutputSets; ++i)
     {
@@ -787,7 +787,7 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
     };
 
     unsigned int outputIndex = 0;
-    unsigned int numOutputs = outputTensors->size();
+    unsigned int numOutputs = static_cast<unsigned>(outputTensors->size());
     for (const auto& output: *outputTensors)
     {
         const auto bindingName = findOutputName(output.first);

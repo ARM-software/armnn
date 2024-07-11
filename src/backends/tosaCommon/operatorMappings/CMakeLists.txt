@@ -10,6 +10,8 @@ list(APPEND armnnTosaBackendOperators_sources
         ReluOperator.cpp
         AvgPool2DIgnoreValueOperator.hpp
         AvgPool2DIgnoreValueOperator.cpp
+        BatchMatMulOperator.hpp
+        BatchMatMulOperator.cpp
         ConcatOperator.hpp
         ConcatOperator.cpp
         ConstantOperator.hpp

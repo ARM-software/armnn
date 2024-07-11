@@ -56,6 +56,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto unaryDesc = PolymorphicDowncast<const ElementwiseUnaryDescriptor*>(&descriptor);
             return ConvertElementwiseUnaryOperator(layer, inputs, outputs, unaryDesc);
         }
+        case LayerType::BatchMatMul:
+        {
+            auto batchMatMulDesc = PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor);
+            return ConvertBatchMatMulToTosaOperator(layer, inputs, outputs, batchMatMulDesc);
+        }
         case LayerType::Concat:
         {
             auto concatDesc = PolymorphicDowncast<const OriginsDescriptor*>(&descriptor);

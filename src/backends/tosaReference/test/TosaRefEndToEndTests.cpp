@@ -7,6 +7,7 @@
 
 #include "backendsCommon/test/ActivationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
+#include "backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
@@ -130,6 +131,83 @@ TEST_CASE("TosaRefAdditionEndtoEndTestInt32")
 TEST_CASE("TosaRefAdditionEndtoEndTestFloat16")
 {
     AdditionEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+// BatchMatMul
+
+TEST_CASE("TosaRefBatchMatMulEndToEndFloat32Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulEndToEndInt8Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulEndToEndInt16Test")
+{
+    BatchMatMulEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulNoTransposeEndToEndFloat32Test")
+{
+    BatchMatMulNoTransposeEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulNoTransposeEndToEndInt8Test")
+{
+    BatchMatMulNoTransposeEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulNoTransposeEndToEndInt16Test")
+{
+    BatchMatMulNoTransposeEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulSimple4DEndToEndFloat32Test")
+{
+    BatchMatMulSimple4DEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulSimple4DEndToEndInt8Test")
+{
+    BatchMatMulSimple4DEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulSimple4DEndToEndInt16Test")
+{
+    BatchMatMulSimple4DEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulNotSquareEndToEndFloat32Test")
+{
+    BatchMatMulNotSquareEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulNotSquareEndToEndInt8Test")
+{
+    BatchMatMulNotSquareEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMulNotSquareEndToEndInt16Test")
+{
+    BatchMatMulNotSquareEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMul4DEndToEndFloat32Test")
+{
+    BatchMatMul4DEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMul4DEndToEndInt8Test")
+{
+    BatchMatMul4DEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefBatchMatMul4DEndToEndInt16Test")
+{
+    BatchMatMul4DEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
 }
 
 // Concat

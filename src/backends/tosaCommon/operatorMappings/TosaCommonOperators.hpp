@@ -8,6 +8,7 @@
 #include "ReluOperator.hpp"
 #include "LeakyReluOperator.hpp"
 #include "AvgPool2DIgnoreValueOperator.hpp"
+#include "BatchMatMulOperator.hpp"
 #include "ConcatOperator.hpp"
 #include "ConstantOperator.hpp"
 #include "Conv2dOperator.hpp"

@@ -42,6 +42,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         case LayerType::Output:
             return true;
         case LayerType::Addition:
+        case LayerType::BatchMatMul:
         case LayerType::Multiplication:
         case LayerType::Subtraction:
         case LayerType::ElementwiseBinary:

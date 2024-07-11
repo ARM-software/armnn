@@ -501,6 +501,46 @@ TEST_CASE("RefBatchMatMulEndToEndInt8Test")
     BatchMatMulEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
 }
 
+TEST_CASE("RefBatchMatMulNoTransposeEndToEndFloat32Test")
+{
+    BatchMatMulNoTransposeEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefBatchMatMulNoTransposeEndToEndInt8Test")
+{
+    BatchMatMulNoTransposeEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefBatchMatMulSimple4DEndToEndFloat32Test")
+{
+    BatchMatMulSimple4DEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefBatchMatMulSimple4DEndToEndInt8Test")
+{
+    BatchMatMulSimple4DEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefBatchMatMul4DEndToEndFloat32Test")
+{
+    BatchMatMul4DEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefBatchMatMul4DEndToEndInt8Test")
+{
+    BatchMatMul4DEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefBatchMatMulNotSquareEndToEndFloat32Test")
+{
+    BatchMatMulNotSquareEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefBatchMatMulNotSquareEndToEndInt8Test")
+{
+    BatchMatMulNotSquareEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
 TEST_CASE("RefBatchToSpaceNdEndToEndFloat32NHWCTest")
 {
     BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(defaultBackends, armnn::DataLayout::NHWC);

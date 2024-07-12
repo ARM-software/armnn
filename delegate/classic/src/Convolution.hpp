@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -645,6 +645,22 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
     const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
 
+    TfLiteFusedActivation activationType = kTfLiteActNone;
+    if (parameters->activation != kTfLiteActNone)
+    {
+        activationType = parameters->activation;
+
+        TfLiteStatus activationStatus = ValidateFusedActivationOperator(delegateData,
+                                                                        tfLiteContext,
+                                                                        outputTensorInfo,
+                                                                        outputTensorInfo,
+                                                                        activationType);
+        if(activationStatus != kTfLiteOk)
+        {
+            return kTfLiteError;
+        }
+    }
+
     // TfLite uses NHWC tensors
     const unsigned int inputHeight = inputTensorInfo.GetShape()[1];
     const unsigned int inputWidth  = inputTensorInfo.GetShape()[2];
@@ -779,6 +795,12 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
         delegateData.m_OutputSlotForNode[static_cast<unsigned int>(tfLiteNode->outputs->data[outputIndex])] =
                                                                    &outputSlot;
     }
+
+    if (activationType != kTfLiteActNone)
+    {
+        return FusedActivation(tfLiteContext, tfLiteNode, activationType, layer, 0, delegateData, nodeIndex);
+    }
+
     return kTfLiteOk;
 }
 

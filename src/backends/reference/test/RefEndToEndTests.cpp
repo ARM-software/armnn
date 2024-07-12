@@ -1253,6 +1253,32 @@ TEST_CASE("RefReLuEndToEndTestQSymmS16")
     ActivationEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends, ActivationFunction::ReLu);
 }
 
+// GeLu
+TEST_CASE("RefGeluEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(defaultBackends, ActivationFunction::Gelu);
+}
+
+TEST_CASE("RefGeluEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(defaultBackends, ActivationFunction::Gelu);
+}
+
+TEST_CASE("RefGeluEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends, ActivationFunction::Gelu);
+}
+
+TEST_CASE("RefGeluEndToEndTestQAsymmU8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends, ActivationFunction::Gelu);
+}
+
+TEST_CASE("RefGeluEndToEndTestQSymmS16")
+{
+    ActivationEndToEndTest<armnn::DataType::QSymmS16>(defaultBackends, ActivationFunction::Gelu);
+}
+
 // BoundedReLu
 TEST_CASE("RefBoundedReLuEndToEndTestFloat32")
 {

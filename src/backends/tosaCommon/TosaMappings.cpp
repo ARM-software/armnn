@@ -37,6 +37,10 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
                 {
                     return ConvertReluToTosaOperator(layer, inputs, outputs, activationDesc);
                 }
+                case ActivationFunction::Gelu:
+                {
+                    return ConvertGeluToTosaOperator(layer, inputs, outputs, activationDesc);
+                }
                 default:
                 {
                     return CreateEmptyTosaSerializationBasicBlock();

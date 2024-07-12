@@ -8,6 +8,8 @@ list(APPEND armnnTosaBackendOperators_sources
         LeakyReluOperator.cpp
         ReluOperator.hpp
         ReluOperator.cpp
+        GeluOperator.hpp
+        GeluOperator.cpp
         AvgPool2DIgnoreValueOperator.hpp
         AvgPool2DIgnoreValueOperator.cpp
         BatchMatMulOperator.hpp

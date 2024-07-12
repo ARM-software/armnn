@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ReluOperator.hpp"
+#include "GeluOperator.hpp"
 #include "LeakyReluOperator.hpp"
 #include "AvgPool2DIgnoreValueOperator.hpp"
 #include "BatchMatMulOperator.hpp"

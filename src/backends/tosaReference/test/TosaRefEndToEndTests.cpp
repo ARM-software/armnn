@@ -93,6 +93,12 @@ TEST_CASE("TosaRefReLuEndToEndTestQSymmS16")
     ActivationEndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::ReLu);
 }
 
+// Gelu
+TEST_CASE("TosaRefGeluEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::Gelu);
+}
+
 // BoundedRelu
 TEST_CASE("TosaRefBoundedReLuEndToEndTestFloat32")
 {

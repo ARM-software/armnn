@@ -205,6 +205,12 @@ TEST_CASE("TosaRefDepthwiseConv2dEndtoEndTestInt8")
                                    armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
 }
 
+TEST_CASE("TosaRefDepthwiseConv2dEndtoEndTestInt8BiasDisabled")
+{
+    DepthwiseConvolution2dEndToEnd<armnn::DataType::QSymmS8,
+                                   armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
+}
+
 // Elementwise Binary
 //Add
 TEST_CASE("TosaRefAddEndtoEndTestInt32")

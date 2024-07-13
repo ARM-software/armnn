@@ -31,23 +31,26 @@ armnn::INetworkPtr CreateDepthwiseConvolution2dNetwork(const armnn::DepthwiseCon
     INetworkPtr network(INetwork::Create());
     IConnectableLayer* input = network->AddInputLayer(0, "input");
     armnn::IConnectableLayer* weightsLayer = network->AddConstantLayer(weights, "Weights");
-    armnn::IConnectableLayer* biasLayer = network->AddConstantLayer(biases, "Bias");
     IConnectableLayer* convolution2d = network->AddDepthwiseConvolution2dLayer(descriptor, "depthwiseConvolution2d");
     IConnectableLayer* output = network->AddOutputLayer(0, "output");
 
     Connect(input, convolution2d, inputInfo, 0, 0);
     Connect(weightsLayer, convolution2d, weightsInfo, 0, 1);
-    Connect(biasLayer, convolution2d, biasInfo, 0, 2);
     Connect(convolution2d, output, outputInfo, 0, 0);
+
+    if(descriptor.m_BiasEnabled)
+    {
+        armnn::IConnectableLayer* biasLayer = network->AddConstantLayer(biases, "Bias");
+        Connect(biasLayer, convolution2d, biasInfo, 0, 2);
+    }
 
     return network;
 }
 
-} // anonymous namespace
-
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType = ArmnnType>
 void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
-                                    armnn::DataLayout dataLayout)
+                                    armnn::DataLayout dataLayout,
+                                    bool biasEnabled = true)
 {
     using namespace armnn;
     using T  = ResolveType<ArmnnType>;
@@ -86,6 +89,7 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
         0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
         0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
         0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+
         0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
         0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
         0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
@@ -125,7 +129,7 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
 
     std::vector<float> biasesData = { 0.0f, 2.0f, 1.0f, -1.0f };
 
-    std::vector<float> expectedOutputData =
+    std::vector<float> expectedOutputData = biasEnabled ? std::vector<float>(
     {
         3.0f,  4.5f,  2.0f,  1.0f,  3.0f,  4.5f,  3.0f,  1.0f,  3.0f,  4.5f,  4.0f,  3.0f,  3.0f,  4.5f,
         1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
@@ -133,25 +137,58 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
         1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
         3.0f,  5.5f,  3.0f,  2.0f,  3.0f,  5.5f,  4.0f,  2.0f,  3.0f,  5.5f,  5.0f,  4.0f,  3.0f,  5.5f,
         1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
+
         3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,
         1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
         5.0f,  6.5f,  3.0f,  2.0f,  5.0f,  6.5f,  4.0f,  2.0f,  5.0f,  6.5f,  5.0f,  4.0f,  5.0f,  6.5f,
         1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
         5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,
         1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
+
         5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
         1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
         5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
         1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
         5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
         1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+
         5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
         1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
         5.0f,  8.0f,  3.0f,  2.0f,  5.0f,  8.0f,  4.0f,  2.0f,  5.0f,  8.0f,  5.0f,  4.0f,  5.0f,  8.0f,
         1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,
         5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,
         1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f
-    };
+    } )
+    : std::vector<float>(
+    {
+        3.0f,  2.5f,  1.0f,  2.0f,  3.0f,  2.5f,  2.0f,  2.0f,  3.0f,  2.5f,  3.0f,  4.0f,  3.0f,  2.5f,
+        0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,
+        3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,
+        0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,
+        3.0f,  3.5f,  2.0f,  3.0f,  3.0f,  3.5f,  3.0f,  3.0f,  3.0f,  3.5f,  4.0f,  5.0f,  3.0f,  3.5f,
+        0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,
+
+        3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,
+        0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,
+        5.0f,  4.5f,  2.0f,  3.0f,  5.0f,  4.5f,  3.0f,  3.0f,  5.0f,  4.5f,  4.0f,  5.0f,  5.0f,  4.5f,
+        0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,
+        5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,
+        0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,
+
+        5.5f,  6.0f,  2.0f,  3.0f,  5.5f,  6.0f,  3.0f,  3.0f,  5.5f,  6.0f,  4.0f,  5.0f,  5.5f,  6.0f,
+        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+        5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,
+        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+        5.5f,  6.0f,  2.0f,  3.0f,  5.5f,  6.0f,  3.0f,  3.0f,  5.5f,  6.0f,  4.0f,  5.0f,  5.5f,  6.0f,
+        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+
+        5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,
+        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+        5.0f,  6.0f,  2.0f,  3.0f,  5.0f,  6.0f,  3.0f,  3.0f,  5.0f,  6.0f,  4.0f,  5.0f,  5.0f,  6.0f,
+        0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,
+        5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,
+        0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f
+    } );
 
     DepthwiseConvolution2dDescriptor descriptor;
     descriptor.m_PadLeft     = 0;
@@ -160,7 +197,7 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     descriptor.m_PadBottom   = 1;
     descriptor.m_StrideX     = 1;
     descriptor.m_StrideY     = 1;
-    descriptor.m_BiasEnabled = true;
+    descriptor.m_BiasEnabled = biasEnabled;
     descriptor.m_DataLayout  = dataLayout;
 
     // Permute input if NCHW, the original input and output are in NHWC format.
@@ -174,9 +211,8 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     // Quantize data
     std::vector<T> qInputData          = armnnUtils::QuantizedVector<T>(inputData, qScale, qOffset);
     std::vector<T> qWeightsData        = armnnUtils::QuantizedVector<T>(weightsData, qScale, qOffset);
+    std::vector<BT> qBiasesData        = armnnUtils::QuantizedVector<BT>(biasesData, qScale * qScale, 0);
     std::vector<T> qExpectedOutputData = armnnUtils::QuantizedVector<T>(expectedOutputData, qScale, qOffset);
-
-    std::vector<BT> qBiasesData = armnnUtils::QuantizedVector<BT>(biasesData, qScale * qScale, 0);
 
     ConstTensor weights(weightsInfo, qWeightsData);
     ConstTensor biases(biasesInfo, qBiasesData);
@@ -194,3 +230,5 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
                                                 { { 0, qExpectedOutputData } },
                                                 backends);
 }
+
+} // anonymous namespace

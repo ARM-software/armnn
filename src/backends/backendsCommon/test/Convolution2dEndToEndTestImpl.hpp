@@ -24,8 +24,7 @@ armnn::INetworkPtr CreateConstConvolution2dNetwork(const armnn::Convolution2dDes
                                                    const armnn::TensorInfo& biasInfo,
                                                    const armnn::TensorInfo& outputInfo,
                                                    const armnn::ConstTensor& weights,
-                                                   const armnn::ConstTensor& biases,
-                                                   bool biasEnabled)
+                                                   const armnn::ConstTensor& biases)
 {
     using namespace armnn;
 
@@ -38,7 +37,7 @@ armnn::INetworkPtr CreateConstConvolution2dNetwork(const armnn::Convolution2dDes
     Connect(input, convolution2d, inputInfo, 0, 0);
     Connect(weightsLayer, convolution2d, weightsInfo, 0, 1);
 
-    if(biasEnabled)
+    if(descriptor.m_BiasEnabled)
     {
         armnn::IConnectableLayer* biasLayer = network->AddConstantLayer(biases, "Bias");
         Connect(biasLayer, convolution2d, biasInfo, 0, 2);
@@ -85,15 +84,15 @@ void Convolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
                     3, 2, 1
             };
 
-    std::vector<float> biasesData = { 1 };
-    float bias = biasEnabled ? biasesData[0] : 0;
+    std::vector<float> biasesData = biasEnabled ? std::vector<float>({ 1.0f })
+                                                : std::vector<float>({ 0.f });
 
     std::vector<float> expectedOutputData =
-            {
-                    65 + bias, 76 + bias,  91 + bias,
-                    107 + bias, 99 + bias,  89 + bias,
-                    116 + bias, 98 + bias, 118 + bias
-            };
+    {
+         65 + biasesData[0], 76 + biasesData[0],  91 + biasesData[0],
+        107 + biasesData[0], 99 + biasesData[0],  89 + biasesData[0],
+        116 + biasesData[0], 98 + biasesData[0], 118 + biasesData[0]
+    };
 
     Convolution2dDescriptor descriptor;
     descriptor.m_PadLeft     = 0;
@@ -127,8 +126,7 @@ void Convolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
                                                           biasesInfo,
                                                           outputInfo,
                                                           weights,
-                                                          biases,
-                                                          biasEnabled);
+                                                          biases);
 
     EndToEndLayerTestImpl<ArmnnIType, ArmnnOType>(std::move(network),
                                                   {{ 0, qInputData }},

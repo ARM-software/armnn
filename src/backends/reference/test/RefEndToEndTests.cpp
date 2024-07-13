@@ -669,6 +669,13 @@ TEST_CASE("RefDepthwiseConvolution2dEndtoEndFloat32Test")
                                                                                        armnn::DataLayout::NHWC);
 }
 
+TEST_CASE("RefDepthwiseConvolution2dEndtoEndFloat32TestBiasDisabled")
+{
+    DepthwiseConvolution2dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(defaultBackends,
+                                                                                       armnn::DataLayout::NHWC,
+                                                                                       false);
+}
+
 TEST_CASE("RefFillEndToEndTest")
 {
     FillEndToEnd<armnn::DataType::Float32>(defaultBackends);

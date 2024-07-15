@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c9f7d47aa45d041a9d5f5c14fe2a7510d3760ece" # Revert "Add dedicated FP32 SME2 Logistic Activation Kernel"
+DEFAULT_CLFRAMEWORKREVISION="b461c65e6e7490500661fa249e2c8a75b695b9e0" # Provide a wrapper class to expose cpu::CpuWinogradConv2d
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

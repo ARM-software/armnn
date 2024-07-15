@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,6 +38,15 @@ TfLiteStatus VisitArgMinMaxOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+    if(outputTensorInfo.GetShape().GetDimensionality() == armnn::Dimensionality::NotSpecified)
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnDelegate: NotSpecified Dimensionality is not supported in operator #%d node #%d: ",
+            argMinMaxOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     // Get const axis value from model and set it to descriptor.
     const TfLiteTensor& tfLiteAxisTensor = tfLiteTensors[tfLiteNode->inputs->data[1]];

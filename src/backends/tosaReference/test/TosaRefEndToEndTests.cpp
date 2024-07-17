@@ -15,6 +15,7 @@
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/FullyConnectedEndToEndTestImpl.hpp"
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
+#include "backendsCommon/test/PadEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/QuantizationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
@@ -383,6 +384,32 @@ TEST_CASE("TosaRefFullyConnectedEndToEndTestNoBiasInt8Symm")
                                                  armnn::DataType::QSymmS8,
                                                  armnn::DataType::Signed32,
                                                  armnn::DataType::QSymmS8>(tosaDefaultBackends, false);
+}
+
+// Pad
+TEST_CASE("TosaRefPadEndToEndFloat32Test")
+{
+    PadEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefPadEndToEndInt8Test")
+{
+    PadEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefPad4dEndToEndFloat32Test")
+{
+    Pad4dEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefPad4dEndToEndInt8Test")
+{
+    Pad4dEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefPad4dEndToEndInt32Test")
+{
+    Pad4dEndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends);
 }
 
 // Pooling

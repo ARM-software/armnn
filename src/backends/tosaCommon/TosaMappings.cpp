@@ -114,6 +114,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto fullyConnectedDesc = PolymorphicDowncast<const FullyConnectedDescriptor*>(&descriptor);
             return ConvertFullyConnectedToTosaOperator(layer, inputs, outputs, fullyConnectedDesc);
         }
+        case LayerType::Pad:
+        {
+            auto padDesc = PolymorphicDowncast<const PadDescriptor*>(&descriptor);
+            return ConvertPadToTosaOperator(layer, inputs, outputs, padDesc);
+        }
         case LayerType::Pooling2d:
         {
             auto poolDesc = PolymorphicDowncast<const Pooling2dDescriptor*>(&descriptor);

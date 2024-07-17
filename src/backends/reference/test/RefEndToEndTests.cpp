@@ -28,6 +28,7 @@
 #include <backendsCommon/test/GatherNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
+#include <backendsCommon/test/PadEndToEndTestImpl.hpp>
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
 #include <backendsCommon/test/QLstmEndToEndTestImpl.hpp>
@@ -1452,6 +1453,27 @@ TEST_CASE("RefMaxPool2DTwoLayerEndtoEndTestFloat32")
 TEST_CASE("RefMaxPool2DThreeLayerEndtoEndTestFloat32")
 {
     MaxPool2dThreeLayerEndToEnd<DataType::Float32>(defaultBackends);
+}
+
+// Pad
+TEST_CASE("RefPadEndToEndFloat32Test")
+{
+    PadEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefPadEndToEndInt8Test")
+{
+    PadEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefPad4dEndToEndFloat32Test")
+{
+    Pad4dEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefPad4dEndToEndInt8Test")
+{
+    Pad4dEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends);
 }
 
 // Quantization

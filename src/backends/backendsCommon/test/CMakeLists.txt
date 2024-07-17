@@ -45,6 +45,7 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     MultiplicationEndToEndTestImpl.hpp
     OptimizeSubgraphViewTests.cpp
     OptimizationViewsTests.cpp
+    PadEndToEndTestImpl.hpp
     PreluEndToEndTestImpl.hpp
     QLstmEndToEndTestImpl.cpp
     QLstmEndToEndTestImpl.hpp

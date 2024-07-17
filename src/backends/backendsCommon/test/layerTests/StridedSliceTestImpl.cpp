@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -860,6 +860,599 @@ LayerTestResult<T, 2> StridedSlice2dReverseTest(
         inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
 }
 
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 1, 2, 4};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin       = {0, 0, 1};
+    desc.m_Parameters.m_End         = {2, 1, 3};
+    desc.m_Parameters.m_Stride      = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask = 1;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {2, 1, 2, 4};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin       = {0, 0, 1};
+    desc.m_Parameters.m_End         = {2, 1, 3};
+    desc.m_Parameters.m_Stride      = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask = 2;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {2, 1, 1, 4};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin       = {0, 0, 1};
+    desc.m_Parameters.m_End         = {2, 1, 3};
+    desc.m_Parameters.m_Stride      = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask = 4;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSlice3dEllipsisMask1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {2, 1, 2};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_EllipsisMask    = 1;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        2.0f, 3.0f,
+
+        20.0f, 30.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 3>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSlice3dEllipsisMask2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 3, 2};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_EllipsisMask    = 2;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        2.0f, 3.0f, 6.0f, 7.0f, 10.0f, 11.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 3>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSlice3dEllipsisMask4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 1, 4};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_EllipsisMask    = 4;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 3>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSlice3dNewAxisMask1EllipsisMask1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {2, 1, 2};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 1;
+    desc.m_Parameters.m_EllipsisMask    = 1;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        2.0f, 3.0f,
+
+        20.0f, 30.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 3>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask1EllipsisMask2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 2, 3, 2};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 1;
+    desc.m_Parameters.m_EllipsisMask    = 2;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        2.0f, 3.0f, 6.0f, 7.0f, 10.0f, 11.0f,
+
+        20.0f, 30.0f, 60.0f, 70.0f, 100.0f, 110.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask1EllipsisMask4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 1, 3, 4};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 1;
+    desc.m_Parameters.m_EllipsisMask    = 4;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask2EllipsisMask1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {2, 3, 1, 2};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 2;
+    desc.m_Parameters.m_EllipsisMask    = 1;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        2.0f, 3.0f, 6.0f, 7.0f, 10.0f, 11.0f,
+
+        20.0f, 30.0f, 60.0f, 70.0f, 100.0f, 110.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSlice3dNewAxisMask2EllipsisMask2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 3, 2};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 2;
+    desc.m_Parameters.m_EllipsisMask    = 2;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        2.0f, 3.0f, 6.0f, 7.0f, 10.0f, 11.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 3>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask2EllipsisMask4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 1, 3, 4};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 2;
+    desc.m_Parameters.m_EllipsisMask    = 4;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask4EllipsisMask1Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {2, 3, 1, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 4;
+    desc.m_Parameters.m_EllipsisMask    = 1;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        1.0f, 5.0f, 9.0f,
+
+        10.0f, 50.0f, 90.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 4> StridedSlice3dNewAxisMask4EllipsisMask2Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 3, 4, 1};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 4;
+    desc.m_Parameters.m_EllipsisMask    = 2;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(4, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 4>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+LayerTestResult<T, 3> StridedSlice3dNewAxisMask4EllipsisMask4Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    armnn::TensorInfo inputTensorInfo;
+    armnn::TensorInfo outputTensorInfo;
+
+    unsigned int inputShape[]  = {2, 3, 4};
+    unsigned int outputShape[] = {1, 1, 4};
+
+    armnn::StridedSliceQueueDescriptor desc;
+    desc.m_Parameters.m_Begin           = {0, 0, 1};
+    desc.m_Parameters.m_End             = {1, 1, 3};
+    desc.m_Parameters.m_Stride          = {1, 1, 1};
+    desc.m_Parameters.m_NewAxisMask     = 4;
+    desc.m_Parameters.m_EllipsisMask    = 4;
+
+    inputTensorInfo     = armnn::TensorInfo(3, inputShape, ArmnnType);
+    outputTensorInfo    = armnn::TensorInfo(3, outputShape, ArmnnType);
+
+    std::vector<float> input = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f,
+
+        10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f, 110.0f, 120.0f
+    });
+
+    std::vector<float> outputExpected = std::vector<float>(
+    {
+        1.0f, 2.0f, 3.0f, 4.0f
+    });
+
+    return StridedSliceTestImpl<T, 3, 3>(
+        workloadFactory, memoryManager, tensorHandleFactory,
+        inputTensorInfo, outputTensorInfo, input, outputExpected, desc);
+}
+
 } // anonymous namespace
 
 LayerTestResult<float, 4> StridedSlice4dFloat32Test(
@@ -1052,6 +1645,156 @@ LayerTestResult<float, 2> StridedSlice2dReverseFloat32Test(
                                                                tensorHandleFactory);
 }
 
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask1Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask1Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask2Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask2Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask4Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask4Test<armnn::DataType::Float32>(workloadFactory,
+                                                       memoryManager,
+                                                       tensorHandleFactory);
+}
+
+LayerTestResult<float, 3> StridedSlice3dEllipsisMask1Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask1Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 3> StridedSlice3dEllipsisMask2Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask2Test<armnn::DataType::Float32>(workloadFactory,
+                                                       memoryManager,
+                                                       tensorHandleFactory);
+}
+
+LayerTestResult<float, 3> StridedSlice3dEllipsisMask4Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask4Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 3> StridedSlice3dNewAxisMask1EllipsisMask1Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask1EllipsisMask1Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask1EllipsisMask2Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask1EllipsisMask2Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask1EllipsisMask4Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask1EllipsisMask4Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask2EllipsisMask1Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask2EllipsisMask1Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 3> StridedSlice3dNewAxisMask2EllipsisMask2Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask2EllipsisMask2Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask2EllipsisMask4Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask2EllipsisMask4Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask4EllipsisMask1Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask4EllipsisMask1Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 4> StridedSlice3dNewAxisMask4EllipsisMask2Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask4EllipsisMask2Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
+LayerTestResult<float, 3> StridedSlice3dNewAxisMask4EllipsisMask4Float32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask4EllipsisMask4Test<armnn::DataType::Float32>(workloadFactory,
+                                                           memoryManager,
+                                                           tensorHandleFactory);
+}
+
 LayerTestResult<uint8_t, 4> StridedSlice4dUint8Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1224,6 +1967,66 @@ LayerTestResult<uint8_t, 2> StridedSlice2dReverseUint8Test(
     return StridedSlice2dReverseTest<armnn::DataType::QAsymmU8>(workloadFactory, memoryManager, tensorHandleFactory);
 }
 
+LayerTestResult<uint8_t, 4> StridedSlice3dNewAxisMask1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask1Test<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                   memoryManager,
+                                                   tensorHandleFactory);
+}
+
+LayerTestResult<uint8_t, 4> StridedSlice3dNewAxisMask2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask2Test<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                   memoryManager,
+                                                   tensorHandleFactory);
+}
+
+LayerTestResult<uint8_t, 4> StridedSlice3dNewAxisMask4Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask4Test<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                   memoryManager,
+                                                   tensorHandleFactory);
+}
+
+LayerTestResult<uint8_t, 3> StridedSlice3dEllipsisMask1Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask1Test<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                  memoryManager,
+                                                  tensorHandleFactory);
+}
+
+LayerTestResult<uint8_t, 3> StridedSlice3dEllipsisMask2Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask2Test<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                  memoryManager,
+                                                  tensorHandleFactory);
+}
+
+LayerTestResult<uint8_t, 3> StridedSlice3dEllipsisMask4Uint8Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask4Test<armnn::DataType::QAsymmU8>(workloadFactory,
+                                                  memoryManager,
+                                                  tensorHandleFactory);
+}
+
 LayerTestResult<int16_t, 4> StridedSlice4dInt16Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -1300,4 +2103,64 @@ LayerTestResult<int16_t, 2> StridedSlice2dReverseInt16Test(
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return StridedSlice2dReverseTest<armnn::DataType::QSymmS16>(workloadFactory, memoryManager, tensorHandleFactory);
+}
+
+LayerTestResult<int16_t, 4> StridedSlice3dNewAxisMask1Int16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask1Test<armnn::DataType::QSymmS16>(workloadFactory,
+                                               memoryManager,
+                                               tensorHandleFactory);
+}
+
+LayerTestResult<int16_t, 4> StridedSlice3dNewAxisMask2Int16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask2Test<armnn::DataType::QSymmS16>(workloadFactory,
+                                               memoryManager,
+                                               tensorHandleFactory);
+}
+
+LayerTestResult<int16_t, 4> StridedSlice3dNewAxisMask4Int16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dNewAxisMask4Test<armnn::DataType::QSymmS16>(workloadFactory,
+                                               memoryManager,
+                                               tensorHandleFactory);
+}
+
+LayerTestResult<int16_t, 3> StridedSlice3dEllipsisMask1Int16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask1Test<armnn::DataType::QSymmS16>(workloadFactory,
+                                           memoryManager,
+                                           tensorHandleFactory);
+}
+
+LayerTestResult<int16_t, 3> StridedSlice3dEllipsisMask2Int16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask2Test<armnn::DataType::QSymmS16>(workloadFactory,
+                                           memoryManager,
+                                           tensorHandleFactory);
+}
+
+LayerTestResult<int16_t, 3> StridedSlice3dEllipsisMask4Int16Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StridedSlice3dEllipsisMask4Test<armnn::DataType::QSymmS16>(workloadFactory,
+                                           memoryManager,
+                                           tensorHandleFactory);
 }

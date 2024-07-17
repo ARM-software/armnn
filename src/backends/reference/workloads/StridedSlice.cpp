@@ -108,34 +108,105 @@ void StridedSlice(const TensorInfo& inputInfo,
     // Pad parameters to 4 dimensions
     PadParams(paddedParams, 4);
 
-    const int start0 = paddedParams.GetStartForAxis(inputShape, 0);
-    const int stop0  = paddedParams.GetStopForAxis (inputShape, 0, start0);
+    // Arrays containing the start and stop index for each axis (adjusted by set params/flags)
+    int startArray [4] = {0};
+    int stopArray [4] = {0};
 
-    const int start1 = paddedParams.GetStartForAxis(inputShape, 1);
-    const int stop1  = paddedParams.GetStopForAxis (inputShape, 1, start1);
+    // Getting paddedParams stop and start values for each axis
+    for(unsigned int i = 0; i < 4; ++i)
+    {
+        startArray[i] = paddedParams.GetStartForAxis(inputShape, i);
+        stopArray[i] = paddedParams.GetStopForAxis(inputShape, i, startArray[i]);
+    }
 
-    const int start2 = paddedParams.GetStartForAxis(inputShape, 2);
-    const int stop2  = paddedParams.GetStopForAxis (inputShape, 2, start2);
+    // Adjusting the EllipsisMask based on the NewAxisMask
+    // (if NewAxisMask extends an axis, the ellipsis flag is extended as well)
+    if(paddedParams.m_NewAxisMask > 0 && paddedParams.m_EllipsisMask > 0)
+    {
+        // Iterate until the current EllipsisMask 1-bit found
+        for(unsigned int i = 0; i < 4; ++i)
+        {
+            // If EllipsisMask bit found, adjust based on NewAxisMask and exit loop
+            if(paddedParams.m_EllipsisMask & (1 << i) && !(paddedParams.m_NewAxisMask & (1 << i)))
+            {
+                // If the previous bit is the NewAxisMask, set the EllipsisMask there
+                // (this condition was determined based on the unit tests expected data)
+                if(paddedParams.m_NewAxisMask & (1 << (i-1)))
+                {
+                    paddedParams.m_EllipsisMask |= (1 << (i-1));
+                }
+                // Otherwise, extend the EllipsisMask by one bit
+                else
+                {
+                    paddedParams.m_EllipsisMask |= (1 << (i+1));
+                }
+                break;
+            }
+        }
+    }
 
-    const int start3 = paddedParams.GetStartForAxis(inputShape, 3);
-    const int stop3  = paddedParams.GetStopForAxis (inputShape, 3, start3);
+    // Processing start and stop values based on the EllipsisMask and NewAxisMask
+    for(unsigned int i = 0, dimIdx = 0; i < 4; ++i)
+    {
+        // If the EllipsisMask is set, extend the start/stop to the input dimension size
+        if(paddedParams.m_EllipsisMask & (1 << dimIdx))
+        {
+            startArray[i] = 0;
+            stopArray[i] = armnn::numeric_cast<int>(inputShape[i]);
+        }
+        // Otherwise, if the NewAxisMask is set, shift all following start/stop values to the left
+        else if(paddedParams.m_NewAxisMask & (1 << dimIdx))
+        {
+            // Increment dimIdx - skip the current dimension for which NewAxisMask is set
+            ++dimIdx;
+        }
+
+        // If the index of the currently processed dimension is higher than
+        // the index of the current start/stop array position, shift start/stop values
+        if(dimIdx > i && !(paddedParams.m_EllipsisMask & (1 << dimIdx)))
+        {
+            if(dimIdx < 4)
+            {
+                startArray[i] = startArray[dimIdx];
+                stopArray[i] = stopArray[dimIdx];
+            }
+            else
+            {
+                // If dimIdx is greater than the amount of available dimensions,
+                // instead of shifting the next ones, create new start/stop values
+                if(paddedParams.m_EllipsisMask > 0)
+                {
+                    // The new values are 0,1 if there is an EllipsisMask bit present
+                    startArray[i] = 0;
+                    stopArray[i] = 1;
+                }
+                else
+                {
+                    // Otherwise, select the entire inputTensor dimension size
+                    startArray[i] = 0;
+                    stopArray[i] = armnn::numeric_cast<int>(inputShape[i]);
+                }
+            }
+        }
+        ++dimIdx;
+    }
 
     const int step = armnn::numeric_cast<int>(dataTypeSize);
 
-    for (int in0 = start0;
-         !LoopCondition(in0, stop0, paddedParams.m_Stride[0]);
+    for (int in0 = startArray[0];
+         !LoopCondition(in0, stopArray[0], paddedParams.m_Stride[0]);
          in0 += paddedParams.m_Stride[0])
     {
-        for (int in1 = start1;
-             !LoopCondition(in1, stop1, paddedParams.m_Stride[1]);
+        for (int in1 = startArray[1];
+             !LoopCondition(in1, stopArray[1], paddedParams.m_Stride[1]);
              in1 += paddedParams.m_Stride[1])
         {
-            for (int in2 = start2;
-                 !LoopCondition(in2, stop2, paddedParams.m_Stride[2]);
+            for (int in2 = startArray[2];
+                 !LoopCondition(in2, stopArray[2], paddedParams.m_Stride[2]);
                  in2 += paddedParams.m_Stride[2])
             {
-                for (int in3 = start3;
-                     !LoopCondition(in3, stop3, paddedParams.m_Stride[3]);
+                for (int in3 = startArray[3];
+                     !LoopCondition(in3, stopArray[3], paddedParams.m_Stride[3]);
                      in3 += paddedParams.m_Stride[3])
                 {
                     int dim1 = armnn::numeric_cast<int>(inputShape[1]);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -37,10 +37,33 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
         {
             return kTfLiteError;
         }
+        // Checking for unsupported non-const non-network input tensors
+        // Index 0 is the input, index 1-3 should be constant
+        if(i > 0 && inputTensor->allocation_type != kTfLiteMmapRo)
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Unsupported constant data input through non-const tensor "
+                "in operator #%d node #%d",
+                sliceOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
     }
 
     // We save the begin, end and strides tensors in our descriptor. Therefore we have to read those values from inputs
     int inputRank = tfLiteInputs[0]->dims->size;
+
+    // Input tensors of rank greater than 4 are unsupported - delegate back to TFLite runtime
+    if(inputRank > 4)
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLitearmnnOpaqueDelegate: Tensors of rank greater than 4 are unsupported"
+            " in the StridedSlice operator. Operator: #%d node #%d: ",
+            sliceOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
+
     auto ReadInt32Input = [&](int inputIndex, std::vector<int32_t>& outputData) ->  TfLiteStatus
     {
         if (tfLiteInputs[inputIndex]->type != kTfLiteInt32)
@@ -103,6 +126,44 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
     descriptor.m_ShrinkAxisMask = stridedSliceParams->shrink_axis_mask;
     descriptor.m_DataLayout     = armnn::DataLayout::NHWC;
 
+    // Checking begin and end bounds with ShrinkAxisMask
+    for(unsigned int i = 0; i < inputRank; ++i)
+    {
+        if((descriptor.m_ShrinkAxisMask & (1 << i)) &&
+           (((descriptor.m_Begin[i] - descriptor.m_End[i]) > 1) ||
+           ((descriptor.m_Begin[i] - descriptor.m_End[i]) < -1)))
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLitearmnnDelegate: Invalid combination of ShrinkAxisMask, Begin- and End-Tensor values "
+                "in the StridedSlice operator. Operator: #%d node #%d: ",
+                sliceOperatorCode, nodeIndex);
+            return kTfLiteError;
+        }
+    }
+
+    // Checking that NewAxisMask doesn't extend the output beyond the supported rank
+    if(inputRank >= 3 && (descriptor.m_NewAxisMask > 4 || descriptor.m_NewAxisMask == 3))
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLitearmnnOpaqueDelegate: Maximum output tensor rank is 4, the currently set NewAxisMask "
+            "results in an unsupported higher rank. Operator: #%d node #%d: ",
+            sliceOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
+
+    // The variable 'offset' is documented in TFLite builtin_op_data.h:
+    // "If true, then the end tensor is an offset of the begin tensor."
+    if(stridedSliceParams->offset &&
+       descriptor.m_Begin.size() == descriptor.m_End.size())
+    {
+        for(unsigned int i = 0; i < descriptor.m_End.size(); ++i)
+        {
+            descriptor.m_End[i] += descriptor.m_Begin[i];
+        }
+    }
+
     // Validate output
     const TfLiteTensor& tfLiteOutputTensor = tfLiteTensors[tfLiteNode->outputs->data[0]];
     if (!IsValid(tfLiteContext, tfLiteOutputTensor, sliceOperatorCode, nodeIndex))
@@ -112,6 +173,16 @@ TfLiteStatus VisitStridedSliceOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo  = GetTensorInfoForTfLiteTensor(*tfLiteInputs[0]);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor);
+
+    // Check for unsupported 0-size dimensions in the input/output tensor shapes
+    if(ZeroDimPresent({inputTensorInfo, outputTensorInfo}))
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d",
+            sliceOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     bool isSupported = false;
     armnn::BackendId setBackend;

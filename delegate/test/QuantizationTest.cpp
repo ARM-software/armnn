@@ -4,7 +4,6 @@
 //
 
 #include "QuantizationTestHelper.hpp"
-#include <common/src/DelegateUtils.hpp>
 
 #include <doctest/doctest.h>
 
@@ -275,56 +274,8 @@ void QuantizeUint8Int8Test(const std::vector<armnn::BackendId>& backends = {})
                                       backends);
 }
 
-void QuantizeInt8ZeroDim(const std::vector<armnn::BackendId>& backends = {})
-{
-    uint32_t inputShape[]   = { 2, 4 };
-    uint32_t outputShape[]  = { 2, 4 };
-
-    armnn::TensorInfo  inputInfo   = armnn::TensorInfo(2, inputShape, armnn::DataType::QAsymmS8);
-    armnn::TensorInfo  outputInfo  = armnn::TensorInfo(2, outputShape, armnn::DataType::QAsymmS8);
-
-    inputInfo.SetQuantizationScale(1.0f);
-    inputInfo.SetQuantizationOffset(0);
-    inputInfo.SetQuantizationDim(armnn::Optional<unsigned int>(0));
-
-    outputInfo.SetQuantizationScale(1.0f);
-    outputInfo.SetQuantizationOffset(0);
-    outputInfo.SetQuantizationDim(armnn::Optional<unsigned int>(1));
-
-    CHECK(ZeroDimPresent({inputInfo, outputInfo}) == true);
-}
-
-void QuantizeInt8OneDim(const std::vector<armnn::BackendId>& backends = {})
-{
-    uint32_t inputShape[]   = { 2, 4 };
-    uint32_t outputShape[]  = { 2, 4 };
-
-    armnn::TensorInfo  inputInfo   = armnn::TensorInfo(2, inputShape, armnn::DataType::QAsymmS8);
-    armnn::TensorInfo  outputInfo  = armnn::TensorInfo(2, outputShape, armnn::DataType::QAsymmS8);
-
-    inputInfo.SetQuantizationScale(1.0f);
-    inputInfo.SetQuantizationOffset(0);
-    inputInfo.SetQuantizationDim(armnn::Optional<unsigned int>(1));
-
-    outputInfo.SetQuantizationScale(1.0f);
-    outputInfo.SetQuantizationOffset(0);
-    outputInfo.SetQuantizationDim(armnn::Optional<unsigned int>(1));
-
-    CHECK(ZeroDimPresent({inputInfo, outputInfo}) == false);
-}
-
 TEST_SUITE("CpuRef_QuantizationTests")
 {
-
-TEST_CASE ("QUANTIZE_INT8ZERODIM_Test")
-{
-    QuantizeInt8ZeroDim();
-}
-
-TEST_CASE ("QUANTIZE_INT8ONEDIM_Test")
-{
-    QuantizeInt8OneDim();
-}
 
 TEST_CASE ("DEQUANTIZE_UINT8_Test")
 {

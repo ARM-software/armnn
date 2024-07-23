@@ -310,10 +310,6 @@ bool ZeroDimPresent(std::initializer_list<armnn::TensorInfo> tensorInfoList)
             {
                 return true;
             }
-            if (tensorInfo.IsQuantized() && tensorInfo.GetQuantizationDim() == 0)
-            {
-                return true;
-            }
         }
     }
     return false;

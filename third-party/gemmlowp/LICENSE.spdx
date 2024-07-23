@@ -1,0 +1,7 @@
+PackageName: gemmlowp
+SPXID: SPDXRef-gemmlowp
+FilesAnalyzed: true
+PackageLicenseConcluded: Apache-2.0
+PackageLicenseInfoFromFiles: Apache-2.0
+PackageLicenseDeclared: Apache-2.0
+PackageCopyrightText: <text>Copyright (c) 2024 The gemmlowp Authors.  All rights reserved.</text>

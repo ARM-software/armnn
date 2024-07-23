@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -641,4 +641,12 @@ LayerTestResult<int32_t, 4> StackInt32Test(
         const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return StackAxis0TestImpl<armnn::DataType::Signed32>(workloadFactory, memoryManager, tensorHandleFactory);
+}
+
+LayerTestResult<int64_t, 4> StackInt64Test(
+        armnn::IWorkloadFactory& workloadFactory,
+        const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+        const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return StackAxis0TestImpl<armnn::DataType::Signed64>(workloadFactory, memoryManager, tensorHandleFactory);
 }

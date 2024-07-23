@@ -988,7 +988,8 @@ void StackQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Signed32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed64
     };
 
     ValidateDataTypes(workloadInfo.m_InputTensorInfos[0], supportedTypes, descriptorName);
@@ -1667,7 +1668,8 @@ void ReverseV2QueueDescriptor::Validate(const WorkloadInfo &workloadInfo) const
         DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -1954,7 +1956,9 @@ void SpaceToDepthQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
@@ -2602,7 +2606,8 @@ void StridedSliceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
         DataType::Float32,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -2783,6 +2788,7 @@ void GatherNdQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
                     DataType::QAsymmU8,
                     DataType::QSymmS16,
                     DataType::Signed32,
+                    DataType::Signed64
             };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -3706,7 +3712,8 @@ void DepthToSpaceQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) con
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
-        DataType::QSymmS16
+        DataType::QSymmS16,
+        DataType::Signed32
     };
 
     ValidateDataTypes(inputInfo,  supportedTypes, descriptorName);

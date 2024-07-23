@@ -222,6 +222,10 @@ private:
                 armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
                                                                  static_cast<int32_t*>(memory));
                 break;
+            case arm_compute::DataType::S64:
+                armcomputetensorutils::CopyArmComputeITensorData(this->GetTensor(),
+                                                                 static_cast<int64_t*>(memory));
+                break;
             default:
             {
                 throw armnn::UnimplementedException();
@@ -264,6 +268,10 @@ private:
                 break;
             case arm_compute::DataType::S32:
                 armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int32_t*>(memory),
+                                                                 this->GetTensor());
+                break;
+            case arm_compute::DataType::S64:
+                armcomputetensorutils::CopyArmComputeITensorData(static_cast<const int64_t*>(memory),
                                                                  this->GetTensor());
                 break;
             default:

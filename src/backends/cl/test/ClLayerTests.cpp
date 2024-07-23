@@ -1257,6 +1257,9 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd4dInt8, ClContextControlFixture, Simple
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd2dInt32, ClContextControlFixture, SimpleGatherNd2dTest<DataType::Signed32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd3dInt32, ClContextControlFixture, SimpleGatherNd3dTest<DataType::Signed32>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd4dInt32, ClContextControlFixture, SimpleGatherNd4dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd2dInt64, ClContextControlFixture, SimpleGatherNd2dTest<DataType::Signed64>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd3dInt64, ClContextControlFixture, SimpleGatherNd3dTest<DataType::Signed64>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherNd4dInt64, ClContextControlFixture, SimpleGatherNd4dTest<DataType::Signed64>)
 
 // Reshape
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleReshapeFloat32, ClContextControlFixture, SimpleReshapeTest<DataType::Float32>)
@@ -1666,6 +1669,12 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToDepthNchw2Float32, ClContextControlFixtu
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToDepthNhwcQSymm16, ClContextControlFixture, SpaceToDepthNhwcQSymm16Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToDepthNchwQSymm16, ClContextControlFixture, SpaceToDepthNchwQSymm16Test)
 
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToDepthNhwcSigned32, ClContextControlFixture, SpaceToDepthNhwcSigned32Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToDepthNchwSigned32, ClContextControlFixture, SpaceToDepthNchwSigned32Test)
+
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToDepthNhwcSigned64, ClContextControlFixture, SpaceToDepthNhwcSigned64Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SpaceToDepthNchwSigned64, ClContextControlFixture, SpaceToDepthNchwSigned64Test)
+
 // Stack
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Stack0Axis, ClContextControlFixture, StackAxis0Float32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StackOutput4DAxis1, ClContextControlFixture, StackOutput4DAxis1Float32Test)
@@ -1674,6 +1683,8 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StackOutput4DAxis3, ClContextControlFixture, St
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StackOutput3DInputs3, ClContextControlFixture, StackOutput3DInputs3Float32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StackOutput5D, ClContextControlFixture, StackOutput5DFloat32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StackFloat16, ClContextControlFixture, StackFloat16Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StackInt32, ClContextControlFixture, StackInt32Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StackInt64, ClContextControlFixture, StackInt64Test)
 
 // Slice
 ARMNN_AUTO_TEST_FIXTURE(Slice4dFloat32, ClContextControlFixture, Slice4dFloat32Test)
@@ -1691,6 +1702,7 @@ ARMNN_AUTO_TEST_FIXTURE(Slice1dInt16, ClContextControlFixture, Slice1dInt16Test)
 
 // Strided Slice
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StridedSlice4dFloat32, ClContextControlFixture, StridedSlice4dFloat32Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StridedSlice4dSigned32, ClContextControlFixture, StridedSlice4dSigned32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
     StridedSlice4dReverseFloat32, ClContextControlFixture, StridedSlice4dReverseFloat32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
@@ -1730,10 +1742,12 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StridedSliceShrinkAxisMaskBitPosition0And1And3F
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StridedSlice3dFloat32,
                                  ClContextControlFixture,
                                  StridedSlice3dFloat32Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StridedSlice3dSigned32, ClContextControlFixture, StridedSlice3dSigned32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
     StridedSlice3dReverseFloat32, ClContextControlFixture, StridedSlice3dReverseFloat32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
     StridedSlice2dFloat32, ClContextControlFixture, StridedSlice2dFloat32Test)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(StridedSlice2dSigned32, ClContextControlFixture, StridedSlice2dSigned32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(
     StridedSlice2dReverseFloat32, ClContextControlFixture, StridedSlice2dReverseFloat32Test)
 

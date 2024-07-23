@@ -292,6 +292,11 @@ TEST_CASE("DephtToSpaceEndToEndNchwInt16")
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(clDefaultBackends, armnn::DataLayout::NCHW);
 }
 
+TEST_CASE("DephtToSpaceEndToEndNchwSigned32")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Signed32>(clDefaultBackends, armnn::DataLayout::NCHW);
+}
+
 TEST_CASE("DephtToSpaceEndToEndNhwcFloat32")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float32>(clDefaultBackends, armnn::DataLayout::NHWC);
@@ -310,6 +315,11 @@ TEST_CASE("DephtToSpaceEndToEndNhwcUint8")
 TEST_CASE("DephtToSpaceEndToEndNhwcInt16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(clDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("DephtToSpaceEndToEndNhwcSigned32")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Signed32>(clDefaultBackends, armnn::DataLayout::NHWC);
 }
 
 // Dequantize
@@ -685,6 +695,16 @@ TEST_CASE("ClResizeNearestNeighborEndToEndFloatHalfPixelNhwcTest")
 TEST_CASE("ClReverseV2EndToEndTest")
 {
     ReverseV2EndToEnd<armnn::DataType::Float32>(clDefaultBackends);
+}
+
+TEST_CASE("ClReverseV2EndToEndSigned32Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::Signed32>(clDefaultBackends);
+}
+
+TEST_CASE("ClReverseV2EndToEndSigned64Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::Signed64>(clDefaultBackends);
 }
 
 // Space to depth

@@ -267,6 +267,11 @@ TEST_CASE("NeonDephtToSpaceEndToEndNchwInt16")
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends, armnn::DataLayout::NCHW);
 }
 
+TEST_CASE("NeonDephtToSpaceEndToEndNchwSigned32")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Signed32>(neonDefaultBackends, armnn::DataLayout::NCHW);
+}
+
 TEST_CASE("NeonDephtToSpaceEndToEndNhwcFloat32")
 {
     DepthToSpaceEndToEnd<armnn::DataType::Float32>(neonDefaultBackends, armnn::DataLayout::NHWC);
@@ -285,6 +290,11 @@ TEST_CASE("NeonDephtToSpaceEndToEndNhwcUint8")
 TEST_CASE("NeonDephtToSpaceEndToEndNhwcInt16")
 {
     DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("NeonDephtToSpaceEndToEndNhwcSigned32")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Signed32>(neonDefaultBackends, armnn::DataLayout::NHWC);
 }
 
 // Dequantize

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -275,3 +275,53 @@ LayerTestResult<int16_t, 4> SpaceToDepthNchwQSymm16Test(
         tensorHandleFactory,
         armnn::DataLayout::NCHW);
 }
+
+LayerTestResult<int32_t, 4> SpaceToDepthNhwcSigned32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory);
+}
+
+
+LayerTestResult<int32_t, 4> SpaceToDepthNchwSigned32Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::Signed32>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory,
+        armnn::DataLayout::NCHW);
+}
+
+
+LayerTestResult<int64_t, 4> SpaceToDepthNhwcSigned64Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::Signed64>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory);
+}
+
+
+LayerTestResult<int64_t, 4> SpaceToDepthNchwSigned64Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return SpaceToDepthSimpleTest2<armnn::DataType::Signed64>(
+        workloadFactory,
+        memoryManager,
+        tensorHandleFactory,
+        armnn::DataLayout::NCHW);
+}
+

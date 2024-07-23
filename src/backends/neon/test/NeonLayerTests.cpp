@@ -772,6 +772,12 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNchw2Float32, SpaceToDepthNchwFloat32T
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNhwcQSymm16, SpaceToDepthNhwcQSymm16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNchwQSymm16, SpaceToDepthNchwQSymm16Test)
 
+ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNhwcSigned32, SpaceToDepthNhwcSigned32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNchwSigned32, SpaceToDepthNchwSigned32Test)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNhwcSigned64, SpaceToDepthNhwcSigned64Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SpaceToDepthNchwSigned64, SpaceToDepthNchwSigned64Test)
+
 // Splitter
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSplitterFloat32, SplitterFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSplitterUint8, SplitterUint8Test)
@@ -963,6 +969,9 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd4dInt8, SimpleGatherNd4dTest<DataType::QAs
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd2dInt32, SimpleGatherNd2dTest<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd3dInt32, SimpleGatherNd3dTest<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd4dInt32, SimpleGatherNd4dTest<DataType::Signed32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd2dInt64, SimpleGatherNd2dTest<DataType::Signed64>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd3dInt64, SimpleGatherNd3dTest<DataType::Signed64>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(GatherNd4dInt64, SimpleGatherNd4dTest<DataType::Signed64>)
 
 // Equal
 ARMNN_AUTO_TEST_CASE_WITH_THF(EqualSimple,            EqualSimpleTest)
@@ -1398,6 +1407,7 @@ ARMNN_AUTO_TEST_CASE(Slice1dInt16, Slice1dInt16Test)
 
 // Strided Slice
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice4dFloat32, StridedSlice4dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice4dSigned32, StridedSlice4dSigned32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice4dReverseFloat32, StridedSlice4dReverseFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSliceSimpleStrideFloat32, StridedSliceSimpleStrideFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSliceSimpleRangeMaskFloat32, StridedSliceSimpleRangeMaskFloat32Test)
@@ -1423,8 +1433,10 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(
 ARMNN_AUTO_TEST_CASE_WITH_THF(
     StridedSliceShrinkAxisMaskBitPosition0And1And3Float32, StridedSliceShrinkAxisMaskBitPosition0And1And3Float32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice3dFloat32, StridedSlice3dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice3dSigned32, StridedSlice3dSigned32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice3dReverseFloat32, StridedSlice3dReverseFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice2dFloat32, StridedSlice2dFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice2dSigned32, StridedSlice2dSigned32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice2dReverseFloat32, StridedSlice2dReverseFloat32Test)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(StridedSlice4dUint8, StridedSlice4dUint8Test)
@@ -1470,6 +1482,9 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput4DAxis2,   StackOutput4DAxis2Float32Tes
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput4DAxis3,   StackOutput4DAxis3Float32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput3DInputs3, StackOutput3DInputs3Float32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(StackOutput5D,        StackOutput5DFloat32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StackFloat16,         StackFloat16Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StackInt32,           StackInt32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(StackInt64,           StackInt64Test)
 
 //Tile
 ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestFloat32, Tile1dTest<DataType::Float32>)

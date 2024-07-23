@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,14 +21,29 @@ std::vector<T> ConvertToDataType(const std::vector<float>& input,
     auto outputTensorInfo = inputTensorInfo;
     outputTensorInfo.SetDataType(ArmnnType);
 
-    std::unique_ptr<armnn::Encoder<float>> pOutputEncoder = armnn::MakeEncoder<float>(outputTensorInfo, output.data());
-    armnn::Encoder<float>& rOutputEncoder = *pOutputEncoder;
-
-    for (auto it = input.begin(); it != input.end(); ++it)
+    if(sizeof(T) > 4)
     {
-        rOutputEncoder.Set(*it);
-        ++rOutputEncoder;
+        std::unique_ptr<armnn::Encoder<double>> pOutputEncoder = armnn::MakeEncoder<double>(outputTensorInfo,
+                                                                                            output.data());
+        armnn::Encoder<double>& rOutputEncoder = *pOutputEncoder;
+        for (auto it = input.begin(); it != input.end(); ++it)
+        {
+            rOutputEncoder.Set(*it);
+            ++rOutputEncoder;
+        }
     }
+    else
+    {
+        std::unique_ptr<armnn::Encoder<float>> pOutputEncoder = armnn::MakeEncoder<float>(outputTensorInfo,
+                                                                                          output.data());
+        armnn::Encoder<float>& rOutputEncoder = *pOutputEncoder;
+        for (auto it = input.begin(); it != input.end(); ++it)
+        {
+            rOutputEncoder.Set(*it);
+            ++rOutputEncoder;
+        }
+    }
+
     return output;
 }
 
@@ -38,8 +53,19 @@ T ConvertToDataType(const float& value,
                     const armnn::TensorInfo& tensorInfo)
 {
     std::vector<T> output(1);
-    std::unique_ptr<armnn::Encoder<float>> pEncoder = armnn::MakeEncoder<float>(tensorInfo, output.data());
-    armnn::Encoder<float>& rEncoder = *pEncoder;
-    rEncoder.Set(value);
+
+    if(sizeof(T) > 4)
+    {
+        std::unique_ptr<armnn::Encoder<double>> pEncoder = armnn::MakeEncoder<double>(tensorInfo, output.data());
+        armnn::Encoder<double>& rEncoder = *pEncoder;
+        rEncoder.Set(value);
+    }
+    else
+    {
+        std::unique_ptr<armnn::Encoder<float>> pEncoder = armnn::MakeEncoder<float>(tensorInfo, output.data());
+        armnn::Encoder<float>& rEncoder = *pEncoder;
+        rEncoder.Set(value);
+    }
+
     return output[0];
 }

@@ -10,6 +10,7 @@
 #include <tensorflow/lite/c/builtin_op_data.h>
 #include <tensorflow/lite/c/common.h>
 #include <tensorflow/lite/minimal_logging.h>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 namespace armnnOpaqueDelegate
 {
@@ -128,6 +129,15 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
 
     const unsigned int filterHeight = filterTensorInfo.GetShape()[1];
     const unsigned int filterWidth  = filterTensorInfo.GetShape()[2];
+
+    // Check for unsupported group convolution
+    if (IsGroupedConvolution(inputTensorInfo.GetShape(), filterTensorInfo.GetShape(), descriptor.m_DataLayout))
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Group convolution is not supported.");
+        return kTfLiteError;
+    }
 
     // Calculate padding
     CalcPadding(inputHeight, filterHeight, descriptor.m_StrideY, descriptor.m_DilationY,

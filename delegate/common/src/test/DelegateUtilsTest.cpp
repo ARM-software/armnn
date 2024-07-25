@@ -49,6 +49,22 @@ TEST_SUITE("DelegateUtils_Tests")
 
         CHECK(ZeroDimPresent({inputTensor, outputTensor}) == false);
     }
+
+    TEST_CASE("Grouped_Conv_2_Groups")
+    {
+        TensorShape inputShape({2, 2, 2, 2});
+        TensorShape filterShape({2, 2, 2, 1});
+
+        CHECK(IsGroupedConvolution(inputShape, filterShape, armnn::DataLayout::NHWC) == true);
+    }
+
+    TEST_CASE("Grouped_Conv_No_Groups")
+    {
+        TensorShape inputShape({2, 2, 2, 2});
+        TensorShape filterShape({2, 2, 2, 2});
+
+        CHECK(IsGroupedConvolution(inputShape, filterShape, armnn::DataLayout::NHWC) == false);
+    }
 }
 
 }    // namespace armnn

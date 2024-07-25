@@ -21,6 +21,7 @@
 #include <tensorflow/lite/minimal_logging.h>
 #include <tensorflow/lite/kernels/kernel_util.h>
 
+#include <armnnUtils/DataLayoutIndexed.hpp>
 #include <numeric>
 
 namespace
@@ -313,6 +314,21 @@ bool ZeroDimPresent(std::initializer_list<armnn::TensorInfo> tensorInfoList)
         }
     }
     return false;
+}
+
+// Grouped convolution applies a separate filter over each input channel
+// To check for a grouped convolution we can use the following calculation:
+// numGroups = input[channels] / filter[in_channels]
+// This gives us the number of groups to divide the input channel into.
+// An assumption is made here that numGroups > 1 implies a grouped convolution
+// We do not support grouped convolution, therefore we will return unsupported if numGroups > 1
+bool IsGroupedConvolution(armnn::TensorShape inputShape,
+                          armnn::TensorShape filterShape,
+                          const armnn::DataLayout dataLayout)
+{
+    const armnnUtils::DataLayoutIndexed dataLayoutIndexed(dataLayout);
+    const unsigned int channelsIndex = dataLayoutIndexed.GetChannelsIndex();
+    return inputShape[channelsIndex] / filterShape[channelsIndex] > 1;
 }
 
 } // namespace anonymous

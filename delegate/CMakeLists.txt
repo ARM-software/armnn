@@ -127,6 +127,7 @@ endif()
 if(BUILD_UNIT_TESTS)
     set(commonDelegate_unittest_sources)
     list(APPEND commonDelegate_unittest_sources
+        common/src/test/DelegateUtilsTest.cpp
         common/src/test/DelegateTestInterpreter.hpp
         common/src/test/DelegateTestInterpreterUtils.hpp
         test/ActivationTest.cpp

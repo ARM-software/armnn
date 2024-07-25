@@ -295,10 +295,15 @@ TfLiteIntArray* ArmnnOpaqueDelegate::IdentifyOperatorsToDelegate(TfLiteOpaqueCon
         return nullptr;
     }
 
+    // Execution plan size and data are stored as independent variables here so that they are not invalidated by further
+    // Opaque API calls. There is no guarantee that the execution plan's size or data won't change.
+    const int executionPlanSize = executionPlan->size;
+    const int* executionPlanData = executionPlan->data;
+
     // Delegate data with null network
     DelegateData delegateData(m_Options.GetBackends());
 
-    TfLiteIntArray* nodesToDelegate = TfLiteIntArrayCreate(executionPlan->size);
+    TfLiteIntArray* nodesToDelegate = TfLiteIntArrayCreate(executionPlanSize);
     if (nodesToDelegate == nullptr)
     {
         TF_LITE_OPAQUE_KERNEL_LOG(tfLiteContext,
@@ -309,9 +314,9 @@ TfLiteIntArray* ArmnnOpaqueDelegate::IdentifyOperatorsToDelegate(TfLiteOpaqueCon
 
     std::set<int32_t> unsupportedOperators;
 
-    for (int i = 0; i < executionPlan->size; ++i)
+    for (int i = 0; i < executionPlanSize; ++i)
     {
-        const int nodeIndex = executionPlan->data[i];
+        const int nodeIndex = executionPlanData[i];
 
         // If TfLiteOpaqueNodes can be delegated to ArmNN
         TfLiteOpaqueNode* tfLiteNode = nullptr;

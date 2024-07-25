@@ -13,6 +13,7 @@
 #include <tensorflow/lite/c/common.h>
 #include <tensorflow/lite/minimal_logging.h>
 #include <tensorflow/lite/kernels/internal/tensor.h>
+#include <armnnUtils/DataLayoutIndexed.hpp>
 
 namespace armnnDelegate
 {
@@ -80,6 +81,15 @@ TfLiteStatus VisitConv2dOperator(DelegateData& delegateData,
     }
 
     const armnn::TensorInfo& filterTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteFilterTensor);
+
+    // Check for unsupported group convolution
+    if (IsGroupedConvolution(inputTensorInfo.GetShape(), filterTensorInfo.GetShape(), descriptor.m_DataLayout))
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Group convolution is not supported.");
+        return kTfLiteError;
+    }
 
     armnn::TensorInfo biasTensorInfo;
     if(biasEnabled)

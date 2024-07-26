@@ -20,6 +20,7 @@
 #include "RsqrtOperator.hpp"
 #include "Pooling2DOperator.hpp"
 #include "QuantizeOperator.hpp"
+#include "ReduceOperator.hpp"
 #include "ReshapeOperator.hpp"
 #include "ResizeOperator.hpp"
 #include "SliceOperator.hpp"

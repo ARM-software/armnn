@@ -18,6 +18,7 @@
 #include "backendsCommon/test/PadEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/QuantizationEndToEndTestImpl.hpp"
+#include "backendsCommon/test/ReduceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ResizeEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
@@ -490,6 +491,128 @@ TEST_CASE("TosaRefQuantizeFromFloat16ToInt16")
 TEST_CASE("TosaRefQuantizeFromFloat16ToInt32")
 {
     QuantizationEndToEndFloat16<DataType::Signed32>(tosaDefaultBackends);
+}
+
+// Reduce
+// Reduce Sum
+TEST_CASE("TosaRefReduce2dEndtoEndTestSigned32")
+{
+    ReduceEndToEnd2d<DataType::Signed32>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce2dEndtoEndTestSigned32WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::Signed32>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce2dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd2d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce2dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce2dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd2d<DataType::Float32>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce2dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::Float32>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce2dEndtoEndTestInt8")
+{
+    ReduceEndToEnd2d<DataType::QAsymmS8>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce2dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::QAsymmS8>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestSigned32")
+{
+    ReduceEndToEnd3d<DataType::Signed32>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestSigned32WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Signed32>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd3d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd3d<DataType::Float32>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Float32>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestInt8")
+{
+    ReduceEndToEnd3d<DataType::QAsymmS8>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce3dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::QAsymmS8>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestSigned32")
+{
+    ReduceEndToEnd4d<DataType::Signed32>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestSigned32WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Signed32>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd4d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd4d<DataType::Float32>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Float32>(tosaDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestInt8")
+{
+    ReduceEndToEnd4d<DataType::QAsymmS8>(tosaDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("TosaRefReduce4dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::QAsymmS8>(tosaDefaultBackends, ReduceOperation::Sum, true);
 }
 
 // Reshape

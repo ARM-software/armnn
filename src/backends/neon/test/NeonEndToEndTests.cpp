@@ -752,14 +752,125 @@ TEST_CASE("NeonArgMinAxis3TestQuantisedAsymm8")
 }
 
 // Reduce
-TEST_CASE("NeonReduceEndToEndTest")
+// Reduce Sum
+TEST_CASE("NeonReduceSum2dEndtoEndTestSigned32")
 {
-    ReduceEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+    ReduceEndToEnd2d<DataType::Signed32>(neonDefaultBackends, ReduceOperation::Sum);
 }
 
-TEST_CASE("NeonReduceEndToEndTestFloat16")
+TEST_CASE("NeonReduceSum2dEndtoEndTestSigned32WithKeepDims")
 {
-    ReduceEndToEnd<armnn::DataType::Float16>(neonDefaultBackends);
+    ReduceEndToEnd2d<DataType::Signed32>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum2dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd2d<DataType::Float16>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum2dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::Float16>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum2dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd2d<DataType::Float32>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum2dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::Float32>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum2dEndtoEndTestInt8")
+{
+    ReduceEndToEnd2d<DataType::QAsymmS8>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum2dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::QAsymmS8>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestSigned32")
+{
+    ReduceEndToEnd3d<DataType::Signed32>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestSigned32WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Signed32>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd3d<DataType::Float16>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Float16>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd3d<DataType::Float32>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Float32>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestInt8")
+{
+    ReduceEndToEnd3d<DataType::QAsymmS8>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum3dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::QAsymmS8>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestSigned32")
+{
+    ReduceEndToEnd4d<DataType::Signed32>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestSigned32WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Signed32>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd4d<DataType::Float16>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Float16>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd4d<DataType::Float32>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Float32>(neonDefaultBackends, ReduceOperation::Sum, true);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestInt8")
+{
+    ReduceEndToEnd4d<DataType::QAsymmS8>(neonDefaultBackends, ReduceOperation::Sum);
+}
+
+TEST_CASE("NeonReduceSum4dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::QAsymmS8>(neonDefaultBackends, ReduceOperation::Sum, true);
 }
 
 // Reshape

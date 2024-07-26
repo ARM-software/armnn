@@ -152,6 +152,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         {
             return ConvertQuantizeToTosaOperator(layer, inputs, outputs);
         }
+        case LayerType::Reduce:
+        {
+            auto reduceDesc = PolymorphicDowncast<const ReduceDescriptor*>(&descriptor);
+            return ConvertReduceToTosaOperator(layer, inputs, outputs, reduceDesc);
+        }
         case LayerType::Reshape:
         {
             auto reshapeDesc = PolymorphicDowncast<const ReshapeDescriptor*>(&descriptor);

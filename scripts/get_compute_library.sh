@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b461c65e6e7490500661fa249e2c8a75b695b9e0" # Provide a wrapper class to expose cpu::CpuWinogradConv2d
+DEFAULT_CLFRAMEWORKREVISION="75e91436e79eca99453bbc0cfcff01b62c083f02" # 11949: Fix UpdateStaticQuantInfoAfterConfigure test cases failed in nightly.
 
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out

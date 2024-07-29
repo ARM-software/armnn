@@ -1950,6 +1950,7 @@ bool RefLayerSupport::IsMeanSupported(const TensorInfo& input,
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 

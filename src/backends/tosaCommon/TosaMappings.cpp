@@ -148,6 +148,17 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
                 return ConvertPooling2DToTosaOperator(layer, inputs, outputs, poolDesc);
             }
         }
+        case LayerType::Mean:
+        {
+            auto meanDesc = PolymorphicDowncast<const MeanDescriptor*>(&descriptor);
+
+            ReduceDescriptor reduceDesc;
+            reduceDesc.m_KeepDims        = meanDesc->m_KeepDims;
+            reduceDesc.m_vAxis           = meanDesc->m_Axis;
+            reduceDesc.m_ReduceOperation = ReduceOperation::Mean;
+
+            return ConvertReduceToTosaOperator(layer, inputs, outputs, &reduceDesc);
+        }
         case LayerType::Quantize:
         {
             return ConvertQuantizeToTosaOperator(layer, inputs, outputs);

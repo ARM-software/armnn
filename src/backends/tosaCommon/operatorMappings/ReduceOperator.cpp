@@ -10,6 +10,9 @@
 #include <armnn/TypesUtils.hpp>
 #include "TosaRescaleOperatorUtils.hpp"
 
+// This function is paraphrased from:
+// tensorflow/compiler/mlir/tosa/transforms/legalize_common.cc from functions convertReduceMeanOp, convertReduceSumOp,
+// convertReduceOpCommon
 TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                                          const std::vector<const TensorInfo*>& inputs,
                                                          const std::vector<const TensorInfo*>& outputs,
@@ -18,12 +21,13 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
     // Early exits
     if (!inputs[0])
     {
-        throw armnn::Exception("Must provide a valid input tensor.");
+        throw armnn::Exception("ConvertReduceOperator: Must provide a valid input tensor.");
     }
 
     if (inputs[0]->IsQuantized() ^ outputs[0]->IsQuantized())
     {
-        throw armnn::Exception("Both input and output tensors must be either quantised or non-quantised data types.");
+        throw armnn::Exception("ConvertReduceOperator: "
+                               "Both input and output tensors must be either quantised or non-quantised data types.");
     }
 
     if (reduceDescriptor->m_vAxis.size() > 1)
@@ -50,6 +54,7 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
     std::string outputNameRescale1 = "intermediate0_" + GetUniqueTosaMappingID();
     std::string outputNameReduce   = "intermediate1_" + GetUniqueTosaMappingID();
     std::string outputNameRescale2 = "intermediate2_" + GetUniqueTosaMappingID();
+    std::string outputNameMul      = "intermediate3_" + GetUniqueTosaMappingID();
 
     std::string outputName         = "output0_";
 
@@ -66,6 +71,7 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
     }
 
     std::vector<TosaSerializationTensor*> tensors;
+    std::vector<std::string> inputNames{inputName};
 
     DType inputType = ArmNNToDType(inputs[0]->GetDataType());
 
@@ -115,6 +121,7 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
     switch(reduceDescriptor->m_ReduceOperation)
     {
         case ReduceOperation::Sum:
+        case ReduceOperation::Mean:
             operators.emplace_back(new TosaSerializationOperator(Op_REDUCE_SUM,
                                                                  Attribute_AxisAttribute,
                                                                  &reduceAttribute,
@@ -125,7 +132,7 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
             throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");
     }
 
-    std::vector<int32_t>& outputShapeReduce = inputShape;
+    std::vector<int32_t> outputShapeReduce = inputShape;
     outputShapeReduce[reduceDescriptor->m_vAxis[0]] = 1;
 
     tensors.emplace_back(new TosaSerializationTensor(outputNameReduce,
@@ -134,8 +141,17 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                                      {}));
 
     // Conditional RESCALE
+    auto numElemsOnReducedAxis = inputShape[static_cast<unsigned long>(axis)];
+    float divScale = 1.0f / static_cast<float>(numElemsOnReducedAxis);
     if (inputs[0]->IsQuantized())
     {
+
+        // if Mean, modify output_scale to account for 1/number of elements.
+        if (reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean)
+        {
+            output_scale *= divScale;
+        }
+
         TosaSerializationOperator* rescaleOp2 = nullptr;
 
         CreateRescaleTosaOperator(outputNameReduce,
@@ -153,6 +169,55 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                                          outputShapeReduce,
                                                          inputType,
                                                          {}));
+    }
+    else
+    {
+        // if Mean, add Mul to account for 1/number of elements.
+        if (reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean)
+        {
+            // CONSTANT operator, value to multiply by
+            std::string divConstantName = std::string("constant_") + GetUniqueTosaMappingID();
+            inputNames.emplace_back(divConstantName);
+
+            operators.push_back(new TosaSerializationOperator(Op_CONST,
+                                                              Attribute_NONE,
+                                                              nullptr,
+                                                              {},
+                                                              {divConstantName}));
+
+            std::vector<uint8_t> uint8DivScale;
+            switch (inputType)
+            {
+                case DType_FP16:
+                    TosaSerializationHandler::ConvertF16toU8({divScale}, uint8DivScale);
+                    break;
+                case DType_FP32:
+                    TosaSerializationHandler::ConvertF32toU8({divScale}, uint8DivScale);
+                    break;
+                default:
+                    throw armnn::Exception("ConvertReduceOperator: Data type not supported");
+            }
+
+            std::vector<int32_t> divConstantShape (outputShapeReduce.size(), 1);
+            tensors.push_back(new TosaSerializationTensor(divConstantName,
+                                                          divConstantShape,
+                                                          inputType,
+                                                          uint8DivScale));
+
+            // MUL operator
+            int8_t shift = 0;
+            TosaMulAttribute mulAttribute(shift);
+
+            operators.emplace_back(new TosaSerializationOperator(Op_MUL,
+                                                                 Attribute_MulAttribute,
+                                                                 &mulAttribute,
+                                                                 {divConstantName, outputNameReduce},
+                                                                 {outputNameMul}));
+            tensors.push_back(new TosaSerializationTensor(outputNameMul,
+                                                          outputShapeReduce,
+                                                          inputType,
+                                                          {}));
+        }
     }
 
     // RESHAPE
@@ -173,6 +238,6 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                            mainName,        // region name
                                            operators,       // operators
                                            tensors,         // tensors
-                                           { inputName },   // inputs
+                                           inputNames,      // inputs
                                            { outputName }); // outputs
 }

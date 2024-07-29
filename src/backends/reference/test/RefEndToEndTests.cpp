@@ -28,6 +28,7 @@
 #include <backendsCommon/test/GatherNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include <backendsCommon/test/LogSoftmaxEndToEndTestImpl.hpp>
+#include <backendsCommon/test/MeanEndToEndTestImpl.hpp>
 #include <backendsCommon/test/PadEndToEndTestImpl.hpp>
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
@@ -1506,6 +1507,37 @@ TEST_CASE("RefMaxPool2DThreeLayerEndtoEndTestFloat32")
     MaxPool2dThreeLayerEndToEnd<DataType::Float32>(defaultBackends);
 }
 
+// Mean
+TEST_CASE("RefMeanEndToEndFloat16Test")
+{
+    MeanEndToEnd<armnn::DataType::Float16>(defaultBackends);
+}
+
+TEST_CASE("RefMeanEndToEndFloat16TestWithKeepDims")
+{
+    MeanEndToEnd<armnn::DataType::Float16>(defaultBackends, true);
+}
+
+TEST_CASE("RefMeanEndToEndFloat32Test")
+{
+    MeanEndToEnd<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefMeanEndToEndFloat32TestWithKeepDims")
+{
+    MeanEndToEnd<armnn::DataType::Float32>(defaultBackends, true);
+}
+
+TEST_CASE("RefMeanEndToEndInt8Test")
+{
+    MeanEndToEnd<armnn::DataType::QSymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefMeanEndToEndInt8TestWithKeepDims")
+{
+    MeanEndToEnd<armnn::DataType::QSymmS8>(defaultBackends, true);
+}
+
 // Pad
 TEST_CASE("RefPadEndToEndFloat32Test")
 {
@@ -2244,6 +2276,101 @@ TEST_CASE("RefReduceSum4dEndtoEndTestInt8")
 TEST_CASE("RefReduceSum4dEndtoEndTestInt8WithKeepDims")
 {
     ReduceEndToEnd4d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Sum, true);
+}
+TEST_CASE("RefReduceSumEmptyAxisEndtoEndTestInt8")
+{
+    ReduceEndToEndEmptyAxis<DataType::QAsymmS8>(defaultBackends);
+}
+
+// Reduce Mean
+TEST_CASE("RefReduce2dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd2d<DataType::Float16>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce2dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::Float16>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce2dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd2d<DataType::Float32>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce2dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::Float32>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce2dEndtoEndTestInt8")
+{
+    ReduceEndToEnd2d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce2dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd2d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce3dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd3d<DataType::Float16>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce3dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Float16>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce3dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd3d<DataType::Float32>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce3dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::Float32>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce3dEndtoEndTestInt8")
+{
+    ReduceEndToEnd3d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce3dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd3d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce4dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd4d<DataType::Float16>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce4dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Float16>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce4dEndtoEndTestFloat32")
+{
+    ReduceEndToEnd4d<DataType::Float32>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce4dEndtoEndTestFloat32WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Float32>(defaultBackends, ReduceOperation::Mean, true);
+}
+
+TEST_CASE("RefReduce4dEndtoEndTestInt8")
+{
+    ReduceEndToEnd4d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("RefReduce4dEndtoEndTestInt8WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean, true);
 }
 
 // Reshape

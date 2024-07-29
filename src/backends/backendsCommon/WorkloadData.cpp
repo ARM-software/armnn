@@ -2446,6 +2446,7 @@ void MeanQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::Float16,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
+        DataType::QSymmS8,
         DataType::QSymmS16
     };
 

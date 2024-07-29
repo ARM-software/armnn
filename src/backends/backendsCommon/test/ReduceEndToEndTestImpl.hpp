@@ -83,6 +83,12 @@ void ReduceEndToEnd2d(const std::vector<armnn::BackendId>& backends,
                 5.0f, 7.0f, 9.0f
             };
             break;
+        case ReduceOperation::Mean:
+            floatOutputData =
+            {
+                5.0f/2.f, 7.0f/2.f, 9.0f/2.f
+            };
+            break;
         default:
             throw armnn::Exception("ReduceEndToEnd2d: Reduce Operation not implemented.");
     }
@@ -144,6 +150,13 @@ void ReduceEndToEnd3d(const std::vector<armnn::BackendId>& backends,
                 17.0f, 19.0f, 21.0f
             };
             break;
+        case ReduceOperation::Mean:
+            floatOutputData =
+            {
+                5.0f/2.f,  7.0f/2.f,  9.0f/2.f,
+                17.0f/2.f, 19.0f/2.f, 21.0f/2.f
+            };
+            break;
         default:
             throw armnn::Exception("ReduceEndToEnd3d: Reduce Operation not implemented.");
     }
@@ -196,6 +209,9 @@ void ReduceEndToEnd4d(const std::vector<armnn::BackendId>& backends,
     {
         case ReduceOperation::Sum:
             floatOutputData = { 34.0f };
+            break;
+        case ReduceOperation::Mean:
+            floatOutputData = { 34.0f/5.f };
             break;
         default:
             throw armnn::Exception("ReduceEndToEnd4d: Reduce Operation not implemented.");

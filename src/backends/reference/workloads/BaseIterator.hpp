@@ -764,7 +764,7 @@ public:
     {
         ARMNN_THROW_INVALIDARG_MSG_IF_FALSE(m_Iterator, "PerAxisIterator: m_Iterator is null!");
         m_Iterator = m_Start + index;
-        if (index < m_AxisFactor)
+        if (index < m_AxisFactor || m_AxisDimensionality < 1)
         {
             m_AxisIndex = 0;
         }
@@ -796,12 +796,12 @@ class QSymm8PerAxisDecoder : public PerAxisIterator<const int8_t, Decoder<float>
 public:
     QSymm8PerAxisDecoder(const int8_t* data, const armnn::TensorInfo& tensorInfo)
             : PerAxisIterator(data, tensorInfo.GetShape(), tensorInfo.GetQuantizationDim().value()),
-              m_Scales(tensorInfo.GetQuantizationScales())
+              m_Scales(tensorInfo.GetQuantizationScales()), m_Offset(tensorInfo.GetQuantizationOffset())
     {}
 
     float Get() const override
     {
-        return armnn::Dequantize(*m_Iterator, GetScale(), 0);
+        return armnn::Dequantize(*m_Iterator, GetScale(), m_Offset);
     }
 
     // Get scale of the current value
@@ -819,29 +819,32 @@ public:
         for (uint32_t i = 0; i < size; ++i)
         {
             SetIndexOnMem(i);
-            decodedTensor.emplace_back(armnn::Dequantize(*m_Iterator, GetScale(), 0));
+            decodedTensor.emplace_back(armnn::Dequantize(*m_Iterator, GetScale(), m_Offset));
         }
         return decodedTensor;
     }
 
 private:
     std::vector<float> m_Scales;
+    const int32_t m_Offset;
 };
 
 class QSymm8PerAxisEncoder : public PerAxisIterator<int8_t, Encoder<float>>
 {
 public:
-    QSymm8PerAxisEncoder(int8_t* data, const std::vector<float>& scale, unsigned int axisFactor)
-        : PerAxisIterator(data, axisFactor), m_Scale(scale) {}
+    QSymm8PerAxisEncoder(int8_t* data, const armnn::TensorInfo& tensorInfo)
+        : PerAxisIterator(data, tensorInfo.GetShape(), tensorInfo.GetQuantizationDim().value()),
+          m_Scale(tensorInfo.GetQuantizationScales()), m_Offset(tensorInfo.GetQuantizationOffset())
+    {}
 
     void Set(float right)
     {
-        *m_Iterator = armnn::Quantize<int8_t>(right, m_Scale[m_AxisIndex], 0);
+        *m_Iterator = armnn::Quantize<int8_t>(right, m_Scale[m_AxisIndex], m_Offset);
     }
 
     float Get() const
     {
-        return armnn::Dequantize(*m_Iterator, m_Scale[m_AxisIndex], 0);
+        return armnn::Dequantize(*m_Iterator, m_Scale[m_AxisIndex], m_Offset);
     }
 
     // Get scale of the current value
@@ -852,6 +855,7 @@ public:
 
 private:
     std::vector<float> m_Scale;
+    const int32_t m_Offset;
 };
 
 class ScaledInt32PerAxisDecoder : public PerAxisIterator<const int32_t, Decoder<float>>

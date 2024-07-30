@@ -429,6 +429,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
             }
             ret.SetQuantizationScales(quantizationScales);
             ret.SetQuantizationDim(armnn::numeric_cast<unsigned int>(affineQuantization->quantized_dimension));
+            ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
         }
         else
         {

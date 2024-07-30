@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,11 +38,7 @@ inline std::unique_ptr<Encoder<float>> MakeEncoder(const TensorInfo& info, void*
         {
             if (info.HasPerAxisQuantization())
             {
-                std::pair<unsigned int, std::vector<float>> params = armnnUtils::GetPerAxisParams(info);
-                return std::make_unique<QSymm8PerAxisEncoder>(
-                        static_cast<int8_t*>(data),
-                        params.second,
-                        params.first);
+                return std::make_unique<QSymm8PerAxisEncoder>(static_cast<int8_t*>(data), info);
             }
             else
             {

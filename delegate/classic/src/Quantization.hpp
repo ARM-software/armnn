@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -140,6 +140,18 @@ TfLiteStatus VisitQuantizeOperator(DelegateData& delegateData,
 
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+    if (outputTensorInfo.HasPerAxisQuantization())
+    {
+        auto outputTensorDataType = outputTensorInfo.GetDataType();
+        if (outputTensorDataType == armnn::DataType::QAsymmU8 || outputTensorDataType == armnn::DataType::QAsymmS8)
+        {
+            TF_LITE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnDelegate: Per Axis Quantization is not supported in asymmetric Quantization Datatype.");
+            return kTfLiteError;
+        }
+    }
 
     bool isSupported = false;
     armnn::BackendId setBackend;

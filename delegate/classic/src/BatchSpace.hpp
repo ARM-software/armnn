@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -51,6 +51,16 @@ TfLiteStatus VisitBatchToSpaceNdOperator(DelegateData& delegateData,
     const armnn::TensorInfo& blockShapeTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteBlockShapeTensor);
     const armnn::TensorInfo& cropsTensorInfo      = GetTensorInfoForTfLiteTensor(tfLiteCropsTensor);
     const armnn::TensorInfo& outputTensorInfo     = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+    // Check for unsupported 0-size dimensions in the tensor shapes
+    if(ZeroDimPresent({inputTensorInfo, outputTensorInfo}))
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Zero dimension tensors are not supported in operator #%d node #%d",
+            operatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     std::vector<unsigned int> blockShape(blockShapeTensorInfo.GetNumElements());
     ::memcpy(blockShape.data(), tfLiteBlockShapeTensor.data.data, blockShapeTensorInfo.GetNumBytes());

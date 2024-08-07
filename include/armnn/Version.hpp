@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,7 +11,7 @@
 
 // ArmNN version components
 #define ARMNN_MAJOR_VERSION 33
-#define ARMNN_MINOR_VERSION 1
+#define ARMNN_MINOR_VERSION 2
 #define ARMNN_PATCH_VERSION 0
 
 /// ARMNN_VERSION: "X.Y.Z"

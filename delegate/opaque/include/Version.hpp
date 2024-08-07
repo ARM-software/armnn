@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,7 +15,7 @@ namespace armnnOpaqueDelegate
 // ArmNN Delegate version components
 #define OPAQUE_DELEGATE_MAJOR_VERSION 2
 #define OPAQUE_DELEGATE_MINOR_VERSION 0
-#define OPAQUE_DELEGATE_PATCH_VERSION 0
+#define OPAQUE_DELEGATE_PATCH_VERSION 1
 
 /// DELEGATE_VERSION: "X.Y.Z"
 /// where:

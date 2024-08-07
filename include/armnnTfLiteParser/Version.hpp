@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,7 +15,7 @@ namespace armnnTfLiteParser
 // TfLiteParser version components
 #define TFLITE_PARSER_MAJOR_VERSION 24
 #define TFLITE_PARSER_MINOR_VERSION 6
-#define TFLITE_PARSER_PATCH_VERSION 0
+#define TFLITE_PARSER_PATCH_VERSION 1
 
 /// TFLITE_PARSER_VERSION: "X.Y.Z"
 /// where:

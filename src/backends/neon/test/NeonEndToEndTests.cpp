@@ -953,6 +953,11 @@ TEST_CASE("NeonReverseV2EndToEndTest")
     ReverseV2EndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
 }
 
+TEST_CASE("NeonReverseV2EndToEndSigned32Test")
+{
+    ReverseV2EndToEnd<armnn::DataType::Signed32>(neonDefaultBackends);
+}
+
 // Slice
 TEST_CASE("NeonSliceEndtoEndTestFloat32")
 {

@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: Copyright © 2023-2024 Arm Ltd and Contributors.
+# SPDX-License-Identifier: MIT
+version = 1
+[[annotations]]
+path = "gemmlowp/**"
+precedence = "closest"
+SPDX-FileCopyrightText = "NOASSERTION"
+SPDX-License-Identifier = "Apache-2.0"

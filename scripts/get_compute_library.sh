@@ -7,10 +7,10 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-#DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_05" # Release 24.05
+DEFAULT_CLFRAMEWORKREVISION="rc_24_08_12_0" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="8f029ff2a020bc7ca61d83f03665ef95f2f18b2e" # 12101: fix: illegal intruction in multi_isa armv8a.(Release Candidate)
+#DEFAULT_CLFRAMEWORKREVISION="8f029ff2a020bc7ca61d83f03665ef95f2f18b2e" # 12101: fix: illegal intruction in multi_isa armv8a.(Release Candidate)
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

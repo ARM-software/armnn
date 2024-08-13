@@ -452,14 +452,22 @@ TEST_CASE("IsLayerSupportedTosaReferenceRsqrtUnsupported")
     ElementwiseUnaryDescriptor desc(UnaryOperation::Rsqrt);
     TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
-    auto supported = supportChecker.IsLayerSupported(LayerType::ElementwiseUnary,
-                                                     {in0, out},
-                                                     desc,
-                                                     EmptyOptional(),
-                                                     EmptyOptional(),
-                                                     reasonIfNotSupported);
 
-    CHECK(!supported);
+    try
+    {
+        supportChecker.IsLayerSupported(LayerType::ElementwiseUnary,
+                                        { in0, out },
+                                        desc,
+                                        EmptyOptional(),
+                                        EmptyOptional(),
+                                        reasonIfNotSupported);
+        FAIL("Rsqrt: An exception should have been thrown.");
+    }
+    catch(armnn::Exception& e)
+    {
+        CHECK_EQ(std::string(e.what()), "ConvertRsqrtOperator(): unsupported datatype INT32 or INT64."
+                                        " Supported Types: FLOAT32, FLOAT16 & INT8.");
+    }
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceSlice")

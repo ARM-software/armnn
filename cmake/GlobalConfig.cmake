@@ -353,13 +353,15 @@ endif()
 if(ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
     # verify we have a valid flatbuffers include path
     find_path(FLATBUFFERS_INCLUDE_PATH flatbuffers/flatbuffers.h
-              HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include)
+              HINTS ${FLATBUFFERS_ROOT}/include /usr/local/include /usr/include
+              NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
     message(STATUS "Flatbuffers headers are located at: ${FLATBUFFERS_INCLUDE_PATH}")
 
     find_library(FLATBUFFERS_LIBRARY
                  NAMES libflatbuffers.a flatbuffers
-                 HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib)
+                 HINTS ${FLATBUFFERS_ROOT}/lib /usr/local/lib /usr/lib
+                 NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
     message(STATUS "Flatbuffers library located at: ${FLATBUFFERS_LIBRARY}")
 

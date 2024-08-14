@@ -1,11 +1,19 @@
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
 cmake_minimum_required(VERSION 3.7.0)
 
 project("armnn_delegate_jni")
+
+# Setting JAVA_HOME so that cmake finds JNI_INCLUDE_DIRS and JNI_LIBRARIES while building JNI.
+# JAVA_HOME is set to a system installed Java version. 
+set(JAVA_HOME /usr/lib/jvm/default-java)
+set(JAVA_JVM_LIBRARY ${JAVA_HOME})
+set(JAVA_AWT_LIBRARY ${JAVA_HOME})
+set(JAVA_INCLUDE_PATH2 ${JAVA_HOME})
+set(JAVA_AWT_INCLUDE_PATH ${JAVA_HOME})
 
 # JNI is needed for jni calls
 find_package(JNI)

@@ -7,7 +7,7 @@
 CMD=$( basename "$0" )
 
 # For pinning to a ref use this:
-DEFAULT_CLFRAMEWORKREVISION="rc_24_08_12_0" # Release 24.08
+DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
 #DEFAULT_CLFRAMEWORKREVISION="8f029ff2a020bc7ca61d83f03665ef95f2f18b2e" # 12101: fix: illegal intruction in multi_isa armv8a.(Release Candidate)

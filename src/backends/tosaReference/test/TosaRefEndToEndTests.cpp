@@ -102,6 +102,28 @@ TEST_CASE("TosaRefGeluEndToEndTestQAsymmS8")
     ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::Gelu);
 }
 
+// Sigmoid
+TEST_CASE("TosaRefSigmoidEndToEndTestFloat32")
+{
+    ActivationEndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends, ActivationFunction::Sigmoid);
+}
+
+TEST_CASE("TosaRefSigmoidEndToEndTestFloat16")
+{
+    ActivationEndToEndTest<armnn::DataType::Float16>(tosaDefaultBackends, ActivationFunction::Sigmoid);
+}
+
+TEST_CASE("TosaRefSigmoidEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::Sigmoid);
+}
+
+// TanH
+TEST_CASE("TosaRefTanHEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::TanH);
+}
+
 // BoundedRelu
 TEST_CASE("TosaRefBoundedReLuEndToEndTestFloat32")
 {

@@ -44,12 +44,16 @@ list(APPEND armnnTosaBackendOperators_sources
         ReshapeOperator.cpp
         ResizeOperator.hpp
         ResizeOperator.cpp
+        SigmoidOperator.hpp
+        SigmoidOperator.cpp
         SliceOperator.hpp
         SliceOperator.cpp
         SoftmaxOperator.hpp
         SoftmaxOperator.cpp
         SplitOperator.hpp
         SplitOperator.cpp
+        TanhOperator.hpp
+        TanhOperator.cpp
         TosaOperatorUtils.hpp
         TosaRescaleOperatorUtils.hpp
         TosaSoftmaxOperatorUtils.hpp

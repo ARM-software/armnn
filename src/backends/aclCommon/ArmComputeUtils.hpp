@@ -369,36 +369,63 @@ inline const TensorInfo ComputeReductionTensorShape(const armnn::TensorInfo& inp
     return reducedTensorInfo;
 }
 
-/// Macro function check if layer with multiple axes is supported on each backend
-#define IS_MULTI_AXES_REDUCE_SUPPORTED(func, input, desc, status)                 \
-    armnn::TensorInfo inputTensorInfo = input;                                    \
-    unsigned int recalulatedAxis = 0;                                             \
-    std::vector<uint32_t> axes;                                                   \
-                                                                                  \
-    for (unsigned int i = 0; i != desc.m_vAxis.size(); ++i)                       \
-    {                                                                             \
-        axes.emplace_back(desc.m_vAxis[i]);                                       \
-                                                                                  \
-        const armnn::TensorInfo& reducedTensorInfo =                              \
-            ComputeReductionTensorShape(input, axes, desc.m_KeepDims);            \
-                                                                                  \
-        std::vector<uint32_t> singleAxis(1, desc.m_vAxis[i] - recalulatedAxis);   \
-                                                                                  \
-        armnn::ReduceDescriptor newReduceDescriptor = desc;                       \
-        newReduceDescriptor.m_vAxis.assign(singleAxis.begin(), singleAxis.end()); \
-                                                                                  \
-        status = func(inputTensorInfo, reducedTensorInfo, newReduceDescriptor);   \
-        if (!status)                                                              \
-        {                                                                         \
-            break;                                                                \
-        }                                                                         \
-                                                                                  \
-        if (!desc.m_KeepDims)                                                     \
-        {                                                                         \
-            recalulatedAxis++;                                                    \
-        }                                                                         \
-                                                                                  \
-        inputTensorInfo = reducedTensorInfo;                                      \
+/// Function pointer type used in IsMultiAxesReduceSupported for readability
+using reduceValidateFunction = arm_compute::Status (*)(const armnn::TensorInfo&,
+                                                       const armnn::TensorInfo&,
+                                                       const armnn::ReduceDescriptor&);
+
+/// Function to check if layer with multiple axes is supported on each backend
+inline void IsMultiAxesReduceSupported(reduceValidateFunction func,
+                                       const armnn::TensorInfo& input,
+                                       const armnn::TensorInfo& output,
+                                       const armnn::ReduceDescriptor& desc,
+                                       arm_compute::Status& status)
+{
+    armnn::TensorInfo inputTensorInfo = input;
+    unsigned int recalulatedAxis = 0;
+    std::vector<uint32_t> axes;
+    axes.reserve(desc.m_vAxis.size());
+
+    for (unsigned int i = 0; i != desc.m_vAxis.size(); ++i)
+    {
+        axes.emplace_back(desc.m_vAxis[i]);
+
+        // Getting next reduced tensor shape
+        armnn::TensorInfo reducedTensorInfo =
+            ComputeReductionTensorShape(input, axes, desc.m_KeepDims);
+
+        // If the next reduced tensor shape is the output, set the corresponding quantization
+        if(reducedTensorInfo.GetShape() == output.GetShape())
+        {
+            if(output.HasMultipleQuantizationScales())
+            {
+                reducedTensorInfo.SetQuantizationScales(output.GetQuantizationScales());
+            }
+            else
+            {
+                reducedTensorInfo.SetQuantizationScale(output.GetQuantizationScale());
+            }
+            reducedTensorInfo.SetQuantizationOffset(output.GetQuantizationOffset());
+        }
+
+        std::vector<uint32_t> singleAxis(1, desc.m_vAxis[i] - recalulatedAxis);
+
+        armnn::ReduceDescriptor newReduceDescriptor = desc;
+        newReduceDescriptor.m_vAxis.assign(singleAxis.begin(), singleAxis.end());
+
+        status = func(inputTensorInfo, reducedTensorInfo, newReduceDescriptor);
+        if (!status)
+        {
+            break;
+        }
+
+        if (!desc.m_KeepDims)
+        {
+            recalulatedAxis++;
+        }
+
+        inputTensorInfo = reducedTensorInfo;
     }
+}
 
 } // namespace armnn

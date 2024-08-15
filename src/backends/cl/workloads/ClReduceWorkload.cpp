@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,7 +38,7 @@ arm_compute::Status ClReduceWorkloadValidate(const TensorInfo& input,
     {
         // Validate layer if there are multiple axes.
         arm_compute::Status status;
-        IS_MULTI_AXES_REDUCE_SUPPORTED(ClReduceWorkloadValidate, input, descriptor, status);
+        IsMultiAxesReduceSupported(ClReduceWorkloadValidate, input, output, descriptor, status);
         return status;
     }
 }

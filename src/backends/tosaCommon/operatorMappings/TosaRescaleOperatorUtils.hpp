@@ -62,7 +62,7 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
 /// From a scale value, generates multiplier and shift values where
 /// mantissa is in [-1.0,-0.5] or [0.5, 1.0] such that
 /// multiplier = mantissa*2^shift for 32-bit scaling.
-static void ComputeMultiplierAndShiftTosaScale32(double scale,
+inline void ComputeMultiplierAndShiftTosaScale32(double scale,
                                                  int32_t &multiplier,
                                                  int32_t &shift)
 {
@@ -107,7 +107,7 @@ static void ComputeMultiplierAndShiftTosaScale32(double scale,
 /// From a scale value, generates multiplier and shift values where
 /// mantissa is in [-1.0,-0.5] or [0.5, 1.0] such that
 /// multiplier = mantissa*2^shift for 16-bit scaling.
-static void ComputeMultiplierAndShiftTosaScale16(double scale,
+inline void ComputeMultiplierAndShiftTosaScale16(double scale,
                                                  int32_t &multiplier,
                                                  int32_t &shift)
 {

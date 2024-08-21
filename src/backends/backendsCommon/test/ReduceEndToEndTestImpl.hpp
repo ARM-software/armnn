@@ -25,15 +25,14 @@ armnn::INetworkPtr CreateReduceNetwork(const armnn::TensorShape& inputShape,
 
     INetworkPtr network(INetwork::Create());
 
-    TensorInfo inputTensorInfo(inputShape, DataType, qScale, qOffset, true);
+    TensorInfo inputTensorInfo(inputShape,   DataType, qScale, qOffset, true);
     TensorInfo outputTensorInfo(outputShape, DataType, qScale, qOffset);
 
-
     IConnectableLayer* reduce = network->AddReduceLayer(descriptor, "reduce");
-    IConnectableLayer* input   = network->AddInputLayer(0, "input");
-    IConnectableLayer* output  = network->AddOutputLayer(0, "output");
+    IConnectableLayer* input  = network->AddInputLayer(0, "input");
+    IConnectableLayer* output = network->AddOutputLayer(0, "output");
 
-    Connect(input, reduce, inputTensorInfo, 0, 0);
+    Connect(input,  reduce, inputTensorInfo,  0, 0);
     Connect(reduce, output, outputTensorInfo, 0, 0);
 
     return network;
@@ -86,7 +85,7 @@ void ReduceEndToEnd2d(const std::vector<armnn::BackendId>& backends,
         case ReduceOperation::Mean:
             floatOutputData =
             {
-                5.0f/2.f, 7.0f/2.f, 9.0f/2.f
+                2.5f, 3.5f, 4.5f
             };
             break;
         default:
@@ -153,8 +152,8 @@ void ReduceEndToEnd3d(const std::vector<armnn::BackendId>& backends,
         case ReduceOperation::Mean:
             floatOutputData =
             {
-                5.0f/2.f,  7.0f/2.f,  9.0f/2.f,
-                17.0f/2.f, 19.0f/2.f, 21.0f/2.f
+                2.5f, 3.5f,  4.5f,
+                8.5f, 9.5f, 10.5f
             };
             break;
         default:
@@ -182,7 +181,7 @@ void ReduceEndToEnd4d(const std::vector<armnn::BackendId>& backends,
     descriptor.m_vAxis           = { 3 };
     descriptor.m_ReduceOperation = reduceOperation;
 
-    TensorShape inputShape  = { 1, 1, 1, 5 };
+    TensorShape inputShape  = { 1, 1, 2, 5 };
     TensorShape outputShape = inputShape;
 
     if (keepDims)
@@ -191,7 +190,7 @@ void ReduceEndToEnd4d(const std::vector<armnn::BackendId>& backends,
     }
     else
     {
-        outputShape = { 1, 1, 1 };
+        outputShape = { 1, 1, 2 };
     }
 
     INetworkPtr network = CreateReduceNetwork<ArmnnType>(inputShape, outputShape, descriptor);
@@ -200,7 +199,8 @@ void ReduceEndToEnd4d(const std::vector<armnn::BackendId>& backends,
 
     std::vector<float> floatInputData = 
     {
-        5.0f, 2.0f, 8.0f, 10.0f, 9.0f
+        5.0f, 2.0f, 8.0f, 10.0f, 9.0f,
+        4.0f, 1.0f, 7.0f,  9.0f, 8.0f
     };
 
     std::vector<float> floatOutputData;
@@ -208,10 +208,10 @@ void ReduceEndToEnd4d(const std::vector<armnn::BackendId>& backends,
     switch(reduceOperation)
     {
         case ReduceOperation::Sum:
-            floatOutputData = { 34.0f };
+            floatOutputData = { 34.0f, 29.0f };
             break;
         case ReduceOperation::Mean:
-            floatOutputData = { 34.0f/5.f };
+            floatOutputData = { 6.8f, 5.8f };
             break;
         default:
             throw armnn::Exception("ReduceEndToEnd4d: Reduce Operation not implemented.");
@@ -223,7 +223,11 @@ void ReduceEndToEnd4d(const std::vector<armnn::BackendId>& backends,
     std::map<int, std::vector<T>> inputTensorData    = { { 0, inputData  } };
     std::map<int, std::vector<T>> expectedOutputData = { { 0, outputData } };
 
-    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network), inputTensorData, expectedOutputData, backends);
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
+                                                inputTensorData,
+                                                expectedOutputData,
+                                                backends,
+                                                std::is_same<T, half_float::half>::value ? 0.005f : 0.000001f);
 }
 
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>

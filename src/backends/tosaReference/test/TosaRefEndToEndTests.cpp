@@ -737,6 +737,16 @@ TEST_CASE("TosaRefReduceMean3dEndtoEndTestInt8WithKeepDims")
     ReduceEndToEnd3d<DataType::QAsymmS8>(tosaDefaultBackends, ReduceOperation::Mean, true);
 }
 
+TEST_CASE("TosaRefReduceMean4dEndtoEndTestFloat16")
+{
+    ReduceEndToEnd4d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Mean);
+}
+
+TEST_CASE("TosaRefReduceMean4dEndtoEndTestFloat16WithKeepDims")
+{
+    ReduceEndToEnd4d<DataType::Float16>(tosaDefaultBackends, ReduceOperation::Mean, true);
+}
+
 TEST_CASE("TosaRefReduceMean4dEndtoEndTestFloat32")
 {
     ReduceEndToEnd4d<DataType::Float32>(tosaDefaultBackends, ReduceOperation::Mean);

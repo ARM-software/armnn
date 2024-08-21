@@ -31,36 +31,20 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                "Both input and output tensors must be either quantised or non-quantised data types.");
     }
 
-    if (reduceDescriptor->m_vAxis.size() > 1)
-    {
-        throw armnn::Exception("ConvertReduceOperator: Reduce Operation with multiple axes not implemented.");
-    }
-
     if (reduceDescriptor->m_vAxis.empty())
     {
         throw armnn::Exception("ConvertReduceOperator: Reduce Operation with empty axis not implemented.");
     }
 
-    auto axis = static_cast<int32_t>(reduceDescriptor->m_vAxis[0]);
-    auto rank = static_cast<int32_t>(inputs[0]->GetNumDimensions());
-
-    if (axis < 0 || axis >= rank)
-    {
-        throw armnn::Exception("Axis value not within range of input shape.");
-    }
-
     // Tensor names
-    std::string inputName          = "input_";
+    std::string inputName           = "input_";
 
-    std::string outputNameRescale1 = "intermediate0_" + GetUniqueTosaMappingID();
-    std::string outputNameReduce   = "intermediate1_" + GetUniqueTosaMappingID();
-    std::string outputNameRescale2 = "intermediate2_" + GetUniqueTosaMappingID();
-    std::string outputNameMul      = "intermediate3_" + GetUniqueTosaMappingID();
+    std::size_t intermediateCounter = 0;
 
-    std::string outputName         = "output0_";
+    std::string outputName          = "output0_";
 
-    std::string reduceOpName       = GetReduceOperationAsCString(reduceDescriptor->m_ReduceOperation);
-    std::string blockName          = "Op_REDUCE_" + reduceOpName + "_block_" + GetUniqueTosaMappingID();
+    std::string reduceOpName        = GetReduceOperationAsCString(reduceDescriptor->m_ReduceOperation);
+    std::string blockName           = "Op_REDUCE_" + reduceOpName + "_block_" + GetUniqueTosaMappingID();
 
     std::vector<int32_t> inputShape  = GetTosaTensorShape(inputs[0]->GetShape());
     std::vector<int32_t> outputShape = GetTosaTensorShape(outputs[0]->GetShape());
@@ -84,156 +68,256 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                                          {}));
     }
 
-    int32_t input_shift = 20;
+    int64_t input_zp  = 0;
+    int64_t output_zp = 0;
 
-    double input_scale  = static_cast<double>(1 << input_shift) * inputs[0]->GetQuantizationScale();
-    double output_scale = 1.0 / (outputs[0]->GetQuantizationScale() * static_cast<double>(1 << input_shift));
+    double input_scale  = 1.0;
+    double output_scale = 1.0;
 
-    int32_t input_zp    =  0;
-    int32_t output_zp   =  0;
+    int32_t input_multiplier  = 1;
+    int32_t output_multiplier = 1;
+
+    int32_t input_shift  = 0;
+    int32_t output_shift = 0;
+
+    int64_t numElemsOnReducedAxis = 1;
+
+    std::vector<int32_t> axes(reduceDescriptor->m_vAxis.begin(), reduceDescriptor->m_vAxis.end());
+
+    for (int64_t axis : axes)
+    {
+        numElemsOnReducedAxis *= inputShape[static_cast<uint64_t>(axis)];
+    }
 
     std::vector<TosaSerializationOperator*> operators;
 
+    bool inputQuantised = inputs[0]->IsQuantized();
+
     // Conditional RESCALE
-    if (inputs[0]->IsQuantized())
+    if (inputQuantised)
     {
+        input_zp  = inputs[0]->GetQuantizationOffset();
+        output_zp = outputs[0]->GetQuantizationOffset();
+
+        std::string outputNameRescale =
+            "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID();
+
         TosaSerializationOperator* rescaleOp1 = nullptr;
 
-        CreateRescaleTosaOperator(inputName,
-                                  outputNameRescale1,
-                                  input_scale,
-                                  input_zp,
-                                  output_zp,
-                                  true,
-                                  true,
-                                  &rescaleOp1);
+        switch(reduceDescriptor->m_ReduceOperation)
+        {
+            case ReduceOperation::Sum:
+                input_shift = 20;
+
+                input_scale  = static_cast<double>(1 << input_shift) * inputs[0]->GetQuantizationScale();
+                output_scale = 1.0 / (outputs[0]->GetQuantizationScale() * static_cast<double>(1 << input_shift));
+
+                CreateRescaleTosaOperator(inputName,
+                                          outputNameRescale,
+                                          input_scale,
+                                          static_cast<int32_t>(input_zp),
+                                          static_cast<int32_t>(output_zp),
+                                          true,
+                                          true,
+                                          &rescaleOp1);
+
+                break;
+            case ReduceOperation::Mean:
+            {
+                // calculate shifts and multipliers
+                ComputeMultiplierAndShiftTosaScale32(1.0, input_multiplier, input_shift);
+                ComputeMultiplierAndShiftTosaScale32
+                (
+                    static_cast<double>(inputs[0]->GetQuantizationScale()) /
+                    static_cast<double>(outputs[0]->GetQuantizationScale()),
+                    output_multiplier,
+                    output_shift
+                );
+
+                int shift = 63 - __builtin_clzl(static_cast<uint64_t>(numElemsOnReducedAxis));
+                shift = std::min(shift, 32);
+                shift = std::min(shift, 62 - output_shift);
+
+                output_multiplier = static_cast<int32_t>(
+                                        (static_cast<int64_t>(output_multiplier) << shift) / numElemsOnReducedAxis);
+
+                output_shift += shift;
+
+                CreateRescaleTosaOperator(inputName,
+                                          outputNameRescale,
+                                          input_multiplier,
+                                          input_shift,
+                                          static_cast<int32_t>(input_zp),
+                                          static_cast<int32_t>(output_zp),
+                                          true,
+                                          true,
+                                          false,
+                                          &rescaleOp1);
+                break;
+            }
+            default:
+                throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");
+        }
 
         operators.emplace_back(rescaleOp1);
 
-        tensors.emplace_back(new TosaSerializationTensor(outputNameRescale1,
+        tensors.emplace_back(new TosaSerializationTensor(outputNameRescale,
                                                          inputShape,
                                                          DType_INT32,
                                                          {}));
     }
 
-    // REDUCE
-    TosaAxisAttribute reduceAttribute(axis);
-
-    switch(reduceDescriptor->m_ReduceOperation)
+    // REDUCE_SUM
+    for (const auto axis : axes)
     {
-        case ReduceOperation::Sum:
-        case ReduceOperation::Mean:
-            operators.emplace_back(new TosaSerializationOperator(Op_REDUCE_SUM,
-                                                                 Attribute_AxisAttribute,
-                                                                 &reduceAttribute,
-                                                                 { tensors.back()->GetName() },
-                                                                 { outputNameReduce }));
-            break;
-        default:
-            throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");
+        auto rank = static_cast<int64_t>(inputs[0]->GetNumDimensions());
+
+        if (axis < 0 || axis >= rank)
+        {
+            throw armnn::Exception("Axis value not within range of input shape.");
+        }
+
+        TosaAxisAttribute reduceAttribute(axis);
+
+        std::string outputNameReduce =
+            "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID();
+
+        switch(reduceDescriptor->m_ReduceOperation)
+        {
+            case ReduceOperation::Sum:
+            case ReduceOperation::Mean:
+                operators.emplace_back(new TosaSerializationOperator(Op_REDUCE_SUM,
+                                                                     Attribute_AxisAttribute,
+                                                                     &reduceAttribute,
+                                                                     { tensors.back()->GetName() },
+                                                                     { outputNameReduce }));
+                break;
+            default:
+                throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");
+        }
+
+        std::vector<int32_t> outputShapeReduce = tensors.back()->GetShape();
+        outputShapeReduce[static_cast<std::size_t>(axis)] = 1;
+
+        tensors.emplace_back(new TosaSerializationTensor(outputNameReduce,
+                                                         outputShapeReduce,
+                                                         tensors.back()->GetDtype(),
+                                                         {}));
     }
 
-    std::vector<int32_t> outputShapeReduce = inputShape;
-    outputShapeReduce[reduceDescriptor->m_vAxis[0]] = 1;
-
-    tensors.emplace_back(new TosaSerializationTensor(outputNameReduce,
-                                                     outputShapeReduce,
-                                                     tensors.back()->GetDtype(),
-                                                     {}));
-
     // Conditional RESCALE
-    auto numElemsOnReducedAxis = inputShape[static_cast<unsigned long>(axis)];
-    float divScale = 1.0f / static_cast<float>(numElemsOnReducedAxis);
-    if (inputs[0]->IsQuantized())
+    if (inputQuantised)
     {
-
-        // if Mean, modify output_scale to account for 1/number of elements.
-        if (reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean)
-        {
-            output_scale *= divScale;
-        }
+        std::string outputNameRescale =
+            "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID();
 
         TosaSerializationOperator* rescaleOp2 = nullptr;
 
-        CreateRescaleTosaOperator(outputNameReduce,
-                                  outputNameRescale2,
-                                  output_scale,
-                                  output_zp,
-                                  input_zp,
-                                  true,
-                                  true,
-                                  &rescaleOp2);
+        switch(reduceDescriptor->m_ReduceOperation)
+        {
+            case ReduceOperation::Sum:
+                CreateRescaleTosaOperator(tensors.back()->GetName(),
+                                          outputNameRescale,
+                                          output_scale,
+                                          static_cast<int32_t>(output_zp),
+                                          static_cast<int32_t>(input_zp),
+                                          true,
+                                          true,
+                                          &rescaleOp2);
+                break;
+            case ReduceOperation::Mean:
+                CreateRescaleTosaOperator(tensors.back()->GetName(),
+                                          outputNameRescale,
+                                          output_multiplier,
+                                          output_shift,
+                                          static_cast<int32_t>(output_zp),
+                                          static_cast<int32_t>(input_zp),
+                                          true,
+                                          true,
+                                          false,
+                                          &rescaleOp2);
+                break;
+            default:
+                throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");
+        }
 
         operators.push_back(rescaleOp2);
 
-        tensors.emplace_back(new TosaSerializationTensor(outputNameRescale2,
-                                                         outputShapeReduce,
+        tensors.emplace_back(new TosaSerializationTensor(outputNameRescale,
+                                                         tensors.back()->GetShape(),
                                                          inputType,
                                                          {}));
-    }
-    else
-    {
-        // if Mean, add Mul to account for 1/number of elements.
-        if (reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean)
-        {
-            // CONSTANT operator, value to multiply by
-            std::string divConstantName = std::string("constant_") + GetUniqueTosaMappingID();
-            inputNames.emplace_back(divConstantName);
-
-            operators.push_back(new TosaSerializationOperator(Op_CONST,
-                                                              Attribute_NONE,
-                                                              nullptr,
-                                                              {},
-                                                              {divConstantName}));
-
-            std::vector<uint8_t> uint8DivScale;
-            switch (inputType)
-            {
-                case DType_FP16:
-                    TosaSerializationHandler::ConvertF16toU8({divScale}, uint8DivScale);
-                    break;
-                case DType_FP32:
-                    TosaSerializationHandler::ConvertF32toU8({divScale}, uint8DivScale);
-                    break;
-                default:
-                    throw armnn::Exception("ConvertReduceOperator: Data type not supported");
-            }
-
-            std::vector<int32_t> divConstantShape (outputShapeReduce.size(), 1);
-            tensors.push_back(new TosaSerializationTensor(divConstantName,
-                                                          divConstantShape,
-                                                          inputType,
-                                                          uint8DivScale));
-
-            // MUL operator
-            int8_t shift = 0;
-            TosaMulAttribute mulAttribute(shift);
-
-            operators.emplace_back(new TosaSerializationOperator(Op_MUL,
-                                                                 Attribute_MulAttribute,
-                                                                 &mulAttribute,
-                                                                 {divConstantName, outputNameReduce},
-                                                                 {outputNameMul}));
-            tensors.push_back(new TosaSerializationTensor(outputNameMul,
-                                                          outputShapeReduce,
-                                                          inputType,
-                                                          {}));
-        }
     }
 
     // RESHAPE
     TosaReshapeAttribute reshapeAttribute(GetTosaTensorShape(outputs[0]->GetShape()));
 
+    std::string outputNameReshape = !inputQuantised && reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean
+        ? "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID()
+        : outputName;
+
     operators.emplace_back(new TosaSerializationOperator(Op_RESHAPE,
                                                          Attribute_ReshapeAttribute,
                                                          &reshapeAttribute,
                                                          { tensors.back()->GetName() },
-                                                         { outputName }));
+                                                         { outputNameReshape }));
 
-    tensors.emplace_back(new TosaSerializationTensor(outputName,
+    tensors.emplace_back(new TosaSerializationTensor(outputNameReshape,
                                                      outputShape,
                                                      inputType,
                                                      {}));
+
+    // Conditional MUL
+    // Multiply previous tensor by constant of 1 / number of elements
+    if (!inputQuantised && reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean)
+    {
+        // Constant
+        std::string constNameDivScale = "constant_" + GetUniqueTosaMappingID();
+        inputNames.emplace_back(constNameDivScale);
+
+        operators.push_back(new TosaSerializationOperator(Op_CONST,
+                                                          Attribute_NONE,
+                                                          nullptr,
+                                                          {},
+                                                          { constNameDivScale }));
+
+        float divScale = 1.0f / static_cast<float>(numElemsOnReducedAxis);
+
+        std::vector<uint8_t> uint8DivScale;
+        switch (inputType)
+        {
+            case DType_FP32:
+                TosaSerializationHandler::ConvertF32toU8({divScale}, uint8DivScale);
+                break;
+            case DType_FP16:
+                TosaSerializationHandler::ConvertF16toU8({divScale}, uint8DivScale);
+                break;
+            default:
+                throw armnn::Exception("ConvertReduceOperator: Data type not supported");
+        }
+
+        // Broadcast to match shapes
+        std::vector<int32_t> divConstantShape(outputShape.size(), 1);
+
+        tensors.push_back(new TosaSerializationTensor(constNameDivScale,
+                                                      divConstantShape,
+                                                      inputType,
+                                                      uint8DivScale));
+
+        // MUL
+        TosaMulAttribute mulAttribute(0);
+
+        operators.emplace_back(new TosaSerializationOperator(Op_MUL,
+                                                             Attribute_MulAttribute,
+                                                             &mulAttribute,
+                                                             { constNameDivScale, outputNameReshape },
+                                                             { outputName }));
+
+        tensors.push_back(new TosaSerializationTensor(outputName,
+                                                      outputShape,
+                                                      inputType,
+                                                      {}));
+    }
 
     return new TosaSerializationBasicBlock(blockName,       // name
                                            mainName,        // region name

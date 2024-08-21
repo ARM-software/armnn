@@ -2283,92 +2283,92 @@ TEST_CASE("RefReduceSumEmptyAxisEndtoEndTestInt8")
 }
 
 // Reduce Mean
-TEST_CASE("RefReduce2dEndtoEndTestFloat16")
+TEST_CASE("RefReduceMean2dEndtoEndTestFloat16")
 {
     ReduceEndToEnd2d<DataType::Float16>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce2dEndtoEndTestFloat16WithKeepDims")
+TEST_CASE("RefReduceMean2dEndtoEndTestFloat16WithKeepDims")
 {
     ReduceEndToEnd2d<DataType::Float16>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce2dEndtoEndTestFloat32")
+TEST_CASE("RefReduceMean2dEndtoEndTestFloat32")
 {
     ReduceEndToEnd2d<DataType::Float32>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce2dEndtoEndTestFloat32WithKeepDims")
+TEST_CASE("RefReduceMean2dEndtoEndTestFloat32WithKeepDims")
 {
     ReduceEndToEnd2d<DataType::Float32>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce2dEndtoEndTestInt8")
+TEST_CASE("RefReduceMean2dEndtoEndTestInt8")
 {
     ReduceEndToEnd2d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce2dEndtoEndTestInt8WithKeepDims")
+TEST_CASE("RefReduceMean2dEndtoEndTestInt8WithKeepDims")
 {
     ReduceEndToEnd2d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce3dEndtoEndTestFloat16")
+TEST_CASE("RefReduceMean3dEndtoEndTestFloat16")
 {
     ReduceEndToEnd3d<DataType::Float16>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce3dEndtoEndTestFloat16WithKeepDims")
+TEST_CASE("RefReduceMean3dEndtoEndTestFloat16WithKeepDims")
 {
     ReduceEndToEnd3d<DataType::Float16>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce3dEndtoEndTestFloat32")
+TEST_CASE("RefReduceMean3dEndtoEndTestFloat32")
 {
     ReduceEndToEnd3d<DataType::Float32>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce3dEndtoEndTestFloat32WithKeepDims")
+TEST_CASE("RefReduceMean3dEndtoEndTestFloat32WithKeepDims")
 {
     ReduceEndToEnd3d<DataType::Float32>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce3dEndtoEndTestInt8")
+TEST_CASE("RefReduceMean3dEndtoEndTestInt8")
 {
     ReduceEndToEnd3d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce3dEndtoEndTestInt8WithKeepDims")
+TEST_CASE("RefReduceMean3dEndtoEndTestInt8WithKeepDims")
 {
     ReduceEndToEnd3d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce4dEndtoEndTestFloat16")
+TEST_CASE("RefReduceMean4dEndtoEndTestFloat16")
 {
     ReduceEndToEnd4d<DataType::Float16>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce4dEndtoEndTestFloat16WithKeepDims")
+TEST_CASE("RefReduceMean4dEndtoEndTestFloat16WithKeepDims")
 {
     ReduceEndToEnd4d<DataType::Float16>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce4dEndtoEndTestFloat32")
+TEST_CASE("RefReduceMean4dEndtoEndTestFloat32")
 {
     ReduceEndToEnd4d<DataType::Float32>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce4dEndtoEndTestFloat32WithKeepDims")
+TEST_CASE("RefReduceMean4dEndtoEndTestFloat32WithKeepDims")
 {
     ReduceEndToEnd4d<DataType::Float32>(defaultBackends, ReduceOperation::Mean, true);
 }
 
-TEST_CASE("RefReduce4dEndtoEndTestInt8")
+TEST_CASE("RefReduceMean4dEndtoEndTestInt8")
 {
     ReduceEndToEnd4d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean);
 }
 
-TEST_CASE("RefReduce4dEndtoEndTestInt8WithKeepDims")
+TEST_CASE("RefReduceMean4dEndtoEndTestInt8WithKeepDims")
 {
     ReduceEndToEnd4d<DataType::QAsymmS8>(defaultBackends, ReduceOperation::Mean, true);
 }

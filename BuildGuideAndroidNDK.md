@@ -73,9 +73,9 @@ Cmake 3.19rc3 or later is required to build Arm NN. If you are using Ubuntu 20.0
 ```bash
 cd $WORKING_DIR
 sudo apt-get install libssl-dev
-wget https://github.com/Kitware/CMake/releases/download/v3.19.0-rc3/cmake-3.19.0-rc3.tar.gz
-tar -zxvf cmake-3.19.0-rc3.tar.gz
-cd cmake-3.19.0-rc3
+wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz
+tar -zxvf cmake-3.22.1.tar.gz
+cd cmake-3.22.1
 ./bootstrap --prefix=$WORKING_DIR/cmake/install
 make all install
 cd..
@@ -265,7 +265,6 @@ cmake .. \
     -DFLATC_DIR=$WORKING_DIR/flatbuffers-x86 \
     -DBUILD_UNIT_TESTS=1 \
     -DBUILD_TESTS=1 \
-    -fexception \
 ```
 
 To include the Arm NN TFLite delegate add these arguments to the above list:

@@ -95,13 +95,13 @@ function GetAndroidNDK {
     fi
 }
 
-function GetAndBuildCmake319 {
-    echo "+++ Building Cmake 3.19rc3"
+function GetAndBuildCmake {
+    echo "+++ Building Cmake 3.22.1"
     cd $WORKING_DIR
     sudo apt-get install libssl-dev
-    wget https://github.com/Kitware/CMake/releases/download/v3.19.0-rc3/cmake-3.19.0-rc3.tar.gz
-    tar -zxf cmake-3.19.0-rc3.tar.gz
-    pushd cmake-3.19.0-rc3
+    wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz
+    tar -zxf cmake-3.22.1.tar.gz
+    pushd cmake-3.22.1
     ./bootstrap --prefix=$WORKING_DIR/cmake/install
     make all install
     popd
@@ -296,8 +296,7 @@ function BuildArmNN {
             -DFLATBUFFERS_ROOT=$WORKING_DIR/flatbuffers-android \
             -DFLATC_DIR=$WORKING_DIR/flatbuffers-x86 \
             -DBUILD_UNIT_TESTS=$BUILD_TESTS \
-            -DBUILD_TESTS=$BUILD_TESTS \
-            -fexceptions"
+            -DBUILD_TESTS=$BUILD_TESTS "
 
     if [[ $TFLITE_PARSER == 1 ]]; then
         CMARGS="$CMARGS \
@@ -425,7 +424,7 @@ if [[ $? != 0 ]] ; then
     echo "Downloading Android NDK failed"
     exit 1
 fi
-GetAndBuildCmake319
+GetAndBuildCmake
 CMAKE=$WORKING_DIR/cmake/install/bin/cmake
 GetAndBuildFlatbuffers
 if [[ $? != 0 ]] ; then

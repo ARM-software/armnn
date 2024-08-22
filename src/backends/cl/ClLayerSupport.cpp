@@ -1527,13 +1527,7 @@ bool ClLayerSupport::IsSplitterSupported(const TensorInfo& input,
                                        *splitAxis.begin());
     }
 #endif
-    // Check if descriptor within supported dimension bounds
-    if(descriptor.GetNumDimensions() > 4)
-    {
-        SetValueChecked(reasonIfUnsupported, "Cl Splitter: More than 4 dimensions unsupported.");
-        return false;
-    }
-    // Check output types and quantization parameters
+    IgnoreUnused(descriptor);
     for (auto output : outputs)
     {
         if (!input.IsTypeSpaceMatch(output)) // Cannot use sub-tensors if the types are not same space

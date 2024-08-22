@@ -41,6 +41,10 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
                 {
                     return ConvertGeluToTosaOperator(layer, inputs, outputs, activationDesc);
                 }
+                case ActivationFunction::HardSwish:
+                {
+                    return ConvertHardSwishToTosaOperator(layer, inputs, outputs, activationDesc);
+                }
                 case ActivationFunction::Sigmoid:
                 {
                     return ConvertSigmoidToTosaOperator(layer, inputs, outputs, activationDesc);

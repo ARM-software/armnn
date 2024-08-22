@@ -102,6 +102,12 @@ TEST_CASE("TosaRefGeluEndToEndTestQAsymmS8")
     ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::Gelu);
 }
 
+// HardSwish
+TEST_CASE("TosaRefHardSwishEndToEndTestQAsymmS8")
+{
+    ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::HardSwish);
+}
+
 // Sigmoid
 TEST_CASE("TosaRefSigmoidEndToEndTestFloat32")
 {

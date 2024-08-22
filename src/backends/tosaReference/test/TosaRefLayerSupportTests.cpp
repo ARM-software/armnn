@@ -291,6 +291,25 @@ TEST_CASE("IsLayerSupportedTosaReferenceLeakyReLuActivation")
     CHECK(supported);
 }
 
+TEST_CASE("IsLayerSupportedTosaReferenceHardSwishActivation")
+{
+    TensorInfo inputInfo1({1,1,3,4}, DataType::QAsymmS8);
+    TensorInfo outputInfo({1,1,3,4}, DataType::QAsymmS8);
+
+    TosaRefLayerSupport supportChecker;
+    std::string reasonIfNotSupported;
+    ActivationDescriptor descriptor;
+    descriptor.m_Function = ActivationFunction::HardSwish;
+    auto supported = supportChecker.IsLayerSupported(LayerType::Activation,
+                                                     {inputInfo1, outputInfo},
+                                                     descriptor,
+                                                     EmptyOptional(),
+                                                     EmptyOptional(),
+                                                     reasonIfNotSupported);
+
+    CHECK(supported);
+}
+
 TEST_CASE("IsLayerSupportedTosaReferenceActivationUnsupported")
 {
     TensorInfo inputInfo1({1,1,3,4}, DataType::Float32);
@@ -300,7 +319,7 @@ TEST_CASE("IsLayerSupportedTosaReferenceActivationUnsupported")
     TosaRefLayerSupport supportChecker;
     std::string reasonIfNotSupported;
     ActivationDescriptor descriptor;
-    descriptor.m_Function = ActivationFunction::HardSwish;
+    descriptor.m_Function = ActivationFunction::Square;
     auto supported = supportChecker.IsLayerSupported(LayerType::Activation,
                                                      {inputInfo1, inputInfo2, outputInfo},
                                                      descriptor,

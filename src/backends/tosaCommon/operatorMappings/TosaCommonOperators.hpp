@@ -16,6 +16,7 @@
 #include "DepthwiseConv2dOperator.hpp"
 #include "ElementwiseBinaryOperator.hpp"
 #include "FullyConnectedOperator.hpp"
+#include "HardSwishOperator.hpp"
 #include "PadOperator.hpp"
 #include "RsqrtOperator.hpp"
 #include "Pooling2DOperator.hpp"

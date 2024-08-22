@@ -26,6 +26,8 @@ list(APPEND armnnTosaBackendOperators_sources
         ElementwiseBinaryOperator.cpp
         FullyConnectedOperator.cpp
         FullyConnectedOperator.hpp
+        HardSwishOperator.hpp
+        HardSwishOperator.cpp
         RsqrtOperator.cpp
         RsqrtOperator.hpp
         ExpOperator.cpp

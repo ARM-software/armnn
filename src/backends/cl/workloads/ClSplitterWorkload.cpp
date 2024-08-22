@@ -35,12 +35,6 @@ arm_compute::Status ClSplitterWorkloadValidate(const TensorInfo& input,
 {
     const arm_compute::TensorInfo aclInputInfo = BuildArmComputeTensorInfo(input);
 
-    // Check if input tensor dimensions within supported bounds
-    if(input.GetNumDimensions() > 4)
-    {
-        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR, "Unsupported number of dimensions"};
-    }
-
     size_t numOutputs = outputs.size();
 
     std::vector<arm_compute::TensorInfo> aclOutputs;

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,6 +19,16 @@ static constexpr arm_compute::ConvertPolicy g_AclConvertPolicy = arm_compute::Co
 
 arm_compute::Status ClCastValidate(const TensorInfo& input, const TensorInfo& output)
 {
+    // ACL doesn't have a Boolean type - the armnn Boolean is evaluated as an ACL U8.
+    // This causes issues when casting numbers to Boolean, as casting float to U8 truncates decimal points
+    // and casting negative signed ints to U8 clamps to 0, but a cast to Boolean returns true for anything non-zero.
+    // For example, float to U8 expects 0.1f -> 0u, but float to Boolean 0.1f -> true.
+    // ACL isn't aware of the Boolean type, so this check has to be here.
+    if(output.GetDataType() == armnn::DataType::Boolean)
+    {
+        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR, "Cast to Boolean unsupported"};
+    }
+
     const arm_compute::TensorInfo aclInput  = armcomputetensorutils::BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 

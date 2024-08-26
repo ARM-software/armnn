@@ -169,7 +169,7 @@ TEST_CASE("IsConstantSupportedCl")
 
     result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
             armnn::DataType::Boolean>(reasonIfUnsupported);
-    CHECK(!result);
+    CHECK(result);
 
     result = IsConstantLayerSupportedTests<armnn::ClWorkloadFactory,
             armnn::DataType::QSymmS16>(reasonIfUnsupported);

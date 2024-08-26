@@ -21,7 +21,7 @@ arm_compute::Status NeonConstantWorkloadValidate(const TensorInfo& output)
 {
     const arm_compute::TensorInfo neonOutputInfo = armcomputetensorutils::BuildArmComputeTensorInfo(output);
 
-    std::array<arm_compute::DataType,9> supportedTypes = {
+    std::array<arm_compute::DataType,11> supportedTypes = {
             arm_compute::DataType::BFLOAT16,
             arm_compute::DataType::F16,
             arm_compute::DataType::F32,
@@ -30,7 +30,9 @@ arm_compute::Status NeonConstantWorkloadValidate(const TensorInfo& output)
             arm_compute::DataType::QSYMM16,
             arm_compute::DataType::QSYMM8,
             arm_compute::DataType::QSYMM8_PER_CHANNEL,
-            arm_compute::DataType::S32
+            arm_compute::DataType::S32,
+            arm_compute::DataType::S64,
+            arm_compute::DataType::U8
     };
     auto it = std::find(begin(supportedTypes), end(supportedTypes), neonOutputInfo.data_type());
 
@@ -112,6 +114,16 @@ void NeonConstantWorkload::Execute() const
             case arm_compute::DataType::S32:
             {
                 CopyArmComputeITensorData(data.m_LayerOutput->GetConstTensor<int32_t>(), output);
+                break;
+            }
+            case arm_compute::DataType::S64:
+            {
+                CopyArmComputeITensorData(data.m_LayerOutput->GetConstTensor<int64_t>(), output);
+                break;
+            }
+            case arm_compute::DataType::U8:
+            {
+                CopyArmComputeITensorData(data.m_LayerOutput->GetConstTensor<uint8_t>(), output);
                 break;
             }
             default:

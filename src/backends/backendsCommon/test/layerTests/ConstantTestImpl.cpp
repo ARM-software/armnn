@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -133,6 +133,22 @@ LayerTestResult<float, 4> ConstantTest(
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ConstantTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.0f, 0);
+}
+
+LayerTestResult<int64_t, 4> ConstantSigned64Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return ConstantTestImpl<armnn::DataType::Signed64>(workloadFactory, memoryManager, tensorHandleFactory, 0.0f, 0);
+}
+
+LayerTestResult<uint8_t, 4> ConstantBooleanTest(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return ConstantTestImpl<armnn::DataType::Boolean>(workloadFactory, memoryManager, tensorHandleFactory, 0.0f, 0);
 }
 
 LayerTestResult<int16_t, 4> ConstantInt16SimpleQuantizationScaleNoOffsetTest(

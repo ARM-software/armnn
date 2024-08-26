@@ -1,0 +1,3 @@
+# Design Documents
+
+This subdirectory has been created to hold design documents for features that the Arm NN project has decided NOT to implement. They are provided for information only. Note that users raising queries on the contents or seeking support for developing code on the basis of the designs here will only receive the amount of engineering resource that we would deploy on any general query coming into our support lists.

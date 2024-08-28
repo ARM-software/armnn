@@ -1,0 +1,9 @@
+<map id="Pooling3dLayer" name="Pooling3dLayer">
+<area shape="rect" id="node1" title="This layer represents a pooling 3d operation." alt="" coords="89,352,211,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="59,261,241,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="47,81,106,108"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="75,157,238,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="5,5,148,32"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_pooling3d_descriptor.html" title="A Pooling3dDescriptor for the Pooling3dLayer." alt="" coords="269,165,423,191"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="285,81,407,108"/>
+</map>

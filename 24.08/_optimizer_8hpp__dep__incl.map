@@ -1,0 +1,9 @@
+<map id="src/armnn/Optimizer.hpp" name="src/armnn/Optimizer.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="534,5,717,32"/>
+<area shape="rect" id="node2" href="$_network_8cpp.html" title=" " alt="" coords="5,87,179,114"/>
+<area shape="rect" id="node3" href="$_optimizer_8cpp.html" title=" " alt="" coords="203,87,384,114"/>
+<area shape="rect" id="node4" href="$_cl_backend_8cpp.html" title=" " alt="" coords="409,87,629,114"/>
+<area shape="rect" id="node5" href="$_gpu_fsa_backend_8cpp.html" title=" " alt="" coords="653,80,811,121"/>
+<area shape="rect" id="node6" href="$_neon_backend_8cpp.html" title=" " alt="" coords="835,87,1098,114"/>
+<area shape="rect" id="node7" href="$_tosa_ref_backend_8cpp.html" title=" " alt="" coords="1122,80,1326,121"/>
+</map>

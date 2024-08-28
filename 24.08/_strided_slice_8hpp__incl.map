@@ -1,0 +1,29 @@
+<map id="src/backends/reference/workloads/StridedSlice.hpp" name="src/backends/reference/workloads/StridedSlice.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="556,5,759,47"/>
+<area shape="rect" id="node2" href="$_descriptors_8hpp.html" title=" " alt="" coords="711,95,881,121"/>
+<area shape="rect" id="node5" href="$_tensor_8hpp.html" title=" " alt="" coords="425,169,516,196"/>
+<area shape="rect" id="node3" href="$_deprecated_8hpp.html" title=" " alt="" coords="932,319,1057,345"/>
+<area shape="rect" id="node4" href="$_descriptors_fwd_8hpp.html" title=" " alt="" coords="541,169,691,196"/>
+<area shape="rect" id="node6" href="$_exceptions_8hpp.html" title=" " alt="" coords="213,319,334,345"/>
+<area shape="rect" id="node13" href="$_types_8hpp.html" title=" " alt="" coords="559,244,646,271"/>
+<area shape="rect" id="node23" title=" " alt="" coords="863,393,926,420"/>
+<area shape="rect" id="node25" title=" " alt="" coords="933,244,993,271"/>
+<area shape="rect" id="node26" title=" " alt="" coords="716,169,783,196"/>
+<area shape="rect" id="node27" title=" " alt="" coords="807,169,878,196"/>
+<area shape="rect" id="node10" href="$_optional_8hpp.html" title=" " alt="" coords="90,244,195,271"/>
+<area shape="rect" id="node14" title=" " alt="" coords="457,319,513,345"/>
+<area shape="rect" id="node16" title=" " alt="" coords="362,319,433,345"/>
+<area shape="rect" id="node24" title=" " alt="" coords="322,244,433,271"/>
+<area shape="rect" id="node7" title=" " alt="" coords="128,393,203,420"/>
+<area shape="rect" id="node8" title=" " alt="" coords="227,393,314,420"/>
+<area shape="rect" id="node9" title=" " alt="" coords="339,393,397,420"/>
+<area shape="rect" id="node11" title=" " alt="" coords="5,319,72,345"/>
+<area shape="rect" id="node12" title=" " alt="" coords="97,319,189,345"/>
+<area shape="rect" id="node15" title=" " alt="" coords="770,319,857,345"/>
+<area shape="rect" id="node17" title=" " alt="" coords="679,319,745,345"/>
+<area shape="rect" id="node18" href="$_backend_id_8hpp.html" title=" " alt="" coords="537,319,655,345"/>
+<area shape="rect" id="node19" title=" " alt="" coords="560,393,637,420"/>
+<area shape="rect" id="node20" title=" " alt="" coords="662,393,738,420"/>
+<area shape="rect" id="node21" title=" " alt="" coords="763,393,805,420"/>
+<area shape="rect" id="node22" title=" " alt="" coords="421,393,536,420"/>
+</map>

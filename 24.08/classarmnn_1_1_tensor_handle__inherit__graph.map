@@ -1,0 +1,7 @@
+<map id="TensorHandle" name="TensorHandle">
+<area shape="rect" id="node1" title=" " alt="" coords="143,155,254,181"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_passthrough_tensor_handle.html" title=" " alt="" coords="5,229,195,256"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_scoped_tensor_handle.html" title=" " alt="" coords="219,229,376,256"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_const_tensor_handle.html" title=" " alt="" coords="125,80,272,107"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="141,5,256,32"/>
+</map>

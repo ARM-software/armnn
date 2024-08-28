@@ -1,0 +1,6 @@
+var _serializer_8cpp =
+[
+    [ "GetFlatBufferActivationFunction", "_serializer_8cpp.html#aac3bf4453f8a909ca23f290089df8ff1", null ],
+    [ "GetFlatBufferArgMinMaxFunction", "_serializer_8cpp.html#a6fcb1eefde815b0b7465a689c8d26b50", null ],
+    [ "GetFlatBufferScatterNdFunction", "_serializer_8cpp.html#aa7f2df39a8ac495df172c6d473780dfb", null ]
+];

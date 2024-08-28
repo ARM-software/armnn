@@ -1,0 +1,4 @@
+<map id="OptimizeForExclusiveConnectionImpl&lt; BaseType, ChildType, Wrapped &gt;" name="OptimizeForExclusiveConnectionImpl&lt; BaseType, ChildType, Wrapped &gt;">
+<area shape="rect" id="node1" title="Wrapper Optimization class that calls Wrapped::Run for every connection BaseType &#45;&gt; ChildType." alt="" coords="5,80,241,136"/>
+<area shape="rect" id="node2" title=" " alt="" coords="83,5,163,32"/>
+</map>

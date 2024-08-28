@@ -1,0 +1,13 @@
+<map id="ClConstantWorkload" name="ClConstantWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="1740,145,1895,172"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_cl_base_workload.html" title=" " alt="" coords="1489,138,1691,179"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="991,166,1222,207"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="199,207,286,233"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="469,173,724,200"/>
+<area shape="rect" id="node11" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="469,115,724,141"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_constant_queue_descriptor.html" title=" " alt="" coords="502,49,691,76"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="177,84,308,111"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_const_tensor_handle.html" title=" " alt="" coords="169,5,316,32"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="5,5,120,32"/>
+<area shape="rect" id="node10" href="$classarmnn_1_1_cl_base_workload.html" title=" " alt="" coords="973,115,1240,141"/>
+</map>

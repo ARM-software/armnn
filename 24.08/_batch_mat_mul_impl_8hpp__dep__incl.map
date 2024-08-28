@@ -1,0 +1,8 @@
+<map id="src/backends/reference/workloads/BatchMatMulImpl.hpp" name="src/backends/reference/workloads/BatchMatMulImpl.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="271,5,511,47"/>
+<area shape="rect" id="node2" href="$_ref_batch_mat_mul_workload_8hpp.html" title=" " alt="" coords="59,95,353,136"/>
+<area shape="rect" id="node5" href="$_ref_batch_mat_mul_workload_8cpp.html" title=" " alt="" coords="245,184,538,225"/>
+<area shape="rect" id="node6" href="$_batch_mat_mul_impl_8cpp.html" title=" " alt="" coords="429,95,668,136"/>
+<area shape="rect" id="node3" href="$_ref_workloads_8hpp.html" title=" " alt="" coords="5,184,220,225"/>
+<area shape="rect" id="node4" href="$_ref_workload_factory_8cpp.html" title=" " alt="" coords="22,273,203,315"/>
+</map>

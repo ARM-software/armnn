@@ -1,0 +1,24 @@
+var _arm_compute_utils_8hpp =
+[
+    [ "IS_MULTI_AXES_REDUCE_SUPPORTED", "_arm_compute_utils_8hpp.html#a97d67174b2c48969547ba4bac79e5ea2", null ],
+    [ "ComputeAclAxis", "_arm_compute_utils_8hpp.html#a44a3b98b37a25c995aa9e4dae7d7b456", null ],
+    [ "ComputeConv3DInfo", "_arm_compute_utils_8hpp.html#a855760e957668804d33c0691a802496e", null ],
+    [ "ComputeConv3DInfo", "_arm_compute_utils_8hpp.html#a3f2c9ea2505a2cac1d05e17e989aff2b", null ],
+    [ "ComputeReductionTensorShape", "_arm_compute_utils_8hpp.html#a9d43aa01b882d8776ab9403eea3cf779", null ],
+    [ "ComputeSoftmaxAclAxis", "_arm_compute_utils_8hpp.html#ae33fcc729c3eeda77a443a11f13da7ba", null ],
+    [ "ConvertActivationDescriptorToAclActivationLayerInfo", "_arm_compute_utils_8hpp.html#ad701d0d29baa4266ab4d33b090aa661c", null ],
+    [ "ConvertActivationDescriptorToAclActivationLayerInfo", "_arm_compute_utils_8hpp.html#af6d517245110f6b1ca702da0cbbf4518", null ],
+    [ "ConvertActivationFunctionToAclActivationFunction", "_arm_compute_utils_8hpp.html#afdba36f125621d775d471f0daf613df2", null ],
+    [ "ConvertAdditionalInfoToAclActivationLayerInfo", "_arm_compute_utils_8hpp.html#abfb0841058a8190d30851f07eca3991f", null ],
+    [ "ConvertComparisonOperationToAcl", "_arm_compute_utils_8hpp.html#ac1438a97bbc2aee5cd8470d9d2a3aebc", null ],
+    [ "ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo", "_arm_compute_utils_8hpp.html#a2f12c1f572fb15978e51cf646d42d4dc", null ],
+    [ "ConvertFullyConnectedDescriptorToAclFullyConnectedLayerInfo", "_arm_compute_utils_8hpp.html#ae2e0c1d8160fadce44d479379790718e", null ],
+    [ "ConvertLstmActivationFuncToAclLayerInfo", "_arm_compute_utils_8hpp.html#aa1e93ef5f9ee3dbb5e7faa9578f180ae", null ],
+    [ "ConvertNormalizationAlgorithmChannelToAclNormType", "_arm_compute_utils_8hpp.html#aa5baabb8e3a4aa6cbdcab419d743e747", null ],
+    [ "ConvertOutputShapeRoundingToAclDimensionRoundingType", "_arm_compute_utils_8hpp.html#a8f3bfacadfd6d2146d6ccd299dabc7aa", null ],
+    [ "ConvertPaddingModeToAcl", "_arm_compute_utils_8hpp.html#adf5a024ace0dbe2af2d5b1a1b9623771", null ],
+    [ "ConvertPoolingAlgorithmToAclPoolingType", "_arm_compute_utils_8hpp.html#ad256fcf8c7f4d5a240fa47f0b56d50af", null ],
+    [ "ConvertReductionOperationToAcl", "_arm_compute_utils_8hpp.html#a03ab984d93d0f240f31274499b72e6b0", null ],
+    [ "ConvertResizeMethodToAclInterpolationPolicy", "_arm_compute_utils_8hpp.html#ae9bdcb8ac91731109dc423d6ed476204", null ],
+    [ "CreateAclNormalizationLayerInfoForL2Normalization", "_arm_compute_utils_8hpp.html#a5e783a951642781b9e7b55db06a514b7", null ]
+];

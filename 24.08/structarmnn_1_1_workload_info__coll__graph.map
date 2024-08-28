@@ -1,0 +1,11 @@
+<map id="WorkloadInfo" name="WorkloadInfo">
+<area shape="rect" id="node1" title="Contains information about TensorInfos of a layer." alt="" coords="1593,115,1701,141"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="1195,84,1367,111"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="609,11,795,82"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_optional_base.html" title="OptionalBase is the common functionality between reference and non&#45;reference optional types." alt="" coords="5,167,115,193"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_optional_reference_switch.html" title="The default implementation is the non&#45;reference case." alt="" coords="164,114,351,155"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="609,107,795,163"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_optional_reference_switch.html" title=" " alt="" coords="599,187,805,258"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="855,121,969,148"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_optional.html" title=" " alt="" coords="1169,144,1393,171"/>
+</map>

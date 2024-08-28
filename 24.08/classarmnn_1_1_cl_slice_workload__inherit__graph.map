@@ -1,0 +1,9 @@
+<map id="ClSliceWorkload" name="ClSliceWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="217,365,344,392"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_cl_base_workload.html" title=" " alt="" coords="172,275,388,316"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="51,171,254,212"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="109,5,196,32"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="25,81,280,108"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="304,81,558,108"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_cl_base_workload.html" title=" " alt="" coords="287,178,554,205"/>
+</map>

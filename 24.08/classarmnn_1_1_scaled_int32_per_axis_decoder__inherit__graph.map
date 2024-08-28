@@ -1,0 +1,9 @@
+<map id="ScaledInt32PerAxisDecoder" name="ScaledInt32PerAxisDecoder">
+<area shape="rect" id="node1" title=" " alt="" coords="96,380,297,407"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="93,289,300,331"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="48,178,183,205"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="5,5,108,32"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="79,81,219,108"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_per_axis_iterator.html" title="PerAxisIterator for per&#45;axis quantization." alt="" coords="207,171,354,212"/>
+<area shape="rect" id="node7" title=" " alt="" coords="253,81,308,108"/>
+</map>

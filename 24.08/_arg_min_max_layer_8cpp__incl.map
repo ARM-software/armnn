@@ -1,0 +1,170 @@
+<map id="src/armnn/layers/ArgMinMaxLayer.cpp" name="src/armnn/layers/ArgMinMaxLayer.cpp">
+<area shape="rect" id="node1" title=" " alt="" coords="187,5,396,47"/>
+<area shape="rect" id="node2" href="$_arg_min_max_layer_8hpp.html" title=" " alt="" coords="10240,326,10399,353"/>
+<area shape="rect" id="node51" href="$_types_utils_8hpp.html" title=" " alt="" coords="822,1026,985,1053"/>
+<area shape="rect" id="node66" href="$_workload_data_8hpp.html" title=" " alt="" coords="3299,847,3553,874"/>
+<area shape="rect" id="node67" href="$_layer_clone_base_8hpp.html" title=" " alt="" coords="379,95,534,121"/>
+<area shape="rect" id="node98" href="$_workload_factory_8hpp.html" title=" " alt="" coords="810,594,1077,621"/>
+<area shape="rect" id="node168" href="$_tensor_utils_8hpp.html" title=" " alt="" coords="2677,937,2876,963"/>
+<area shape="rect" id="node3" href="$_layer_with_parameters_8hpp.html" title=" " alt="" coords="6597,505,6788,531"/>
+<area shape="rect" id="node4" href="$_constant_layer_8hpp.html" title=" " alt="" coords="6621,594,6764,621"/>
+<area shape="rect" id="node5" href="$_layer_8hpp.html" title=" " alt="" coords="3161,676,3246,703"/>
+<area shape="rect" id="node6" href="$_layer_fwd_8hpp.html" title=" " alt="" coords="3919,758,4032,785"/>
+<area shape="rect" id="node7" href="$_i_tensor_handle_factory_8hpp.html" title=" " alt="" coords="3075,929,3300,971"/>
+<area shape="rect" id="node10" href="$_types_8hpp.html" title=" " alt="" coords="3735,1190,3869,1217"/>
+<area shape="rect" id="node12" title=" " alt="" coords="5176,1272,5263,1299"/>
+<area shape="rect" id="node16" title=" " alt="" coords="1947,1347,2025,1373"/>
+<area shape="rect" id="node19" title=" " alt="" coords="855,1347,914,1373"/>
+<area shape="rect" id="node21" title=" " alt="" coords="5927,1347,5989,1373"/>
+<area shape="rect" id="node27" href="$_ignore_unused_8hpp.html" title=" " alt="" coords="3511,1108,3739,1135"/>
+<area shape="rect" id="node28" href="$_tensor_8hpp.html" title=" " alt="" coords="3247,1108,3384,1135"/>
+<area shape="rect" id="node33" href="$_output_handler_8hpp.html" title=" " alt="" coords="2581,758,2725,785"/>
+<area shape="rect" id="node38" href="$_i_network_8hpp.html" title=" " alt="" coords="2131,847,2286,874"/>
+<area shape="rect" id="node48" title=" " alt="" coords="4462,1026,4542,1053"/>
+<area shape="rect" id="node49" title=" " alt="" coords="1358,1026,1443,1053"/>
+<area shape="rect" id="node54" href="$_tensor_handle_factory_registry_8hpp.html" title=" " alt="" coords="4209,840,4443,881"/>
+<area shape="rect" id="node56" href="$_workload_data_collector_8hpp.html" title=" " alt="" coords="4567,1019,4805,1060"/>
+<area shape="rect" id="node57" href="$_workload_info_8hpp.html" title=" " alt="" coords="4931,1026,5177,1053"/>
+<area shape="rect" id="node58" href="$_internal_types_8hpp.html" title=" " alt="" coords="5075,1108,5212,1135"/>
+<area shape="rect" id="node60" href="$_serialize_layer_parameters_8hpp.html" title=" " alt="" coords="4398,937,4614,963"/>
+<area shape="rect" id="node61" href="$_dll_export_8hpp.html" title=" " alt="" coords="6024,937,6135,963"/>
+<area shape="rect" id="node62" href="$_numeric_cast_8hpp.html" title=" " alt="" coords="1373,937,1596,963"/>
+<area shape="rect" id="node64" href="$_polymorphic_downcast_8hpp.html" title=" " alt="" coords="627,751,817,792"/>
+<area shape="rect" id="node65" title=" " alt="" coords="5517,758,5559,785"/>
+<area shape="rect" id="node8" href="$_i_tensor_handle_8hpp.html" title=" " alt="" coords="3108,1026,3251,1053"/>
+<area shape="rect" id="node9" href="$_memory_sources_8hpp.html" title=" " alt="" coords="3021,1108,3223,1135"/>
+<area shape="rect" id="node26" title=" " alt="" coords="1637,1272,1729,1299"/>
+<area shape="rect" id="node11" title=" " alt="" coords="3774,1272,3830,1299"/>
+<area shape="rect" id="node13" title=" " alt="" coords="3099,1272,3169,1299"/>
+<area shape="rect" id="node14" title=" " alt="" coords="6042,1272,6109,1299"/>
+<area shape="rect" id="node15" href="$_backend_id_8hpp.html" title=" " alt="" coords="951,1272,1069,1299"/>
+<area shape="rect" id="node22" href="$_exceptions_8hpp.html" title=" " alt="" coords="653,1272,775,1299"/>
+<area shape="rect" id="node25" href="$_deprecated_8hpp.html" title=" " alt="" coords="3505,1272,3630,1299"/>
+<area shape="rect" id="node17" title=" " alt="" coords="956,1347,1032,1373"/>
+<area shape="rect" id="node18" title=" " alt="" coords="789,1347,831,1373"/>
+<area shape="rect" id="node20" title=" " alt="" coords="8439,1347,8554,1373"/>
+<area shape="rect" id="node23" title=" " alt="" coords="574,1347,649,1373"/>
+<area shape="rect" id="node24" title=" " alt="" coords="673,1347,760,1373"/>
+<area shape="rect" id="node29" href="$_optional_8hpp.html" title=" " alt="" coords="1821,1190,1927,1217"/>
+<area shape="rect" id="node31" title=" " alt="" coords="3172,1190,3283,1217"/>
+<area shape="rect" id="node32" title=" " alt="" coords="2616,1190,2676,1217"/>
+<area shape="rect" id="node30" title=" " alt="" coords="1841,1272,1907,1299"/>
+<area shape="rect" id="node34" href="$_descriptors_8hpp.html" title=" " alt="" coords="3862,1026,4033,1053"/>
+<area shape="rect" id="node35" href="$_descriptors_fwd_8hpp.html" title=" " alt="" coords="2389,1108,2540,1135"/>
+<area shape="rect" id="node36" title=" " alt="" coords="3966,1108,4033,1135"/>
+<area shape="rect" id="node37" title=" " alt="" coords="4260,1108,4331,1135"/>
+<area shape="rect" id="node39" href="$_backend_options_8hpp.html" title=" " alt="" coords="596,1026,797,1053"/>
+<area shape="rect" id="node41" href="$_i_strategy_8hpp.html" title=" " alt="" coords="2348,937,2501,963"/>
+<area shape="rect" id="node42" href="$_network_fwd_8hpp.html" title=" " alt="" coords="2449,1026,2627,1053"/>
+<area shape="rect" id="node43" href="$_tensor_fwd_8hpp.html" title=" " alt="" coords="1854,1026,2019,1053"/>
+<area shape="rect" id="node44" href="$_logging_8hpp.html" title=" " alt="" coords="950,937,1097,963"/>
+<area shape="rect" id="node50" href="$_tensor_handle_8hpp.html" title=" " alt="" coords="1923,937,2172,963"/>
+<area shape="rect" id="node40" title=" " alt="" coords="1466,1108,1535,1135"/>
+<area shape="rect" id="node45" href="$_utils_8hpp.html" title=" " alt="" coords="393,1026,520,1053"/>
+<area shape="rect" id="node47" title=" " alt="" coords="1161,1026,1232,1053"/>
+<area shape="rect" id="node46" title=" " alt="" coords="457,1108,520,1135"/>
+<area shape="rect" id="node52" href="$_assert_8hpp.html" title=" " alt="" coords="1467,1026,1646,1053"/>
+<area shape="rect" id="node53" href="$_compatible_types_8hpp.html" title=" " alt="" coords="2075,1108,2313,1135"/>
+<area shape="rect" id="node55" title=" " alt="" coords="6311,937,6362,963"/>
+<area shape="rect" id="node59" title=" " alt="" coords="5338,1183,5525,1224"/>
+<area shape="rect" id="node63" title=" " alt="" coords="1721,1026,1779,1053"/>
+<area shape="rect" id="node68" href="$_graph_8hpp.html" title=" " alt="" coords="2691,169,2780,196"/>
+<area shape="rect" id="node69" href="$_layers_fwd_8hpp.html" title=" " alt="" coords="4635,244,4755,271"/>
+<area shape="rect" id="node103" href="$_profiling_8hpp.html" title=" " alt="" coords="6143,758,6245,785"/>
+<area shape="rect" id="node165" href="$_i_graph_observable_8hpp.html" title=" " alt="" coords="861,505,1028,531"/>
+<area shape="rect" id="node166" href="$_transform_iterator_8hpp.html" title=" " alt="" coords="10071,505,10322,531"/>
+<area shape="rect" id="node167" title=" " alt="" coords="633,244,757,271"/>
+<area shape="rect" id="node70" href="$_activation_layer_8hpp.html" title=" " alt="" coords="7085,415,7279,442"/>
+<area shape="rect" id="node71" href="$_addition_layer_8hpp.html" title=" " alt="" coords="1139,326,1321,353"/>
+<area shape="rect" id="node73" href="$_batch_mat_mul_layer_8hpp.html" title=" " alt="" coords="3607,415,3821,442"/>
+<area shape="rect" id="node74" href="$_batch_normalization_layer_8hpp.html" title=" " alt="" coords="3846,408,4041,449"/>
+<area shape="rect" id="node75" href="$_batch_to_space_nd_layer_8hpp.html" title=" " alt="" coords="4065,415,4302,442"/>
+<area shape="rect" id="node76" href="$_broadcast_to_layer_8hpp.html" title=" " alt="" coords="4326,415,4534,442"/>
+<area shape="rect" id="node77" href="$_cast_layer_8hpp.html" title=" " alt="" coords="1853,594,2012,621"/>
+<area shape="rect" id="node78" href="$_channel_shuffle_layer_8hpp.html" title=" " alt="" coords="4558,415,4785,442"/>
+<area shape="rect" id="node79" href="$_comparison_layer_8hpp.html" title=" " alt="" coords="4809,415,5016,442"/>
+<area shape="rect" id="node80" href="$_concat_layer_8hpp.html" title=" " alt="" coords="7783,415,7957,442"/>
+<area shape="rect" id="node81" href="$_convert_fp16_to_fp32_layer_8hpp.html" title=" " alt="" coords="3149,497,3343,539"/>
+<area shape="rect" id="node82" href="$_convert_fp32_to_fp16_layer_8hpp.html" title=" " alt="" coords="3266,587,3461,628"/>
+<area shape="rect" id="node83" href="$_convolution2d_layer_8hpp.html" title=" " alt="" coords="7981,415,8204,442"/>
+<area shape="rect" id="node84" href="$_convolution3d_layer_8hpp.html" title=" " alt="" coords="8228,415,8451,442"/>
+<area shape="rect" id="node85" href="$_debug_layer_8hpp.html" title=" " alt="" coords="3469,505,3639,531"/>
+<area shape="rect" id="node86" href="$_depth_to_space_layer_8hpp.html" title=" " alt="" coords="8475,415,8697,442"/>
+<area shape="rect" id="node87" href="$_depthwise_convolution2d_layer_8hpp.html" title=" " alt="" coords="9227,408,9457,449"/>
+<area shape="rect" id="node88" href="$_dequantize_layer_8hpp.html" title=" " alt="" coords="3586,594,3789,621"/>
+<area shape="rect" id="node89" href="$_detection_post_process_layer_8hpp.html" title=" " alt="" coords="9481,408,9688,449"/>
+<area shape="rect" id="node90" href="$_division_layer_8hpp.html" title=" " alt="" coords="1345,326,1528,353"/>
+<area shape="rect" id="node91" href="$_elementwise_binary_layer_8hpp.html" title=" " alt="" coords="2854,408,3046,449"/>
+<area shape="rect" id="node92" href="$_elementwise_unary_layer_8hpp.html" title=" " alt="" coords="3071,415,3323,442"/>
+<area shape="rect" id="node93" href="$_fake_quantization_layer_8hpp.html" title=" " alt="" coords="5040,415,5281,442"/>
+<area shape="rect" id="node94" href="$_fill_layer_8hpp.html" title=" " alt="" coords="9712,415,9860,442"/>
+<area shape="rect" id="node95" href="$_floor_layer_8hpp.html" title=" " alt="" coords="6914,505,7077,531"/>
+<area shape="rect" id="node96" href="$_fully_connected_layer_8hpp.html" title=" " alt="" coords="9885,415,10114,442"/>
+<area shape="rect" id="node97" href="$_fused_layer_8hpp.html" title=" " alt="" coords="709,415,876,442"/>
+<area shape="rect" id="node115" href="$_gather_layer_8hpp.html" title=" " alt="" coords="5306,415,5479,442"/>
+<area shape="rect" id="node116" href="$_gather_nd_layer_8hpp.html" title=" " alt="" coords="1405,594,1596,621"/>
+<area shape="rect" id="node117" href="$_input_layer_8hpp.html" title=" " alt="" coords="2229,505,2391,531"/>
+<area shape="rect" id="node118" href="$_instance_normalization_layer_8hpp.html" title=" " alt="" coords="7303,408,7517,449"/>
+<area shape="rect" id="node119" href="$_l2_normalization_layer_8hpp.html" title=" " alt="" coords="3347,415,3583,442"/>
+<area shape="rect" id="node120" href="$_logical_binary_layer_8hpp.html" title=" " alt="" coords="7541,415,7759,442"/>
+<area shape="rect" id="node121" href="$_log_softmax_layer_8hpp.html" title=" " alt="" coords="5504,415,5711,442"/>
+<area shape="rect" id="node122" href="$_lstm_layer_8hpp.html" title=" " alt="" coords="4675,326,4836,353"/>
+<area shape="rect" id="node124" href="$_map_layer_8hpp.html" title=" " alt="" coords="1621,594,1778,621"/>
+<area shape="rect" id="node125" href="$_maximum_layer_8hpp.html" title=" " alt="" coords="1553,326,1747,353"/>
+<area shape="rect" id="node126" href="$_mean_layer_8hpp.html" title=" " alt="" coords="6018,415,6183,442"/>
+<area shape="rect" id="node127" href="$_mem_copy_layer_8hpp.html" title=" " alt="" coords="1749,505,1943,531"/>
+<area shape="rect" id="node128" href="$_mem_import_layer_8hpp.html" title=" " alt="" coords="2935,594,3141,621"/>
+<area shape="rect" id="node129" href="$_merge_layer_8hpp.html" title=" " alt="" coords="2954,505,3125,531"/>
+<area shape="rect" id="node130" href="$_minimum_layer_8hpp.html" title=" " alt="" coords="1772,326,1963,353"/>
+<area shape="rect" id="node131" href="$_multiplication_layer_8hpp.html" title=" " alt="" coords="1987,326,2206,353"/>
+<area shape="rect" id="node132" href="$_normalization_layer_8hpp.html" title=" " alt="" coords="6207,415,6429,442"/>
+<area shape="rect" id="node133" href="$_output_layer_8hpp.html" title=" " alt="" coords="2087,594,2261,621"/>
+<area shape="rect" id="node134" href="$_pad_layer_8hpp.html" title=" " alt="" coords="6453,415,6605,442"/>
+<area shape="rect" id="node135" href="$_permute_layer_8hpp.html" title=" " alt="" coords="1886,415,2070,442"/>
+<area shape="rect" id="node136" href="$_pooling2d_layer_8hpp.html" title=" " alt="" coords="5257,326,5451,353"/>
+<area shape="rect" id="node137" href="$_pooling3d_layer_8hpp.html" title=" " alt="" coords="7587,326,7780,353"/>
+<area shape="rect" id="node138" href="$_pre_compiled_layer_8hpp.html" title=" " alt="" coords="10289,415,10501,442"/>
+<area shape="rect" id="node139" href="$_prelu_layer_8hpp.html" title=" " alt="" coords="7805,326,7967,353"/>
+<area shape="rect" id="node140" href="$_quantize_layer_8hpp.html" title=" " alt="" coords="2018,505,2205,531"/>
+<area shape="rect" id="node141" href="$_q_lstm_layer_8hpp.html" title=" " alt="" coords="7991,326,8162,353"/>
+<area shape="rect" id="node142" href="$_quantized_lstm_layer_8hpp.html" title=" " alt="" coords="2386,594,2613,621"/>
+<area shape="rect" id="node143" href="$_rank_layer_8hpp.html" title=" " alt="" coords="2466,505,2629,531"/>
+<area shape="rect" id="node144" href="$_reduce_layer_8hpp.html" title=" " alt="" coords="8187,326,8364,353"/>
+<area shape="rect" id="node145" href="$_reshape_layer_8hpp.html" title=" " alt="" coords="1003,415,1188,442"/>
+<area shape="rect" id="node146" href="$_resize_layer_8hpp.html" title=" " alt="" coords="8388,326,8560,353"/>
+<area shape="rect" id="node147" href="$_reverse_v2_layer_8hpp.html" title=" " alt="" coords="8584,326,8783,353"/>
+<area shape="rect" id="node148" href="$_scatter_nd_layer_8hpp.html" title=" " alt="" coords="8807,326,9000,353"/>
+<area shape="rect" id="node149" href="$_shape_layer_8hpp.html" title=" " alt="" coords="9024,326,9193,353"/>
+<area shape="rect" id="node150" href="$_slice_layer_8hpp.html" title=" " alt="" coords="9218,326,9378,353"/>
+<area shape="rect" id="node151" href="$_softmax_layer_8hpp.html" title=" " alt="" coords="9403,326,9585,353"/>
+<area shape="rect" id="node152" href="$_space_to_batch_nd_layer_8hpp.html" title=" " alt="" coords="5475,326,5713,353"/>
+<area shape="rect" id="node153" href="$_space_to_depth_layer_8hpp.html" title=" " alt="" coords="5737,326,5958,353"/>
+<area shape="rect" id="node154" href="$_splitter_layer_8hpp.html" title=" " alt="" coords="5982,326,6158,353"/>
+<area shape="rect" id="node155" href="$_stack_layer_8hpp.html" title=" " alt="" coords="6182,326,6347,353"/>
+<area shape="rect" id="node156" href="$_stand_in_layer_8hpp.html" title=" " alt="" coords="6371,326,6550,353"/>
+<area shape="rect" id="node157" href="$_strided_slice_layer_8hpp.html" title=" " alt="" coords="6575,326,6781,353"/>
+<area shape="rect" id="node158" href="$_subtraction_layer_8hpp.html" title=" " alt="" coords="911,326,1114,353"/>
+<area shape="rect" id="node159" href="$_switch_layer_8hpp.html" title=" " alt="" coords="2688,594,2860,621"/>
+<area shape="rect" id="node160" href="$_tile_layer_8hpp.html" title=" " alt="" coords="6805,326,6959,353"/>
+<area shape="rect" id="node161" href="$_transpose_convolution2d_layer_8hpp.html" title=" " alt="" coords="6983,319,7208,360"/>
+<area shape="rect" id="node162" href="$_transpose_layer_8hpp.html" title=" " alt="" coords="1213,415,1407,442"/>
+<area shape="rect" id="node163" href="$_unidirectional_sequence_lstm_layer_8hpp.html" title=" " alt="" coords="4860,319,5080,360"/>
+<area shape="rect" id="node164" href="$_unmap_layer_8hpp.html" title=" " alt="" coords="2703,505,2879,531"/>
+<area shape="rect" id="node72" href="$_elementwise_base_layer_8hpp.html" title=" " alt="" coords="1549,415,1751,442"/>
+<area shape="rect" id="node99" href="$_workload_8hpp.html" title=" " alt="" coords="1737,676,1848,703"/>
+<area shape="rect" id="node100" href="$_i_workload_8hpp.html" title=" " alt="" coords="4158,937,4273,963"/>
+<area shape="rect" id="node101" href="$_working_mem_descriptor_8hpp.html" title=" " alt="" coords="3627,937,3830,963"/>
+<area shape="rect" id="node102" href="$_execution_data_8hpp.html" title=" " alt="" coords="1374,758,1518,785"/>
+<area shape="rect" id="node114" title=" " alt="" coords="1542,751,1713,792"/>
+<area shape="rect" id="node104" href="$_profiling_event_8hpp.html" title=" " alt="" coords="5768,1108,5908,1135"/>
+<area shape="rect" id="node105" title=" " alt="" coords="6051,1190,6108,1217"/>
+<area shape="rect" id="node107" href="$_profiling_details_8hpp.html" title=" " alt="" coords="5215,847,5365,874"/>
+<area shape="rect" id="node110" href="$_i_profiler_8hpp.html" title=" " alt="" coords="5803,937,5948,963"/>
+<area shape="rect" id="node111" href="$_wall_clock_timer_8hpp.html" title=" " alt="" coords="5939,847,6089,874"/>
+<area shape="rect" id="node112" title=" " alt="" coords="6247,847,6311,874"/>
+<area shape="rect" id="node113" title=" " alt="" coords="6165,847,6223,874"/>
+<area shape="rect" id="node106" href="$_instrument_8hpp.html" title=" " alt="" coords="5651,1190,5772,1217"/>
+<area shape="rect" id="node108" title=" " alt="" coords="5353,1026,5427,1053"/>
+<area shape="rect" id="node109" href="$_json_utils_8hpp.html" title=" " alt="" coords="5266,937,5373,963"/>
+<area shape="rect" id="node123" href="$_lstm_parameters_8hpp.html" title=" " alt="" coords="5787,415,5943,442"/>
+</map>

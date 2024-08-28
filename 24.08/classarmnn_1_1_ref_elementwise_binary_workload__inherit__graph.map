@@ -1,0 +1,9 @@
+<map id="RefElementwiseBinaryWorkload" name="RefElementwiseBinaryWorkload">
+<area shape="rect" id="node1" title=" " alt="" coords="1429,59,1660,85"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="1144,51,1380,93"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="663,22,877,63"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_workload.html" title="Workload interface to enqueue a layer computation." alt="" coords="5,37,92,64"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="141,37,396,64"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_base_workload.html" title=" " alt="" coords="141,88,396,115"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_ref_base_workload.html" title=" " alt="" coords="632,88,908,115"/>
+</map>

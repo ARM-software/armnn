@@ -1,0 +1,27 @@
+<map id="include/armnn/backends/ITensorHandle.hpp" name="include/armnn/backends/ITensorHandle.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="475,5,655,47"/>
+<area shape="rect" id="node2" href="$_memory_sources_8hpp.html" title=" " alt="" coords="465,95,666,121"/>
+<area shape="rect" id="node20" href="$_ignore_unused_8hpp.html" title=" " alt="" coords="690,95,918,121"/>
+<area shape="rect" id="node21" href="$_tensor_8hpp.html" title=" " alt="" coords="303,95,441,121"/>
+<area shape="rect" id="node3" href="$_types_8hpp.html" title=" " alt="" coords="629,169,763,196"/>
+<area shape="rect" id="node19" title=" " alt="" coords="97,244,189,271"/>
+<area shape="rect" id="node4" title=" " alt="" coords="460,244,516,271"/>
+<area shape="rect" id="node5" title=" " alt="" coords="778,244,865,271"/>
+<area shape="rect" id="node6" title=" " alt="" coords="541,244,611,271"/>
+<area shape="rect" id="node7" title=" " alt="" coords="889,244,956,271"/>
+<area shape="rect" id="node8" href="$_backend_id_8hpp.html" title=" " alt="" coords="636,244,753,271"/>
+<area shape="rect" id="node15" href="$_exceptions_8hpp.html" title=" " alt="" coords="213,244,334,271"/>
+<area shape="rect" id="node18" href="$_deprecated_8hpp.html" title=" " alt="" coords="980,244,1105,271"/>
+<area shape="rect" id="node9" title=" " alt="" coords="533,319,611,345"/>
+<area shape="rect" id="node10" title=" " alt="" coords="635,319,711,345"/>
+<area shape="rect" id="node11" title=" " alt="" coords="736,319,779,345"/>
+<area shape="rect" id="node12" title=" " alt="" coords="355,319,413,345"/>
+<area shape="rect" id="node13" title=" " alt="" coords="803,319,917,345"/>
+<area shape="rect" id="node14" title=" " alt="" coords="443,319,506,345"/>
+<area shape="rect" id="node16" title=" " alt="" coords="132,319,207,345"/>
+<area shape="rect" id="node17" title=" " alt="" coords="231,319,318,345"/>
+<area shape="rect" id="node22" href="$_optional_8hpp.html" title=" " alt="" coords="110,169,215,196"/>
+<area shape="rect" id="node24" title=" " alt="" coords="342,169,453,196"/>
+<area shape="rect" id="node25" title=" " alt="" coords="26,169,86,196"/>
+<area shape="rect" id="node23" title=" " alt="" coords="5,244,72,271"/>
+</map>

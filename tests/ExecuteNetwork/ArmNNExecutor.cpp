@@ -258,7 +258,7 @@ void ArmNNExecutor::ExecuteAsync()
 
     // For the asynchronous execution, we are adding a pool of working memory handles (1 per thread) in the
     // LoadedNetwork with each scheduled inference having a specific priority
-    for (size_t i = 0; i < m_Params.m_Iterations; ++i)
+    for (unsigned int i = 0; i < m_Params.m_Iterations; ++i)
     {
         std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
 
@@ -272,7 +272,7 @@ void ArmNNExecutor::ExecuteAsync()
     }
 
     // Check the results
-    for (size_t iteration = 0; iteration < m_Params.m_Iterations; ++iteration)
+    for (unsigned int iteration = 0; iteration < m_Params.m_Iterations; ++iteration)
     {
         auto cb = callbackManager.GetNotifiedCallback();
 
@@ -315,7 +315,7 @@ void ArmNNExecutor::ExecuteSync()
         ARMNN_LOG(info) << "serialize-to-armnn has been specified. No inference will be executed.";
         return;
     }
-    for (size_t x = 0; x < m_Params.m_Iterations; x++)
+    for (unsigned int x = 0; x < m_Params.m_Iterations; x++)
     {
         std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
 

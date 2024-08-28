@@ -226,7 +226,7 @@ std::vector<const void *> TfLiteExecutor::Execute()
 {
     TfLiteStatus status;
     std::vector<const void*> results;
-    for (size_t x = 0; x < m_Params.m_Iterations; x++)
+    for (unsigned int x = 0; x < m_Params.m_Iterations; x++)
     {
         // Start timer to record inference time in milliseconds.
         const auto start_time = armnn::GetTimeNow();

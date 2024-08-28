@@ -272,7 +272,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "run will consume the first two inputs, the second the next two and the last will begin from the "
                  "start and use the first two inputs again. "
                  "Note: If the 'concurrent' option is enabled all iterations will be run asynchronously.",
-                 cxxopts::value<size_t>(m_ExNetParams.m_Iterations)->default_value("1"))
+                 cxxopts::value<unsigned int>(m_ExNetParams.m_Iterations)->default_value("1"))
 
                 ("l,dequantize-output",
                  "If this option is enabled, all quantized outputs will be dequantized to float. "

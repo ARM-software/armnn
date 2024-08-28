@@ -42,7 +42,7 @@ struct ExecuteNetworkParams
     std::vector<std::string>          m_InputNames;
     std::vector<std::string>          m_InputTensorDataFilePaths;
     std::vector<armnn::TensorShape>   m_InputTensorShapes;
-    size_t                            m_Iterations;
+    unsigned int                      m_Iterations;
     std::string                       m_ModelPath;
     unsigned int                      m_NumberOfThreads;
     bool                              m_OutputDetailsToStdOut;

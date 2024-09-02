@@ -30,20 +30,11 @@ arm_compute::DataType GetArmComputeDataType(armnn::DataType dataType, bool multi
         case armnn::DataType::Float32:
             return arm_compute::DataType::F32;
         case armnn::DataType::QAsymmS8:
-        {
-            // Per Channel Quantization not supported for QAsymmS8 in ACL (as of 2024-08)
-            return multiScales ? arm_compute::DataType::UNKNOWN : arm_compute::DataType::QASYMM8_SIGNED;
-        }
+            return arm_compute::DataType::QASYMM8_SIGNED;
         case armnn::DataType::QAsymmU8:
-        {
-            // Per Channel Quantization not supported for QAsymmU8 in ACL (as of 2024-08)
-            return multiScales ? arm_compute::DataType::UNKNOWN : arm_compute::DataType::QASYMM8;
-        }
+            return arm_compute::DataType::QASYMM8;
         case armnn::DataType::QSymmS16:
-        {
-            // Per Channel Quantization not supported for QSymmS16 in ACL (as of 2024-08)
-            return multiScales ? arm_compute::DataType::UNKNOWN : arm_compute::DataType::QSYMM16;
-        }
+            return arm_compute::DataType::QSYMM16;
         case armnn::DataType::Signed64:
             return arm_compute::DataType::S64;
         case armnn::DataType::QSymmS8:

@@ -889,8 +889,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(InstanceNormFloat32Nhwc2, InstanceNormFloat32Test2
 
 // Constant
 ARMNN_AUTO_TEST_CASE_WITH_THF(Constant, ConstantTest)
-ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantSigned64, ConstantSigned64Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantBoolean, ConstantBooleanTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantUint8, ConstantUint8SimpleQuantizationScaleNoOffsetTest)
 
 // Concat
@@ -958,8 +956,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 // Gather
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsFloat32, Gather1dParamsFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsUint8, Gather1dParamsUint8Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsInt32, Gather1dParamsInt32Test)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsInt64, Gather1dParamsInt64Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsFloat32, GatherMultiDimParamsFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsUint8, GatherMultiDimParamsUint8Test)
 
@@ -1507,14 +1503,6 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestUint8, Tile1dTest<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestUint8, Tile2dTest<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestUint8, Tile3dTest<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestUint8, Tile4dTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestSigned64, Tile1dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestSigned64, Tile2dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestSigned64, Tile3dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestSigned64, Tile4dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestBoolean, Tile1dTest<DataType::Boolean>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestBoolean, Tile2dTest<DataType::Boolean>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestBoolean, Tile3dTest<DataType::Boolean>)
-ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestBoolean, Tile4dTest<DataType::Boolean>)
 
 // Transpose
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleTransposeFloat32, SimpleTransposeTest<DataType::Float32>)

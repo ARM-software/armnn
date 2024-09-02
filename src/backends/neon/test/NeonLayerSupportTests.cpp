@@ -123,7 +123,7 @@ TEST_CASE("IsConstantSupportedNeon")
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::Boolean>(reasonIfUnsupported);
-    CHECK(result);
+    CHECK(!result);
 
     result = IsConstantLayerSupportedTests<armnn::NeonWorkloadFactory,
             armnn::DataType::QSymmS16>(reasonIfUnsupported);

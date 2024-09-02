@@ -1,5 +1,5 @@
 //
-// Copyright © 2019, 2024 Arm Ltd. All rights reserved.
+// Copyright © 2019 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,11 +38,10 @@ TEST_CASE("BuildArmComputeTensorInfoTest")
     CHECK(aclTensorInfo0.quantization_info().scale()[0] == quantScale);
 
     // Tensor info with per-axis quantization
-    const armnn::TensorInfo tensorInfo1(tensorShape, armnn::DataType::QSymmS8, quantScales, 0);
+    const armnn::TensorInfo tensorInfo1(tensorShape, dataType, quantScales, 0);
     const arm_compute::TensorInfo aclTensorInfo1 = BuildArmComputeTensorInfo(tensorInfo1);
 
     CHECK(aclTensorInfo1.quantization_info().scale() == quantScales);
-    CHECK(aclTensorInfo1.data_type() == arm_compute::DataType::QSYMM8_PER_CHANNEL);
 }
 
 TEST_CASE("IsMultiAxesReduceSupportedQuantizationTest")

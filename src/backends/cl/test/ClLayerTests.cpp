@@ -1073,8 +1073,6 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(L2NormalizationNonDefaultEpsilon,
 
 // Constant
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Constant, ClContextControlFixture, ConstantTest)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ConstantSigned64, ClContextControlFixture, ConstantSigned64Test)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ConstantBoolean, ClContextControlFixture, ConstantBooleanTest)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(ConstantUint8,
                                  ClContextControlFixture,
                                  ConstantUint8SimpleQuantizationScaleNoOffsetTest)
@@ -1246,8 +1244,6 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleFloor, ClContextControlFixture, SimpleFlo
 // Gather
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Gather1dParamsFloat32, ClContextControlFixture, Gather1dParamsFloat32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Gather1dParamsUint8, ClContextControlFixture, Gather1dParamsUint8Test)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Gather1dParamsInt32, ClContextControlFixture, Gather1dParamsInt32Test)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Gather1dParamsInt64, ClContextControlFixture, Gather1dParamsInt64Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherMultiDimParamsFloat32, ClContextControlFixture, GatherMultiDimParamsFloat32Test)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(GatherMultiDimParamsUint8, ClContextControlFixture, GatherMultiDimParamsUint8Test)
 
@@ -2189,14 +2185,6 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile1dTestUint8, ClContextControlFixture, Tile1
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile2dTestUint8, ClContextControlFixture, Tile2dTest<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile3dTestUint8, ClContextControlFixture, Tile3dTest<DataType::QAsymmU8>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile4dTestUint8, ClContextControlFixture, Tile4dTest<DataType::QAsymmU8>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile1dTestSigned64, ClContextControlFixture, Tile1dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile2dTestSigned64, ClContextControlFixture, Tile2dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile3dTestSigned64, ClContextControlFixture, Tile3dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile4dTestSigned64, ClContextControlFixture, Tile4dTest<DataType::Signed64>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile1dTestBoolean, ClContextControlFixture, Tile1dTest<DataType::Boolean>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile2dTestBoolean, ClContextControlFixture, Tile2dTest<DataType::Boolean>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile3dTestBoolean, ClContextControlFixture, Tile3dTest<DataType::Boolean>)
-ARMNN_AUTO_TEST_FIXTURE_WITH_THF(Tile4dTestBoolean, ClContextControlFixture, Tile4dTest<DataType::Boolean>)
 
 // Transpose
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(

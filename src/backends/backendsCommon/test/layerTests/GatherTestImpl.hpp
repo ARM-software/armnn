@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022,2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -38,11 +38,6 @@ LayerTestResult<int16_t, 1> Gather1dParamsInt16Test(
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
 LayerTestResult<int32_t, 1> Gather1dParamsInt32Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-LayerTestResult<int64_t, 1> Gather1dParamsInt64Test(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);

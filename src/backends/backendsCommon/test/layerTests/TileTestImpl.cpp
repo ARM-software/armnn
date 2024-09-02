@@ -1,5 +1,5 @@
 //
-// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -444,50 +444,3 @@ Tile4dTest<armnn::DataType::Signed32>(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 1>
-Tile1dTest<armnn::DataType::Signed64>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 2>
-Tile2dTest<armnn::DataType::Signed64>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 3>
-Tile3dTest<armnn::DataType::Signed64>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 4>
-Tile4dTest<armnn::DataType::Signed64>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Boolean>, 1>
-Tile1dTest<armnn::DataType::Boolean>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Boolean>, 2>
-Tile2dTest<armnn::DataType::Boolean>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Boolean>, 3>
-Tile3dTest<armnn::DataType::Boolean>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-template LayerTestResult<armnn::ResolveType<armnn::DataType::Boolean>, 4>
-Tile4dTest<armnn::DataType::Boolean>(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);

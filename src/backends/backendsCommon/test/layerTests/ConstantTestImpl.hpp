@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
+// Copyright © 2017 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,16 +11,6 @@
 #include <armnn/backends/WorkloadFactory.hpp>
 
 LayerTestResult<float, 4> ConstantTest(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-LayerTestResult<int64_t, 4> ConstantSigned64Test(
-    armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
-    const armnn::ITensorHandleFactory& tensorHandleFactory);
-
-LayerTestResult<uint8_t, 4> ConstantBooleanTest(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);

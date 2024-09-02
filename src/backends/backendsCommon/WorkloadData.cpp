@@ -1815,9 +1815,7 @@ void ConstantQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
-        DataType::Signed32,
-        DataType::Signed64,
-        DataType::Boolean
+        DataType::Signed32
     };
 
     ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
@@ -2826,7 +2824,6 @@ void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmU8,
         DataType::QSymmS16,
         DataType::Signed32,
-        DataType::Signed64
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -4418,9 +4415,7 @@ void TileQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
-        DataType::Signed32,
-        DataType::Signed64,
-        DataType::Boolean
+        DataType::Signed32
     };
 
     // Multiples length must be the same as the number of dimensions in input.

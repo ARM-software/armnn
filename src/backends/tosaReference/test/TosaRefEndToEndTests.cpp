@@ -1056,6 +1056,18 @@ TEST_CASE("TosaRefSubtractionEndtoEndTestFloat16")
     SubtractionEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
 }
 
+// SqDiff
+TEST_CASE("TosaRefSquaredDifferenceEndToEndTestFloat32")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, BinaryOperation::SqDiff);
+}
+
+TEST_CASE("TosaRefSquaredDifferenceEndToEndTestInt8")
+{
+    ElementwiseBinarySimpleEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, BinaryOperation::SqDiff);
+}
+
+// Mul
 TEST_CASE("TosaRefMultiplicationEndtoEndTestFloat32")
 {
     MultiplicationEndToEnd<DataType::Float32>(tosaDefaultBackends);

@@ -68,7 +68,13 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         case LayerType::ElementwiseBinary:
         {
             auto binaryDesc = PolymorphicDowncast<const ElementwiseBinaryDescriptor*>(&descriptor);
-            return ConvertElementwiseBinaryToTosaOperator(layer, type, inputs, outputs, binaryDesc);
+            switch (binaryDesc->m_Operation)
+            {
+                case BinaryOperation::SqDiff:
+                    return ConvertSquaredDifferenceToTosaOperator(layer, type, inputs, outputs, binaryDesc);
+                default:
+                    return ConvertElementwiseBinaryToTosaOperator(layer, type, inputs, outputs, binaryDesc);
+            }
         }
         case LayerType::ElementwiseUnary:
         {

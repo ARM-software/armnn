@@ -79,6 +79,41 @@ IBackendInternal::ILayerSupportSharedPtr TosaRefBackend::GetLayerSupport() const
     return layerSupport;
 }
 
+static void LayerToTosaMappings(const Layer& base,
+                                std::vector<std::string>& graphInputs,
+                                std::vector<std::string>& graphOutputs,
+                                std::vector<TosaSerializationOperator*>& operators,
+                                std::vector<TosaSerializationTensor*>& tensors)
+{
+    tosa::TosaSerializationBasicBlock* mappings = GetTosaMappingFromLayer(&base);
+
+    // Loop through inputs to see if there are any graph inputs, if so save them.
+    // If it's an input to the graph "input" can be found in the string.
+    for (const std::string& blockInputName : mappings->GetInputs())
+    {
+        if (blockInputName.find("input") != std::string::npos)
+        {
+            graphInputs.push_back(blockInputName);
+        }
+    }
+
+    // Loop through outputs to see if there are any graph outputs, if so save them.
+    // If it's an output to the graph "output" can be found in the string.
+    for (const std::string& blockOutputName : mappings->GetOutputs())
+    {
+        if (blockOutputName.find("output") != std::string::npos)
+        {
+            graphOutputs.push_back(blockOutputName);
+        }
+    }
+
+    auto blockOperators = mappings->GetOperators();
+    operators.insert(operators.end(), blockOperators.begin(), blockOperators.end());
+
+    auto blockTensors = mappings->GetTensors();
+    tensors.insert(tensors.end(), blockTensors.begin(), blockTensors.end());
+}
+
 OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                        const ModelOptions& modelOptions) const
 {
@@ -97,43 +132,44 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
     {
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));
 
-        if(base.GetType() == armnn::LayerType::Input ||
-           base.GetType() == armnn::LayerType::Output)
+        if (base.GetType() == LayerType::Input ||
+            base.GetType() == LayerType::Output)
         {
             ++it;
             continue;
         }
 
-        tosa::TosaSerializationBasicBlock* mappings = GetTosaMappingFromLayer(&base);
-
-        // Loop through inputs to see if there are any graph inputs, if so save them.
-        // If it's an input to the graph "input" can be found in the string.
-        for (const std::string& blockInputName : mappings->GetInputs())
+        bool baseContainsBroadcastReshape = false;
+        if (base.GetType() == LayerType::ElementwiseBinary)
         {
-            if (blockInputName.find("input") != std::string::npos)
+            auto nextIt = it;
+            if (++nextIt != subgraph.end())
             {
-                graphInputs.push_back(blockInputName);
+                Layer& nextLayer = *(PolymorphicDowncast<Layer*>(*(nextIt)));
+
+                for (uint32_t i = 0; i < base.GetNumInputSlots(); i++)
+                {
+                    const auto& parentLayer = base.GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
+                    if (parentLayer.GetType() == LayerType::Reshape && &parentLayer == &nextLayer)
+                    {
+                        LayerToTosaMappings(nextLayer, graphInputs, graphOutputs, operators, tensors);
+                        baseContainsBroadcastReshape = true;
+                    }
+                }
             }
         }
 
-        // Loop through outputs to see if there are any graph outputs, if so save them.
-        // If it's an output to the graph "output" can be found in the string.
-        for (const std::string& blockOutputName : mappings->GetOutputs())
-        {
-            if (blockOutputName.find("output") != std::string::npos)
-            {
-                graphOutputs.push_back(blockOutputName);
-            }
-        }
-
-        auto blockOperators = mappings->GetOperators();
-        operators.insert(operators.end(), blockOperators.begin(), blockOperators.end());
-
-        auto blockTensors = mappings->GetTensors();
-        tensors.insert(tensors.end(), blockTensors.begin(), blockTensors.end());
+        LayerToTosaMappings(base, graphInputs, graphOutputs, operators, tensors);
 
         ++it;
+        if (baseContainsBroadcastReshape)
+        {
+            ++it;
+        }
     }
+
+    std::sort(graphInputs.begin(), graphInputs.end());
+
 
     // Add all mappings to main block.
     auto* block = new TosaSerializationBasicBlock("main", "main", operators, tensors, graphInputs, graphOutputs);

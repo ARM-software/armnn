@@ -32,19 +32,29 @@ TosaSerializationBasicBlock* ConvertReshapeToTosaOperator(const Layer* layer,
 
     std::vector<TosaSerializationTensor*> tensors;
 
+    std::vector<int32_t> outputShape = GetTosaTensorShape(outputs[0]->GetShape());
+    DType outputDType = ArmNNToDType(outputs[0]->GetDataType());
+
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
     if(inputName.find("input_") != std::string::npos)
     {
+        // TOSA spec requires input and output shape to be the same size.
+        // Pad the inputShape with 1 values to meet this condition.
         std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
+        if (inputShape.size() < outputShape.size())
+        {
+            for (size_t i = inputShape.size(); i < outputShape.size(); ++i)
+            {
+                inputShape.emplace_back(1);
+            }
+        }
+
         DType inputDType = ArmNNToDType(inputs[0]->GetDataType());
 
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape, inputDType, {}));
     }
-
-    std::vector<int32_t> outputShape = GetTosaTensorShape(outputs[0]->GetShape());
-    DType outputDType = ArmNNToDType(outputs[0]->GetDataType());
 
     tensors.push_back(new TosaSerializationTensor(outputName, outputShape, outputDType, {}));
 

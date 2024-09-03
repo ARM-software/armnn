@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors.
 // SPDX-License-Identifier: MIT
 //
 
@@ -17,7 +17,8 @@ public:
     /// Print available information about the network
     virtual void PrintNetworkInfo() = 0;
     /// Compare the output with the result of another IExecutor
-    virtual void CompareAndPrintResult(std::vector<const void*> otherOutput) = 0;
+    /// @return 0 if all output tensors match otherwise, the whole part of a non zero RMSE result.
+    virtual unsigned int CompareAndPrintResult(std::vector<const void*> otherOutput) = 0;
     virtual ~IExecutor(){};
     bool m_constructionFailed = false;
 };

@@ -378,10 +378,12 @@ void FileComparisonExecutor::PrintNetworkInfo()
     std::cout << "Not implemented in this class." << std::endl;
 }
 
-void FileComparisonExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
+unsigned int FileComparisonExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
 {
     unsigned int index = 0;
     std::string typeString;
+    // Track the per output tensor results. Return the last non-zero value.
+    unsigned int overallResult = 0;
     for (const auto& outputTensors : m_OutputTensorsVec)
     {
         for (const auto& outputTensor : outputTensors)
@@ -389,8 +391,13 @@ void FileComparisonExecutor::CompareAndPrintResult(std::vector<const void*> othe
             size_t size   = outputTensor.second.GetNumBytes();
             double result = ComputeByteLevelRMSE(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
             std::cout << "Byte level root mean square error: " << result << "\n";
+            if (result != 0)
+            {
+                overallResult = static_cast<unsigned int>(result);
+            }
         }
     }
+    return overallResult;
 }
 
 FileComparisonExecutor::~FileComparisonExecutor()

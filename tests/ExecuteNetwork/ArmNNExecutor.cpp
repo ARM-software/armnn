@@ -867,10 +867,12 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
     }
 }
 
-void ArmNNExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
+unsigned int ArmNNExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
 {
     unsigned int index = 0;
     std::string typeString;
+    // Track the per output tensor results. Return the last non-zero value.
+    unsigned int overallResult = 0;
     for (const auto& outputTensors: m_OutputTensorsVec)
     {
         for (const auto& outputTensor: outputTensors)
@@ -878,8 +880,13 @@ void ArmNNExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
             size_t size = outputTensor.second.GetNumBytes();
             double result = ComputeByteLevelRMSE(outputTensor.second.GetMemoryArea(), otherOutput[index++], size);
             std::cout << "Byte level root mean square error: " << result << "\n";
+            if (result != 0)
+            {
+                overallResult = static_cast<unsigned int>(result);
+            }
         }
     }
+    return overallResult;
 }
 #if defined(ARMNN_SERIALIZER)
 ArmNNExecutor::ArmNNDeserializer::ArmNNDeserializer() : m_Parser(armnnDeserializer::IDeserializer::Create()){}

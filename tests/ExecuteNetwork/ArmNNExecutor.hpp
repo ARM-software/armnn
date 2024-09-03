@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors.
 // SPDX-License-Identifier: MIT
 //
 
@@ -44,7 +44,7 @@ public:
 
     std::vector<const void* > Execute() override;
     void PrintNetworkInfo() override;
-    void CompareAndPrintResult(std::vector<const void*> otherOutput) override;
+    unsigned int CompareAndPrintResult(std::vector<const void*> otherOutput) override;
 
 private:
     ArmNNExecutor(ArmNNExecutor&&); // No move constructor.

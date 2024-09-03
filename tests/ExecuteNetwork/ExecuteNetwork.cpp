@@ -108,6 +108,6 @@ int main(int argc, const char* argv[])
     {
         FileComparisonExecutor comparisonExecutor(programOptions.m_ExNetParams);
         comparisonExecutor.Execute();
-        comparisonExecutor.CompareAndPrintResult(outputResults);
+        return comparisonExecutor.CompareAndPrintResult(outputResults);
     }
 }

@@ -406,8 +406,10 @@ std::vector<const void *> TfLiteExecutor::Execute()
     return results;
 }
 
-void TfLiteExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
+unsigned int TfLiteExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
 {
+    // Track the per output tensor results. Return the last non-zero value.
+    unsigned int overallResult = 0;
     for (unsigned int outputIndex = 0; outputIndex < m_TfLiteInterpreter->outputs().size(); ++outputIndex)
     {
         auto tfLiteDelegateOutputId = m_TfLiteInterpreter->outputs()[outputIndex];
@@ -451,5 +453,10 @@ void TfLiteExecutor::CompareAndPrintResult(std::vector<const void*> otherOutput)
             }
         }
         std::cout << "Byte level root mean square error: " << result << "\n";
+        if (result != 0)
+        {
+            overallResult = static_cast<unsigned int>(result);
+        }
     }
+    return overallResult;
 };

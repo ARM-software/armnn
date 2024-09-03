@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023, 2024 Arm Ltd and Contributors.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,7 +15,7 @@ public:
     ~FileComparisonExecutor();
     std::vector<const void*> Execute() override;
     void PrintNetworkInfo() override;
-    void CompareAndPrintResult(std::vector<const void*> otherOutput) override;
+    unsigned int CompareAndPrintResult(std::vector<const void*> otherOutput) override;
 
 private:
     // Disallow copy and assignment constructors.

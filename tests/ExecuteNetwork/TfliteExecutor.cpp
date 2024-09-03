@@ -239,177 +239,170 @@ std::vector<const void *> TfLiteExecutor::Execute()
         }
         const auto duration = armnn::GetTimeDuration(start_time);
 
-        if (!m_Params.m_DontPrintOutputs)
+        // Handle the results.
+        for (unsigned int outputIndex = 0; outputIndex < m_TfLiteInterpreter->outputs().size(); ++outputIndex)
         {
-            // Print out the output
-            for (unsigned int outputIndex = 0; outputIndex < m_TfLiteInterpreter->outputs().size(); ++outputIndex)
+            auto tfLiteDelegateOutputId = m_TfLiteInterpreter->outputs()[outputIndex];
+            TfLiteIntArray* outputDims = m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
+            // If we've been asked to write to a file then set a file output stream. Otherwise, use stdout.
+            FILE* outputTensorFile = stdout;
+            bool isNumpyOutput = false;
+            if (!m_Params.m_OutputTensorFiles.empty())
             {
-                auto tfLiteDelegateOutputId = m_TfLiteInterpreter->outputs()[outputIndex];
-                TfLiteIntArray* outputDims = m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->dims;
-                // If we've been asked to write to a file then set a file output stream. Otherwise use stdout.
-                FILE* outputTensorFile = stdout;
-                bool isNumpyOutput = false;
-                if (!m_Params.m_OutputTensorFiles.empty())
+                isNumpyOutput = m_Params.m_OutputTensorFiles[outputIndex].find(".npy") != std::string::npos;
+                outputTensorFile = fopen(m_Params.m_OutputTensorFiles[outputIndex].c_str(), "w");
+                if (outputTensorFile == NULL)
                 {
-                    isNumpyOutput = m_Params.m_OutputTensorFiles[outputIndex].find(".npy") != std::string::npos;
-                    outputTensorFile = fopen(m_Params.m_OutputTensorFiles[outputIndex].c_str(), "w");
-                    if (outputTensorFile == NULL)
-                    {
-                        LogAndThrow("Specified output tensor file, \"" + m_Params.m_OutputTensorFiles[outputIndex] +
-                                    "\", cannot be created. Defaulting to stdout. Error was: " + std::strerror(errno));
-                    }
-                    else
-                    {
-                        ARMNN_LOG(info) << "Writing output " << outputIndex << " of iteration: " << x + 1
-                                        << " to file: '" << m_Params.m_OutputTensorFiles[outputIndex] << "'";
-                    }
+                    LogAndThrow("Specified output tensor file, \"" + m_Params.m_OutputTensorFiles[outputIndex] +
+                                "\", cannot be created. Defaulting to stdout. Error was: " + std::strerror(errno));
                 }
-
-                long outputSize = 1;
-                for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
+                else
                 {
-                    outputSize *= outputDims->data[dim];
+                    ARMNN_LOG(info) << "Writing output " << outputIndex << " of iteration: " << x + 1
+                                    << " to file: '" << m_Params.m_OutputTensorFiles[outputIndex] << "'";
                 }
-
-                // outputDims->data can be a Flexible Array Member (int data[];) in a C extern code in TF common.h
-                // TensorShape constructor argument is an unsigned int *
-                // so reinterpret_cast is used here to ensure the correct type of data is passed
-                armnn::TensorShape shape(static_cast<unsigned int>(outputDims->size),
-                                            reinterpret_cast<unsigned int *>(outputDims->data));
-                armnn::DataType dataType(GetDataType(*m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)));
-
-                std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
-                switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
-                {
-                    case kTfLiteFloat32:
-                    {
-                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(
-                                tfLiteDelegateOutputId);
-                        results.push_back(tfLiteDelegateOutputData);
-
-                        if (isNumpyOutput)
-                        {
-                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
-                                                         tfLiteDelegateOutputData,
-                                                         outputSize,
-                                                         dataType,
-                                                         shape);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < outputSize; ++i)
-                            {
-                                fprintf(outputTensorFile, "%f ", tfLiteDelegateOutputData[i]);
-                            }
-                        }
-                        break;
-                    }
-                    case kTfLiteInt32:
-                    {
-                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(
-                                tfLiteDelegateOutputId);
-                        results.push_back(tfLiteDelegateOutputData);
-
-                        if (isNumpyOutput)
-                        {
-                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
-                                                         tfLiteDelegateOutputData,
-                                                         outputSize,
-                                                         dataType,
-                                                         shape);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < outputSize; ++i)
-                            {
-                                fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
-                            }
-                        }
-
-                        break;
-                    }
-                    case kTfLiteUInt8:
-                    {
-                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(
-                                tfLiteDelegateOutputId);
-                        results.push_back(tfLiteDelegateOutputData);
-
-                        if (isNumpyOutput)
-                        {
-                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
-                                                         tfLiteDelegateOutputData,
-                                                         outputSize,
-                                                         dataType,
-                                                         shape);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < outputSize; ++i)
-                            {
-                                fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
-                            }
-                        }
-
-                        break;
-                    }
-                    case kTfLiteInt8:
-                    {
-                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(
-                                tfLiteDelegateOutputId);
-                        results.push_back(tfLiteDelegateOutputData);
-
-                        if (isNumpyOutput)
-                        {
-                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
-                                                         tfLiteDelegateOutputData,
-                                                         outputSize,
-                                                         dataType,
-                                                         shape);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < outputSize; ++i)
-                            {
-                                fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
-                            }
-                        }
-
-                        break;
-                    }
-                    case kTfLiteBool:
-                    {
-                        auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<bool>(
-                                tfLiteDelegateOutputId);
-                        results.push_back(tfLiteDelegateOutputData);
-
-                        if (isNumpyOutput)
-                        {
-                            armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
-                                                         tfLiteDelegateOutputData,
-                                                         outputSize,
-                                                         dataType,
-                                                         shape);
-                        }
-                        else
-                        {
-                            for (int i = 0; i < outputSize; ++i)
-                            {
-                                fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                    {
-                        LogAndThrow("Unsupported output type");
-                    }
-                }
-                std::cout << std::endl;
             }
+
+            long outputSize = 1;
+            for (unsigned int dim = 0; dim < static_cast<unsigned int>(outputDims->size); ++dim)
+            {
+                outputSize *= outputDims->data[dim];
+            }
+
+            // outputDims->data can be a Flexible Array Member (int data[];) in a C extern code in TF common.h
+            // TensorShape constructor argument is an unsigned int *
+            // so reinterpret_cast is used here to ensure the correct type of data is passed
+            armnn::TensorShape shape(static_cast<unsigned int>(outputDims->size),
+                                        reinterpret_cast<unsigned int *>(outputDims->data));
+            armnn::DataType dataType(GetDataType(*m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)));
+
+            std::cout << m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->name << ": ";
+            switch (m_TfLiteInterpreter->tensor(tfLiteDelegateOutputId)->type)
+            {
+                case kTfLiteFloat32:
+                {
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<float>(
+                            tfLiteDelegateOutputId);
+                    results.push_back(tfLiteDelegateOutputData);
+
+                    if (isNumpyOutput)
+                    {
+                        armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                     tfLiteDelegateOutputData,
+                                                     outputSize,
+                                                     dataType,
+                                                     shape);
+                    }
+                    else if (!m_Params.m_DontPrintOutputs)
+                    {
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%f ", tfLiteDelegateOutputData[i]);
+                        }
+                    }
+                    break;
+                }
+                case kTfLiteInt32:
+                {
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int32_t>(
+                            tfLiteDelegateOutputId);
+                    results.push_back(tfLiteDelegateOutputData);
+
+                    if (isNumpyOutput)
+                    {
+                        armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                     tfLiteDelegateOutputData,
+                                                     outputSize,
+                                                     dataType,
+                                                     shape);
+                    }
+                    else if (!m_Params.m_DontPrintOutputs)
+                    {
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                        }
+                    }
+                    break;
+                }
+                case kTfLiteUInt8:
+                {
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<uint8_t>(
+                            tfLiteDelegateOutputId);
+                    results.push_back(tfLiteDelegateOutputData);
+
+                    if (isNumpyOutput)
+                    {
+                        armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                     tfLiteDelegateOutputData,
+                                                     outputSize,
+                                                     dataType,
+                                                     shape);
+                    }
+                    else if (!m_Params.m_DontPrintOutputs)
+                    {
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+                        }
+                    }
+                    break;
+                }
+                case kTfLiteInt8:
+                {
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<int8_t>(
+                            tfLiteDelegateOutputId);
+                    results.push_back(tfLiteDelegateOutputData);
+
+                    if (isNumpyOutput)
+                    {
+                        armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                     tfLiteDelegateOutputData,
+                                                     outputSize,
+                                                     dataType,
+                                                     shape);
+                    }
+                    else if (!m_Params.m_DontPrintOutputs)
+                    {
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%d ", tfLiteDelegateOutputData[i]);
+                        }
+                    }
+                    break;
+                }
+                case kTfLiteBool:
+                {
+                    auto tfLiteDelegateOutputData = m_TfLiteInterpreter->typed_tensor<bool>(
+                            tfLiteDelegateOutputId);
+                    results.push_back(tfLiteDelegateOutputData);
+
+                    if (isNumpyOutput)
+                    {
+                        armnnNumpy::WriteToNumpyFile(m_Params.m_OutputTensorFiles[outputIndex],
+                                                     tfLiteDelegateOutputData,
+                                                     outputSize,
+                                                     dataType,
+                                                     shape);
+                    }
+                    else if (!m_Params.m_DontPrintOutputs)
+                    {
+                        for (int i = 0; i < outputSize; ++i)
+                        {
+                            fprintf(outputTensorFile, "%u ", tfLiteDelegateOutputData[i]);
+                        }
+                    }
+                    break;
+                }
+                default:
+                {
+                    LogAndThrow("Unsupported output type");
+                }
+            }
+            std::cout << std::endl;
         }
         CheckInferenceTimeThreshold(duration, m_Params.m_ThresholdTime);
     }
-
     return results;
 }
 

@@ -95,6 +95,16 @@ TfLiteStatus VisitUnpackOperator(DelegateData& delegateData,
 
     unpackDimSizes[unpackAxis] /= unpackNum;
 
+    // ACL supports up to 4 dimensions
+    if(unpackDimSizes.size() > 4)
+    {
+        TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnOpaqueDelegate: Split dimension size greater than 4 is not supported. "
+            "Operator: #%d node #%d: ", operatorCode, nodeIndex);
+        return kTfLiteError;
+    }
+
     armnn::SplitterDescriptor splitDesc(unpackNum, static_cast<unsigned int>(unpackDimSizes.size()));
     splitDesc.SetAxis(unpackAxis);
 

@@ -138,6 +138,16 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             }
             break;
         }
+        case LayerType::Stack:
+        {
+            auto stackDesc = PolymorphicDowncast<const StackDescriptor*>(&descriptor);
+            for (unsigned int i = 0; i < stackDesc->m_NumInputs; ++i)
+            {
+                inputInfos.emplace_back(&infos[i]);
+            }
+            outputInfos.emplace_back(&infos[stackDesc->m_NumInputs]);
+            break;
+        }
         default:
             // Default to false for all unsupported layers.
             return false;

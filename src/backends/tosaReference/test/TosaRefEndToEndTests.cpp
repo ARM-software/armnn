@@ -25,6 +25,7 @@
 #include "backendsCommon/test/SliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SoftmaxEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SplitterEndToEndTestImpl.hpp"
+#include "backendsCommon/test/StackEndToEndTestImpl.hpp"
 #include "backendsCommon/test/StridedSliceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/SubtractionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp"
@@ -1038,6 +1039,195 @@ TEST_CASE("TosaRefSplit4dDim2EndtoEndTestFloat16")
 TEST_CASE("TosaRefSplit4dDim3EndtoEndTestInt8")
 {
     Splitter4dDim3EndToEnd<DataType::QSymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank1, Axis0
+TEST_CASE("TosaRefStackRank1Axis0EndToEndFloat32")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank1Axis0EndToEndInt32")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank1Axis0EndToEndQSymmS16")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank1Axis0EndToEndQAsymmS8")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank1, Axis1
+TEST_CASE("TosaRefStackRank1Axis1EndToEndFloat32")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank1Axis1EndToEndInt32")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank1Axis1EndToEndQSymmS16")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank1Axis1EndToEndQAsymmS8")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank2, Axis0
+TEST_CASE("TosaRefStackRank2Axis0EndToEndFloat32")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis0EndToEndInt32")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis0EndToEndQSymmS16")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis0EndToEndQAsymmS8")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank2, Axis1
+TEST_CASE("TosaRefStackRank2Axis1EndToEndFloat32")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis1EndToEndInt32")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis1EndToEndQSymmS16")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis1EndToEndQAsymmS8")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank2, Axis2
+TEST_CASE("TosaRefStackRank2Axis2EndToEndFloat32")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis2EndToEndInt32")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis2EndToEndQSymmS16")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank2Axis2EndToEndQAsymmS8")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank3, Axis0
+TEST_CASE("TosaRefStackRank3Axis0EndToEndFloat32")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis0EndToEndInt32")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis0EndToEndQSymmS16")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis0EndToEndQAsymmS8")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank3, Axis1
+TEST_CASE("TosaRefStackRank3Axis1EndToEndFloat32")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis1EndToEndInt32")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis1EndToEndQSymmS16")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis1EndToEndQAsymmS8")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank3, Axis2
+TEST_CASE("TosaRefStackRank3Axis2EndToEndFloat32")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis2EndToEndInt32")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis2EndToEndQSymmS16")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis2EndToEndQAsymmS8")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+// Stack - Rank3, Axis3
+TEST_CASE("TosaRefStackRank3Axis3EndToEndFloat32")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis3EndToEndInt32")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis3EndToEndQSymmS16")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefStackRank3Axis3EndToEndQAsymmS8")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
 }
 
 // Subtraction

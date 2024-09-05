@@ -44,6 +44,7 @@
 #include <backendsCommon/test/SoftmaxEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SpaceToDepthEndToEndTestImpl.hpp>
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
+#include <backendsCommon/test/StackEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
@@ -1777,6 +1778,240 @@ TEST_CASE("RefSplitter4dDim2EndToEndUint8Test")
 TEST_CASE("RefSplitter4dDim3EndToEndUint8Test")
 {
     Splitter4dDim3EndToEnd<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank1, Axis0
+TEST_CASE("RefStackRank1Axis0EndToEndFloat32")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis0EndToEndInt32")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis0EndToEndQSymmS16")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis0EndToEndQAsymmS8")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis0EndToEndQAsymmU8")
+{
+    StackRank1Axis0EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank1, Axis1
+TEST_CASE("RefStackRank1Axis1EndToEndFloat32")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis1EndToEndInt32")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis1EndToEndQSymmS16")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis1EndToEndQAsymmS8")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank1Axis1EndToEndQAsymmU8")
+{
+    StackRank1Axis1EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank2, Axis0
+TEST_CASE("RefStackRank2Axis0EndToEndFloat32")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis0EndToEndInt32")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis0EndToEndQSymmS16")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis0EndToEndQAsymmS8")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis0EndToEndQAsymmU8")
+{
+    StackRank2Axis0EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank2, Axis1
+TEST_CASE("RefStackRank2Axis1EndToEndFloat32")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis1EndToEndInt32")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis1EndToEndQSymmS16")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis1EndToEndQAsymmS8")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis1EndToEndQAsymmU8")
+{
+    StackRank2Axis1EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank2, Axis2
+TEST_CASE("RefStackRank2Axis2EndToEndFloat32")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis2EndToEndInt32")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis2EndToEndQSymmS16")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis2EndToEndQAsymmS8")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank2Axis2EndToEndQAsymmU8")
+{
+    StackRank2Axis2EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank3, Axis0
+TEST_CASE("RefStackRank3Axis0EndToEndFloat32")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis0EndToEndInt32")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis0EndToEndQSymmS16")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis0EndToEndQAsymmS8")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis0EndToEndQAsymmU8")
+{
+    StackRank3Axis0EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank3, Axis1
+TEST_CASE("RefStackRank3Axis1EndToEndFloat32")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis1EndToEndInt32")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis1EndToEndQSymmS16")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis1EndToEndQAsymmS8")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis1EndToEndQAsymmU8")
+{
+    StackRank3Axis1EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank3, Axis2
+TEST_CASE("RefStackRank3Axis2EndToEndFloat32")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis2EndToEndInt32")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis2EndToEndQSymmS16")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis2EndToEndQAsymmS8")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis2EndToEndQAsymmU8")
+{
+    StackRank3Axis2EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
+}
+
+// Stack - Rank3, Axis3
+TEST_CASE("RefStackRank3Axis3EndToEndFloat32")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::Float32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis3EndToEndInt32")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::Signed32>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis3EndToEndQSymmS16")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::QSymmS16>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis3EndToEndQAsymmS8")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::QAsymmS8>(defaultBackends);
+}
+
+TEST_CASE("RefStackRank3Axis3EndToEndQAsymmU8")
+{
+    StackRank3Axis3EndToEndTest<armnn::DataType::QAsymmU8>(defaultBackends);
 }
 
 // Tile

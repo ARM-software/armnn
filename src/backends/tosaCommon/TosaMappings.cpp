@@ -211,6 +211,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto splitDesc = PolymorphicDowncast<const SplitterDescriptor*>(&descriptor);
             return ConvertSplitToTosaOperator(layer, inputs, outputs, splitDesc);
         }
+        case LayerType::Stack:
+        {
+            auto stackDesc = PolymorphicDowncast<const StackDescriptor*>(&descriptor);
+            return ConvertStackToTosaOperator(layer, inputs, outputs, stackDesc);
+        }
         case LayerType::StridedSlice:
         {
             auto sliceDesc = PolymorphicDowncast<const StridedSliceDescriptor*>(&descriptor);

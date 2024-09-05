@@ -56,6 +56,8 @@ list(APPEND armnnTosaBackendOperators_sources
         StridedSliceOperator.cpp
         SplitOperator.hpp
         SplitOperator.cpp
+        StackOperator.hpp
+        StackOperator.cpp
         TanhOperator.hpp
         TanhOperator.cpp
         TosaOperatorUtils.hpp

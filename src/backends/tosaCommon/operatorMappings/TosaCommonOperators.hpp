@@ -29,6 +29,7 @@
 #include "SoftmaxOperator.hpp"
 #include "StridedSliceOperator.hpp"
 #include "SplitOperator.hpp"
+#include "StackOperator.hpp"
 #include "TanhOperator.hpp"
 #include "TransposeConv2dOperator.hpp"
 #include "TransposeOperator.hpp"

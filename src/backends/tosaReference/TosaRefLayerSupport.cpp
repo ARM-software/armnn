@@ -34,10 +34,6 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
 
     switch (type)
     {
-        case LayerType::Activation:
-            inputInfos.push_back(&infos[0]);
-            outputInfos.push_back(&infos[1]);
-            break;
         case LayerType::Input:
         case LayerType::Output:
             return true;
@@ -99,6 +95,8 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             }
             break;
         }
+        case LayerType::Activation:
+        case LayerType::Dequantize:
         case LayerType::ElementwiseUnary:
         case LayerType::Pad:
         case LayerType::Pooling2d:

@@ -177,6 +177,10 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
 
             return ConvertReduceToTosaOperator(layer, inputs, outputs, &reduceDesc);
         }
+        case LayerType::Dequantize:
+        {
+            return ConvertDequantizeToTosaOperator(layer, inputs, outputs);
+        }
         case LayerType::Quantize:
         {
             return ConvertQuantizeToTosaOperator(layer, inputs, outputs);

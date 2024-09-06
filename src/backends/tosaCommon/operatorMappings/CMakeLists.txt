@@ -22,6 +22,8 @@ list(APPEND armnnTosaBackendOperators_sources
         Conv2dOperator.cpp
         DepthwiseConv2dOperator.hpp
         DepthwiseConv2dOperator.cpp
+        DequantizeOperator.hpp
+        DequantizeOperator.cpp
         ElementwiseBinaryOperator.hpp
         ElementwiseBinaryOperator.cpp
         FullyConnectedOperator.cpp

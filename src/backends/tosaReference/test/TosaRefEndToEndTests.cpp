@@ -11,6 +11,7 @@
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
+#include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/FullyConnectedEndToEndTestImpl.hpp"
@@ -554,6 +555,32 @@ TEST_CASE("TosaRefQuantizeFromFloat16ToInt16")
 TEST_CASE("TosaRefQuantizeFromFloat16ToInt32")
 {
     QuantizationEndToEndFloat16<DataType::Signed32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeInt8")
+{
+    QuantizationEndToEndInt8(tosaDefaultBackends);
+}
+
+// Dequantize
+TEST_CASE("TosaRefDequantizeEndToEndSimpleTest")
+{
+    DequantizeEndToEndSimple<DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefDequantizeEndToEndOffsetTest")
+{
+    DequantizeEndToEndOffset<DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefDequantizeEndToEndSimpleInt16Test")
+{
+    DequantizeEndToEndSimple<DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefDequantizeEndToEndOffsetInt16Test")
+{
+    DequantizeEndToEndOffset<DataType::QSymmS16>(tosaDefaultBackends);
 }
 
 // Reduce

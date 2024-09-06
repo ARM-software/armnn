@@ -157,7 +157,7 @@ namespace armnnNumpy
     inline void CreateHeader(std::ifstream& ifStream, HeaderInfo& headerInfo, Header& header)
     {
         char stringBuffer[headerInfo.m_HeaderLen];
-        ifStream.read(stringBuffer, headerInfo.m_HeaderLen);
+        ifStream.read(stringBuffer, static_cast<std::streamsize>(headerInfo.m_HeaderLen));
 
         header.m_HeaderString = std::string(stringBuffer, headerInfo.m_HeaderLen);
         // Remove new line character at the end of the string

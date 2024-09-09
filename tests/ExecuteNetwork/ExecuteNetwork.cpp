@@ -77,12 +77,12 @@ int main(int argc, const char* argv[])
     if (!programOptions.m_ExNetParams.m_ComparisonComputeDevices.empty() ||
         programOptions.m_ExNetParams.m_CompareWithTflite)
     {
-        ExecuteNetworkParams comparisonParams = programOptions.m_ExNetParams;
-        comparisonParams.m_ComputeDevices     = programOptions.m_ExNetParams.m_ComparisonComputeDevices;
-
+        // Here we're reusing programOptions.m_ExNetParams for the comparison executor. Modify the compute device and
+        // the executor.
+        programOptions.m_ExNetParams.m_ComputeDevices     = programOptions.m_ExNetParams.m_ComparisonComputeDevices;
         if (programOptions.m_ExNetParams.m_CompareWithTflite)
         {
-            comparisonParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter;
+            programOptions.m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter;
         }
 
         auto comparisonExecutor = BuildExecutor(programOptions);

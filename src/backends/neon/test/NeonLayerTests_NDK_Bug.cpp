@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,6 +29,19 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleSoftmaxBeta2, SimpleSoftmaxTest, 2.0f)
 
 // LogSoftmax
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat32_1, LogSoftmaxTest1<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat32_2, LogSoftmaxTest2<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat32_3, LogSoftmaxTest3<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat32_4, LogSoftmaxTest4<DataType::Float32>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_1, LogSoftmaxTest1<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_2, LogSoftmaxTest2<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_3, LogSoftmaxTest3<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_4, LogSoftmaxTest4<DataType::QAsymmS8>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_1, LogSoftmaxTest1<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_2, LogSoftmaxTest2<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_3, LogSoftmaxTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_4, LogSoftmaxTest4<DataType::QAsymmU8>)
 
 ARMNN_AUTO_TEST_CASE_WITH_THF(L2Normalization1dNhwc, L2Normalization1dTest, DataLayout::NHWC)
 

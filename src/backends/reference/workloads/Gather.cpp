@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,13 +11,13 @@
 
 namespace armnn
 {
-
+template<typename I, typename O>
 void Gather(const TensorInfo& paramsInfo,
             const TensorInfo& indicesInfo,
             const TensorInfo& outputInfo,
-            Decoder<float>& params,
+            Decoder<I>& params,
             const int32_t* indices,
-            Encoder<float>& output,
+            Encoder<O>& output,
             const int32_t axis_int)
 {
     IgnoreUnused(outputInfo);
@@ -68,7 +68,7 @@ void Gather(const TensorInfo& paramsInfo,
             for (unsigned int k = startOffset; k < endOffset; ++k)
             {
                 params[k];
-                float outputValue = params.Get();
+                auto outputValue = params.Get();
                 output[outIndex];
                 output.Set(outputValue);
                 ++outIndex;
@@ -83,4 +83,20 @@ void Gather(const TensorInfo& paramsInfo,
     }
 }
 
+// Template method instantiation
+template void Gather(const TensorInfo& paramsInfo,
+                     const TensorInfo& indicesInfo,
+                     const TensorInfo& outputInfo,
+                     Decoder<float>& params,
+                     const int32_t* indices,
+                     Encoder<float>& output,
+                     const int32_t axis_int);
+
+template void Gather(const TensorInfo& paramsInfo,
+                     const TensorInfo& indicesInfo,
+                     const TensorInfo& outputInfo,
+                     Decoder<double_t>& params,
+                     const int32_t* indices,
+                     Encoder<double_t>& output,
+                     const int32_t axis_int);
 } //namespace armnn

@@ -1638,6 +1638,11 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestSigned32, Tile2dTest<DataType::Signed32>
 ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestSigned32, Tile3dTest<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestSigned32, Tile4dTest<DataType::Signed32>)
 
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile1dTestSigned64, Tile1dTest<DataType::Signed64>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile2dTestSigned64, Tile2dTest<DataType::Signed64>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile3dTestSigned64, Tile3dTest<DataType::Signed64>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Tile4dTestSigned64, Tile4dTest<DataType::Signed64>)
+
 // Fake Quantization
 ARMNN_AUTO_TEST_CASE_WITH_THF(FakeQuantization, FakeQuantizationTest)
 
@@ -1687,6 +1692,16 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat16_1, LogSoftmaxTest1<DataType::Flo
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat16_2, LogSoftmaxTest2<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat16_3, LogSoftmaxTest3<DataType::Float16>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxFloat16_4, LogSoftmaxTest4<DataType::Float16>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_1, LogSoftmaxTest1<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_2, LogSoftmaxTest2<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_3, LogSoftmaxTest3<DataType::QAsymmS8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxInt8_4, LogSoftmaxTest4<DataType::QAsymmS8>)
+
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_1, LogSoftmaxTest1<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_2, LogSoftmaxTest2<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_3, LogSoftmaxTest3<DataType::QAsymmU8>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(LogSoftmaxUint8_4, LogSoftmaxTest4<DataType::QAsymmU8>)
 
 // Pad - Constant
 ARMNN_AUTO_TEST_CASE_WITH_THF(PadFloat322d, PadFloat322dTest)
@@ -1741,6 +1756,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(PadReflectFloat16, PadReflectFloat16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Constant, ConstantTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantUint8, ConstantUint8CustomQuantizationScaleAndOffsetTest)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantInt16, ConstantInt16CustomQuantizationScaleAndOffsetTest)
+ARMNN_AUTO_TEST_CASE_WITH_THF(ConstantSigned64, ConstantSigned64Test)
 
 // Concat
 ARMNN_AUTO_TEST_CASE_WITH_THF(Concat1d, Concat1dTest)
@@ -2368,6 +2384,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsFloat16, Gather1dParamsFloat16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsUint8, Gather1dParamsUint8Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsInt16, Gather1dParamsInt16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsInt32, Gather1dParamsInt32Test)
+ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsInt64, Gather1dParamsInt64Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsFloat32, GatherMultiDimParamsFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsFloat16, GatherMultiDimParamsFloat16Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(GatherMultiDimParamsUint8, GatherMultiDimParamsUint8Test)

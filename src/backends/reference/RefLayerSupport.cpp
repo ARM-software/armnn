@@ -981,7 +981,7 @@ bool RefLayerSupport::IsConcatSupported(const std::vector<const TensorInfo*> inp
 bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
                                           Optional<std::string&> reasonIfUnsupported) const
 {
-    std::array<DataType,8> supportedTypes =
+    std::array<DataType, 8> supportedTypes =
     {
         DataType::Float16,
         DataType::Float32,
@@ -989,7 +989,8 @@ bool RefLayerSupport::IsConstantSupported(const TensorInfo& output,
         DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     return CheckSupportRule(TypeAnyOf(output, supportedTypes), reasonIfUnsupported,
@@ -1642,7 +1643,8 @@ bool RefLayerSupport::IsGatherSupported(const armnn::TensorInfo& input0,
         DataType::QAsymmS8,
         DataType::QAsymmU8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     IgnoreUnused(descriptor);
@@ -1767,10 +1769,12 @@ bool RefLayerSupport::IsLogSoftmaxSupported(const TensorInfo& input,
 {
     IgnoreUnused(descriptor);
 
-    std::array<DataType, 3> supportedTypes =
+    std::array<DataType, 4> supportedTypes =
     {
         DataType::Float32,
-        DataType::Float16
+        DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8
     };
 
     bool supported = true;
@@ -2818,7 +2822,7 @@ bool RefLayerSupport::IsTileSupported(const TensorInfo& input,
 
     bool supported = true;
 
-    std::array<DataType, 7> supportedTypes
+    std::array<DataType, 8> supportedTypes
     {
         DataType::Float32,
         DataType::Float16,
@@ -2826,7 +2830,8 @@ bool RefLayerSupport::IsTileSupported(const TensorInfo& input,
         DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     supported &= CheckSupportRule(TypeAnyOf(input, supportedTypes), reasonIfUnsupported,

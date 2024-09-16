@@ -1784,6 +1784,8 @@ void LogSoftmaxQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::BFloat16,
         DataType::Float32,
         DataType::Float16,
+        DataType::QAsymmS8,
+        DataType::QAsymmU8
     };
 
     ValidateDataTypes(inputTensorInfo,  supportedTypes, descriptorName);
@@ -1815,7 +1817,8 @@ void ConstantQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     ValidateDataTypes(outputTensorInfo, supportedTypes, descriptorName);
@@ -2824,6 +2827,7 @@ void GatherQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmU8,
         DataType::QSymmS16,
         DataType::Signed32,
+        DataType::Signed64
     };
 
     ValidateDataTypes(inputTensorInfo, supportedTypes, descriptorName);
@@ -4415,7 +4419,8 @@ void TileQueueDescriptor::Validate(const WorkloadInfo& workloadInfo) const
         DataType::QAsymmU8,
         DataType::QSymmS8,
         DataType::QSymmS16,
-        DataType::Signed32
+        DataType::Signed32,
+        DataType::Signed64
     };
 
     // Multiples length must be the same as the number of dimensions in input.

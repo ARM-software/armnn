@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -24,12 +24,11 @@ namespace
 template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, 4> ConstantTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
-    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& ,
     const armnn::ITensorHandleFactory& tensorHandleFactory,
     float qScale,
     int32_t qOffset)
 {
-    IgnoreUnused(memoryManager);
     constexpr unsigned int inputWidth = 3;
     constexpr unsigned int inputHeight = 4;
     constexpr unsigned int inputChannels = 3;
@@ -133,6 +132,14 @@ LayerTestResult<float, 4> ConstantTest(
     const armnn::ITensorHandleFactory& tensorHandleFactory)
 {
     return ConstantTestImpl<armnn::DataType::Float32>(workloadFactory, memoryManager, tensorHandleFactory, 0.0f, 0);
+}
+
+LayerTestResult<int64_t, 4> ConstantSigned64Test(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory)
+{
+    return ConstantTestImpl<armnn::DataType::Signed64>(workloadFactory, memoryManager, tensorHandleFactory, 0.0f, 0);
 }
 
 LayerTestResult<int16_t, 4> ConstantInt16SimpleQuantizationScaleNoOffsetTest(

@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,9 +13,10 @@
 namespace armnn
 {
 
+template<typename I, typename O>
 void Tile(const TileDescriptor& params,
           const TensorInfo& inputInfo,
-          Decoder<float>& inputDecoder,
-          Encoder<float>& outputEncoder);
+          Decoder<I>& inputDecoder,
+          Encoder<O>& outputEncoder);
 
 } // namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "NeonTileWorkload.hpp"
@@ -15,6 +15,12 @@ arm_compute::Status NeonTileWorkloadValidate(const TensorInfo& input,
                                              const TensorInfo& output,
                                              const TileDescriptor& descriptor)
 {
+    if(input.GetDataType() == DataType::Boolean)
+    {
+        return arm_compute::Status{arm_compute::ErrorCode::RUNTIME_ERROR,
+                                    "NeonTileWorkloadValidate: Unsupported Boolean DataType"};
+    }
+
     const arm_compute::TensorInfo aclInput = BuildArmComputeTensorInfo(input);
     const arm_compute::TensorInfo aclOutput = BuildArmComputeTensorInfo(output);
 

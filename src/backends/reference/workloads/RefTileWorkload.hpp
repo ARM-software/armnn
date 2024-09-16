@@ -23,6 +23,7 @@ namespace armnn
         void ExecuteAsync(ExecutionData& executionData) override;
 
     private:
+        template <typename T>
         void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 
     };

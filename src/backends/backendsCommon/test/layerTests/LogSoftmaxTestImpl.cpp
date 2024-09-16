@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,9 +22,55 @@
 namespace
 {
 
+// As per ACL specification, the quantization params for LogSoftmax are:
+// * QAsymmU8: scale = 1/256, offset = 0
+// * QAsymmS8: scale = 16/256, offset = 127
+// This is because the return value of the LogSoftmax function is always in the domain (-inf,0)
+template<armnn::DataType ArmnnType>
+void GetLogSoftmaxOutputQuantizationInfo(float& qScale, int32_t& qOffset)
+{
+    if(ArmnnType == armnn::DataType::QAsymmU8)
+    {
+        qScale  = 16.0f / 256.0f;
+        qOffset = 255;
+    }
+    else if(ArmnnType == armnn::DataType::QAsymmS8)
+    {
+        qScale  = 16.0f / 256.0f;
+        qOffset = 127;
+    }
+    else
+    {
+        qScale  = 1.0f / 256.0f;
+        qOffset = 0;
+    }
+}
+
+// This function gets the input tensor quantization info, which is based on the min and max values
+// if the type is quantized. For unquantized types, it returns a scale of 1.0f and offset of 0
+template<armnn::DataType ArmnnType>
+void GetLogSoftmaxInputQuantizationInfo(float& qScale, int32_t& qOffset, float min, float max)
+{
+    if(ArmnnType == armnn::DataType::QAsymmU8)
+    {
+        qScale = (max - min) / 255.0f;
+        qOffset = 127;
+    }
+    else if(ArmnnType == armnn::DataType::QAsymmS8)
+    {
+        qScale = (max - min) / 255.0f;
+        qOffset = 0;
+    }
+    else
+    {
+        qScale = 1.0f;
+        qOffset = 0;
+    }
+}
+
 template<armnn::DataType ArmnnType,
-         std::size_t NumDims,
-         typename T = armnn::ResolveType<ArmnnType>>
+          std::size_t NumDims,
+          typename T = armnn::ResolveType<ArmnnType>>
 LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
@@ -39,7 +85,9 @@ LayerTestResult<T, NumDims> LogSoftmaxTestImpl(
 {
     IgnoreUnused(memoryManager);
 
-    auto inputTensor = armnnUtils::QuantizedVector<T>(inputValues, qScale, qOffset);
+    auto inputTensor = armnnUtils::QuantizedVector<T>(inputValues,
+                                                      inputInfo.GetQuantizationScale(),
+                                                      inputInfo.GetQuantizationOffset());
 
     std::vector<T> actualOutput(outputInfo.GetNumElements());
     std::vector<T> expectedOutput = armnnUtils::QuantizedVector<T>(expectedOutputValues, qScale, qOffset);
@@ -82,8 +130,16 @@ LayerTestResult<T, 4> LogSoftmaxTest1(
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
-    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType);
-    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType);
+    float qScale;
+    int32_t qOffset;
+    GetLogSoftmaxOutputQuantizationInfo<ArmnnType>(qScale, qOffset);
+
+    float inputScale;
+    int32_t inputOffset;
+    GetLogSoftmaxInputQuantizationInfo<ArmnnType>(inputScale, inputOffset, -10.0f, 10.0f);
+
+    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType, inputScale, inputOffset);
+    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType, qScale, qOffset);
 
     std::vector<float> inputValues
     {
@@ -109,7 +165,9 @@ LayerTestResult<T, 4> LogSoftmaxTest1(
         outputTensorInfo,
         inputValues,
         expectedOutputValues,
-        descriptor);
+        descriptor,
+        qScale,
+        qOffset);
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -120,8 +178,16 @@ LayerTestResult<T, 4> LogSoftmaxTest2(
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
-    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType);
-    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType);
+    float qScale;
+    int32_t qOffset;
+    GetLogSoftmaxOutputQuantizationInfo<ArmnnType>(qScale, qOffset);
+
+    float inputScale;
+    int32_t inputOffset;
+    GetLogSoftmaxInputQuantizationInfo<ArmnnType>(inputScale, inputOffset, -10.0f, 10.0f);
+
+    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType, inputScale, inputOffset);
+    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType, qScale, qOffset);
 
     std::vector<float> inputValues
     {
@@ -147,7 +213,9 @@ LayerTestResult<T, 4> LogSoftmaxTest2(
         outputTensorInfo,
         inputValues,
         expectedOutputValues,
-        descriptor);
+        descriptor,
+        qScale,
+        qOffset);
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -158,8 +226,16 @@ LayerTestResult<T, 4> LogSoftmaxTest3(
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
-    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType);
-    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType);
+    float qScale;
+    int32_t qOffset;
+    GetLogSoftmaxOutputQuantizationInfo<ArmnnType>(qScale, qOffset);
+
+    float inputScale;
+    int32_t inputOffset;
+    GetLogSoftmaxInputQuantizationInfo<ArmnnType>(inputScale, inputOffset, -1.0f, 1.0f);
+
+    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType, inputScale, inputOffset);
+    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType, qScale, qOffset);
 
     std::vector<float> inputValues
     {
@@ -185,7 +261,9 @@ LayerTestResult<T, 4> LogSoftmaxTest3(
         outputTensorInfo,
         inputValues,
         expectedOutputValues,
-        descriptor);
+        descriptor,
+        qScale,
+        qOffset);
 }
 
 template<armnn::DataType ArmnnType, typename T>
@@ -196,8 +274,16 @@ LayerTestResult<T, 4> LogSoftmaxTest4(
 {
     const armnn::TensorShape inputOutputShape{1, 1, 2, 4};
 
-    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType);
-    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType);
+    float qScale;
+    int32_t qOffset;
+    GetLogSoftmaxOutputQuantizationInfo<ArmnnType>(qScale, qOffset);
+
+    float inputScale;
+    int32_t inputOffset;
+    GetLogSoftmaxInputQuantizationInfo<ArmnnType>(inputScale, inputOffset, -10.0f, 10.0f);
+
+    armnn::TensorInfo inputTensorInfo(inputOutputShape, ArmnnType, inputScale, inputOffset);
+    armnn::TensorInfo outputTensorInfo(inputOutputShape, ArmnnType, qScale, qOffset);
 
     std::vector<float> inputValues
     {
@@ -223,7 +309,9 @@ LayerTestResult<T, 4> LogSoftmaxTest4(
         outputTensorInfo,
         inputValues,
         expectedOutputValues,
-        descriptor);
+        descriptor,
+        qScale,
+        qOffset);
 }
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float32>, 4>
@@ -270,6 +358,56 @@ LogSoftmaxTest3<armnn::DataType::Float16>(
 
 template LayerTestResult<armnn::ResolveType<armnn::DataType::Float16>, 4>
 LogSoftmaxTest4<armnn::DataType::Float16>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+// Int8
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+LogSoftmaxTest1<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+LogSoftmaxTest2<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+LogSoftmaxTest3<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmS8>, 4>
+LogSoftmaxTest4<armnn::DataType::QAsymmS8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+// Uint8
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+LogSoftmaxTest1<armnn::DataType::QAsymmU8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+LogSoftmaxTest2<armnn::DataType::QAsymmU8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+LogSoftmaxTest3<armnn::DataType::QAsymmU8>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::QAsymmU8>, 4>
+LogSoftmaxTest4<armnn::DataType::QAsymmU8>(
     armnn::IWorkloadFactory& workloadFactory,
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);

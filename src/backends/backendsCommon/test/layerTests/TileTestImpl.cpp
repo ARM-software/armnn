@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -217,8 +217,8 @@ LayerTestResult<T, 4> Tile4dTest(armnn::IWorkloadFactory& workloadFactory,
     float qScale = 1.0f;
     int32_t qOffset = 0;
 
-    armnn::TensorShape inputShape  = { 2, 2, 2, 3};
-    armnn::TensorShape outputShape = { 4, 2, 2, 3};
+    armnn::TensorShape inputShape  = { 2, 2, 2, 3 };
+    armnn::TensorShape outputShape = { 4, 2, 2, 3 };
 
     armnn::TensorInfo inputInfo(inputShape, ArmnnType);
     armnn::TensorInfo outputInfo(outputShape, ArmnnType);
@@ -444,3 +444,26 @@ Tile4dTest<armnn::DataType::Signed32>(
     const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
     const armnn::ITensorHandleFactory& tensorHandleFactory);
 
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 1>
+Tile1dTest<armnn::DataType::Signed64>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 2>
+Tile2dTest<armnn::DataType::Signed64>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 3>
+Tile3dTest<armnn::DataType::Signed64>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);
+
+template LayerTestResult<armnn::ResolveType<armnn::DataType::Signed64>, 4>
+Tile4dTest<armnn::DataType::Signed64>(
+    armnn::IWorkloadFactory& workloadFactory,
+    const armnn::IBackendInternal::IMemoryManagerSharedPtr& memoryManager,
+    const armnn::ITensorHandleFactory& tensorHandleFactory);

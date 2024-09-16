@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,10 +42,11 @@ uint32_t CoordinatesToIndex(TensorShape& shape, std::vector<uint32_t>& coordinat
     return index;
 }
 
+template<typename I, typename O>
 void Tile(const TileDescriptor& params,
           const TensorInfo& inputInfo,
-          Decoder<float>& inputDecoder,
-          Encoder<float>& outputEncoder)
+          Decoder<I>& inputDecoder,
+          Encoder<O>& outputEncoder)
 {
     // Input and output will always have same rank
     uint32_t rank = inputInfo.GetNumDimensions();
@@ -64,7 +65,7 @@ void Tile(const TileDescriptor& params,
     {
         for (uint32_t idx = 0; idx < inputInfo.GetNumElements(); ++idx)
         {
-            float inputValue = inputDecoder.Get();
+            auto inputValue = inputDecoder.Get();
             ++inputDecoder;
             outputEncoder.Set(inputValue);
             ++outputEncoder;
@@ -99,4 +100,14 @@ void Tile(const TileDescriptor& params,
     }
 }
 
+// Template method instantiation
+template void Tile(const TileDescriptor& params,
+                   const TensorInfo& inputInfo,
+                   Decoder<float>& inputDecoder,
+                   Encoder<float>& outputEncoder);
+
+template void Tile(const TileDescriptor& params,
+                   const TensorInfo& inputInfo,
+                   Decoder<double_t>& inputDecoder,
+                   Encoder<double_t>& outputEncoder);
 } // namespace armnn

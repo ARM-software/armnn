@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,13 +13,13 @@
 
 namespace armnn
 {
-
+template<typename I, typename O>
 void Gather(const TensorInfo& paramsInfo,
             const TensorInfo& indicesInfo,
             const TensorInfo& outputInfo,
-            Decoder<float>& params,
+            Decoder<I>& params,
             const int32_t* indices,
-            Encoder<float>& output,
+            Encoder<O>& output,
             const int32_t = 0);
 
 } //namespace armnn

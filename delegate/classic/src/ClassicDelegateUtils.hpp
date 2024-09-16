@@ -418,18 +418,37 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
     if (quantizationInfo.type == kTfLiteAffineQuantization)
     {
         // get per-channel quantization parameters
-        const auto* affineQuantization =
-            reinterpret_cast<TfLiteAffineQuantization*>(tfLiteTensor.quantization.params);
+        const auto* affineQuantization = reinterpret_cast<TfLiteAffineQuantization*>(tfLiteTensor.quantization.params);
         if (affineQuantization->scale->size > 1)
         {
-            std::vector<float> quantizationScales;
-            for (unsigned int i = 0; i < static_cast<unsigned int>(affineQuantization->scale->size); ++i)
+            // If each scale data is the same, then this can be assumed as a regular QAsymmS8 quantization.
+            bool areAllScalesSame = true;
+            for(unsigned int i = 1; i < affineQuantization->scale->size; ++i)
             {
-                quantizationScales.push_back(affineQuantization->scale->data[i]);
+                if(affineQuantization->scale->data[0] != affineQuantization->scale->data[i])
+                {
+                    areAllScalesSame = false;
+                    break;
+                }
             }
-            ret.SetQuantizationScales(quantizationScales);
-            ret.SetQuantizationDim(armnn::numeric_cast<unsigned int>(affineQuantization->quantized_dimension));
-            ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
+            if (areAllScalesSame)
+            {
+                ret.SetDataType(armnn::DataType::QAsymmS8);
+                ret.SetQuantizationScale(affineQuantization->scale->data[0]);
+                ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
+            }
+            else
+            {
+                std::vector<float> quantizationScales;
+                quantizationScales.reserve(affineQuantization->scale->size);
+                for (unsigned int i = 0; i < static_cast<unsigned int>(affineQuantization->scale->size); ++i)
+                {
+                    quantizationScales.emplace_back(affineQuantization->scale->data[i]);
+                }
+                ret.SetQuantizationScales(quantizationScales);
+                ret.SetQuantizationDim(armnn::numeric_cast<unsigned int>(affineQuantization->quantized_dimension));
+                ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
+            }
         }
         else
         {

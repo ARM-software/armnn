@@ -124,6 +124,8 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     layerTests/FillTestImpl.hpp
     layerTests/FloorTestImpl.cpp
     layerTests/FloorTestImpl.hpp
+    layerTests/FloorDivTestImpl.cpp
+    layerTests/FloorDivTestImpl.hpp
     layerTests/FullyConnectedTestImpl.cpp
     layerTests/FullyConnectedTestImpl.hpp
     layerTests/GatherNdTestImpl.cpp

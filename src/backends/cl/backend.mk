@@ -50,6 +50,7 @@ BACKEND_SOURCES := \
         workloads/ClElementwiseBinaryWorkload.cpp \
         workloads/ClExpWorkload.cpp \
         workloads/ClFillWorkload.cpp \
+        workloads/ClFloorDivWorkload.cpp \
         workloads/ClFloorFloatWorkload.cpp \
         workloads/ClFullyConnectedWorkload.cpp \
         workloads/ClGatherWorkload.cpp \

@@ -144,7 +144,8 @@ enum class BinaryOperation
     Mul     = 4,
     Sub     = 5,
     SqDiff  = 6,
-    Power   = 7
+    Power   = 7,
+    FloorDiv = 8
 };
 
 enum class PoolingAlgorithm

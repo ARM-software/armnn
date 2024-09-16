@@ -13,6 +13,7 @@
 #include "Minimum.hpp"
 #include "SquaredDifference.hpp"
 #include "Power.hpp"
+#include "FloorDiv.hpp"
 
 #include <Profiling.hpp>
 
@@ -26,8 +27,7 @@ namespace armnn
 template<typename DataType>
 void ExecuteFunction(std::vector<ITensorHandle*> inputs,
                      std::vector<ITensorHandle*> outputs,
-                     BinaryOperation operation,
-                     const std::string& layerName = "")
+                     BinaryOperation operation)
 {
     const TensorInfo& inputInfo0 = GetTensorInfo(inputs[0]);
     const TensorInfo& inputInfo1 = GetTensorInfo(inputs[1]);
@@ -41,16 +41,15 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
     std::unique_ptr<Decoder<DataType>> input1 = MakeDecoder<DataType>(inputInfo1, inputs[1]->Map());
     std::unique_ptr<Encoder<DataType>> output = MakeEncoder<DataType>(outputInfo, outputs[0]->Map());
 
-    using AddFunction     = ElementwiseBinaryFunction<std::plus<DataType>>;
-    using DivFunction     = ElementwiseBinaryFunction<std::divides<DataType>>;
+    using AddFunction      = ElementwiseBinaryFunction<std::plus<DataType>>;
+    using DivFunction      = ElementwiseBinaryFunction<std::divides<DataType>>;
     using FloorDivFunction = ElementwiseBinaryFunction<armnn::floorDiv<DataType>>;
-    using MaximumFunction = ElementwiseBinaryFunction<armnn::maximum<DataType>>;
-    using MinimumFunction = ElementwiseBinaryFunction<armnn::minimum<DataType>>;
-    using MulFunction     = ElementwiseBinaryFunction<std::multiplies<DataType>>;
-    using SubFunction     = ElementwiseBinaryFunction<std::minus<DataType>>;
-    using SqDiffFunction  = ElementwiseBinaryFunction<armnn::squaredDifference<DataType>>;
-    using PowerFunction   = ElementwiseBinaryFunction<armnn::power<DataType>>;
-
+    using MaximumFunction  = ElementwiseBinaryFunction<armnn::maximum<DataType>>;
+    using MinimumFunction  = ElementwiseBinaryFunction<armnn::minimum<DataType>>;
+    using MulFunction      = ElementwiseBinaryFunction<std::multiplies<DataType>>;
+    using SubFunction      = ElementwiseBinaryFunction<std::minus<DataType>>;
+    using SqDiffFunction   = ElementwiseBinaryFunction<armnn::squaredDifference<DataType>>;
+    using PowerFunction    = ElementwiseBinaryFunction<armnn::power<DataType>>;
 
     switch (operation)
     {
@@ -61,14 +60,12 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
         }
         case BinaryOperation::Div:
         {
-            if(!layerName.empty() && layerName.find("FloorDiv") != std::string::npos)
-            {
-                FloorDivFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
-            }
-            else
-            {
-                DivFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
-            }
+            DivFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
+            break;
+        }
+        case BinaryOperation::FloorDiv:
+        {
+            FloorDivFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
             break;
         }
         case BinaryOperation::Maximum:
@@ -86,6 +83,11 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
             MulFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
             break;
         }
+        case BinaryOperation::Power:
+        {
+            PowerFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
+            break;
+        }
         case BinaryOperation::Sub:
         {
             SubFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
@@ -94,11 +96,6 @@ void ExecuteFunction(std::vector<ITensorHandle*> inputs,
         case BinaryOperation::SqDiff:
         {
             SqDiffFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
-            break;
-        }
-        case BinaryOperation::Power:
-        {
-            PowerFunction(inShape0, inShape1, outShape, *input0, *input1, *output);
             break;
         }
         default:
@@ -133,11 +130,11 @@ void RefElementwiseBinaryWorkload::Execute(std::vector<ITensorHandle*> inputs,
 
     if (GetTensorInfo(inputs[0]).GetDataType() == DataType::Signed32)
     {
-        ExecuteFunction<int32_t>(inputs, outputs, m_Data.m_Parameters.m_Operation, m_Name);
+        ExecuteFunction<int32_t>(inputs, outputs, m_Data.m_Parameters.m_Operation);
     }
     else
     {
-        ExecuteFunction<float>(inputs, outputs, m_Data.m_Parameters.m_Operation, m_Name);
+        ExecuteFunction<float>(inputs, outputs, m_Data.m_Parameters.m_Operation);
     }
 }
 

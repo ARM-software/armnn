@@ -66,6 +66,7 @@ COMMON_TEST_SOURCES := \
     test/layerTests/ExpTestImpl.cpp \
     test/layerTests/FakeQuantizationTestImpl.cpp \
     test/layerTests/FillTestImpl.cpp \
+    test/layerTests/FloorDivTestImpl.cpp \
     test/layerTests/FloorTestImpl.cpp \
     test/layerTests/FullyConnectedTestImpl.cpp \
     test/layerTests/GatherNdTestImpl.cpp \

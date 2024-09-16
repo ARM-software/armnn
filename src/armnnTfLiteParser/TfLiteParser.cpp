@@ -2748,8 +2748,8 @@ void TfLiteParserImpl::ParseFloorDiv(size_t subgraphIndex, size_t operatorIndex)
     armnn::TensorInfo inputTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 0);
     armnn::TensorInfo input1TensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
-    auto layerName = fmt::format("Div:{}:{}", subgraphIndex, operatorIndex);
-    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::Div, layerName.c_str());
+    auto layerName = fmt::format("FloorDiv:{}:{}", subgraphIndex, operatorIndex);
+    IConnectableLayer* layer = m_Network->AddElementwiseBinaryLayer(BinaryOperation::FloorDiv, layerName.c_str());
 
     if (!layer)
     {

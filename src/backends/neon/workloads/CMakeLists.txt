@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2020,2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2020,2022-2024 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -50,6 +50,8 @@ list(APPEND armnnNeonBackendWorkloads_sources
     NeonExpWorkload.hpp
     NeonFillWorkload.cpp
     NeonFillWorkload.hpp
+    NeonFloorDivWorkload.cpp
+    NeonFloorDivWorkload.hpp
     NeonFloorFloatWorkload.cpp
     NeonFloorFloatWorkload.hpp
     NeonFullyConnectedWorkload.cpp

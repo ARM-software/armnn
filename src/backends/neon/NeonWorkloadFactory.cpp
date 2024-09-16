@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -309,6 +309,13 @@ std::unique_ptr<IWorkload> NeonWorkloadFactory::CreateWorkload(LayerType type,
                     divisionQueueDescriptor.m_Inputs = descriptor.m_Inputs;
                     divisionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
                     return std::make_unique<NeonDivisionWorkload>(divisionQueueDescriptor, info);
+                }
+                case BinaryOperation::FloorDiv:
+                {
+                    DivisionQueueDescriptor floorDivQueueDescriptor;
+                    floorDivQueueDescriptor.m_Inputs = descriptor.m_Inputs;
+                    floorDivQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    return std::make_unique<NeonFloorDivWorkload>(floorDivQueueDescriptor, info);
                 }
                 case BinaryOperation::Maximum:
                 {

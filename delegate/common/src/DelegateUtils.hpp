@@ -163,13 +163,16 @@ unsigned int ComputeWrappedIndex(int index, unsigned int numDimensions)
     return static_cast<unsigned int>(wrappedIndex);
 };
 
-bool AreAllSigned32(const armnn::TensorInfo& inputInfo1,
-                    const armnn::TensorInfo& inputInfo2,
-                    const armnn::TensorInfo& outputInfo)
+bool AreAllTensorsSigned32(const std::vector<armnn::TensorInfo>& tensorInfos)
 {
-    return (armnn::DataType::Signed32 == inputInfo1.GetDataType()) &&
-           (armnn::DataType::Signed32 == inputInfo2.GetDataType()) &&
-           (armnn::DataType::Signed32 == outputInfo.GetDataType());
+    for (const auto& tensorInfo : tensorInfos)
+    {
+        if(tensorInfo.GetDataType() != armnn::DataType::Signed32)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void UpdateConstantTensorOutputs(const armnn::TensorInfo& inputInfo, armnn::TensorInfo& outputInfo)
@@ -329,6 +332,14 @@ bool IsGroupedConvolution(armnn::TensorShape inputShape,
     const armnnUtils::DataLayoutIndexed dataLayoutIndexed(dataLayout);
     const unsigned int channelsIndex = dataLayoutIndexed.GetChannelsIndex();
     return inputShape[channelsIndex] / filterShape[channelsIndex] > 1;
+}
+
+// Function that takes a TensorInfo Parameter and returns the same TensorInfo with data type FLoat32.
+armnn::TensorInfo ConvertTensorInfoToFloat32(const armnn::TensorInfo& tensorInfo)
+{
+    armnn::TensorInfo newTensorInfo(tensorInfo);
+    newTensorInfo.SetDataType(armnn::DataType::Float32);
+    return newTensorInfo;
 }
 
 } // namespace anonymous

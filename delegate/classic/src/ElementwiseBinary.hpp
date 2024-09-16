@@ -6,7 +6,6 @@
 #pragma once
 
 #include <ClassicDelegateUtils.hpp>
-#include "MultiLayerFacade.hpp"
 #include "SharedFunctions.hpp"
 
 #include <tensorflow/lite/builtin_ops.h>
@@ -70,6 +69,28 @@ TfLiteStatus ValidateDivOperator(DelegateData& delegateData,
     return isSupported ? kTfLiteOk : kTfLiteError;
 }
 
+TfLiteStatus ValidateCastOperator(const DelegateData& delegateData,
+                                  TfLiteContext* tfLiteContext,
+                                  const armnn::TensorInfo& inputInfo,
+                                  const armnn::TensorInfo& outputInfo)
+{
+    bool isSupported  = false;
+    auto validateFunc = [&](const armnn::TensorInfo& outInfo, bool& isSupported)
+    {
+        FORWARD_LAYER_SUPPORT_FUNC("CAST",
+                                   tfLiteContext,
+                                   IsCastSupported,
+                                   delegateData.m_Backends,
+                                   isSupported,
+                                   armnn::BackendId(),
+                                   inputInfo,
+                                   outInfo);
+    };
+
+    validateFunc(outputInfo, isSupported);
+    return isSupported ? kTfLiteOk : kTfLiteError;
+}
+
 TfLiteStatus ValidateFloorDivOperator(DelegateData& delegateData,
                                       TfLiteContext* tfLiteContext,
                                       const armnn::TensorInfo& inputInfo1,
@@ -77,17 +98,43 @@ TfLiteStatus ValidateFloorDivOperator(DelegateData& delegateData,
                                       const armnn::TensorInfo& outputInfo)
 {
     // need first to validate that the div operator is supported
-    // then that the floor operator is supported
+    // then that the floor operator is supported, unless types are of Signed32.
     TfLiteStatus status = ValidateDivOperator(delegateData, tfLiteContext, inputInfo1, inputInfo2, outputInfo);
     if (status != kTfLiteOk)
     {
         return status;
     }
-    // if the inputs and output of the div are all Signed32 we don't need to add the floor operator afterward.
-    if (AreAllSigned32(inputInfo1, inputInfo2, outputInfo))
+
+    // if the Inputs of FloorDiv are Signed32 we need to cast the inputs ato Float32 to Floor correctly.
+    if (AreAllTensorsSigned32({ inputInfo1, inputInfo2, outputInfo }))
     {
+        // Converting to Float32 for Cast Outputs
+        auto castOutputInfo0 = ConvertTensorInfoToFloat32(inputInfo1);
+        auto castOutputInfo1 = ConvertTensorInfoToFloat32(inputInfo2);
+
+        // We need to cast specifically for negative values, which floor towards -(infinity) and not
+        // truncate towards zero, which without cast -> div -> floor, will happen.
+        status = ValidateCastOperator(delegateData, tfLiteContext, inputInfo1, castOutputInfo0);
+        if (status != kTfLiteOk)
+        {
+            return status;
+        }
+
+        status = ValidateCastOperator(delegateData, tfLiteContext, inputInfo2, castOutputInfo1);
+        if (status != kTfLiteOk)
+        {
+            return status;
+        }
+
+        // No need for conversion for the output as the last cast layer will output the originally intended output type
+        status = ValidateCastOperator(delegateData, tfLiteContext, castOutputInfo0, outputInfo);
+        if (status != kTfLiteOk)
+        {
+            return status;
+        }
         return status;
     }
+
     // in case broadcasting is being done from one of the inputs to the div
     // choose the full sized input tensor to pass to the floor validation routine
     armnn::TensorInfo floorInputInfo = inputInfo1;
@@ -249,29 +296,6 @@ TfLiteStatus ValidateSubOperator(DelegateData& delegateData,
     return isSupported ? kTfLiteOk : kTfLiteError;
 }
 
-std::pair<armnn::IConnectableLayer*, armnn::IConnectableLayer*> AddFloorDivLayer(
-        DelegateData& delegateData,
-        const armnn::TensorInfo& outputTensorInfo,
-        int nodeIndex)
-{
-    auto layerName = "FloorDiv:" +  std::to_string(nodeIndex);
-    armnn::IConnectableLayer* divisionLayer = delegateData.m_Network->AddElementwiseBinaryLayer(
-            armnn::BinaryOperation::Div, layerName.c_str());
-
-    // if the output of the div is Signed32 the Floor layer is not required
-    if (armnn::DataType::Signed32 == outputTensorInfo.GetDataType())
-    {
-        return std::make_pair(divisionLayer, divisionLayer);
-    }
-    armnn::IOutputSlot& outputSlot = divisionLayer->GetOutputSlot(0);
-    outputSlot.SetTensorInfo(outputTensorInfo);
-
-    auto floorName = GetLayerName(armnn::BinaryOperation::Div, nodeIndex);
-    armnn::IConnectableLayer* floorLayer = delegateData.m_Network->AddFloorLayer(floorName.c_str());
-    outputSlot.Connect(floorLayer->GetInputSlot(0));
-    return std::make_pair(divisionLayer, floorLayer);
-}
-
 TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
                                             TfLiteContext* tfLiteContext,
                                             TfLiteNode* tfLiteNode,
@@ -420,7 +444,6 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
     }
 
     armnn::IConnectableLayer* elementwiseBinaryLayer = nullptr;
-    MultiLayerFacade multiLayer;
     std::string layerName;
     switch(elementwiseBinaryOperatorCode)
     {
@@ -435,11 +458,9 @@ TfLiteStatus VisitElementwiseBinaryOperator(DelegateData& delegateData,
                     armnn::BinaryOperation::Div, layerName.c_str());
             break;
         case kTfLiteBuiltinFloorDiv:
-            {
-                auto layers = AddFloorDivLayer(delegateData, outputTensorInfo, nodeIndex);
-                multiLayer.AssignValues(layers.first, layers.second);
-                elementwiseBinaryLayer = &multiLayer;
-            }
+            layerName = GetLayerName(armnn::BinaryOperation::FloorDiv, nodeIndex);
+            elementwiseBinaryLayer = delegateData.m_Network->AddElementwiseBinaryLayer(armnn::BinaryOperation::FloorDiv,
+                                                                                       layerName.c_str());
             break;
         case kTfLiteBuiltinMaximum:
             layerName = GetLayerName(armnn::BinaryOperation::Maximum, nodeIndex);

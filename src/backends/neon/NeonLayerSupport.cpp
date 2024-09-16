@@ -42,6 +42,7 @@
 #include "workloads/NeonDivisionWorkload.hpp"
 #include "workloads/NeonElementwiseBinaryWorkload.hpp"
 #include "workloads/NeonExpWorkload.hpp"
+#include "workloads/NeonFloorDivWorkload.hpp"
 #include "workloads/NeonFullyConnectedWorkload.hpp"
 #include "workloads/NeonFusedWorkload.hpp"
 #include "workloads/NeonGatherWorkload.hpp"
@@ -378,6 +379,14 @@ bool IsLayerTypeSupported(const LayerType& type,
                                                    nullptr);
                 case BinaryOperation::Div:
                     FORWARD_WORKLOAD_VALIDATE_FUNC(NeonDivisionWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+
+                case BinaryOperation::FloorDiv:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(NeonFloorDivWorkloadValidate,
                                                    reasonIfUnsupported,
                                                    infos[0],
                                                    infos[1],

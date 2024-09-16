@@ -953,6 +953,10 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(L2NormalizationNonDefaultEpsilon, L2NormalizationN
 // Floor
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 
+// FloorDiv
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorDivFloat32,  SimpleFloorDivTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorDivSigned32, SimpleFloorDivTest<DataType::Signed32>)
+
 // Gather
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsFloat32, Gather1dParamsFloat32Test)
 ARMNN_AUTO_TEST_CASE_WITH_THF(Gather1dParamsUint8, Gather1dParamsUint8Test)

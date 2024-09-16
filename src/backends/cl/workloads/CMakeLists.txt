@@ -50,6 +50,8 @@ list(APPEND armnnClBackendWorkloads_sources
     ClExpWorkload.hpp
     ClFillWorkload.cpp
     ClFillWorkload.hpp
+    ClFloorDivWorkload.cpp
+    ClFloorDivWorkload.hpp
     ClFloorFloatWorkload.cpp
     ClFloorFloatWorkload.hpp
     ClFullyConnectedWorkload.cpp

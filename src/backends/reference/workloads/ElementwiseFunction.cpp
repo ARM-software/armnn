@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,6 +16,7 @@
 #include "Sqrt.hpp"
 #include "Power.hpp"
 #include "SquaredDifference.hpp"
+#include "FloorDiv.hpp"
 
 
 namespace armnn

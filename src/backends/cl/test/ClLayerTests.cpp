@@ -1238,6 +1238,12 @@ ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleFill, ClContextControlFixture, SimpleFill
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleFillF16, ClContextControlFixture, SimpleFillTest<DataType::Float16>)
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleFillS32, ClContextControlFixture, SimpleFillTest<DataType::Signed32>)
 
+// FloorDiv
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleFloorDivFloat32,
+                                 ClContextControlFixture, SimpleFloorDivTest<DataType::Float32>)
+ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleFloorDivSigned32,
+                                 ClContextControlFixture, SimpleFloorDivTest<DataType::Signed32>)
+
 // FloorPreluUint8
 ARMNN_AUTO_TEST_FIXTURE_WITH_THF(SimpleFloor, ClContextControlFixture, SimpleFloorTest<DataType::Float32>)
 

@@ -347,7 +347,8 @@ enum BinaryOperation : byte {
     Mul     = 4,
     Sub     = 5,
     SqDiff  = 6,
-    Power   = 7
+    Power   = 7,
+    FloorDiv = 8
 }
 
 table ElementwiseBinaryDescriptor {

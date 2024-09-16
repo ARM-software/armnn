@@ -24,6 +24,7 @@
 #include "ClElementwiseBinaryWorkload.hpp"
 #include "ClExpWorkload.hpp"
 #include "ClFillWorkload.hpp"
+#include "ClFloorDivWorkload.hpp"
 #include "ClFloorFloatWorkload.hpp"
 #include "ClFullyConnectedWorkload.hpp"
 #include "ClGatherWorkload.hpp"

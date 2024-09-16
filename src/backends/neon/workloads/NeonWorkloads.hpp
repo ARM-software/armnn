@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -28,6 +28,7 @@
 #include "NeonElementwiseBinaryWorkload.hpp"
 #include "NeonExpWorkload.hpp"
 #include "NeonFillWorkload.hpp"
+#include "NeonFloorDivWorkload.hpp"
 #include "NeonFloorFloatWorkload.hpp"
 #include "NeonFullyConnectedWorkload.hpp"
 #include "NeonFusedWorkload.hpp"

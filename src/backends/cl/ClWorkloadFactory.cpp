@@ -427,6 +427,15 @@ std::unique_ptr<IWorkload> ClWorkloadFactory::CreateWorkload(LayerType type,
                         elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
                     return std::make_unique<ClDivisionWorkload>(divisionQueueDescriptor, info, m_CLCompileContext);
                 }
+                case BinaryOperation::FloorDiv:
+                {
+                    DivisionQueueDescriptor divisionQueueDescriptor;
+                    divisionQueueDescriptor.m_Inputs  = descriptor.m_Inputs;
+                    divisionQueueDescriptor.m_Outputs = descriptor.m_Outputs;
+                    divisionQueueDescriptor.m_AdditionalInfoObject =
+                        elementwiseBinaryQueueDescriptor->m_AdditionalInfoObject;
+                    return std::make_unique<ClFloorDivWorkload>(divisionQueueDescriptor, info, m_CLCompileContext);
+                }
                 case BinaryOperation::Maximum:
                 {
                     MaximumQueueDescriptor maximumQueueDescriptor;

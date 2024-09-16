@@ -603,6 +603,8 @@ armnn::BinaryOperation ToElementwiseBinaryOperation(armnnSerializer::BinaryOpera
             return armnn::BinaryOperation::Add;
         case armnnSerializer::BinaryOperation::BinaryOperation_Div:
             return armnn::BinaryOperation::Div;
+        case armnnSerializer::BinaryOperation::BinaryOperation_FloorDiv:
+            return armnn::BinaryOperation::FloorDiv;
         case armnnSerializer::BinaryOperation::BinaryOperation_Maximum:
             return armnn::BinaryOperation::Maximum;
         case armnnSerializer::BinaryOperation::BinaryOperation_Minimum:

@@ -1513,7 +1513,6 @@ bool RefLayerSupport::IsFloorSupported(const TensorInfo& input,
                                        const TensorInfo& output,
                                        Optional<std::string&> reasonIfUnsupported) const
 {
-    IgnoreUnused(output);
     bool supported = true;
 
     std::array<DataType,3> supportedTypes =

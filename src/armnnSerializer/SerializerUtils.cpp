@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -114,6 +114,8 @@ armnnSerializer::BinaryOperation GetFlatBufferBinaryOperation(armnn::BinaryOpera
         case armnn::BinaryOperation::Add:
             return armnnSerializer::BinaryOperation::BinaryOperation_Add;
         case armnn::BinaryOperation::Div:
+            return armnnSerializer::BinaryOperation::BinaryOperation_Div;
+        case armnn::BinaryOperation::FloorDiv:
             return armnnSerializer::BinaryOperation::BinaryOperation_Div;
         case armnn::BinaryOperation::Maximum:
             return armnnSerializer::BinaryOperation::BinaryOperation_Maximum;

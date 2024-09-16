@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -85,6 +85,7 @@ constexpr char const* GetBinaryOperationAsCString(BinaryOperation operation)
         case BinaryOperation::Power:    return "Power";
         case BinaryOperation::SqDiff:   return "SqDiff";
         case BinaryOperation::Sub:      return "Sub";
+        case BinaryOperation::FloorDiv: return "FloorDiv";
         default:                        return "Unknown";
     }
 }

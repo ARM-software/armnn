@@ -513,5 +513,4 @@ TfLiteStatus ProcessInputs(armnn::IConnectableLayer* layer,
     }
     return kTfLiteOk;
 }
-
 } // namespace anonymous

@@ -41,6 +41,7 @@
 #include "workloads/ClElementwiseBinaryWorkload.hpp"
 #include "workloads/ClExpWorkload.hpp"
 #include "workloads/ClFillWorkload.hpp"
+#include "workloads/ClFloorDivWorkload.hpp"
 #include "workloads/ClFloorFloatWorkload.hpp"
 #include "workloads/ClFullyConnectedWorkload.hpp"
 #include "workloads/ClGatherWorkload.hpp"
@@ -371,6 +372,13 @@ bool ClLayerSupport::IsLayerSupported(const LayerType& type,
                                                    nullptr);
                 case BinaryOperation::Div:
                     FORWARD_WORKLOAD_VALIDATE_FUNC(ClDivisionWorkloadValidate,
+                                                   reasonIfUnsupported,
+                                                   infos[0],
+                                                   infos[1],
+                                                   infos[2],
+                                                   nullptr);
+                case BinaryOperation::FloorDiv:
+                    FORWARD_WORKLOAD_VALIDATE_FUNC(ClFloorDivWorkloadValidate,
                                                    reasonIfUnsupported,
                                                    infos[0],
                                                    infos[1],

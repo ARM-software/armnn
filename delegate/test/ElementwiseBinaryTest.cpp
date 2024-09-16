@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -362,6 +362,38 @@ void FloorDivFP32Test()
                                  input1Values,
                                  expectedOutputValues);
 
+}
+
+void FloorDivINT32Test()
+{
+    std::vector<int32_t> input0Shape { 1, 1, 2, 2 };
+    std::vector<int32_t> input1Shape { 1 };
+    std::vector<int32_t> expectedOutputShape { 1, 1, 2, 2 };
+
+    std::vector<int> input0Values =
+        {
+            10, -9, -11, 7
+        };
+
+    std::vector<int> input1Values =
+        {
+            -3
+        };
+
+    std::vector<int> expectedOutputValues =
+        {
+            -4, 3, 3, -3
+        };
+
+    ElementwiseBinaryTest<int>(tflite::BuiltinOperator_FLOOR_DIV,
+                                 tflite::ActivationFunctionType_NONE,
+                                 ::tflite::TensorType_INT32,
+                                 input0Shape,
+                                 input1Shape,
+                                 expectedOutputShape,
+                                 input0Values,
+                                 input1Values,
+                                 expectedOutputValues);
 }
 
 void MaxFP32Test()
@@ -808,6 +840,11 @@ TEST_CASE ("DIV_Broadcast_Test")
 TEST_CASE ("FLOORDIV_FP32_Test")
 {
     FloorDivFP32Test();
+}
+
+TEST_CASE ("FLOORDIV_INT32_Test")
+{
+    FloorDivINT32Test();
 }
 
 TEST_CASE ("DIV_UINT8_Test")

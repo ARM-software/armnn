@@ -1797,6 +1797,11 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFillS32, SimpleFillTest<DataType::Signed32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloor, SimpleFloorTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorFloat16, SimpleFloorTest<DataType::Float16>)
 
+// FloorDiv
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorDivFloat32,  SimpleFloorDivTest<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorDivFloat16,  SimpleFloorDivTest<DataType::Float16>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleFloorDivSigned32, SimpleFloorDivTest<DataType::Signed32>)
+
 // Reshape
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeFloat32, SimpleReshapeTest<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(SimpleReshapeQuantisedAsymmS8, SimpleReshapeTest<DataType::QAsymmS8>)

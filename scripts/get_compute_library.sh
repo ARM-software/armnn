@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c4955e24d63cee13c4efc8eba3fb81724410e0fc" # 12279: fix: rounding of negative integers in pooling 2d/3d gpu kernels
+DEFAULT_CLFRAMEWORKREVISION="b7c73efb2bbf3889bded0858613dbc9c214b76c4" # 12425: refactor: Generate only one shared library when building with CMake
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

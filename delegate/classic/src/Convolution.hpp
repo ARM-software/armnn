@@ -548,7 +548,7 @@ TfLiteStatus VisitDepthwiseConv2dOperator(DelegateData& delegateData,
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
-    auto layerName = GetLayerName(armnn::LayerType::Convolution3d, nodeIndex);
+    auto layerName = GetLayerName(armnn::LayerType::DepthwiseConvolution2d, nodeIndex);
     armnn::IConnectableLayer* layer = delegateData.m_Network->AddDepthwiseConvolution2dLayer(descriptor,
                                                                                              layerName.c_str());
     layer->SetBackendId(setBackend);

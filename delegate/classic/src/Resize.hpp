@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -184,9 +184,7 @@ TfLiteStatus VisitResizeOperator(DelegateData& delegateData,
                                       desc);
     }
 
-
-    auto resizeName = GetLayerName(armnn::LayerType::Resize, nodeIndex);
-    armnn::IConnectableLayer* resizeLayer = delegateData.m_Network->AddResizeLayer(desc, resizeName.c_str());
+    armnn::IConnectableLayer* resizeLayer = delegateData.m_Network->AddResizeLayer(desc, layerName.c_str());
 
     armnn::IOutputSlot& outputSlot = resizeLayer->GetOutputSlot(0);
     outputSlot.SetTensorInfo(outputTensorInfo);

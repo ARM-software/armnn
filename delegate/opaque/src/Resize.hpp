@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -203,9 +203,6 @@ TfLiteStatus VisitResizeOperator(DelegateData& delegateData,
 
 
     armnn::IConnectableLayer* resizeLayer = nullptr;
-    layerName += ":";
-    layerName += nodeIndex;
-
     resizeLayer = delegateData.m_Network->AddResizeLayer(desc, layerName.c_str());
 
     armnn::IOutputSlot& outputSlot = resizeLayer->GetOutputSlot(0);

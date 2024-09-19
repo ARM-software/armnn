@@ -76,15 +76,25 @@ arm_compute::Status ClGatherNdWorkloadValidate(const TensorInfo& paramsInfo,
 
     /// Validate Reshape
     const arm_compute::TensorInfo aclOutputInfo = BuildArmComputeTensorInfo(outputInfo);
+    const arm_compute::TensorInfo aclParamsOriginalShapeInfo = BuildArmComputeTensorInfo(paramsInfo);
+    const arm_compute::TensorInfo aclIndicesOriginalShapeInfo = BuildArmComputeTensorInfo(indicesInfo);
+    const arm_compute::TensorInfo aclParamsReshapeInfo = BuildArmComputeTensorInfo(paramsInfo);
+    const arm_compute::TensorInfo aclIndicesReshapeInfo = BuildArmComputeTensorInfo(indicesInfo);
 
-    auto statusReshape = arm_compute::CLReshapeLayer::validate(&aclOutputGatherInfo, &aclOutputInfo);
+    auto statusOutputReshape = arm_compute::CLReshapeLayer::validate(&aclOutputGatherInfo, &aclOutputInfo);
+    auto statusParamsReshape = arm_compute::CLReshapeLayer::validate(&aclParamsOriginalShapeInfo,
+                                                                     &aclParamsReshapeInfo);
+    auto statusIndicesReshape = arm_compute::CLReshapeLayer::validate(&aclIndicesOriginalShapeInfo,
+                                                                      &aclIndicesReshapeInfo);
 
     /// Return OK if all the layers are valid
     auto okCode = arm_compute::ErrorCode::OK;
     if (statusMul.error_code()       == okCode &&
         statusReduceSum.error_code() == okCode &&
         statusGather.error_code()    == okCode &&
-        statusReshape.error_code()   == okCode)
+        statusParamsReshape.error_code() == okCode &&
+        statusIndicesReshape.error_code() == okCode &&
+        statusOutputReshape.error_code()   == okCode)
     {
         return arm_compute::Status(arm_compute::ErrorCode::OK,
                                    "All GatherND layers validate status OK.");
@@ -125,7 +135,10 @@ ClGatherNdWorkload::ClGatherNdWorkload(const GatherNdQueueDescriptor& descriptor
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_FlattenedIndices);
 
     // Reshape indices into { W, ND }
-    indices.info()->set_tensor_shape(BuildArmComputeTensorShape({ keyIndices["W"], keyIndices["ND"] }));
+    armnn::TensorInfo indicesInfoReshape = indicesInfo;
+    indicesInfoReshape.SetShape({ keyIndices["W"], keyIndices["ND"] });
+    BuildArmComputeTensor(m_IndicesReshaped, indicesInfoReshape);
+    armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_IndicesReshaped);
 
     // Calculate the m_FlattenedCoeff
     TensorShape paramsShape = paramsInfo.GetShape();
@@ -150,9 +163,12 @@ ClGatherNdWorkload::ClGatherNdWorkload(const GatherNdQueueDescriptor& descriptor
     BuildArmComputeTensor(m_OutputMul, outputMul_Info);
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_OutputMul);
 
+    // Reshape indices to the mul layer input shape
+    m_ReshapeIndicesLayer.configure(&indices, &m_IndicesReshaped);
+
     // Multiply
     m_MulLayer.configure(clCompileContext,
-                         &indices,
+                         &m_IndicesReshaped,
                          &m_FlattenedCoeff,
                          &m_OutputMul,
                          1.0f,
@@ -174,8 +190,13 @@ ClGatherNdWorkload::ClGatherNdWorkload(const GatherNdQueueDescriptor& descriptor
 
     /// Call Gather with adequate shapes
     // Reshape params into { K, C }
-    paramsInfo.SetShape({ keyIndices["K"], keyIndices["C"] });
-    input.info()->set_tensor_shape(BuildArmComputeTensorShape(paramsInfo.GetShape()));
+    armnn::TensorInfo paramsInfoReshape = paramsInfo;
+    paramsInfoReshape.SetShape({ keyIndices["K"], keyIndices["C"] });
+    BuildArmComputeTensor(m_InputGather, paramsInfoReshape);
+    armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_InputGather);
+
+    // Reshape input to the gather params input shape
+    m_ReshapeInputLayer.configure(&input, &m_InputGather);
 
     // Reshape output to have the shape given by gather { W, C }
     // (the original outputInfo has the shape given by gatherNd)
@@ -185,20 +206,22 @@ ClGatherNdWorkload::ClGatherNdWorkload(const GatherNdQueueDescriptor& descriptor
     armcomputetensorutils::InitialiseArmComputeTensorEmpty(m_OutputGather);
     {
         ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClGatherNdWorkload_configure");
-        auto aclAxis = ComputeAclAxis(0, paramsInfo);
-        m_GatherLayer.configure(clCompileContext, &input, &m_FlattenedIndices, &m_OutputGather, aclAxis);
+        auto aclAxis = ComputeAclAxis(0, paramsInfoReshape);
+        m_GatherLayer.configure(clCompileContext, &m_InputGather, &m_FlattenedIndices, &m_OutputGather, aclAxis);
     }
 
     // Reshape output to the original output shape
-    m_ReshapeLayer.configure(clCompileContext, &m_OutputGather, &output);
+    m_ReshapeOutputLayer.configure(clCompileContext, &m_OutputGather, &output);
 };
 
 void ClGatherNdWorkload::Execute() const
 {
     ARMNN_SCOPED_PROFILING_EVENT_CL_NAME_GUID("ClGatherNdWorkload_Execute");
+    RunClFunction(m_ReshapeInputLayer, CHECK_LOCATION());
+    RunClFunction(m_ReshapeIndicesLayer, CHECK_LOCATION());
     RunClFunction(m_MulLayer, CHECK_LOCATION());
     RunClFunction(m_ReduceSumLayer, CHECK_LOCATION());
     RunClFunction(m_GatherLayer, CHECK_LOCATION());
-    RunClFunction(m_ReshapeLayer, CHECK_LOCATION());
+    RunClFunction(m_ReshapeOutputLayer, CHECK_LOCATION());
 }
 } // namespace armnn

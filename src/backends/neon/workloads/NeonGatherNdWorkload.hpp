@@ -26,15 +26,19 @@ public:
     virtual void Execute() const override;
 
 private:
+    arm_compute::Tensor m_InputGather;
     arm_compute::Tensor m_FlattenedCoeff;
     arm_compute::Tensor m_OutputMul;
     arm_compute::Tensor m_FlattenedIndices;
     arm_compute::Tensor m_OutputGather;
+    arm_compute::Tensor m_IndicesReshaped;
 
     mutable arm_compute::NEPixelWiseMultiplication m_MulLayer;
     mutable arm_compute::NEReductionOperation m_ReduceSumLayer;
     mutable arm_compute::NEGather m_GatherLayer;
-    mutable arm_compute::NEReshapeLayer m_ReshapeLayer;
+    mutable arm_compute::NEReshapeLayer m_ReshapeInputLayer;
+    mutable arm_compute::NEReshapeLayer m_ReshapeOutputLayer;
+    mutable arm_compute::NEReshapeLayer m_ReshapeIndicesLayer;
 
 };
 

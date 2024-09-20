@@ -20,6 +20,8 @@ list(APPEND armnnTosaBackendOperators_sources
         ConstantOperator.cpp
         Conv2dOperator.hpp
         Conv2dOperator.cpp
+        Conv3dOperator.hpp
+        Conv3dOperator.cpp
         DepthwiseConv2dOperator.hpp
         DepthwiseConv2dOperator.cpp
         DequantizeOperator.hpp

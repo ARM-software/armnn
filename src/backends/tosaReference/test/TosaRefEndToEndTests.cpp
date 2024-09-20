@@ -9,6 +9,7 @@
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/Convolution3dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
@@ -315,6 +316,19 @@ TEST_CASE("TosaRefConv2dWithoutBiasEndtoEndTestInt8")
     Convolution2dEndToEnd<armnn::DataType::QSymmS8,
                           armnn::DataType::QSymmS8,
                           armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
+}
+
+// Conv3d
+TEST_CASE("TosaRefConvolution3dFloat32Test")
+{
+    Convolution3dEndToEnd<armnn::DataType::Float32, armnn::DataType::Float32>(tosaDefaultBackends,
+                                                                              armnn::DataLayout::NDHWC);
+}
+
+TEST_CASE("TosaRefConvolution3dInt8Test")
+{
+    Convolution3dEndToEnd<armnn::DataType::QSymmS8, armnn::DataType::QSymmS8>(tosaDefaultBackends,
+                                                                              armnn::DataLayout::NDHWC);
 }
 
 // DepthwiseConv2d

@@ -13,6 +13,7 @@
 #include "ConcatOperator.hpp"
 #include "ConstantOperator.hpp"
 #include "Conv2dOperator.hpp"
+#include "Conv3dOperator.hpp"
 #include "DepthwiseConv2dOperator.hpp"
 #include "DequantizeOperator.hpp"
 #include "ElementwiseBinaryOperator.hpp"

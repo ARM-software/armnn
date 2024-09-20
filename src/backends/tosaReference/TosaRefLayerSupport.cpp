@@ -70,6 +70,19 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             }
             break;
         }
+        case LayerType::Convolution3d:
+        {
+            inputInfos.push_back(&infos[0]); // input
+            outputInfos.push_back(&infos[1]); // output
+            inputInfos.push_back(&infos[2]); // weights
+
+            auto conv3dDesc = PolymorphicDowncast<const Convolution3dDescriptor*>(&descriptor);
+            if(conv3dDesc->m_BiasEnabled)
+            {
+                inputInfos.push_back(&infos[3]); // bias
+            }
+            break;
+        }
         case LayerType::DepthwiseConvolution2d:
         {
             inputInfos.push_back(&infos[0]); // input

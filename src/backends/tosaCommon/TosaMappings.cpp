@@ -130,6 +130,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto conv2dDesc = PolymorphicDowncast<const Convolution2dDescriptor*>(&descriptor);
             return ConvertConv2dToTosaOperator(layer, inputs, outputs, conv2dDesc);
         }
+        case LayerType::Convolution3d:
+        {
+            auto conv3dDesc = PolymorphicDowncast<const Convolution3dDescriptor*>(&descriptor);
+            return ConvertConv3dToTosaOperator(layer, inputs, outputs, conv3dDesc);
+        }
         case LayerType::DepthwiseConvolution2d:
         {
             auto conv2dDesc = PolymorphicDowncast<const DepthwiseConvolution2dDescriptor*>(&descriptor);

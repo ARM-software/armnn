@@ -48,7 +48,8 @@ const BackendCapabilities gpuFsaCapabilities("GpuFsa",
                                                      {"PreImportIOTensors", false},
                                                      {"ExternallyManagedMemory", false},
                                                      {"MultiAxisPacking", false},
-                                                     {"SingleAxisPacking", false}
+                                                     {"SingleAxisPacking", false},
+                                                     {"AllOrNothing", true}
                                              });
 ARMNN_NO_DEPRECATE_WARN_BEGIN
 class GpuFsaBackend : public IBackendInternal

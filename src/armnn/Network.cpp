@@ -783,6 +783,7 @@ void ReportWarning(const std::string& warningMessage,
     }
 }
 
+// Given an OptimizationResult, build and add an error message to the errMessages vector. Then return the result.
 OptimizationResult ReturnWithError(OptimizationResult res,
                                    const Layer* layer,
                                    const BackendSettings& backendSettings,
@@ -796,7 +797,6 @@ OptimizationResult ReturnWithError(OptimizationResult res,
     res.m_Error = true;
     return res;
 }
-
 
 bool CheckScaleSetOnQuantizedType(Layer* layer, Optional<std::vector<std::string>&> errMessages)
 {
@@ -849,14 +849,14 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
                                             DataType dataTypeOut,
                                             const std::vector<BackendId>& availablePreferredBackends,
                                             std::string& reasonIfUnsupported,
-                                            Optional<std::vector<std::string>&> errMessages)
+                                            Optional<std::vector<std::string>&> messages)
 {
     OptimizationResult result;
 
     // Helper lambda to compose meaningful error message before returning with error
     auto ReturnError = [&](const Layer* layer)
         {
-            return ReturnWithError(result, layer, backendSettings, errMessages);
+            return ReturnWithError(result, layer, backendSettings, messages);
         };
 
     // need to set the compute device on the layer
@@ -869,6 +869,25 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
     // to be FP32 and inserting convert layers around the FP32 operator.
     bool isLayerSupported = IWorkloadFactory::IsLayerSupported(*layer, EmptyOptional(), currentReasonIfUnsupported);
     reasonIfUnsupported += currentReasonIfUnsupported;
+    if (!isLayerSupported && HasCapability("AllOrNothing", backend))
+    {
+        // It has the capability but is it set to true?
+        if (GetCapability("AllOrNothing", backend).value().GetValue().AsBool())
+        {
+            // This is when a backend says it must execute all layers in a model. We'll report a message to say the
+            // backend will be ignored for the rest of this subgraph.
+            std::stringstream fullWarningMessage;
+            fullWarningMessage << "Backend: " << backend
+                               << " has \"AllOrNothing\" enabled. A layer of type "
+                               << GetLayerTypeAsCString(layer->GetType()) << " reports that it is not supported. "
+                               << "This backend will not be considered to execute this subgraph.";
+            reasonIfUnsupported.append(fullWarningMessage.str());
+            // Also add it to the messages if they exist.
+            ReportWarning(fullWarningMessage.str(), messages);
+            result.m_Warning = true;
+            return result;
+        }
+    }
     // This string matches the error message that is produced by acl when attempting to run FP16 kernels on
     // a cpu or build that does not have fp16 support. We use this to check if we should add
     // conversion layers or not.
@@ -1004,7 +1023,7 @@ OptimizationResult AttemptBackendAssignment(BackendSettings& backendSettings,
                    << " and output data type " << GetDataTypeName(dataTypeOut)
                    << " (reason: " << reasonIfUnsupported
                    << "), falling back to the next backend.";
-        ReportWarning(warningMsg.str(), errMessages);
+        ReportWarning(warningMsg.str(), messages);
 
         return OptimizationResult(true, false);
     }
@@ -1075,7 +1094,8 @@ void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
                                 Optional<std::vector<std::string>&> errMessages,
                                 OptimizationResult& result,
                                 BackendSettings& backendSettings,
-                                std::vector<BackendId>& availablePreferredBackends)
+                                std::vector<BackendId>& availablePreferredBackends,
+                                bool& restart)
 {
     auto ReturnError = [&](const Layer* layer)
     {
@@ -1118,7 +1138,7 @@ void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
     }
     else
     {
-        // Try assign layer to prefered list of backends
+        // Try assign layer to preferred list of backends
         for (const auto& backend : availablePreferredBackends)
         {
             if (layer->GetBackendHint().has_value() &&
@@ -1148,6 +1168,18 @@ void AssignBackendsIConnectable(OptimizedNetworkImpl* optNetObjPtr,
                 result = res;  // Cannot continue.
                 // Note: we don't need to log the error as it would already
                 // be logged in AttemptBackendAssignment().
+            }
+            else if (res.IsWarningOnly())
+            {
+                // Does the warning message relate to an AllOrNothing backend saying it rejects the subgraph?
+                if (reasonIfUnsupported.find("AllOrNothing") != std::string::npos)
+                {
+                    // Layer not supported by all or nothing backend. Add this backend to the ignore list and
+                    // indicate that the backend search should restart.
+                    backendSettings.m_IgnoredBackends.insert(backend);
+                    restart = true;
+                    return;
+                }
             }
         }
     }
@@ -1185,15 +1217,32 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_AssignBackends");
     OptimizationResult result;
 
-    auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
-    if (availablePreferredBackends.empty())
+    bool restart = false;
+    BackendIdVector availablePreferredBackends;
+    for (auto it = firstLayer; it != lastLayer; it = (restart ? firstLayer : ++it))
     {
-        std::stringstream failureMsg;
-        failureMsg << "No preferred backends are available";
-        ReportError(failureMsg.str(), errMessages);
-
-        result.m_Error = true;
-        return result;
+        if (it == firstLayer)
+        {
+            availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
+            if (availablePreferredBackends.empty())
+                {
+                        ReportError("No preferred backends are available", errMessages);
+                        result.m_Error = true;
+                        return result;
+                }
+        }
+        // In the case where we've set restart it must be reset before we continue looking at backends.
+        if (restart)
+        {
+            restart = false;
+        }
+        AssignBackendsIConnectable(optNetObjPtr,
+                                   *it,
+                                   errMessages,
+                                   result,
+                                   backendSettings,
+                                   availablePreferredBackends,
+                                   restart);
     }
 
     for (auto it = firstLayer; it != lastLayer; ++it)
@@ -1223,7 +1272,8 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                        errMessages,
                                        result,
                                        backendSettings,
-                                       availablePreferredBackends);
+                                       availablePreferredBackends,
+                                       restart);
         }
     }
 
@@ -1261,6 +1311,7 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
         return result;
     }
 
+    bool restart = false;
     for (auto it = firstLayer; it != lastLayer; ++it)
     {
         AssignBackendsIConnectable(optNetObjPtr,
@@ -1268,7 +1319,8 @@ OptimizationResult AssignBackends(OptimizedNetworkImpl* optNetObjPtr,
                                    errMessages,
                                    result,
                                    backendSettings,
-                                   availablePreferredBackends);
+                                   availablePreferredBackends,
+                                   restart);
     }
 
     for (auto it = firstLayer; it != lastLayer; ++it)

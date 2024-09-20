@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -19,7 +19,8 @@ const BackendCapabilities cpuRefCapabilities("CpuRef",
                                                     {"ExternallyManagedMemory", true},
                                                     {"MultiAxisPacking", false},
                                                     {"SingleAxisPacking", true},
-                                                    {"HasFp16", true}
+                                                    {"HasFp16", true},
+                                                    {"AllOrNothing", false}
                                              });
 
 const std::set<armnn::BackendCapability> oldCpuRefCapabilities {

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -7,6 +7,10 @@
 
 
 #include <Network.hpp>
+#include <BackendSettings.hpp>
+#include <armnn/BackendRegistry.hpp>
+#include <armnn/backends/IBackendInternal.hpp>
+#include <backendsCommon/LayerSupportBase.hpp>
 
 #include <doctest/doctest.h>
 
@@ -25,6 +29,8 @@ bool AreAllLayerInputSlotsConnected(const armnn::IConnectableLayer& layer)
 }
 
 }
+
+using namespace armnn;
 
 TEST_SUITE("Network")
 {
@@ -660,4 +666,258 @@ TEST_CASE("CheckNullDescriptor")
     CHECK(descriptor.IsNull() == true);
 }
 
+/**
+ * This test object will return the value of isActivationSupported to calls on IsActivationSupported.
+ */
+class ActivationLayerSupport : public LayerSupportBase
+{
+public:
+    ActivationLayerSupport(const bool isActivationSupported)
+        : m_ActivationSupported(isActivationSupported)
+    {}
+
+    bool IsLayerSupported(const LayerType& type,
+                          const std::vector<TensorInfo>& infos,
+                          const BaseDescriptor& descriptor,
+                          const Optional<LstmInputParamsInfo>& /*lstmParamsInfo*/,
+                          const Optional<QuantizedLstmInputParamsInfo>& /*quantizedLstmParamsInfo*/,
+                          Optional<std::string&> reasonIfUnsupported) const override
+    {
+        switch (type)
+        {
+            case LayerType::Input:
+                return IsInputSupported(infos[0], reasonIfUnsupported);
+            case LayerType::Output:
+                return IsOutputSupported(infos[0], reasonIfUnsupported);
+            case LayerType::Activation:
+                return IsActivationSupported(infos[0], infos[1],
+                                             *(PolymorphicDowncast<const ActivationDescriptor*>(&descriptor)),
+                                             reasonIfUnsupported);
+            default:
+                return false;
+        }
+    }
+
+    bool IsInputSupported(const TensorInfo& /*input*/,
+                          Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
+    {
+        return true;
+    }
+
+    bool IsOutputSupported(const TensorInfo& /*input*/,
+                           Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
+    {
+        return true;
+    }
+
+    bool IsActivationSupported(const TensorInfo& /*input0*/,
+                               const TensorInfo& /*output*/,
+                               const ActivationDescriptor& /*descriptor*/,
+                               Optional<std::string&> /*reasonIfUnsupported = EmptyOptional()*/) const
+    {
+        // return the valuer as set in the test object constructor.
+        return m_ActivationSupported;
+    }
+
+    bool m_ActivationSupported;
+};
+
+/**
+ * This test backend has the value it returns for AllOrNothing capability and passes down an activation supported value
+ * to an ActivationLayerSupport test object.
+ */
+template <typename NamePolicy>
+class AllOrNothingBackend : public IBackendInternal
+{
+public:
+    AllOrNothingBackend(const bool allOrNothingValue, const bool isActivationSupported)
+        : m_BackendCapabilities(NamePolicy::GetIdStatic(), { { "AllOrNothing", allOrNothingValue } })
+        , m_CustomAllocator(false)
+        , m_ActivationSupported(isActivationSupported){};
+    AllOrNothingBackend(const BackendCapabilities& capabilities)
+        : m_BackendCapabilities(capabilities)
+        , m_CustomAllocator(false){};
+    ~AllOrNothingBackend() = default;
+
+    static const BackendId& GetIdStatic()
+    {
+        return NamePolicy::GetIdStatic();
+    }
+    const BackendId& GetId() const override
+    {
+        return GetIdStatic();
+    }
+
+    IBackendInternal::IMemoryManagerUniquePtr CreateMemoryManager() const override
+    {
+        return nullptr;
+    };
+
+    IBackendInternal::IWorkloadFactoryPtr
+        CreateWorkloadFactory(const IBackendInternal::IMemoryManagerSharedPtr&) const override
+    {
+        return nullptr;
+    }
+
+    IBackendInternal::IBackendContextPtr CreateBackendContext(const IRuntime::CreationOptions&) const override
+    {
+        return nullptr;
+    }
+
+    IBackendInternal::ILayerSupportSharedPtr GetLayerSupport() const override
+    {
+        return std::make_shared<ActivationLayerSupport>(m_ActivationSupported);
+    }
+
+    OptimizationViews OptimizeSubgraphView(const SubgraphView&) const override
+    {
+        return {};
+    };
+
+    BackendCapabilities GetCapabilities() const override
+    {
+        return m_BackendCapabilities;
+    };
+
+    virtual bool UseCustomMemoryAllocator(std::shared_ptr<ICustomAllocator>, armnn::Optional<std::string&>) override
+    {
+        m_CustomAllocator = true;
+        return m_CustomAllocator;
+    }
+
+    BackendCapabilities m_BackendCapabilities;
+    bool m_CustomAllocator;
+    bool m_ActivationSupported;
+};
+
+/**
+ * Create a mock backend with AllOrNothing enabled that doesn't support any activation layers. Pass a network with an
+ * activation layer. The backend should be rejected and a suitable warning message observed.
+ */
+TEST_CASE("AllOrNothingBackendSimpleTest")
+{
+
+    struct AllOrNothingPolicy
+    {
+        static const BackendId& GetIdStatic()
+        {
+            static BackendId id = "AllOrNothingBackend";
+            return id;
+        }
+    };
+
+    auto& backendRegistry = BackendRegistryInstance();
+    backendRegistry.Register("AllOrNothingBackend",
+                             []() { return std::make_unique<AllOrNothingBackend<AllOrNothingPolicy>>(true, false); });
+
+    // Define the network
+    auto network = INetwork::Create();
+    ActivationDescriptor desc;
+    desc.m_Function = ActivationFunction::Linear;
+
+    std::unique_ptr<armnn::Graph> graph = std::make_unique<armnn::Graph>();
+    auto input                          = graph->AddLayer<InputLayer>(0, "input");
+    auto act                            = graph->AddLayer<ActivationLayer>(desc, "activation");
+    auto output                         = graph->AddLayer<OutputLayer>(0, "output");
+
+    input->GetOutputSlot(0).Connect(act->GetInputSlot(0));
+    act->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    OptimizedNetworkImpl optNet(std::move(graph));
+
+    // Get the optimized graph
+    Graph& optGraph = optNet.GetGraph();
+
+    std::vector<BackendId> prefs{ "AllOrNothingBackend" };
+
+    BackendIdSet availableBackends = { "AllOrNothingBackend" };
+    DeviceSpec spec(availableBackends);
+
+    BackendSettings backendSettings(prefs, spec);
+
+    // Assign an available backend to each layer
+    Graph::Iterator firstLayer = optGraph.begin();
+    Graph::Iterator lastLayer  = optGraph.end();
+
+    OptimizedNetworkImpl* optNetObjPtr = &optNet;
+    std::vector<std::string> messages;
+    OptimizationResult res = AssignBackends(optNetObjPtr, backendSettings, firstLayer, lastLayer, messages);
+
+    CHECK(res.IsError());    // The error came from no backends available.
+    // We expect 2 message. AllOrNothingBackend and then no backends available.
+    CHECK(messages.size() == 2);
+    CHECK(messages[0].find("AllOrNothingBackend") != std::string::npos);
+}
+
+/**
+ * With two mock backends registered the first of which is an AllOrNothing and the second isn't. Pass a network with
+ * multiple layers one of which is an activation which will be rejected by the preferred backend. AssignBackends should
+ * return all OK but with a suitable warning message about the first backend being rejected.
+ */
+TEST_CASE("AllOrNothingBackendComplexTest")
+{
+    struct AllOrNothingPolicyTrue
+    {
+        static const BackendId& GetIdStatic()
+        {
+            static BackendId id = "AllOrNothingBackendTrue";
+            return id;
+        }
+    };
+    struct AllOrNothingPolicyFalse
+    {
+        static const BackendId& GetIdStatic()
+        {
+            static BackendId id = "AllOrNothingBackendFalse";
+            return id;
+        }
+    };
+
+    auto& backendRegistry = BackendRegistryInstance();
+    backendRegistry.Register("AllOrNothingBackendTrue", []() {
+        return std::make_unique<AllOrNothingBackend<AllOrNothingPolicyTrue>>(true, false);
+    });
+    backendRegistry.Register("AllOrNothingBackendFalse", []() {
+        return std::make_unique<AllOrNothingBackend<AllOrNothingPolicyFalse>>(false, true);
+    });
+
+    // Define the network
+    auto network = INetwork::Create();
+    ActivationDescriptor desc;
+    desc.m_Function = ActivationFunction::Linear;
+
+    std::unique_ptr<armnn::Graph> graph = std::make_unique<armnn::Graph>();
+    auto input                          = graph->AddLayer<InputLayer>(0, "input");
+    auto act                            = graph->AddLayer<ActivationLayer>(desc, "activation");
+    auto output                         = graph->AddLayer<OutputLayer>(0, "output");
+
+    input->GetOutputSlot(0).Connect(act->GetInputSlot(0));
+    act->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    OptimizedNetworkImpl optNet(std::move(graph));
+
+    // Get the optimized graph
+    Graph& optGraph = optNet.GetGraph();
+
+    // We'll try the AllOrNothingBackendTrue first this should be rejected in favour of AllOrNothingBackendFalse.
+    std::vector<BackendId> prefs{ "AllOrNothingBackendTrue", "AllOrNothingBackendFalse" };
+
+    BackendIdSet availableBackends = { "AllOrNothingBackendTrue", "AllOrNothingBackendFalse" };
+    DeviceSpec spec(availableBackends);
+
+    BackendSettings backendSettings(prefs, spec);
+
+    // Assign an available backend to each layer
+    Graph::Iterator firstLayer = optGraph.begin();
+    Graph::Iterator lastLayer  = optGraph.end();
+
+    OptimizedNetworkImpl* optNetObjPtr = &optNet;
+    std::vector<std::string> messages;
+    OptimizationResult res = AssignBackends(optNetObjPtr, backendSettings, firstLayer, lastLayer, messages);
+
+    CHECK(res.IsOk());    // No error as AllOrNothingBackendFalse should be able to take the network.
+    // We do expect a warning message. AllOrNothingBackend rejecting the AllOrNothingBackendTrue backend.
+    CHECK(messages.size() == 1);
+    CHECK(messages[0].find("AllOrNothingBackendTrue") != std::string::npos);
+}
 }

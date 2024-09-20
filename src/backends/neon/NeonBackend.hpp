@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -22,7 +22,8 @@ const BackendCapabilities cpuAccCapabilities("CpuAcc",
                                                      {"ExternallyManagedMemory", true},
                                                      {"MultiAxisPacking", false},
                                                      {"SingleAxisPacking", true},
-                                                     {"HasFp16", arm_compute::CPUInfo::get().has_fp16()}
+                                                     {"HasFp16", arm_compute::CPUInfo::get().has_fp16()},
+                                                     {"AllOrNothing", false}
                                              });
 
 

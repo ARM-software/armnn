@@ -285,6 +285,7 @@ BackendCapabilities ClBackend::GetCapabilities() const
                                                      {"ExternallyManagedMemory", true},
                                                      {"MultiAxisPacking", false},
                                                      {"SingleAxisPacking", true},
+                                                     {"AllOrNothing", false},
                                                      {"HasFp16", arm_compute::CLKernelLibrary::get().fp16_supported()}
                                                  });
 }

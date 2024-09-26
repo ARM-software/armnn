@@ -49,20 +49,24 @@ inline bool CheckRequestedBackendsAreValid(const std::vector<armnn::BackendId>& 
     }
 
     armnn::BackendIdSet validBackendIds = armnn::BackendRegistryInstance().GetBackendIds();
-
     bool allValid = true;
     for (const auto& backendId : backendIds)
     {
         if (std::find(validBackendIds.begin(), validBackendIds.end(), backendId) == validBackendIds.end())
         {
-            allValid = false;
-            if (invalidBackendIds)
+            // Validation at least one mapped Gpu All or nothing backend done in Optimization after runtime loaded
+            // so bypass GpuAcc validation if it is first in the list
+            if (!(backendId == armnn::BackendId("GpuAcc") && backendIds[0] == armnn::BackendId("GpuAcc")))
             {
-                if (!invalidBackendIds.value().empty())
+                allValid = false;
+                if (invalidBackendIds)
                 {
-                    invalidBackendIds.value() += ", ";
+                    if (!invalidBackendIds.value().empty())
+                    {
+                        invalidBackendIds.value() += ", ";
+                    }
+                    invalidBackendIds.value() += backendId;
                 }
-                invalidBackendIds.value() += backendId;
             }
         }
     }

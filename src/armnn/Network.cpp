@@ -1968,18 +1968,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     ProfilerManager::GetInstance().RegisterProfiler(profiler.get());
     profiler->EnableProfiling(options.GetProfilingEnabled());
 
-    // Some backends don't play well together. Check here before continuing.
-    {
-        std::set<BackendId> backendSet(backendPreferences.begin(), backendPreferences.end());
-        // GpuFsa cannot co-exist with GpuAcc.
-        if (backendSet.find("GpuFsa") != backendSet.end() &&
-            backendSet.find("GpuAcc") != backendSet.end())
-        {
-            throw InvalidArgumentException("The backends \"GpuAcc\" and \"GpuFsa\" cannot be specified "
-                                           "for the same optimized network.");
-        }
-    }
-
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer");
     if (backendPreferences.empty())
     {
@@ -2069,13 +2057,43 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat32(),
                                                 FuseBatchNormIntoDepthwiseConvolution2DFloat16()));
 
+    const std::vector<BackendId> mappedGpuBackends = BackendRegistryInstance().GetMappedGpuBackends();
+
+    // All or nothing Gpu backends cannot be used as fallback
+    for (auto backend : mappedGpuBackends)
+    {
+        if (std::count(backendPreferences.begin(), backendPreferences.end(), backend)
+            && (backendPreferences[0] != backend) &&
+            (backendPreferences[0] != armnn::BackendId("GpuAcc")))
+        {
+            std::stringstream failureMsg;
+            failureMsg << backend << " backend cannot be specified as fallback.";
+            ReportError(failureMsg.str(), messages);
+            throw InvalidArgumentException(failureMsg.str());
+        }
+    }
+
+    std::vector<BackendId> amendedBackendPreferences = backendPreferences;
+    std::unordered_set<BackendId> supportedBackends = armnn::BackendRegistryInstance().GetBackendIds();
+    if (amendedBackendPreferences[0] == armnn::BackendId("GpuAcc"))
+    {
+        // Add mapped Gpu backends if not already there and GpuAcc is first backend requested
+        for (auto backend : mappedGpuBackends)
+        {
+            if (!std::count(amendedBackendPreferences.begin(), amendedBackendPreferences.end(), backend))
+            {
+                amendedBackendPreferences.insert(amendedBackendPreferences.begin(), backend);
+            }
+        }
+    }
+
     // Initialize backend settings
-    BackendSettings backendSettings(backendPreferences, deviceSpec);
+    BackendSettings backendSettings(amendedBackendPreferences, deviceSpec);
     auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
     if (availablePreferredBackends.empty())
     {
         std::stringstream failureMsg;
-        failureMsg << "None of the preferred backends " << backendPreferences
+        failureMsg << "None of the preferred backends " << amendedBackendPreferences
                    << " are supported. Current platform provides " << backendSettings.m_SupportedBackends;
         ReportError(failureMsg.str(), messages);
         throw InvalidArgumentException(failureMsg.str());

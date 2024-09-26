@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -49,6 +49,8 @@ public:
     std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> GetAllocators();
     void RegisterMemoryOptimizerStrategy(const BackendId& id, std::shared_ptr<IMemoryOptimizerStrategy> strategy);
     MemoryOptimizerStrategiesMapRef GetMemoryOptimizerStrategies();
+    void AddMappedGpuBackend(const BackendId& id);
+    BackendIdVector GetMappedGpuBackends();
 
     BackendRegistry() {}
     virtual ~BackendRegistry() {}
@@ -81,6 +83,7 @@ private:
     armnn::Optional<arm::pipe::IProfilingService&> m_ProfilingService;
     std::unordered_map<BackendId, std::shared_ptr<ICustomAllocator>> m_CustomMemoryAllocatorMap;
     std::unordered_map<BackendId, std::shared_ptr<IMemoryOptimizerStrategy>> m_MemoryOptimizerStrategyMap;
+    BackendIdVector m_MappedGpuBackends = {};
 };
 
 BackendRegistry& BackendRegistryInstance();

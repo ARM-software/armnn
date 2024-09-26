@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -150,6 +150,16 @@ void BackendRegistry::DeregisterMemoryOptimizerStrategy(const BackendId &id)
 MemoryOptimizerStrategiesMapRef BackendRegistry::GetMemoryOptimizerStrategies()
 {
     return m_MemoryOptimizerStrategyMap;
+}
+
+void BackendRegistry::AddMappedGpuBackend(const BackendId& id)
+{
+    m_MappedGpuBackends.insert(m_MappedGpuBackends.begin(), id);
+}
+
+BackendIdVector BackendRegistry::GetMappedGpuBackends()
+{
+    return m_MappedGpuBackends;
 }
 
 } // namespace armnn

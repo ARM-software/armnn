@@ -6,6 +6,7 @@
 #include "LoadedNetwork.hpp"
 #include "Layer.hpp"
 #include "Graph.hpp"
+#include "Markers.hpp"
 #include "Profiling.hpp"
 #include "HeapProfiling.hpp"
 #include "WorkingMemHandle.hpp"
@@ -623,6 +624,7 @@ LoadedNetwork::LoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
             workload->Execute();
         }
     }
+    MARK_OPTIMIZED_NETWORK_LOADED()
 }
 
 void LoadedNetwork::AllocateAndExecuteConstantWorkloads()
@@ -1341,7 +1343,10 @@ bool LoadedNetwork::Execute(std::unique_ptr<TimelineUtilityMethods>& timelineUti
                     workloadInferenceID = timelineUtils->RecordWorkloadInferenceAndStartOfLifeEvent(workload->GetGuid(),
                                                                                                     inferenceGuid);
                 }
+
+                MARK_WORKLOAD_EXECUTION_BEGIN();
                 workload->Execute();
+                MARK_WORKLOAD_EXECUTION_END();
                 if(timelineUtils)
                 {
                     timelineUtils->RecordEndOfLifeEvent(workloadInferenceID);
@@ -1349,9 +1354,11 @@ bool LoadedNetwork::Execute(std::unique_ptr<TimelineUtilityMethods>& timelineUti
             }
         };
 
+        MARK_INFERENCE_EXECUTION_BEGIN();
         ExecuteQueue(m_InputQueue);
         ExecuteQueue(m_WorkloadQueue);
         ExecuteQueue(m_OutputQueue);
+        MARK_INFERENCE_EXECUTION_END();
     }
     catch (const RuntimeException& error)
     {

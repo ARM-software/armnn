@@ -199,9 +199,16 @@ build_flatbuffers()
 download_tensorflow()
 {
   cd "$SOURCE_DIR"
-
+  git config --global http.postBuffer 524288000
   echo -e "\n***** Downloading TensorFlow *****"
-  git clone https://github.com/tensorflow/tensorflow.git
+  # Attempt to clone Tensorflow, wait 60 second between attempts. Max 5 tries
+  n=0
+  until [ $n -ge 5 ]
+  do
+    git clone https://github.com/tensorflow/tensorflow.git && break
+    n=$[$n+1]
+    sleep 60
+  done
   cd "$TENSORFLOW_SRC"
 
   git checkout "$TENSORFLOW_VERSION"

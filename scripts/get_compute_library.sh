@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b69e228dac518dbcc8f768a5a7aa27a6ec579e72" # 12522: fix: build for Android™ OS build on armv7a
+DEFAULT_CLFRAMEWORKREVISION="73eca2a04c8de2845d801b7dcd889a65a239f38c" # 12471: fix: softmax SME2 kernel selection
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

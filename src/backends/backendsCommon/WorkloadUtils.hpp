@@ -51,7 +51,7 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
 
     TensorShape srcStrides      = srcTensor->GetStrides();
     const TensorShape& srcShape = srcTensor->GetShape();
-    const auto srcSize          = srcTensor->GetStrides()[0] * srcShape[0];
+    auto srcSize                = srcTensor->GetStrides()[0] * srcShape[0];
     TensorShape dstStrides      = dstTensor->GetStrides();
     const TensorShape& dstShape = dstTensor->GetShape();
     const auto dstSize          = dstTensor->GetStrides()[0] * dstShape[0];
@@ -133,6 +133,16 @@ void CopyTensorContentsGeneric(const ITensorHandle* srcTensor, ITensorHandle* ds
     size_t copyHeight  = std::min(srcHeight, dstHeight);
     size_t copyBatches = std::min(srcBatches, dstBatches);
     size_t copyDepth   = std::min(srcDepth, dstDepth);
+
+    // Edge case fix for DTS 1.In1D_Int32End & 5.In1D_Int32End, This was down to how ACL handled 1D tensors.
+    if(copyLength != srcSize        &&
+       srcSize != dstSize           &&
+       srcWidthStride == copyLength &&
+       srcWidthStride == dstSize)
+    {
+        srcSize = dstSize;
+        srcWidthStride = dstWidthStride;
+    }
 
     // Coalesce inner dimensions where possible
     // to reduce overheard calling copy() and to

@@ -22,6 +22,8 @@ list(APPEND armnnTosaBackendOperators_sources
         Conv2dOperator.cpp
         Conv3dOperator.hpp
         Conv3dOperator.cpp
+        DepthToSpaceOperator.hpp
+        DepthToSpaceOperator.cpp
         DepthwiseConv2dOperator.hpp
         DepthwiseConv2dOperator.cpp
         DequantizeOperator.hpp

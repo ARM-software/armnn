@@ -11,6 +11,7 @@
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution3dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
+#include <backendsCommon/test/DepthToSpaceEndToEndTestImpl.hpp>
 #include "backendsCommon/test/DepthwiseConvolution2dEndToEndTests.hpp"
 #include <backendsCommon/test/DequantizeEndToEndTestImpl.hpp>
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
@@ -595,6 +596,32 @@ TEST_CASE("TosaRefDequantizeEndToEndSimpleInt16Test")
 TEST_CASE("TosaRefDequantizeEndToEndOffsetInt16Test")
 {
     DequantizeEndToEndOffset<DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+// DepthToSpace
+TEST_CASE("TosaRefDepthToSpaceEndToEndNhwcFloat32")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefDepthToSpaceEndToEndNhwcFloat16")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefDepthToSpaceEndToEndNhwcInt8")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefDepthToSpaceEndToEndNhwcInt16")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefDepthToSpaceEndToEndNhwcSigned32")
+{
+    DepthToSpaceEndToEnd<armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
 }
 
 // Reduce

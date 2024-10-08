@@ -25,6 +25,16 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
                                            const Optional<QuantizedLstmInputParamsInfo>& quantizedLstmInputParamsInfo,
                                            Optional<std::string&> reasonIfUnsupported) const
 {
+    for (const auto& info : infos)
+    {
+        if (info.GetDataType() == DataType::Signed64 ||
+            info.GetDataType() == DataType::QAsymmU8)
+        {
+            reasonIfUnsupported.value() = "TOSA does not have INT64 or unsigned INT support for TOSARef backend";
+            return false;
+        }
+    }
+
     IgnoreUnused(lstmParamsInfo);
     IgnoreUnused(quantizedLstmInputParamsInfo);
     IgnoreUnused(reasonIfUnsupported);
@@ -109,6 +119,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
             break;
         }
         case LayerType::Activation:
+        case LayerType::DepthToSpace:
         case LayerType::Dequantize:
         case LayerType::ElementwiseUnary:
         case LayerType::Pad:

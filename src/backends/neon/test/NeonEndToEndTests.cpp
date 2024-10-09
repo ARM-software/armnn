@@ -17,6 +17,7 @@
 #include <backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp>
 #include <backendsCommon/test/FillEndToEndTestImpl.hpp>
+#include <backendsCommon/test/GatherNdEndToEndTestImpl.hpp>
 #include <backendsCommon/test/InstanceNormalizationEndToEndTestImpl.hpp>
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
 #include <backendsCommon/test/PreluEndToEndTestImpl.hpp>
@@ -307,6 +308,37 @@ TEST_CASE("DequantizeEndToEndSimpleTest")
 TEST_CASE("DequantizeEndToEndOffsetTest")
 {
     DequantizeEndToEndOffset<armnn::DataType::QAsymmU8>(neonDefaultBackends);
+}
+
+// GatherNd
+TEST_CASE("NeonGatherNdFloatTest")
+{
+    GatherNdEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonGatherNdUint8Test")
+{
+    GatherNdEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonGatherNdInt16Test")
+{
+    GatherNdEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonGatherNdMultiDimFloatTest")
+{
+    GatherNdMultiDimEndToEnd<armnn::DataType::Float32>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonGatherNdMultiDimUint8Test")
+{
+    GatherNdMultiDimEndToEnd<armnn::DataType::QAsymmU8>(neonDefaultBackends);
+}
+
+TEST_CASE("NeonGatherNdMultiDimInt16Test")
+{
+    GatherNdMultiDimEndToEnd<armnn::DataType::QSymmS16>(neonDefaultBackends);
 }
 
 // Activations

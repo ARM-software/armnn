@@ -93,7 +93,7 @@ Model options is a vector of name value pairs contained inside OptimizerOptions.
 
 Arm NN Parameter | Delegate  | Support library | Values | Description
 :--------------- | :-------- | :-------------- | :----- | :----------
-FastMathEnabled  | enable-fast-math | enable-fast-math | ["true"/"false"] | Enables fast_math options in backends that support it.
+FastMathEnabled  | enable-fast-math | enable-fast-math | ["true"/"false"] | Enables fast_math options in backends that support it. If fastmath is enabled, Arm NN will automatically enable reduceFp32ToFp16 for models which have FP16 weights and biases and FP32 layers.
 SaveCachedNetwork| save-cached-network |save-cached-network | ["true"/"false"] | Enables saving the cached network to the file given with cached-network-file option.
 CachedNetworkFilePath| cached-network-filepath |cached-network-file | String file path | If non-empty, the given file will be used to load/save cached network. If save-cached-network option is given will save the cached network to given file. If save-cached-network option is not given will load the cached network from given file.
 MLGOTuningFilePath |gpu-mlgo-tuning-file | mlgo-cl-tuned-parameters-file | String file path | If non-empty, the given file will be used to load/save MLGO CL tuned parameters. 
@@ -103,7 +103,7 @@ KernelProfilingEnabled | gpu-kernel-profiling-enabled | (Not available) | ["true
 
 Arm NN Parameter | Delegate  | Support library | Values | Description
 :--------------- | :-------- | :-------------- | :---   | :----------
-FastMathEnabled  | enable-fast-math | enable-fast-math | ["true"/"false"] | Enables fast_math options in backends that support it.
+FastMathEnabled  | enable-fast-math | enable-fast-math | ["true"/"false"] | Enables fast_math options in backends that support it. If fastmath is enabled, Arm NN will automatically enable reduceFp32ToFp16 for models which have FP16 weights and biases and FP32 layers.
 NumberOfThreads  | number-of-threads | number-of-threads | Integer [1-64] | Assign the number of threads used by the CpuAcc backend. Input value must be between 1 and 64. Default is set to 0 (Backend will decide number of threads to use).
 
 @subsection ethosnmodeloptions EthosNAcc backend model options

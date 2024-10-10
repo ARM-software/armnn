@@ -1941,6 +1941,63 @@ OptimizationResult SelectTensorHandleStrategy(Graph& optGraph,
     return result;
 }
 
+bool CheckFastMathSupport(const std::vector<BackendId>& availablePreferredBackends,
+                          const ModelOptions& modelOptions)
+{
+    bool hasFastMath = false;
+    // Check if the first preferred backend has Fastmath support
+    auto firstBackend = availablePreferredBackends[0];
+
+    if (!modelOptions.empty())
+    {
+        ParseOptions(modelOptions, firstBackend, [&](std::string name, const BackendOptions::Var& value)
+        {
+            if (name == "FastMathEnabled")
+            {
+                hasFastMath = value.AsBool();
+                ARMNN_LOG(debug) << "The first available preferred backend: " << firstBackend
+                                 << ", has FastMath support.";
+            }
+        });
+    }
+    else
+    {
+        ARMNN_LOG(warning) << "The first available preferred backend: " << firstBackend
+                           << ", does not have FastMath support. "
+                           << "Support for Turbo mode for TfLite post quantized FP16 models wil be disabled.";
+    }
+
+    return hasFastMath;
+}
+
+bool IsTfLiteTurboModel(const Graph& optGraph)
+{
+    // We will define a TfLiteTurboModel as follows:
+    // All constant layers which are followed by a dequantize layer convert from Fp16 to FP32
+    // There must be at least one constant layer to dequantize layer converting from FP16 to Fp32
+    Graph::ConstIterator firstLayer = optGraph.begin();
+    Graph::ConstIterator lastLayer = optGraph.end();
+
+    for (auto it = firstLayer; it != lastLayer; ++it)
+    {
+        auto layer = *it;
+        if (layer->GetType() == LayerType::Constant)
+        {
+            auto& connectedLayer = layer->GetOutputSlot(0).GetConnection(0)->GetOwningLayer();
+            if (connectedLayer.GetType() == LayerType::Dequantize)
+            {
+                if(!(connectedLayer.GetInputSlot(0).GetTensorInfo().GetDataType() == DataType::Float16 &&
+                   connectedLayer.GetOutputSlot(0).GetTensorInfo().GetDataType() == DataType::Float32))
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+
 // Forwarding function to remain backward compatible with legacy OptimizerOptions
 IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                               const std::vector<BackendId>& backendPreferences,
@@ -2028,13 +2085,41 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         optGraph.InferTensorInfos();
     }
 
+    // Initialize backend settings
+    BackendSettings backendSettings(backendPreferences, deviceSpec);
+    auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
+    if (availablePreferredBackends.empty())
+    {
+        std::stringstream failureMsg;
+        failureMsg << "None of the preferred backends " << backendPreferences
+                   << " are supported. Current platform provides " << backendSettings.m_SupportedBackends;
+        ReportError(failureMsg.str(), messages);
+        throw InvalidArgumentException(failureMsg.str());
+    }
+
+    // Create a map to temporarily hold initialized backend objects
+    TensorHandleFactoryRegistry tensorHandleFactoryRegistry;
+    BackendsMap backends = CreateSupportedBackends(tensorHandleFactoryRegistry, backendSettings);
+    bool hasFp16 = CheckFp16Support(backends, availablePreferredBackends);
+
+    bool reduceFp32ToFp16 = options.GetReduceFp32ToFp16();
+    // If fp16 is supported on the backend and fastmath has been enabled and the model is a TfLite converted Fp16
+    // model: enable turbo mode optimizations
+    if (hasFp16 && CheckFastMathSupport(availablePreferredBackends, optimizedOptions) && IsTfLiteTurboModel(optGraph))
+    {
+        Optimizer::Pass(optGraph, MakeOptimizations(TurboConvertConstDequantisationLayersToConstLayers()));
+        reduceFp32ToFp16 = true;
+    }
+    else
+    {
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstDequantisationLayersToConstLayers()));
+    }
+
     // Group Constant Layer optimizations together where possible.
     // This is important as:
     // FusePermuteIntoConstantLayer must happen before FoldPadIntoDepthwiseConvolution2d and
     // FuseBatchNormIntoDepthwiseConvolution2D.
-    // ConvertConstDequantisationLayersToConstLayers must happen before FoldPadIntoConvolution2d
-    Optimizer::Pass(optGraph, MakeOptimizations(FusePermuteIntoConstLayer(),
-                                                ConvertConstDequantisationLayersToConstLayers()));
+    Optimizer::Pass(optGraph, MakeOptimizations(FusePermuteIntoConstLayer()));
     // Perform optimisation passes
     Optimizer::Pass(optGraph, MakeOptimizations(SquashEqualPermuteSiblings(),
                                                 SquashEqualTransposeSiblings(),
@@ -2087,33 +2172,12 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         }
     }
 
-    // Initialize backend settings
-    BackendSettings backendSettings(amendedBackendPreferences, deviceSpec);
-    auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
-    if (availablePreferredBackends.empty())
+    if (reduceFp32ToFp16 && hasFp16)
     {
-        std::stringstream failureMsg;
-        failureMsg << "None of the preferred backends " << amendedBackendPreferences
-                   << " are supported. Current platform provides " << backendSettings.m_SupportedBackends;
-        ReportError(failureMsg.str(), messages);
-        throw InvalidArgumentException(failureMsg.str());
+        ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToFp16");
+        Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
+        Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
     }
-
-    // Create a map to temporarily hold initialized backend objects
-    TensorHandleFactoryRegistry tensorHandleFactoryRegistry;
-    BackendsMap backends = CreateSupportedBackends(tensorHandleFactoryRegistry, backendSettings);
-
-    if (options.GetReduceFp32ToFp16())
-    {
-        bool hasFp16 = CheckFp16Support(backends, availablePreferredBackends);
-        if (hasFp16)
-        {
-            ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Optimizer_ReduceFp32ToFp16");
-            Optimizer::Pass(optGraph, MakeOptimizations(Fp32NetworkToFp16Converter()));
-            Optimizer::Pass(optGraph, MakeOptimizations(ConvertConstantsFloatToHalf()));
-        }
-    }
-
     // Assign an available backend to each layer
     Graph::Iterator firstLayer = optGraph.begin();
     Graph::Iterator lastLayer  = optGraph.end();

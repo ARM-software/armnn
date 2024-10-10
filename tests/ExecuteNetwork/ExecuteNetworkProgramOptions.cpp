@@ -365,6 +365,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                 ("enable-fast-math",
                  "Enables fast_math options in backends that support it. Using the fast_math flag "
                  "can lead to performance improvements but may result in reduced or different precision. "
+                 "If enable-fast-math has been set, Arm NN will automatically enable fp16-turbo mode for models"
+                 "which have FP16 weights and biases and FP32 layers."
                  "Supported on CpuAcc and GpuAcc only.",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableFastMath)->default_value("false")->implicit_value("true"))
 
@@ -395,6 +397,8 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "weights and biases will be converted to FP16 where the backend supports it. "
                  "If the first preferred backend does not have FP16 support, this option will be disabled. "
                  "If the value of converted FP16 is infinity, round to the closest finite FP16 value."
+                 "If enable-fast-math has been set, Arm NN will automatically enable fp16-turbo mode for models"
+                 "which have FP16 weights and biases and FP32 layers."
                  "Supported on CpuAcc and GpuAcc only.",
                  cxxopts::value<bool>(m_ExNetParams.m_EnableFp16TurboMode)
                          ->default_value("false")->implicit_value("true"))

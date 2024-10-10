@@ -24,3 +24,4 @@
 #include "PermuteDepthwiseConv2dWeights.hpp"
 #include "SquashEqualSiblings.hpp"
 #include "TransposeAsReshape.hpp"
+#include "TurboConvertConstDequantisationLayersToConstLayers.hpp"

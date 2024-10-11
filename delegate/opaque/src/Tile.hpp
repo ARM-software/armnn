@@ -9,6 +9,22 @@
 
 namespace armnnOpaqueDelegate
 {
+std::vector<int32_t> getMultiplesData(armnn::DataType dataType, const TfLiteOpaqueTensor* tfLiteTensor)
+{
+    auto multiplesTensorNum = TfLiteOpaqueTensorDim(tfLiteTensor, 0);
+    // If the Multiples Datatype is Signed64 we need to cast the values different otherwise an error is thrown.
+    if(dataType == armnn::DataType::Signed64)
+    {
+        auto multiplesTensorDataPtr = static_cast<int64_t*>(TfLiteOpaqueTensorData(tfLiteTensor));
+        return {multiplesTensorDataPtr, multiplesTensorDataPtr + multiplesTensorNum};
+    }
+    else
+    {
+        auto multiplesTensorDataPtr = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLiteTensor));
+        return {multiplesTensorDataPtr, multiplesTensorDataPtr + multiplesTensorNum};
+    }
+}
+
 TfLiteStatus ValidateTileOperator(DelegateData& delegateData,
                                   TfLiteOpaqueContext *tfLiteContext,
                                   const armnn::TensorInfo& inputInfo,
@@ -115,9 +131,7 @@ TfLiteStatus VisitTileOperator(DelegateData& delegateData,
 
     // Get the Multiples data: In armnn, the values of the multiples input tensor is saved in the operator descriptor
     // We have to read it from the input tensor and write it the descriptor
-    auto* multiplesTensorDataPtr = static_cast<int32_t*>(TfLiteOpaqueTensorData(tfLiteMultiplesTensor));
-    auto multiplesTensorNum = TfLiteOpaqueTensorDim(tfLiteMultiplesTensor, 0);
-    std::vector<int32_t> multiplesIntData(multiplesTensorDataPtr, multiplesTensorDataPtr + multiplesTensorNum);
+    auto multiplesIntData = getMultiplesData(multiplesTensorInfo.GetDataType(), tfLiteMultiplesTensor);
 
     // The multiples must be positive
     for (auto multiple : multiplesIntData)

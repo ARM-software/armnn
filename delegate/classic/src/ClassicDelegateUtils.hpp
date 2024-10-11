@@ -433,7 +433,7 @@ armnn::TensorInfo GetTensorInfoForTfLiteTensor(const TfLiteTensor& tfLiteTensor,
             }
             if (areAllScalesSame)
             {
-                ret.SetDataType(armnn::DataType::QAsymmS8);
+                ret.SetDataType(type);
                 ret.SetQuantizationScale(affineQuantization->scale->data[0]);
                 ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
             }

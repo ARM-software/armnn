@@ -343,6 +343,14 @@ void ArmNNExecutor::ExecuteSync()
             throw armnn::Exception("IRuntime::EnqueueWorkload failed");
         }
 
+        // This is an easy point to sort m_OutputTensorsVec[x] based on the binding ID. This makes life easier when
+        // comparing outputs against TfLite runtime.
+        std::sort(m_OutputTensorsVec[x].begin(), m_OutputTensorsVec[x].end(),
+                  [](const auto& op1, const auto& op2)
+                  {
+                      return op1.first < op2.first;
+                  });
+
         if(!m_Params.m_DontPrintOutputs)
         {
             PrintOutputTensors(&m_OutputTensorsVec[x],  x);

@@ -548,9 +548,15 @@ armnn::TensorInfo GetTensorInfoForTfLiteOpaqueTensor(const TfLiteOpaqueTensor* t
                     break;
                 }
             }
-            if (areAllScalesSame)
+            if (areAllScalesSame && type != armnn::DataType::QSymmS8)
             {
                 ret.SetDataType(type);
+                ret.SetQuantizationScale(affineQuantization->scale->data[0]);
+                ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
+            }
+            else if(areAllScalesSame)
+            {
+                ret.SetDataType(armnn::DataType::QAsymmS8);
                 ret.SetQuantizationScale(affineQuantization->scale->data[0]);
                 ret.SetQuantizationOffset(affineQuantization->zero_point->data[0]);
             }

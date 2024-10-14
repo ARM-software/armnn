@@ -19,16 +19,14 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
                               int nodeIndex,
                               int32_t tfLitePadOperatorCode)
 {
+    // Validate Output
     TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
 
     switch(tfLitePadOperatorCode)
     {
         case kTfLiteBuiltinMirrorPad:
         case kTfLiteBuiltinPad:
-            TF_LITE_ENSURE_STATUS(ValidateNumInputs(tfLiteContext, tfLiteNode, 2, nodeIndex));
-            break;
         case kTfLiteBuiltinPadv2:
-            TF_LITE_ENSURE_STATUS(ValidateNumInputs(tfLiteContext, tfLiteNode, 3, nodeIndex));
             break;
         default:
             return kTfLiteError;
@@ -60,6 +58,16 @@ TfLiteStatus VisitPadOperator(DelegateData& delegateData,
     const armnn::TensorInfo& inputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteInputTensor);
     const armnn::TensorInfo& paddingTensorInfo = GetTensorInfoForTfLiteTensor(tfLitepaddingTensor);
     const armnn::TensorInfo& outputTensorInfo = GetTensorInfoForTfLiteTensor(tfLiteOutputTensor, true);
+
+    // Check for zero dimension tensors in the Input Tensors.
+    if(ZeroDimPresent({inputTensorInfo}))
+    {
+        TF_LITE_MAYBE_KERNEL_LOG(
+            tfLiteContext,
+            "TfLiteArmnnDelegate: Zero dimension tensors are not supported in operator #%d node #%d: ",
+            tfLitePadOperatorCode, nodeIndex);
+        return kTfLiteError;
+    }
 
     // Get the padding data from the input tensor
     auto* paddingData = tflite::GetTensorData<int32_t>(&tfLitepaddingTensor);

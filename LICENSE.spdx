@@ -1056,8 +1056,6 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-3cc32d55eb9ebd7b687b998ac80e29a
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-63cfae6200f424b28dcbb612558de3bb
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-254afa5892f6afd961bfbba5ee4ac0ed
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-23fb8ac0d0f12df05b9871ab5a777dc2
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-1698ced45bc704b81198648c09b46c60
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-be26166a451d5cce94b9e673c95510ec
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-436c08f63b30559bfeacef298c0c0302
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-a40987a353605414b7bcd7d2c2bfe710
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-68bf21470793cb2e035e2dcdc15b2862
@@ -9914,20 +9912,6 @@ FileChecksum: SHA1: 2d3331923d44db25832b95554229b26159080629
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2020 Arm Ltd. All rights reserved.</text>
-
-FileName: ./src/armnnConverter/ArmnnConverter.cpp
-SPDXID: SPDXRef-1698ced45bc704b81198648c09b46c60
-FileChecksum: SHA1: 06599968e0dcc600b2ae65107a11f917367bc8ec
-LicenseConcluded: NOASSERTION
-LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2017, 2023-2024 Arm Ltd and Contributors. All rights reserved.</text>
-
-FileName: ./src/armnnConverter/README.md
-SPDXID: SPDXRef-be26166a451d5cce94b9e673c95510ec
-FileChecksum: SHA1: a26278519c2596613b3cef51f4d9e72b3b0da99a
-LicenseConcluded: NOASSERTION
-LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2019, 2021 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./src/armnnDeserializer/CMakeLists.txt
 SPDXID: SPDXRef-436c08f63b30559bfeacef298c0c0302

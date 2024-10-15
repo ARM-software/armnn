@@ -949,32 +949,6 @@ if(BUILD_UNIT_TESTS)
     addDllCopyCommands(UnitTests)
 endif()
 
-if (BUILD_ARMNN_SERIALIZER AND (BUILD_TF_LITE_PARSER OR BUILD_ONNX_PARSER) AND ARMNNREF)
-    set(ArmnnConverter_sources
-        src/armnnConverter/ArmnnConverter.cpp)
-
-    add_executable_ex(ArmnnConverter ${ArmnnConverter_sources})
-    target_include_directories(ArmnnConverter PRIVATE src/armnn)
-    target_include_directories(ArmnnConverter PRIVATE src/armnnUtils)
-
-    if(BUILD_ONNX_PARSER)
-        target_link_libraries(ArmnnConverter armnnOnnxParser)
-    endif()
-
-    if(BUILD_TF_LITE_PARSER)
-        target_link_libraries(ArmnnConverter armnnTfLiteParser)
-    endif()
-
-    target_link_libraries(ArmnnConverter armnnSerializer)
-
-    target_link_libraries(ArmnnConverter armnn)
-    target_link_libraries(ArmnnConverter ${CMAKE_THREAD_LIBS_INIT})
-    addDllCopyCommands(ArmnnConverter)
-
-    install(TARGETS ArmnnConverter
-            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif()
-
 if(BUILD_BASE_PIPE_SERVER)
     add_subdirectory(profiling/server/src/basePipeServer)
 endif()

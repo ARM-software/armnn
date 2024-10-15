@@ -3,7 +3,7 @@
 The `ModelAccuracyTool-Armnn` is a program for measuring the Top 5 accuracy results of a model against an image dataset.
 
 Prerequisites:
-1. The model is in .armnn format model file. The `ArmnnConverter` can be used to convert a model to this format.
+1. The model is in .armnn format model file.
 
 Build option:
 To build ModelAccuracyTool, pass the following options to Cmake:

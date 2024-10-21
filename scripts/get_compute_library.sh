@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="fa2dfaf98a274c553d185d858a0d2179494c8f4a" # 12587: fix: pretransposed is not supported in CpuGemmLowpMatrixMultiplyCore
+DEFAULT_CLFRAMEWORKREVISION="5fd1c421a31cb4ce1e8df23c2a0b1a220e3af93b" # 12639: test: Force misalignment in testing import memory at a misaligned pointer
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

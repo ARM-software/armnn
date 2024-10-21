@@ -17,6 +17,7 @@
 #include "backendsCommon/test/ElementwiseBinaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ElementwiseUnaryEndToEndTestImpl.hpp"
 #include "backendsCommon/test/FullyConnectedEndToEndTestImpl.hpp"
+#include "backendsCommon/test/GatherEndToEndTestImpl.hpp"
 #include "backendsCommon/test/MeanEndToEndTestImpl.hpp"
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/PadEndToEndTestImpl.hpp"
@@ -177,7 +178,6 @@ TEST_CASE("TosaRefAdditionEndtoEndTestFloat16")
 }
 
 // BatchMatMul
-
 TEST_CASE("TosaRefBatchMatMulEndToEndFloat32Test")
 {
     BatchMatMulEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
@@ -439,6 +439,50 @@ TEST_CASE("TosaRefFullyConnectedEndToEndTestNoBiasInt8Symm")
                                                  armnn::DataType::QSymmS8,
                                                  armnn::DataType::Signed32,
                                                  armnn::DataType::QSymmS8>(tosaDefaultBackends, false);
+}
+
+// Gather
+TEST_CASE("TosaRefGatherFloatTest")
+{
+    GatherEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefGatherInt16Test")
+{
+    GatherEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefGatherInt8Test")
+{
+    GatherEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefGatherMultiDimFloatTest")
+{
+    GatherMultiDimEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefGatherMultiDimInt16Test")
+{
+    GatherMultiDimEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefGatherMultiDimInt8Test")
+{
+    int axis;
+    SUBCASE("Axis0")
+    {
+        axis=0;
+    }
+    SUBCASE("Axis1")
+    {
+        axis=1;
+    }
+    SUBCASE("Axis2")
+    {
+        axis=2;
+    }
+    GatherMultiDimEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends, axis);
 }
 
 // Pad

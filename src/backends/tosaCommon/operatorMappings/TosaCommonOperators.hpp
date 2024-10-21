@@ -19,6 +19,7 @@
 #include "DequantizeOperator.hpp"
 #include "ElementwiseBinaryOperator.hpp"
 #include "FullyConnectedOperator.hpp"
+#include "GatherOperator.hpp"
 #include "HardSwishOperator.hpp"
 #include "PadOperator.hpp"
 #include "RsqrtOperator.hpp"

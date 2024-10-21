@@ -915,6 +915,25 @@ TEST_CASE("RefGatherMultiDimInt16Test")
     GatherMultiDimEndToEnd<armnn::DataType::QSymmS16>(defaultBackends);
 }
 
+TEST_CASE("RefGatherMultiDimInt8Test")
+{
+    int axis;
+    SUBCASE("Axis0")
+    {
+        axis=0;
+    }
+    SUBCASE("Axis1")
+    {
+        axis=1;
+    }
+    SUBCASE("Axis2")
+    {
+        axis=2;
+    }
+    GatherMultiDimEndToEnd<armnn::DataType::QAsymmS8>(defaultBackends, axis);
+}
+
+// GatherNd
 TEST_CASE("RefGatherNdFloatTest")
 {
     GatherNdEndToEnd<armnn::DataType::Float32>(defaultBackends);

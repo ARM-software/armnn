@@ -150,6 +150,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
             auto fullyConnectedDesc = PolymorphicDowncast<const FullyConnectedDescriptor*>(&descriptor);
             return ConvertFullyConnectedToTosaOperator(layer, inputs, outputs, fullyConnectedDesc);
         }
+        case LayerType::Gather:
+        {
+            auto gatherDesc = PolymorphicDowncast<const GatherDescriptor*>(&descriptor);
+            return ConvertGatherToTosaOperator(layer, inputs, outputs, gatherDesc);
+        }
         case LayerType::Pad:
         {
             auto padDesc = PolymorphicDowncast<const PadDescriptor*>(&descriptor);

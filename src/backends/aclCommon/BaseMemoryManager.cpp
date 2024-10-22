@@ -4,7 +4,7 @@
 //
 #include "BaseMemoryManager.hpp"
 
-#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED) || defined(ARMCOMPUTEGPUFSA_ENABLED)
+#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 #include "arm_compute/runtime/BlobLifetimeManager.h"
 #include "arm_compute/runtime/PoolManager.h"
 #include "arm_compute/runtime/OffsetLifetimeManager.h"
@@ -14,7 +14,7 @@
 namespace armnn
 {
 
-#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED) || defined(ARMCOMPUTEGPUFSA_ENABLED)
+#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 BaseMemoryManager::BaseMemoryManager(std::shared_ptr<arm_compute::IAllocator> alloc,
                                      MemoryAffinity memoryAffinity)
 {
@@ -93,14 +93,6 @@ NeonMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryMa
 #if defined(ARMCOMPUTECL_ENABLED)
 std::shared_ptr<arm_compute::IMemoryGroup>
 ClMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
-{
-    return std::make_shared<arm_compute::MemoryGroup>(memoryManager);
-}
-#endif
-
-#if defined(ARMCOMPUTEGPUFSA_ENABLED)
-std::shared_ptr<arm_compute::IMemoryGroup>
-GpuFsaMemoryManager::CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager)
 {
     return std::make_shared<arm_compute::MemoryGroup>(memoryManager);
 }

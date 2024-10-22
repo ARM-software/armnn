@@ -14,7 +14,7 @@ list(APPEND armnnAclCommon_sources
     IClTensorHandle.hpp
 )
 
-if(ARMCOMPUTECL OR ARMCOMPUTEGPUFSA)
+if(ARMCOMPUTECL)
     list(APPEND armnnAclCommon_sources
         ArmComputeTuningUtils.hpp
         ArmComputeTuningUtils.cpp

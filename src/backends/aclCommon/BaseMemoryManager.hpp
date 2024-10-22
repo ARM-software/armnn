@@ -7,14 +7,14 @@
 #include <armnn/backends/IMemoryManager.hpp>
 #include <armnn/backends/WorkloadFactory.hpp>
 
-#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED) || defined(ARMCOMPUTEGPUFSA_ENABLED)
+#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
 #include <arm_compute/runtime/MemoryGroup.h>
 #include <arm_compute/runtime/IAllocator.h>
 #include <arm_compute/runtime/IMemoryGroup.h>
 #include <arm_compute/runtime/MemoryManagerOnDemand.h>
 #endif
 
-#if defined(ARMCOMPUTECL_ENABLED) || defined(ARMCOMPUTEGPUFSA_ENABLED)
+#if defined(ARMCOMPUTECL_ENABLED)
 #include <arm_compute/runtime/CL/CLTensorAllocator.h>
 #endif
 
@@ -36,7 +36,7 @@ public:
     void Acquire() override;
     void Release() override;
 
-#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED) || defined(ARMCOMPUTEGPUFSA_ENABLED)
+#if defined(ARMCOMPUTENEON_ENABLED) || defined(ARMCOMPUTECL_ENABLED)
     BaseMemoryManager(std::shared_ptr<arm_compute::IAllocator> alloc, MemoryAffinity memoryAffinity);
 
     std::shared_ptr<arm_compute::MemoryManagerOnDemand>& GetIntraLayerManager() { return m_IntraLayerMemoryMgr; }
@@ -95,24 +95,5 @@ protected:
 };
 #endif
 
-#if defined(ARMCOMPUTEGPUFSA_ENABLED)
-class GpuFsaMemoryManager : public BaseMemoryManager
-{
-public:
-    GpuFsaMemoryManager() {}
-    virtual ~GpuFsaMemoryManager() {}
-
-    GpuFsaMemoryManager(std::shared_ptr<arm_compute::IAllocator> alloc)
-    : BaseMemoryManager(std::move(alloc), MemoryAffinity::Buffer)
-    {
-        arm_compute::CLTensorAllocator::set_global_allocator(alloc.get());
-        m_InterLayerMemoryGroup = CreateMemoryGroup(m_InterLayerMemoryMgr);
-    }
-
-protected:
-    std::shared_ptr<arm_compute::IMemoryGroup>
-    CreateMemoryGroup(const std::shared_ptr<arm_compute::MemoryManagerOnDemand>& memoryManager) override;
-};
-#endif
 
 } //namespace armnn

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="5fd1c421a31cb4ce1e8df23c2a0b1a220e3af93b" # 12639: test: Force misalignment in testing import memory at a misaligned pointer
+DEFAULT_CLFRAMEWORKREVISION="b3cedbda192340356f757346f6831938821bf62c" #revert: "fix: add bf16 support for CpuGemmAssemblyDispatchWrapper"
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

@@ -3473,8 +3473,7 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
         }
     }
 
-    armnn::TensorInfo reshapeOutputTensorInfo =
-        TfLiteParserImpl::OutputShapeOfReshape(inputTensorInfo, targetShape);
+    armnn::TensorInfo reshapeOutputTensorInfo = TfLiteParserImpl::OutputShapeOfReshape(inputTensorInfo, targetShape);
 
     // Check for valid input size and that reshape parameters equal output shape
     // The output shape can be provided to us in 2 ways:
@@ -3482,7 +3481,8 @@ void TfLiteParserImpl::ParseReshape(size_t subgraphIndex, size_t operatorIndex)
     // 2. through additional parameter 'shape_signature' given by outputs[indx]->buffer.
     //    This parameter can sometimes contain -1 value not visible in the 'shape' parameter.
     const armnn::TensorShape& reshapeOutputTensorShape = reshapeOutputTensorInfo.GetShape();
-    if (inputs.size() > 1 && !CheckShape(reshapeOutputTensorShape, outputs[0]->shape))
+    if (inputs.size() > 1 && !CheckShape(reshapeOutputTensorShape, outputs[0]->shape)
+                          && !outputs[0]->shape_signature.empty())
     {
         // Attempt to extract output shape from secondary 'shape_signature'
         // parameter and try to CheckShape() with this param.

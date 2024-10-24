@@ -21,7 +21,6 @@ option(GPERFTOOLS_ROOT "Location where the gperftools 'include' and 'lib' folder
 # options used for tensorflow lite support
 option(BUILD_TF_LITE_PARSER "Build Tensorflow Lite parser" OFF)
 option(BUILD_ARMNN_SERIALIZER "Build Armnn Serializer" OFF)
-option(BUILD_ACCURACY_TOOL "Build Accuracy Tool" OFF)
 option(FLATC_DIR "Path to Flatbuffers compiler" OFF)
 option(TF_LITE_GENERATED_PATH "Tensorflow lite generated C++ schema location" OFF)
 option(FLATBUFFERS_ROOT "Location where the flatbuffers 'include' and 'lib' folders to be found" Off)
@@ -39,7 +38,6 @@ option(BUILD_STATIC_PIPE_LIBS "Build Static PIPE libraries" OFF)
 option(BUILD_PIPE_ONLY "Build the PIPE libraries only" OFF)
 option(BUILD_CLASSIC_DELEGATE "Build the Arm NN TfLite delegate" OFF)
 option(BUILD_OPAQUE_DELEGATE "Build the Arm NN TfLite Opaque delegate" OFF)
-option(BUILD_MEMORY_STRATEGY_BENCHMARK "Build the MemoryBenchmark" OFF)
 option(BUILD_BARE_METAL "Disable features requiring operating system support" OFF)
 option(BUILD_SHARED_LIBS "Determines if Armnn will be built statically or dynamically.
                           This is an experimental feature and not fully supported.

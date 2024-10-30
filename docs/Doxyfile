@@ -821,9 +821,8 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./docs/05_01_parsers.dox \
                          ./docs/05_02_serializer.dox \
                          ./docs/05_03_delegate.dox \
-                         ./docs/05_04_supportlibrary.dox \
-                         ./docs/05_05_runtimeoptions.dox \
-                         ./docs/05_06_deserializer.dox \
+                         ./docs/05_04_runtimeoptions.dox \
+                         ./docs/05_05_deserializer.dox \
                          ./docs/FAQ.md \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \
@@ -840,10 +839,6 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./delegate/opaque/src/armnn_external_delegate.cpp \
                          ./delegate/BuildGuideNative.md \
                          ./delegate/DelegateQuickStartGuide.md \
-                         ./shim/ \
-                         ./shim/BuildGuideShimSupportLibrary.md \
-                         ./shim/sl/ \
-                         ./shim/sl/canonical/ \
                          ./README.md \
                          ./InstallationViaAptRepository.md \
                          ./CONTRIBUTING.md \

@@ -743,7 +743,7 @@ bool NeonLayerSupport::IsLayerSupported(const LayerType& type,
                                             reasonIfUnsupported,
                                             *this);
 
-    // For android-nn-driver and support library, to run FP16 operations on CpuAcc we need at least v8.2
+    // For android-nn-driver to run FP16 operations on CpuAcc we need at least v8.2
     // architecture. If the available architecture is older than v8.2, we can check if the operator is
     // supported by changing operator inputs & outputs to be FP32.
     // This does not change the operator datatype in the above parsers to be FP32. We are simply reporting

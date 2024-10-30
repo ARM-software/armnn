@@ -12,7 +12,6 @@ On this page you can find all software components contained in the Arm NN reposi
 other helpful information in each section.
 
  - @subpage deserializer
- - @subpage supportlibrary
  - @subpage parsers
  - @subpage runtimeoptions
  - @subpage serializer

@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="b3cedbda192340356f757346f6831938821bf62c" #revert: "fix: add bf16 support for CpuGemmAssemblyDispatchWrapper"
+DEFAULT_CLFRAMEWORKREVISION="b343ed883af41668566a25deb30054e4dc4ae939" #build: Include test .cpp files automatically in CMake build
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

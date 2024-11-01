@@ -10,6 +10,8 @@
 
 #include "TosaRescaleOperatorUtils.hpp"
 
+#include <fmt/format.h>
+
 // This function is paraphrased from:
 // tensorflow/compiler/mlir/tosa/transforms/legalize_common.cc from function convertQuantizeOp
 TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
@@ -58,7 +60,24 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
     // There also can't be duplicate tensor.
     if(inputName.find("input_") != std::string::npos)
     {
-        tensors.push_back(new TosaSerializationTensor(inputName, inputShape0, inputDType0, {}));
+        DType tmp = inputDType0;
+
+        if (IsUnsignedDataType(tmp))
+        {
+            //TOSA rescale only supports signed types. Need to override type
+            //when using unsigned attribute
+            FlipSignage(tmp);
+        }
+        tensors.push_back(new TosaSerializationTensor(inputName, inputShape0, tmp, {}));
+    }
+    else
+    {
+        if (IsUnsignedDataType(inputDType0))
+        {
+            // Can't modify the type of a previously created TosaSerializationTensor
+            throw armnn::Exception(fmt::format("ConvertQuantizeToTosaOperator: {} intermediate input"
+                                               " layer not supported.",EnumNamesDType()[inputDType0]));
+        }
     }
 
     std::vector<int32_t> outputShape0 = GetTosaTensorShape(outputInfo.GetShape());
@@ -148,9 +167,19 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
                                   scale_alpha,
                                   input_zp,
                                   output_zp,
+                                  IsUnsignedDataType(inputDType0),
+                                  IsUnsignedDataType(outputDType0),
                                   true,
                                   true,
                                   &rescaleOp);
+
+        if (IsUnsignedDataType(outputDType0))
+        {
+            // TOSA rescale only supports signed types. Need to override type
+            // when using unsigned attribute
+            FlipSignage(outputDType0);
+        }
+
         tensors.push_back(new TosaSerializationTensor(outputName,
                                                       inputShape0,
                                                       outputDType0, {}));

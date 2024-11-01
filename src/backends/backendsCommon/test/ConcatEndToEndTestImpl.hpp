@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2022, 2024 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -111,6 +111,52 @@ void ConcatDim0EndToEnd(const std::vector<BackendId>& backends)
 
     std::map<int, std::vector<T>> inputTensorData = {{ 0,inputData }, { 1,inputData }};
     std::map<int, std::vector<T>> expectedOutputData = {{ 0,expectedOutput }};
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
+}
+
+template<armnn::DataType ArmnnType>
+void ConcatDim0EndToEnd3D(const std::vector<BackendId>& backends)
+{
+    using namespace armnn;
+    using T = ResolveType<ArmnnType>;
+
+    unsigned int concatAxis = 0;
+    const std::vector<TensorShape> inputShapes{{ 2, 3, 2 }, { 2, 3, 2 }};
+    const TensorShape& outputShape = { 4, 3, 2 };
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateConcatNetwork<ArmnnType>(inputShapes, outputShape, concatAxis);
+
+    CHECK(net);
+
+    // Creates structures for input & output.
+    std::vector<T> inputData{
+        1, 2,
+        3, 4,
+        5, 6,
+        7, 8,
+        9, 10,
+        11, 12
+    };
+
+    std::vector<T> expectedOutput{
+        1, 2,
+        3, 4,
+        5, 6,
+        7, 8,
+        9, 10,
+        11, 12,
+        1, 2,
+        3, 4,
+        5, 6,
+        7, 8,
+        9, 10,
+        11, 12
+    };
+
+    std::map<int, std::vector<T>> inputTensorData = {{ 0, inputData }, { 1, inputData }};
+    std::map<int, std::vector<T>> expectedOutputData = {{ 0, expectedOutput }};
 
     EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net), inputTensorData, expectedOutputData, backends);
 }

@@ -7,20 +7,50 @@
 
 #pragma once
 
-inline void CreateRescaleTosaOperator(const std::string& inputName,
-                                      const std::string& outputName,
-                                      const std::vector<int32_t>& multipliers,
-                                      const std::vector<int32_t>& shifts,
-                                      int32_t input_zp,
-                                      int32_t output_zp,
-                                      bool double_round,
-                                      bool scale32,
-                                      bool per_channel,
-                                      TosaSerializationOperator** op)
+inline void CreateRawRescaleTosaOperator(const std::string& inputName,
+                                         const std::string& outputName,
+                                         const std::vector<int32_t>& multipliers,
+                                         const std::vector<int32_t>& shifts,
+                                         int32_t input_zp,
+                                         int32_t output_zp,
+                                         bool input_unsigned,
+                                         bool output_unsigned,
+                                         bool double_round,
+                                         bool scale32,
+                                         bool per_channel,
+                                         TosaSerializationOperator** op)
 {
     if (!op)
     {
-        throw armnn::Exception("CreateRescaleTosaOperator: nullptr op");
+        throw armnn::Exception("CreateRawRescaleTosaOperator: nullptr op.");
+    }
+
+    if (multipliers.empty())
+    {
+        throw armnn::Exception("CreateRawRescaleTosaOperator: multipliers is empty.");
+    }
+
+    if (multipliers.size() != shifts.size())
+    {
+        throw armnn::Exception("CreateRawRescaleTosaOperator: multipliers and shift not same size.");
+    }
+
+    if (multipliers.size() == 1 && per_channel)
+    {
+        throw armnn::Exception("CreateRawRescaleTosaOperator: \
+                                multipliers must be greater than 1 if per_channel is true.");
+    }
+
+    if (multipliers.size() == 1 && per_channel)
+    {
+        throw armnn::Exception("CreateRawRescaleTosaOperator: \
+                                multipliers size must be greater than 1 if per_channel is true.");
+    }
+
+    if (multipliers.size() > 1 && !per_channel)
+    {
+        throw armnn::Exception("CreateRawRescaleTosaOperator: \
+                                multipliers size must be 1 if per_channel is false.");
     }
 
     TosaRescaleAttribute attribute(input_zp,
@@ -30,8 +60,8 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
                                    scale32,
                                    double_round,
                                    per_channel,
-                                   false,  // input_unsigned
-                                   false); // output_unsigned
+                                   input_unsigned,
+                                   output_unsigned);
 
     // op
     *op = new TosaSerializationOperator(Op_RESCALE, Attribute_RescaleAttribute, &attribute, {inputName}, {outputName});
@@ -39,23 +69,6 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
     {
         throw armnn::Exception("CreateRescaleTosaOperator: failed to created operator");
     }
-}
-
-inline void CreateRescaleTosaOperator(const std::string& inputName,
-                                      const std::string& outputName,
-                                      int32_t scale_multiplier,
-                                      int32_t scale_shift,
-                                      int32_t input_zp,
-                                      int32_t output_zp,
-                                      bool double_round,
-                                      bool scale32,
-                                      bool per_channel,
-                                      TosaSerializationOperator** op)
-{
-    const std::vector<int32_t> multipliers{scale_multiplier};
-    const std::vector<int32_t> shifts{scale_shift};
-    CreateRescaleTosaOperator(inputName, outputName, multipliers, shifts,
-                              input_zp, output_zp, double_round, scale32, per_channel, op);
 }
 
 /// The following is taken from mlir/lib/Dialect/Tosa/Utils/QuantUtils.cpp in the LLVM project
@@ -153,6 +166,8 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
                                       double scale,
                                       int32_t input_zp,
                                       int32_t output_zp,
+                                      bool input_unsigned,
+                                      bool output_unsigned,
                                       bool double_round,
                                       bool scale32,
                                       TosaSerializationOperator** op)
@@ -169,14 +184,19 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
         ComputeMultiplierAndShiftTosaScale16(scale, multiplier, shift);
     }
 
-    CreateRescaleTosaOperator(inputName, outputName, multiplier, shift,
-                              input_zp, output_zp, double_round, scale32, false, op);
+    const std::vector<int32_t> multipliers{multiplier};
+    const std::vector<int32_t> shifts{shift};
+    CreateRawRescaleTosaOperator(inputName, outputName, multipliers, shifts,
+                                 input_zp, output_zp, input_unsigned, output_unsigned,
+                                 double_round, scale32, false, op);
 }
 
-inline void CreateRescaleTosaOperatorPerChannel(const std::string& inputName,
+inline void CreateRescaleTosaOperatorForWeights(const std::string& inputName,
                                                 const std::string& outputName,
                                                 int32_t input_zp,
                                                 int32_t output_zp,
+                                                bool input_unsigned,
+                                                bool output_unsigned,
                                                 bool double_round,
                                                 bool scale32,
                                                 double input_scale,
@@ -209,16 +229,7 @@ inline void CreateRescaleTosaOperatorPerChannel(const std::string& inputName,
     }
 
     bool per_channel = weight_scales.size() == 1 ? false : true;
-    CreateRescaleTosaOperator(inputName, outputName, op_tensor_multipliers, op_tensor_shifts,
-                              input_zp, output_zp, double_round, scale32, per_channel, op);
-}
-
-inline void CreateFromInt32RescaleTosaOperator(const std::string& inputName,
-                                               const std::string& outputName,
-                                               double output_scale,
-                                               int32_t output_zp,
-                                               TosaSerializationOperator** op)
-{
-    CreateRescaleTosaOperator(inputName, outputName, output_scale,
-                              0, output_zp, true, true, op);
+    CreateRawRescaleTosaOperator(inputName, outputName, op_tensor_multipliers, op_tensor_shifts,
+                                 input_zp, output_zp, input_unsigned, output_unsigned, double_round,
+                                 scale32, per_channel, op);
 }

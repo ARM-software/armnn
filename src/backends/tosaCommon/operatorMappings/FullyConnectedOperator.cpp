@@ -162,10 +162,12 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
         const std::vector<float>& weight_scales = inputs[1]->GetQuantizationScales();
 
         TosaSerializationOperator* rescaleOp = nullptr;
-        CreateRescaleTosaOperatorPerChannel(fcOutputName,
+        CreateRescaleTosaOperatorForWeights(fcOutputName,
                                             outputName,
                                             0,
                                             output_zp,
+                                            false,
+                                            false,
                                             true,
                                             true,
                                             input_scale,

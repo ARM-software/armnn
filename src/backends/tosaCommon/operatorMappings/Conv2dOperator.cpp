@@ -55,7 +55,6 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     if(inputNames[0].find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
-
         tensors.push_back(new TosaSerializationTensor(inputNames[0], inputShape0, inputDType0, {}));
     }
 
@@ -146,10 +145,12 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
         const std::vector<float>& weight_scales = inputs[1]->GetQuantizationScales();
 
         TosaSerializationOperator* rescaleOp = nullptr;
-        CreateRescaleTosaOperatorPerChannel(outputConv2dName,
+        CreateRescaleTosaOperatorForWeights(outputConv2dName,
                                             outputName,
                                             0,
                                             output_zp,
+                                            false,
+                                            false,
                                             true,
                                             true,
                                             input_scale,
@@ -159,7 +160,8 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
         operators.push_back(rescaleOp);
         tensors.push_back(new TosaSerializationTensor(outputName,
                                                       outputShape0,
-                                                      DType_INT8, {}));
+                                                      DType_INT8,
+                                                      {}));
     }
 
     // operatorInputNames/operatorOutputNames ends up being the same as

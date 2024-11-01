@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -155,10 +155,12 @@ TosaSerializationBasicBlock* ConvertDepthwiseConv2dToTosaOperator(
         const std::vector<float>& weight_scales = inputs[1]->GetQuantizationScales();
 
         TosaSerializationOperator* rescaleOp = nullptr;
-        CreateRescaleTosaOperatorPerChannel(outputConv2dName,
+        CreateRescaleTosaOperatorForWeights(outputConv2dName,
                                             outputName,
                                             0,
                                             output_zp,
+                                            false,
+                                            false,
                                             true,
                                             true,
                                             input_scale,

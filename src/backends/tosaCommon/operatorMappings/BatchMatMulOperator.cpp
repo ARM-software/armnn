@@ -225,6 +225,8 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
                                   scale_alpha,
                                   input_zp,
                                   output_zp,
+                                  false,
+                                  false,
                                   doubleRound,
                                   scale32,
                                   &rescaleOp);

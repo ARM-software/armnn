@@ -79,7 +79,7 @@ void QuantizationEndToEndFloat32(const std::vector<armnn::BackendId>& backends)
                                                                  expectedOutputData,
                                                                  qScale,
                                                                  qOffset);
-};
+}
 
 template<armnn::DataType ArmnnOType, typename Tout = armnn::ResolveType<ArmnnOType>>
 void QuantizationEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
@@ -103,7 +103,7 @@ void QuantizationEndToEndFloat16(const std::vector<armnn::BackendId>& backends)
                                                                  expectedOutputData,
                                                                  qScale,
                                                                  qOffset);
-};
+}
 
 inline void QuantizationEndToEndInt8(const std::vector<armnn::BackendId>& backends)
 {
@@ -123,6 +123,66 @@ inline void QuantizationEndToEndInt8(const std::vector<armnn::BackendId>& backen
                                                                         expectedOutputData,
                                                                         qScale,
                                                                         qOffset);
-};
+}
+
+inline void QuantizationEndToEndInt8ToUInt8(const std::vector<armnn::BackendId>& backends)
+{
+    using namespace armnn;
+
+    const TensorShape tensorShape({ 1, 1, 1, 5 });
+
+    std::vector<int8_t> inputData = { 113, 16, 13, 101, 13 };
+    std::vector<uint8_t> expectedOutputData = { 175, 45, 41, 159, 41 };
+
+    float qScale = 0.75f;
+    int32_t qOffset = 24;
+
+    QuantizeEndToEndLayerTestImpl<DataType::QSymmS8, DataType::QAsymmU8>(backends,
+                                                                         tensorShape,
+                                                                         inputData,
+                                                                         expectedOutputData,
+                                                                         qScale,
+                                                                         qOffset);
+}
+
+inline void QuantizationEndToEndUInt8ToInt8(const std::vector<armnn::BackendId>& backends)
+{
+    using namespace armnn;
+
+    const TensorShape tensorShape({ 1, 1, 1, 5 });
+
+    std::vector<uint8_t> inputData = { 113, 255, 0, 101, 75 };
+    std::vector<int8_t> expectedOutputData = { 113, 127, 0, 101, 75 };
+
+    float qScale = 1.f;
+    int32_t qOffset = 0;
+
+    QuantizeEndToEndLayerTestImpl<DataType::QAsymmU8, DataType::QSymmS8>(backends,
+                                                                         tensorShape,
+                                                                         inputData,
+                                                                         expectedOutputData,
+                                                                         qScale,
+                                                                         qOffset);
+}
+
+inline void QuantizationEndToEndUInt8ToUInt8(const std::vector<armnn::BackendId>& backends)
+{
+    using namespace armnn;
+
+    const TensorShape tensorShape({ 1, 1, 1, 5 });
+
+    std::vector<uint8_t> inputData = { 0, 127, 128, 101, 75 };
+    std::vector<uint8_t> expectedOutputData = { 0, 254, 255, 202, 150 };
+
+    float qScale = .5f;
+    int32_t qOffset = 0;
+
+    QuantizeEndToEndLayerTestImpl<DataType::QAsymmU8, DataType::QAsymmU8>(backends,
+                                                                          tensorShape,
+                                                                          inputData,
+                                                                          expectedOutputData,
+                                                                          qScale,
+                                                                          qOffset);
+}
 
 }

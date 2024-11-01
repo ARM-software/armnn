@@ -2,10 +2,6 @@
 // Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
-//
-// Copyright © 2020 The TensorFlow Authors. All Rights Reserved.
-// SPDX-License-Identifier: Apache-2.0
-//
 
 #include "SliceOperator.hpp"
 

@@ -23,6 +23,8 @@ void AddRescaleOp(const string &inputName,
                                   scale_alpha,
                                   input_zp,
                                   output_zp,
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &rescaleOp);
@@ -331,6 +333,8 @@ TosaSerializationBasicBlock* ConvertSquaredDifferenceToTosaOperator(const Layer*
                                   (1 << LEFT_SHIFT),
                                   inputs[0]->GetQuantizationOffset(),
                                   0,
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &xShiftOp);
@@ -346,6 +350,8 @@ TosaSerializationBasicBlock* ConvertSquaredDifferenceToTosaOperator(const Layer*
                                   (1 << LEFT_SHIFT),
                                   inputs[1]->GetQuantizationOffset(),
                                   0,
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &yShiftOp);
@@ -361,6 +367,8 @@ TosaSerializationBasicBlock* ConvertSquaredDifferenceToTosaOperator(const Layer*
                                   x_rescale_scale,
                                   0,
                                   0,
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &xScaledOp);
@@ -376,6 +384,8 @@ TosaSerializationBasicBlock* ConvertSquaredDifferenceToTosaOperator(const Layer*
                                   y_rescale_scale,
                                   0,
                                   0,
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &yScaledOp);
@@ -418,6 +428,8 @@ TosaSerializationBasicBlock* ConvertSquaredDifferenceToTosaOperator(const Layer*
                                   output_rescale_scale,
                                   0,
                                   outputs[0]->GetQuantizationOffset(),
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &rescaleOutputOp);

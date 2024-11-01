@@ -116,7 +116,9 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                           outputNameRescale,
                                           input_scale,
                                           static_cast<int32_t>(input_zp),
-                                          static_cast<int32_t>(output_zp),
+                                          0,
+                                          false,
+                                          false,
                                           true,
                                           true,
                                           &rescaleOp1);
@@ -143,16 +145,18 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
 
                 output_shift += shift;
 
-                CreateRescaleTosaOperator(inputName,
-                                          outputNameRescale,
-                                          input_multiplier,
-                                          input_shift,
-                                          static_cast<int32_t>(input_zp),
-                                          static_cast<int32_t>(output_zp),
-                                          true,
-                                          true,
-                                          false,
-                                          &rescaleOp1);
+                CreateRawRescaleTosaOperator(inputName,
+                                             outputNameRescale,
+                                             {input_multiplier},
+                                             {input_shift},
+                                             static_cast<int32_t>(input_zp),
+                                             0,
+                                             false,
+                                             false,
+                                             true,
+                                             true,
+                                             false,
+                                             &rescaleOp1);
                 break;
             }
             default:
@@ -219,23 +223,27 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                 CreateRescaleTosaOperator(tensors.back()->GetName(),
                                           outputNameRescale,
                                           output_scale,
+                                          0,
+                                          false,
+                                          false,
                                           static_cast<int32_t>(output_zp),
-                                          static_cast<int32_t>(input_zp),
                                           true,
                                           true,
                                           &rescaleOp2);
                 break;
             case ReduceOperation::Mean:
-                CreateRescaleTosaOperator(tensors.back()->GetName(),
-                                          outputNameRescale,
-                                          output_multiplier,
-                                          output_shift,
-                                          static_cast<int32_t>(output_zp),
-                                          static_cast<int32_t>(input_zp),
-                                          true,
-                                          true,
-                                          false,
-                                          &rescaleOp2);
+                CreateRawRescaleTosaOperator(tensors.back()->GetName(),
+                                             outputNameRescale,
+                                             {output_multiplier},
+                                             {output_shift},
+                                             0,
+                                             false,
+                                             false,
+                                             static_cast<int32_t>(output_zp),
+                                             true,
+                                             true,
+                                             false,
+                                             &rescaleOp2);
                 break;
             default:
                 throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");

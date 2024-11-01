@@ -23,9 +23,9 @@ TosaSerializationBasicBlock* ConvertRsqrtOperator(const Layer* layer,
                                         "ConvertRsqrtOperator: Rsqrt must have only one output");
 
 
-    std::string inputName = std::string("input_");
-    std::string outputName = std::string("output0_");
-    std::string blockName  = std::string("Op_RSQRT_block_") + GetUniqueTosaMappingID();
+    std::string inputName      = std::string("input_");
+    std::string outputName     = std::string("output0_");
+    std::string blockName      = std::string("Op_RSQRT_block_") + GetUniqueTosaMappingID();
     std::string supportedTypes = std::string(" Supported Types: FLOAT32, FLOAT16 & INT8.");
 
     // If a layer is present then the block will be used for execution, so input and output names need to be determined

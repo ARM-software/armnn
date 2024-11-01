@@ -190,10 +190,12 @@ TosaSerializationBasicBlock* ConvertConv3dToTosaOperator(const Layer* layer,
         const std::vector<float>& weight_scales = inputs[1]->GetQuantizationScales();
 
         TosaSerializationOperator* rescaleOp = nullptr;
-        CreateRescaleTosaOperatorPerChannel(outputConv3dName,
+        CreateRescaleTosaOperatorForWeights(outputConv3dName,
                                             outputName,
                                             0,
                                             output_zp,
+                                            false,
+                                            false,
                                             true,
                                             true,
                                             input_scale,

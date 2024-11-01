@@ -31,36 +31,7 @@ TosaSerializationBasicBlock* ConvertReluToTosaOperator(const Layer* layer,
 
     std::string inputName  = std::string("input_");
     std::string outputName = std::string("output0_");
-    std::string blockName  = "";
-
-    int32_t clamp_min = 0;
-    int32_t clamp_max = 0;
-    float float_max = 0.0f;
-    switch (desc->m_Function)
-    {
-        case ActivationFunction::ReLu:
-        {
-            clamp_max = std::numeric_limits<int32_t>::max();
-            float_max = std::numeric_limits<float>::max();
-            blockName = std::string("Op_RELU_block_") + GetUniqueTosaMappingID();
-            break;
-        }
-        case ActivationFunction::BoundedReLu:
-        {
-            clamp_max = static_cast<int32_t>(desc->m_A);
-            float_max = desc->m_A;
-            blockName = std::string("Op_BOUNDED_RELU_block_") + GetUniqueTosaMappingID();
-            break;
-        }
-        case ActivationFunction::LeakyReLu:
-        {
-            throw Exception("LeakyRelu TOSA mappings are performed in ConvertLeakyReluToTosaOperator().");
-        }
-        default:
-        {
-            throw Exception("Activation function is not supported in ConvertReluToTosaOperator().");
-        }
-    }
+    std::string blockName  = std::string("Op_RELU_block_") + GetUniqueTosaMappingID();
 
     // If a layer is present then the block will be used for execution, so input and output names need to be determined
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
@@ -76,18 +47,43 @@ TosaSerializationBasicBlock* ConvertReluToTosaOperator(const Layer* layer,
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    std::vector<int32_t> inputShape0;
-    DType inputDType0 = DType::DType_UNKNOWN;
+    std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
+    DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
     if(inputName.find("input_") != std::string::npos)
     {
-        inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
-        inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape0, inputDType0, {}));
     }
 
     std::vector<int32_t> outputShape0 = GetTosaTensorShape(outputs[0]->GetShape());
     DType outputDType0 = ArmNNToDType(outputs[0]->GetDataType());
     tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
+
+    int32_t clamp_min = 0;
+    int32_t clamp_max = 0;
+    float float_max = 0.0f;
+    switch (desc->m_Function)
+    {
+        case ActivationFunction::ReLu:
+        {
+            clamp_max = std::numeric_limits<int32_t>::max();
+            float_max = std::numeric_limits<float>::max();
+            break;
+        }
+        case ActivationFunction::BoundedReLu:
+        {
+            clamp_max = static_cast<int32_t>(desc->m_A);
+            float_max = desc->m_A;
+            break;
+        }
+        case ActivationFunction::LeakyReLu:
+        {
+            throw Exception("LeakyRelu TOSA mappings are performed in ConvertLeakyReluToTosaOperator().");
+        }
+        default:
+        {
+            throw Exception("Activation function is not supported in ConvertReluToTosaOperator().");
+        }
+    }
 
     std::string clampInputNameStr = inputName;
     if (inputDType0 == tosa::DType::DType_INT8 || inputDType0 == tosa::DType::DType_INT16)
@@ -127,6 +123,8 @@ TosaSerializationBasicBlock* ConvertReluToTosaOperator(const Layer* layer,
                                   scale,
                                   input_zp,
                                   output_zp,
+                                  false, //input unsigned
+                                  false, //output unsigned
                                   false,
                                   true,
                                   &rescaleOp);

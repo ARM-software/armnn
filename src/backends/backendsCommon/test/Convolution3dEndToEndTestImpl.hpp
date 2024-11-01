@@ -1,16 +1,15 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
 
 #include "EndToEndTestImpl.hpp"
+
 #include <armnnUtils/QuantizeHelper.hpp>
-
-#include <ResolveType.hpp>
-
-#include <CommonTestUtils.hpp>
 #include <armnnTestUtils/DataLayoutUtils.hpp>
+#include <CommonTestUtils.hpp>
+#include <ResolveType.hpp>
 
 #include <map>
 #include <vector>

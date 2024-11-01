@@ -33,7 +33,19 @@ TosaSerializationBasicBlock* ConvertPooling2DToTosaOperator(const Layer* layer,
                                static_cast<int>(poolDescriptor->m_PoolWidth)};
     std::vector<int> stride = {static_cast<int>(poolDescriptor->m_StrideY),
                                static_cast<int>(poolDescriptor->m_StrideX)};
-    TosaPoolAttribute attribute(pad, kernel, stride, 0, 0, ArmNNToDType(inputs[0]->GetDataType()));
+
+    DType accType = DType_INT32;
+    DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
+    if (inputDType0 == DType_FP32)
+    {
+        accType = DType_FP32;
+    }
+    else if (inputDType0 == DType_FP16)
+    {
+        accType = DType_FP16;
+    }
+
+    TosaPoolAttribute attribute(pad, kernel, stride, 0, 0, accType);
 
     auto* op = new TosaSerializationOperator(opcode,
                                              Attribute_PoolAttribute,
@@ -49,7 +61,6 @@ TosaSerializationBasicBlock* ConvertPooling2DToTosaOperator(const Layer* layer,
     if(input0Name.find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
-        DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
 
         tensors.push_back(new TosaSerializationTensor(input0Name, inputShape0, inputDType0, {}));
     }

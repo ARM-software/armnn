@@ -135,7 +135,8 @@ TosaSerializationBasicBlock* ConvertSoftmaxToTosaOperator(const Layer* layer,
     reduceShape[static_cast<unsigned long>(axis)] = 1;
 
     TosaSerializationOperator *rescaleOp1 = nullptr;
-    CreateRescaleTosaOperator(inputName, outputNameRescale1, 1.0f, input_zp, 0, false, true, &rescaleOp1);
+    CreateRescaleTosaOperator(inputName, outputNameRescale1, 1.0f, input_zp, 0,
+                              false, false, false, true, &rescaleOp1);
 
     tensors.push_back(new TosaSerializationTensor(outputNameRescale1, inputShape0, DType_INT32, {}));
     operators.push_back(rescaleOp1);
@@ -157,7 +158,7 @@ TosaSerializationBasicBlock* ConvertSoftmaxToTosaOperator(const Layer* layer,
     operators.push_back(subOp1);
 
     TosaSerializationOperator *rescaleOp2 = nullptr;
-    CreateRescaleTosaOperator(outputNameSub1, outputNameRescale2, 128.0f, 0, 0, false, true, &rescaleOp2);
+    CreateRescaleTosaOperator(outputNameSub1, outputNameRescale2, 128.0f, 0, 0, false, false, false, true, &rescaleOp2);
     tensors.push_back(new TosaSerializationTensor(outputNameRescale2, inputShape0, DType_INT16, {}));
     operators.push_back(rescaleOp2);
 
@@ -542,7 +543,8 @@ TosaSerializationBasicBlock* ConvertSoftmaxToTosaOperator(const Layer* layer,
     operators.push_back(arithmeticROp3);
 
     TosaSerializationOperator* rescaleOp3 = nullptr;
-    CreateRescaleTosaOperator(outputNameArithmeticR3, outputName, 1.0f, 0, output_zp, false, true, &rescaleOp3);
+    CreateRescaleTosaOperator(outputNameArithmeticR3, outputName, 1.0f, 0, output_zp, false, false, 
+                              false, true, &rescaleOp3);
 
     tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
     operators.push_back(rescaleOp3);

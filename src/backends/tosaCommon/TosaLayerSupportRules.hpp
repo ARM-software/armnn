@@ -1,9 +1,14 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
+
+#include <tosa_serialization_handler.h>
+
+using namespace armnn;
+using namespace tosa;
 
 // List of Layer Support Rules common to TOSA backends only, for use with CheckSupportRule()
 

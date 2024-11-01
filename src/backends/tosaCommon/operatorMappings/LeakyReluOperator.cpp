@@ -49,11 +49,10 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
     std::vector<int32_t> inputShape0;
-    DType inputDType0 =  DType::DType_UNKNOWN;
+    DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
     if(inputName.find("input_") != std::string::npos)
     {
         inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
-        inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape0, inputDType0, {}));
     }
 
@@ -135,6 +134,8 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
                                   scale_alpha,
                                   input_zp,
                                   0,
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &rescaleAlphaOp);
@@ -150,6 +151,8 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
                                   scale_identity,
                                   input_zp,
                                   0,
+                                  false,
+                                  false,
                                   true,
                                   true,
                                   &rescaleIdentityOp);
@@ -193,11 +196,16 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
         // Value output = buildRescaleFromInt32(rewriter, op, output_type, result_int32,
         //                                      1.0, output_qtype.getZeroPoint());
         TosaSerializationOperator* rescaleOutputOp = nullptr;
-        CreateFromInt32RescaleTosaOperator(outputNameRescaleMaxMin,
-                                           outputName,
-                                           1.0,
-                                           output_zp,
-                                           &rescaleOutputOp);
+        CreateRescaleTosaOperator(outputNameRescaleMaxMin,
+                                  outputName,
+                                  1.0,
+                                  0,
+                                  output_zp,
+                                  false,
+                                  false,
+                                  true,
+                                  true,
+                                  &rescaleOutputOp);
 
         // operatorInputNames/operatorOutputNames ends up being the same as
         // blockInputNames/blockOutputNames for one-to-one ArmNN to Tosa mappings

@@ -26,9 +26,6 @@ TEST_CASE("GetTosaMapping_AdditionLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_AdditionLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -89,9 +86,6 @@ TEST_CASE("GetTosaMapping_ConcatLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_ConcatLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -147,9 +141,6 @@ TEST_CASE("GetTosaMapping_ConstantLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_ConstantLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -203,9 +194,6 @@ TEST_CASE("GetTosaMapping_Conv2dLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_Conv2dLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -276,9 +264,6 @@ TEST_CASE("GetTosaMapping_ElementwiseUnaryLayerRsqrt")
 }
 TEST_CASE("GetTosaMappingFromLayer_ElementwiseUnaryLayerRsqrt")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
     ElementwiseUnaryDescriptor unaryDescriptor = ElementwiseUnaryDescriptor(UnaryOperation::Rsqrt);
@@ -324,9 +309,6 @@ TEST_CASE("GetTosaMapping_MultiplicationLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_MultiplicationLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -387,9 +369,6 @@ TEST_CASE("GetTosaMapping_AvgPool2DLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_AvgPool2DLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -456,9 +435,6 @@ TEST_CASE("GetTosaMapping_MaxPool2DLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_MaxPool2DLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -518,9 +494,6 @@ TEST_CASE("GetTosaMapping_ReshapeLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_ReshapeLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -584,9 +557,145 @@ TEST_CASE("GetTosaMapping_ResizeLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_ResizeLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
+    // Builds up the structure of the network.
+    INetworkPtr net(INetwork::Create());
 
+    ResizeDescriptor descriptor;
+    descriptor.m_DataLayout = DataLayout::NHWC;
+    descriptor.m_TargetHeight = 2;
+    descriptor.m_TargetWidth = 3;
+
+    IConnectableLayer* input  = net->AddInputLayer(0, "input");
+    IConnectableLayer* resize = net->AddResizeLayer(descriptor, "resize");
+    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+
+    input->GetOutputSlot(0).Connect(resize->GetInputSlot(0));
+    resize->GetOutputSlot(0).Connect(output->GetInputSlot(0));
+
+    TensorInfo inputInfo  = TensorInfo({ 1, 4, 6, 3 }, DataType::Float32);
+    TensorInfo outputInfo = TensorInfo({ 1, 2, 3, 3 }, DataType::Float32);
+
+    input->GetOutputSlot(0).SetTensorInfo(inputInfo);
+    resize->GetOutputSlot(0).SetTensorInfo(outputInfo);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 4, 6, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 2, 3, 3 }};
+
+    TosaSerializationBasicBlock* basicBlock = GetTosaMappingFromLayer(PolymorphicDowncast<Layer*>(resize));
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_RESIZE,
+                                        Attribute_ResizeAttribute,
+                                        descriptor,
+                                        LayerType::Resize);
+}
+
+TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_NCHW")
+{
+    TensorInfo inputInfo  = TensorInfo({ 1, 3, 2, 3 }, DataType::Float32);
+    TensorInfo outputInfo = TensorInfo({ 1, 3, 4, 6 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 3, 2, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 3, 4, 6 }};
+
+    ResizeDescriptor descriptor;
+    descriptor.m_DataLayout = DataLayout::NCHW;
+    descriptor.m_TargetHeight = 4;
+    descriptor.m_TargetWidth = 6;
+
+    try
+    {
+        TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
+                                                                 LayerType::Resize,
+                                                                 {&inputInfo},
+                                                                 {&outputInfo},
+                                                                 descriptor);
+
+        AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                            inputShape,
+                                            outputShape,
+                                            Op_RESIZE,
+                                            Attribute_ResizeAttribute,
+                                            descriptor,
+                                            LayerType::Resize);
+
+        FAIL("An exception should have been thrown");
+    }
+    catch (const armnn::InvalidArgumentException& e)
+    {
+        CHECK(strcmp(e.what(), "ConvertResizeToTosaOperator: NCHW not supported.") == 0);
+    }
+}
+
+TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_Bilinear")
+{
+    TensorInfo inputInfo  = TensorInfo({ 1, 2, 3, 3 }, DataType::Float32);
+    TensorInfo outputInfo = TensorInfo({ 1, 4, 6, 3 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 2, 3, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 4, 6, 3 }};
+
+    ResizeDescriptor descriptor;
+    descriptor.m_Method = ResizeMethod::Bilinear;
+    descriptor.m_DataLayout = DataLayout::NHWC;
+    descriptor.m_TargetHeight = 4;
+    descriptor.m_TargetWidth = 6;
+
+    try
+    {
+        TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
+                                                                 LayerType::Resize,
+                                                                 {&inputInfo},
+                                                                 {&outputInfo},
+                                                                 descriptor);
+
+        AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                            inputShape,
+                                            outputShape,
+                                            Op_RESIZE,
+                                            Attribute_ResizeAttribute,
+                                            descriptor,
+                                            LayerType::Resize);
+
+        FAIL("An exception should have been thrown");
+    }
+    catch (const armnn::InvalidArgumentException& e)
+    {
+        CHECK(strcmp(e.what(), "ConvertResizeToTosaOperator: Unimplemented Resize method.") == 0);
+    }
+}
+
+
+TEST_CASE("GetTosaMapping_ResizeLayer")
+{
+    TensorInfo inputInfo  = TensorInfo({ 1, 2, 3, 3 }, DataType::Float32);
+    TensorInfo outputInfo = TensorInfo({ 1, 4, 6, 3 }, DataType::Float32);
+
+    std::vector<std::vector<int32_t>> inputShape  = {{ 1, 2, 3, 3 }};
+    std::vector<std::vector<int32_t>> outputShape = {{ 1, 4, 6, 3 }};
+
+    ResizeDescriptor descriptor;
+    descriptor.m_DataLayout = DataLayout::NHWC;
+    descriptor.m_TargetHeight = 4;
+    descriptor.m_TargetWidth = 6;
+
+    TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
+                                                             LayerType::Resize,
+                                                             {&inputInfo},
+                                                             {&outputInfo},
+                                                             descriptor);
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_RESIZE,
+                                        Attribute_ResizeAttribute,
+                                        descriptor,
+                                        LayerType::Resize);
+}
+
+TEST_CASE("GetTosaMappingFromLayer_ResizeLayer")
+{
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -721,9 +830,6 @@ TEST_CASE("GetTosaMapping_SliceLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_SliceLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -801,9 +907,6 @@ TEST_CASE("GetTosaMapping_TransposeConv2dLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_TransposeConv2dLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 
@@ -884,9 +987,6 @@ TEST_CASE("GetTosaMapping_TransposeLayer")
 
 TEST_CASE("GetTosaMappingFromLayer_TransposeLayer")
 {
-    IRuntime::CreationOptions options;
-    IRuntimePtr runtime(IRuntime::Create(options));
-
     // Builds up the structure of the network.
     INetworkPtr net(INetwork::Create());
 

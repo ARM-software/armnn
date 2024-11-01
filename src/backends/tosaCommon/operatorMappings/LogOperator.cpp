@@ -48,7 +48,7 @@ TosaSerializationBasicBlock* ConvertLogOperator(const Layer* layer,
 
         auto log_func = [&](float x) -> float
         {
-            if (x <= 0.0f) 
+            if (x <= 0.0f)
             {
                 return output_min;
             }

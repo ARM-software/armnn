@@ -85,11 +85,10 @@ TosaSerializationBasicBlock* ConvertGeluToTosaOperator(const Layer* layer,
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
     std::vector<int32_t> inputShape0;
-    DType inputDType0 = DType::DType_UNKNOWN;
+    DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
     if(inputName.find("input_") != std::string::npos)
     {
         inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
-        inputDType0 = ArmNNToDType(inputs[0]->GetDataType());
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape0, inputDType0, {}));
     }
 

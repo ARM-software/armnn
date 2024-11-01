@@ -178,6 +178,7 @@ TEST_CASE("TosaRefAdditionEndtoEndTestFloat16")
 }
 
 // BatchMatMul
+
 TEST_CASE("TosaRefBatchMatMulEndToEndFloat32Test")
 {
     BatchMatMulEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
@@ -446,27 +447,22 @@ TEST_CASE("TosaRefGatherFloatTest")
 {
     GatherEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
 }
-
 TEST_CASE("TosaRefGatherInt16Test")
 {
     GatherEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
 }
-
 TEST_CASE("TosaRefGatherInt8Test")
 {
     GatherEndToEnd<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
 }
-
 TEST_CASE("TosaRefGatherMultiDimFloatTest")
 {
     GatherMultiDimEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
 }
-
 TEST_CASE("TosaRefGatherMultiDimInt16Test")
 {
     GatherMultiDimEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends);
 }
-
 TEST_CASE("TosaRefGatherMultiDimInt8Test")
 {
     int axis;

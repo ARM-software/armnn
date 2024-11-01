@@ -507,3 +507,40 @@ inline void CreateConstTosaOperator(const std::string& outputName,
     tensor = new TosaSerializationTensor(outputName, shape, dtype, uint8Data);
     ARMNN_THROW_MSG_IF_FALSE(tensor, armnn::Exception, "CreateConstTosaOperator: failed to created tensor");
 }
+
+inline bool IsUnsignedDataType(DType type)
+{
+    bool type_unsigned = false;
+    switch(type)
+    {
+        case DType_UINT8:
+        case DType_UINT16:
+            type_unsigned = true;
+            break;
+        default:
+            type_unsigned = false;
+            break;
+    }
+    return type_unsigned;
+}
+
+inline void FlipSignage(DType& type)
+{
+    switch(type)
+    {
+        case DType_UINT8:
+            type = DType_INT8;
+            break;
+        case DType_UINT16:
+            type = DType_INT16;
+            break;
+        case DType_INT8:
+            type = DType_UINT8;
+            break;
+        case DType_INT16:
+            type = DType_UINT16;
+            break;
+        default:
+            throw armnn::Exception("Unknown type to change signage");
+    }
+}

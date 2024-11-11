@@ -1,0 +1,8 @@
+<map id="ScatterNdQueueDescriptor" name="ScatterNdQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="917,47,1112,73"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="633,39,868,81"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,5,136,32"/>
+<area shape="rect" id="node6" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="185,39,420,81"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_scatter_nd_descriptor.html" title="A ScatterNdDescriptor for the ScatterNdLayer." alt="" coords="226,105,379,132"/>
+<area shape="rect" id="node5" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="10,105,131,132"/>
+</map>

@@ -1,0 +1,25 @@
+var classarmnn_1_1_optimization_views =
+[
+    [ "SubstitutionPair", "structarmnn_1_1_optimization_views_1_1_substitution_pair.html", "structarmnn_1_1_optimization_views_1_1_substitution_pair" ],
+    [ "Subgraphs", "classarmnn_1_1_optimization_views.html#a4a2c55491ad3a0a6a98a884b3e3fe6d7", null ],
+    [ "Substitutions", "classarmnn_1_1_optimization_views.html#a5831f7597baa44356221647c45a14f78", null ],
+    [ "OptimizationViews", "classarmnn_1_1_optimization_views.html#aed725c77c38dde2d94f9044bd187ac9d", null ],
+    [ "OptimizationViews", "classarmnn_1_1_optimization_views.html#a9a547d000ab53b70d18c52f8715e2332", null ],
+    [ "OptimizationViews", "classarmnn_1_1_optimization_views.html#a276ddd49e657718e1f5753839872af63", null ],
+    [ "AddDeletedSubgraph", "classarmnn_1_1_optimization_views.html#a4438f2ce297390e50f48dc426ba1f4f9", null ],
+    [ "AddFailedSubgraph", "classarmnn_1_1_optimization_views.html#a1b29d43c2596e40987838f6d1f819858", null ],
+    [ "AddSubstitution", "classarmnn_1_1_optimization_views.html#a57340147dcb1c0ae05fdf14ff7af8a01", null ],
+    [ "AddUntouchedSubgraph", "classarmnn_1_1_optimization_views.html#a28e41bdd6b719a3d60a1a0de2e1ebc95", null ],
+    [ "GetDeletedSubgraphs", "classarmnn_1_1_optimization_views.html#aa3792ea74cfe24d25460a6cf8e851f85", null ],
+    [ "GetFailedSubgraphs", "classarmnn_1_1_optimization_views.html#af90695ff32383f3f967e256783aba816", null ],
+    [ "GetFailedSubgraphs", "classarmnn_1_1_optimization_views.html#ad5fee4381bf82ffa37658dddf4d1fa01", null ],
+    [ "GetINetwork", "classarmnn_1_1_optimization_views.html#ad04187fe81f68558b15b6049b2da9cf9", null ],
+    [ "GetINetworkRef", "classarmnn_1_1_optimization_views.html#a930b60b811f4e7fec8d73c357f5529c2", null ],
+    [ "GetSubstitutions", "classarmnn_1_1_optimization_views.html#af57a6b0e88fd56f8dba7c5cb23871283", null ],
+    [ "GetSubstitutions", "classarmnn_1_1_optimization_views.html#a9a1555f25af4a0ae2c0a1fc0ed9aded8", null ],
+    [ "GetUntouchedSubgraphs", "classarmnn_1_1_optimization_views.html#ab4d6ad65115801991301dc629f187252", null ],
+    [ "GetUntouchedSubgraphs", "classarmnn_1_1_optimization_views.html#a3b4dae097ce086ce94079d09cce18703", null ],
+    [ "operator=", "classarmnn_1_1_optimization_views.html#a730718bdbdf68deb2ded6a223fbac811", null ],
+    [ "operator=", "classarmnn_1_1_optimization_views.html#a868892fed5bcce50e1f59d98439742b7", null ],
+    [ "Validate", "classarmnn_1_1_optimization_views.html#a58dc3ea86870112f745b2a1f7dca55e9", null ]
+];

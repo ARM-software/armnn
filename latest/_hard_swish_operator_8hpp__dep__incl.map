@@ -1,0 +1,9 @@
+<map id="src/backends/tosaCommon/operatorMappings/HardSwishOperator.hpp" name="src/backends/tosaCommon/operatorMappings/HardSwishOperator.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="150,5,451,47"/>
+<area shape="rect" id="node2" href="$_hard_swish_operator_8cpp.html" title=" " alt="" coords="5,102,305,143"/>
+<area shape="rect" id="node3" href="$_tosa_common_operators_8hpp.html" title=" " alt="" coords="329,95,565,151"/>
+<area shape="rect" id="node4" href="$_tosa_mappings_8hpp.html" title=" " alt="" coords="349,199,546,240"/>
+<area shape="rect" id="node5" href="$_tosa_mappings_8cpp.html" title=" " alt="" coords="123,288,321,329"/>
+<area shape="rect" id="node6" href="$_tosa_ref_backend_8cpp.html" title=" " alt="" coords="345,288,549,329"/>
+<area shape="rect" id="node7" href="$_tosa_ref_layer_support_8cpp.html" title=" " alt="" coords="573,288,777,329"/>
+</map>

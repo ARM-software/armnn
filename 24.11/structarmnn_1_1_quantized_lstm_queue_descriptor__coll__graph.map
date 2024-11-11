@@ -1,0 +1,6 @@
+<map id="QuantizedLstmQueueDescriptor" name="QuantizedLstmQueueDescriptor">
+<area shape="rect" id="node1" title=" " alt="" coords="7,317,236,344"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="5,81,136,108"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_const_tensor_handle.html" title=" " alt="" coords="160,81,307,108"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="176,5,291,32"/>
+</map>

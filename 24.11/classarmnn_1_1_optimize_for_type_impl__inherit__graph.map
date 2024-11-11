@@ -1,0 +1,10 @@
+<map id="OptimizeForTypeImpl&lt; BaseType, Wrapped &gt;" name="OptimizeForTypeImpl&lt; BaseType, Wrapped &gt;">
+<area shape="rect" id="node1" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="161,85,341,127"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_optimize_for_type.html" title=" " alt="" coords="663,5,875,47"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="631,71,907,141"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="639,165,898,236"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,67,112,94"/>
+<area shape="rect" id="node3" title=" " alt="" coords="19,118,99,145"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="956,85,1207,127"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="994,173,1169,229"/>
+</map>

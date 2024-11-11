@@ -1,0 +1,6 @@
+<map id="Instrument" name="Instrument">
+<area shape="rect" id="node1" title=" " alt="" coords="131,5,225,32"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_neon_timer.html" title=" " alt="" coords="5,80,100,107"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_open_cl_timer.html" title="OpenClTimer instrument that times all OpenCl kernels executed between calls to Start() and Stop()." alt="" coords="125,80,231,107"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_wall_clock_timer.html" title=" " alt="" coords="256,80,380,107"/>
+</map>

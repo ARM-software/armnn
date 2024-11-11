@@ -1,0 +1,6 @@
+<map id="DepthwiseConvolution2dQueueDescriptor" name="DepthwiseConvolution2dQueueDescriptor">
+<area shape="rect" id="node1" title="Depthwise Convolution 2D layer workload data." alt="" coords="33,291,260,332"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="5,200,288,241"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="76,5,207,32"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="163,81,397,123"/>
+</map>

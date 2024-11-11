@@ -1,0 +1,7 @@
+<map id="TransposeConvolution2dLayer" name="TransposeConvolution2dLayer">
+<area shape="rect" id="node1" title="This layer represents a 2D transpose convolution operation." alt="" coords="36,367,253,393"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,276,284,317"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="110,81,169,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="161,157,323,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="68,5,211,32"/>
+</map>

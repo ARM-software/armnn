@@ -1,0 +1,11 @@
+<map id="Optimization" name="Optimization">
+<area shape="rect" id="node1" title=" " alt="" coords="5,179,112,206"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1optimizations_1_1_convert_constants.html" title=" " alt="" coords="161,5,383,47"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="182,172,362,213"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="672,64,948,135"/>
+<area shape="rect" id="node7" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="681,251,939,321"/>
+<area shape="rect" id="node9" href="$classarmnn_1_1_optimize_for_type_impl_3_01_layer_00_01_wrapped_01_4.html" title="Specialization that calls Wrapped::Run() for any layer type." alt="" coords="192,339,352,380"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_optimize_for_type.html" title=" " alt="" coords="704,172,916,213"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="997,79,1248,120"/>
+<area shape="rect" id="node8" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1035,258,1210,314"/>
+</map>

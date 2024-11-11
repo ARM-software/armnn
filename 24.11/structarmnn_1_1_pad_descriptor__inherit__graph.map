@@ -1,0 +1,4 @@
+<map id="PadDescriptor" name="PadDescriptor">
+<area shape="rect" id="node1" title="A PadDescriptor for the PadLayer." alt="" coords="10,80,122,107"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="5,5,127,32"/>
+</map>

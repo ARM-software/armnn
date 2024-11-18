@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -17,7 +17,6 @@ class CopyMemGenericWorkload : public BaseWorkload<MemCopyQueueDescriptor>
 public:
     CopyMemGenericWorkload(const MemCopyQueueDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData) override;
 
 private:
     using TensorHandlePair = std::pair<const ITensorHandle*, ITensorHandle*>;

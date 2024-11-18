@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,7 +19,7 @@ public:
     using TypedWorkload<PermuteQueueDescriptor, DataType>::m_Data;
     using TypedWorkload<PermuteQueueDescriptor, DataType>::TypedWorkload;
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
+
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };

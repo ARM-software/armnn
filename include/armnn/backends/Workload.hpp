@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -7,8 +7,6 @@
 #include "IWorkload.hpp"
 #include "WorkloadData.hpp"
 #include "WorkloadInfo.hpp"
-#include "WorkingMemDescriptor.hpp"
-#include "ExecutionData.hpp"
 
 #include <armnn/Logging.hpp>
 
@@ -47,19 +45,6 @@ public:
         return m_Name;
     }
 
-    void ExecuteAsync(ExecutionData& executionData) override
-    {
-        ARMNN_LOG(info) << "Using default async workload execution, this will network affect performance";
-#if !defined(ARMNN_DISABLE_THREADS)
-        std::lock_guard<std::mutex> lockGuard(m_AsyncWorkloadMutex);
-#endif
-        WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-        m_Data.m_Inputs = workingMemDescriptor->m_Inputs;
-        m_Data.m_Outputs = workingMemDescriptor->m_Outputs;
-
-        Execute();
-    };
-
     void PostAllocationConfigure() override {}
 
     const QueueDescriptor& GetData() const { return m_Data; }
@@ -89,11 +74,6 @@ protected:
     QueueDescriptor m_Data;
     const arm::pipe::ProfilingGuid m_Guid;
     const std::string m_Name;
-
-private:
-#if !defined(ARMNN_DISABLE_THREADS)
-    std::mutex m_AsyncWorkloadMutex;
-#endif
 };
 
 // TypedWorkload used

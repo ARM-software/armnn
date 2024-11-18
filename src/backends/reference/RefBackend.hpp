@@ -12,7 +12,6 @@ namespace armnn
 const BackendCapabilities cpuRefCapabilities("CpuRef",
                                              {
                                                     {"NonConstWeights", true},
-                                                    {"AsyncExecution", true},
                                                     {"ProtectedContentAllocation", false},
                                                     {"ConstantTensorsAsInputs", true},
                                                     {"PreImportIOTensors", true},
@@ -65,10 +64,6 @@ public:
     };
 
     std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
-
-    ExecutionData CreateExecutionData(WorkingMemDescriptor& workingMemDescriptor) const override;
-
-    void UpdateExecutionData(ExecutionData& executionData, WorkingMemDescriptor& workingMemDescriptor) const override;
 };
 
 } // namespace armnn

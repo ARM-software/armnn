@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,12 +16,6 @@ namespace armnn
 void RefPooling3dWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefPooling3dWorkload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefPooling3dWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const

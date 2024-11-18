@@ -579,8 +579,7 @@ ArmnnSubgraph* ArmnnSubgraph::Create(TfLiteOpaqueContext* tfLiteContext,
         {
             outputSource = armnn::MemorySource::Malloc;
         }
-        armnn::INetworkProperties networkProperties(false,
-                                                    inputSource,
+        armnn::INetworkProperties networkProperties(inputSource,
                                                     outputSource,
                                                     delegate->m_Options.GetInternalProfilingState(),
                                                     delegate->m_Options.GetInternalProfilingDetail());

@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -17,13 +17,6 @@ template <armnn::DataType DataType>
 void RefTransposeWorkload<DataType>::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-template <armnn::DataType DataType>
-void RefTransposeWorkload<DataType>::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 template <armnn::DataType DataType>

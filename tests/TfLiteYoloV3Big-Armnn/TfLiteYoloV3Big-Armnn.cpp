@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -12,7 +12,6 @@
 #include <armnn/INetwork.hpp>
 #include <armnn/IRuntime.hpp>
 #include <armnn/Logging.hpp>
-#include <armnn/utility/IgnoreUnused.hpp>
 
 #include <cxxopts/cxxopts.hpp>
 #include <ghc/filesystem.hpp>
@@ -151,7 +150,7 @@ int LoadModel(const char* filename,
 
         armnn::MemorySource memSource = options.GetImportEnabled() ? armnn::MemorySource::Malloc
                                                                 : armnn::MemorySource::Undefined;
-        INetworkProperties modelProps(false, memSource, memSource);
+        INetworkProperties modelProps(memSource, memSource);
         Status status = runtime.LoadNetwork(networkId, std::move(optimizedModel), errorMessage, modelProps);
         if (status != Status::Success)
         {

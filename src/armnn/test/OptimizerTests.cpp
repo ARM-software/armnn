@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2022-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -726,9 +726,6 @@ TEST_CASE("BackendCapabilityTest")
     // MockBackend does not support the NonConstWeights capability
     CHECK(!armnn::HasMatchingCapability(nonConstWeights, backendId));
     CHECK(!armnn::HasCapability("NonConstWeights", backendId));
-
-    // MockBackend does not support the AsyncExecution capability
-    CHECK(!armnn::GetCapability("AsyncExecution", backendId).has_value());
 }
 
 TEST_CASE("BackendHintTest")

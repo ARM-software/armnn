@@ -7,8 +7,6 @@
 #include "BackendOptions.hpp"
 #include "INetwork.hpp"
 #include "IProfiler.hpp"
-#include "IWorkingMemHandle.hpp"
-#include "IAsyncExecutionCallback.hpp"
 #include "Tensor.hpp"
 #include "Types.hpp"
 #include "TypesUtils.hpp"
@@ -42,21 +40,17 @@ using IRuntimePtr = std::unique_ptr<IRuntime, void(*)(IRuntime* runtime)>;
 
 struct INetworkProperties
 {
-    INetworkProperties(bool asyncEnabled,
-                       MemorySource inputSource,
+    INetworkProperties(MemorySource inputSource,
                        MemorySource outputSource,
                        bool profilingEnabled = false,
                        ProfilingDetailsMethod detailsMethod = ProfilingDetailsMethod::Undefined,
                        bool externalMemoryManagementEnabled = false)
-        : m_AsyncEnabled(asyncEnabled),
-          m_ProfilingEnabled(profilingEnabled),
+        : m_ProfilingEnabled(profilingEnabled),
           m_OutputNetworkDetailsMethod(detailsMethod),
           m_InputSource(inputSource),
           m_OutputSource(outputSource),
           m_ExternalMemoryManagementEnabled(externalMemoryManagementEnabled)
     {}
-
-    const bool m_AsyncEnabled;
 
     const bool m_ProfilingEnabled;
 
@@ -69,8 +63,6 @@ struct INetworkProperties
 
     virtual ~INetworkProperties() {}
 };
-
-using namespace armnn::experimental;
 
 class IRuntime
 {
@@ -237,33 +229,12 @@ public:
     std::vector<ImportedOutputId> ImportOutputs(NetworkId networkId, const OutputTensors& outputTensors,
                                                 MemorySource forceImportMemorySource = MemorySource::Undefined);
 
-    /// Un-import and delete the imported InputTensor/s
-    /// This function is not thread safe and must not be used while other threads are calling Execute().
-    /// Only compatible with AsyncEnabled networks
-    void ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds);
-
-    /// Un-import and delete the imported OutputTensor/s
-    /// This function is not thread safe and must not be used while other threads are calling Execute().
-    /// Only compatible with AsyncEnabled networks
-    void ClearImportedOutputs(NetworkId networkId, const std::vector<ImportedOutputId> outputIds);
-
     /// Evaluates a network using input in inputTensors and outputs filled into outputTensors
     Status EnqueueWorkload(NetworkId networkId,
                            const InputTensors& inputTensors,
                            const OutputTensors& outputTensors,
                            std::vector<ImportedInputId> preImportedInputIds = {},
                            std::vector<ImportedOutputId> preImportedOutputIds = {});
-
-    /// This is an experimental function.
-    /// Evaluates a network using input in inputTensors and outputs filled into outputTensors.
-    /// This function performs a thread safe execution of the network. Returns once execution is complete.
-    /// Will block until this and any other thread using the same workingMem object completes.
-    ARMNN_DEPRECATED_MSG_REMOVAL_DATE("The Async interface will be removed from Arm NN in 24.08", "24.08")
-    Status Execute(IWorkingMemHandle& workingMemHandle,
-                   const InputTensors& inputTensors,
-                   const OutputTensors& outputTensors,
-                   std::vector<ImportedInputId> preImportedInputs = {},
-                   std::vector<ImportedOutputId> preImportedOutputs = {});
 
     /// Unloads a network from the IRuntime.
     /// At the moment this only removes the network from the m_Impl->m_Network.
@@ -273,10 +244,6 @@ public:
     Status UnloadNetwork(NetworkId networkId);
 
     const IDeviceSpec& GetDeviceSpec() const;
-
-    /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
-    /// overlapped Execution by calling this function from different threads.
-    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle(NetworkId networkId);
 
     /// Gets the profiler corresponding to the given network id.
     /// @param networkId The id of the network for which to get the profile.

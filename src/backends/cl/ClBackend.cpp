@@ -278,7 +278,6 @@ BackendCapabilities ClBackend::GetCapabilities() const
     return BackendCapabilities ("GpuAcc",
                                                  {
                                                      {"NonConstWeights", true},
-                                                     {"AsyncExecution", false},
                                                      {"ProtectedContentAllocation", true},
                                                      {"ConstantTensorsAsInputs", true},
                                                      {"PreImportIOTensors", false},

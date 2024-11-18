@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -25,12 +25,6 @@ RefBatchNormalizationWorkload::RefBatchNormalizationWorkload(const BatchNormaliz
 void RefBatchNormalizationWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefBatchNormalizationWorkload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefBatchNormalizationWorkload::Execute(std::vector<ITensorHandle*> inputs,

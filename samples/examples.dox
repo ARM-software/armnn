@@ -37,13 +37,4 @@ memory for the inputs, outputs and inter layer memory.
 @note This is currently an experimental interface
 @example CustomMemoryAllocatorSample.cpp
 **/
-
-/**
-Yet another variant of the SimpleSample application. In this little sample app you will be shown how to run a
-network multiple times asynchronously.
-
-@note This is currently an experimental interface
-@example AsyncExecutionSample.cpp
-**/
-
 }

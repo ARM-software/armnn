@@ -1,5 +1,5 @@
 //
-// Copyright © 2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -36,12 +36,6 @@ RefTransposeConvolution2dWorkload::RefTransposeConvolution2dWorkload(
 void RefTransposeConvolution2dWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefTransposeConvolution2dWorkload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefTransposeConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inputs,

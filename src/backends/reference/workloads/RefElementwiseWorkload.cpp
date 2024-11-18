@@ -1,5 +1,5 @@
 //
-// Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2018-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,14 +29,6 @@ template <typename Functor, typename ParentDescriptor, typename armnn::StringMap
 void RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-template <typename Functor, typename ParentDescriptor, typename armnn::StringMapping::Id DebugString>
-void RefElementwiseWorkload<Functor, ParentDescriptor, DebugString>::ExecuteAsync(
-        ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 template <typename Functor, typename ParentDescriptor, typename armnn::StringMapping::Id DebugString>

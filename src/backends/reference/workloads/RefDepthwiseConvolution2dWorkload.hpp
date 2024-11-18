@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "RefBaseWorkload.hpp"
@@ -17,7 +17,6 @@ public:
     explicit RefDepthwiseConvolution2dWorkload(const DepthwiseConvolution2dQueueDescriptor &descriptor,
                                                const WorkloadInfo &info);
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
 
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;

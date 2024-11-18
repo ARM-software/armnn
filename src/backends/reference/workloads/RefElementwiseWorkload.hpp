@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -23,7 +23,6 @@ class RefElementwiseWorkload : public RefBaseWorkload<ParentDescriptor>
 public:
     RefElementwiseWorkload(const ParentDescriptor& descriptor, const WorkloadInfo& info);
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
 
 private:
     using InType = typename ElementwiseBinaryFunction<Functor>::InType;

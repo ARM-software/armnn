@@ -141,11 +141,6 @@ void CheckForDeprecatedOptions(const cxxopts::ParseResult& result)
         ARMNN_LOG(warning) << "DEPRECATED: The program option 'armnn-tflite-delegate' is deprecated and will be "
                               "removed soon. Please use the option 'tflite-executor' instead.";
     }
-    if(result.count("concurrent") > 0)
-    {
-        ARMNN_LOG(warning) << "DEPRECATED: The program option 'concurrent' is deprecated and will be "
-                              "removed soon. Please use the option '\"P, thread-pool-size\"' instead.";
-    }
     if(result.count("input-type") > 0)
     {
         ARMNN_LOG(warning) << "DEPRECATED: The program option 'input-type' is deprecated and will be "
@@ -237,11 +232,6 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "If left empty (the default), dynamic backends will not be used.",
                  cxxopts::value<std::string>(m_RuntimeOptions.m_DynamicBackendsPath))
 
-                ("P, thread-pool-size",
-                 "Run the network using the Arm NN thread pool with the number of threads provided. "
-                 "DECRECATED: The asynchronous execution interface will be removed in 24.08",
-                 cxxopts::value<size_t>(m_ExNetParams.m_ThreadPoolSize)->default_value("0"))
-
                 ("d,input-tensor-data",
                  "Path to files containing the input data as a flat array separated by whitespace. "
                  "Several paths can be passed by separating them with a comma if the network has multiple inputs "
@@ -270,8 +260,7 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "Note: The number of input files provided must be divisible by the number of inputs of the model. "
                  "e.g. Your model has 2 inputs and you supply 4 input files. If you set 'iterations' to 6 the first "
                  "run will consume the first two inputs, the second the next two and the last will begin from the "
-                 "start and use the first two inputs again. "
-                 "Note: If the 'concurrent' option is enabled all iterations will be run asynchronously.",
+                 "start and use the first two inputs again. ",
                  cxxopts::value<unsigned int>(m_ExNetParams.m_Iterations)->default_value("1"))
 
                 ("l,dequantize-output",
@@ -480,14 +469,6 @@ ProgramOptions::ProgramOptions() : m_CxxOptions{"ExecuteNetwork",
                  "removed soon. The model-format is now automatically set.",
                  cxxopts::value<std::string>())
 
-                ("n,concurrent",
-                "This option is for Arm NN internal asynchronous testing purposes. "
-                "False by default. If set to true will use std::launch::async or the Arm NN thread pool, "
-                "if 'thread-pool-size' is greater than 0, for asynchronous execution."
-                "DEPRECATED: The program option 'concurrent' is deprecated and will be "
-                "removed soon. Please use the option '\"P, thread-pool-size\"' instead.",
-                cxxopts::value<bool>(m_ExNetParams.m_Concurrent)->default_value("false")->implicit_value("true"))
-
                 ("y,input-type",
                  "The type of the input tensors in the network separated by comma. "
                  "If unset, defaults to \"float\" for all defined inputs. "
@@ -589,26 +570,6 @@ void ProgramOptions::ParseOptions(int ac, const char* av[])
     if (m_ExNetParams.m_EnableDelegate)
     {
         m_ExNetParams.m_TfLiteExecutor = ExecuteNetworkParams::TfLiteExecutor::ArmNNTfLiteDelegate;
-    }
-
-    // Set concurrent to true if the user expects to run inferences asynchronously
-    if (m_ExNetParams.m_Concurrent)
-    {
-        m_ExNetParams.m_ThreadPoolSize = 1;
-    }
-
-    // There's an odd combination of parameters to be handled here. It appears that setting m_ThreadPoolSize greater
-    // than 0 implies using the asynchronous mode. However, TfLite executor does not support an asynchronous mode of
-    // execution
-    if (m_ExNetParams.m_ThreadPoolSize > 0)
-    {
-        m_ExNetParams.m_Concurrent = true;
-    }
-    if (m_ExNetParams.m_Concurrent &&
-        m_ExNetParams.m_TfLiteExecutor == ExecuteNetworkParams::TfLiteExecutor::TfliteInterpreter)
-    {
-        ARMNN_LOG(info) << "The TfLite runtime does not support an asynchronous mode of execution. Parameters "
-                           "\"n,concurrent\" or \"P, thread-pool-size\" will be ignored.";
     }
 
     // Parse input tensor shape from the string we got from the command-line.

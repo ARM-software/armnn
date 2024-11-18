@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -80,7 +80,7 @@ TEST_CASE("ClImportEnabledFallbackToNeon")
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -366,7 +366,7 @@ TEST_CASE("ClImportEnabledFallbackSubgraphToNeon")
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output

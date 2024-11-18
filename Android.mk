@@ -187,11 +187,9 @@ LOCAL_SRC_FILES := \
         src/armnn/SubgraphView.cpp \
         src/armnn/SubgraphViewSelector.cpp \
         src/armnn/Tensor.cpp \
-        src/armnn/Threadpool.cpp \
         src/armnn/TypesUtils.cpp \
         src/armnn/Utils.cpp \
         src/armnn/WallClockTimer.cpp \
-        src/armnn/WorkingMemHandle.cpp \
         src/armnnUtils/CompatibleTypes.cpp \
         src/armnnUtils/DataLayoutIndexed.cpp \
         src/armnnUtils/DotSerializer.cpp \

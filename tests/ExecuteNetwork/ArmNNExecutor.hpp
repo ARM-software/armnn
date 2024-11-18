@@ -12,7 +12,6 @@
 #include "armnn/utility/Timer.hpp"
 
 #include <armnn/ArmNN.hpp>
-#include <armnn/Threadpool.hpp>
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
 #include <armnn/BackendRegistry.hpp>
@@ -68,7 +67,6 @@ private:
 
     std::unique_ptr<IParser> CreateParser();
 
-    void ExecuteAsync();
     void ExecuteSync();
     void SetupInputsAndOutputs();
 

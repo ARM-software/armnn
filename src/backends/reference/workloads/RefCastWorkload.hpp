@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -18,7 +18,6 @@ class RefCastWorkload : public RefBaseWorkload<CastQueueDescriptor>
 public:
     using RefBaseWorkload<CastQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;
 };

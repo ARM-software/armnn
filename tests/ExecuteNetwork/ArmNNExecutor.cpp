@@ -7,8 +7,6 @@
 #include "ArmNNExecutor.hpp"
 #include "NetworkExecutionUtils/NetworkExecutionUtils.hpp"
 
-#include <AsyncExecutionCallback.hpp>
-#include <armnn/IAsyncExecutionCallback.hpp>
 #if defined(ARMNN_SERIALIZER)
 #include <armnnSerializer/ISerializer.hpp>
 #endif
@@ -170,8 +168,7 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
         profilingDetailsMethod = armnn::ProfilingDetailsMethod::DetailsWithEvents;
     }
 
-    INetworkProperties networkProperties{m_Params.m_Concurrent,
-                                         MemorySource::Undefined,
+    INetworkProperties networkProperties{MemorySource::Undefined,
                                          MemorySource::Undefined,
                                          params.m_EnableProfiling,
                                          profilingDetailsMethod};
@@ -194,15 +191,7 @@ ArmNNExecutor::ArmNNExecutor(const ExecuteNetworkParams& params, armnn::IRuntime
     if (m_Params.m_Iterations > 1)
     {
         std::stringstream msg;
-        msg << "Network will be executed " << m_Params.m_Iterations;
-        if (m_Params.m_Concurrent)
-        {
-            msg << " times in an asynchronous manner. ";
-        }
-        else
-        {
-            msg << " times successively. ";
-        }
+        msg << "Network will be executed " << m_Params.m_Iterations << " times successively. ";
         msg << "The input-tensor-data files will be reused recursively if the user didn't provide enough to "
                "cover each execution.";
         ARMNN_LOG(info) << msg.str();
@@ -230,81 +219,6 @@ ArmNNExecutor::~ArmNNExecutor()
 
     // We're finished with the network.
     m_Runtime->UnloadNetwork(m_NetworkId);
-}
-
-void ArmNNExecutor::ExecuteAsync()
-{
-#if !defined(ARMNN_DISABLE_THREADS)
-    std::vector<std::shared_ptr<armnn::IWorkingMemHandle>> memHandles;
-    std::unique_ptr<armnn::Threadpool> threadpool;
-    armnn::AsyncCallbackManager callbackManager;
-    std::unordered_map<armnn::InferenceId, const armnn::OutputTensors*> inferenceOutputMap;
-
-    for (size_t i = 0; i < m_Params.m_ThreadPoolSize; ++i)
-    {
-        memHandles.emplace_back(m_Runtime->CreateWorkingMemHandle(m_NetworkId));
-    }
-
-    threadpool = std::make_unique<armnn::Threadpool>(m_Params.m_ThreadPoolSize,
-                                                     m_Runtime,
-                                                     memHandles);
-
-    ARMNN_LOG(info) << "Asynchronous Execution with Arm NN thread pool...  \n";
-    // Declare the latest and earliest inference times here to be used when calculating overall time
-    std::chrono::high_resolution_clock::time_point earliestStartTime =
-            std::chrono::high_resolution_clock::time_point::max();
-    std::chrono::high_resolution_clock::time_point latestEndTime =
-            std::chrono::high_resolution_clock::now();
-
-    // For the asynchronous execution, we are adding a pool of working memory handles (1 per thread) in the
-    // LoadedNetwork with each scheduled inference having a specific priority
-    for (unsigned int i = 0; i < m_Params.m_Iterations; ++i)
-    {
-        std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkId);
-
-        std::shared_ptr<armnn::AsyncExecutionCallback> cb = callbackManager.GetNewCallback();
-        inferenceOutputMap.insert({cb->GetInferenceId(), &m_OutputTensorsVec[i]});
-        threadpool->Schedule(m_NetworkId,
-                             m_InputTensorsVec[i],
-                             m_OutputTensorsVec[i],
-                             armnn::QosExecPriority::Medium,
-                             cb);
-    }
-
-    // Check the results
-    for (unsigned int iteration = 0; iteration < m_Params.m_Iterations; ++iteration)
-    {
-        auto cb = callbackManager.GetNotifiedCallback();
-
-        // Get the results
-        if (earliestStartTime > cb->GetStartTime())
-        {
-            earliestStartTime = cb->GetStartTime();
-        }
-        if (latestEndTime < cb->GetEndTime())
-        {
-            latestEndTime = cb->GetEndTime();
-        }
-
-        auto startTime = time_point_cast<std::chrono::milliseconds>(cb->GetStartTime());
-        auto endTime = time_point_cast<std::chrono::milliseconds>(cb->GetEndTime());
-        auto inferenceDuration = endTime - startTime;
-        CheckInferenceTimeThreshold(inferenceDuration, m_Params.m_ThresholdTime);
-        if(!m_Params.m_DontPrintOutputs)
-        {
-            const armnn::OutputTensors* out = inferenceOutputMap[cb->GetInferenceId()];
-            PrintOutputTensors(out, iteration);
-        }
-    }
-
-    // Print duration difference between overallStartTime and overallEndTime
-    auto overallEndTime = time_point_cast<std::chrono::milliseconds>(latestEndTime);
-    auto overallStartTime = time_point_cast<std::chrono::milliseconds>(earliestStartTime);
-    auto totalInferenceDuration = overallEndTime - overallStartTime;
-    ARMNN_LOG(info) << "Overall Inference time: " << std::setprecision(2)
-                    << std::fixed << totalInferenceDuration.count() << " ms\n";
-
-#endif
 }
 
 void ArmNNExecutor::ExecuteSync()
@@ -369,14 +283,8 @@ std::vector<const void*> ArmNNExecutor::Execute()
         << std::chrono::duration_cast<std::chrono::nanoseconds>(armnn::GetTimeNow().time_since_epoch()).count()
         << " ns) " << ctime (&rawtime);
 
-    if(m_Params.m_ThreadPoolSize == 0)
-    {
-        ExecuteSync();
-    }
-    else
-    {
-        ExecuteAsync();
-    }
+    ExecuteSync();
+
 
     time (&rawtime);
     ARMNN_LOG(info) << "Inferences ended at: ("
@@ -496,13 +404,6 @@ void ArmNNExecutor::SetupInputsAndOutputs()
         {
             LogAndThrow("Specifying multiple sets of outputs not compatible with ReuseBuffers");
         }
-    }
-
-    if (m_Params.m_ThreadPoolSize != 0)
-    {
-        // The current implementation of the Threadpool does not allow binding of outputs to a thread
-        // So to ensure no two threads write to the same output at the same time, no output can be reused
-        noOutputSets = m_Params.m_Iterations;
     }
 
     if (m_Params.m_InputTensorDataFilePaths.size() > noOfInputs)

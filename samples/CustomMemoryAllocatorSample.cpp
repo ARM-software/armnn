@@ -1,5 +1,5 @@
 //
-// Copyright © 2021, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2023-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -136,7 +136,7 @@ int main()
 
     // Load graph into runtime
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(networkIdentifier, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output

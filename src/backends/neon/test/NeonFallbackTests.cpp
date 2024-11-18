@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -84,7 +84,7 @@ TEST_CASE("FallbackImportToCpuAcc")
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -226,7 +226,7 @@ TEST_CASE("FallbackPaddingCopyToCpuAcc")
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -365,7 +365,7 @@ TEST_CASE("FallbackImportFromCpuAcc")
     NetworkId netId;
     std::string ignoredErrorMessage;
 
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -507,7 +507,7 @@ TEST_CASE("FallbackPaddingCopyFromCpuAcc")
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -642,7 +642,7 @@ TEST_CASE("FallbackDisableImportFromCpuAcc")
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string ignoredErrorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -781,7 +781,7 @@ TEST_CASE("NeonImportEnabledFallbackToCl")
     NetworkId netId;
     std::string ignoredErrorMessage;
 
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
@@ -1078,7 +1078,7 @@ TEST_CASE("NeonImportEnabledFallbackSubgraphToCl")
     NetworkId netId;
     std::string ignoredErrorMessage;
 
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
 
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 

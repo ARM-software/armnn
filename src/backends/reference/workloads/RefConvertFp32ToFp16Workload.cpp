@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,11 +19,6 @@ void RefConvertFp32ToFp16Workload::Execute() const
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
 }
 
-void RefConvertFp32ToFp16Workload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
-}
 
 void RefConvertFp32ToFp16Workload::Execute(std::vector<ITensorHandle*> inputs,
                                            std::vector<ITensorHandle*> outputs) const

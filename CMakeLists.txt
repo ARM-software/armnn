@@ -157,12 +157,10 @@ list(APPEND armnn_sources
     include/armnn/Exceptions.hpp
     include/armnn/backends/ILayerSupport.hpp
     include/armnn/backends/ICustomAllocator.hpp
-    include/armnn/IAsyncExecutionCallback.hpp
     include/armnn/INetwork.hpp
     include/armnn/IProfiler.hpp
     include/armnn/IRuntime.hpp
     include/armnn/IStrategy.hpp
-    include/armnn/IWorkingMemHandle.hpp
     include/armnn/Logging.hpp
     include/armnn/LstmParams.hpp
     include/armnn/MemorySources.hpp
@@ -172,7 +170,6 @@ list(APPEND armnn_sources
     include/armnn/StrategyBase.hpp
     include/armnn/Tensor.hpp
     include/armnn/TensorFwd.hpp
-    include/armnn/Threadpool.hpp
     include/armnn/Types.hpp
     include/armnn/TypesUtils.hpp
     include/armnn/Utils.hpp
@@ -346,8 +343,6 @@ list(APPEND armnn_sources
     src/armnn/layers/UnmapLayer.hpp
     src/armnn/ArmNNProfilingServiceInitialiser.cpp
     src/armnn/ArmNNProfilingServiceInitialiser.hpp
-    src/armnn/AsyncExecutionCallback.cpp
-    src/armnn/AsyncExecutionCallback.hpp
     src/armnn/BackendRegistry.cpp
     src/armnn/BackendSettings.hpp
     src/armnn/BackendHelper.cpp
@@ -355,7 +350,6 @@ list(APPEND armnn_sources
     src/armnn/DeviceSpec.hpp
     src/armnn/DllExport.hpp
     src/armnn/Exceptions.cpp
-    src/armnn/ExecutionData.hpp
     src/armnn/ExecutionFrame.cpp
     src/armnn/ExecutionFrame.hpp
     src/armnn/Graph.cpp
@@ -402,14 +396,10 @@ list(APPEND armnn_sources
     src/armnn/SubgraphViewSelector.cpp
     src/armnn/SubgraphViewSelector.hpp
     src/armnn/Tensor.cpp
-    src/armnn/Threadpool.cpp
     src/armnn/TypesUtils.cpp
     src/armnn/Utils.cpp
     src/armnn/WallClockTimer.cpp
     src/armnn/WallClockTimer.hpp
-    src/armnn/WorkingMemDescriptor.hpp
-    src/armnn/WorkingMemHandle.cpp
-    src/armnn/WorkingMemHandle.hpp
     src/armnn/optimizations/AddBroadcastReshapeLayer.hpp
     src/armnn/optimizations/AddDebug.hpp
     src/armnn/optimizations/All.hpp

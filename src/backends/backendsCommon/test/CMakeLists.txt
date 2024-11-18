@@ -17,7 +17,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     ConcatEndToEndTestImpl.hpp
     Convolution2dEndToEndTestImpl.hpp
     Convolution3dEndToEndTestImpl.hpp
-    DefaultAsyncExecuteTest.cpp
     DepthToSpaceEndToEndTestImpl.hpp
     DepthwiseConvolution2dEndToEndTests.hpp
     DequantizeEndToEndTestImpl.hpp
@@ -63,7 +62,6 @@ list(APPEND armnnBackendsCommonUnitTests_sources
     SpaceToDepthEndToEndTestImpl.cpp
     SpaceToDepthEndToEndTestImpl.hpp
     SplitterEndToEndTestImpl.hpp
-    StridedSliceAsyncEndToEndTest.hpp
     SubgraphUtilsTest.hpp
     SubtractionEndToEndTestImpl.hpp
     TileEndToEndTestImpl.hpp

@@ -21,13 +21,6 @@ void RefDebugWorkload<DataType>::Execute() const
 }
 
 template<armnn::DataType DataType>
-void RefDebugWorkload<DataType>::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs);
-}
-
-template<armnn::DataType DataType>
 void RefDebugWorkload<DataType>::Execute(std::vector<ITensorHandle*> inputs) const
 {
     using T = ResolveType<DataType>;

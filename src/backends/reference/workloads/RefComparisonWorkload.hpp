@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,7 +21,6 @@ public:
     RefComparisonWorkload(const ComparisonQueueDescriptor& descriptor, const WorkloadInfo& info);
     void PostAllocationConfigure() override;
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
 
 private:
     void PostAllocationConfigure(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs);

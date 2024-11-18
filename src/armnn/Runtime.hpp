@@ -70,16 +70,6 @@ public:
                            std::vector<ImportedInputId> preImportedInputIds = {},
                            std::vector<ImportedOutputId> preImportedOutputIds = {});
 
-    /// This is an experimental function.
-    /// Evaluates a network using input in inputTensors and outputs filled into outputTensors.
-    /// This function performs a thread safe execution of the network. Returns once execution is complete.
-    /// Will block until this and any other thread using the same workingMem object completes.
-    Status Execute(IWorkingMemHandle& workingMemHandle,
-                   const InputTensors& inputTensors,
-                   const OutputTensors& outputTensors,
-                   std::vector<ImportedInputId> preImportedInputs,
-                   std::vector<ImportedOutputId> preImportedOutputs);
-
     /// Unloads a network from the Runtime.
     /// At the moment this only removes the network from the m_Impl->m_Network.
     /// This might need more work in the future to be AndroidNN compliant.
@@ -93,10 +83,6 @@ public:
     /// @param networkId The id of the network for which to get the profile.
     /// @return A pointer to the requested profiler, or nullptr if not found.
     const std::shared_ptr<IProfiler> GetProfiler(NetworkId networkId) const;
-
-    /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
-    /// overlapped Execution by calling this function from different threads.
-    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle(NetworkId networkId);
 
     /// Registers a callback function to debug layers performing custom computations on intermediate tensors.
     /// @param networkId The id of the network to register the callback.

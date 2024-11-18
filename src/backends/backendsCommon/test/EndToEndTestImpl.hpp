@@ -219,7 +219,7 @@ inline void ImportNonAlignedInputPointerTest(std::vector<BackendId> backends)
     NetworkId netId;
     std::string errorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -288,7 +288,7 @@ inline void ExportNonAlignedOutputPointerTest(std::vector<BackendId> backends)
     NetworkId netId;
     std::string errorMessage;
     // Enable Importing and Exporting
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -363,7 +363,7 @@ inline void ImportAlignedPointerTest(std::vector<BackendId> backends)
     NetworkId netId;
     std::string errorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -449,7 +449,7 @@ inline void ImportOnlyWorkload(std::vector<BackendId> backends)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -539,7 +539,7 @@ inline void ExportOnlyWorkload(std::vector<BackendId> backends)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Malloc);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -629,7 +629,7 @@ inline void ImportAndExportWorkload(std::vector<BackendId> backends)
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -723,7 +723,7 @@ inline void ExportOutputWithSeveralOutputSlotConnectionsTest(std::vector<Backend
     NetworkId netId;
     std::string errorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -823,7 +823,7 @@ inline void ForceImportWithAlignedBuffersEndToEndTest(std::vector<BackendId> bac
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -927,7 +927,7 @@ inline void ForceImportWithMisalignedInputBuffersEndToEndTest(std::vector<Backen
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -1050,7 +1050,7 @@ inline void ForceImportWithMisalignedOutputBuffersEndToEndTest(std::vector<Backe
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
@@ -1172,7 +1172,7 @@ inline void ForceImportWithMisalignedInputAndOutputBuffersEndToEndTest(std::vect
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
     INFO("Generate Data");
@@ -1290,7 +1290,7 @@ inline void ForceImportRepeatedInferencesEndToEndTest(std::vector<BackendId> bac
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
     INFO("Generate Data");
@@ -1476,7 +1476,7 @@ inline void ForceImportRepeatedInferencesInvertedEndToEndTest(std::vector<Backen
     // Load it into the runtime. It should pass.
     NetworkId netId;
     std::string errorMessage;
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage, networkProperties);
     CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
     INFO("Generate Data");

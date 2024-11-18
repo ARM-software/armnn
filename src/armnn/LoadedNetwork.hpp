@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -49,10 +49,6 @@ public:
         FreeWorkingMemory();
     }
 
-    /// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
-    /// overlapped Execution by calling this function from different threads.
-    std::unique_ptr<IWorkingMemHandle> CreateWorkingMemHandle(NetworkId networkId);
-
     TensorInfo GetInputTensorInfo(LayerBindingId layerId) const;
     TensorInfo GetOutputTensorInfo(LayerBindingId layerId) const;
 
@@ -68,13 +64,6 @@ public:
     Status EnqueueWorkload(const InputTensors& inputTensors, const OutputTensors& outputTensors,
                            std::vector<ImportedInputId> preImportedInputIds = {},
                            std::vector<ImportedOutputId> preImportedOutputIds = {});
-
-    /// Thread safe execution of the loaded network
-    Status Execute(const InputTensors& inputTensors,
-                   const OutputTensors& outputTensors,
-                   IWorkingMemHandle& workingMemHandle,
-                   std::vector<ImportedInputId> preImportedInputs = {},
-                   std::vector<ImportedOutputId> preImportedOutputs = {});
 
     static std::unique_ptr<LoadedNetwork> MakeLoadedNetwork(std::unique_ptr<IOptimizedNetwork> net,
                                                             std::string& errorMessage,
@@ -92,11 +81,6 @@ public:
 
     void SendNetworkStructure(arm::pipe::IProfilingService& profilingService);
 
-    bool IsAsyncEnabled()
-    {
-        return m_NetworkProperties.m_AsyncEnabled;
-    }
-
     arm::pipe::ProfilingGuid GetNetworkGuid();
 
 private:
@@ -108,7 +92,6 @@ private:
 #endif
     );
     void AllocateAndExecuteConstantWorkloads();
-    void AllocateAndExecuteConstantWorkloadsAsync();
 
     std::unordered_map<LayerGuid, std::unique_ptr<IWorkload>> m_ConstantWorkloads;
     std::unordered_map<LayerGuid, ITensorHandle*> m_ConstantTensorHandles;
@@ -136,7 +119,6 @@ private:
     inline LayerBindingId ValidateImportedOutputID(ImportedOutputId id);
 
     void CreateMemoryProfile();
-    void CreateMemoryProfileAsync();
 
     std::unique_ptr<MemoryManager> CreateExternalMemoryManger(
             std::vector<std::pair<std::shared_ptr<TensorMemory>, MemorySource>>& tensorMemory);
@@ -195,9 +177,6 @@ private:
 
     std::vector<ImportedTensorHandlePin> m_PreImportedInputHandles;
     std::vector<ImportedTensorHandlePin> m_PreImportedOutputHandles;
-
-    ImportedInputId m_CurImportedInputId = 0;
-    ImportedInputId m_CurImportedOutputId = 0;
 
     std::unordered_map<BackendId, std::vector<MemBlock>> m_MemBlockMap;
     std::unordered_map<BackendId, std::vector<MemBin>> m_MemBinMap;

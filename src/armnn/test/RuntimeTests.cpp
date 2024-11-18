@@ -68,282 +68,6 @@ TEST_CASE("RuntimeUnloadNetwork")
     CHECK(runtime->UnloadNetwork(networkIdentifier1) == armnn::Status::Failure);
 }
 
-TEST_CASE("RuntimePreImportInputs")
-{
-    armnn::IRuntime::CreationOptions options;
-    armnn::IRuntimePtr runtime(armnn::IRuntime::Create(options));
-    armnn::NetworkId networkId = 1;
-    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
-
-    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
-    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 2 layer");
-    ARMNN_NO_DEPRECATE_WARN_BEGIN
-    auto addLayer = testNetwork->AddAdditionLayer("add layer");
-    ARMNN_NO_DEPRECATE_WARN_END
-    auto outputLayer = testNetwork->AddOutputLayer(2, "output layer");
-
-    TensorInfo tensorInfo{{4}, armnn::DataType::Signed32};
-
-    inputLayer1->GetOutputSlot(0).Connect(addLayer->GetInputSlot(0));
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    inputLayer2->GetOutputSlot(0).Connect(addLayer->GetInputSlot(1));
-    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    addLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
-    addLayer->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    std::vector<armnn::BackendId> backends = {armnn::Compute::CpuRef};
-
-    std::string er;
-    armnn::INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
-    runtime->LoadNetwork(networkId,
-                         Optimize(*testNetwork, backends, runtime->GetDeviceSpec()),
-                         er,
-                         networkProperties);
-
-    std::vector<int> inputData1(4, 10);
-    std::vector<int> inputData2(4, 20);
-    std::vector<int> output(4);
-
-    ConstTensor inputTensor1({{4}, armnn::DataType::Signed32, 0.0f, 0, true}, inputData1.data());
-    ConstTensor inputTensor2({{4}, armnn::DataType::Signed32, 0.0f, 0, true}, inputData2.data());
-    Tensor outputTensor({{4}, armnn::DataType::Signed32}, output.data());
-
-    auto importedInputVec1 = runtime->ImportInputs(networkId, {{0, inputTensor1}}, MemorySource::Malloc);
-    CHECK(importedInputVec1.size() == 1);
-    CHECK(importedInputVec1[0] == 0);
-
-    auto memHandle = runtime->CreateWorkingMemHandle(networkId);
-
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-    runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}}, {0 /* pre-imported id */});
-ARMNN_NO_DEPRECATE_WARN_END
-    for (auto val: output) {
-        CHECK(val == 30);
-    }
-
-    auto importedInputVec2 = runtime->ImportInputs(networkId, {{1, inputTensor2}}, MemorySource::Malloc);
-    CHECK(importedInputVec2.size() == 1);
-    CHECK(importedInputVec2[0] == 1);
-
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-    runtime->Execute(*memHandle.get(), {{0, inputTensor1}}, {{2, outputTensor}}, {1 /* pre-imported id */});
-ARMNN_NO_DEPRECATE_WARN_END
-    for (auto val: output) {
-        CHECK(val == 30);
-    }
-
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-    runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0, 1});
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-    for (auto val: output) {
-        CHECK(val == 30);
-    }
-    // Duplicate ImportedInputId and LayerBindingId
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0, 0});,
-                    armnn::InvalidArgumentException);
-    // Duplicate LayerBindingId
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}}, {1});,
-                    armnn::InvalidArgumentException);
-    // Incorrect ImportedInputId
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}}, {10});,
-                    armnn::InvalidArgumentException);
-    // Incorrect LayerBindingId
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{-2, inputTensor2}}, {{2, outputTensor}}, {1});,
-                    armnn::InvalidArgumentException);
-    // Incorrect layer binding id and ImportedInputId
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{-2, inputTensor2}}, {{2, outputTensor}}, {10});,
-                    armnn::InvalidArgumentException);
-    auto importedInputVec3 = runtime->ImportInputs(networkId, {{1, inputTensor2}}, MemorySource::Malloc);
-    CHECK(importedInputVec3[0] == 2);
-    // Too many ImportedInputIds
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0, 1, 2});,
-                    armnn::InvalidArgumentException);
-    // Too many InputTensors
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(),
-                                     {{0, inputTensor2},
-                                      {1, inputTensor2},
-                                      {2, inputTensor2}},
-                                      {{2, outputTensor}});, armnn::InvalidArgumentException);
-    // Too few ImportedInputIds
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0});,
-                    armnn::InvalidArgumentException);
-    runtime->ClearImportedInputs(networkId, {1});
-    runtime->Execute(*memHandle.get(), {{1, inputTensor2}}, {{2, outputTensor}}, {0}, {});
-    for (auto val: output) {
-        CHECK(val == 30);
-    }
-    // Using deleted pre-imported input
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {}, {{2, outputTensor}}, {0, 1}, {});,
-                    armnn::InvalidArgumentException);
-
-    // Trying to delete deleted pre-imported tensor
-    CHECK_THROWS_AS(runtime->ClearImportedInputs(networkId, {1});, armnn::InvalidArgumentException);
-
-    // Trying to delete unknown pre-imported tensor
-    CHECK_THROWS_AS(runtime->ClearImportedInputs(networkId, {10});, armnn::InvalidArgumentException);
-}
-
-TEST_CASE("RuntimePreImportOutputs")
-{
-    armnn::IRuntime::CreationOptions options;
-    armnn::IRuntimePtr               runtime(armnn::IRuntime::Create(options));
-
-    armnn::NetworkId   networkId = 1;
-
-    armnn::INetworkPtr testNetwork(armnn::INetwork::Create());
-    TensorInfo tensorInfo{{4}, armnn::DataType::Float32, 0.0f, 0, true};
-
-    auto inputLayer1 = testNetwork->AddInputLayer(0, "input 1 layer");
-    inputLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    ActivationDescriptor activationDescriptor;
-    activationDescriptor.m_Function = ActivationFunction::BoundedReLu;
-    activationDescriptor.m_A = 2.0f;
-    activationDescriptor.m_B = 0.0f;
-    auto activationLayer1 = testNetwork->AddActivationLayer(activationDescriptor, "add layer");
-    auto outputLayer1 = testNetwork->AddOutputLayer(2, "output layer");
-
-    inputLayer1->GetOutputSlot(0).Connect(activationLayer1->GetInputSlot(0));
-
-    activationLayer1->GetOutputSlot(0).Connect(outputLayer1->GetInputSlot(0));
-    activationLayer1->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    auto inputLayer2 = testNetwork->AddInputLayer(1, "input 1 layer");
-
-    activationDescriptor.m_A = 4.0f;
-    activationDescriptor.m_B = 2.0f;
-    auto activationLayer2 = testNetwork->AddActivationLayer(activationDescriptor, "add layer");
-    auto outputLayer2 = testNetwork->AddOutputLayer(3, "output layer");
-
-    inputLayer2->GetOutputSlot(0).Connect(activationLayer2->GetInputSlot(0));
-    inputLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    activationLayer2->GetOutputSlot(0).Connect(outputLayer2->GetInputSlot(0));
-    activationLayer2->GetOutputSlot(0).SetTensorInfo(tensorInfo);
-
-    std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
-
-    std::string er;
-    armnn::INetworkProperties networkProperties(true, MemorySource::Undefined, MemorySource::Undefined);
-    runtime->LoadNetwork(networkId,
-                         Optimize(*testNetwork, backends, runtime->GetDeviceSpec()),
-                         er,
-                         networkProperties);
-
-    std::vector<float> inputData1(4, 1.0f);
-    std::vector<float> inputData2(4, 3.0f);
-
-    std::vector<float> outputData1(4);
-    std::vector<float> outputData2(4);
-
-    ConstTensor inputTensor1(tensorInfo, inputData1.data());
-    ConstTensor inputTensor2(tensorInfo, inputData2.data());
-
-    Tensor outputTensor1{tensorInfo, outputData1.data()};
-    Tensor outputTensor2{tensorInfo, outputData2.data()};
-
-    InputTensors inputTensors = {{0, inputTensor1}, {1, inputTensor2}};
-
-    std::pair<LayerBindingId, class Tensor> output1{2, outputTensor1};
-    std::pair<LayerBindingId, class Tensor> output2{3, outputTensor2};
-
-    auto testOutputs = [&]()
-    {
-        for (auto val : outputData1)
-        {
-                    CHECK(val == 1.0f);
-        }
-
-        for (auto val : outputData2)
-        {
-                    CHECK(val == 3.0f);
-        }
-    };
-
-    auto memHandle = runtime->CreateWorkingMemHandle(networkId);
-
-    runtime->Execute(*memHandle.get(),inputTensors, {output1, output2});
-    testOutputs();
-
-    auto importedOutputVec = runtime->ImportOutputs(networkId, {output1, output2 }, MemorySource::Malloc);
-    CHECK(importedOutputVec.size() == 2);
-    CHECK(importedOutputVec[0] == 0);
-    CHECK(importedOutputVec[1] == 1);
-
-    runtime->Execute(*memHandle.get(), inputTensors, {}, {}, importedOutputVec);
-    testOutputs();
-
-    runtime->Execute(*memHandle.get(), inputTensors, {output1}, {}, {1});
-    testOutputs();
-
-    runtime->Execute(*memHandle.get(), inputTensors, {output2}, {}, {0});
-    testOutputs();
-
-    auto importedInputVec = runtime->ImportInputs(networkId, inputTensors, MemorySource::Malloc);
-    CHECK(importedInputVec.size() == 2);
-    CHECK(importedInputVec[0] == 0);
-    CHECK(importedInputVec[1] == 1);
-
-    runtime->Execute(*memHandle.get(), {}, {}, importedInputVec, importedOutputVec);
-    testOutputs();
-
-    runtime->Execute(*memHandle.get(), {{0, inputTensor1}}, {output2}, {1}, {0});
-    testOutputs();
-
-    // Too many ids
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {output1, output2}, {}, {0, 1});,
-                    armnn::InvalidArgumentException);
-
-    // Duplicate ids
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {output2}, {}, {1});,
-                    armnn::InvalidArgumentException);
-
-    // Duplicate ids
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {output1, output1}, {}, {});,
-                    armnn::InvalidArgumentException);
-
-    // Duplicate ids
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {}, {}, {0, 0}),
-                    armnn::InvalidArgumentException);
-
-    // Unknown id
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {output1}, {}, {3});,
-                    armnn::InvalidArgumentException);
-
-    // Unknown id
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {{4, outputTensor2}}, {}, {1});,
-                    armnn::InvalidArgumentException);
-
-    // Input id for output
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {{0, outputTensor2}}, {}, {1});,
-                    armnn::InvalidArgumentException);
-
-    // Input id for output
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {{0, outputTensor2}}, {}, {1});,
-                    armnn::InvalidArgumentException);
-
-    // Output id for input
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), {{2, inputTensor1}}, {{0, outputTensor2}}, {1}, {1, 0});,
-                    armnn::InvalidArgumentException);
-
-    runtime->ClearImportedOutputs(networkId, {1});
-
-    runtime->Execute(*memHandle.get(), inputTensors, {output2}, {}, {0});
-    testOutputs();
-
-    // Trying to use deleted pre-imported tensor
-    CHECK_THROWS_AS(runtime->Execute(*memHandle.get(), inputTensors, {}, {}, importedOutputVec),
-                    armnn::InvalidArgumentException);
-
-    // Trying to delete deleted pre-imported tensor
-    CHECK_THROWS_AS(runtime->ClearImportedOutputs(networkId, {1});, armnn::InvalidArgumentException);
-
-    // Trying to delete unknown pre-imported tensor
-    CHECK_THROWS_AS(runtime->ClearImportedOutputs(networkId, {10});, armnn::InvalidArgumentException);
-}
-
 // Note: the current builds we don't do valgrind and gperftools based leak checking at the same
 //       time, so in practice WITH_VALGRIND and ARMNN_LEAK_CHECKING_ENABLED are exclusive. The
 //       valgrind tests can stay for x86 builds, but on hikey Valgrind is just way too slow
@@ -1339,8 +1063,9 @@ TEST_CASE("RuntimeOptimizeImportOff_LoadNetworkImportOn")
     CHECK(optNet);
 
     std::string er;
+
     // Load the network passing an import memory source.
-    armnn::INetworkProperties networkProperties1(true, MemorySource::Malloc, MemorySource::Undefined);
+    armnn::INetworkProperties networkProperties1(MemorySource::Malloc, MemorySource::Undefined);
     // There should be an InvalidArgumentException.
     runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
     CHECK(er.find("However, it was disabled when this network was optimized") != -1);
@@ -1384,8 +1109,9 @@ TEST_CASE("RuntimeOptimizeExportOff_LoadNetworkExportOn")
     CHECK(optNet);
 
     std::string er;
+
     // Load the network passing an import memory source.
-    armnn::INetworkProperties networkProperties1(true, MemorySource::Undefined, MemorySource::Malloc);
+    armnn::INetworkProperties networkProperties1(MemorySource::Undefined, MemorySource::Malloc);
     // There should be an InvalidArgumentException.
     runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
     CHECK(er.find("However, it was disabled when this network was optimized") != -1);
@@ -1429,8 +1155,9 @@ TEST_CASE("RuntimeOptimizeImportOn_LoadNetworkImportOff")
     CHECK(optNet);
 
     std::string er;
+
     // Load the network passing an import memory source.
-    armnn::INetworkProperties networkProperties1(true, MemorySource::Undefined, MemorySource::Undefined);
+    armnn::INetworkProperties networkProperties1(MemorySource::Undefined, MemorySource::Undefined);
     // There should be an InvalidArgumentException.
     runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
     CHECK(er.find("However, it was enabled when this network was optimized") != -1);
@@ -1475,7 +1202,9 @@ TEST_CASE("RuntimeOptimizeExportOn_LoadNetworkExportOff")
 
     std::string er;
     // Load the network passing an import memory source.
-    armnn::INetworkProperties networkProperties1(true, MemorySource::Undefined, MemorySource::Undefined);
+
+    // ciamcg01
+    armnn::INetworkProperties networkProperties1(MemorySource::Undefined, MemorySource::Undefined);
     // There should be an InvalidArgumentException.
     runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);
     CHECK(er.find("However, it was enabled when this network was optimized") != -1);
@@ -1517,7 +1246,7 @@ TEST_CASE("SyncExecutePreImportInputsHappyPath")
     std::vector<armnn::BackendId> backends = { armnn::Compute::CpuRef };
 
     std::string er;
-    armnn::INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    armnn::INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(networkId, Optimize(*testNetwork, backends, runtime->GetDeviceSpec()), er, networkProperties);
 
     std::vector<int> inputData1(4, 10);

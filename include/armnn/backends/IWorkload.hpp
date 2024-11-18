@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -10,27 +10,14 @@
 namespace armnn
 {
 
-namespace experimental
-{
-
-struct ExecutionData;
-
-} // end experimental namespace
-
-using namespace armnn::experimental;
-
 /// Workload interface to enqueue a layer computation.
 class IWorkload {
 public:
     virtual ~IWorkload() {}
 
-    // Note: do not call for async networks via ExecuteAsync or otherwise,
-    // as async networks memory is allocated outside the workload.
     virtual void PostAllocationConfigure() = 0;
 
     virtual void Execute() const = 0;
-
-    virtual void ExecuteAsync(ExecutionData& executionData) = 0;
 
     virtual arm::pipe::ProfilingGuid GetGuid() const = 0;
 
@@ -55,4 +42,4 @@ public:
     }
 };
 
-} //namespace armnn
+}; //namespace armnn

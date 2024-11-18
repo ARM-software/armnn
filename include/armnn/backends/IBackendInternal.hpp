@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -9,9 +9,7 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/Deprecated.hpp>
 
-#include <ExecutionData.hpp>
 #include <ISubgraphViewConverter.hpp>
-#include <WorkingMemDescriptor.hpp>
 
 #include <armnn/backends/IBackendContext.hpp>
 #include <armnn/backends/IMemoryManager.hpp>
@@ -207,27 +205,6 @@ public:
     ///
     /// \return - Returns 0 if backend does not support caching otherwise number of files cached
     virtual unsigned int GetNumberOfCacheFiles() const { return 0; }
-
-    /// Returns ExecutionData for the backend
-    ///
-    /// \param workingMemDescriptor - Vectors of input and output TensorHandles for a layer
-    /// \return - Returns backend specific ExecutionData generated for a layer
-    virtual ExecutionData CreateExecutionData(WorkingMemDescriptor& workingMemDescriptor) const
-    {
-        IgnoreUnused(workingMemDescriptor);
-        throw armnn::Exception("CreateExecutionData: Function has not been implemented in backend.");
-    };
-
-    /// Update the ExecutionData for a layer. It is used to swap in pre-imported tensor handles
-    ///
-    /// \param executionData - Backend specific ExecutionData generated for a layer
-    /// \param workingMemDescriptor - Vectors of input and output TensorHandles for a layer
-    virtual void UpdateExecutionData(ExecutionData& executionData, WorkingMemDescriptor& workingMemDescriptor) const
-    {
-        IgnoreUnused(executionData);
-        IgnoreUnused(workingMemDescriptor);
-        throw armnn::Exception("UpdateExecutionData: Function has not been implemented in backend.");
-    };
 };
 
 using IBackendInternalUniquePtr = std::unique_ptr<IBackendInternal>;

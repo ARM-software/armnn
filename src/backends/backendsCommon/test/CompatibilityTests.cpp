@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -152,18 +152,6 @@ TEST_CASE("Ref_Backends_Unknown_Capability_Test")
     auto refBackend = std::make_unique<RefBackend>();
     auto refCapabilities = refBackend->GetCapabilities();
 
-    armnn::BackendOptions::BackendOption AsyncExecutionFalse{"AsyncExecution", false};
-    CHECK(!armnn::HasMatchingCapability(AsyncExecutionFalse, refCapabilities));
-
-    armnn::BackendOptions::BackendOption AsyncExecutionInt{"AsyncExecution", 50};
-    CHECK(!armnn::HasMatchingCapability(AsyncExecutionFalse, refCapabilities));
-
-    armnn::BackendOptions::BackendOption AsyncExecutionFloat{"AsyncExecution", 0.0f};
-    CHECK(!armnn::HasMatchingCapability(AsyncExecutionFloat, refCapabilities));
-
-    armnn::BackendOptions::BackendOption AsyncExecutionString{"AsyncExecution", "true"};
-    CHECK(!armnn::HasMatchingCapability(AsyncExecutionString, refCapabilities));
-
     CHECK(!armnn::HasCapability("Telekinesis", refCapabilities));
     armnn::BackendOptions::BackendOption unknownCapability{"Telekinesis", true};
     CHECK(!armnn::HasMatchingCapability(unknownCapability, refCapabilities));
@@ -176,7 +164,6 @@ TEST_CASE ("Ref_Backends_Capability_Test")
 
     CapabilityTestHelper(refCapabilities,
                          {{"NonConstWeights", true},
-                          {"AsyncExecution", true},
                           {"ProtectedContentAllocation", false},
                           {"ConstantTensorsAsInputs", true},
                           {"PreImportIOTensors", true},
@@ -195,7 +182,6 @@ TEST_CASE ("Neon_Backends_Capability_Test")
 
     CapabilityTestHelper(neonCapabilities,
                          {{"NonConstWeights", true},
-                          {"AsyncExecution", false},
                           {"ProtectedContentAllocation", false},
                           {"ConstantTensorsAsInputs", true},
                           {"PreImportIOTensors", false},
@@ -214,7 +200,6 @@ TEST_CASE ("Cl_Backends_Capability_Test")
 
     CapabilityTestHelper(clCapabilities,
                          {{"NonConstWeights", true},
-                          {"AsyncExecution", false},
                           {"ProtectedContentAllocation", true},
                           {"ConstantTensorsAsInputs", true},
                           {"PreImportIOTensors", false},

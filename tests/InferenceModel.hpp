@@ -5,20 +5,11 @@
 
 #pragma once
 
-
 #include <armnn/ArmNN.hpp>
-
-#if !defined(ARMNN_DISABLE_THREADS)
-#include <armnn/Threadpool.hpp>
-#include <common/include/IgnoreUnused.hpp>
-#endif
-
 #include <armnn/Logging.hpp>
 #include <armnn/utility/Timer.hpp>
 #include <armnn/BackendRegistry.hpp>
-#include <armnn/utility/Assert.hpp>
 #include <armnn/utility/NumericCast.hpp>
-
 #include <armnnUtils/TContainer.hpp>
 #include "NetworkExecutionUtils/NetworkExecutionUtils.hpp"
 
@@ -83,8 +74,6 @@ struct Params
     std::string                     m_CachedNetworkFilePath;
     unsigned int                    m_NumberOfThreads;
     std::string                     m_MLGOTuningFilePath;
-    bool                            m_AsyncEnabled;
-    size_t                          m_ThreadPoolSize;
     bool                            m_ImportInputsIfAligned;
 
 
@@ -107,8 +96,6 @@ struct Params
         , m_CachedNetworkFilePath("")
         , m_NumberOfThreads(0)
         , m_MLGOTuningFilePath("")
-        , m_AsyncEnabled(false)
-        , m_ThreadPoolSize(0)
         , m_ImportInputsIfAligned(false)
     {}
 };
@@ -508,8 +495,7 @@ public:
             ARMNN_SCOPED_HEAP_PROFILING("LoadNetwork");
 
             const auto loading_start_time = armnn::GetTimeNow();
-            armnn::INetworkProperties networkProperties(params.m_AsyncEnabled,
-                                                        armnn::MemorySource::Undefined,
+            armnn::INetworkProperties networkProperties(armnn::MemorySource::Undefined,
                                                         armnn::MemorySource::Undefined,
                                                         enableProfiling,
                                                         m_ProfilingDetailsMethod);
@@ -518,20 +504,6 @@ public:
 
             ARMNN_LOG(info) << "Network loading time: " << std::setprecision(2)
                             << std::fixed << armnn::GetTimeDuration(loading_start_time).count() << " ms.";
-#if !defined(ARMNN_DISABLE_THREADS)
-            if (params.m_AsyncEnabled && params.m_ThreadPoolSize > 0)
-            {
-                std::vector<std::shared_ptr<armnn::IWorkingMemHandle>> memHandles;
-                for (size_t i = 0; i < params.m_ThreadPoolSize; ++i)
-                {
-                    memHandles.emplace_back(m_Runtime->CreateWorkingMemHandle(m_NetworkIdentifier));
-                }
-
-                m_Threadpool = std::make_unique<armnn::Threadpool>(params.m_ThreadPoolSize,
-                                                                   m_Runtime.get(),
-                                                                   memHandles);
-            }
-#endif
         }
 
         if (ret == armnn::Status::Failure)
@@ -634,98 +606,6 @@ public:
         }
     }
 
-    std::tuple<unsigned int, std::chrono::duration<double, std::milli>> RunAsync(
-        armnn::experimental::IWorkingMemHandle& workingMemHandleRef,
-        const std::vector<armnnUtils::TContainer>& inputContainers,
-        std::vector<armnnUtils::TContainer>& outputContainers,
-        unsigned int inferenceID)
-    {
-        for (unsigned int i = 0; i < outputContainers.size(); ++i)
-        {
-            const unsigned int expectedOutputDataSize = GetOutputSize(i);
-
-            mapbox::util::apply_visitor([expectedOutputDataSize, i](auto&& value)
-            {
-                const unsigned int actualOutputDataSize   = armnn::numeric_cast<unsigned int>(value.size());
-                if (actualOutputDataSize < expectedOutputDataSize)
-                {
-                    unsigned int outputIndex = i;
-                    throw armnn::Exception(
-                            fmt::format("Not enough data for output #{0}: expected "
-                            "{1} elements, got {2}", outputIndex, expectedOutputDataSize, actualOutputDataSize));
-                }
-            },
-            outputContainers[i]);
-        }
-
-        std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkIdentifier);
-
-        // Start timer to record inference time in EnqueueWorkload (in milliseconds)
-        const auto start_time = armnn::GetTimeNow();
-ARMNN_NO_DEPRECATE_WARN_BEGIN
-        armnn::Status ret = m_Runtime->Execute(workingMemHandleRef,
-                                               MakeInputTensors(inputContainers),
-                                               MakeOutputTensors(outputContainers));
-ARMNN_NO_DEPRECATE_WARN_END
-        const auto duration = armnn::GetTimeDuration(start_time);
-
-        // if profiling is enabled print out the results
-        if (profiler && profiler->IsProfilingEnabled())
-        {
-            profiler->Print(std::cout);
-        }
-
-        if (ret == armnn::Status::Failure)
-        {
-            throw armnn::Exception(
-                fmt::format("IRuntime::Execute asynchronously failed for network #{0} on inference #{1}",
-                            m_NetworkIdentifier, inferenceID));
-        }
-        else
-        {
-            return std::make_tuple(inferenceID, duration);
-        }
-    }
-
-    void RunAsync(const std::vector<armnnUtils::TContainer>& inputContainers,
-                  std::vector<armnnUtils::TContainer>& outputContainers,
-                  std::shared_ptr<armnn::IAsyncExecutionCallback> cb)
-    {
-#if !defined(ARMNN_DISABLE_THREADS)
-        for (unsigned int i = 0; i < outputContainers.size(); ++i)
-        {
-            const unsigned int expectedOutputDataSize = GetOutputSize(i);
-
-            mapbox::util::apply_visitor([expectedOutputDataSize, i](auto&& value)
-            {
-                const unsigned int actualOutputDataSize   = armnn::numeric_cast<unsigned int>(value.size());
-                if (actualOutputDataSize < expectedOutputDataSize)
-                {
-                    unsigned int outputIndex = i;
-                    throw armnn::Exception(
-                            fmt::format("Not enough data for output #{0}: expected "
-                            "{1} elements, got {2}", outputIndex, expectedOutputDataSize, actualOutputDataSize));
-                }
-            },
-            outputContainers[i]);
-        }
-
-        std::shared_ptr<armnn::IProfiler> profiler = m_Runtime->GetProfiler(m_NetworkIdentifier);
-
-        m_Threadpool->Schedule(m_NetworkIdentifier,
-                               MakeInputTensors(inputContainers),
-                               MakeOutputTensors(outputContainers),
-                               armnn::QosExecPriority::Medium,
-                               cb);
-
-        // if profiling is enabled print out the results
-        if (profiler && profiler->IsProfilingEnabled())
-        {
-            profiler->Print(std::cout);
-        }
-#endif
-    }
-
     const armnn::BindingPointInfo& GetInputBindingInfo(unsigned int inputIndex = 0u) const
     {
         CheckInputIndexIsValid(inputIndex);
@@ -772,17 +652,9 @@ ARMNN_NO_DEPRECATE_WARN_END
         return quantizationParams;
     }
 
-    std::unique_ptr<armnn::experimental::IWorkingMemHandle> CreateWorkingMemHandle()
-    {
-        return m_Runtime->CreateWorkingMemHandle(m_NetworkIdentifier);
-    }
-
 private:
     armnn::NetworkId m_NetworkIdentifier;
     std::shared_ptr<armnn::IRuntime> m_Runtime;
-#if !defined(ARMNN_DISABLE_THREADS)
-    std::unique_ptr<armnn::Threadpool> m_Threadpool;
-#endif
 
     std::vector<armnn::BindingPointInfo> m_InputBindings;
     std::vector<armnn::BindingPointInfo> m_OutputBindings;

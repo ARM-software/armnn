@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -22,7 +22,6 @@ public:
     ~RefTransposeConvolution2dWorkload() = default;
 
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
 
 private:
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;

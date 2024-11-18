@@ -290,9 +290,6 @@ enum class BackendCapability : uint32_t
     /// On the other hand, non-const weights can be accessed through inputs.
     NonConstWeights,
 
-    /// Asynchronous Execution.
-    AsyncExecution,
-
     /// False: Backends that can only be used if all layers in the graph are supported on that backend.
     /// True: Backends that can be combined with other backends to run a graph.
     AllOrNothing,

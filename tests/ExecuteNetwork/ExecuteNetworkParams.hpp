@@ -27,7 +27,6 @@ struct ExecuteNetworkParams
     bool                              m_AllowExpandedDims;
     std::string                       m_CachedNetworkFilePath;
     std::vector<armnn::BackendId>     m_ComputeDevices;
-    bool                              m_Concurrent;
     bool                              m_DequantizeOutput;
     std::string                       m_DynamicBackendsPath;
     bool                              m_EnableBf16TurboMode;
@@ -61,7 +60,6 @@ struct ExecuteNetworkParams
     std::string                       m_TuningPath;
     std::string                       m_MLGOTuningFilePath;
     TfLiteExecutor                    m_TfLiteExecutor;
-    size_t                            m_ThreadPoolSize;
     bool                              m_ImportInputsIfAligned;
     bool                              m_ReuseBuffers;
     std::string                       m_ComparisonFile;

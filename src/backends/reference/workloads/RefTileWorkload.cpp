@@ -28,20 +28,6 @@ namespace armnn
         }
     }
 
-    void RefTileWorkload::ExecuteAsync(ExecutionData& executionData)
-    {
-        auto* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-        auto inputDataType = GetTensorInfo(workingMemDescriptor->m_Inputs[0]).GetDataType();
-        if(inputDataType == DataType::Signed64)
-        {
-            Execute<double_t>(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
-        }
-        else
-        {
-            Execute<float>(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
-        }
-    }
-
     template <typename T>
     void RefTileWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
     {

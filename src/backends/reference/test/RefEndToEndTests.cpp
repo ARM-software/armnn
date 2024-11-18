@@ -46,7 +46,6 @@
 #include <backendsCommon/test/SplitterEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StackEndToEndTestImpl.hpp>
 #include <backendsCommon/test/StridedSliceEndToEndTestImpl.hpp>
-#include <backendsCommon/test/StridedSliceAsyncEndToEndTest.hpp>
 #include <backendsCommon/test/SubgraphUtilsTest.hpp>
 #include <backendsCommon/test/TileEndToEndTestImpl.hpp>
 #include <backendsCommon/test/TransposeConvolution2dEndToEndTestImpl.hpp>
@@ -2757,21 +2756,6 @@ TEST_CASE("RefStridedSlice3DMaskedEndToEndTest")
 TEST_CASE("RefStridedSliceInvalidSliceEndToEndTest")
 {
     StridedSliceInvalidSliceEndToEndTest(defaultBackends);
-}
-
-TEST_CASE("RefThreadSafeFP32StridedSlicedEndToEndTest")
-{
-    StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends, 1);
-}
-
-TEST_CASE("RefAsyncFP32StridedSlicedMultiThreadedEndToEndTest")
-{
-    armnn::experimental::StridedSlicedMultiThreadedEndToEndTest<armnn::DataType::Float32>(defaultBackends);
-}
-
-TEST_CASE("RefAsyncFP32StridedSlicedScheduledMultiThreadedEndToEndTest")
-{
-    armnn::experimental::StridedSlicedEndToEndTest<armnn::DataType::Float32>(defaultBackends, 3);
 }
 
 TEST_CASE("RefAddEndToEndTestFloat32")

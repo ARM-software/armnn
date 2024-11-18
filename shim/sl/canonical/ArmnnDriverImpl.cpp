@@ -225,8 +225,7 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModel(
     // Load it into the runtime.
     armnn::NetworkId netId = 0;
     std::string msg;
-    armnn::INetworkProperties networkProperties(options.isAsyncModelExecutionEnabled(),
-                                                MemorySource::Undefined,
+    armnn::INetworkProperties networkProperties(MemorySource::Undefined,
                                                 MemorySource::Undefined,
                                                 options.IsGpuProfilingEnabled());
     auto numInputs  = getMainModel(model).inputIndexes.size();
@@ -524,8 +523,7 @@ GeneralResult<SharedPreparedModel> ArmnnDriverImpl::PrepareArmnnModelFromCache(
     // Load it into the runtime.
     armnn::NetworkId netId = 0;
     std::string msg;
-    armnn::INetworkProperties networkProperties(options.isAsyncModelExecutionEnabled(),
-                                                MemorySource::Undefined,
+    armnn::INetworkProperties networkProperties(MemorySource::Undefined,
                                                 MemorySource::Undefined,
                                                 options.IsGpuProfilingEnabled());
     try

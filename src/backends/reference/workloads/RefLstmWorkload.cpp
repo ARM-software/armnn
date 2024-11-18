@@ -1,5 +1,5 @@
 //
-// Copyright © 2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019,2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -42,12 +42,6 @@ RefLstmWorkload::RefLstmWorkload(const LstmQueueDescriptor &descriptor, const Wo
 void RefLstmWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefLstmWorkload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefLstmWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const

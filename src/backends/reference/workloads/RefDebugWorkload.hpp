@@ -30,7 +30,6 @@ public:
     using TypedWorkload<DebugQueueDescriptor, DataType>::TypedWorkload;
 
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
 
     void RegisterDebugCallback(const DebugCallbackFunction& func) override;
 

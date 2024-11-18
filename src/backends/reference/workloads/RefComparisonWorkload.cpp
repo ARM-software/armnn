@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -45,14 +45,6 @@ void RefComparisonWorkload::PostAllocationConfigure(std::vector<ITensorHandle*> 
 void RefComparisonWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefComparisonWorkload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-
-    PostAllocationConfigure(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefComparisonWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const

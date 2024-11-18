@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -21,7 +21,7 @@ class RefGatherWorkload : public RefBaseWorkload<GatherQueueDescriptor>
 public:
     using RefBaseWorkload<GatherQueueDescriptor>::RefBaseWorkload;
     void Execute() const override;
-    void ExecuteAsync(ExecutionData& executionData)  override;
+
 private:
     template <typename T>
     void Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const;

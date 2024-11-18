@@ -15,7 +15,6 @@ namespace armnn
 const BackendCapabilities cpuAccCapabilities("CpuAcc",
                                              {
                                                      {"NonConstWeights", true},
-                                                     {"AsyncExecution", false},
                                                      {"ProtectedContentAllocation", false},
                                                      {"ConstantTensorsAsInputs", true},
                                                      {"PreImportIOTensors", false},

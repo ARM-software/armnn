@@ -101,15 +101,6 @@ std::vector<ImportedOutputId> IRuntime::ImportOutputs(NetworkId networkId, const
     return pRuntimeImpl->ImportOutputs(networkId, outputTensors, forceImportMemorySource);
 }
 
-void IRuntime::ClearImportedInputs(NetworkId networkId, const std::vector<ImportedInputId> inputIds)
-{
-    return pRuntimeImpl->ClearImportedInputs(networkId, inputIds);
-}
-void IRuntime::ClearImportedOutputs(NetworkId networkId, const std::vector<ImportedOutputId> outputIds)
-{
-    return pRuntimeImpl->ClearImportedOutputs(networkId, outputIds);
-}
-
 Status IRuntime::EnqueueWorkload(NetworkId networkId,
                                  const InputTensors& inputTensors,
                                  const OutputTensors& outputTensors,
@@ -120,19 +111,6 @@ Status IRuntime::EnqueueWorkload(NetworkId networkId,
                                          preImportedInputIds, preImportedOutputIds);
 }
 
-Status IRuntime::Execute(IWorkingMemHandle& workingMemHandle,
-                         const InputTensors& inputTensors,
-                         const OutputTensors& outputTensors,
-                         std::vector<ImportedInputId> preImportedInputs,
-                         std::vector<ImportedOutputId> preImportedOutputs)
-{
-    return pRuntimeImpl->Execute(workingMemHandle,
-                                 inputTensors,
-                                 outputTensors,
-                                 preImportedInputs,
-                                 preImportedOutputs);
-}
-
 Status IRuntime::UnloadNetwork(NetworkId networkId)
 {
     return pRuntimeImpl->UnloadNetwork(networkId);
@@ -141,11 +119,6 @@ Status IRuntime::UnloadNetwork(NetworkId networkId)
 const IDeviceSpec& IRuntime::GetDeviceSpec() const
 {
     return pRuntimeImpl->GetDeviceSpec();
-}
-
-std::unique_ptr<IWorkingMemHandle> IRuntime::CreateWorkingMemHandle(NetworkId networkId)
-{
-    return pRuntimeImpl->CreateWorkingMemHandle(networkId);
 }
 
 const std::shared_ptr<IProfiler> IRuntime::GetProfiler(NetworkId networkId) const
@@ -173,8 +146,7 @@ Status RuntimeImpl::LoadNetwork(NetworkId& networkIdOut,
                                 IOptimizedNetworkPtr inNetwork,
                                 std::string& errorMessage)
 {
-    INetworkProperties networkProperties(
-            false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     return LoadNetwork(networkIdOut, std::move(inNetwork), errorMessage, networkProperties);
 }
 
@@ -659,11 +631,6 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
         ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.";
         return Status::Failure;
     }
-    if (loadedNetwork->IsAsyncEnabled())
-    {
-        ARMNN_LOG(error) << "Network " << networkId << " is async enabled.";
-        return Status::Failure;
-    }
     ProfilerManager::GetInstance().RegisterProfiler(loadedNetwork->GetProfiler().get());
 
     ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "EnqueueWorkload");
@@ -681,7 +648,6 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
     auto status = loadedNetwork->EnqueueWorkload(inputTensors, outputTensors,
                                                  preImportedInputIds, preImportedOutputIds);
 
-
     // Check if we imported, if not there's no need to call the After EnqueueWorkload events
     if (!preImportedInputIds.empty() || !preImportedOutputIds.empty())
     {
@@ -694,76 +660,6 @@ Status RuntimeImpl::EnqueueWorkload(NetworkId networkId,
     ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
                     << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
     return status;
-}
-
-Status RuntimeImpl::Execute(IWorkingMemHandle& iWorkingMemHandle,
-                            const InputTensors& inputTensors,
-                            const OutputTensors& outputTensors,
-                            std::vector<ImportedInputId> preImportedInputs,
-                            std::vector<ImportedOutputId> preImportedOutputs)
-{
-    const auto startTime = armnn::GetTimeNow();
-
-    NetworkId networkId = iWorkingMemHandle.GetNetworkId();
-    LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
-
-    if (!loadedNetwork)
-    {
-        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.";
-        return Status::Failure;
-    }
-    if (!loadedNetwork->IsAsyncEnabled())
-    {
-        ARMNN_LOG(error) << "Attempting execute " << networkId << " when it is not async enabled.";
-        return Status::Failure;
-    }
-    ProfilerManager::GetInstance().RegisterProfiler(loadedNetwork->GetProfiler().get());
-
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "Execute");
-
-    auto status = loadedNetwork->Execute(inputTensors,
-                                         outputTensors,
-                                         iWorkingMemHandle,
-                                         preImportedInputs,
-                                         preImportedOutputs);
-
-    ARMNN_LOG(info) << "Execution time: " << std::setprecision(2)
-                    << std::fixed << armnn::GetTimeDuration(startTime).count() << " ms.";
-
-    return status;
-}
-
-/// Create a new unique WorkingMemHandle object. Create multiple handles if you wish to have
-/// overlapped Execution by calling this function from different threads.
-std::unique_ptr<IWorkingMemHandle> RuntimeImpl::CreateWorkingMemHandle(NetworkId networkId)
-{
-    LoadedNetwork* loadedNetwork = GetLoadedNetworkPtr(networkId);
-
-    if (!loadedNetwork)
-    {
-        ARMNN_LOG(error) << "A Network with an id of " << networkId << " does not exist.";
-        return nullptr;
-    }
-    if (!loadedNetwork->IsAsyncEnabled())
-    {
-        ARMNN_LOG(error) << "Network " << networkId << " is not async enabled.";
-        return nullptr;
-    }
-    ProfilerManager::GetInstance().RegisterProfiler(loadedNetwork->GetProfiler().get());
-
-    ARMNN_SCOPED_PROFILING_EVENT(Compute::Undefined, "CreateWorkingMemHandle");
-
-    static thread_local NetworkId lastId = networkId;
-    if (lastId != networkId)
-    {
-        LoadedNetworkFuncSafe(lastId, [](LoadedNetwork* network)
-        {
-            network->FreeWorkingMemory();
-        });
-    }
-    lastId=networkId;
-
-    return loadedNetwork->CreateWorkingMemHandle(networkId);
 }
 
 void RuntimeImpl::RegisterDebugCallback(NetworkId networkId, const DebugCallbackFunction& func)

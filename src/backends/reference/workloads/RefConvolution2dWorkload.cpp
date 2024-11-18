@@ -1,5 +1,5 @@
 //
-// Copyright © 2017,2019,2021-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017,2019,2021-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,12 +33,6 @@ RefConvolution2dWorkload::RefConvolution2dWorkload(const Convolution2dQueueDescr
 void RefConvolution2dWorkload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefConvolution2dWorkload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefConvolution2dWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const

@@ -21,12 +21,6 @@ namespace armnn
         Execute(m_Data.m_Inputs, m_Data.m_Outputs);
     }
 
-    void RefScatterNdWorkload::ExecuteAsync(ExecutionData& executionData)
-    {
-        WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-        Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
-    }
-
     void RefScatterNdWorkload::Execute(std::vector<ITensorHandle*> inputs, std::vector<ITensorHandle*> outputs) const
     {
         ARMNN_SCOPED_PROFILING_EVENT_REF_NAME_GUID("RefScatterNdWorkload_Execute");

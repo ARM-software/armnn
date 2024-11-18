@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2018,2020-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2018,2020-2024 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -29,12 +29,6 @@ void FakeQuantization(const float* inputData, float* outputData, uint32_t numEle
 void RefFakeQuantizationFloat32Workload::Execute() const
 {
     Execute(m_Data.m_Inputs, m_Data.m_Outputs);
-}
-
-void RefFakeQuantizationFloat32Workload::ExecuteAsync(ExecutionData& executionData)
-{
-    WorkingMemDescriptor* workingMemDescriptor = static_cast<WorkingMemDescriptor*>(executionData.m_Data);
-    Execute(workingMemDescriptor->m_Inputs, workingMemDescriptor->m_Outputs);
 }
 
 void RefFakeQuantizationFloat32Workload::Execute(std::vector<ITensorHandle*> inputs,

@@ -151,7 +151,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClImportEndToEnd")
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Malloc, MemorySource::Malloc);
+    INetworkProperties networkProperties(MemorySource::Malloc, MemorySource::Malloc);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -348,7 +348,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConv2dEndToEnd")
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -484,7 +484,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp16toFp32EndToE
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -632,7 +632,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportConvertFp32toFp16EndToE
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -771,7 +771,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportSimpleConvertFp32toFp16
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -923,7 +923,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesEndTo
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output
@@ -1149,7 +1149,7 @@ TEST_CASE_FIXTURE(ClContextControlFixture, "ClForceImportRepeatedInferencesInver
     NetworkId netId;
     std::string ignoredErrorMessage;
     // Enable Importing
-    INetworkProperties networkProperties(false, MemorySource::Undefined, MemorySource::Undefined);
+    INetworkProperties networkProperties(MemorySource::Undefined, MemorySource::Undefined);
     runtime->LoadNetwork(netId, std::move(optNet), ignoredErrorMessage, networkProperties);
 
     // Creates structures for input & output

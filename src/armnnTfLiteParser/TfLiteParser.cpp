@@ -3574,6 +3574,7 @@ void TfLiteParserImpl::ParseResize(size_t subgraphIndex, size_t operatorIndex, R
             const auto * options     = operatorPtr->builtin_options.AsResizeBilinearOptions();
 
             desc.m_AlignCorners = options->align_corners;
+            desc.m_HalfPixelCenters = options->half_pixel_centers;
             break;
         }
         case ResizeMethod::NearestNeighbor:

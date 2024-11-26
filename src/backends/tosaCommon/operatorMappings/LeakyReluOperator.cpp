@@ -30,8 +30,8 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
     }
 
     std::string inputName       = std::string("input_");
-    std::string outputNameAlpha = std::string("intermediate1_") + GetUniqueTosaMappingID();
-    std::string outputNameMul   = std::string("intermediate2_") + GetUniqueTosaMappingID();
+    std::string outputNameAlpha = std::string("constant0_") + GetUniqueTosaMappingID();
+    std::string outputNameMul   = std::string("intermediate1_") + GetUniqueTosaMappingID();
     std::string outputName      = std::string("output0_");
     std::string blockName       = std::string("Op_LEAKY_RELU_block_") + GetUniqueTosaMappingID();
 
@@ -60,8 +60,6 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
     std::vector<int32_t> outputShape0 = GetTosaTensorShape(outputs[0]->GetShape());
     DType outputDType0 = ArmNNToDType(outputs[0]->GetDataType());
     tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
-
-    std::string outputNameMAXMIN= std::string("intermediate3_") + GetUniqueTosaMappingID();
 
     if (inputDType0 == DType::DType_FP32 ||
         inputDType0 == DType::DType_FP16)
@@ -117,9 +115,9 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
     }
     else
     {
-        std::string outputNameRescaleAlpha      = std::string("intermediate3_") + GetUniqueTosaMappingID();
-        std::string outputNameRescaleIdentity   = std::string("intermediate4_") + GetUniqueTosaMappingID();
-        std::string outputNameRescaleMaxMin     = std::string("intermediate5_") + GetUniqueTosaMappingID();
+        std::string outputNameRescaleAlpha      = std::string("intermediate2_") + GetUniqueTosaMappingID();
+        std::string outputNameRescaleIdentity   = std::string("intermediate3_") + GetUniqueTosaMappingID();
+        std::string outputNameRescaleMaxMin     = std::string("intermediate4_") + GetUniqueTosaMappingID();
 
         DType rescale_type    = DType::DType_INT32;
         float alpha           = activationDescriptor->m_A;

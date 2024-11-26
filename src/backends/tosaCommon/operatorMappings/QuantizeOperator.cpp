@@ -73,8 +73,8 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
         // out_add = add(out_mul, const_zeroPoint)
         // output = cast<output_type>(out_add)
 
-        std::string outputNameScale     = std::string("input1_") + GetUniqueTosaMappingID();
-        std::string outputNameZeroPoint = std::string("input2_") + GetUniqueTosaMappingID();
+        std::string outputNameScale     = std::string("constant0") + GetUniqueTosaMappingID();
+        std::string outputNameZeroPoint = std::string("constant1") + GetUniqueTosaMappingID();
         std::string outputNameMul       = std::string("intermediate0_") + GetUniqueTosaMappingID();
         std::string outputNameAdd       = std::string("intermediate1_") + GetUniqueTosaMappingID();
 

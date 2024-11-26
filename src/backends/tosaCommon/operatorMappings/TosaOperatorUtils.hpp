@@ -494,6 +494,11 @@ inline void CreateConstTosaOperator(const std::string& outputName,
                                     TosaSerializationOperator*& op,
                                     TosaSerializationTensor*& tensor)
 {
+    if (outputName.find("constant") == std::string::npos)
+    {
+        throw armnn::Exception(std::string("CreateConstTosaOperator: outputName must contain the string 'constant'"));
+    }
+
     std::vector<uint8_t> uint8Data = CreateConstTosaData(static_cast<const void *>(&value), dtype, shape);
 
     op = new TosaSerializationOperator(Op_CONST, Attribute_NONE, nullptr, {}, {outputName});

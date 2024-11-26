@@ -47,6 +47,8 @@ TosaSerializationBasicBlock* ConvertStackToTosaOperator(const Layer* layer,
     std::vector<TosaSerializationTensor*> tensors;
     std::vector<TosaSerializationOperator*> operators;
 
+    std::string outputName = std::string("output0_");
+
     std::string blockName = std::string("Op_STACK_block_") + GetUniqueTosaMappingID();
     auto blockOutputShape = GetTosaTensorShape(outputs[0]->GetShape());
 
@@ -64,6 +66,7 @@ TosaSerializationBasicBlock* ConvertStackToTosaOperator(const Layer* layer,
         if (layer != nullptr)
         {
             inputName = GenerateUniqueInputName(layer->GetInputSlot(i));
+            outputName = GenerateUniqueOutputName(*layer);
         }
 
         tensors.emplace_back(new TosaSerializationTensor(inputName,
@@ -74,7 +77,6 @@ TosaSerializationBasicBlock* ConvertStackToTosaOperator(const Layer* layer,
     }
 
     // Create output tensor
-    std::string outputName = std::string("output0_");
     tensors.emplace_back(new TosaSerializationTensor(outputName,
                                                      blockOutputShape,
                                                      inputDType,

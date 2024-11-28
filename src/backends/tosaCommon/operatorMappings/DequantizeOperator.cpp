@@ -42,6 +42,7 @@ TosaSerializationBasicBlock* ConvertDequantizeToTosaOperator(
 
     DataType inputDType = inputs[0]->GetDataType();
     DataType outputDType = outputs[0]->GetDataType();
+    std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
     std::vector<int32_t> outputShape = GetTosaTensorShape(outputs[0]->GetShape());
 
     // Only add input tensors if connected layer is an input layer.
@@ -49,7 +50,6 @@ TosaSerializationBasicBlock* ConvertDequantizeToTosaOperator(
     // There also can't be duplicate tensor.
     if(inputName.find("input_") != std::string::npos)
     {
-        std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape, ArmNNToDType(inputDType), {}));
     }
 
@@ -89,7 +89,7 @@ TosaSerializationBasicBlock* ConvertDequantizeToTosaOperator(
         CreateConstTosaOperator<float>(outputNameZeroPoint,
                                        zeroPoint,
                                        ArmNNToDType(outputDType),
-                                       {1,1,1,1},
+                                       inputShape,
                                        zeroPointOp,
                                        zeroPointTensor);
         operators.push_back(zeroPointOp);
@@ -110,7 +110,7 @@ TosaSerializationBasicBlock* ConvertDequantizeToTosaOperator(
         CreateConstTosaOperator<float>(outputNameScale,
                                        scale,
                                        ArmNNToDType(outputDType),
-                                       {1,1,1,1},
+                                       inputShape,
                                        scaleOp,
                                        scaleTensor);
         operators.push_back(scaleOp);

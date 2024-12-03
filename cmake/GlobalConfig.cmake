@@ -491,30 +491,5 @@ if(NOT BUILD_ARMNN_SERIALIZER)
     message(STATUS "Armnn Serializer support is disabled")
 endif()
 
-if(NOT BUILD_PYTHON_WHL)
-    message(STATUS "PyArmNN wheel package is disabled")
-endif()
-
-if(NOT BUILD_PYTHON_SRC)
-    message(STATUS "PyArmNN source package is disabled")
-endif()
-
-if(BUILD_PYTHON_WHL OR BUILD_PYTHON_SRC)
-    find_package(PythonInterp 3 REQUIRED)
-    if(NOT ${PYTHONINTERP_FOUND})
-        message(FATAL_ERROR "Python 3.x required to build PyArmNN, but not found")
-    endif()
-
-    find_package(PythonLibs 3 REQUIRED)
-    if(NOT ${PYTHONLIBS_FOUND})
-        message(FATAL_ERROR "Python 3.x development package required to build PyArmNN, but not found")
-    endif()
-
-    find_package(SWIG 4 REQUIRED)
-    if(NOT ${SWIG_FOUND})
-        message(FATAL_ERROR "SWIG 4.x requried to build PyArmNN, but not found")
-    endif()
-endif()
-
 # ArmNN source files required for all build options
 include_directories(SYSTEM third-party)

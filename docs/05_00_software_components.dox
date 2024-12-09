@@ -1,4 +1,4 @@
-/// Copyright (c) 2022, 2024 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2022 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -14,6 +14,7 @@ other helpful information in each section.
  - @subpage deserializer
  - @subpage supportlibrary
  - @subpage parsers
+ - @subpage md_python_pyarmnn_README
  - @subpage runtimeoptions
  - @subpage serializer
  - @subpage delegate
@@ -29,6 +30,7 @@ namespace armnn
 {
 /**
 
+@page md_python_pyarmnn_README PyArmNN
 
 **/
 }

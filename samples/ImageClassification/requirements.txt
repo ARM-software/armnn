@@ -1,0 +1,7 @@
+#
+# Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+numpy==1.22.0
+Pillow==10.2.0
+pybind11==2.6.2

@@ -12,7 +12,10 @@ namespace armnn
 Execute models from different machine learning platforms efficiently with our parsers. Simply choose a parser according
 to the model you want to run e.g. If you've got a model in onnx format (<model_name>.onnx) use our onnx-parser.
 
-If you would like to run a Tensorflow Lite (TfLite) model you probably also want to take a look at our @ref delegate. All parsers are written in C++.
+If you would like to run a Tensorflow Lite (TfLite) model you probably also want to take a look at our @ref delegate.
+
+All parsers are written in C++ but it is also possible to use them in python. For more information on our python
+bindings take a look into the @ref md_python_pyarmnn_README section.
 
 <br/><br/>
 

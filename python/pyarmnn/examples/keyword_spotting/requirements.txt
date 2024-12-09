@@ -1,0 +1,9 @@
+#
+# Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+# SPDX-License-Identifier: MIT
+#
+numpy>=1.19.2
+soundfile>=0.10.3
+pytest==6.2.4
+pytest-allclose==1.0.0
+sounddevice==0.4.2

@@ -12,7 +12,8 @@
 
 
 ## Introduction
-These are the step by step instructions on how to install the Arm NN core & TensorflowLite Parser for x86_64, Arm64 and Armhf for Ubuntu 20.04.
+These are the step by step instructions on how to install the Arm NN core, TensorflowLite Parser
+as well as PyArmNN for x86_64, Arm64 and Armhf for Ubuntu 20.04.
 The packages will also be added to Debian Bullseye, their progress can be tracked here:
 https://tracker.debian.org/pkg/armnn.
 
@@ -42,6 +43,7 @@ PACKAGE_VERSION: This is the version of the source package used to build the bin
 libarmnn-cpuref-backend{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 libarmnntfliteparser{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 libarmnn{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
+python3-pyarmnn_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 ```
 * Development Packages
 ```
@@ -62,11 +64,14 @@ libarmnn-cpuref-backend{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VE
 libarmnn-gpuacc-backend{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 libarmnntfliteparser{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 libarmnn{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+python3-pyarmnn_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+
 ```
 * Development Packages
 ```
 libarmnn-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
 libarmnntfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_arm64.deb
+
 ```
 * Dependency Packages (These are empty packages that provide a user-friendly name for other packages they will install)
 ```
@@ -86,11 +91,14 @@ libarmnn-cpuref-backend{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VE
 libarmnn-gpuacc-backend{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
 libarmnntfliteparser{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
 libarmnn{ARMNN_MAJOR_VERSION}_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+python3-pyarmnn_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+
 ```
 * Development Packages
 ```
 libarmnn-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
 libarmnntfliteparser-dev_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_armhf.deb
+
 ```
 * Dependency Packages (These are empty packages that provide a user-friendly name for other packages they will install)
 ```
@@ -106,13 +114,16 @@ armnn-latest-ref_{ARMNN_RELEASE_VERSION}-{PACKAGE_VERSION}_amd64.deb
 The easiest way to install all of the available packages for your systems architecture is to run the command:
 
 ```
- sudo apt-get install -y armnn-latest-all
+ sudo apt-get install -y python3-pyarmnn armnn-latest-all
+ # Verify installation via python:
+ python3 -c "import pyarmnn as ann;print(ann.GetVersion())"
+ # Returns '{ARMNN_MAJOR_VERSION}.0.0' e.g. 33.0.0
 ```
-This will install ArmNN with three backends for Neon (CpuAcc), OpenCL (GpuAcc) and our Reference Backend.
+This will install PyArmNN and the three backends for Neon (CpuAcc), OpenCL (GpuAcc) and our Reference Backend.
 It will also install their dependencies including the arm-compute-library package along with the Tensorflow Lite Parser
 and it's dependency Arm NN Core.
-There are a variety of different packages available for uses to install and different combinations of them 
-can be installed as needed:
+If the user does not wish to use PyArmNN they can go up a level of dependencies and instead just install the
+armnn-latest-all package:
 ```
   # Install ArmNN Core, CpuAcc Backend, GpuAcc Backend and Reference Backend as well as the TensorFlow Lite Parser:
   # (This will only install CpuAcc and GpuAcc Backends on arm64 and armhf architectures)

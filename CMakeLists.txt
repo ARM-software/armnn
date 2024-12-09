@@ -1070,9 +1070,3 @@ export(
 
 add_library(Armnn::Armnn ALIAS armnn)
 add_library(Armnn::armnnUtils ALIAS armnnUtils)
-
-####################################################
-## Build Python bindings
-if (BUILD_PYTHON_WHL OR BUILD_PYTHON_SRC)
-    add_subdirectory(python/pyarmnn)
-endif()

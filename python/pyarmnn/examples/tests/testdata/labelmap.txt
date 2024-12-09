@@ -1,9 +1,0 @@
-person
-motorcycle
-airplane
-bicycle
-train
-boat
-truck
-bus
-

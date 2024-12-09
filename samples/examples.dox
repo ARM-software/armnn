@@ -1,4 +1,4 @@
-/// Copyright (c) 2021 ARM Limited and Contributors. All rights reserved.
+/// Copyright (c) 2021, 2024 ARM Limited and Contributors. All rights reserved.
 ///
 /// SPDX-License-Identifier: MIT
 ///
@@ -14,8 +14,7 @@ nothing else but a single fully connected layer with a single weights value. It'
       Still it's a very nice example to see how an Arm NN network is created, optimized and executed.
 
       (You can find more complex examples using the TfLite Parser in samples/ObjectDetection and
-       samples/SpeechRecognition. And another example using @ref md_python_pyarmnn_README "PyArmnn" in
-       samples/ImageClassification)
+       samples/SpeechRecognition.)
 @example SimpleSample.cpp
 **/
 

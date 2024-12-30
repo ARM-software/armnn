@@ -1369,7 +1369,7 @@ ARMNN_AUTO_TEST_CASE_WITH_THF(AlignCornersResizeNearestNeighbourUint8Nhwc,
                               DataLayout::NHWC)
 
 // ReverseV2
-ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2SimpleEmptyAxisFloat32, ReverseV2SimpleTestEmptyAxis<DataType::Float32>)
+ARMNN_AUTO_TEST_CASE_WITH_THF(UNSUPPORTED_ReverseV2EmptyAxisFloat32, ReverseV2SimpleTestEmptyAxis<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple1DimFloat32, ReverseV2SimpleTest1Dim<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim1AxisFloat32, ReverseV2SimpleTest2Dim1Axis<DataType::Float32>)
 ARMNN_AUTO_TEST_CASE_WITH_THF(ReverseV2Simple2Dim2AxisFloat32, ReverseV2SimpleTest2Dim2Axis<DataType::Float32>)

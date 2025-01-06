@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2024-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -66,6 +66,20 @@ TosaSerializationBasicBlock* ConvertStridedSliceToTosaOperator(const Layer* laye
 
     // Figure out size
     uint32_t inputRank = inputs[0]->GetShape().GetNumDimensions();
+
+    // handle cases where end or begin values are negative
+    for (uint32_t i = 0; i < inputRank; ++i)
+    {
+        if ((stridedSliceDescriptor->m_EndMask >> 1) && end[i] < 0)
+        {
+            end[i] = static_cast<int32_t>(inputShape[i]) + end[i];
+        }
+        if((stridedSliceDescriptor->m_Begin[i] >> 1) && begin[i] < 0)
+        {
+            begin[i] = static_cast<int32_t>(inputShape[i]) + begin[i];
+        }
+    }
+
     std::vector<int32_t> a1_size(inputRank);
 
     // If mask set default to begin and end size from input tensor

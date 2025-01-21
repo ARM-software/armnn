@@ -182,7 +182,13 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                             Layer& child = childInput->GetOwningLayer();
 
                             auto* activationLayer = PolymorphicDowncast<ActivationLayer*>(&child);
-
+                            // Before we proceed make sure that this activation layer is in the subgraph. It could be
+                            // the first layer in the next subgraph.
+                            if (untouched.find(activationLayer->GetGuid()) == untouched.end())
+                            {
+                                // We can't fuse a layer that's outside the subgraph.
+                                break;
+                            }
                             const std::string name = std::string("fused-") + child.GetName() + std::string("-into-") +
                                                      base.GetName();
 

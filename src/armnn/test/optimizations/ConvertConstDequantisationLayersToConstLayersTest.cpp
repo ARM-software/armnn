@@ -373,5 +373,64 @@ TEST_CASE("TurboModelRecognitionAndOptimization")
                         &IsLayerOfType<ConvertFp16ToFp32Layer>,
                         &IsLayerOfType<OutputLayer>));
 }
+
+TEST_CASE("NonTurboModeModelRecognitionTest")
+{
+    // This test creates a basic FP32 TfLite Model. Running this through the optimization should *not* be recognised
+    // as a "Turbo Model".
+    //
+    // We know the test is successful by checking that the optimization has not changed the layers in the model.
+
+    IRuntime::CreationOptions options;
+    IRuntimePtr runtime(IRuntime::Create(options));
+
+    // Builds up the structure of the network.
+    INetworkPtr network(INetwork::Create());
+
+    IConnectableLayer* input = network->AddInputLayer(0, "input");
+
+    Convolution2dDescriptor descriptor;
+    descriptor.m_DataLayout  = DataLayout::NHWC;
+
+    TensorInfo inputInfo(  { 1, 5, 5, 1 }, DataType::Float32, 1, 0, true);
+    TensorInfo weightsInfo({ 1, 3, 3, 1 }, DataType::Float32, 1.0, 0, true);
+    TensorInfo outputInfo( { 1, 3, 3, 1 }, DataType::Float32, 1, 0);
+
+    std::vector<float> weightsData = { 4, 5, 6, 0, 0, 0, 3, 2, 1 };
+    ConstTensor weights(weightsInfo, weightsData);
+
+    IConnectableLayer* weightsLayer = network->AddConstantLayer(weights, "Weights");
+    IConnectableLayer* convolution2d = network->AddConvolution2dLayer(descriptor, "convolution2d");
+    IConnectableLayer* output = network->AddOutputLayer(0, "output");
+
+    Connect(input, convolution2d, inputInfo, 0, 0);
+    Connect(weightsLayer, convolution2d, weightsInfo, 0, 1);
+    Connect(convolution2d, output, outputInfo, 0, 0);
+
+    // optimize the network
+    std::vector<BackendId> backends = {Compute::CpuRef};
+    // Now we will set FastMath capability to true which is the remaining condition needed to allow us to test if the
+    // Optimize function can recognise a basic TfLite turbo model and perform the correct optimizations:
+    // Backend has Fastmath capability: true
+    // Backend has FP16 support: true
+    // TfLite Model is a Turbo Model
+
+    armnn::BackendOptions cpuRef("CpuRef", { { "FastMathEnabled", true } });
+    armnn::ModelOptions modelOptions;
+    modelOptions.push_back(cpuRef);
+
+    armnn::OptimizerOptionsOpaque optimizerOptions(false, false, false,
+                                                   false, modelOptions, false);
+
+    IOptimizedNetworkPtr optNet = Optimize(*network, backends, runtime->GetDeviceSpec(), optimizerOptions);
+    Graph& nonTurboGraph = GetGraphForTesting(optNet.get());
+
+    // The model *should not* be modified.
+    CHECK(CheckSequence(nonTurboGraph.cbegin(), nonTurboGraph.cend(),
+                        &IsLayerOfType<InputLayer>,
+                        checkConstantFloat32,
+                        &IsLayerOfType<Convolution2dLayer>,
+                        &IsLayerOfType<OutputLayer>));
+}
 #endif
 }

@@ -1062,7 +1062,7 @@ bool CheckFp16Support(BackendsMap& backends,
     }
     else
     {
-        ARMNN_LOG(warning) << "The first available preferred backend: " << firstBackend
+        ARMNN_LOG(debug) << "The first available preferred backend: " << firstBackend
                            << ", does not have FP16 support. "
                            << "The FP16 turbo mode option will be disable. It will run using FP32.";
     }
@@ -1075,7 +1075,7 @@ bool CheckFp16Support(BackendsMap& backends,
         backendCapabilities = backendObjPtr->GetCapabilities();
         if (!HasMatchingCapability(hasFp16Capability, backendCapabilities))
         {
-            ARMNN_LOG(warning) << "Next preferred backend: " << backend << ", does not have FP16 support. "
+            ARMNN_LOG(debug) << "Next preferred backend: " << backend << ", does not have FP16 support. "
                                << "It will run using FP32 when falling back to this backend.";
         }
         else
@@ -1947,7 +1947,6 @@ bool CheckFastMathSupport(const std::vector<BackendId>& availablePreferredBacken
     bool hasFastMath = false;
     // Check if the first preferred backend has Fastmath support
     auto firstBackend = availablePreferredBackends[0];
-
     if (!modelOptions.empty())
     {
         ParseOptions(modelOptions, firstBackend, [&](std::string name, const BackendOptions::Var& value)
@@ -1974,10 +1973,10 @@ bool IsTfLiteTurboModel(const Graph& optGraph)
 {
     // We will define a TfLiteTurboModel as follows:
     // All constant layers which are followed by a dequantize layer convert from Fp16 to FP32
-    // There must be at least one constant layer to dequantize layer converting from FP16 to Fp32
     Graph::ConstIterator firstLayer = optGraph.begin();
     Graph::ConstIterator lastLayer = optGraph.end();
-
+    // There must be at least one constant layer to dequantize layer converting from FP16 to Fp32
+    bool atLeastOneDequantizeEncountered = false;
     for (auto it = firstLayer; it != lastLayer; ++it)
     {
         auto layer = *it;
@@ -1991,8 +1990,16 @@ bool IsTfLiteTurboModel(const Graph& optGraph)
                 {
                     return false;
                 }
+                else
+                {
+                    atLeastOneDequantizeEncountered = true;
+                }
             }
         }
+    }
+    if (!atLeastOneDequantizeEncountered)
+    {
+        return false;
     }
     return true;
 }

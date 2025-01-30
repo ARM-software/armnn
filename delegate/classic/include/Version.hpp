@@ -1,5 +1,5 @@
 //
-// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,7 +15,7 @@ namespace armnnDelegate
 // ArmNN Delegate version components
 #define DELEGATE_MAJOR_VERSION 29
 #define DELEGATE_MINOR_VERSION 1
-#define DELEGATE_PATCH_VERSION 0
+#define DELEGATE_PATCH_VERSION 1
 
 /// DELEGATE_VERSION: "X.Y.Z"
 /// where:

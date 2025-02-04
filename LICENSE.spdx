@@ -2,11 +2,11 @@ SPDXVersion: SPDX-2.1
 DataLicense: CC0-1.0
 SPDXID: SPDXRef-DOCUMENT
 DocumentName: armnn
-DocumentNamespace: http://spdx.org/spdxdocs/spdx-v2.1-24ebab81-95cd-4890-aa56-eae747962728
+DocumentNamespace: http://spdx.org/spdxdocs/spdx-v2.1-b4cd0f86-f9cb-4a70-bca7-3047c53d3e30
 Creator: Person: Anonymous ()
 Creator: Organization: Anonymous ()
 Creator: Tool: reuse-4.0.3
-Created: 2024-12-30T10:00:40Z
+Created: 2025-02-04T16:44:14Z
 CreatorComment: <text>This document was created automatically using available reuse information consistent with REUSE.</text>
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-c776fce76bc4fc3804f114fc99526610
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-0927a128e6e481137399294d2c65ffb2
@@ -46,7 +46,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-401e540dbdb8edebd1c8d352de3b4bc
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-6110b7fb8c342e7afb3ff7d3aa04f3aa
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-e0226f19f126607afaa02dc12c63089a
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-b0589731c6bfeee2d067629f1faea237
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-b905c80995cef71311ff71687e4681ea
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-1ca2bbd5229d889f123d29e613216101
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-d8c0ad46ea75e9b82c1a42ce7c2879ea
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-c4906b29a8a0dccf2a0007ae6b43da69
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-0aeff3770c87fe47c261cedfe2b541b6
@@ -109,7 +109,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-b837f84542d1afdb1ce381d979910b2
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-5c5ec25a16d47253d1449f31fb03b6c6
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-357e3f3e77eae924556da719096b94e6
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-84dde47d1aba9f3dde0d4bce383303c2
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-d82d849d14d013c685162079a49c772f
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-a6ba73e5437c5afc49e8824e415a22d8
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-224ccd063b357758f18e88374df3c570
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-1f224b69946148bfa338b1d58a071b67
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-f212cf1d1e1b44c4abdb4e2740e11a4f
@@ -267,7 +267,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-5f2e5f915594dd75e988d02ac782405
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-cc5896c5b6f7743817f0ba11354efe35
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-75067761fc0efb8347e378e073617472
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-22ba63626a97c0fd49b77b341eac9db1
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-c853533df29cc280a8737294224c5989
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-d4289ece0ac6d774f63265561f94a9e5
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-c3d3fe8f2a8887548b0cec4da3b766a0
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-03f1dd2b0f9cefdb26c1fa21ba07219e
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-5b9f21fff4935c6d0231265eca459453
@@ -300,7 +300,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-76f69397e059ee130b6bfb8c18eef65
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-fc4836ca5a2368d09207bc7c7296934c
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-5e3a429f2108f09138ca1cee48be44c7
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-9799f353153374ffc0da11f01a083624
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-401d97f0dffc68d61d69efd3b536ed39
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-3867eb9052f7cde99bff3b815c97950d
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-6775994f89354263da2d7a5282b7f1c7
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-620c01b4d4bf33869c2bf46604631b51
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-95b35e97c4fc3f2b6bc8c3ff44b5e479
@@ -345,7 +345,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-2b0950ceecc8f30527ada3d8eabe25f
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-d5630491b9dcf3a9bb505b364a5594b7
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-d9785fc429780c7b0603dda787498abc
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-9427a4c36672f5b0f66ade0063ee2d3a
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-dd9e9ce58c355c255d4102e9536a800d
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-3b6134b8353bb8a025479b999675a7f6
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-38daa25ccdd8bdc0b0437cbe5cac3d2f
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-4d7c283ad2ba1ac9537e0d8b89f76509
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-fca1f99e9bc97f37f0771b83e12b4862
@@ -593,7 +593,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-fceb2ca04289b6d64d4f7ecd10fa38a
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-ff089c3def7ffae97d1598a725a6e925
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-55ded9b36e9fc8776c9e8343e7522015
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-64288878cc29cb8e2ddbeeeb5908b85b
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-14c2bdd409a3e7e437bda76e8b855e73
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-cfc9c99fd0039ea3989da1fcbfacc450
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-fdf64e9ce88f3a8a1e4bc560a07bbaab
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-c384c38e2a46795f8e17eaae0bfd0838
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-70927b9688a16cc131c5e0c00384d3e7
@@ -626,7 +626,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-45d458dcb3f5ab9864d3ef8d065b552
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-13807e230cd3d2e222b25fe54bb64e7f
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-cca646cbd043fe74bbd26f35711375e3
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-835f8df4cd67fd10283873744a37fe25
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-5c9b136df588807eb47d8b8970a2a7de
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-0ec698da08a0e6553e943d481bdd3237
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-06ad0e5346fa67194fa3afae6b150a51
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-594f30df33a819772a1a6c7af8568136
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-b2c402958d3bf3087ecc53883af8d1ca
@@ -885,7 +885,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-fbfd7ff56e8025e471b123077ecaa0a
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-a7c2ee6ce33d5ff564d57c59b36ff044
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-42e798e977f3a6f6a2ca0b010295cc95
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-0e1a26acf87a5255ccb1f8fd7bf6beb6
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-1d4bddbbb6ac5a53c3fe1cfd7c30eb2f
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-9a68973e635f190f9fe0a8f1a397326f
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-b12a28b7d303330a53726ba2d9a12f77
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-fcdbb2ecbd61f9e70a35c1359c5f1224
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-77e71e245c83c07d38e04cc5b9908383
@@ -1433,7 +1433,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-ffc95ef1e8ca265045eb7a8849b399b
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-980b13a7661ddaf811248b57df970656
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-0c625a340d2244ab74ef8273b9bc653b
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-73619bc159222537693ade716ff0af27
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-ff44833458c1f23c7aec1c3cd02d3823
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-73f90649be41eb18dc25b9da80d28bef
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-63f59a5d5fd288ca3364765dd12d6bf0
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-6455f9852cc1c99804acdea5d17e951e
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-7e211aeddf907a507fe4774b94abde16
@@ -1636,7 +1636,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-88972cb83a341525c3a5c22788a5d03
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-9e5a53da36deda62d2e818937157d168
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-93a2318b70b412a440bf98eae6cbd0c0
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-d1427dd6fc99b41d63597fcdbc8a1f5b
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-9f427ce42bf658ed66444e27aa1886d5
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-a12a102aa328dff345a61fd410df2084
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-ac7c5b6a844372851b64f90e277afb1b
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-f2ce22f63444ca8fcac0035a8e118df7
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-3753f1b044d4b41d1f92f2b68f3e1eba
@@ -2143,7 +2143,7 @@ Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-65e44f7e944d3de21315e2cb6069426
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-d94417c6e87164cdba9be1f22a2f222b
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-0dd3ed0b30e726252fa29af64d1ab539
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-8b06467e6f9437b11e76d7f40494dcda
-Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-18b9665caf35ff462b99d5793e77e024
+Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-49c66bf7a4684a44c0831f686b806694
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-b3b7c075b5ca01a8e7f7511f4295a289
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-acdfc738e0f922c6ba621290fd6ce291
 Relationship: SPDXRef-DOCUMENT DESCRIBES SPDXRef-7d7fd9f7fcc39e4e53e712c6f1096177
@@ -2644,11 +2644,11 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./delegate/classic/include/Version.hpp
-SPDXID: SPDXRef-b905c80995cef71311ff71687e4681ea
-FileChecksum: SHA1: 06f7142c06520637b5eaf6bdb13fbd69d7be5c03
+SPDXID: SPDXRef-1ca2bbd5229d889f123d29e613216101
+FileChecksum: SHA1: 9c38b598202c0058aa2e330b7ce7e466ffa5074b
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.</text>
+FileCopyrightText: <text>Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./delegate/classic/include/armnn_delegate.hpp
 SPDXID: SPDXRef-d8c0ad46ea75e9b82c1a42ce7c2879ea
@@ -3085,11 +3085,11 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./delegate/opaque/include/Version.hpp
-SPDXID: SPDXRef-d82d849d14d013c685162079a49c772f
-FileChecksum: SHA1: a066cfc3b24a262760367dc074f8b4d1bf27ebaf
+SPDXID: SPDXRef-a6ba73e5437c5afc49e8824e415a22d8
+FileChecksum: SHA1: ee1b6e31cd87d07e4297b6970849da1e4beee8b4
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.</text>
+FileCopyrightText: <text>Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./delegate/opaque/include/armnn_delegate.hpp
 SPDXID: SPDXRef-224ccd063b357758f18e88374df3c570
@@ -4191,11 +4191,11 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2020 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./docs/Doxyfile
-SPDXID: SPDXRef-c853533df29cc280a8737294224c5989
-FileChecksum: SHA1: 6f0923ebb1e8f4d303688b8b5d563c6c797454ee
+SPDXID: SPDXRef-d4289ece0ac6d774f63265561f94a9e5
+FileChecksum: SHA1: 94d71403ede2cc1f5cd639a671f73578de700d59
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright (c) 2018, 2020-2024 ARM Ltd and Contributors. All rights reserved.</text>
+FileCopyrightText: <text>Copyright (c) 2018, 2020-2025 ARM Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./docs/FAQ.md
 SPDXID: SPDXRef-c3d3fe8f2a8887548b0cec4da3b766a0
@@ -4423,11 +4423,11 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017,2022 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./include/armnn/Version.hpp
-SPDXID: SPDXRef-401d97f0dffc68d61d69efd3b536ed39
-FileChecksum: SHA1: 0733255f4a14455b6ad78905338b968b3bf90535
+SPDXID: SPDXRef-3867eb9052f7cde99bff3b815c97950d
+FileChecksum: SHA1: 13978e58ce93988c9a54aa031422f33d162159fb
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.</text>
+FileCopyrightText: <text>Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./include/armnn/backends/CMakeLists.txt
 SPDXID: SPDXRef-6775994f89354263da2d7a5282b7f1c7
@@ -4738,11 +4738,11 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017 Arm Ltd. All rights reserved.</text>
 
 FileName: ./include/armnnTfLiteParser/Version.hpp
-SPDXID: SPDXRef-dd9e9ce58c355c255d4102e9536a800d
-FileChecksum: SHA1: 63e5390ca52705cbdb299513013406a77039cfca
+SPDXID: SPDXRef-3b6134b8353bb8a025479b999675a7f6
+FileChecksum: SHA1: 0b7123b22917482814cc812b1a3a7dc90b4f9b94
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.</text>
+FileCopyrightText: <text>Copyright © 2021-2025 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./include/armnnUtils/CompatibleTypes.hpp
 SPDXID: SPDXRef-38daa25ccdd8bdc0b0437cbe5cac3d2f
@@ -6474,11 +6474,11 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017 Arm Ltd. All rights reserved.</text>
 
 FileName: ./scripts/get_compute_library.sh
-SPDXID: SPDXRef-14c2bdd409a3e7e437bda76e8b855e73
-FileChecksum: SHA1: 7c04cbbdc2594bc8417047bf3767a5b6321c5a1b
+SPDXID: SPDXRef-cfc9c99fd0039ea3989da1fcbfacc450
+FileChecksum: SHA1: 6f9defa629272932e4b68963deda6b4a060ed3ea
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2018-2024 Arm Ltd. All rights reserved.</text>
+FileCopyrightText: <text>Copyright © 2018-2025 Arm Ltd. All rights reserved.</text>
 
 FileName: ./scripts/get_tensorflow.sh
 SPDXID: SPDXRef-fdf64e9ce88f3a8a1e4bc560a07bbaab
@@ -6705,8 +6705,8 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2024 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./src/armnn/Network.cpp
-SPDXID: SPDXRef-5c9b136df588807eb47d8b8970a2a7de
-FileChecksum: SHA1: 889893f818eb5c6e3521cb3a9de0d1f9a81fbc58
+SPDXID: SPDXRef-0ec698da08a0e6553e943d481bdd3237
+FileChecksum: SHA1: 667928ad9a3accd044806989aac70334cce6ef9c
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.</text>
@@ -8522,8 +8522,8 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2023 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./src/armnn/test/optimizations/ConvertConstDequantisationLayersToConstLayersTest.cpp
-SPDXID: SPDXRef-1d4bddbbb6ac5a53c3fe1cfd7c30eb2f
-FileChecksum: SHA1: 6780f7c7e7b34e2c891f0762892bb66ca5209a5f
+SPDXID: SPDXRef-9a68973e635f190f9fe0a8f1a397326f
+FileChecksum: SHA1: 0a24833b42a31c2057d5ef212d8c3ca98aaa96ac
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.</text>
@@ -12363,8 +12363,8 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./src/backends/cl/ClBackend.cpp
-SPDXID: SPDXRef-ff44833458c1f23c7aec1c3cd02d3823
-FileChecksum: SHA1: 70d3f789fdb65fc8f568e7ebe17153794ddb33f2
+SPDXID: SPDXRef-73f90649be41eb18dc25b9da80d28bef
+FileChecksum: SHA1: 408489404a2af990534b14894aad9ad7751f2fbe
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017-2024 Arm Ltd. All rights reserved.</text>
@@ -13784,8 +13784,8 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017-2020,2022-2023 Arm Ltd. All rights reserved.</text>
 
 FileName: ./src/backends/neon/NeonBackend.cpp
-SPDXID: SPDXRef-9f427ce42bf658ed66444e27aa1886d5
-FileChecksum: SHA1: dd72f0e57d9d1ad5e12796df2c40a55260254170
+SPDXID: SPDXRef-a12a102aa328dff345a61fd410df2084
+FileChecksum: SHA1: 40ed16c9eb2ad66200046121b7267e88c8241f8e
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.</text>
@@ -17371,11 +17371,11 @@ LicenseInfoInFile: MIT
 FileCopyrightText: <text>Copyright © 2024 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./src/backends/tosaCommon/operatorMappings/StridedSliceOperator.cpp
-SPDXID: SPDXRef-18b9665caf35ff462b99d5793e77e024
-FileChecksum: SHA1: 99d4bcb2a41f650ddc581372f2f2ea157866087b
+SPDXID: SPDXRef-49c66bf7a4684a44c0831f686b806694
+FileChecksum: SHA1: 18c0260fe606695f824a1b2c8f6980fd3f06ce3b
 LicenseConcluded: NOASSERTION
 LicenseInfoInFile: MIT
-FileCopyrightText: <text>Copyright © 2024 Arm Ltd and Contributors. All rights reserved.</text>
+FileCopyrightText: <text>Copyright © 2024-2025 Arm Ltd and Contributors. All rights reserved.</text>
 
 FileName: ./src/backends/tosaCommon/operatorMappings/StridedSliceOperator.hpp
 SPDXID: SPDXRef-b3b7c075b5ca01a8e7f7511f4295a289

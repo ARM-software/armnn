@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2018-2024 Arm Ltd. All rights reserved.
+# Copyright © 2018-2025 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c85b8f805d9d1a140f681f8b72dcd3e33b558848" #refactor: Use operator API inside NEMeanstdDevNormalizationLayer
+DEFAULT_CLFRAMEWORKREVISION="f1be55c81f7f580fbbfd88894bc3e79af3185743" #fix: gemm_hybrid_quantized.hpp was passing incorrect K size to the kernel.
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

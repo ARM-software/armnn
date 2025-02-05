@@ -70,11 +70,11 @@ TosaSerializationBasicBlock* ConvertStridedSliceToTosaOperator(const Layer* laye
     // handle cases where end or begin values are negative
     for (uint32_t i = 0; i < inputRank; ++i)
     {
-        if ((stridedSliceDescriptor->m_EndMask >> 1) && end[i] < 0)
+        if (end[i] < 0)
         {
             end[i] = static_cast<int32_t>(inputShape[i]) + end[i];
         }
-        if((stridedSliceDescriptor->m_Begin[i] >> 1) && begin[i] < 0)
+        if (begin[i] < 0)
         {
             begin[i] = static_cast<int32_t>(inputShape[i]) + begin[i];
         }

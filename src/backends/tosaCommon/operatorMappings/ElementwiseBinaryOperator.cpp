@@ -1,40 +1,10 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ElementwiseBinaryOperator.hpp"
 #include "TosaRescaleOperatorUtils.hpp"
-
-void AddRescaleOp(const string &inputName,
-                  const string &outputName,
-                  std::vector<TosaSerializationTensor*>& tensors,
-                  const std::vector<const TensorInfo*>& inputs,
-                  const std::vector<const TensorInfo*>& outputs,
-                  std::vector<TosaSerializationOperator*>& operators)
-{
-        double scale_alpha = inputs[1]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
-        int32_t input_zp   = inputs[1]->GetQuantizationOffset();
-        int32_t output_zp  = outputs[0]->GetQuantizationOffset();
-
-        TosaSerializationOperator* rescaleOp = nullptr;
-        CreateRescaleTosaOperator(inputName,
-                                  outputName,
-                                  scale_alpha,
-                                  input_zp,
-                                  output_zp,
-                                  false,
-                                  false,
-                                  true,
-                                  true,
-                                  &rescaleOp);
-
-        std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[1]->GetShape());
-        tensors.push_back(new TosaSerializationTensor(outputName,
-                                                      inputShape,
-                                                      DType_INT32, {}));
-        operators.push_back(rescaleOp);
-}
 
 TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer* layer,
                                                                     const LayerType type,
@@ -102,8 +72,39 @@ TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer*
     bool isMulOp = (type == LayerType::Multiplication) || isMulDesc ? true : false;
     if (isInputInt8 && !isMulOp)
     {
-        AddRescaleOp(input0Name, input0ElemenwiseBinaryName, tensors, inputs, outputs, operators);
-        AddRescaleOp(input1Name, input1ElemenwiseBinaryName, tensors, inputs, outputs, operators);
+        TosaSerializationOperator* rescaleOp0 = nullptr;
+        CreateRescaleTosaOperator(input0Name,
+                                  input0ElemenwiseBinaryName,
+                                  inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale(),
+                                  inputs[0]->GetQuantizationOffset(),
+                                  0,
+                                  false,
+                                  false,
+                                  true,
+                                  true,
+                                  &rescaleOp0);
+        tensors.push_back(new TosaSerializationTensor(input0ElemenwiseBinaryName,
+                                                      GetTosaTensorShape(inputs[0]->GetShape()),
+                                                      DType_INT32,
+                                                      {}));
+        operators.push_back(rescaleOp0);
+
+        TosaSerializationOperator* rescaleOp1 = nullptr;
+        CreateRescaleTosaOperator(input1Name,
+                                  input1ElemenwiseBinaryName,
+                                  inputs[1]->GetQuantizationScale() / outputs[0]->GetQuantizationScale(),
+                                  inputs[1]->GetQuantizationOffset(),
+                                  0,
+                                  false,
+                                  false,
+                                  true,
+                                  true,
+                                  &rescaleOp1);
+        tensors.push_back(new TosaSerializationTensor(input1ElemenwiseBinaryName,
+                                                      GetTosaTensorShape(inputs[1]->GetShape()),
+                                                      DType_INT32,
+                                                      {}));
+        operators.push_back(rescaleOp1);
     }
 
     std::string& elementwiseInput0Str = isInputInt8 ? input0ElemenwiseBinaryName : input0Name;
@@ -213,7 +214,28 @@ TosaSerializationBasicBlock* ConvertElementwiseBinaryToTosaOperator(const Layer*
     // from DType_INT32 to DType_INT8 when the input is DType_INT8
     if (inputDType0 == DType_INT8)
     {
-        AddRescaleOp(outputElemenwiseBinaryName, outputName, tensors, inputs, outputs, operators);
+        // double output_rescale_scale = in_lhs_scale * in_rhs_scale / output_scale;
+        float input0QScale = inputs[0]->IsQuantized()?inputs[0]->GetQuantizationScale():1.0f;
+        float input1QScale = inputs[1]->IsQuantized()?inputs[1]->GetQuantizationScale():1.0f;
+        float outputQScale = outputs[0]->IsQuantized()?outputs[0]->GetQuantizationScale():1.0f;
+        double combinedQScale = input0QScale * input1QScale / outputQScale;
+
+        TosaSerializationOperator* rescaleOp = nullptr;
+        CreateRescaleTosaOperator(outputElemenwiseBinaryName,
+                                  outputName,
+                                  combinedQScale,
+                                  0,
+                                  outputs[0]->GetQuantizationOffset(),
+                                  false,
+                                  false,
+                                  true,
+                                  true,
+                                  &rescaleOp);
+        tensors.push_back(new TosaSerializationTensor(outputName,
+                                                      GetTosaTensorShape(outputs[0]->GetShape()),
+                                                      DType_INT8,
+                                                      {}));
+        operators.push_back(rescaleOp);
     }
 
     return new TosaSerializationBasicBlock(blockName, // name

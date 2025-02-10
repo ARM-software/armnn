@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.
 # Copyright © 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -387,8 +387,6 @@ list(APPEND armnn_sources
     src/armnn/Profiling.hpp
     src/armnn/Runtime.cpp
     src/armnn/Runtime.hpp
-    src/armnn/RangeTracker.cpp
-    src/armnn/RangeTracker.hpp
     src/armnn/ResolveType.hpp
     src/armnn/SerializeLayerParameters.cpp
     src/armnn/SerializeLayerParameters.hpp

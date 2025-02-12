@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="aa721e4316a5956f532dd9f0ea0d769bf16394bb" #feat: detect number of cpu cores in OpenBSD
+DEFAULT_CLFRAMEWORKREVISION="aa12e48ce4960e05087f46610649fa8c9f64acc7" #revert: "perf: Create default memory manager when none is provided"
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

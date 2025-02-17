@@ -1,0 +1,5 @@
+var _convert_const_dequantisation_layers_to_const_layers_8hpp =
+[
+    [ "ConvertConstDequantisationLayersToConstLayersImpl", "classarmnn_1_1optimizations_1_1_convert_const_dequantisation_layers_to_const_layers_impl.html", "classarmnn_1_1optimizations_1_1_convert_const_dequantisation_layers_to_const_layers_impl" ],
+    [ "ConvertConstDequantisationLayersToConstLayers", "_convert_const_dequantisation_layers_to_const_layers_8hpp.html#a4dfbdc8cc90b67e74eccd146d977ff66", null ]
+];

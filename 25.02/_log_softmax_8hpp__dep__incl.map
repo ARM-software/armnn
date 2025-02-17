@@ -1,0 +1,5 @@
+<map id="src/backends/reference/workloads/LogSoftmax.hpp" name="src/backends/reference/workloads/LogSoftmax.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="138,5,341,47"/>
+<area shape="rect" id="node2" href="$_log_softmax_8cpp.html" title=" " alt="" coords="5,95,207,136"/>
+<area shape="rect" id="node3" href="$_ref_log_softmax_workload_8cpp.html" title=" " alt="" coords="231,95,515,136"/>
+</map>

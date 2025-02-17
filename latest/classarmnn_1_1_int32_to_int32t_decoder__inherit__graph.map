@@ -1,9 +1,8 @@
 <map id="Int32ToInt32tDecoder" name="Int32ToInt32tDecoder">
-<area shape="rect" id="node1" title=" " alt="" coords="112,365,273,392"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="81,275,304,316"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="21,171,172,197"/>
-<area shape="rect" id="node4" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="5,5,108,32"/>
-<area shape="rect" id="node5" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="79,81,219,108"/>
-<area shape="rect" id="node6" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="197,171,383,197"/>
-<area shape="rect" id="node7" title=" " alt="" coords="263,81,317,108"/>
+<area shape="rect" id="node1" title=" " alt="" coords="88,276,249,303"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="57,185,280,227"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="5,81,145,108"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="24,5,127,32"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="170,81,357,108"/>
+<area shape="rect" id="node6" title=" " alt="" coords="236,5,291,32"/>
 </map>

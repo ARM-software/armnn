@@ -1,0 +1,5 @@
+<map id="TransposeDescriptor" name="TransposeDescriptor">
+<area shape="rect" id="node1" title="A TransposeDescriptor for the TransposeLayer." alt="" coords="66,95,221,121"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="5,5,127,32"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_permutation_vector.html" title=" " alt="" coords="151,5,293,32"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="src/backends/tosaCommon/operatorMappings/TanhOperator.hpp" name="src/backends/tosaCommon/operatorMappings/TanhOperator.hpp">
+<area shape="rect" id="node1" title=" " alt="" coords="141,5,403,47"/>
+<area shape="rect" id="node2" href="$_tanh_operator_8cpp.html" title=" " alt="" coords="5,102,267,143"/>
+<area shape="rect" id="node3" href="$_tosa_common_operators_8hpp.html" title=" " alt="" coords="290,95,526,151"/>
+<area shape="rect" id="node4" href="$_tosa_mappings_8hpp.html" title=" " alt="" coords="309,199,507,240"/>
+<area shape="rect" id="node5" href="$_tosa_mappings_8cpp.html" title=" " alt="" coords="84,288,281,329"/>
+<area shape="rect" id="node6" href="$_tosa_ref_backend_8cpp.html" title=" " alt="" coords="306,288,510,329"/>
+<area shape="rect" id="node7" href="$_tosa_ref_layer_support_8cpp.html" title=" " alt="" coords="534,288,738,329"/>
+</map>

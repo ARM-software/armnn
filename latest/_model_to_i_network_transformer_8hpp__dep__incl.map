@@ -1,9 +1,0 @@
-<map id="shim/sl/canonical/ModelToINetworkTransformer.hpp" name="shim/sl/canonical/ModelToINetworkTransformer.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="299,5,493,47"/>
-<area shape="rect" id="node2" href="$_armnn_driver_8hpp.html" title=" " alt="" coords="191,102,441,129"/>
-<area shape="rect" id="node3" href="$_armnn_prepared_model_8hpp.html" title=" " alt="" coords="5,184,245,225"/>
-<area shape="rect" id="node4" href="$_armnn_driver_impl_8cpp.html" title=" " alt="" coords="318,273,541,315"/>
-<area shape="rect" id="node7" href="$_model_to_i_network_transformer_8cpp.html" title=" " alt="" coords="515,95,709,136"/>
-<area shape="rect" id="node6" href="$support__library__service_8cpp.html" title=" " alt="" coords="269,184,440,225"/>
-<area shape="rect" id="node5" href="$_armnn_prepared_model_8cpp.html" title=" " alt="" coords="5,273,245,315"/>
-</map>

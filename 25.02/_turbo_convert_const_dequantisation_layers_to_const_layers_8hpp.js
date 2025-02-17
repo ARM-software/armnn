@@ -1,0 +1,5 @@
+var _turbo_convert_const_dequantisation_layers_to_const_layers_8hpp =
+[
+    [ "TurboConvertConstDequantisationLayersToConstLayersImpl", "classarmnn_1_1optimizations_1_1_turbo_convert_const_dequantisation_layers_to_const_layers_impl.html", "classarmnn_1_1optimizations_1_1_turbo_convert_const_dequantisation_layers_to_const_layers_impl" ],
+    [ "TurboConvertConstDequantisationLayersToConstLayers", "_turbo_convert_const_dequantisation_layers_to_const_layers_8hpp.html#a437fe6ffca1974266c3c0192cfeb3d74", null ]
+];

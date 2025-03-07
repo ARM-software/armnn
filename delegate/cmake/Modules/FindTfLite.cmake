@@ -16,7 +16,7 @@ unset(TFLITE_FOUND)
 # First look for the static version of tensorflow lite
 find_library(TfLite_LIB NAMES "libtensorflow-lite.a" HINTS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite NO_CMAKE_FIND_ROOT_PATH  )
 # If not found then, look for the dynamic library of tensorflow lite
-find_library(TfLite_LIB NAMES "libtensorflow_lite_all.so" "libtensorflowlite.so" HINTS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite NO_CMAKE_FIND_ROOT_PATH)
+find_library(TfLite_LIB NAMES "libtensorflow_lite_all.so" "libtensorflowlite.so" "libtensorflow-lite.so" HINTS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite NO_CMAKE_FIND_ROOT_PATH)
 
 # If the static library was found, gather all of its dependencies
 if (TfLite_LIB MATCHES .a$)

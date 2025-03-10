@@ -200,7 +200,6 @@ download_tensorflow()
 {
   cd "$SOURCE_DIR"
   git config --global http.postBuffer 524288000
-  git config --global http.version HTTP/1.1  # force git using http version1.1
   echo -e "\n***** Downloading TensorFlow *****"
   # Attempt to clone Tensorflow, wait 60 second between attempts. Max 5 tries
   n=0
@@ -210,7 +209,6 @@ download_tensorflow()
     n=$[$n+1]
     sleep 60
   done
-  git config --unset http.version
   cd "$TENSORFLOW_SRC"
 
   git checkout "$TENSORFLOW_VERSION"

@@ -33,62 +33,62 @@ TosaSerializationBasicBlock* ConvertSoftmaxToTosaOperator(const Layer* layer,
     std::string outputName = std::string("output0_");
     std::string blockName = std::string("Op_SOFTMAX_block_") + GetUniqueTosaMappingID();
 
-    std::string inputNameConst1 = std::string("intermediate_constant1_") + GetUniqueTosaMappingID();
-    std::string inputNameConst2 = std::string("intermediate_constant2_") + GetUniqueTosaMappingID();
-    std::string inputNameConst3 = std::string("intermediate_constant3_") + GetUniqueTosaMappingID();
-    std::string inputNameConst3a = std::string("intermediate_constant3a_") + GetUniqueTosaMappingID();
-    std::string inputNameConst4 = std::string("intermediate_constant4_") + GetUniqueTosaMappingID();
-    std::string inputNameConst5 = std::string("intermediate_constant5_") + GetUniqueTosaMappingID();
-    std::string inputNameConst6 = std::string("intermediate_constant6_") + GetUniqueTosaMappingID();
-    std::string inputNameConst7 = std::string("intermediate_constant7_") + GetUniqueTosaMappingID();
-    std::string inputNameConst8 = std::string("intermediate_constant8_") + GetUniqueTosaMappingID();
-    std::string inputNameConst8a = std::string("intermediate_constant8a_") + GetUniqueTosaMappingID();
-    std::string inputNameConst8b = std::string("intermediate_constant8b_") + GetUniqueTosaMappingID();
-    std::string inputNameConst9 = std::string("intermediate_constant9_") + GetUniqueTosaMappingID();
-    std::string inputNameConst9a = std::string("intermediate_constant9a_") + GetUniqueTosaMappingID();
-    std::string inputNameConst9b = std::string("intermediate_constant9b_") + GetUniqueTosaMappingID();
-    std::string inputNameConst10 = std::string("intermediate_constant10_") + GetUniqueTosaMappingID();
+    std::string inputNameConst1 = std::string("layer_intermediate_constant1_") + GetUniqueTosaMappingID();
+    std::string inputNameConst2 = std::string("layer_intermediate_constant2_") + GetUniqueTosaMappingID();
+    std::string inputNameConst3 = std::string("layer_intermediate_constant3_") + GetUniqueTosaMappingID();
+    std::string inputNameConst3a = std::string("layer_intermediate_constant3a_") + GetUniqueTosaMappingID();
+    std::string inputNameConst4 = std::string("layer_intermediate_constant4_") + GetUniqueTosaMappingID();
+    std::string inputNameConst5 = std::string("layer_intermediate_constant5_") + GetUniqueTosaMappingID();
+    std::string inputNameConst6 = std::string("layer_intermediate_constant6_") + GetUniqueTosaMappingID();
+    std::string inputNameConst7 = std::string("layer_intermediate_constant7_") + GetUniqueTosaMappingID();
+    std::string inputNameConst8 = std::string("layer_intermediate_constant8_") + GetUniqueTosaMappingID();
+    std::string inputNameConst8a = std::string("layer_intermediate_constant8a_") + GetUniqueTosaMappingID();
+    std::string inputNameConst8b = std::string("layer_intermediate_constant8b_") + GetUniqueTosaMappingID();
+    std::string inputNameConst9 = std::string("layer_intermediate_constant9_") + GetUniqueTosaMappingID();
+    std::string inputNameConst9a = std::string("layer_intermediate_constant9a_") + GetUniqueTosaMappingID();
+    std::string inputNameConst9b = std::string("layer_intermediate_constant9b_") + GetUniqueTosaMappingID();
+    std::string inputNameConst10 = std::string("layer_intermediate_constant10_") + GetUniqueTosaMappingID();
 
-    std::string outputNameRescale1 = std::string("intermediate0_") + GetUniqueTosaMappingID();
-    std::string outputNameReduceMax1 = std::string("intermediate1_") + GetUniqueTosaMappingID();
-    std::string outputNameSub1 = std::string("intermediate2_") + GetUniqueTosaMappingID();
-    std::string outputNameRescale2 = std::string("intermediate3_") + GetUniqueTosaMappingID();
-    std::string outputNameTable1 = std::string("intermediate4_") + GetUniqueTosaMappingID();
-    std::string outputNameTable2 = std::string("intermediate5_") + GetUniqueTosaMappingID();
-    std::string outputNameTable3 = std::string("intermediate6_") + GetUniqueTosaMappingID();
-    std::string outputNameTable4 = std::string("intermediate7_") + GetUniqueTosaMappingID();
-    std::string outputNameLogicalL1 = std::string("intermediate8_") + GetUniqueTosaMappingID();
-    std::string outputNameLogicalL2 = std::string("intermediate9_") + GetUniqueTosaMappingID();
-    std::string outputNameLogicalL3 = std::string("intermediate10_") + GetUniqueTosaMappingID();
-    std::string outputNameArithmeticR1 = std::string("intermediate11_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd1 = std::string("intermediate12_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd2 = std::string("intermediate13_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd3 = std::string("intermediate14_") + GetUniqueTosaMappingID();
-    std::string outputNameArithmeticR2 = std::string("intermediate15_") + GetUniqueTosaMappingID();
-    std::string outputNameReduceSum1 = std::string("intermediate16_") + GetUniqueTosaMappingID();
-    std::string outputNameCLZ1 = std::string("intermediate17_") + GetUniqueTosaMappingID();
-    std::string outputNameSub2 = std::string("intermediate18_") + GetUniqueTosaMappingID();
-    std::string outputNameLogicalL4 = std::string("intermediate19_") + GetUniqueTosaMappingID();
-    std::string outputNameMul1 = std::string("intermediate20_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd4 = std::string("intermediate21_") + GetUniqueTosaMappingID();
-    std::string outputNameMul2 = std::string("intermediate22_") + GetUniqueTosaMappingID();
-    std::string outputNameSub3 = std::string("intermediate23_") + GetUniqueTosaMappingID();
-    std::string outputNameMul3 = std::string("intermediate24_") + GetUniqueTosaMappingID();
-    std::string outputNameMul4 = std::string("intermediate25_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd5 = std::string("intermediate26_") + GetUniqueTosaMappingID();
-    std::string outputNameMul5 = std::string("intermediate27_") + GetUniqueTosaMappingID();
-    std::string outputNameSub4 = std::string("intermediate28_") + GetUniqueTosaMappingID();
-    std::string outputNameMul6 = std::string("intermediate29_") + GetUniqueTosaMappingID();
-    std::string outputNameMul7 = std::string("intermediate30_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd6 = std::string("intermediate31_") + GetUniqueTosaMappingID();
-    std::string outputNameMul8 = std::string("intermediate32_") + GetUniqueTosaMappingID();
-    std::string outputNameSub5 = std::string("intermediate33_") + GetUniqueTosaMappingID();
-    std::string outputNameMul9 = std::string("intermediate34_") + GetUniqueTosaMappingID();
-    std::string outputNameMul10 = std::string("intermediate35_") + GetUniqueTosaMappingID();
-    std::string outputNameAdd7 = std::string("intermediate36_") + GetUniqueTosaMappingID();
-    std::string outputNameMul11 = std::string("intermediate37_") + GetUniqueTosaMappingID();
-    std::string outputNameSub6 = std::string("intermediate38_") + GetUniqueTosaMappingID();
-    std::string outputNameArithmeticR3 = std::string("intermediate39_") + GetUniqueTosaMappingID();
+    std::string outputNameRescale1 = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
+    std::string outputNameReduceMax1 = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
+    std::string outputNameSub1 = std::string("layer_intermediate2_") + GetUniqueTosaMappingID();
+    std::string outputNameRescale2 = std::string("layer_intermediate3_") + GetUniqueTosaMappingID();
+    std::string outputNameTable1 = std::string("layer_intermediate4_") + GetUniqueTosaMappingID();
+    std::string outputNameTable2 = std::string("layer_intermediate5_") + GetUniqueTosaMappingID();
+    std::string outputNameTable3 = std::string("layer_intermediate6_") + GetUniqueTosaMappingID();
+    std::string outputNameTable4 = std::string("layer_intermediate7_") + GetUniqueTosaMappingID();
+    std::string outputNameLogicalL1 = std::string("layer_intermediate8_") + GetUniqueTosaMappingID();
+    std::string outputNameLogicalL2 = std::string("layer_intermediate9_") + GetUniqueTosaMappingID();
+    std::string outputNameLogicalL3 = std::string("layer_intermediate10_") + GetUniqueTosaMappingID();
+    std::string outputNameArithmeticR1 = std::string("layer_intermediate11_") + GetUniqueTosaMappingID();
+    std::string outputNameAdd1 = std::string("layer_intermediate12_") + GetUniqueTosaMappingID();
+    std::string outputNameAdd2 = std::string("layer_intermediate13_") + GetUniqueTosaMappingID();
+    std::string outputNameAdd3 = std::string("layer_intermediate14_") + GetUniqueTosaMappingID();
+    std::string outputNameArithmeticR2 = std::string("layer_intermediate15_") + GetUniqueTosaMappingID();
+    std::string outputNameReduceSum1 = std::string("layer_intermediate16_") + GetUniqueTosaMappingID();
+    std::string outputNameCLZ1 = std::string("layer_intermediate17_") + GetUniqueTosaMappingID();
+    std::string outputNameSub2 = std::string("layer_intermediate18_") + GetUniqueTosaMappingID();
+    std::string outputNameLogicalL4 = std::string("layer_intermediate19_") + GetUniqueTosaMappingID();
+    std::string outputNameMul1 = std::string("layer_intermediate20_") + GetUniqueTosaMappingID();
+    std::string outputNameAdd4 = std::string("layer_intermediate21_") + GetUniqueTosaMappingID();
+    std::string outputNameMul2 = std::string("layer_intermediate22_") + GetUniqueTosaMappingID();
+    std::string outputNameSub3 = std::string("layer_intermediate23_") + GetUniqueTosaMappingID();
+    std::string outputNameMul3 = std::string("layer_intermediate24_") + GetUniqueTosaMappingID();
+    std::string outputNameMul4 = std::string("layer_intermediate25_") + GetUniqueTosaMappingID();
+    std::string outputNameAdd5 = std::string("layer_intermediate26_") + GetUniqueTosaMappingID();
+    std::string outputNameMul5 = std::string("layer_intermediate27_") + GetUniqueTosaMappingID();
+    std::string outputNameSub4 = std::string("layer_intermediate28_") + GetUniqueTosaMappingID();
+    std::string outputNameMul6 = std::string("layer_intermediate29_") + GetUniqueTosaMappingID();
+    std::string outputNameMul7 = std::string("layer_intermediate30_") + GetUniqueTosaMappingID();
+    std::string outputNameAdd6 = std::string("layer_intermediate31_") + GetUniqueTosaMappingID();
+    std::string outputNameMul8 = std::string("layer_intermediate32_") + GetUniqueTosaMappingID();
+    std::string outputNameSub5 = std::string("layer_intermediate33_") + GetUniqueTosaMappingID();
+    std::string outputNameMul9 = std::string("layer_intermediate34_") + GetUniqueTosaMappingID();
+    std::string outputNameMul10 = std::string("layer_intermediate35_") + GetUniqueTosaMappingID();
+    std::string outputNameAdd7 = std::string("layer_intermediate36_") + GetUniqueTosaMappingID();
+    std::string outputNameMul11 = std::string("layer_intermediate37_") + GetUniqueTosaMappingID();
+    std::string outputNameSub6 = std::string("layer_intermediate38_") + GetUniqueTosaMappingID();
+    std::string outputNameArithmeticR3 = std::string("layer_intermediate39_") + GetUniqueTosaMappingID();
 
     // If a layer is present then the block will be used for execution, so input and output names need to be determined
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
@@ -543,8 +543,16 @@ TosaSerializationBasicBlock* ConvertSoftmaxToTosaOperator(const Layer* layer,
     operators.push_back(arithmeticROp3);
 
     TosaSerializationOperator* rescaleOp3 = nullptr;
-    CreateRescaleTosaOperator(outputNameArithmeticR3, outputName, 1.0f, 0, output_zp, false, false, 
-                              false, true, &rescaleOp3);
+    CreateRescaleTosaOperator(outputNameArithmeticR3,
+                              outputName,
+                              1.0f,
+                              0,
+                              output_zp,
+                              false,
+                              false,
+                              false,
+                              true,
+                              &rescaleOp3);
 
     tensors.push_back(new TosaSerializationTensor(outputName, outputShape0, outputDType0, {}));
     operators.push_back(rescaleOp3);

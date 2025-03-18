@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2021,2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2021,2023-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -63,11 +63,12 @@ public:
 
             reshapeInfo.SetShape(armnn::TensorShape{ numDimensions, reshapedDimensions.data() });
 
-            // If the parent layer is a Constant layer and it is only used once we can short circuit by just
-            // changing the tensor info rather than adding a reshape layer.
+            // If the parent layer is a Constant layer and it is only used once or trying to reshape to 4D
+            // we can short circuit by just changing the tensor info rather than adding a reshape layer.
             Layer& parentLayer = layer.GetInputSlot(reshapeSlot).GetConnectedOutputSlot()->GetOwningLayer();
             if ((parentLayer.GetType() == armnn::LayerType::Constant) &&
-                (parentLayer.GetOutputSlot(0).GetNumConnections() == 1))
+                    ((parentLayer.GetOutputSlot(0).GetNumConnections() == 1) ||
+                    numDimensions == 4))
             {
                 ConstantLayer& constantLayer = static_cast<ConstantLayer&>(parentLayer);
 

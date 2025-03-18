@@ -31,7 +31,7 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
 
     std::string inputName       = std::string("input_");
     std::string outputNameAlpha = std::string("constant0_") + GetUniqueTosaMappingID();
-    std::string outputNameMul   = std::string("intermediate1_") + GetUniqueTosaMappingID();
+    std::string outputNameMul   = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
     std::string outputName      = std::string("output0_");
     std::string blockName       = std::string("Op_LEAKY_RELU_block_") + GetUniqueTosaMappingID();
 
@@ -114,9 +114,9 @@ TosaSerializationBasicBlock* ConvertLeakyReluToTosaOperator(const Layer* layer,
     }
     else
     {
-        std::string outputNameRescaleAlpha      = std::string("intermediate2_") + GetUniqueTosaMappingID();
-        std::string outputNameRescaleIdentity   = std::string("intermediate3_") + GetUniqueTosaMappingID();
-        std::string outputNameRescaleMaxMin     = std::string("intermediate4_") + GetUniqueTosaMappingID();
+        std::string outputNameRescaleAlpha    = std::string("layer_intermediate2_") + GetUniqueTosaMappingID();
+        std::string outputNameRescaleIdentity = std::string("layer_intermediate3_") + GetUniqueTosaMappingID();
+        std::string outputNameRescaleMaxMin   = std::string("layer_intermediate4_") + GetUniqueTosaMappingID();
 
         DType rescale_type    = DType::DType_INT32;
         float alpha           = activationDescriptor->m_A;

@@ -52,19 +52,18 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     // Only add tensor if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensors.
+    std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
     if(inputNames[0].find("input_") != std::string::npos)
     {
-        std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
         tensors.push_back(new TosaSerializationTensor(inputNames[0], inputShape0, inputDType0, {}));
     }
 
     // Only add input tensors if weights and bias are not constant or if running validation.
     // Constant tensors will be created in the ConvertConstantToTosaOperator function.
+    std::vector<int32_t> inputShape1 = GetTosaTensorShape(inputs[1]->GetShape());
     if(!inputs[1]->IsConstant() || layer == nullptr)
     {
-        std::vector<int32_t> inputShape1 = GetTosaTensorShape(inputs[1]->GetShape());
         DType inputDType1 = ArmNNToDType(inputs[1]->GetDataType());
-
         tensors.push_back(new TosaSerializationTensor(inputNames[1], inputShape1, inputDType1, {}));
     }
 
@@ -107,7 +106,7 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     bool isInputInt8 = (inputDType0 == DType_INT8);
     if (isInputInt8)
     {
-        outputConv2dName = std::string("intermediate0_") + GetUniqueTosaMappingID();
+        outputConv2dName = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
         tensors.push_back(new TosaSerializationTensor(outputConv2dName, outputShape0, DType_INT32, {}));
     }
     else
@@ -124,6 +123,18 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
                                static_cast<int>(conv2dDescriptor->m_StrideX)};
     std::vector<int> dilation = {static_cast<int>(conv2dDescriptor->m_DilationY),
                                  static_cast<int>(conv2dDescriptor->m_DilationX)};
+
+    std::string sliceOutputName = GetInputSlicedToItsUsedSize(inputShape0,
+                                                              inputNames[0],
+                                                              conv2dDescriptor->m_DataLayout,
+                                                              inputDType0,
+                                                              inputShape1,
+                                                              pad,
+                                                              stride,
+                                                              dilation,
+                                                              tensors,
+                                                              operators);
+
     TosaConvAttribute attribute(pad, stride, dilation,
                                 inputs[0]->GetQuantizationOffset(), // input_zp
                                 inputs[1]->GetQuantizationOffset(), // weight_zp
@@ -133,7 +144,7 @@ TosaSerializationBasicBlock* ConvertConv2dToTosaOperator(const Layer* layer,
     auto* conv2d_op = new TosaSerializationOperator(Op_CONV2D,
                                                     Attribute_ConvAttribute,
                                                     &attribute,
-                                                    inputNames,
+                                                    {sliceOutputName, inputNames[1], inputNames[2]},
                                                     {convOutStr});
     operators.push_back(conv2d_op);
 

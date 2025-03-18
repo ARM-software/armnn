@@ -827,7 +827,6 @@ INPUT                  = ./docs/01_00_quick_start.dox \
                          ./tests/ImageCSVFileGenerator/README.md \
                          ./tests/ImageTensorGenerator/README.md \
                          ./tests/ModelAccuracyTool-Armnn/README.md \
-                         ./python/pyarmnn/README.md \
                          ./include/ \
                          ./src/ \
                          ./src/armnnConverter/README.md \

@@ -628,7 +628,7 @@ TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_NCHW")
     }
 }
 
-TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_Bilinear")
+TEST_CASE("GetTosaMapping_ResizeLayer_Bilinear")
 {
     TensorInfo inputInfo  = TensorInfo({ 1, 2, 3, 3 }, DataType::Float32);
     TensorInfo outputInfo = TensorInfo({ 1, 4, 6, 3 }, DataType::Float32);
@@ -642,28 +642,19 @@ TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_Bilinear")
     descriptor.m_TargetHeight = 4;
     descriptor.m_TargetWidth = 6;
 
-    try
-    {
-        TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
-                                                                 LayerType::Resize,
-                                                                 {&inputInfo},
-                                                                 {&outputInfo},
-                                                                 descriptor);
+    TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
+                                                                LayerType::Resize,
+                                                                {&inputInfo},
+                                                                {&outputInfo},
+                                                                descriptor);
 
-        AssertTosaOneToOneMappingBasicBlock(basicBlock,
-                                            inputShape,
-                                            outputShape,
-                                            Op_RESIZE,
-                                            Attribute_ResizeAttribute,
-                                            descriptor,
-                                            LayerType::Resize);
-
-        FAIL("An exception should have been thrown");
-    }
-    catch (const armnn::InvalidArgumentException& e)
-    {
-        CHECK(strcmp(e.what(), "ConvertResizeToTosaOperator: Unimplemented Resize method.") == 0);
-    }
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_RESIZE,
+                                        Attribute_ResizeAttribute,
+                                        descriptor,
+                                        LayerType::Resize);
 }
 
 
@@ -767,7 +758,7 @@ TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_NCHW")
     }
 }
 
-TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_Bilinear")
+TEST_CASE("GetTosaMapping_ResizeLayer_Bilinear")
 {
     TensorInfo inputInfo  = TensorInfo({ 1, 2, 3, 3 }, DataType::Float32);
     TensorInfo outputInfo = TensorInfo({ 1, 4, 6, 3 }, DataType::Float32);
@@ -781,28 +772,19 @@ TEST_CASE("UNSUPPORTED_GetTosaMapping_ResizeLayer_Bilinear")
     descriptor.m_TargetHeight = 4;
     descriptor.m_TargetWidth = 6;
 
-    try
-    {
-        TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
-                                                                 LayerType::Resize,
-                                                                 {&inputInfo},
-                                                                 {&outputInfo},
-                                                                 descriptor);
+    TosaSerializationBasicBlock* basicBlock = GetTosaMapping(nullptr,
+                                                                LayerType::Resize,
+                                                                {&inputInfo},
+                                                                {&outputInfo},
+                                                                descriptor);
 
-        AssertTosaOneToOneMappingBasicBlock(basicBlock,
-                                            inputShape,
-                                            outputShape,
-                                            Op_RESIZE,
-                                            Attribute_ResizeAttribute,
-                                            descriptor,
-                                            LayerType::Resize);
-
-        FAIL("An exception should have been thrown");
-    }
-    catch (const armnn::InvalidArgumentException& e)
-    {
-        CHECK(strcmp(e.what(), "ConvertResizeToTosaOperator: Unimplemented Resize method.") == 0);
-    }
+    AssertTosaOneToOneMappingBasicBlock(basicBlock,
+                                        inputShape,
+                                        outputShape,
+                                        Op_RESIZE,
+                                        Attribute_ResizeAttribute,
+                                        descriptor,
+                                        LayerType::Resize);
 }
 
 TEST_CASE("GetTosaMapping_SliceLayer")

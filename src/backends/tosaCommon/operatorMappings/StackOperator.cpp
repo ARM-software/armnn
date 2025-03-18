@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2024 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 //
@@ -61,22 +61,27 @@ TosaSerializationBasicBlock* ConvertStackToTosaOperator(const Layer* layer,
             throw armnn::Exception("ConvertStackToTosaOperator: Inputs have mismatched shapes.");
         }
 
-        std::string inputName = "input" + std::to_string(i) + "_";
+        std::string inputName = "input_" + std::to_string(i);
 
         if (layer != nullptr)
         {
             inputName = GenerateUniqueInputName(layer->GetInputSlot(i));
             outputName = GenerateUniqueOutputName(*layer);
+
+        }
+        if(inputName.find("input_") != std::string::npos)
+        {
+            tensors.emplace_back(new TosaSerializationTensor(inputName,
+                                                             GetTosaTensorShape(inputs[i]->GetShape()),
+                                                             inputDType,
+                                                             {}));
         }
 
-        tensors.emplace_back(new TosaSerializationTensor(inputName,
-                                                         GetTosaTensorShape(inputs[i]->GetShape()),
-                                                         inputDType,
-                                                         {}));
         inputNames.push_back(inputName);
     }
 
     // Create output tensor
+
     tensors.emplace_back(new TosaSerializationTensor(outputName,
                                                      blockOutputShape,
                                                      inputDType,
@@ -117,7 +122,7 @@ TosaSerializationBasicBlock* ConvertStackToTosaOperator(const Layer* layer,
     concatOutputShape[concatAxis] *= static_cast<int>(stackDescriptor->m_NumInputs);
 
     // Concatenation operator
-    std::string concatOutputName = std::string("intermediate1_concat_") + GetUniqueTosaMappingID();
+    std::string concatOutputName = std::string("layer_intermediate1_concat_") + GetUniqueTosaMappingID();
 
     TosaAxisAttribute axisAttribute(static_cast<int32_t>(concatAxis));
 
@@ -134,7 +139,7 @@ TosaSerializationBasicBlock* ConvertStackToTosaOperator(const Layer* layer,
                                                      {}));
 
     // Reshape operator
-    std::string reshapeOutputName = std::string("intermediate2_reshape_") + GetUniqueTosaMappingID();
+    std::string reshapeOutputName = std::string("layer_intermediate2_reshape_") + GetUniqueTosaMappingID();
     std::string& reshapeOpOutputName = transposeOpNeeded ? reshapeOutputName : outputName;
 
     TosaReshapeAttribute reshapeAttribute = transposeOpNeeded ? reshapeOutputShape : blockOutputShape;

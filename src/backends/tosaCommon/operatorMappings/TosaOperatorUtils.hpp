@@ -1,6 +1,10 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
+//
+//
+// Copyright © 2020 The TensorFlow Authors. All Rights Reserved.
+// SPDX-License-Identifier: Apache-2.0
 //
 
 #pragma once
@@ -112,8 +116,21 @@ inline std::string GenerateUniqueInputName(const armnn::InputSlot& slot)
     Layer& connectedLayer = slot.GetConnectedOutputSlot()->GetOwningLayer();
     // For layer input, we want to ensure we get the correct output slot of the parent layer.
     // For example, if parent layer is split, the parent output slot could be 0 or 1 index.
-    uint32_t connectedOutputSlotIdx = slot.GetConnectedOutputSlot()->CalculateIndexOnOwner();
-    return GenerateUniqueName(connectedLayer, connectedOutputSlotIdx);
+    uint32_t connectedInputSlotIdx = slot.GetConnectedOutputSlot()->CalculateIndexOnOwner();
+    return GenerateUniqueName(connectedLayer, connectedInputSlotIdx);
+}
+
+// Function to determine if inputs are from different layers.
+inline bool WeightFromDifferentLayer(const Layer& layer)
+{
+    bool multipleParents = false;
+    if (layer.GetNumInputSlots()> 1)
+    {
+        multipleParents = layer.GetInputSlots()[0].GetConnectedOutputSlot()->GetOwningLayerGuid() !=
+                         layer.GetInputSlots()[1].GetConnectedOutputSlot()->GetOwningLayerGuid();
+    }
+
+    return multipleParents;
 }
 
 // Function that generates unique output name using the layer type, input slot and layer guid.
@@ -134,7 +151,7 @@ inline std::string GenerateUniqueOutputName(const Layer& layer, uint32_t layerSl
 }
 
 // Function to return unique int as a string to ensure uniqueness between all input, output and block names.
-static int uniqueTosaMappingID = 0;
+inline int uniqueTosaMappingID = 0;
 inline std::string GetUniqueTosaMappingID()
 {
     return std::to_string(++uniqueTosaMappingID);
@@ -543,4 +560,96 @@ inline void FlipSignage(DType& type)
         default:
             throw armnn::Exception("Unknown type to change signage");
     }
+}
+
+// This function is paraphrased from:
+// tensorflow/core/util/tensor_format.h from function GetTensorSpatialDimIndex
+inline int GetTensorSpatialDimIndex(DataLayout format, int spatialDim)
+{
+  switch (format)
+  {
+    case DataLayout::NHWC:
+        return spatialDim + 1;
+    case DataLayout::NCHW:
+    case DataLayout::NDHWC:
+        return spatialDim + 2;
+    case DataLayout::NCDHW:
+        return spatialDim + 3;
+    default:
+      throw Exception("GetTensorSpatialDimIndex Unknown format");
+  }
+}
+
+// This function is paraphrased from:
+// tensorflow/core/util/tensor_format.h from function GetTensorSpatialDims
+inline int GetTensorSpatialDims(int numDims, DataLayout format)
+{
+  switch (format)
+  {
+    case DataLayout::NHWC:
+    case DataLayout::NCHW:
+        return numDims - 2; // Exclude N,C.
+    case DataLayout::NDHWC:
+    case DataLayout::NCDHW:
+      return numDims - 3;  // Exclude N,C,D.
+    default:
+      throw Exception("GetTensorFeatureDimIndex Unknown format");
+  }
+}
+
+// This function is paraphrased from:
+// tensorflow/compiler/mlir/tosa/transforms/legalize_utils.cc from function getInputSlicedToItsUsedSize
+inline std::string GetInputSlicedToItsUsedSize(const std::vector<int32_t>& inputShape,
+                                               const std::string& inputName,
+                                               const DataLayout layout,
+                                               const DType datatype,
+                                               const std::vector<int32_t>& kernel,
+                                               const std::vector<int32_t>& pad,
+                                               const std::vector<int32_t>& stride,
+                                               const std::vector<int32_t>& dilations,
+                                               std::vector<TosaSerializationTensor*>& tensors,
+                                               std::vector<TosaSerializationOperator*>& operators,
+                                               const bool isPoolingOp = false)
+{
+    const int32_t spatialDims = GetTensorSpatialDims(static_cast<int>(inputShape.size()), layout);
+
+    std::vector<int32_t> outputSizeRemainder;
+    for (int spatialDim = 0; spatialDim < spatialDims; spatialDim++)
+    {
+        const size_t spatialDimSize_t = static_cast<size_t>(spatialDim);
+        const size_t spatialDimIndexSize_t = static_cast<size_t>(GetTensorSpatialDimIndex(layout, spatialDim));
+        const int32_t kernelVal = isPoolingOp ? kernel[spatialDimSize_t] : kernel[spatialDimIndexSize_t];
+
+        const int32_t inSize = inputShape[spatialDimIndexSize_t];
+        const int32_t fullPad = pad[2 * spatialDimSize_t + 0] + pad[2 * spatialDimSize_t + 1];
+        const int32_t fullSize = inSize - 1 + fullPad - (kernelVal - 1) * dilations[spatialDimSize_t];
+        outputSizeRemainder.push_back(fullSize % stride[spatialDimSize_t]);
+    }
+
+    const bool needSlicing = std::any_of(
+        outputSizeRemainder.begin(), outputSizeRemainder.end(), [](int64_t v) { return v > 0; });
+    const bool zeroPads = std::all_of(pad.begin(), pad.end(), [](int v) { return v == 0; });
+
+    std::string sliceOutputName = inputName;
+    if (needSlicing && zeroPads)
+    {
+        sliceOutputName = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
+        std::vector<int32_t> start(inputShape.size(), 0);
+        std::vector<int32_t> size = inputShape;
+        for (int spatialDim = 0; spatialDim < spatialDims; spatialDim++)
+        {
+            const int index = GetTensorSpatialDimIndex(layout, spatialDim);
+            size[static_cast<size_t>(index)] -= outputSizeRemainder[static_cast<size_t>(spatialDim)];
+        }
+
+        TosaSliceAttribute attribute(start, size);
+
+        operators.push_back(new TosaSerializationOperator(Op_SLICE,
+                                                          Attribute_SliceAttribute,
+                                                          &attribute,
+                                                          {inputName},
+                                                          {sliceOutputName}));
+        tensors.push_back(new TosaSerializationTensor(sliceOutputName, size, datatype, {}));
+    }
+    return sliceOutputName;
 }

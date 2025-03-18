@@ -1,5 +1,5 @@
 //
-// Copyright © 2021-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -201,6 +201,9 @@ Layer2dT* FoldPadIntoLayer2dImpl(Graph& graph, InputSlot& connection)
     // Old layer2d layer will be removed as it's left unconnected.
     // Pad layer will be removed if left unconnected.
     layer2d.GetOutputSlot().MoveAllConnections(newLayer2d.GetOutputSlot());
+
+    // Copy the backend
+    newLayer2d.SetBackendId(layer2d.GetBackendId());
 
     return &newLayer2d;
 }

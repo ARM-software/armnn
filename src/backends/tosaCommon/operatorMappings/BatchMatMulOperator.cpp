@@ -28,10 +28,10 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
     std::string input0Name = std::string("input_0");
     std::string input1Name = std::string("input_1");
     std::string outputName = std::string("output_0");
-    std::string outputReshape0Name = std::string("intermediate0_") + GetUniqueTosaMappingID();
-    std::string outputReshape1Name = std::string("intermediate0_") + GetUniqueTosaMappingID();
-    std::string outputTranspose0Name = std::string("intermediate1_") + GetUniqueTosaMappingID();
-    std::string outputTranspose1Name = std::string("intermediate1_") + GetUniqueTosaMappingID();
+    std::string outputReshape0Name = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
+    std::string outputReshape1Name = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
+    std::string outputTranspose0Name = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
+    std::string outputTranspose1Name = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
 
     std::string blockName  = std::string("Op_BATCHMATMUL_block_") + GetUniqueTosaMappingID();
 
@@ -79,7 +79,6 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
     // ADD a RESHAPE OPs if BATCH DIMS > 1
     // RESHAPE input 1
     std::vector<int32_t> targetShape0 = GetTosaTensorShape(outputs[0]->GetShape());
-    std::vector<int32_t> transpose0Shape = GetTosaTensorShape(inputs[0]->GetShape());
     uint32_t input0Dimensions = inputs[0]->GetNumDimensions();
     if (input0Dimensions > 3)
     {
@@ -102,7 +101,6 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
                                                               {outputReshape0Name});
 
         operators.push_back(input0ReshapeOp);
-        transpose0Shape = targetShape0;
         tensors.push_back(new TosaSerializationTensor(outputReshape0Name, targetShape0, inputDType, {}));
         input0TransposeName = outputReshape0Name;
         input0MatMulName = outputReshape0Name;
@@ -110,7 +108,6 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
 
     // RESHAPE input 2
     std::vector<int32_t> targetShape1 = GetTosaTensorShape(outputs[0]->GetShape());
-    std::vector<int32_t> transpose1Shape = GetTosaTensorShape(inputs[1]->GetShape());
     uint32_t input1Dimensions = inputs[1]->GetNumDimensions();
     if (input1Dimensions > 3)
     {
@@ -133,7 +130,6 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
                                                               {outputReshape1Name});
 
         operators.push_back(input1ReshapeOp);
-        transpose1Shape = targetShape1;
         tensors.push_back(new TosaSerializationTensor(outputReshape1Name, targetShape1, inputDType, {}));
         input1TransposeName = outputReshape1Name;
         input1MatMulName = outputReshape1Name;
@@ -145,9 +141,16 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
     {
         auto permuteVec = BatchMatMulDescriptor::GetPermuteVec(descriptor->m_DataLayoutX,
                                                                inputs[0]->GetShape());
-
         std::vector<int32_t> mappings(permuteVec.begin(),
                                       permuteVec.end());
+        if (input0Dimensions > 3)
+        {
+            auto input0BatchedDims = input0Dimensions - 3;
+            mappings = {static_cast<int>(permuteVec[0]),
+                        static_cast<int>(permuteVec[input0Dimensions - 2] - input0BatchedDims),
+                        static_cast<int>(permuteVec[input0Dimensions - 1] - input0BatchedDims)};
+        }
+
         TosaTransposeAttribute transposeAttribute(mappings);
 
         TosaSerializationOperator *transposeOp = new TosaSerializationOperator(Op_TRANSPOSE,
@@ -155,6 +158,14 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
                                                                                &transposeAttribute,
                                                                                {input0TransposeName},
                                                                                {outputTranspose0Name});
+
+        std::vector<int32_t> transpose0Shape =
+        {
+            targetShape0[static_cast<unsigned int>(mappings[0])],
+            targetShape0[static_cast<unsigned int>(mappings[1])],
+            targetShape0[static_cast<unsigned int>(mappings[2])]
+        };
+
         operators.push_back(transposeOp);
         tensors.push_back(new TosaSerializationTensor(outputTranspose0Name, transpose0Shape, inputDType, {}));
         input0MatMulName = outputTranspose0Name;
@@ -165,9 +176,17 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
         auto permuteVec = BatchMatMulDescriptor::GetPermuteVec(descriptor->m_DataLayoutY,
                                                                inputs[1]->GetShape());
 
-
         std::vector<int32_t> mappings(permuteVec.begin(),
                                       permuteVec.end());
+
+        auto input1BatchedDims = input1Dimensions - 3;
+        if (input1Dimensions > 3)
+        {
+            mappings = {static_cast<int>(permuteVec[0]),
+                        static_cast<int>(permuteVec[input1Dimensions - 2] - input1BatchedDims),
+                        static_cast<int>(permuteVec[input1Dimensions - 1] - input1BatchedDims)};
+        }
+
         TosaTransposeAttribute transposeAttribute(mappings);
 
         TosaSerializationOperator *transposeOp = new TosaSerializationOperator(Op_TRANSPOSE,
@@ -175,6 +194,13 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
                                                                                &transposeAttribute,
                                                                                {input1TransposeName},
                                                                                {outputTranspose1Name});
+        std::vector<int32_t> transpose1Shape =
+        {
+            targetShape1[static_cast<unsigned int>(mappings[0])],
+            targetShape1[static_cast<unsigned int>(mappings[1])],
+            targetShape1[static_cast<unsigned int>(mappings[2])]
+        };
+
         operators.push_back(transposeOp);
         tensors.push_back(new TosaSerializationTensor(outputTranspose1Name, transpose1Shape, inputDType, {}));
         input1MatMulName = outputTranspose1Name;
@@ -182,7 +208,7 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
 
     // ADD MAT MUL layer
     std::string matMulOutputStr = needsReshape || isInputInt8 || isInputInt16 ?
-                                  std::string("intermediate2_") + GetUniqueTosaMappingID() : outputName;
+                                  std::string("layer_intermediate2_") + GetUniqueTosaMappingID() : outputName;
 
     TosaMatMulAttribute matMulAttribute(0,0); // input0_zp, input1_zp
     DType matMulOutDType = ArmNNToDType(inputs[1]->GetDataType());
@@ -202,11 +228,25 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
                                                                         {input0MatMulName, input1MatMulName},
                                                                         {matMulOutputStr});
 
+    uint32_t outputDimensions = outputs[0]->GetNumDimensions();
+    if (outputDimensions > 3)
+    {
+        uint32_t x = 1;
+        for (uint32_t i = 0; i < (outputDimensions - 2); ++i)
+        {
+            x *=(outputs[0]->GetShape()[i]);
+        }
+
+        outputShape0 = {static_cast<int32_t>(x),
+                        static_cast<int32_t>(outputs[0]->GetShape()[outputDimensions - 2]),
+                        static_cast<int32_t>(outputs[0]->GetShape()[outputDimensions - 1])};
+    }
+
     operators.push_back(matMulOp);
-    tensors.push_back(new TosaSerializationTensor(matMulOutputStr, targetShape0, matMulOutDType, {}));
+    tensors.push_back(new TosaSerializationTensor(matMulOutputStr, outputShape0, matMulOutDType, {}));
 
     std::string outputRescale = needsReshape ?
-                                     std::string("intermediate3_") + GetUniqueTosaMappingID() : outputName;
+                                     std::string("layer_intermediate3_") + GetUniqueTosaMappingID() : outputName;
     std::string inputReshape2Name = isInputInt8 ||  isInputInt16 ? outputRescale : matMulOutputStr;
 
     // ADD Rescale layer if it is int8
@@ -215,24 +255,27 @@ TosaSerializationBasicBlock* ConvertBatchMatMulToTosaOperator(const Layer* layer
         bool scale32 = isInputInt16 ? false : true;
         bool doubleRound = isInputInt16 ? false : true;
 
-        double scale_alpha = inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
-        int32_t input_zp   = inputs[0]->GetQuantizationOffset();
         int32_t output_zp  = outputs[0]->GetQuantizationOffset();
+        double output_scale = outputs[0]->GetQuantizationScales()[0];
+        double input_scale = inputs[0]->GetQuantizationScales()[0];
+        const std::vector<float>& weight_scales = inputs[1]->GetQuantizationScales();
 
         TosaSerializationOperator* rescaleOp = nullptr;
-        CreateRescaleTosaOperator(matMulOutputStr,
-                                  outputRescale,
-                                  scale_alpha,
-                                  input_zp,
-                                  output_zp,
-                                  false,
-                                  false,
-                                  doubleRound,
-                                  scale32,
-                                  &rescaleOp);
+        CreateRescaleTosaOperatorForWeights(matMulOutputStr,
+                                            outputRescale,
+                                            0,
+                                            output_zp,
+                                            false,
+                                            false,
+                                            doubleRound,
+                                            scale32,
+                                            input_scale,
+                                            output_scale,
+                                            weight_scales,
+                                            &rescaleOp);
 
         tensors.push_back(new TosaSerializationTensor(outputRescale,
-                                                      targetShape0,
+                                                      outputShape0,
                                                       inputDType, {}));
 
         operators.push_back(rescaleOp);

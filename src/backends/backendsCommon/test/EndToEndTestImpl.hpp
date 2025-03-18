@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -147,7 +147,7 @@ void EndToEndLayerTestImpl(INetworkPtr network,
     NetworkId netId;
     std::string errorMessage;
     armnn::Status loadingStatus = runtime->LoadNetwork(netId, std::move(optNet), errorMessage);
-    CHECK_MESSAGE(loadingStatus == Status::Success, errorMessage);
+    REQUIRE_MESSAGE(loadingStatus == Status::Success, errorMessage);
 
     InputTensors inputTensors;
     inputTensors.reserve(inputTensorData.size());

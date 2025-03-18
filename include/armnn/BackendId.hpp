@@ -26,7 +26,9 @@ enum class Compute
     /// CPU Execution: NEON: ArmCompute
     CpuAcc    = 2,
     /// GPU Execution: OpenCL: ArmCompute
-    GpuAcc    = 3
+    GpuAcc    = 3,
+    /// CPU Execution: TOSA Reference Model
+    TosaRef    = 4
 };
 
 /// Deprecated function that will be removed together with
@@ -38,6 +40,7 @@ constexpr char const* GetComputeDeviceAsCString(Compute compute)
         case armnn::Compute::CpuRef: return "CpuRef";
         case armnn::Compute::CpuAcc: return "CpuAcc";
         case armnn::Compute::GpuAcc: return "GpuAcc";
+        case armnn::Compute::TosaRef:  return "TosaRef";
         default:                     return "Unknown";
     }
 }

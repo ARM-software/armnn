@@ -18,6 +18,8 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
                                                            const std::vector<const TensorInfo*>& inputs,
                                                            const std::vector<const TensorInfo*>& outputs)
 {
+    bool tosaRefBackend {false};
+
     ARMNN_THROW_INVALIDARG_MSG_IF_FALSE( inputs.size() == 1,
                                          "ConvertQuantizeToTosaOperator: Quantize must have only one input" );
     ARMNN_THROW_INVALIDARG_MSG_IF_FALSE( outputs.size() == 1,
@@ -33,6 +35,8 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
     {
         inputName  = GenerateUniqueInputName(layer->GetInputSlot(0));
         outputName = GenerateUniqueOutputName(*layer);
+
+        tosaRefBackend = (layer->GetBackendId().Get().find("TosaRef") != std::string::npos);
     }
 
     const TensorInfo inputInfo = *inputs[0];
@@ -62,7 +66,7 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
     {
         DType tmp = inputDType0;
 
-        if (IsUnsignedDataType(tmp))
+        if (IsUnsignedDataType(tmp) && !tosaRefBackend)
         {
             //TOSA rescale only supports signed types. Need to override type
             //when using unsigned attribute
@@ -94,8 +98,8 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
 
         std::string outputNameScale     = std::string("constant0") + GetUniqueTosaMappingID();
         std::string outputNameZeroPoint = std::string("constant1") + GetUniqueTosaMappingID();
-        std::string outputNameMul       = std::string("intermediate0_") + GetUniqueTosaMappingID();
-        std::string outputNameAdd       = std::string("intermediate1_") + GetUniqueTosaMappingID();
+        std::string outputNameMul       = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
+        std::string outputNameAdd       = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
 
         // const_zeroPoint
         TosaSerializationOperator* zeroPointOp = nullptr;
@@ -173,7 +177,7 @@ TosaSerializationBasicBlock* ConvertQuantizeToTosaOperator(const Layer* layer,
                                   true,
                                   &rescaleOp);
 
-        if (IsUnsignedDataType(outputDType0))
+        if (IsUnsignedDataType(outputDType0) && !tosaRefBackend)
         {
             // TOSA rescale only supports signed types. Need to override type
             // when using unsigned attribute

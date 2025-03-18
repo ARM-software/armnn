@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -1390,6 +1390,7 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
             throw armnn::NullPointerException("backendObjPtr must not be null.");
         }
 
+
         if (selectedBackend == armnn::Compute::GpuAcc || selectedBackend == armnn::Compute::CpuAcc)
         {
             Optimizer::Pass(optGraph, MakeOptimizations(optimizations::PermuteDepthwiseConv2dWeights()));
@@ -2138,9 +2139,6 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
                                                 PermuteAsReshape(),
                                                 TransposeAsReshape(),
                                                 OptimizeConsecutiveReshapes(),
-                                                FoldPadIntoConvolution2d(),
-                                                FoldPadIntoDepthwiseConvolution2d(),
-                                                FoldPadIntoPooling2d(),
                                                 BroadcastToOptimizationLayer(),
                                                 PermuteAndBatchToSpaceAsDepthToSpace(),
                                                 TransposeAndBatchToSpaceAsDepthToSpace(),

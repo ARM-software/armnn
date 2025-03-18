@@ -1,5 +1,5 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -45,6 +45,8 @@ public:
     void RegisterTensorHandleFactories(class TensorHandleFactoryRegistry& registry) override;
 
     std::unique_ptr<ICustomAllocator> GetDefaultAllocator() const override;
+
+    BackendCapabilities GetCapabilities() const override;
 
 private:
     // Private members

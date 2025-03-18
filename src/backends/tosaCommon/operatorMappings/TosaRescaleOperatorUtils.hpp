@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2024-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -105,14 +105,12 @@ inline void ComputeMultiplierAndShiftTosaScale32(double scale,
 
     multiplier = static_cast<int32_t>(shiftedM);
 
-    // Shifting tops out at 62 bits. Right shift to make 62 bits the max.
-    // The limit of 62 on shift allows the shift to be decomposed as
-    // two right shifts of 31.
-    if (shift > 62)
+    // Shifting tops out at 47 bits. Right shift to make 47 bits the max.
+    int32_t maxShiftValue = 47;
+    if (shift > maxShiftValue)
     {
-        // Shifting the multiplier by more than 32-bits is unnecessary.
-        multiplier = multiplier >> std::min<int32_t>(31, shift - 62);
-        shift = 62;
+        multiplier = multiplier >> std::min<int32_t>(31, shift - maxShiftValue);
+        shift = maxShiftValue;
     }
 }
 
@@ -186,9 +184,19 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
 
     const std::vector<int32_t> multipliers{multiplier};
     const std::vector<int32_t> shifts{shift};
-    CreateRawRescaleTosaOperator(inputName, outputName, multipliers, shifts,
-                                 input_zp, output_zp, input_unsigned, output_unsigned,
-                                 double_round, scale32, false, op);
+
+    CreateRawRescaleTosaOperator(inputName,
+                                 outputName,
+                                 multipliers,
+                                 shifts,
+                                 input_zp,
+                                 output_zp,
+                                 input_unsigned,
+                                 output_unsigned,
+                                 double_round,
+                                 scale32,
+                                 false,
+                                 op);
 }
 
 inline void CreateRescaleTosaOperatorForWeights(const std::string& inputName,
@@ -229,7 +237,16 @@ inline void CreateRescaleTosaOperatorForWeights(const std::string& inputName,
     }
 
     bool per_channel = weight_scales.size() == 1 ? false : true;
-    CreateRawRescaleTosaOperator(inputName, outputName, op_tensor_multipliers, op_tensor_shifts,
-                                 input_zp, output_zp, input_unsigned, output_unsigned, double_round,
-                                 scale32, per_channel, op);
+    CreateRawRescaleTosaOperator(inputName,
+                                 outputName,
+                                 op_tensor_multipliers,
+                                 op_tensor_shifts,
+                                 input_zp,
+                                 output_zp,
+                                 input_unsigned,
+                                 output_unsigned,
+                                 double_round,
+                                 scale32,
+                                 per_channel,
+                                 op);
 }

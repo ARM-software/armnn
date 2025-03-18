@@ -8,6 +8,7 @@
 
 #include <numeric>
 #include "ResizeOperator.hpp"
+#include "TosaRescaleOperatorUtils.hpp"
 
 // This function is paraphrased from:
 // tensorflow/compiler/mlir/tosa/transforms/legalize_common.cc from function convertResizeOp
@@ -30,7 +31,6 @@ TosaSerializationBasicBlock* ConvertResizeToTosaOperator(const Layer* layer,
     else if (resizeDescriptor->m_Method == ResizeMethod::Bilinear)
     {
         mode = tosa::ResizeMode_BILINEAR;
-        throw armnn::InvalidArgumentException("ConvertResizeToTosaOperator: Unimplemented Resize method.");
     }
     else
     {
@@ -134,36 +134,91 @@ TosaSerializationBasicBlock* ConvertResizeToTosaOperator(const Layer* layer,
 
     TosaResizeAttribute resizeAttribute(scale, offset, border, mode);
 
-    auto* op = new TosaSerializationOperator(Op_RESIZE,
-                                             Attribute_ResizeAttribute,
-                                             &resizeAttribute,
-                                             {inputName},
-                                             {outputName});
-
     std::vector<TosaSerializationTensor*> tensors;
+
+    DType inputDType = ArmNNToDType(inputs[0]->GetDataType());
+    DType outputDType = ArmNNToDType(outputs[0]->GetDataType());
+
+    if(inputs[0]->GetDataType() == DataType::QSymmS16 && mode == tosa::ResizeMode_BILINEAR)
+    {
+        throw armnn::Exception("ConvertResizeToTosaOperator(): Bilinear INT16 is not yet implemented.");
+    }
+
+    if (inputs[0]->GetDataType() == DataType::Signed32 && mode == tosa::ResizeMode_BILINEAR)
+    {
+        throw armnn::Exception("ConvertResizeToTosaOperator(): Bilinear INT32 is not supported.");
+    }
 
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensor.
-    if(inputName.find("input_") != std::string::npos)
+    if (inputName.find("input_") != std::string::npos)
     {
         std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
-        DType inputDType = ArmNNToDType(inputs[0]->GetDataType());
 
         tensors.push_back(new TosaSerializationTensor(inputName, inputShape, inputDType, {}));
     }
 
     std::vector<int32_t> outputShape = GetTosaTensorShape(outputs[0]->GetShape());
-    DType outputDType = ArmNNToDType(outputs[0]->GetDataType());
 
-    tensors.push_back(new TosaSerializationTensor(outputName, outputShape, outputDType, {}));
+    if (mode == tosa::ResizeMode_BILINEAR &&
+        inputDType == DType::DType_INT8 &&
+        outputDType == DType::DType_INT8)
+    {
+        std::string inoutResizeToRescale = std::string("inout_resize2rescale_bilinear_") + GetUniqueTosaMappingID();
 
-    // operatorInputNames/operatorOutputNames ends up being the same as
-    // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
-    return new TosaSerializationBasicBlock(blockName, // name
-                                           mainName, // region name
-                                           {op}, // operators
-                                           tensors, // tensors
-                                           {inputName}, // inputs
-                                           {outputName}); // outputs
+        //For this scenario the resize output TOSA tensor type is a scaled INT32 value. Need to
+        //convert to unscaled INT8
+        tensors.push_back(new TosaSerializationTensor(inoutResizeToRescale, outputShape, DType::DType_INT32, {}));
+
+        auto* resizeOp = new TosaSerializationOperator(Op_RESIZE,
+                                                       Attribute_ResizeAttribute,
+                                                       &resizeAttribute,
+                                                       {inputName},
+                                                       {inoutResizeToRescale});
+
+        tensors.push_back(new TosaSerializationTensor(outputName, outputShape, outputDType, {}));
+
+        //As per TOSA spec INT32 output is scaled by scale_y_n * scale_x_n for bilinear resize
+        double scale_bi { 1. / static_cast<double>(scale_y_n * scale_x_n) };
+
+        TosaSerializationOperator* rescaleOp {nullptr};
+
+        CreateRescaleTosaOperator(inoutResizeToRescale,
+                                  outputName,
+                                  scale_bi,
+                                  0,
+                                  0,
+                                  false,
+                                  false,
+                                  true,
+                                  true,
+                                  &rescaleOp);
+
+        return new TosaSerializationBasicBlock(blockName,                  // name
+                                               mainName,                   // region name
+                                               { resizeOp, rescaleOp },    // operators
+                                               tensors,                    // tensors
+                                               { inputName },              // inputs
+                                               { outputName });            // outputs
+    }
+    else
+    {
+        tensors.push_back(new TosaSerializationTensor(outputName, outputShape, outputDType, {}));
+
+        auto* op = new TosaSerializationOperator(Op_RESIZE,
+                                                 Attribute_ResizeAttribute,
+                                                 &resizeAttribute,
+                                                 {inputName},
+                                                 {outputName});
+
+        // operatorInputNames/operatorOutputNames ends up being the same as
+        // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
+        return new TosaSerializationBasicBlock(blockName, // name
+                                               mainName, // region name
+                                               {op}, // operators
+                                               tensors, // tensors
+                                               {inputName}, // inputs
+                                               {outputName}); // outputs
+    }
 }

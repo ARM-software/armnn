@@ -30,8 +30,8 @@ TosaSerializationBasicBlock* ConvertDepthToSpaceToTosaOperator(const Layer* laye
 
     std::string inputName;
     std::string outputName = std::string("output0_");
-    std::string outputReshapeName = std::string("intermediate0_") + GetUniqueTosaMappingID();
-    std::string outputTransposeName = std::string("intermediate1_") + GetUniqueTosaMappingID();
+    std::string outputReshapeName = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
+    std::string outputTransposeName = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
     std::string blockName  = std::string("Op_DEPTHTOSPACE_block_") + GetUniqueTosaMappingID();
 
     DType inputDType0 = ArmNNToDType(inputs[0]->GetDataType());

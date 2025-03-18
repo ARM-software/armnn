@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2024 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 // Copyright © 2020 The TensorFlow Authors. All Rights Reserved.
@@ -18,6 +18,7 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
                                                                  const std::vector<const TensorInfo*>& outputs,
                                                                  const FullyConnectedDescriptor* fcDescriptor)
 {
+    std::string inputName;
     std::vector<std::string> inputNames;
     std::vector<std::string> fcInputNames;
     std::string outputName = std::string("output0_");
@@ -41,10 +42,15 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
     // For validation this doesn't matter.
     else
     {
-        // Get the layer connected to the input slot and determine unique tensor names.
-        for (uint32_t i = 0; i < inputs.size(); ++i)
+        inputName = GenerateUniqueInputName(layer->GetInputSlot(0));
+        inputNames.push_back(inputName);
+
+        inputName = GenerateUniqueInputName(layer->GetInputSlot(1));
+        inputNames.push_back(inputName);
+
+        if(fcDescriptor->m_BiasEnabled)
         {
-            std::string inputName = GenerateUniqueInputName(layer->GetInputSlot(i));
+            inputName = GenerateUniqueInputName(layer->GetInputSlot(2));
             inputNames.push_back(inputName);
         }
 
@@ -59,15 +65,15 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
     // Only add tensor if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensors.
-    std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
     if(inputNames[0].find("input_") != std::string::npos)
     {
+        std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
         tensors.push_back(new TosaSerializationTensor(inputNames[0], inputShape0, inputDType0, {}));
     }
 
     // Only add input tensors if weights and bias are not constant or if running validation.
     // Constant tensors will be created in the ConvertConstantToTosaOperator function.
-    if(!inputs[1]->IsConstant() || layer == nullptr)
+    if(layer == nullptr || (!inputs[1]->IsConstant() && !WeightFromDifferentLayer(*layer)))
     {
         std::vector<int32_t> inputShape1 = GetTosaTensorShape(inputs[1]->GetShape());
         DType inputDType1 = ArmNNToDType(inputs[1]->GetDataType());
@@ -86,9 +92,10 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
     else
     {
         // If bias is disabled, create a constant bias of 0 as three inputs are required.
-        std::string constantName = std::string("constant_") + GetUniqueTosaMappingID();
+        inputName = std::string("constant_") + GetUniqueTosaMappingID();
+        inputNames.push_back(inputName);
 
-        operators.push_back(new TosaSerializationOperator(Op_CONST, Attribute_NONE, nullptr, {}, {constantName}));
+        operators.push_back(new TosaSerializationOperator(Op_CONST, Attribute_NONE, nullptr, {}, {inputName}));
 
         const DType dType = (inputDType0 == DType_INT8) ? DType_INT32 : outputDType0;
         std::vector<float> data(outputs[0]->GetShape()[1], 0);
@@ -96,11 +103,10 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
         std::vector<uint8_t> uint8Data;
         TosaSerializationHandler::ConvertF32toU8(data, uint8Data);
 
-        tensors.push_back(new TosaSerializationTensor(constantName,
+        tensors.push_back(new TosaSerializationTensor(inputName,
                                                       {static_cast<int32_t>(outputs[0]->GetShape()[1])},
                                                       dType,
                                                       uint8Data));
-        inputNames.emplace_back(constantName);
     }
 
     fcInputNames = inputNames;
@@ -111,7 +117,7 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
         uint32_t num_elems = inputs[1]->GetShape()[1];
         uint32_t num_batch = inputs[0]->GetShape().GetNumElements() / num_elems;
 
-        std::string outputReshapeName = std::string("intermediate0_") + GetUniqueTosaMappingID();
+        std::string outputReshapeName = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
         const std::vector<int32_t>& targetShape = {static_cast<int32_t>(num_batch), static_cast<int32_t>(num_elems)};
         TosaReshapeAttribute attribute(GetTosaTensorShape(TensorShape({num_batch, num_elems})));
 
@@ -134,7 +140,7 @@ TosaSerializationBasicBlock* ConvertFullyConnectedToTosaOperator(const Layer* la
     bool isInputInt8 = (inputDType0 == DType_INT8);
     if (isInputInt8)
     {
-        fcOutputName = std::string("intermediate0_") + GetUniqueTosaMappingID();
+        fcOutputName = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
         tensors.push_back(new TosaSerializationTensor(fcOutputName, outputShape0, DType_INT32, {}));
     }
     else

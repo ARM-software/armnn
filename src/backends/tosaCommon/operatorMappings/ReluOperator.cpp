@@ -88,7 +88,7 @@ TosaSerializationBasicBlock* ConvertReluToTosaOperator(const Layer* layer,
     std::string clampInputNameStr = inputName;
     if (inputDType0 == tosa::DType::DType_INT8 || inputDType0 == tosa::DType::DType_INT16)
     {
-        std::string outputNameRescale = std::string("intermediate0_") + GetUniqueTosaMappingID();
+        std::string outputNameRescale = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
         clampInputNameStr = outputNameRescale;
 
         double scale = inputs[0]->GetQuantizationScale() / outputs[0]->GetQuantizationScale();
@@ -134,7 +134,6 @@ TosaSerializationBasicBlock* ConvertReluToTosaOperator(const Layer* layer,
                                                       inputDType0,
                                                       {}));
     }
-    
     TosaClampAttribute attribute(clamp_min, clamp_max, 0, float_max);
     auto* clamp_op = new TosaSerializationOperator(Op_CLAMP,
                                                    Attribute_ClampAttribute,

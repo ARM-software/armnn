@@ -1203,7 +1203,6 @@ TEST_CASE("RuntimeOptimizeExportOn_LoadNetworkExportOff")
     std::string er;
     // Load the network passing an import memory source.
 
-    // ciamcg01
     armnn::INetworkProperties networkProperties1(MemorySource::Undefined, MemorySource::Undefined);
     // There should be an InvalidArgumentException.
     runtime->LoadNetwork(networkId, std::move(optNet), er, networkProperties1);

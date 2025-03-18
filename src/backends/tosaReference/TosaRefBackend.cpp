@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -127,6 +127,8 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
     std::vector<TosaSerializationOperator*> operators;
     std::vector<TosaSerializationTensor*> tensors;
 
+    bool graphContainsBroadcastReshape = false;
+
     auto it = subgraph.begin();
     while (it != subgraph.end())
     {
@@ -153,6 +155,7 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
                     if (parentLayer.GetType() == LayerType::Reshape && &parentLayer == &nextLayer)
                     {
                         LayerToTosaMappings(nextLayer, graphInputs, graphOutputs, operators, tensors);
+                        graphContainsBroadcastReshape = true;
                         baseContainsBroadcastReshape = true;
                     }
                 }
@@ -168,8 +171,10 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
         }
     }
 
-    std::sort(graphInputs.begin(), graphInputs.end());
-
+    if (graphContainsBroadcastReshape)
+    {
+        std::sort(graphInputs.begin(),graphInputs.end());
+    }
 
     // Add all mappings to main block.
     auto* block = new TosaSerializationBasicBlock("main", "main", operators, tensors, graphInputs, graphOutputs);
@@ -223,6 +228,15 @@ void TosaRefBackend::RegisterTensorHandleFactories(class TensorHandleFactoryRegi
 std::unique_ptr<ICustomAllocator> TosaRefBackend::GetDefaultAllocator() const
 {
     return std::make_unique<DefaultAllocator>();
+}
+
+BackendCapabilities TosaRefBackend::GetCapabilities() const
+{
+    return BackendCapabilities ("TosaRef",
+                                {
+                                        {"NonConstWeights", true},
+                                        {"ConstantTensorsAsInputs", true}
+                                });
 }
 
 } // namespace armnn

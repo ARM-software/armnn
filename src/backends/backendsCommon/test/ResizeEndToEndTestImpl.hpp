@@ -34,12 +34,13 @@ armnn::INetworkPtr CreateResizeNetwork(const armnn::ResizeDescriptor& descriptor
     return network;
 }
 
-template<armnn::DataType ArmnnType>
+template <armnn::DataType ArmnnType>
 void ResizeEndToEnd(const std::vector<armnn::BackendId>& backends,
                     armnn::DataLayout dataLayout,
                     armnn::ResizeMethod resizeMethod,
                     bool alignCorners = false,
-                    bool halfPixel = false)
+                    bool halfPixel    = false,
+                    float tolerance   = 0.000001f)
 {
     using namespace armnn;
     using T = ResolveType<ArmnnType>;
@@ -161,16 +162,18 @@ void ResizeEndToEnd(const std::vector<armnn::BackendId>& backends,
     EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
                                                 { { 0, qInputData } },
                                                 { { 0, qExpectedOutputData } },
-                                                backends);
+                                                backends,
+                                                tolerance);
 }
 
 } // anonymous namespace
 
-template<armnn::DataType ArmnnType>
+template <armnn::DataType ArmnnType>
 void ResizeBilinearEndToEnd(const std::vector<armnn::BackendId>& backends,
-                            armnn::DataLayout dataLayout)
+                            armnn::DataLayout dataLayout,
+                            float tolerance = 0.000001f)
 {
-    ResizeEndToEnd<ArmnnType>(backends, dataLayout, armnn::ResizeMethod::Bilinear);
+    ResizeEndToEnd<ArmnnType>(backends, dataLayout, armnn::ResizeMethod::Bilinear, false, false, tolerance);
 }
 
 template<armnn::DataType ArmnnType>

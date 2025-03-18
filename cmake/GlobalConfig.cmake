@@ -439,6 +439,7 @@ if(ARMNNTOSAREF)
     if(TOSA_REFERENCE_MODEL_OUTPUT)
         add_definitions("-DTOSA_REFERENCE_MODEL_OUTPUT=1")
     endif()
+    add_definitions("-DARMNN_TOSAREF_BACKEND_ENABLED")
 endif()
 
 # This is the root for the dynamic backend tests to search for dynamic

@@ -34,8 +34,8 @@ TosaSerializationBasicBlock* ConvertStridedSliceToTosaOperator(const Layer* laye
     }
 
     std::string inputName = std::string("input_");
-    std::string outputNameSlice = std::string("intermediate1_") + GetUniqueTosaMappingID();
-    std::string outputNameReshape = std::string("intermediate2_") + GetUniqueTosaMappingID();
+    std::string outputNameSlice = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
+    std::string outputNameReshape = std::string("layer_intermediate2_") + GetUniqueTosaMappingID();
     std::string outputName = std::string("output0_");
     std::string blockName  = std::string("Op_SLICE_block_") + GetUniqueTosaMappingID();
 
@@ -72,11 +72,11 @@ TosaSerializationBasicBlock* ConvertStridedSliceToTosaOperator(const Layer* laye
     {
         if (end[i] < 0)
         {
-            end[i] = static_cast<int32_t>(inputShape[i]) + end[i];
+            end[i] = inputShape[i] + end[i];
         }
         if (begin[i] < 0)
         {
-            begin[i] = static_cast<int32_t>(inputShape[i]) + begin[i];
+            begin[i] = inputShape[i] + begin[i];
         }
     }
 

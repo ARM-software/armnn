@@ -64,17 +64,17 @@ TosaSerializationBasicBlock* ConvertConv3dToTosaOperator(const Layer* layer,
     // Only add tensor if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
     // There also can't be duplicate tensors.
+    std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
     if(inputNames[0].find("input_") != std::string::npos)
     {
-        std::vector<int32_t> inputShape0 = GetTosaTensorShape(inputs[0]->GetShape());
         tensors.push_back(new TosaSerializationTensor(inputNames[0], inputShape0, inputDType0, {}));
     }
 
     // Only add input tensors if weights and bias are not constant or if running validation.
     // Constant tensors will be created in the ConvertConstantToTosaOperator function.
+    std::vector<int32_t> inputShape1 = GetTosaTensorShape(inputs[1]->GetShape());
     if(!inputs[1]->IsConstant() || layer == nullptr)
     {
-        std::vector<int32_t> inputShape1 = GetTosaTensorShape(inputs[1]->GetShape());
         DType inputDType1 = ArmNNToDType(inputs[1]->GetDataType());
 
         tensors.push_back(new TosaSerializationTensor(inputNames[1], inputShape1, inputDType1, {}));
@@ -119,7 +119,7 @@ TosaSerializationBasicBlock* ConvertConv3dToTosaOperator(const Layer* layer,
     bool isInputInt8 = (inputDType0 == DType_INT8);
     if (isInputInt8)
     {
-        outputConv3dName = std::string("intermediate0_") + GetUniqueTosaMappingID();
+        outputConv3dName = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
         tensors.push_back(new TosaSerializationTensor(outputConv3dName, outputShape0, DType_INT32, {}));
     }
     else
@@ -135,7 +135,7 @@ TosaSerializationBasicBlock* ConvertConv3dToTosaOperator(const Layer* layer,
                                                  transposeInputShape[2],
                                                  transposeInputShape[3]};
 
-    std::string transposeOutputName = std::string("intermediate1_") + GetUniqueTosaMappingID();
+    std::string transposeOutputName = std::string("layer_intermediate1_") + GetUniqueTosaMappingID();
     tensors.push_back(new TosaSerializationTensor(transposeOutputName, transposeOutputShape, inputDType0, {}));
 
     // Connect the layer input to Transpose
@@ -169,6 +169,17 @@ TosaSerializationBasicBlock* ConvertConv3dToTosaOperator(const Layer* layer,
                                  static_cast<int>(conv3dDescriptor->m_DilationY),
                                  static_cast<int>(conv3dDescriptor->m_DilationX)};
 
+    std::string sliceOutputName = GetInputSlicedToItsUsedSize(inputShape0,
+                                                              conv3dInput,
+                                                              conv3dDescriptor->m_DataLayout,
+                                                              inputDType0,
+                                                              transposeOutputShape,
+                                                              pad,
+                                                              stride,
+                                                              dilation,
+                                                              tensors,
+                                                              operators);
+
     TosaConvAttribute attribute(pad, stride, dilation,
                                 inputs[0]->GetQuantizationOffset(), // input_zp
                                 inputs[1]->GetQuantizationOffset(), // weight_zp
@@ -178,7 +189,7 @@ TosaSerializationBasicBlock* ConvertConv3dToTosaOperator(const Layer* layer,
     auto* conv3d_op = new TosaSerializationOperator(Op_CONV3D,
                                                     Attribute_ConvAttribute,
                                                     &attribute,
-                                                    {conv3dInput, conv3dWeight, conv3dBias},
+                                                    {sliceOutputName, conv3dWeight, conv3dBias},
                                                     {convOutStr});
     operators.push_back(conv3d_op);
 

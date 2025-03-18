@@ -53,10 +53,6 @@ This errors appears to be related to the number of cmake jobs used to build Arm 
 
 make -j2
 
-Arm NN UnitTests fails intermittently with segmentation fault on aarch64.
-----------------------------------------------------------
-The DefaultAsyncExeuteWithThreads test seems to be throwing intermittent segmentation fault while running Arm NN Unittest in aarch64 architecture. This test will pass if you run the Unittest again.
-
 Arm NN delegate build fails with "undefined reference to `absl::lts_20220623::raw_logging_internal::RawLog"
 ----------------------------------------------------------
 This build failure occurs because Tensorflow 2.10 has been built with GCC version older than 9.3.1. The solution is to rebuild with 9.3.1 or later.

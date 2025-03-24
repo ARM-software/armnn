@@ -24,6 +24,7 @@
 #include "PadOperator.hpp"
 #include "RsqrtOperator.hpp"
 #include "Pooling2DOperator.hpp"
+#include "PReluOperator.hpp"
 #include "QuantizeOperator.hpp"
 #include "ReduceOperator.hpp"
 #include "ReshapeOperator.hpp"

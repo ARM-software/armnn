@@ -22,6 +22,7 @@
 #include "backendsCommon/test/MultiplicationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/PadEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Pooling2dEndToEndTestImpl.hpp"
+#include "backendsCommon/test/PreluEndToEndTestImpl.hpp"
 #include "backendsCommon/test/QuantizationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReduceEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ReshapeEndToEndTestImpl.hpp"
@@ -112,6 +113,17 @@ TEST_CASE("TosaRefGeluEndToEndTestQAsymmS8")
 TEST_CASE("TosaRefHardSwishEndToEndTestQAsymmS8")
 {
     ActivationEndToEndTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::HardSwish);
+}
+
+// PRelu
+TEST_CASE("TosaRefPreluEndToEndPosAlphaQuantizedTestInt8")
+{
+    PreluEndToEndPosIdQuantizedTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefPreluEndToEndNegSlopeQuantizedTestInt8")
+{
+    PreluEndToEndNegSlopeQuantizedTest<armnn::DataType::QAsymmS8>(tosaDefaultBackends);
 }
 
 // Sigmoid

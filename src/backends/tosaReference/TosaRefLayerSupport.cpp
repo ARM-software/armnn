@@ -53,6 +53,7 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         case LayerType::Gather:
         case LayerType::Multiplication:
         case LayerType::Subtraction:
+        case LayerType::Prelu:
             // Setup inputs and outputs
             inputInfos.push_back(&infos[0]);
             inputInfos.push_back(&infos[1]);

@@ -1,5 +1,5 @@
 //
-// Copyright © 2019,2021,2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -57,6 +57,68 @@ void PreluEndToEnd(const std::vector<BackendId>& backends,
     alphaInfo.SetConstant(true);
     outputInfo.SetQuantizationOffset(qOffset);
     outputInfo.SetQuantizationScale(qScale);
+
+    INetworkPtr net = CreatePreluNetwork<ArmnnType>(inputInfo, alphaInfo, outputInfo);
+
+    CHECK(net);
+
+    std::map<int, std::vector<T>> inputTensorData          = { { 0, inputData }, { 1, alphaData} };
+    std::map<int, std::vector<T>> expectedOutputTensorData = { { 0, expectedOutputData } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net),
+                                                inputTensorData,
+                                                expectedOutputTensorData,
+                                                backends);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void PreluEndToEndNegSlopeQuantizedTest(const std::vector<BackendId>& backends)
+{
+    const float qScale = 0.25f;
+    const float qAScale = 1.25f;
+    const float qOScale = 1.25f;
+    const int32_t qOffset = 0;
+    const int32_t qAOffset = 0;
+
+    std::vector<T> inputData{ 1, 24, 3, -4, 5, 6, -17, 118 };
+    std::vector<T> alphaData{ 2 };
+
+    std::vector<T> expectedOutputData{ 0, 5, 1, -2, 1, 1, -9, 24 };
+
+    TensorInfo inputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset, true);
+    TensorInfo alphaInfo({ 1, 1, 1, 1 }, ArmnnType, qAScale, qAOffset, true);
+    TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qOScale, qOffset, false);
+
+    INetworkPtr net = CreatePreluNetwork<ArmnnType>(inputInfo, alphaInfo, outputInfo);
+
+    CHECK(net);
+
+    std::map<int, std::vector<T>> inputTensorData          = { { 0, inputData }, { 1, alphaData} };
+    std::map<int, std::vector<T>> expectedOutputTensorData = { { 0, expectedOutputData } };
+
+    EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(net),
+                                                inputTensorData,
+                                                expectedOutputTensorData,
+                                                backends);
+}
+
+template<armnn::DataType ArmnnType, typename T = armnn::ResolveType<ArmnnType>>
+void PreluEndToEndPosIdQuantizedTest(const std::vector<BackendId>& backends)
+{
+    const float qScale = 0.25f;
+    const float qAScale = 1.25f;
+    const float qOScale = 1.25f;
+    const int32_t qOffset = 0;
+    const int32_t qAOffset = 0;
+
+    std::vector<T> inputData{ 1, 24, 3, 4, 5, 6, 17, 118 };
+    std::vector<T> alphaData{ 2 };
+
+    std::vector<T> expectedOutputData{ 0, 5, 1, 1, 1, 1, 4, 24 };
+
+    TensorInfo inputInfo({ 2, 2, 2, 1 }, ArmnnType, qScale, qOffset, true);
+    TensorInfo alphaInfo({ 1, 1, 1, 1 }, ArmnnType, qAScale, qAOffset, true);
+    TensorInfo outputInfo({ 2, 2, 2, 1 }, ArmnnType, qOScale, qOffset, false);
 
     INetworkPtr net = CreatePreluNetwork<ArmnnType>(inputInfo, alphaInfo, outputInfo);
 

@@ -65,10 +65,18 @@ public:
 
             // If the parent layer is a Constant layer and it is only used once or trying to reshape to 4D
             // we can short circuit by just changing the tensor info rather than adding a reshape layer.
+
+            bool elementWiseMul = false;
+            if (layer.GetType() == armnn::LayerType::ElementwiseBinary)
+            {
+                auto& binaryLayerOp = *PolymorphicDowncast<ElementwiseBinaryLayer*>(&layer);
+                elementWiseMul = binaryLayerOp.GetParameters().m_Operation==BinaryOperation::Mul;
+            }
+            auto parentName = std::string(layer.GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer().GetName());
             Layer& parentLayer = layer.GetInputSlot(reshapeSlot).GetConnectedOutputSlot()->GetOwningLayer();
             if ((parentLayer.GetType() == armnn::LayerType::Constant) &&
-                    ((parentLayer.GetOutputSlot(0).GetNumConnections() == 1) ||
-                    numDimensions == 4))
+                ((parentLayer.GetOutputSlot(0).GetNumConnections() == 1) ||
+                 (parentName.find("Quantize")!=std::string::npos && elementWiseMul)))
             {
                 ConstantLayer& constantLayer = static_cast<ConstantLayer&>(parentLayer);
 

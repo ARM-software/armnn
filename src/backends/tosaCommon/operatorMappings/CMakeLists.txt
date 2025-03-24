@@ -46,6 +46,8 @@ list(APPEND armnnTosaBackendOperators_sources
         PadOperator.hpp
         Pooling2DOperator.hpp
         Pooling2DOperator.cpp
+        PReluOperator.hpp
+        PReluOperator.cpp
         QuantizeOperator.hpp
         QuantizeOperator.cpp
         ReduceOperator.hpp

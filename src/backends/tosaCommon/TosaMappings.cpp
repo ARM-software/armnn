@@ -4,6 +4,7 @@
 //
 
 #include "TosaMappings.hpp"
+#include "tosaCommon/operatorMappings/PReluOperator.hpp"
 
 using namespace armnn;
 using namespace tosa;
@@ -199,6 +200,10 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         case LayerType::Quantize:
         {
             return ConvertQuantizeToTosaOperator(layer, inputs, outputs);
+        }
+        case LayerType::Prelu:
+        {
+            return ConvertPReluToTosaOperator(layer, inputs, outputs);
         }
         case LayerType::Reduce:
         {

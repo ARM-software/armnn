@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2024-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 // Copyright © 2020 The TensorFlow Authors. All Rights Reserved.
@@ -100,7 +100,7 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
         output_zp = outputs[0]->GetQuantizationOffset();
 
         std::string outputNameRescale =
-            "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID();
+            "layer_intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID();
 
         TosaSerializationOperator* rescaleOp1 = nullptr;
 
@@ -171,6 +171,9 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                                          {}));
     }
 
+    std::string outputNameReduce;
+    bool reuseOutputName = !inputQuantised && reduceDescriptor->m_ReduceOperation == ReduceOperation::Sum;
+
     // REDUCE_SUM
     for (const auto axis : axes)
     {
@@ -183,8 +186,12 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
 
         TosaAxisAttribute reduceAttribute(axis);
 
-        std::string outputNameReduce =
-            "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID();
+        std::vector<int32_t> outputShapeReduce = tensors.back()->GetShape();
+        outputShapeReduce[static_cast<std::size_t>(axis)] = 1;
+
+        outputNameReduce = (reuseOutputName && outputShapeReduce == outputShape)
+                            ? outputName
+                            : "intermediate_" + GetUniqueTosaMappingID();
 
         switch(reduceDescriptor->m_ReduceOperation)
         {
@@ -200,28 +207,80 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                 throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");
         }
 
-        std::vector<int32_t> outputShapeReduce = tensors.back()->GetShape();
-        outputShapeReduce[static_cast<std::size_t>(axis)] = 1;
-
         tensors.emplace_back(new TosaSerializationTensor(outputNameReduce,
                                                          outputShapeReduce,
                                                          tensors.back()->GetDtype(),
                                                          {}));
     }
 
+    std::string outputNameReshape;
+    bool reshapeLogic = false;
+
+    // Input and output shapes are always going to be different along the axis passed to the mean operator
+    // so we need to check if the shapes differ on dimensions other than the axis, if they do then a reshape is needed.
+    if (inputShape.size() == outputShape.size() && inputShape != outputShape && !axes.empty())
+    {
+        bool onlyMeanAxisChanged = true;
+
+        for (size_t i = 0; i < inputShape.size(); ++i)
+        {
+            if (inputShape[i] != outputShape[i] &&
+                std::find(axes.begin(), axes.end(), static_cast<int64_t>(i)) == axes.end())
+            {
+                onlyMeanAxisChanged = false;
+                break;
+            }
+        }
+
+        // Only reshape if the shape difference are not from mean axis.
+        reshapeLogic = !onlyMeanAxisChanged;
+    }
+    else if (inputShape.size() != outputShape.size())
+    {
+        reshapeLogic = true;
+    }
+
+    std::string outputNameRescale;
+    if (inputQuantised)
+    {
+        outputNameRescale = "intermediate_" + GetUniqueTosaMappingID();
+    }
+
+    if(reshapeLogic)
+    {
+        TosaReshapeAttribute reshapeAttribute(outputShape);
+        outputNameReshape = !inputQuantised && reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean
+                            ? "intermediate_" + GetUniqueTosaMappingID() : outputName;
+
+        if(!outputNameRescale.empty())
+        {
+            outputNameReshape = outputNameRescale;
+        }
+
+        operators.emplace_back(new TosaSerializationOperator(Op_RESHAPE,
+                                                             Attribute_ReshapeAttribute,
+                                                             &reshapeAttribute,
+                                                             { tensors.back()->GetName() },
+                                                             { outputNameReshape }));
+        if(outputNameReshape != outputName)
+        {
+            tensors.emplace_back(new TosaSerializationTensor(outputNameReshape,
+                                                             outputShape,
+                                                             tensors.back()->GetDtype(),
+                                                             {}));
+        }
+    }
+
     // Conditional RESCALE
     if (inputQuantised)
     {
-        std::string outputNameRescale =
-            "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID();
-
         TosaSerializationOperator* rescaleOp2 = nullptr;
 
         switch(reduceDescriptor->m_ReduceOperation)
         {
             case ReduceOperation::Sum:
                 CreateRescaleTosaOperator(tensors.back()->GetName(),
-                                          outputNameRescale,
+                                          outputName,
                                           output_scale,
                                           0,
                                           static_cast<int32_t>(output_zp),
@@ -233,7 +292,7 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                 break;
             case ReduceOperation::Mean:
                 CreateRawRescaleTosaOperator(tensors.back()->GetName(),
-                                             outputNameRescale,
+                                             outputName,
                                              {output_multiplier},
                                              {output_shift},
                                              0,
@@ -249,31 +308,8 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                 throw armnn::Exception("ConvertReduceOperator: Reduce Operation not implemented.");
         }
 
-        operators.push_back(rescaleOp2);
-
-        tensors.emplace_back(new TosaSerializationTensor(outputNameRescale,
-                                                         tensors.back()->GetShape(),
-                                                         inputType,
-                                                         {}));
+        operators.emplace_back(rescaleOp2);
     }
-
-    // RESHAPE
-    TosaReshapeAttribute reshapeAttribute(GetTosaTensorShape(outputs[0]->GetShape()));
-
-    std::string outputNameReshape = !inputQuantised && reduceDescriptor->m_ReduceOperation == ReduceOperation::Mean
-        ? "intermediate" + std::to_string(intermediateCounter++) + "_" + GetUniqueTosaMappingID()
-        : outputName;
-
-    operators.emplace_back(new TosaSerializationOperator(Op_RESHAPE,
-                                                         Attribute_ReshapeAttribute,
-                                                         &reshapeAttribute,
-                                                         { tensors.back()->GetName() },
-                                                         { outputNameReshape }));
-
-    tensors.emplace_back(new TosaSerializationTensor(outputNameReshape,
-                                                     outputShape,
-                                                     inputType,
-                                                     {}));
 
     // Conditional MUL
     // Multiply previous tensor by constant of 1 / number of elements
@@ -313,18 +349,33 @@ TosaSerializationBasicBlock* ConvertReduceToTosaOperator(const Layer* layer,
                                                       uint8DivScale));
 
         // MUL
-        TosaMulAttribute mulAttribute(0);
+        int8_t shift = 0;
+        TosaMulAttribute mulAttribute(shift);
+        if(reshapeLogic && !outputNameReshape.empty())
+        {
+            operators.emplace_back(new TosaSerializationOperator(Op_MUL,
+                                                                 Attribute_MulAttribute,
+                                                                 &mulAttribute,
+                                                                 { constNameDivScale, outputNameReshape },
+                                                                 { outputName }));
+        }
+        else if (!outputNameReduce.empty())
+        {
+            operators.emplace_back(new TosaSerializationOperator(Op_MUL,
+                                                                 Attribute_MulAttribute,
+                                                                 &mulAttribute,
+                                                                 { constNameDivScale, outputNameReduce },
+                                                                 { outputName }));
+        }
+    }
 
-        operators.emplace_back(new TosaSerializationOperator(Op_MUL,
-                                                             Attribute_MulAttribute,
-                                                             &mulAttribute,
-                                                             { constNameDivScale, outputNameReshape },
-                                                             { outputName }));
 
-        tensors.push_back(new TosaSerializationTensor(outputName,
-                                                      outputShape,
-                                                      inputType,
-                                                      {}));
+    if(tensors.back()->GetName() != outputName)
+    {
+        tensors.emplace_back(new TosaSerializationTensor(outputName,
+                                                         outputShape,
+                                                         inputType,
+                                                         {}));
     }
 
     return new TosaSerializationBasicBlock(blockName,       // name

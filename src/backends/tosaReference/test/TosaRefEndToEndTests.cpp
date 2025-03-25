@@ -356,47 +356,50 @@ TEST_CASE("TosaRefAddEndtoEndTestInt32")
 
 TEST_CASE("TosaRefAddEndtoEndTestInt8")
 {
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
-                                                                armnn::BinaryOperation::Add);
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends, armnn::BinaryOperation::Add);
+}
+
+TEST_CASE("TosaRefAddDifferentScalesEndToEndTestInt8")
+{
+    ElementwiseBinarySimpleWithScalesEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, BinaryOperation::Add);
 }
 
 // Maximum
 TEST_CASE("TosaRefMaximumEndtoEndTestInt32")
 {
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
-                                                                 armnn::BinaryOperation::Maximum);
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends, armnn::BinaryOperation::Maximum);
 }
 
 TEST_CASE("TosaRefMaximumEndtoEndTestInt8")
 {
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
-                                                                 armnn::BinaryOperation::Maximum);
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends, armnn::BinaryOperation::Maximum);
 }
 
 //Mul
 TEST_CASE("TosaRefMulEndtoEndTestInt32")
 {
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
-                                                                 armnn::BinaryOperation::Mul);
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends, armnn::BinaryOperation::Mul);
 }
 
 TEST_CASE("TosaRefMulEndtoEndTestInt8")
 {
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
-                                                                armnn::BinaryOperation::Mul);
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends, armnn::BinaryOperation::Mul);
 }
 
 //Sub
 TEST_CASE("TosaRefMulEndtoEndTestInt32")
 {
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends,
-                                                                 armnn::BinaryOperation::Sub);
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends, armnn::BinaryOperation::Sub);
 }
 
 TEST_CASE("TosaRefSubEndtoEndTestInt8")
 {
-    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
-                                                                armnn::BinaryOperation::Sub);
+    ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends, armnn::BinaryOperation::Sub);
+}
+
+TEST_CASE("TosaRefSubDifferentScalesEndToEndTestInt8")
+{
+    ElementwiseBinarySimpleWithScalesEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, BinaryOperation::Sub);
 }
 
 // FullyConnected
@@ -1379,6 +1382,11 @@ TEST_CASE("TosaRefMultiplicationEndtoEndTestInt32")
 TEST_CASE("TosaRefMultiplicationEndtoEndTestFloat16")
 {
     MultiplicationEndToEndFloat16<DataType::Float16>(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefMulDifferentScalesEndToEndTestInt8")
+{
+    ElementwiseBinarySimpleWithScalesEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, BinaryOperation::Mul);
 }
 
 // TransposeConvolution2d

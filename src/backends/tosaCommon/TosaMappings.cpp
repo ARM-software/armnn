@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -260,15 +260,15 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
 TosaSerializationBasicBlock* GetTosaMappingFromLayer(const Layer* layer)
 {
     std::vector<const TensorInfo*> inputs;
-    for (auto inputSlot : layer->GetInputSlots())
+    for (auto const& inputSlot : layer->GetInputSlots())
     {
-        inputs.push_back(&inputSlot.GetTensorInfo());
+        inputs.emplace_back(&inputSlot.GetTensorInfo());
     }
 
     std::vector<const TensorInfo*> outputs;
     for (auto& outputSlot : layer->GetOutputSlots())
     {
-        outputs.push_back(&outputSlot.GetTensorInfo());
+        outputs.emplace_back(&outputSlot.GetTensorInfo());
     }
 
     TosaSerializationBasicBlock* basicBlock = GetTosaMapping(layer,
@@ -276,5 +276,6 @@ TosaSerializationBasicBlock* GetTosaMappingFromLayer(const Layer* layer)
                                                              inputs,
                                                              outputs,
                                                              layer->GetParameters());
+
     return basicBlock;
 }

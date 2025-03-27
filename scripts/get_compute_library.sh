@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="37f59ac6ebac4d3bbe3741b3a3638b1c6d7df5cd" # refactor: Refactor reorder kernel and layer
+DEFAULT_CLFRAMEWORKREVISION="e3ec7b0c44fd8965c3f4b1982de9c34a58df3e3c" # feat: port for QNX
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

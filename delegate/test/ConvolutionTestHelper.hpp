@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -688,8 +688,223 @@ void TransposeConvTest(tflite::TensorType tensorType,
     armnnInterpreter.Cleanup();
 }
 
+template <typename T>
+std::vector<char> CreateTransposeConvWithBiasTfLiteModel(tflite::TensorType tensorType,
+                                                 uint32_t strideX,
+                                                 uint32_t strideY,
+                                                 tflite::Padding padding,
+                                                 const std::vector <int32_t>& transposeTensorShape,
+                                                 const std::vector <int32_t>& filterTensorShape,
+                                                 const std::vector <int32_t>& biasTensorShape,
+                                                 const std::vector <int32_t>& inputTensorShape,
+                                                 const std::vector <int32_t>& outputTensorShape,
+                                                 const std::vector <int32_t>& transposeData,
+                                                 const std::vector <T>& filterData,
+                                                 const std::vector <T>& biasData,
+                                                 float filterScale = 1.0f,
+                                                 int filterOffset = 0,
+                                                 float biasScale = 1.0f,
+                                                 int biasOffset = 0,
+                                                 float outputQuantScale = 2.0f,
+                                                 int outputQuantOffset = 0,
+                                                 float quantScale = 1.0f,
+                                                 int quantOffset = 0)
+{
+    using namespace tflite;
+    flatbuffers::FlatBufferBuilder flatBufferBuilder;
+
+    std::array<flatbuffers::Offset<tflite::Buffer>, 4> buffers;
+    buffers[0] = CreateBuffer(flatBufferBuilder); // Buffer 0 empty.
+    buffers[1] = CreateBuffer(flatBufferBuilder,  // Output
+                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(outputTensorShape.data()),
+                                                             sizeof(int32_t) * outputTensorShape.size()));
+    buffers[2] = CreateBuffer(flatBufferBuilder,     // Weights
+                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(filterData.data()),
+                                                             sizeof(T) * filterData.size()));
+    buffers[3] = CreateBuffer(flatBufferBuilder,     // Bias
+                              flatBufferBuilder.CreateVector(reinterpret_cast<const uint8_t*>(biasData.data()),
+                                                             sizeof(T) * biasData.size()));
+
+    auto quantizationParameters =
+        CreateQuantizationParameters(flatBufferBuilder,
+                                     0,
+                                     0,
+                                     flatBufferBuilder.CreateVector<float>({ quantScale }),
+                                     flatBufferBuilder.CreateVector<int64_t>({ quantOffset }));
+    auto outputQuantizationParameters =
+        CreateQuantizationParameters(flatBufferBuilder,
+                                     0,
+                                     0,
+                                     flatBufferBuilder.CreateVector<float>({ outputQuantScale }),
+                                     flatBufferBuilder.CreateVector<int64_t>({ outputQuantOffset }));
+    auto filterQuantizationParameters =
+        CreateQuantizationParameters(flatBufferBuilder,
+                                     0,
+                                     0,
+                                     flatBufferBuilder.CreateVector<float>({ filterScale }),
+                                     flatBufferBuilder.CreateVector<int64_t>({ filterOffset }));
+    auto biasQuantizationParameters =
+        CreateQuantizationParameters(flatBufferBuilder,
+                                     0,
+                                     0,
+                                     flatBufferBuilder.CreateVector<float>({ biasScale }),
+                                     flatBufferBuilder.CreateVector<int64_t>({ biasOffset }));
+
+    std::array<flatbuffers::Offset<Tensor>, 5> tensors;
+    // output_shape tensor
+    tensors[0] = CreateTensor(flatBufferBuilder,
+                              flatBufferBuilder.CreateVector<int32_t>(transposeTensorShape.data(),
+                                                                      transposeTensorShape.size()),
+                              tflite::TensorType_INT32,
+                              1,
+                              flatBufferBuilder.CreateString("output_shape"));
+    // Filter.
+    tensors[1] = CreateTensor(flatBufferBuilder,
+                              flatBufferBuilder.CreateVector<int32_t>(filterTensorShape.data(),
+                                                                      filterTensorShape.size()),
+                              tensorType,
+                              2,
+                              flatBufferBuilder.CreateString("filter"),
+                              filterQuantizationParameters);
+    // input
+    tensors[2] = CreateTensor(flatBufferBuilder,
+                              flatBufferBuilder.CreateVector<int32_t>(inputTensorShape.data(),
+                                                                      inputTensorShape.size()),
+                              tensorType,
+                              0,
+                              flatBufferBuilder.CreateString("input"),
+                              quantizationParameters);
+    // Bias
+    tensors[3] = CreateTensor(flatBufferBuilder,
+                              flatBufferBuilder.CreateVector<int32_t>(biasTensorShape.data(),
+                                                                      biasTensorShape.size()),
+                              tensorType,
+                              3,
+                              flatBufferBuilder.CreateString("bias"),
+                              biasQuantizationParameters);
+    // Output
+    tensors[4] = CreateTensor(flatBufferBuilder,
+                              flatBufferBuilder.CreateVector<int32_t>(outputTensorShape.data(),
+                                                                      outputTensorShape.size()),
+                              tensorType,
+                              0,
+                              flatBufferBuilder.CreateString("output"),
+                              outputQuantizationParameters);
+
+
+    tflite::BuiltinOptions operatorBuiltinOptionsType = tflite::BuiltinOptions_TransposeConvOptions;
+    flatbuffers::Offset<void> operatorBuiltinOptions =
+        CreateTransposeConvOptions(flatBufferBuilder, padding, strideX, strideY).Union();
+
+    // create operator
+    const std::vector<int> operatorInputs{0, 1, 2, 3};
+    const std::vector<int> operatorOutputs{4};
+    flatbuffers::Offset <Operator> convolutionOperator =
+        CreateOperator(flatBufferBuilder,
+                       0,
+                       flatBufferBuilder.CreateVector<int32_t>(operatorInputs.data(), operatorInputs.size()),
+                       flatBufferBuilder.CreateVector<int32_t>(operatorOutputs.data(), operatorOutputs.size()),
+                       operatorBuiltinOptionsType,
+                       operatorBuiltinOptions);
+
+    const std::vector<int> subgraphInputs{0, 1, 2, 3};
+    const std::vector<int> subgraphOutputs{4};
+    flatbuffers::Offset <SubGraph> subgraph =
+        CreateSubGraph(flatBufferBuilder,
+                       flatBufferBuilder.CreateVector(tensors.data(), tensors.size()),
+                       flatBufferBuilder.CreateVector<int32_t>(subgraphInputs.data(), subgraphInputs.size()),
+                       flatBufferBuilder.CreateVector<int32_t>(subgraphOutputs.data(), subgraphOutputs.size()),
+                       flatBufferBuilder.CreateVector(&convolutionOperator, 1));
+
+    flatbuffers::Offset <flatbuffers::String> modelDescription =
+        flatBufferBuilder.CreateString("ArmnnDelegate: TransposeConv Operator with bias Model");
+    flatbuffers::Offset <OperatorCode> operatorCode =
+        CreateOperatorCode(flatBufferBuilder, tflite::BuiltinOperator_TRANSPOSE_CONV);
+
+    flatbuffers::Offset <Model> flatbufferModel =
+        CreateModel(flatBufferBuilder,
+                    TFLITE_SCHEMA_VERSION,
+                    flatBufferBuilder.CreateVector(&operatorCode, 1),
+                    flatBufferBuilder.CreateVector(&subgraph, 1),
+                    modelDescription,
+                    flatBufferBuilder.CreateVector(buffers.data(), buffers.size()));
+
+    flatBufferBuilder.Finish(flatbufferModel, armnnDelegate::FILE_IDENTIFIER);
+
+    return std::vector<char>(flatBufferBuilder.GetBufferPointer(),
+                             flatBufferBuilder.GetBufferPointer() + flatBufferBuilder.GetSize());
+}
+
+template <typename T>
+void TransposeConvWithBiasTest(tflite::TensorType tensorType,
+                       uint32_t strideX,
+                       uint32_t strideY,
+                       tflite::Padding padding,
+                       const std::vector <int32_t>& transposeTensorShape,
+                       const std::vector <int32_t>& filterTensorShape,
+                       const std::vector <int32_t>& biasTensorShape,
+                       const std::vector <int32_t>& inputTensorShape,
+                       const std::vector <int32_t>& outputTensorShape,
+                       const std::vector <int32_t>& transposeData,
+                       const std::vector <T>& filterData,
+                       const std::vector <T>& biasData,
+                       std::vector<T>& inputValues,
+                       std::vector<T>& expectedOutputValues,
+                       float filterScale = 1.0f,
+                       int filterOffset = 0,
+                       float biasScale = 1.0f,
+                       int biasOffset = 0,
+                       float outputQuantScale = 1.0f,
+                       int outputQuantOffset = 0,
+                       float quantScale = 1.0f,
+                       int quantOffset = 0,
+                       const std::vector<armnn::BackendId>& backends = {})
+{
+    using namespace delegateTestInterpreter;
+
+    std::vector<char> modelBuffer;
+    modelBuffer = CreateTransposeConvWithBiasTfLiteModel<T>(tensorType,
+                                                           strideX,
+                                                           strideY,
+                                                           padding,
+                                                           transposeTensorShape,
+                                                           filterTensorShape,
+                                                           biasTensorShape,
+                                                           inputTensorShape,
+                                                           outputTensorShape,
+                                                           transposeData,
+                                                           filterData,
+                                                           biasData,
+                                                           filterScale,
+                                                           filterOffset,
+                                                           biasScale,
+                                                           biasOffset,
+                                                           outputQuantScale,
+                                                           outputQuantOffset,
+                                                           quantScale,
+                                                           quantOffset);
+
+    // Setup interpreter with Arm NN Delegate applied. Note we're using the copied model here.
+    auto armnnInterpreter = DelegateTestInterpreter(modelBuffer, CaptureAvailableBackends(backends));
+    REQUIRE(armnnInterpreter.AllocateTensors() == kTfLiteOk);
+    REQUIRE(armnnInterpreter.FillInputTensor<T>(inputValues, 2) == kTfLiteOk);
+    REQUIRE(armnnInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       armnnOutputValues = armnnInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> armnnOutputShape  = armnnInterpreter.GetOutputShape(0);
+    armnnInterpreter.Cleanup();
+
+    // Setup interpreter with just TFLite Runtime.
+    auto tfLiteInterpreter = DelegateTestInterpreter(modelBuffer);
+    REQUIRE(tfLiteInterpreter.AllocateTensors() == kTfLiteOk);
+    REQUIRE(tfLiteInterpreter.FillInputTensor<T>(inputValues, 2) == kTfLiteOk);
+    REQUIRE(tfLiteInterpreter.Invoke() == kTfLiteOk);
+    std::vector<T>       tfLiteOutputValues = tfLiteInterpreter.GetOutputResult<T>(0);
+    std::vector<int32_t> tfLiteOutputShape  = tfLiteInterpreter.GetOutputShape(0);
+    tfLiteInterpreter.Cleanup();
+
+    armnnDelegate::CompareOutputData<T>(tfLiteOutputValues, armnnOutputValues, expectedOutputValues);
+    armnnDelegate::CompareOutputShape(tfLiteOutputShape, armnnOutputShape, outputTensorShape);
+}
+
+
 } // anonymous namespace
-
-
-
-

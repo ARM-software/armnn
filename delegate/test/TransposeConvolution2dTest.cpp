@@ -1,11 +1,12 @@
 //
-// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ConvolutionTestHelper.hpp"
-
+#include <DelegateTestInterpreter.hpp>
 #include <doctest/doctest.h>
+#include <tensorflow/lite/schema/schema_generated.h>
 
 namespace armnnDelegate
 {
@@ -75,12 +76,55 @@ void TransposeConvFp32Test()
                              expectedOutputValues);
 }
 
+void TransposeConvWithBiasFp32Test()
+{
+    std::vector<int32_t> transposeTensorShape { 4 };
+    std::vector<int32_t> filterShape { 1, 2, 2, 1 };
+    std::vector<int32_t> biasShape { 1 };
+    std::vector<int32_t> inputShape { 1, 2, 2, 1 };
+    std::vector<int32_t> outputShape { 1, 3, 3, 1 };
+
+    std::vector<int32_t> transposeData = { 1, 3, 3, 1 };
+    static std::vector<float> inputValues = { 1, 2, 3, 4 };
+    std::vector<float> filterValues = { 0, 1, 2, 4 };
+    std::vector<float> biasValues = {10};
+    std::vector<float> expectedOutputValues =
+        {
+            10, 11,  12,
+            12, 21, 22,
+            16, 30, 26
+        };
+
+    tflite::Padding padding = tflite::Padding_VALID;
+    TransposeConvWithBiasTest<float>(::tflite::TensorType_FLOAT32,
+                                     1, // strideX
+                                     1, // strideY
+                                     padding,
+                                     transposeTensorShape,
+                                     filterShape,
+                                     biasShape,
+                                     inputShape,
+                                     outputShape,
+                                     transposeData,
+                                     filterValues,
+                                     biasValues,
+                                     inputValues,
+                                     expectedOutputValues);
+}
+
+
+
 TEST_SUITE("TransposeConv_Test")
 {
 
 TEST_CASE ("TransposeConv_Fp32_Test")
 {
     TransposeConvFp32Test();
+}
+
+TEST_CASE ("TransposeConv_WithBias_Fp32_Test")
+{
+    TransposeConvWithBiasFp32Test();
 }
 
 TEST_CASE ("TransposeConv_Int8_Test")

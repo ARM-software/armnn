@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,6 +33,11 @@ DelegateTestInterpreter::DelegateTestInterpreter(std::vector<char>& modelBuffer,
 
     m_TfLiteDelegate = armnnDelegate;
     m_TfLiteInterpreter = TfLiteInterpreterCreate(tfLiteModel, options);
+
+    if (!m_TfLiteInterpreter)    // This can happen if the model is corrupted or considered invalid.
+    {
+        throw armnn::Exception("TfLiteInterpreterCreate return null. This usually means the passed model is invalid.");
+    }
 
     // The options and model can be deleted after the interpreter is created.
     TfLiteInterpreterOptionsDelete(options);

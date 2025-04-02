@@ -1,5 +1,5 @@
 //
-// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -690,17 +690,31 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
                                           int nodeIndex,
                                           int32_t operatorCode)
 {
-    TF_LITE_ENSURE_STATUS(ValidateNumInputs(tfLiteContext, tfLiteNode, 3, nodeIndex));
-    TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
-
     armnn::TransposeConvolution2dDescriptor descriptor;
     auto* parameters = reinterpret_cast<TfLiteTransposeConvParams*>(TfLiteOpaqueNodeGetBuiltinData(tfLiteNode));
     descriptor.m_BiasEnabled = false;
+    // Bias is optional.
+    auto numInputs = TfLiteOpaqueNodeNumberOfInputs(tfLiteNode);
+    switch (numInputs)
+    {
+        case 3:
+            descriptor.m_BiasEnabled = false;
+            break;
+        case 4:
+            descriptor.m_BiasEnabled = true;
+            break;
+        default:
+            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: TransposeConv2d num inputs specified, %d, is out of range 3-4 on node #%d",
+                numInputs, nodeIndex);
+            return kTfLiteError;
+    }
+
+    TF_LITE_ENSURE_STATUS(ValidateNumOutputs(tfLiteContext, tfLiteNode, 1, nodeIndex));
     descriptor.m_StrideX = NonNegative(parameters->stride_width, nodeIndex);
     descriptor.m_StrideY = NonNegative(parameters->stride_height, nodeIndex);
     descriptor.m_DataLayout = armnn::DataLayout::NHWC;
-
-    auto numInputs = TfLiteOpaqueNodeNumberOfInputs(tfLiteNode);
     // Gather input indices and use to get input tensor.
     const int* inputTensors;
     if (TfLiteOpaqueNodeInputs(tfLiteNode, &inputTensors, &numInputs) != kTfLiteOk)
@@ -729,6 +743,16 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     if (!IsValid(tfLiteContext, tfLiteFilterTensor, operatorCode, nodeIndex))
     {
         return kTfLiteError;
+    }
+
+    TfLiteOpaqueTensor* tfLiteBiasTensor = nullptr;
+    if (descriptor.m_BiasEnabled)
+    {
+        tfLiteBiasTensor = TfLiteOpaqueContextGetOpaqueTensor(tfLiteContext, inputTensors[3]);
+        if (!IsValid(tfLiteContext, tfLiteFilterTensor, operatorCode, nodeIndex))
+        {
+            return kTfLiteError;
+        }
     }
 
     // Gather output indices and use to get output tensors.
@@ -848,6 +872,18 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
     // Set up filter
     auto filterTensor = CreateConstTensor(tfLiteFilterTensor,
                                           filterTensorInfo);
+    armnn::Optional<armnn::TensorInfo> optionalBiasInfoCopy;
+    if (descriptor.m_BiasEnabled)
+    {
+        optionalBiasInfoCopy = armnn::Optional(GetTensorInfoForTfLiteOpaqueTensor(tfLiteBiasTensor));
+        bool biasIsConst = optionalBiasInfoCopy.value().IsConstant();
+        if (!biasIsConst)
+        {
+            biasIsConst = WillInputBeOptimizedToConst(tfLiteContext, inputTensors[3]);
+        }
+        optionalBiasInfoCopy.value().SetConstant(biasIsConst);
+    }
+
     armnn::BackendId setBackend;
     if (!delegateData.m_Network)
     {
@@ -862,15 +898,24 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
                                           outputTensorInfo,
                                           descriptor,
                                           filterTensorInfo,
-                                          armnn::EmptyOptional());
+                                          optionalBiasInfoCopy);
         return isSupported ? kTfLiteOk : kTfLiteError;
     }
 
     auto layerName = GetName(armnn::LayerType::TransposeConvolution2d, nodeIndex);
-    armnn::IConnectableLayer* layer = delegateData.m_Network->AddTransposeConvolution2dLayer(descriptor,
-                                                                                             filterTensor,
-                                                                                             armnn::EmptyOptional(),
-                                                                                             layerName.c_str());
+
+    armnn::IConnectableLayer* layer;
+    armnn::Optional<armnn::ConstTensor> optionalBiases;
+    if (descriptor.m_BiasEnabled)
+    {
+        auto biasTensor = CreateConstTensor(tfLiteBiasTensor,
+                                            GetTensorInfoForTfLiteOpaqueTensor(tfLiteBiasTensor));
+        optionalBiases = armnn::MakeOptional<armnn::ConstTensor>(biasTensor);
+    }
+    layer = delegateData.m_Network->AddTransposeConvolution2dLayer(descriptor,
+                                                                   filterTensor,
+                                                                   optionalBiases,
+                                                                   layerName.c_str());
     layer->SetBackendId(setBackend);
     ARMNN_ASSERT(layer != nullptr);
 

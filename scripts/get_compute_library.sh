@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="382c8547ebee4e8588df2a39d5d3c4d28271e3a6" # test: add default values to NEDeconvolution example
+DEFAULT_CLFRAMEWORKREVISION="c4d037c2462d3ad3ef67dde973ee5cd6a71cad6f" # fix: String conversion for Datatype::BFLOAT16
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

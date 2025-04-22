@@ -110,14 +110,14 @@ function GetAndBuildCmake {
 function GetAndBuildFlatbuffers {
     cd $WORKING_DIR
 
-    if [[ ! -d flatbuffers-23.5.26 ]]; then
+    if [[ ! -d flatbuffers-24.3.25 ]]; then
         echo "+++ Getting Flatbuffers"
-        wget https://github.com/google/flatbuffers/archive/v23.5.26.tar.gz
-        tar xf v23.5.26.tar.gz
+        wget https://github.com/google/flatbuffers/archive/v24.3.25.tar.gz
+        tar xf v24.3.25.tar.gz
     fi
     #Build FlatBuffers
     echo "+++ Building x86 Flatbuffers library"
-    cd $WORKING_DIR/flatbuffers-23.5.26
+    cd $WORKING_DIR/flatbuffers-24.3.25
 
     rm -f CMakeCache.txt
 
@@ -135,7 +135,7 @@ function GetAndBuildFlatbuffers {
     make all install -j16
 
     echo "+++ Building Android Flatbuffers library"
-    cd $WORKING_DIR/flatbuffers-23.5.26
+    cd $WORKING_DIR/flatbuffers-24.3.25
 
     rm -f CMakeCache.txt
 

@@ -86,13 +86,13 @@ cd..
 Download Flatbuffers:
 ```bash
 cd $WORKING_DIR
-wget https://github.com/google/flatbuffers/archive/v23.5.26.tar.gz
-tar xf v23.5.26.tar.gz
+wget https://github.com/google/flatbuffers/archive/v24.3.25.tar.gz
+tar xf v24.3.25.tar.gz
 ```
 
 Build Flatbuffers for x86:
 ```bash
-cd $WORKING_DIR/flatbuffers-23.5.26
+cd $WORKING_DIR/flatbuffers-24.3.25
 
 rm -f CMakeCache.txt
 
@@ -113,7 +113,7 @@ Note: -fPIC is added to allow users to use the libraries in shared objects.
 
 Build Flatbuffers for Android:
 ```bash
-cd $WORKING_DIR/flatbuffers-23.5.26
+cd $WORKING_DIR/flatbuffers-24.3.25
 
 rm -f CMakeCache.txt
 
@@ -170,7 +170,7 @@ First clone Tensorflow manually and check out the version Arm NN was tested with
 cd $WORKING_DIR
 git clone https://github.com/tensorflow/tensorflow.git
 cd tensorflow
-git fetch && git checkout v2.15.0
+git fetch && git checkout v2.19.0
 ```
 Or use the script that Arm NN provides:
 ```bash

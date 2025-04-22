@@ -49,6 +49,8 @@
 #include <armnnUtils/Filesystem.hpp>
 #include <armnn/utility/Timer.hpp>
 #include <flatbuffers/flatbuffers.h>
+
+#include <tensorflow/lite/c/c_api.h>
 #include <tensorflow/lite/context_util.h>
 #include <tensorflow/lite/schema/schema_generated.h>
 #include <tensorflow/lite/minimal_logging.h>
@@ -186,7 +188,7 @@ TfLiteStatus DoPrepare(TfLiteOpaqueContext* tfLiteContext, TfLiteOpaqueDelegate*
     TfLiteRegistrationExternal* kernelRegistration =
             TfLiteRegistrationExternalCreate(kTfLiteBuiltinDelegate,
                                              "armnn_delegate",
-                                             /*version=*/OPAQUE_DELEGATE_MAJOR_VERSION);
+                                             /*version=*/OPAQUE_DELEGATE_MAJOR_VERSION, nullptr);
     if(kernelRegistration == nullptr)
     {
         return kTfLiteError;

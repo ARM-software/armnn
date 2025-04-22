@@ -155,6 +155,11 @@ build_armnn()
 
   echo -e "\n***** Building Arm NN for $TARGET_ARCH *****"
 
+  if [ -f "${TENSORFLOW_SRC}/tensorflow/compiler/mlir/lite/schema/schema.fbs" ]; then
+      cp "${TENSORFLOW_SRC}/tensorflow/compiler/mlir/lite/schema/schema.fbs" "${TFLITE_SRC}/schema/"
+      cp "${TENSORFLOW_SRC}/tensorflow/compiler/mlir/lite/schema/conversion_metadata_generated.h" "${TFLITE_SRC}/schema/"
+  fi
+
   local flatbuffers_root="$FLATBUFFERS_BUILD_TARGET"
   local protobuf_root="$PROTOBUF_BUILD_TARGET"
   if [ "$os_darwin" -eq 1 ]; then
@@ -179,8 +184,8 @@ build_armnn()
         -DARMCOMPUTE_BUILD_DIR="$ACL_BUILD_TARGET" \
         -DTENSORFLOW_ROOT="$TENSORFLOW_SRC" \
         -DTFLITE_ROOT_DIR="$TFLITE_SRC" \
-        -DTF_LITE_GENERATED_PATH="$TFLITE_SRC"/schema \
-        -DTF_LITE_SCHEMA_INCLUDE_PATH="$TFLITE_SRC"/schema \
+        -DTF_LITE_GENERATED_PATH="$TENSORFLOW_SRC"/tensorflow/compiler/mlir/lite/schema \
+        -DTF_LITE_SCHEMA_INCLUDE_PATH="$TENSORFLOW_SRC"/tensorflow/lite/schema \
         -DTFLITE_LIB_ROOT="$TFLITE_BUILD_TARGET" \
         -DFLATBUFFERS_ROOT="$flatbuffers_root" \
         -DFLATC_DIR="$FLATBUFFERS_BUILD_HOST" \

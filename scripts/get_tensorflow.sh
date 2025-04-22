@@ -8,7 +8,7 @@
 CMD=$( basename "$0" )
 
 # Revision or tag that Arm NN has been tested with:
-DEFAULT_TENSORFLOW_REVISION=v2.15.0 # tag v2.15.0
+DEFAULT_TENSORFLOW_REVISION=v2.19.0 # tag v2.19.0
 
 Usage() {
     echo "Gets the revision or tag of TensorFlow that this version of Arm NN has been" 

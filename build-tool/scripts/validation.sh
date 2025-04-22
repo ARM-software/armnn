@@ -16,7 +16,7 @@ set -o errexit  # Catch and propagate non zero exit codes.
 
 # Host and target architecture validation
 if [ "$target_arch" == "" ]; then
-  echo "$name: --target_arch is not set. Example usage: --target_arch=aarch64"
+  echo "$name: --target_arch is not set. Example usage: --target-arch=aarch64"
   exit 1
 fi
 

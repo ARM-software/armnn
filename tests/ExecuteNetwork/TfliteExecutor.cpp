@@ -55,6 +55,10 @@ std::string TfLiteStatusToString(const TfLiteStatus status)
         // Generally referring to invocation cancelled by the user.
         case kTfLiteCancelled:
             return "Status: invocation has been cancelled by the user.";
+        case kTfLiteOutputShapeNotKnown:
+            return "Status: The output shape cannot be determined.";
+        default:
+            break;
     }
     return "Unknown status result.";
 }

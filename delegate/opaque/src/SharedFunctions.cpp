@@ -6,6 +6,7 @@
 #include "SharedFunctions.hpp"
 
 #include <OpaqueDelegateUtils.hpp>
+#include <tensorflow/lite/c/c_api.h>
 
 namespace armnnOpaqueDelegate
 {

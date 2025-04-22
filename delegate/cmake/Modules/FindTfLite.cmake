@@ -16,7 +16,7 @@ unset(TFLITE_FOUND)
 # First look for the static version of tensorflow lite
 find_library(TfLite_LIB NAMES "libtensorflow-lite.a" HINTS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite NO_CMAKE_FIND_ROOT_PATH  )
 # If not found then, look for the dynamic library of tensorflow lite
-find_library(TfLite_LIB NAMES "libtensorflow_lite_all.so" "libtensorflowlite.so" "libtensorflow-lite.so" HINTS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite NO_CMAKE_FIND_ROOT_PATH)
+find_library(TfLite_LIB NAMES "libtensorflow_lite_all.so" "libtensorflowlite.so" HINTS ${TFLITE_LIB_ROOT} ${TFLITE_LIB_ROOT}/tensorflow/lite NO_CMAKE_FIND_ROOT_PATH)
 
 # If the static library was found, gather all of its dependencies
 if (TfLite_LIB MATCHES .a$)
@@ -24,33 +24,34 @@ if (TfLite_LIB MATCHES .a$)
     find_library(TfLite_abseilstrings_LIB "libabsl_strings.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/strings
                  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-
+    find_library(TfLite_abseil_internal_strings_LIB "libabsl_strings_internal.a"
+                 PATHS ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/strings
+                 NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     find_library(TfLite_abseil_synchronization_LIB "libabsl_synchronization.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/synchronization
                  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_kernel_timeout_LIB "libabsl_kernel_timeout_internal.a"
+                 PATHS ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/synchronization
+                 NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+    find_library(TfLite_abseil_raw_logging_internal_LIB "libabsl_raw_logging_internal.a" PATHS
+                ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/base
+                NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
-
-  # Required for building TensorFlow in Debug
-
+    # Required for building TensorFlow in Debug
     find_library(TfLite_abseil_graphCycle_internal_LIB "libabsl_graphcycles_internal.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/abseil-cpp-build/absl/synchronization NO_CMAKE_FIND_ROOT_PATH )
-
-
     find_library(TfLite_farmhash_LIB "libfarmhash.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/farmhash-build NO_CMAKE_FIND_ROOT_PATH)
     find_library(TfLite_fftsg_LIB "libfft2d_fftsg.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/fft2d-build NO_CMAKE_FIND_ROOT_PATH)
     find_library(TfLite_fftsg2d_LIB "libfft2d_fftsg2d.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/fft2d-build NO_CMAKE_FIND_ROOT_PATH)
-
-  find_library(TfLite_flatbuffers_LIB "libflatbuffers.a"
+    find_library(TfLite_flatbuffers_LIB "libflatbuffers.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/flatbuffers-build
                  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-
     find_library(TfLite_cpuinfo_LIB "libcpuinfo.a" PATH
                  ${TFLITE_LIB_ROOT}/_deps/cpuinfo-build NO_CMAKE_FIND_ROOT_PATH)
-
- find_library(TfLite_ruy_allocator_LIB "libruy_allocator.a"
+    find_library(TfLite_ruy_allocator_LIB "libruy_allocator.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/ruy-build/ruy
                  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
     find_library(TfLite_ruy_apply_multiplier_LIB "libruy_apply_multiplier.a"
@@ -137,9 +138,6 @@ if (TfLite_LIB MATCHES .a$)
     find_library(TfLite_ruy_profiler_LIB "libruy_profiler_instrumentation.a"
                  PATHS ${TFLITE_LIB_ROOT}/_deps/ruy-build/ruy/profiler
                  NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
-    find_library(TfLite_pthread_pool_LIB "libpthreadpool.a"
-                 PATHS ${TFLITE_LIB_ROOT}/pthreadpool
-                 NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
 
     ## Set TFLITE_FOUND if all libraries are satisfied for static lib
     find_package_handle_standard_args(TfLite DEFAULT_MSG TfLite_LIB TfLite_abseilstrings_LIB TfLite_farmhash_LIB TfLite_fftsg_LIB TfLite_fftsg2d_LIB
@@ -151,7 +149,8 @@ if (TfLite_LIB MATCHES .a$)
                                       TfLite_ruy_pack_avx2_fma_LIB TfLite_ruy_pack_avx512_LIB TfLite_ruy_pack_avx_LIB TfLite_ruy_prepacked_cache_LIB
                                       TfLite_ruy_prepare_packed_matrices_LIB TfLite_ruy_system_aligned_alloc_LIB TfLite_ruy_threadpool_LIB
                                       TfLite_ruy_trmul_LIB TfLite_ruy_tune_LIB TfLite_ruy_wait_LIB TfLite_ruy_profiler_LIB TfLite_cpuinfo_LIB
-                                      TfLite_abseil_synchronization_LIB TfLite_abseil_graphCycle_internal_LIB TfLite_pthread_pool_LIB)
+                                      TfLite_abseil_synchronization_LIB TfLite_abseil_graphCycle_internal_LIB TfLite_abseil_raw_logging_internal_LIB
+                                      TfLite_abseil_kernel_timeout_LIB TfLite_abseil_internal_strings_LIB)
     # Set external variables for usage in CMakeLists.txt
     if (TFLITE_FOUND)
         # WARNING! The order of these libraries is critical. Moving them
@@ -166,7 +165,8 @@ if (TfLite_LIB MATCHES .a$)
                                      ${TfLite_ruy_pack_avx2_fma_LIB} ${TfLite_ruy_pack_avx512_LIB} ${TfLite_ruy_pack_avx_LIB} ${TfLite_ruy_prepacked_cache_LIB}
                                      ${TfLite_ruy_prepare_packed_matrices_LIB} ${TfLite_ruy_system_aligned_alloc_LIB}
                                      ${TfLite_ruy_tune_LIB} ${TfLite_ruy_wait_LIB} ${TfLite_ruy_profiler_LIB}
-                                     ${TfLite_cpuinfo_LIB} ${TfLite_abseil_synchronization_LIB} ${TfLite_abseil_graphCycle_internal_LIB} ${TfLite_pthread_pool_LIB})
+                                     ${TfLite_cpuinfo_LIB} ${TfLite_abseil_synchronization_LIB} ${TfLite_abseil_graphCycle_internal_LIB}
+                                     ${TfLite_abseil_raw_logging_internal_LIB} ${TfLite_abseil_kernel_timeout_LIB} ${TfLite_abseil_internal_strings_LIB})
     endif ()
 elseif (TfLite_LIB MATCHES .so$)
     message("-- Dynamic tensorflow lite library found, using for ArmNN build")

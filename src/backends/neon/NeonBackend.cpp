@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -526,6 +526,76 @@ OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph
                 continue;
             }
             RemoveReshapeLayer(baseLayer, untouched, optimizationViews);
+        }
+        if (base.GetType() == LayerType::Pooling2d)
+        {
+            Pooling2dLayer* baseLayer = PolymorphicDowncast<Pooling2dLayer*>(&base);
+            Pooling2dDescriptor poolingDescriptor = baseLayer->GetParameters();
+
+            if (baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Pad)
+            {
+                PadLayer* padLayer = PolymorphicDowncast<PadLayer*>(
+                    &baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer());
+                if (padLayer->GetOutputSlot(0).GetNumConnections() == 1 &&
+                    optimizations::pad_fold::TryFoldPadIntoLayer2d(padLayer->GetParameters(),
+                                                                   poolingDescriptor,
+                                                                   padLayer->GetOutputSlot().GetTensorInfo(),
+                                                                   true))
+                {
+                    FoldPadLayer2d<Pooling2dLayer, Pooling2dDescriptor>(optimizationViews, baseLayer,
+                                                             poolingDescriptor, padLayer);
+                    untouched.erase(baseLayer->GetGuid());
+                    untouched.erase(padLayer->GetGuid());
+                }
+            }
+        }
+
+        if (base.GetType() == LayerType::Convolution2d)
+        {
+            Convolution2dLayer* baseLayer = PolymorphicDowncast<Convolution2dLayer*>(&base);
+            Convolution2dDescriptor convDescriptor = baseLayer->GetParameters();
+            if (baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Pad)
+            {
+                // perform fold pad into conv2d if possible
+                PadLayer* padLayer = PolymorphicDowncast<PadLayer*>(
+                    &baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer());
+                if (padLayer->GetOutputSlot(0).GetNumConnections() == 1 &&
+                    optimizations::pad_fold::TryFoldPadIntoLayer2d<Convolution2dDescriptor>(padLayer->GetParameters(),
+                                                                   convDescriptor,
+                                                                   padLayer->GetOutputSlot().GetTensorInfo()))
+                {
+                    FoldPadLayer2d<Convolution2dLayer, Convolution2dDescriptor>(optimizationViews, baseLayer,
+                                                             convDescriptor, padLayer);
+
+                    untouched.erase(baseLayer->GetGuid());
+                    untouched.erase(padLayer->GetGuid());
+                }
+            }
+        }
+        if (base.GetType() == LayerType::DepthwiseConvolution2d)
+        {
+            DepthwiseConvolution2dLayer* baseLayer = PolymorphicDowncast<DepthwiseConvolution2dLayer*>(&base);
+            DepthwiseConvolution2dDescriptor convDescriptor = baseLayer->GetParameters();
+            if (baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Pad)
+            {
+                // perform fold pad into depthwiseconv2d if possible
+                PadLayer* padLayer = PolymorphicDowncast<PadLayer*>(
+                    &baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer());
+                if (padLayer->GetOutputSlot(0).GetNumConnections() == 1 &&
+                    optimizations::pad_fold::TryFoldPadIntoLayer2d<DepthwiseConvolution2dDescriptor>(
+                                             padLayer->GetParameters(),
+                                             convDescriptor,
+                                             padLayer->GetOutputSlot().GetTensorInfo()))
+                {
+                    FoldPadLayer2d<DepthwiseConvolution2dLayer, DepthwiseConvolution2dDescriptor>(optimizationViews,
+                                                                                                  baseLayer,
+                                                                                                  convDescriptor,
+                                                                                                  padLayer);
+
+                    untouched.erase(baseLayer->GetGuid());
+                    untouched.erase(padLayer->GetGuid());
+                }
+            }
         }
 
         // Replace Add/Mul/Add where possible

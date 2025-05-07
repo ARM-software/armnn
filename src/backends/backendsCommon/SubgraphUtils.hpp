@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,6 +8,7 @@
 #include <armnn/StrategyBase.hpp>
 #include <armnn/Descriptors.hpp>
 #include <optimizations/FoldPadIntoLayer2d.hpp>
+#include <type_traits>
 
 namespace armnn
 {
@@ -210,6 +211,28 @@ SubgraphView::IOutputSlots CreateIOutputsFromSlotLists(const std::vector<ILayerT
 }
 }
 
+namespace FoldPadConstraints
+{
+    // namespace for holding template constraints related to fold pad functions
+    // and for static asserts to prevent function misuse
+    template <class>
+    inline constexpr bool alwaysFalse = false;
+
+    template <typename L, typename D>
+    struct IsValidPair : std::false_type {};
+
+    // template specialization of IsValidPair for allowed pairings of layers and descriptors
+    template <>
+    struct IsValidPair<Pooling2dLayer, Pooling2dDescriptor> : std::true_type {};
+
+    template <>
+    struct IsValidPair<Convolution2dLayer, Convolution2dDescriptor> : std::true_type {};
+
+    template <>
+    struct IsValidPair<DepthwiseConvolution2dLayer, DepthwiseConvolution2dDescriptor> : std::true_type {};
+
+} // namespace FoldPadConstraints
+
 inline bool IsNCHW(armnn::Layer& layer)
 {
     CheckForNCHW check;
@@ -228,6 +251,25 @@ inline void ReportUntouchedLayers(OptimizationViews& optimizationViews, std::map
                                   CreateIOutputsFrom({layer}));
         optimizationViews.AddUntouchedSubgraph(std::move(subgraphView));
     }
+}
+
+template<typename LayerType>
+LayerType* ReplaceLayer(OptimizationViews& optimizationViews,
+                        LayerType* baseLayer,
+                        LayerType* replacementLayer)
+{
+    SubgraphView substitutionSubgraph({baseLayer},
+                                      CreateIInputsFrom({baseLayer}),
+                                      CreateIOutputsFrom({baseLayer}));
+
+    SubgraphView replacementSubgraph({replacementLayer},
+                                      CreateIInputsFrom({replacementLayer}),
+                                      CreateIOutputsFrom({replacementLayer}));
+
+
+    optimizationViews.AddSubstitution({substitutionSubgraph, replacementSubgraph});
+
+    return replacementLayer;
 }
 
 template<typename LayerType>
@@ -337,22 +379,57 @@ inline void RemoveReshapeLayer(ReshapeLayer* baseLayer,
     optimizationViews.AddDeletedSubgraph(baseLayer);
 }
 
-template<typename LayerType>
-LayerType* FoldPadIntoAveragePool2d(OptimizationViews& optimizationViews,
-                                    Pooling2dLayer* baseLayer,
-                                    Pooling2dDescriptor& poolDescriptor,
-                                    PadLayer* padLayer)
+
+template<typename LayerT, typename Descriptor>
+void FoldPadLayer2d(OptimizationViews& optimizationViews,
+                    LayerT* baseLayer,
+                    Descriptor& descriptor,
+                    PadLayer* padLayer)
 {
-    IConnectableLayer* replacement =
-        optimizationViews.GetINetwork()->AddPooling2dLayer(poolDescriptor, "folded-pad-into-pool2d");
-    LayerType* replacementLayer = PolymorphicDowncast<LayerType*>(replacement);
 
-    FoldPadLayer(optimizationViews,
-                 baseLayer,
-                 replacementLayer,
-                 padLayer);
+    // Enforce that the function is called with a valid combination of layertype and descriptors
+    static_assert(FoldPadConstraints::IsValidPair<LayerT, Descriptor>::value,
+                  "FoldPadLayer2d() called with an unsupported (LayerType, Descriptor) combination!");
 
-    return replacementLayer;
+    IConnectableLayer* replacement = nullptr;
+    const std::string name = std::string("folded-") + padLayer->GetName() + "-into-" + baseLayer->GetName();
+    if constexpr (std::is_same_v<LayerT, Pooling2dLayer>)
+    {
+        replacement = optimizationViews.GetINetwork()->AddPooling2dLayer(descriptor, name.c_str());
+        LayerT* replacementLayer = PolymorphicDowncast<LayerT*>(replacement);
+        FoldPadLayer(optimizationViews,
+                    baseLayer,
+                    replacementLayer,
+                    padLayer);
+    }
+    else if constexpr (std::is_same_v<LayerT, Convolution2dLayer> ||
+                       std::is_same_v<LayerT, DepthwiseConvolution2dLayer>)
+    {
+        // DepthwiseConv2d and Conv2d pad fold is being done by creating a new layer and subsitituing 
+        // the existing conv after updating the padding descriptor with TryFoldPadIntoLayer2d
+        // We then mark the pad layer for deletion
+        // this prevents a mismatch in the number of expected input slots on the optimized layer
+        // i.e. pad has 1 input slot but conv2d has 3 (1 input and 2 constants which show as input slots)
+        if constexpr (std::is_same_v<LayerT, Convolution2dLayer>)
+        {
+            replacement = optimizationViews.GetINetwork()->AddConvolution2dLayer(descriptor, name.c_str());
+        }
+        else
+        {
+            replacement = optimizationViews.GetINetwork()->AddDepthwiseConvolution2dLayer(descriptor, name.c_str());
+        }
+        LayerT* replacementLayer = PolymorphicDowncast<LayerT*>(replacement);
+        SubgraphView layerToDelete(padLayer);
+        optimizationViews.AddDeletedSubgraph(std::move(layerToDelete));
+        ReplaceLayer(optimizationViews,
+                     baseLayer,
+                     replacementLayer);
+    }
+    else
+    {
+        static_assert(FoldPadConstraints::alwaysFalse<LayerT>, 
+                     "FoldPadLayer2d() called with an unsupported LayerType");
+    }
 }
 
 //
@@ -467,5 +544,100 @@ bool IsLayerSequence(Layer& currentLayer,
 
     return result;
 }
+
+// OpBlockSequencer reorders blocks based on the availability of their input tensors.
+// If all of a block’s input tensors are already known, the block is added to the list immediately;
+// otherwise, it is queued until its inputs become available.
+template<typename LayerT, typename BlockT>
+class OpBlockSequencer
+{
+public:
+    struct Pair
+    {
+        LayerT* layer;
+        BlockT* block;
+    };
+
+    OpBlockSequencer() = default;
+    ~OpBlockSequencer() = default;
+
+    void Add(LayerT* layer, BlockT* block)
+    {
+        if (HasInputs(block))
+        {
+            AddReady({layer, block});
+            ProcessPending();
+        }
+        else
+        {
+            m_Pending.emplace_back(Pair{layer,block});
+        }
+    }
+
+    std::list<Pair>& Finish()
+    {
+        ProcessPending();
+        if (m_Pending.size())
+        {
+            std::stringstream stm;
+            stm << "[OpBlockSequencer] " <<  m_Pending.size();
+            stm << " blocks could not be processed!";
+            throw std::invalid_argument(stm.str());
+        }
+        return m_Ready;
+    }
+private:
+    bool HasInputs(BlockT* block)
+    {
+        for (auto& inputTensorName : block->GetInputs())
+        {
+            if (inputTensorName.find("input") != std::string::npos)
+            {
+                continue;
+            }
+
+            if (inputTensorName.find("constant") != std::string::npos)
+            {
+                continue;
+            }
+
+            if (m_TensorMap.find(inputTensorName) == m_TensorMap.end())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void AddReady(Pair&& pair)
+    {
+        m_Ready.emplace_back(pair);
+        for (auto & outputTensor : pair.block->GetOutputs())
+        {
+            m_TensorMap[outputTensor] = 1;
+        }
+    }
+
+    void ProcessPending()
+    {
+        auto itr = m_Pending.begin();
+        while (itr != m_Pending.end())
+        {
+            if (HasInputs((*itr).block))
+            {
+                AddReady(std::move(*itr));
+                itr = m_Pending.erase(itr);
+            }
+            else
+            {
+                ++itr;
+            }
+        }
+    }
+private:
+    std::list<Pair> m_Ready;
+    std::list<Pair> m_Pending;
+    std::unordered_map<std::string, uint32_t> m_TensorMap;
+};
 
 } // namespace armnn

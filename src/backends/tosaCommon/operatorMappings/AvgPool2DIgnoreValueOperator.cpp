@@ -11,7 +11,7 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
                                                                        const Pooling2dDescriptor* poolDescriptor)
 {
     std::string padInputName   = std::string("input_");
-    std::string padOutputName  = std::string("intermediate0_") + GetUniqueTosaMappingID();
+    std::string padOutputName  = std::string("layer_intermediate0_") + GetUniqueTosaMappingID();
     std::string poolOutputName = std::string("output0_");
     std::string blockName      = std::string("Op_AVG_POOL2D_block_") + GetUniqueTosaMappingID();
 
@@ -49,30 +49,44 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
         };
     }
 
+    std::vector<TosaSerializationTensor*> tensors;
+    std::vector<TosaSerializationOperator*> operators;
+
     TosaPadAttribute padAttribute(paddings, 0, 0.0f);
-    auto* opPad = new TosaSerializationOperator(Op_PAD,
-                                                Attribute_PadAttribute,
-                                                &padAttribute,
-                                                {padInputName},
-                                                {padOutputName});
+    operators.push_back(new TosaSerializationOperator(Op_PAD,
+                                                      Attribute_PadAttribute,
+                                                      &padAttribute,
+                                                      {padInputName},
+                                                      {padOutputName}));
 
     std::vector<int> pad    = {0, 0, 0, 0};
     std::vector<int> kernel = {static_cast<int>(poolDescriptor->m_PoolHeight),
                                static_cast<int>(poolDescriptor->m_PoolWidth)};
     std::vector<int> stride = {static_cast<int>(poolDescriptor->m_StrideY),
                                static_cast<int>(poolDescriptor->m_StrideX)};
-    TosaPoolAttribute poolAttribute(pad, kernel, stride, 0, 0, ArmNNToDType(inputs[0]->GetDataType()));
-
-    auto* opPool = new TosaSerializationOperator(Op_AVG_POOL2D,
-                                                 Attribute_PoolAttribute,
-                                                 &poolAttribute,
-                                                 {padOutputName},
-                                                 {poolOutputName});
-
-    std::vector<TosaSerializationTensor*> tensors;
+    std::vector<int> dilation = {1, 1};
 
     std::vector<int32_t> inputShape = GetTosaTensorShape(inputs[0]->GetShape());
     DType inputDType = ArmNNToDType(inputs[0]->GetDataType());
+    std::string sliceOutputName = GetInputSlicedToItsUsedSize(inputShape,
+                                                              padOutputName,
+                                                              poolDescriptor->m_DataLayout,
+                                                              inputDType,
+                                                              kernel,
+                                                              pad,
+                                                              stride,
+                                                              dilation,
+                                                              tensors,
+                                                              operators,
+                                                              true);
+
+    TosaPoolAttribute poolAttribute(pad, kernel, stride, 0, 0, ArmNNToDType(inputs[0]->GetDataType()));
+
+    operators.push_back(new TosaSerializationOperator(Op_AVG_POOL2D,
+                                                      Attribute_PoolAttribute,
+                                                      &poolAttribute,
+                                                      {sliceOutputName},
+                                                      {poolOutputName}));
 
     // Only add input tensors if connected layer is an input layer.
     // As intermediate or constant tensors will be created separately.
@@ -108,7 +122,7 @@ TosaSerializationBasicBlock* ConvertAvgPool2DIgnoreValueToTosaOperator(const Lay
     // blockInputNames/blockOutputNames for one-to-one ArmNN to TOSA mappings
     return new TosaSerializationBasicBlock(blockName, // name
                                            mainName, // region name
-                                           {opPad, opPool}, // operators
+                                           operators, // operators
                                            tensors, // tensors
                                            {padInputName}, // inputs
                                            {poolOutputName}); // outputs

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -8,6 +8,7 @@
 #include "backendsCommon/test/ActivationEndToEndTestImpl.hpp"
 #include "backendsCommon/test/AdditionEndToEndTestImpl.hpp"
 #include "backendsCommon/test/BatchMatMulEndToEndTestImpl.hpp"
+#include "backendsCommon/test/BatchSpaceOpsTestImpl.hpp"
 #include "backendsCommon/test/Convolution2dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/Convolution3dEndToEndTestImpl.hpp"
 #include "backendsCommon/test/ConcatEndToEndTestImpl.hpp"
@@ -371,6 +372,13 @@ TEST_CASE("TosaRefAddEndtoEndTestInt8")
     ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::QSymmS8>(tosaDefaultBackends, armnn::BinaryOperation::Add);
 }
 
+// Test case for corner case, duplicate tensor issue
+TEST_CASE("TosaRefAddDuplicateTensorEndtoEndTestInt8")
+{
+    ElementwiseBinarySimpleNoReshapeDuplicateTensorEndToEnd<DataType::QSymmS8>(tosaDefaultBackends,
+                                                                               armnn::BinaryOperation::Add);
+}
+
 TEST_CASE("TosaRefAddDifferentScalesEndToEndTestInt8")
 {
     ElementwiseBinarySimpleWithScalesEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, BinaryOperation::Add);
@@ -630,6 +638,16 @@ TEST_CASE("TosaRefQuantizeFromFloat16ToInt32")
 TEST_CASE("TosaRefQuantizeInt8")
 {
     QuantizationEndToEndInt8(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeInt8ToUInt8")
+{
+    QuantizationEndToEndInt8ToUInt8(tosaDefaultBackends);
+}
+
+TEST_CASE("TosaRefQuantizeUInt8ToInt8")
+{
+    QuantizationEndToEndUInt8ToInt8(tosaDefaultBackends);
 }
 
 // Dequantize
@@ -998,6 +1016,21 @@ TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt16AlignCornersNhwcTest")
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt16HalfPixelNhwcTest")
 {
     ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+}
+
+TEST_CASE("TosaRefResizeBilinearEndToEndInt8")
+{
+    ResizeBilinearEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, armnn::DataLayout::NHWC);
+}
+
+TEST_CASE("TosaRefResizeBilinearEndToEndFloat16")
+{
+    ResizeBilinearEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::DataLayout::NHWC, 0.01f);
+}
+
+TEST_CASE("TosaRefResizeBilinearEndToEndFloat32")
+{
+    ResizeBilinearEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
 }
 
 // Slice
@@ -1418,6 +1451,263 @@ TEST_CASE("TosaRefSimpleTransposeConvolution2dEndToEndFloatNhwcTest")
 TEST_CASE("TosaRefTransposeEndtoEndTestFloat32")
 {
     TransposeEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends);
+}
+
+
+TEST_CASE("TosaRefSpaceToBatchNDOperatorInputVariations")
+{
+    // based off of model that was used to test for prototyping
+    SUBCASE("Baseline")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 32, 32, 3}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // input size isn't divisible by the block size so padding is required
+    SUBCASE("WithPadding")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 31, 31, 1}, {2, 2}, {{1, 0}, {1, 0}}, tosaDefaultBackends);
+    }
+    // test where batch size is greater than 1
+    SUBCASE("BatchSize2")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {2, 16, 16, 2}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // test with non symmetric padding
+    SUBCASE("NonSymmetricPadding")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 30, 28, 1}, {2, 2}, {{2, 2}, {1, 3}}, tosaDefaultBackends);
+    }
+    // Non square block shape i.e. 2x4
+    SUBCASE("RectangularBlock")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 20, 20, 1}, {2, 4}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // high number of channels i.e. 64
+    SUBCASE("ManyChannels")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 8, 8, 64}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // input requires padding to match up with block shape
+    SUBCASE("PaddingRequiredToMatchBlock")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 3, 3, 1}, {2, 2}, {{1, 0}, {1, 0}}, tosaDefaultBackends);
+    }
+    // Smallest input for a block without needing padding
+    SUBCASE("SmallestInputForBlockShape")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 2, 2, 1}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // Odd input size and padding to make it divisible by block
+    SUBCASE("OddSpatialDimsWithPadding")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 5, 7, 1}, {2, 2}, {{1, 0}, {1, 0}}, tosaDefaultBackends);
+    }
+    // batch size more than 1 with non symmetrical padding and large block shape
+    SUBCASE("Batch2WithPadding")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {2, 15, 15, 1}, {3, 3}, {{1, 2}, {0, 3}}, tosaDefaultBackends);
+    }
+    // spatial dimensions are smaller than the initial batch dimension
+    SUBCASE("HighBatchLowSpatial")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {4, 4, 4, 1}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // padding applied to only one dimension
+    SUBCASE("SingleDimPadding")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 6, 6, 1}, {3, 3}, {{0, 0}, {1, 2}}, tosaDefaultBackends);
+    }
+    // Mimics RGB input as a test
+    SUBCASE("Channels3")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 6, 6, 3}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // Mimics RGBA input as a test
+    SUBCASE("Channels4")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 6, 6, 4}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // Large batch count test
+    SUBCASE("HighBatchCount")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {8, 16, 16, 1}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // Edge case where spatial dimension is 1
+    SUBCASE("OneDimHeight")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 1, 32, 1}, {1, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // padding applied on one side of spatial dimension only
+    SUBCASE("PaddingOnlyOnOneSide")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 30, 30, 1}, {2, 2}, {{2, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // padding applied on height only
+    SUBCASE("PaddingOnlyHeight")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 31, 32, 1}, {2, 2}, {{1, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // edge case where the block shape is [1,1], leading to no change in spatial dim
+    SUBCASE("BlockShapeOne")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 16, 16, 1}, {1, 1}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+    }
+    // Symmetric Padding with a high value (relative to the input size) 
+    SUBCASE("ExtremePadding")
+    {
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {1, 4, 4, 1}, {2, 2}, {{4, 4}, {4, 4}}, tosaDefaultBackends);
+    }
+
+}
+TEST_CASE("TosaRefBatchToSpaceNDOperatorInputVariations")
+{
+    SUBCASE("MinimalBatchToSpaceNoCrop")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {4, 1, 1, 1},         // NHWC
+            {2, 2},               // block shape
+            {{0, 0}, {0, 0}},     // no crop
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("Batch8_TwoByTwoBlock")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {8, 1, 1, 1},
+            {2, 2},
+            {{0, 0}, {0, 0}},
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("Batch8_TwoByTwoBlock_LargerSpatial")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {8, 2, 1, 1},
+            {2, 2},
+            {{0, 0}, {0, 0}},
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("NonZeroCrop_TopLeft")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {4, 2, 2, 1},
+            {2, 1},
+            {{1, 0}, {1, 0}}, // crops remove top row and left column
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("NonZeroCrop_BottomRight")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {4, 2, 2, 1},
+            {2, 1},
+            {{0, 1}, {0, 1}}, // crops remove bottom row and right column
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("NonSquareBlockShape")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {6, 2, 1, 1},
+            {3, 2},
+            {{0, 0}, {0, 0}}, // block shape 3x2
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("MultiChannelData")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {4, 2, 1, 3},
+            {2, 1},
+            {{0, 0}, {0, 0}}, // test with 3 channels
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("WideSpatialInput")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {4, 4, 4, 1},
+            {2, 2},
+            {{0, 0}, {0, 0}},
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("CropShrinksOutput")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::QAsymmS8>(
+            {4, 3, 3, 1},
+            {2, 2},
+            {{1, 1}, {1, 1}}, // crops 2 rows and 2 cols total
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("LargerBatch16")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {16, 1, 1, 1},
+            {4, 1},
+            {{0, 0}, {0, 0}}, // higher batch count
+            tosaDefaultBackends
+        );
+    }
+        SUBCASE("NoOp_Identity")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {1, 4, 4, 1},
+            {1, 1},
+            {{0, 0}, {0, 0}},
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("OneByThreeBlock")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {3, 2, 2, 1},
+            {1, 3},
+            {{0, 0}, {0, 0}},
+            tosaDefaultBackends
+        );
+    }
+
+    SUBCASE("LargerSpatialWithCrop")
+    {
+        BatchToSpaceNdEndToEnd<armnn::DataType::Float32>(
+            {4, 4, 4, 1},
+            {2, 2},
+            {{1, 0}, {0, 1}},
+            tosaDefaultBackends
+        );
+    }
 }
 
 }

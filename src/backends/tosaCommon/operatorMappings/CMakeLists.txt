@@ -1,5 +1,5 @@
 #
-# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -14,6 +14,8 @@ list(APPEND armnnTosaBackendOperators_sources
         AvgPool2DIgnoreValueOperator.cpp
         BatchMatMulOperator.hpp
         BatchMatMulOperator.cpp
+        BatchToSpaceOperator.hpp
+        BatchToSpaceOperator.cpp
         ConcatOperator.hpp
         ConcatOperator.cpp
         ConstantOperator.hpp
@@ -62,6 +64,8 @@ list(APPEND armnnTosaBackendOperators_sources
         SliceOperator.cpp
         SoftmaxOperator.hpp
         SoftmaxOperator.cpp
+        SpaceToBatchOperator.hpp
+        SpaceToBatchOperator.cpp
         StridedSliceOperator.hpp
         StridedSliceOperator.cpp
         SplitOperator.hpp

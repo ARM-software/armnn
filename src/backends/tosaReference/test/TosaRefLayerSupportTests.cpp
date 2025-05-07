@@ -480,7 +480,7 @@ TEST_CASE("IsLayerSupportedTosaReferenceRsqrtUnsupported")
                                                      reasonIfNotSupported);
 
     CHECK_EQ(supported, false);
-    CHECK_EQ(reasonIfNotSupported, "TOSA does not have INT64 or unsigned INT support for TOSARef backend");
+    CHECK_EQ(reasonIfNotSupported, "TOSA does not have INT64 support for TOSARef backend");
 }
 
 TEST_CASE("IsLayerSupportedTosaReferenceSlice")

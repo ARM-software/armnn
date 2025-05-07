@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2024 Arm Ltd. All rights reserved.
+// Copyright © 2017-2025 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -709,8 +709,55 @@ OptimizationViews ClBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                                    padLayer->GetOutputSlot().GetTensorInfo(),
                                                                    true))
                 {
-                    FoldPadIntoAveragePool2d<Pooling2dLayer>(optimizationViews, baseLayer,
+                    FoldPadLayer2d<Pooling2dLayer, Pooling2dDescriptor>(optimizationViews, baseLayer,
                                                              poolingDescriptor, padLayer);
+                    untouched.erase(baseLayer->GetGuid());
+                    untouched.erase(padLayer->GetGuid());
+                }
+            }
+        }
+        if (base.GetType() == LayerType::Convolution2d)
+        {
+            Convolution2dLayer* baseLayer = PolymorphicDowncast<Convolution2dLayer*>(&base);
+            Convolution2dDescriptor convDescriptor = baseLayer->GetParameters();
+            if (baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Pad)
+            {
+                // perform fold pad into conv2d if possible
+                PadLayer* padLayer = PolymorphicDowncast<PadLayer*>(
+                    &baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer());
+                if (padLayer->GetOutputSlot(0).GetNumConnections() == 1 &&
+                    optimizations::pad_fold::TryFoldPadIntoLayer2d<Convolution2dDescriptor>(padLayer->GetParameters(),
+                                                                   convDescriptor,
+                                                                   padLayer->GetOutputSlot().GetTensorInfo()))
+                {
+                    FoldPadLayer2d<Convolution2dLayer, Convolution2dDescriptor>(optimizationViews, baseLayer,
+                                                             convDescriptor, padLayer);
+
+                    untouched.erase(baseLayer->GetGuid());
+                    untouched.erase(padLayer->GetGuid());
+                }
+            }
+        }
+        if (base.GetType() == LayerType::DepthwiseConvolution2d)
+        {
+            DepthwiseConvolution2dLayer* baseLayer = PolymorphicDowncast<DepthwiseConvolution2dLayer*>(&base);
+            DepthwiseConvolution2dDescriptor convDescriptor = baseLayer->GetParameters();
+            if (baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer().GetType() == LayerType::Pad)
+            {
+                // perform fold pad into depthwiseconv2d if possible
+                PadLayer* padLayer = PolymorphicDowncast<PadLayer*>(
+                    &baseLayer->GetInputSlot(0).GetConnectedOutputSlot()->GetOwningLayer());
+                if (padLayer->GetOutputSlot(0).GetNumConnections() == 1 &&
+                    optimizations::pad_fold::TryFoldPadIntoLayer2d<DepthwiseConvolution2dDescriptor>(
+                                             padLayer->GetParameters(),
+                                             convDescriptor,
+                                             padLayer->GetOutputSlot().GetTensorInfo()))
+                {
+                    FoldPadLayer2d<DepthwiseConvolution2dLayer, DepthwiseConvolution2dDescriptor>(optimizationViews,
+                                                                                                  baseLayer,
+                                                                                                  convDescriptor,
+                                                                                                  padLayer);
+
                     untouched.erase(baseLayer->GetGuid());
                     untouched.erase(padLayer->GetGuid());
                 }

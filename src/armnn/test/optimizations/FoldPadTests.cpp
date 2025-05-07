@@ -1,5 +1,5 @@
 //
-// Copyright © 2022, 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -953,4 +953,385 @@ TEST_CASE("FoldPadLayerIntoDepthwiseConv2dLayer_ExecuteInferenceWithAndWithoutOp
 }
 #endif
 
+#ifdef ARMNN_TOSAREF_BACKEND_ENABLED
+
+struct PadData
+{
+    uint32_t    top      {};
+    uint32_t    bottom   {};
+    uint32_t    left     {};
+    uint32_t    right    {};
+};
+
+struct FoldOptimizationTestArgs
+{
+    uint32_t tensorH        {4};
+    uint32_t tensorW        {4};
+    uint32_t kernelH        {3};
+    uint32_t kernelW        {3};
+    PadData  pad            {};
+    uint32_t outputShape[4] {};
+    uint32_t weightShape[4] {};
+    LayerType whichLayer    {};
+
+    std::vector<float> data    {};
+    std::vector<float> weights {};
+    std::vector<float> bias    {};
+};
+
+// 
+// This creates Pool2D or Conv2D layers.
+// if 'folded' is true, padding values are added to the layer descriptor.
+//
+static IConnectableLayer*
+CreateLayer
+(
+    INetworkPtr                     &network,
+    FoldOptimizationTestArgs const  &arg,
+    bool                            folded
+)
+{
+    IConnectableLayer *opLayer{nullptr};
+
+    switch( arg.whichLayer )
+    {
+        case LayerType::Pooling2d:
+        {
+            Pooling2dDescriptor pool2dDesc{};
+            pool2dDesc.m_PoolType   = PoolingAlgorithm::Average;
+            pool2dDesc.m_PoolWidth  = arg.kernelW;
+            pool2dDesc.m_PoolHeight = arg.kernelH;
+            pool2dDesc.m_StrideX    = 1;
+            pool2dDesc.m_StrideY    = 1;
+            pool2dDesc.m_DataLayout = DataLayout::NHWC;
+            if( folded)
+            {
+                pool2dDesc.m_PadLeft    = arg.pad.left;
+                pool2dDesc.m_PadRight   = arg.pad.right;
+                pool2dDesc.m_PadTop     = arg.pad.top;
+                pool2dDesc.m_PadBottom  = arg.pad.bottom;
+            }
+            
+            opLayer = network->AddPooling2dLayer(pool2dDesc, "Pool2D");
+        }
+        break;
+
+        case LayerType::Convolution2d:
+        {
+            Convolution2dDescriptor desc{};
+            desc.m_DataLayout  = DataLayout::NHWC;
+            desc.m_StrideX     = 1;
+            desc.m_StrideY     = 1;
+            desc.m_BiasEnabled = true;
+            if( folded)
+            {
+                desc.m_PadLeft    = arg.pad.left;
+                desc.m_PadRight   = arg.pad.right;
+                desc.m_PadTop     = arg.pad.top;
+                desc.m_PadBottom  = arg.pad.bottom;
+            }
+            opLayer = network->AddConvolution2dLayer(desc, "Conv2D");
+
+            TensorInfo  weightsInfo(4, arg.weightShape, DataType::Float32, 1.0f, 0, true);
+            ConstTensor weights(weightsInfo, arg.weights);
+            auto        weightsLayer = network->AddConstantLayer(weights, "Weights");
+            weightsLayer->GetOutputSlot(0).SetTensorInfo(weights.GetInfo());
+            weightsLayer->GetOutputSlot(0).Connect(opLayer->GetInputSlot(1));
+
+            TensorInfo  biasInfo({1}, DataType::Float32, 1.0f, 0, true);
+            ConstTensor bias(biasInfo, arg.bias);
+            auto        biasLayer = network->AddConstantLayer(bias, "Bias");
+            biasLayer->GetOutputSlot(0).SetTensorInfo(bias.GetInfo());
+            biasLayer->GetOutputSlot(0).Connect(opLayer->GetInputSlot(2));
+        }
+        break;
+        
+        default:
+        {
+            throw armnn::InvalidArgumentException( "Unexpected layer type!");
+        }
+    }
+        
+    return opLayer;
+}
+
+//
+// This builds and run the following model
+// Input-> (Pool2D | Conv2D with padding) -> Output
+//
+static bool 
+BuildAndRunFoldedNetwork
+( 
+    FoldOptimizationTestArgs const &arg
+)
+{
+    bool ok{false};
+    try
+    {
+        auto network    = INetwork::Create();
+
+        // add input layer
+        auto inputLayer = network->AddInputLayer(0, "input");
+        {
+            const uint32_t  inputShape[]  = {1, arg.tensorH, arg.tensorW, 1};
+            TensorInfo      inputInfo(4, inputShape, DataType::Float32);
+            inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+        }
+
+        //create the op layer
+        IConnectableLayer *opLayer{ CreateLayer(network, arg, true) };
+        TensorInfo outputInfo(4, arg.outputShape, DataType::Float32);
+        opLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+        
+        auto outputLayer = network->AddOutputLayer(0,"output");
+
+        // connect the layers
+        inputLayer->GetOutputSlot(0).Connect(opLayer->GetInputSlot(0));
+        opLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+        
+        // init runtime and load net
+        IRuntimePtr          runTime          = IRuntime::Create(IRuntime::CreationOptions());    // default options
+        IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, {Compute::TosaRef}, runTime->GetDeviceSpec());
+        NetworkId            netid{};
+        CHECK(runTime->LoadNetwork(netid, std::move(optimizedNetwork)) == Status::Success);
+
+        // setup input tensor
+        TensorInfo inputTensorInfo = runTime->GetInputTensorInfo(netid, 0);
+        inputTensorInfo.SetConstant(true);
+        InputTensors inTensor{{0, ConstTensor(inputTensorInfo, arg.data.data())}};
+
+        // setup output tensor
+        int outSize = arg.outputShape[0] * arg.outputShape[1] * arg.outputShape[2] * arg.outputShape[3];
+        std::vector<float> output(outSize, 0);
+        OutputTensors       outTensor{{0, Tensor(outputInfo, output.data())}};
+
+        // run the net
+        runTime->EnqueueWorkload(netid, inTensor, outTensor);
+        runTime->UnloadNetwork(netid);
+        ok = true;
+    }
+    catch (const std::exception& e)
+    {
+        // ignore the exception, false will be returned
+        std::ignore = e;
+    }
+    return ok;
+}
+
+//
+// This builds and runs the following model
+// Input-> Pad ->(Pool2D | Conv2D ) -> Output
+//
+static bool 
+BuildAndRunNetwork
+(
+    FoldOptimizationTestArgs const   &arg
+)
+{
+    bool ok{false};
+    try
+    {
+        auto network    = INetwork::Create();
+
+        // add input layer
+        auto inputLayer = network->AddInputLayer(0, "input");
+        {
+            const uint32_t  inputShape[]  = {1, arg.tensorH, arg.tensorW, 1};
+            TensorInfo      inputInfo(4, inputShape, DataType::Float32);
+            inputLayer->GetOutputSlot(0).SetTensorInfo(inputInfo);
+        }
+
+        // add pad layer
+        PadDescriptor padDesc({ {0, 0},
+                                {arg.pad.top, arg.pad.bottom},
+                                {arg.pad.left, arg.pad.right},
+                                {0, 0}
+                            });
+        auto padLayer = network->AddPadLayer(padDesc, "Pad");
+
+        {
+            uint32_t        padedH      = arg.tensorH + arg.pad.top  + arg.pad.bottom;
+            uint32_t        padedW      = arg.tensorW + arg.pad.left + arg.pad.right;
+            const uint32_t  padShape[]  = {1, padedH, padedW, 1};
+            TensorInfo      padInfo(4, padShape, DataType::Float32);
+            padLayer->GetOutputSlot(0).SetTensorInfo(padInfo);
+        }
+        
+         //create the op layer
+        IConnectableLayer   *opLayer{ CreateLayer(network, arg, false) };
+        TensorInfo          outputInfo(4, arg.outputShape, DataType::Float32);
+        opLayer->GetOutputSlot(0).SetTensorInfo(outputInfo);
+        
+        auto outputLayer = network->AddOutputLayer(0,"output");
+
+        // connect the layers
+        inputLayer->GetOutputSlot(0).Connect(padLayer->GetInputSlot(0));
+        padLayer->GetOutputSlot(0).Connect(opLayer->GetInputSlot(0));
+        opLayer->GetOutputSlot(0).Connect(outputLayer->GetInputSlot(0));
+        
+        // init runtime and load net
+        IRuntimePtr          runTime          = IRuntime::Create(IRuntime::CreationOptions());    // default options
+        IOptimizedNetworkPtr optimizedNetwork = Optimize(*network, {Compute::TosaRef}, runTime->GetDeviceSpec());
+        NetworkId            netid{};
+        CHECK(runTime->LoadNetwork(netid, std::move(optimizedNetwork)) == Status::Success);
+
+        // setup input tensor
+        TensorInfo inputTensorInfo = runTime->GetInputTensorInfo(netid, 0);
+        inputTensorInfo.SetConstant(true);
+        InputTensors inTensor{{0, ConstTensor(inputTensorInfo, arg.data.data())}};
+
+        // setup output tensor
+        int outSize = arg.outputShape[0] * arg.outputShape[1] * arg.outputShape[2] * arg.outputShape[3];
+        std::vector<float> output(outSize, 0);
+        OutputTensors       outTensor{{0, Tensor(outputInfo, output.data())}};
+
+        // run the net
+        runTime->EnqueueWorkload(netid, inTensor, outTensor);
+        runTime->UnloadNetwork(netid);
+        ok = true;
+    }
+    catch (const std::exception& e)
+    {
+        // there shouldn't be any exception 
+        std::cerr << e.what() << std::endl;
+        ARMNN_ASSERT_MSG(false, e.what());
+    }
+    return ok;
+}
+
+TEST_CASE("TosaRef_PadFoldingVerification")
+{
+    auto ToStr = [](PadData const &p) -> std::string
+    {
+        std::stringstream stm;
+        stm << "["  << p.top;
+        stm << ", " << p.bottom;
+        stm << ", " << p.left;
+        stm << ", " << p.right<<"]";
+        return stm.str();
+    };
+
+    auto CalcOutputShape = [](FoldOptimizationTestArgs &a )
+    {
+        a.outputShape[0] = 1;
+        a.outputShape[1] = (a.tensorH + a.pad.top + a.pad.bottom- a.kernelH ) / 1 + 1;
+        a.outputShape[2] = (a.tensorW + a.pad.left + a.pad.right- a.kernelW ) / 1 + 1;
+        a.outputShape[3] = 1;
+    };
+
+    FoldOptimizationTestArgs args{};
+
+
+    // dummy input data, shape (1,4,4,1)
+    args.data = {  
+        20.0f, 21.0f, 22.0f, 23.0f,
+        30.0f, 31.0f, 32.0f, 33.0f,
+        40.0f, 41.0f, 42.0f, 43.0f,
+        50.0f, 51.0f, 52.0f, 53.0f
+    };
+
+     // CoutHWCin
+     args.weightShape[0] = 1;
+     args.weightShape[1] = 3;
+     args.weightShape[2] = 3;
+     args.weightShape[3] = 1;
+
+    // dummy weights
+    args.weights = {  
+        2.0f,3.0f,4.0f,
+        5.0f,6.0f,7.0f,
+        8.0f,9.0f,1.0f
+    };
+
+    // dummy bias
+    args.bias = {  
+        1.0f
+    };
+
+    SUBCASE("Pool2D_AsymetricPadding") 
+    {
+        // asymetric padding but both (folded & non-folded) should pass
+        PadData           padValue{ 1,2,1,2};
+        args.pad        = padValue;
+        args.whichLayer = LayerType::Pooling2d;
+
+        CalcOutputShape(args);
+
+        bool foldedRunState = BuildAndRunFoldedNetwork( args );
+        bool nonFoldedState = BuildAndRunNetwork(args);
+
+        CHECK_MESSAGE( foldedRunState == true, ToStr(padValue) );
+        CHECK_MESSAGE( nonFoldedState == true, ToStr(padValue) );
+    }
+
+    SUBCASE("Pool2D_KernelSizePad") 
+    {
+        // There is a pad value which is as big as the pool2d-kernel.
+        std::vector<PadData> padVec{
+            {1,1,1,3},
+            {2,2,3,3},
+            {2,3,1,0},
+            {3,0,1,0}
+        };
+
+        args.whichLayer = LayerType::Pooling2d;
+
+        for( auto& pad : padVec )
+        {
+            args.pad = pad;
+            CalcOutputShape(args);
+        
+            // This should pass, no folding
+            bool nonFoldedState = BuildAndRunNetwork(args);
+            CHECK_MESSAGE( nonFoldedState == true, ToStr(pad) );
+
+            // This will fail tosa validation as pad size >= kernel size
+            // Pad->Pool2D folding can be enabled, if pad size < kernel size
+            bool foldedRunState = BuildAndRunFoldedNetwork( args );
+            CHECK_MESSAGE( foldedRunState == false, ToStr(pad) );
+        }
+    }
+
+    SUBCASE("Conv2D") 
+    {
+        std::vector<PadData> padVec{};
+
+        // kernel size is 3.
+        uint32_t padrange[]{2,3,7};
+
+        // generate mixed pad value combinations.
+        for( auto top: padrange )
+        {   
+            for( auto bottom: padrange)
+            {
+                for( auto left: padrange)
+                {
+                    for( auto right: padrange)
+                    {
+                        PadData pd{top, bottom, left, right};
+                        padVec.emplace_back( pd );
+                    }
+                }
+            }
+        }
+
+        args.whichLayer = LayerType::Convolution2d;
+
+        for( auto& pad : padVec )
+        {
+            args.pad = pad;
+            CalcOutputShape(args);
+        
+            // This should pass, no folding.
+            bool nonFoldedState = BuildAndRunNetwork(args);
+            CHECK_MESSAGE( nonFoldedState == true, ToStr(pad) );
+
+            // This passes. 
+            // It seems the Pad-Conv2D folding optimization can be enabled
+            bool foldedRunState = BuildAndRunFoldedNetwork(args);
+            CHECK_MESSAGE( foldedRunState == true, ToStr(pad) );
+        }
+    }
+}
+#endif //ARMNN_TOSAREF_BACKEND_ENABLED
 }

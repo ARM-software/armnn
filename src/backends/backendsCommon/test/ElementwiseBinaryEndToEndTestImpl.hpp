@@ -34,14 +34,52 @@ INetworkPtr CreateElementwiseBinaryNetwork(const TensorShape& input1Shape,
     TensorInfo input2TensorInfo(input2Shape, ArmnnTypeInput, qScale, qOffset, true);
     TensorInfo outputTensorInfo(outputShape, ArmnnTypeInput, qScale, qOffset);
 
-    IConnectableLayer* input1 = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(0));
-    IConnectableLayer* input2 = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(1));
+    IConnectableLayer* input1                 = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(0));
+    IConnectableLayer* input2                 = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(1));
     IConnectableLayer* elementwiseBinaryLayer = net->AddElementwiseBinaryLayer(operation, "elementwiseUnary");
-    IConnectableLayer* output = net->AddOutputLayer(0, "output");
+    IConnectableLayer* output                 = net->AddOutputLayer(0, "output");
 
     Connect(input1, elementwiseBinaryLayer, input1TensorInfo, 0, 0);
     Connect(input2, elementwiseBinaryLayer, input2TensorInfo, 0, 1);
     Connect(elementwiseBinaryLayer, output, outputTensorInfo, 0, 0);
+
+    return net;
+}
+
+// Test case for corner case : Duplicate tensor
+template<armnn::DataType ArmnnTypeInput>
+INetworkPtr CreateElementwiseDuplicateTensorBinaryNetwork(const TensorShape& inputShape,
+                                                          BinaryOperation operation,
+                                                          const float qScale = 1.0f,
+                                                          const int32_t qOffset = 0)
+{
+    using namespace armnn;
+    INetworkPtr net(INetwork::Create());
+
+    // Create the TensorInfos
+    TensorInfo inputInfo     (inputShape,  ArmnnTypeInput, qScale, qOffset, true);
+    TensorInfo outputInfo    (inputShape,  ArmnnTypeInput, qScale, qOffset);
+
+    // Build layers
+    IConnectableLayer* input    = net->AddInputLayer(armnn::numeric_cast<LayerBindingId>(0), "input");
+
+    // Add layers
+    IConnectableLayer* elementwiseBinaryLayer1  = net->AddElementwiseBinaryLayer(operation, "elementwiseUnary1");
+    IConnectableLayer* elementwiseBinaryLayer2  = net->AddElementwiseBinaryLayer(operation, "elementwiseUnary2");
+
+    // Output layer
+    IConnectableLayer* outLayer   = net->AddOutputLayer(0, "output");
+
+    // Connecting same input to both inputs
+    Connect(input,   elementwiseBinaryLayer1,  inputInfo, 0, 0);
+    Connect(input,   elementwiseBinaryLayer1,  inputInfo, 0, 1);
+
+    // Connecting output of first Add layer to next Add layer
+    Connect(elementwiseBinaryLayer1, elementwiseBinaryLayer2, inputInfo,  0, 0);
+    Connect(input,   elementwiseBinaryLayer2, inputInfo,  0, 1);
+
+    // Output layer
+    Connect(elementwiseBinaryLayer2,  outLayer, outputInfo,  0, 0);
 
     return net;
 }
@@ -327,6 +365,44 @@ void ElementwiseBinarySimpleNoReshapeEndToEnd(const std::vector<BackendId>& back
     std::vector<TInput> qExpectedOutput = armnnUtils::QuantizedVector<TInput>(expectedOutput_const, qScale, qOffset);
 
     std::map<int, std::vector<TInput>> inputTensorData    = {{ 0, qInput1Data }, { 1, qInput2Data }};
+    std::map<int, std::vector<TInput>> expectedOutputData = {{ 0, qExpectedOutput }};
+
+    EndToEndLayerTestImpl<ArmnnInType, ArmnnInType>(std::move(net), inputTensorData, expectedOutputData, backends);
+}
+
+// Test case for corner case : Duplicate tensor issue
+template<armnn::DataType ArmnnInType, typename TInput = armnn::ResolveType<ArmnnInType>>
+void ElementwiseBinarySimpleNoReshapeDuplicateTensorEndToEnd(const std::vector<BackendId>& backends,
+                                                             BinaryOperation operation)
+{
+    using namespace armnn;
+
+    const float   qScale  = 1.0f;
+    const int32_t qOffset = 0;
+
+    // Both input and output shapes are same
+    const TensorShape& inputShape  = { 2, 2, 2, 2 };
+
+    // Builds up the structure of the network
+    INetworkPtr net = CreateElementwiseDuplicateTensorBinaryNetwork<ArmnnInType>(inputShape,
+                                                                                 operation,
+                                                                                 qScale,
+                                                                                 qOffset);
+
+    CHECK(net);
+
+    // Define input data for 1 row, 1 channel, height 2, width 1
+    const std::vector<float> input = { 1, -1, 1, 1,  5, -5, 5, 5,  -3, 3, 3, 3,  4, 4, -4, 4 };
+
+    // Expected output after applying transpose and the operation
+    const std::vector<float> expectedOutput = { 3, -3, 3, 3, 15, -15, 15, 15, -9, 9, 9, 9, 12, 12, -12, 12};
+
+    // Quantize data
+    std::vector<TInput> qInput1Data     = armnnUtils::QuantizedVector<TInput>(input, qScale, qOffset);
+    std::vector<TInput> qExpectedOutput = armnnUtils::QuantizedVector<TInput>(expectedOutput, qScale, qOffset);
+
+    // Only input is provided
+    std::map<int, std::vector<TInput>> inputTensorData    = {{ 0, qInput1Data }};
     std::map<int, std::vector<TInput>> expectedOutputData = {{ 0, qExpectedOutput }};
 
     EndToEndLayerTestImpl<ArmnnInType, ArmnnInType>(std::move(net), inputTensorData, expectedOutputData, backends);

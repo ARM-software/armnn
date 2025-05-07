@@ -5,6 +5,8 @@
 
 #include "TosaMappings.hpp"
 #include "tosaCommon/operatorMappings/PReluOperator.hpp"
+#include "tosaCommon/operatorMappings/BatchToSpaceOperator.hpp"
+#include "tosaCommon/operatorMappings/SpaceToBatchOperator.hpp"
 
 using namespace armnn;
 using namespace tosa;
@@ -104,6 +106,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         {
             auto batchMatMulDesc = PolymorphicDowncast<const BatchMatMulDescriptor*>(&descriptor);
             return ConvertBatchMatMulToTosaOperator(layer, inputs, outputs, batchMatMulDesc);
+        }
+        case LayerType::BatchToSpaceNd:
+        {
+            auto batchToSpaceDesc = PolymorphicDowncast<const BatchToSpaceNdDescriptor*>(&descriptor);
+            return ConvertBatchToSpaceToTosaOperator(layer, inputs, outputs, batchToSpaceDesc);
         }
         case LayerType::Concat:
         {
@@ -234,6 +241,11 @@ TosaSerializationBasicBlock* GetTosaMapping(const Layer* layer,
         {
             auto splitDesc = PolymorphicDowncast<const SplitterDescriptor*>(&descriptor);
             return ConvertSplitToTosaOperator(layer, inputs, outputs, splitDesc);
+        }
+        case LayerType::SpaceToBatchNd:
+        {
+            auto spaceToBatchDesc = PolymorphicDowncast<const SpaceToBatchNdDescriptor*>(&descriptor);
+            return ConvertSpaceToBatchToTosaOperator(layer, inputs, outputs, spaceToBatchDesc);
         }
         case LayerType::Stack:
         {

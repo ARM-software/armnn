@@ -79,41 +79,6 @@ IBackendInternal::ILayerSupportSharedPtr TosaRefBackend::GetLayerSupport() const
     return layerSupport;
 }
 
-static void LayerToTosaMappings(const Layer& base,
-                                std::vector<std::string>& graphInputs,
-                                std::vector<std::string>& graphOutputs,
-                                std::vector<TosaSerializationOperator*>& operators,
-                                std::vector<TosaSerializationTensor*>& tensors)
-{
-    tosa::TosaSerializationBasicBlock* mappings = GetTosaMappingFromLayer(&base);
-
-    // Loop through inputs to see if there are any graph inputs, if so save them.
-    // If it's an input to the graph "input" can be found in the string.
-    for (const std::string& blockInputName : mappings->GetInputs())
-    {
-        if (blockInputName.find("input") != std::string::npos)
-        {
-            graphInputs.push_back(blockInputName);
-        }
-    }
-
-    // Loop through outputs to see if there are any graph outputs, if so save them.
-    // If it's an output to the graph "output" can be found in the string.
-    for (const std::string& blockOutputName : mappings->GetOutputs())
-    {
-        if (blockOutputName.find("output") != std::string::npos)
-        {
-            graphOutputs.push_back(blockOutputName);
-        }
-    }
-
-    auto blockOperators = mappings->GetOperators();
-    operators.insert(operators.end(), blockOperators.begin(), blockOperators.end());
-
-    auto blockTensors = mappings->GetTensors();
-    tensors.insert(tensors.end(), blockTensors.begin(), blockTensors.end());
-}
-
 OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgraph,
                                                        const ModelOptions& modelOptions) const
 {
@@ -123,57 +88,72 @@ OptimizationViews TosaRefBackend::OptimizeSubgraphView(const SubgraphView& subgr
 
     std::vector<std::string> graphInputs;
     std::vector<std::string> graphOutputs;
-
     std::vector<TosaSerializationOperator*> operators;
     std::vector<TosaSerializationTensor*> tensors;
+    OpBlockSequencer<Layer, TosaSerializationBasicBlock> sequencer;
 
-    bool graphContainsBroadcastReshape = false;
+    // These sets are created to check the duplication of tensor and input
+    std::unordered_set<std::string> graphInputsSet;
+    std::unordered_set<std::string> uniqueTensorNamesSet;
 
     auto it = subgraph.begin();
     while (it != subgraph.end())
     {
         Layer& base = *(PolymorphicDowncast<Layer*>(*it));
+        ++it;
 
         if (base.GetType() == LayerType::Input ||
             base.GetType() == LayerType::Output)
         {
-            ++it;
             continue;
         }
 
-        bool baseContainsBroadcastReshape = false;
-        if (base.GetType() == LayerType::ElementwiseBinary)
-        {
-            auto nextIt = it;
-            if (++nextIt != subgraph.end())
-            {
-                Layer& nextLayer = *(PolymorphicDowncast<Layer*>(*(nextIt)));
+        TosaSerializationBasicBlock* mappings = GetTosaMappingFromLayer(&base);
 
-                for (uint32_t i = 0; i < base.GetNumInputSlots(); i++)
-                {
-                    const auto& parentLayer = base.GetInputSlot(i).GetConnectedOutputSlot()->GetOwningLayer();
-                    if (parentLayer.GetType() == LayerType::Reshape && &parentLayer == &nextLayer)
-                    {
-                        LayerToTosaMappings(nextLayer, graphInputs, graphOutputs, operators, tensors);
-                        graphContainsBroadcastReshape = true;
-                        baseContainsBroadcastReshape = true;
-                    }
-                }
+        // Loop through inputs to see if there are any graph inputs, if so save them.
+        // If it's an input to the graph "input" can be found in the string.
+        for (const std::string& blockInputName : mappings->GetInputs())
+        {
+            if ((blockInputName.find("input") != std::string::npos) && !graphInputsSet.count(blockInputName))
+            {
+                graphInputs.push_back(blockInputName);
+                graphInputsSet.insert(blockInputName);
             }
         }
 
-        LayerToTosaMappings(base, graphInputs, graphOutputs, operators, tensors);
-
-        ++it;
-        if (baseContainsBroadcastReshape)
+        // Loop through outputs to see if there are any graph outputs, if so save them.
+        // If it's an output to the graph "output" can be found in the string.
+        for (const std::string& blockOutputName : mappings->GetOutputs())
         {
-            ++it;
+            if (blockOutputName.find("output") != std::string::npos)
+            {
+                graphOutputs.push_back(blockOutputName);
+            }
         }
+
+        sequencer.Add(&base, mappings);
     }
 
-    if (graphContainsBroadcastReshape)
+    for (auto & pair : sequencer.Finish())
     {
-        std::sort(graphInputs.begin(),graphInputs.end());
+        auto blockOperators = pair.block->GetOperators();
+        operators.insert(operators.end(), blockOperators.begin(), blockOperators.end());
+
+        auto blockTensors = pair.block->GetTensors();
+
+        // Checking for duplicate tensors, to handle special cases where same input is
+        // added to different layer in the architecture.
+        for (const auto& tensor : blockTensors)
+        {
+            const std::string& name = tensor->GetName();
+
+            // If the input tensor is already present, we don't need to add to the list
+            if (!uniqueTensorNamesSet.count(name))
+            {
+                uniqueTensorNamesSet.insert(name);
+                tensors.push_back(tensor);
+            }
+        }
     }
 
     // Add all mappings to main block.

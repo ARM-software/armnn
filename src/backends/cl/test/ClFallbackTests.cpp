@@ -456,6 +456,8 @@ TEST_CASE("ClImportDisableFallbackSubgraphToNeon")
     INetworkPtr net(INetwork::Create());
 
     Pooling2dDescriptor desc;
+    desc.m_StrideX = 0;
+    desc.m_StrideY = 0;
 
     IConnectableLayer* input0 = net->AddInputLayer(0, "input0");
     IConnectableLayer* input1 = net->AddInputLayer(1, "input1");

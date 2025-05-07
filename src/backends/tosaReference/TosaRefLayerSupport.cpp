@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,10 +27,19 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
 {
     for (const auto& info : infos)
     {
-        if (info.GetDataType() == DataType::Signed64 ||
-            info.GetDataType() == DataType::QAsymmU8)
+        if (info.GetDataType() == DataType::Signed64)
         {
-            reasonIfUnsupported.value() = "TOSA does not have INT64 or unsigned INT support for TOSARef backend";
+            reasonIfUnsupported.value() = "TOSA does not have INT64 support for TOSARef backend";
+            return false;
+        }
+
+        // ArmNN U8 tensors are supported for TOSA if they are followed or preceeded by a Quantize layer
+        if (info.GetDataType() == DataType::QAsymmU8 &&
+            type != LayerType::Input &&
+            type != LayerType::Quantize &&
+            type != LayerType::Output)
+        {
+            reasonIfUnsupported.value() = "Must use a Quantize layer to/from unsigned INT for TOSARef backend";
             return false;
         }
     }
@@ -135,6 +144,8 @@ bool TosaRefLayerSupport::IsLayerSupported(const LayerType& type,
         case LayerType::Softmax:
         case LayerType::StridedSlice:
         case LayerType::Transpose:
+        case LayerType::BatchToSpaceNd:
+        case LayerType::SpaceToBatchNd:
         {
             inputInfos.push_back(&infos[0]);
             outputInfos.push_back(&infos[1]);

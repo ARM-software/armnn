@@ -1,11 +1,13 @@
 //
-// Copyright © 2022 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #pragma once
 
 #include <armnn/Version.hpp>
+
+#include <cstdint>
 
 namespace arm
 {

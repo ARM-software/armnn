@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -23,8 +23,8 @@ void VerifySoftmax(TosaSerializationBasicBlock* softmaxBlock,
     CHECK(softmaxBlock->GetName().find(blockStr)  != std::string::npos);
     CHECK(softmaxBlock->GetInputs().size() == 1);
     CHECK(softmaxBlock->GetOutputs().size() == 1);
-    CHECK(softmaxBlock->GetOperators().size() == 56);
-    CHECK(softmaxBlock->GetTensors().size() == 57);
+    CHECK(softmaxBlock->GetOperators().size() == 58);
+    CHECK(softmaxBlock->GetTensors().size() == 59);
 
     TosaSerializationOperator* rescaleOp = softmaxBlock->GetOperators().at(0);
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 //
@@ -89,6 +89,8 @@ TosaSerializationBasicBlock* ConvertSoftmaxToTosaOperator(const Layer* layer,
     std::string outputNameMul11 = std::string("layer_intermediate37_") + GetUniqueTosaMappingID();
     std::string outputNameSub6 = std::string("layer_intermediate38_") + GetUniqueTosaMappingID();
     std::string outputNameArithmeticR3 = std::string("layer_intermediate39_") + GetUniqueTosaMappingID();
+    std::string inputMinConst = std::string("layer_intermediate40_const_") + GetUniqueTosaMappingID();
+    std::string outputShiftMin = std::string("layer_intermediate40_min_") + GetUniqueTosaMappingID();
 
     // If a layer is present then the block will be used for execution, so input and output names need to be determined
     // using the previous and following layers so the graph is connected correctly. For validation this doesn't matter.
@@ -534,10 +536,22 @@ TosaSerializationBasicBlock* ConvertSoftmaxToTosaOperator(const Layer* layer,
     tensors.push_back(new TosaSerializationTensor(outputNameSub6, reduceShape, DType_INT32, {}));
     operators.push_back(subOp6);
 
+    TosaSerializationHandler::ConvertI32toU8({31}, uint8Data);
+    tensors.push_back(new TosaSerializationTensor(inputMinConst, singleValueShape, DType_INT32,uint8Data));
+    operators.push_back(new TosaSerializationOperator(Op_CONST, Attribute_NONE, nullptr,{}, {inputMinConst}));
+
+    auto* minOp = new TosaSerializationOperator(Op_MINIMUM,
+                                                Attribute_NONE, nullptr,
+                                                {outputNameSub6,inputMinConst},
+                                                {outputShiftMin});
+
+    tensors.push_back(new TosaSerializationTensor(outputShiftMin, reduceShape, DType_INT32, {}));
+    operators.push_back(minOp);
+
     auto* arithmeticROp3 = new TosaSerializationOperator(Op_ARITHMETIC_RIGHT_SHIFT,
                                                          Attribute_ArithmeticRightShiftAttribute,
                                                          &shiftRAttribute,
-                                                         {outputNameMul11, outputNameSub6},
+                                                         {outputNameMul11, outputShiftMin},
                                                          {outputNameArithmeticR3});
     tensors.push_back(new TosaSerializationTensor(outputNameArithmeticR3, outputShape0, DType_INT32, {}));
     operators.push_back(arithmeticROp3);

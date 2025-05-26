@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="96d6de4345661e2c80e35ee42e9a056324bb923a" #only use GEMM stateless exec for fixed-format
+DEFAULT_CLFRAMEWORKREVISION="eb10c12c0c2b383354baeae41ce7e1166683d08a" # fix: a64_hgemm_8x24: Fix over-eager read ahead of operands.
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

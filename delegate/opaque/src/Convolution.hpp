@@ -881,6 +881,16 @@ TfLiteStatus VisitTransposeConv2dOperator(DelegateData& delegateData,
         {
             biasIsConst = WillInputBeOptimizedToConst(tfLiteContext, inputTensors[3]);
         }
+        // At this point if the bias isn't going to be a const tensor we're in trouble. Calls to
+        // AddTransposeConvolution2dLayer expect only optional ConstTensor.
+        if(!biasIsConst)
+        {
+            TF_LITE_OPAQUE_MAYBE_KERNEL_LOG(
+                tfLiteContext,
+                "TfLiteArmnnOpaqueDelegate: Non constant bias found in TransposeConv2d, node #%d: ",
+                nodeIndex);
+            return kTfLiteError;
+        }
         optionalBiasInfoCopy.value().SetConstant(biasIsConst);
     }
 

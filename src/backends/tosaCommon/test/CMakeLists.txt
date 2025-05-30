@@ -6,6 +6,7 @@
 list(APPEND armnnTosaBackendUnitTests_sources
         OneToManyMappingTests.cpp
         OneToOneMappingTests.cpp
+        OneToManyMappingOperatorTests.cpp
     )
 
 add_library(armnnTosaBackendUnitTests OBJECT ${armnnTosaBackendUnitTests_sources})

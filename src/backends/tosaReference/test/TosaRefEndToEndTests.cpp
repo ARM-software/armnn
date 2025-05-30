@@ -47,34 +47,58 @@ static std::vector<BackendId> tosaDefaultBackends = { "TosaRef" };
 // LeakyRelu
 TEST_CASE("TosaRefLeakyReluActivationFloat32")
 {
-    ActivationEndToEndTest<DataType::Float32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
+    ActivationEndToEndTest<DataType::Float32>(tosaDefaultBackends,
+                                              ActivationFunction::LeakyReLu,
+                                              1.f,
+                                              0,
+                                              0.01f);
 }
 
 TEST_CASE("TosaRefLeakyReluActivationFloat16")
 {
-    ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.3f, 5, 0.01f);
+    ActivationEndToEndTest<DataType::Float16>(tosaDefaultBackends,
+                                              ActivationFunction::LeakyReLu,
+                                              0.3f,
+                                              5,
+                                              0.01f);
 }
 
 TEST_CASE("TosaRefLeakyReluActivationInt32")
 {
-    ActivationEndToEndTest<DataType::Signed32>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.15f, 0, 0.01f);
+    ActivationEndToEndTest<DataType::Signed32>(tosaDefaultBackends,
+                                               ActivationFunction::LeakyReLu,
+                                               0.15f,
+                                               0,
+                                               0.01f);
 }
 
 TEST_CASE("TosaRefLeakyReluActivationInt16")
 {
-    ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.35f, 0, 0.01f);
+    ActivationEndToEndTest<DataType::QSymmS16>(tosaDefaultBackends,
+                                               ActivationFunction::LeakyReLu,
+                                               0.35f,
+                                               0,
+                                               0.01f);
 }
 
 TEST_CASE("TosaRefLeakyReluActivationInt8")
 {
-    ActivationEndToEndTest<DataType::QAsymmS8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 0.6f, 7, 0.01f);
+    ActivationEndToEndTest<DataType::QAsymmS8>(tosaDefaultBackends,
+                                               ActivationFunction::LeakyReLu,
+                                               0.6f,
+                                               7,
+                                               0.01f);
 }
 
 TEST_CASE("UNSUPPORTED_ActivationUInt8")
 {
     try
     {
-        ActivationEndToEndTest<DataType::QAsymmU8>(tosaDefaultBackends, ActivationFunction::LeakyReLu, 1.f, 0, 0.01f);
+        ActivationEndToEndTest<DataType::QAsymmU8>(tosaDefaultBackends,
+                                                   ActivationFunction::LeakyReLu,
+                                                   1.f,
+                                                   0,
+                                                   0.01f);
         FAIL("An exception should have been thrown");
     }
     catch (armnn::Exception& e)
@@ -346,17 +370,207 @@ TEST_CASE("TosaRefConvolution3dInt8Test")
                                                                               armnn::DataLayout::NDHWC);
 }
 
-// DepthwiseConv2d
+// Test case for end-to-end testing of DepthwiseConvolution2d with float32 data type
 TEST_CASE("TosaRefDepthwiseConv2dEndtoEndTestInt8")
 {
-    DepthwiseConvolution2dEndToEnd<armnn::DataType::QSymmS8,
-                                   armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC);
-}
+    // More test cases shall be added for DepthwiseConvolution2d, by changing
+    // descriptor parameters like stride, padding, dilation, etc. And also quantization values.
 
-TEST_CASE("TosaRefDepthwiseConv2dEndtoEndTestInt8BiasDisabled")
-{
-    DepthwiseConvolution2dEndToEnd<armnn::DataType::QSymmS8,
-                                   armnn::DataType::Signed32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false);
+    // Common input data for all DepthwiseConv2d tests
+    // The input data is a 4x4x2x2 tensor with 2 channels.
+    // The input data is designed to have a pattern that allows for easy verification of the output.
+    // This input data does not cover the corner cases of the DepthwiseConv2d operator.
+    std::vector<float> inputData =
+        {
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f
+        };
+
+    SUBCASE("Baseline")
+    {
+        // Baseline test for DepthwiseConv2dEndToEnd with Int8 data type
+
+        // Layer attributes
+        DepthwiseConvolution2dDescriptor descriptor;
+        descriptor.m_PadLeft     = 0;
+        descriptor.m_PadRight    = 0;
+        descriptor.m_PadTop      = 1;
+        descriptor.m_PadBottom   = 1;
+        descriptor.m_StrideX     = 1;
+        descriptor.m_StrideY     = 1;
+        descriptor.m_BiasEnabled = true;
+        descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+        // Expected output data
+        std::vector<float> expectedOutputData = std::vector<float>(
+        {
+            3.0f,  4.5f,  2.0f,  1.0f,  3.0f,  4.5f,  3.0f,  1.0f,  3.0f,  4.5f,  4.0f,  3.0f,  3.0f,  4.5f,
+            1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
+            3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,
+            1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
+            3.0f,  5.5f,  3.0f,  2.0f,  3.0f,  5.5f,  4.0f,  2.0f,  3.0f,  5.5f,  5.0f,  4.0f,  3.0f,  5.5f,
+            1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
+
+            3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,
+            1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
+            5.0f,  6.5f,  3.0f,  2.0f,  5.0f,  6.5f,  4.0f,  2.0f,  5.0f,  6.5f,  5.0f,  4.0f,  5.0f,  6.5f,
+            1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
+            5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,
+            1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
+
+            5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+            5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+            5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+
+            5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+            5.0f,  8.0f,  3.0f,  2.0f,  5.0f,  8.0f,  4.0f,  2.0f,  5.0f,  8.0f,  5.0f,  4.0f,  5.0f,  8.0f,
+            1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,
+            5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,
+            1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f
+        } );
+
+        // Run the end-to-end test for DepthwiseConv2d with Int8 data type
+        DepthwiseConvolution2dEndToEnd<armnn::DataType::QSymmS8,
+                                   armnn::DataType::Signed32>(tosaDefaultBackends,
+                                                              descriptor,
+                                                              inputData,
+                                                              expectedOutputData);
+
+    }
+    SUBCASE("NoBias")
+    {
+        // Test for DepthwiseConv2dEndToEnd with Int8 data type without bias
+
+        // Layer attributes
+        DepthwiseConvolution2dDescriptor descriptor;
+        descriptor.m_PadLeft     = 0;
+        descriptor.m_PadRight    = 0;
+        descriptor.m_PadTop      = 1;
+        descriptor.m_PadBottom   = 1;
+        descriptor.m_StrideX     = 1;
+        descriptor.m_StrideY     = 1;
+        descriptor.m_BiasEnabled = false;
+        descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+        // Expected output data
+        std::vector<float> expectedOutputData = std::vector<float>(
+        {
+            3.0f,  2.5f,  1.0f,  2.0f,  3.0f,  2.5f,  2.0f,  2.0f,  3.0f,  2.5f,  3.0f,  4.0f,  3.0f,  2.5f,
+            0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,
+            3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,
+            0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,
+            3.0f,  3.5f,  2.0f,  3.0f,  3.0f,  3.5f,  3.0f,  3.0f,  3.0f,  3.5f,  4.0f,  5.0f,  3.0f,  3.5f,
+            0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,
+
+            3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,
+            0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,
+            5.0f,  4.5f,  2.0f,  3.0f,  5.0f,  4.5f,  3.0f,  3.0f,  5.0f,  4.5f,  4.0f,  5.0f,  5.0f,  4.5f,
+            0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,
+            5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,
+            0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,
+
+            5.5f,  6.0f,  2.0f,  3.0f,  5.5f,  6.0f,  3.0f,  3.0f,  5.5f,  6.0f,  4.0f,  5.0f,  5.5f,  6.0f,
+            0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+            5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,
+            0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+            5.5f,  6.0f,  2.0f,  3.0f,  5.5f,  6.0f,  3.0f,  3.0f,  5.5f,  6.0f,  4.0f,  5.0f,  5.5f,  6.0f,
+            0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+
+            5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,
+            0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
+            5.0f,  6.0f,  2.0f,  3.0f,  5.0f,  6.0f,  3.0f,  3.0f,  5.0f,  6.0f,  4.0f,  5.0f,  5.0f,  6.0f,
+            0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,
+            5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,
+            0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f
+        });
+
+        // Run the end-to-end test for DepthwiseConv2d with Int8 data type without bias
+        DepthwiseConvolution2dEndToEnd<armnn::DataType::QSymmS8,
+                                   armnn::DataType::Signed32>(tosaDefaultBackends,
+                                                              descriptor,
+                                                              inputData,
+                                                              expectedOutputData);
+    }
+    SUBCASE("QuantizationScale")
+    {
+        // Test for DepthwiseConv2dEndToEnd with Int8 data type with quantization scale and bias
+
+        // Quantization parameters
+        float qScale   = 0.05f;
+        int32_t qBias  = 60;
+
+        // Layer attributes
+        DepthwiseConvolution2dDescriptor descriptor;
+        descriptor.m_PadLeft     = 0;
+        descriptor.m_PadRight    = 0;
+        descriptor.m_PadTop      = 1;
+        descriptor.m_PadBottom   = 1;
+        descriptor.m_StrideX     = 1;
+        descriptor.m_StrideY     = 1;
+        descriptor.m_BiasEnabled = true;
+        descriptor.m_DataLayout  = armnn::DataLayout::NHWC;
+
+        // Expected output data with quantization scale and bias
+        std::vector<float> expectedOutputData = std::vector<float>(
+        {
+            3.0f,  4.5f,  2.0f,  1.0f,  3.0f,  4.5f,  3.0f,  1.0f,  3.0f,  4.5f,  4.0f,  3.0f,  3.0f,  4.5f,
+            1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
+            3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,
+            1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
+            3.0f,  5.5f,  3.0f,  2.0f,  3.0f,  5.5f,  4.0f,  2.0f,  3.0f,  5.5f,  5.0f,  4.0f,  3.0f,  5.5f,
+            1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
+
+            3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,
+            1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
+            5.0f,  6.5f,  3.0f,  2.0f,  5.0f,  6.5f,  4.0f,  2.0f,  5.0f,  6.5f,  5.0f,  4.0f,  5.0f,  6.5f,
+            1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
+            5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,
+            1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
+
+            5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+            5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+            5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+
+            5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
+            1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
+            5.0f,  8.0f,  3.0f,  2.0f,  5.0f,  8.0f,  4.0f,  2.0f,  5.0f,  8.0f,  5.0f,  4.0f,  5.0f,  8.0f,
+            1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,
+            5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,
+            1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f
+        } );
+
+        // Run the end-to-end test for DepthwiseConv2d with Int8 data type with quantization scale and bias
+        DepthwiseConvolution2dEndToEnd<armnn::DataType::QSymmS8,
+                                   armnn::DataType::Signed32>(tosaDefaultBackends,
+                                                              descriptor,
+                                                              inputData,
+                                                              expectedOutputData,
+                                                              qScale,
+                                                              qBias);
+    }
+
 }
 
 // Elementwise Binary
@@ -407,7 +621,7 @@ TEST_CASE("TosaRefMulEndtoEndTestInt8")
 }
 
 //Sub
-TEST_CASE("TosaRefMulEndtoEndTestInt32")
+TEST_CASE("TosaRefSubEndtoEndTestInt32")
 {
     ElementwiseBinarySimpleNoReshapeEndToEnd<DataType::Signed32>(tosaDefaultBackends, armnn::BinaryOperation::Sub);
 }
@@ -980,42 +1194,66 @@ TEST_CASE("TosaRefLogEndToEndTestSint8")
 // Resize
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat32AlignCornersNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::
+                                                            DataLayout::NHWC,
+                                                            true,
+                                                            false);
 }
 
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat32HalfPixelNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float32>(tosaDefaultBackends, armnn::
+                                                            DataLayout::NHWC,
+                                                            false,
+                                                            true);
 }
 
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat16AlignCornersNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::
+                                                            DataLayout::NHWC,
+                                                            true,
+                                                            false);
 }
 
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndFloat16HalfPixelNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::Float16>(tosaDefaultBackends, armnn::
+                                                            DataLayout::NHWC,
+                                                            false,
+                                                            true);
 }
 
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt8AlignCornersNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, armnn::
+                                                            DataLayout::NHWC,
+                                                            true,
+                                                            false);
 }
 
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt8HalfPixelNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS8>(tosaDefaultBackends, armnn::
+                                                            DataLayout::NHWC,
+                                                            false,
+                                                            true);
 }
 
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt16AlignCornersNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::DataLayout::NHWC, true, false);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::
+                                                             DataLayout::NHWC,
+                                                             true,
+                                                             false);
 }
 
 TEST_CASE("TosaRefResizeNearestNeighborEndToEndInt16HalfPixelNhwcTest")
 {
-    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::DataLayout::NHWC, false, true);
+    ResizeNearestNeighborEndToEnd<armnn::DataType::QSymmS16>(tosaDefaultBackends, armnn::
+                                                             DataLayout::NHWC,
+                                                             false,
+                                                             true);
 }
 
 TEST_CASE("TosaRefResizeBilinearEndToEndInt8")
@@ -1459,122 +1697,162 @@ TEST_CASE("TosaRefSpaceToBatchNDOperatorInputVariations")
     // based off of model that was used to test for prototyping
     SUBCASE("Baseline")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 32, 32, 3}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 32, 32, 3},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // input size isn't divisible by the block size so padding is required
     SUBCASE("WithPadding")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 31, 31, 1}, {2, 2}, {{1, 0}, {1, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 31, 31, 1},
+                                                          {2, 2},
+                                                          {{1, 0}, {1, 0}},
+                                                          tosaDefaultBackends);
     }
     // test where batch size is greater than 1
     SUBCASE("BatchSize2")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {2, 16, 16, 2}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({2, 16, 16, 2},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // test with non symmetric padding
     SUBCASE("NonSymmetricPadding")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 30, 28, 1}, {2, 2}, {{2, 2}, {1, 3}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 30, 28, 1},
+                                                          {2, 2},
+                                                          {{2, 2}, {1, 3}},
+                                                          tosaDefaultBackends);
     }
     // Non square block shape i.e. 2x4
     SUBCASE("RectangularBlock")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 20, 20, 1}, {2, 4}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 20, 20, 1},
+                                                          {2, 4},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // high number of channels i.e. 64
     SUBCASE("ManyChannels")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 8, 8, 64}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 8, 8, 64},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // input requires padding to match up with block shape
     SUBCASE("PaddingRequiredToMatchBlock")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 3, 3, 1}, {2, 2}, {{1, 0}, {1, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 3, 3, 1},
+                                                          {2, 2},
+                                                          {{1, 0}, {1, 0}},
+                                                          tosaDefaultBackends);
     }
     // Smallest input for a block without needing padding
     SUBCASE("SmallestInputForBlockShape")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 2, 2, 1}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 2, 2, 1},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // Odd input size and padding to make it divisible by block
     SUBCASE("OddSpatialDimsWithPadding")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 5, 7, 1}, {2, 2}, {{1, 0}, {1, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 5, 7, 1},
+                                                          {2, 2},
+                                                          {{1, 0}, {1, 0}},
+                                                          tosaDefaultBackends);
     }
     // batch size more than 1 with non symmetrical padding and large block shape
     SUBCASE("Batch2WithPadding")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {2, 15, 15, 1}, {3, 3}, {{1, 2}, {0, 3}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({2, 15, 15, 1},
+                                                          {3, 3},
+                                                          {{1, 2}, {0, 3}},
+                                                          tosaDefaultBackends);
     }
     // spatial dimensions are smaller than the initial batch dimension
     SUBCASE("HighBatchLowSpatial")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {4, 4, 4, 1}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({4, 4, 4, 1},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // padding applied to only one dimension
     SUBCASE("SingleDimPadding")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 6, 6, 1}, {3, 3}, {{0, 0}, {1, 2}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 6, 6, 1},
+                                                          {3, 3},
+                                                          {{0, 0}, {1, 2}},
+                                                          tosaDefaultBackends);
     }
     // Mimics RGB input as a test
     SUBCASE("Channels3")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 6, 6, 3}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 6, 6, 3},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // Mimics RGBA input as a test
     SUBCASE("Channels4")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 6, 6, 4}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 6, 6, 4},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // Large batch count test
     SUBCASE("HighBatchCount")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {8, 16, 16, 1}, {2, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({8, 16, 16, 1},
+                                                          {2, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // Edge case where spatial dimension is 1
     SUBCASE("OneDimHeight")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 1, 32, 1}, {1, 2}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 1, 32, 1},
+                                                          {1, 2},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // padding applied on one side of spatial dimension only
     SUBCASE("PaddingOnlyOnOneSide")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 30, 30, 1}, {2, 2}, {{2, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 30, 30, 1},
+                                                          {2, 2},
+                                                          {{2, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // padding applied on height only
     SUBCASE("PaddingOnlyHeight")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 31, 32, 1}, {2, 2}, {{1, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 31, 32, 1},
+                                                          {2, 2},
+                                                          {{1, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // edge case where the block shape is [1,1], leading to no change in spatial dim
     SUBCASE("BlockShapeOne")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 16, 16, 1}, {1, 1}, {{0, 0}, {0, 0}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 16, 16, 1},
+                                                          {1, 1},
+                                                          {{0, 0}, {0, 0}},
+                                                          tosaDefaultBackends);
     }
     // Symmetric Padding with a high value (relative to the input size) 
     SUBCASE("ExtremePadding")
     {
-        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>(
-            {1, 4, 4, 1}, {2, 2}, {{4, 4}, {4, 4}}, tosaDefaultBackends);
+        SpaceToBatchNdEndToEnd<armnn::DataType::QAsymmS8>({1, 4, 4, 1},
+                                                          {2, 2},
+                                                          {{4, 4}, {4, 4}},
+                                                          tosaDefaultBackends);
     }
 
 }
@@ -1709,5 +1987,4 @@ TEST_CASE("TosaRefBatchToSpaceNDOperatorInputVariations")
         );
     }
 }
-
 }

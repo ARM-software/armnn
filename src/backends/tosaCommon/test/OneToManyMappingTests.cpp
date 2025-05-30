@@ -1,7 +1,12 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
+// This file contains test cases for Tosa operator mappings using one-to-many strategies.
+// It validates the mapping of operators for various layers such as AvgPool2D with IgnoreValue,
+// FullyConnected, Quantize, Softmax, and Split, ensuring that tensor shapes, operators,
+// and attributes are correctly handled.
 
 #include "AvgPool2DIgnoreValueChecker.hpp"
 #include "FullyConnectedChecker.hpp"

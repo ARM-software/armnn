@@ -49,15 +49,18 @@ armnn::INetworkPtr CreateDepthwiseConvolution2dNetwork(const armnn::DepthwiseCon
 
 template<armnn::DataType ArmnnType, armnn::DataType ArmnnBType = ArmnnType>
 void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backends,
-                                    armnn::DataLayout dataLayout,
-                                    bool biasEnabled = true)
+                                    DepthwiseConvolution2dDescriptor & descriptor,
+                                    std::vector<float>& inputData,
+                                    std::vector<float>& expectedOutputData,
+                                    float quantizedScale=0.25f,
+                                    int32_t quantizedBias=50)
 {
     using namespace armnn;
     using T  = ResolveType<ArmnnType>;
     using BT = ResolveType<ArmnnBType>;
 
-    const float   qScale  = IsQuantizedType<T>() ? 0.25f : 1.0f;
-    const int32_t qOffset = IsQuantizedType<T>() ? 50    : 0;
+    const float   qScale  = IsQuantizedType<T>() ? quantizedScale : 1.0f;
+    const int32_t qOffset = IsQuantizedType<T>() ? quantizedBias    : 0;
 
     unsigned int depthMultiplier = 2;
 
@@ -79,27 +82,7 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     TensorInfo weightsInfo({ 1, kernelHeight, kernelWidth, outputChannels }, ArmnnType, qScale, qOffset, true);
     TensorInfo biasesInfo({ outputChannels }, ArmnnBType, qScale * qScale, 0, true);
 
-    std::vector<float> inputData =
-    {
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 1.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f,
-        0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f, 0.5f, 0.0f
-    };
-
+    // Layer weights and biases data
     std::vector<float> weightsData =
     {
         1.0f,  1.0f, 1.0f,
@@ -129,79 +112,8 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
 
     std::vector<float> biasesData = { 0.0f, 2.0f, 1.0f, -1.0f };
 
-    std::vector<float> expectedOutputData = biasEnabled ? std::vector<float>(
-    {
-        3.0f,  4.5f,  2.0f,  1.0f,  3.0f,  4.5f,  3.0f,  1.0f,  3.0f,  4.5f,  4.0f,  3.0f,  3.0f,  4.5f,
-        1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
-        3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,
-        1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,  3.0f,  4.5f,  1.0f, -1.0f,
-        3.0f,  5.5f,  3.0f,  2.0f,  3.0f,  5.5f,  4.0f,  2.0f,  3.0f,  5.5f,  5.0f,  4.0f,  3.0f,  5.5f,
-        1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
-
-        3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,
-        1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,  3.0f,  5.5f,  1.0f, -1.0f,
-        5.0f,  6.5f,  3.0f,  2.0f,  5.0f,  6.5f,  4.0f,  2.0f,  5.0f,  6.5f,  5.0f,  4.0f,  5.0f,  6.5f,
-        1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
-        5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,
-        1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,  5.0f,  6.5f,  1.0f, -1.0f,
-
-        5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
-        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
-        5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
-        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
-        5.5f,  8.0f,  3.0f,  2.0f,  5.5f,  8.0f,  4.0f,  2.0f,  5.5f,  8.0f,  5.0f,  4.0f,  5.5f,  8.0f,
-        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
-
-        5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,
-        1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,  5.5f,  8.0f,  1.0f, -1.0f,
-        5.0f,  8.0f,  3.0f,  2.0f,  5.0f,  8.0f,  4.0f,  2.0f,  5.0f,  8.0f,  5.0f,  4.0f,  5.0f,  8.0f,
-        1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,
-        5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,
-        1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f,  5.0f,  8.0f,  1.0f, -1.0f
-    } )
-    : std::vector<float>(
-    {
-        3.0f,  2.5f,  1.0f,  2.0f,  3.0f,  2.5f,  2.0f,  2.0f,  3.0f,  2.5f,  3.0f,  4.0f,  3.0f,  2.5f,
-        0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,
-        3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,
-        0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,  3.0f,  2.5f,  0.0f,  0.0f,
-        3.0f,  3.5f,  2.0f,  3.0f,  3.0f,  3.5f,  3.0f,  3.0f,  3.0f,  3.5f,  4.0f,  5.0f,  3.0f,  3.5f,
-        0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,
-
-        3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,
-        0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,  3.0f,  3.5f,  0.0f,  0.0f,
-        5.0f,  4.5f,  2.0f,  3.0f,  5.0f,  4.5f,  3.0f,  3.0f,  5.0f,  4.5f,  4.0f,  5.0f,  5.0f,  4.5f,
-        0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,
-        5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,
-        0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,  5.0f,  4.5f,  0.0f,  0.0f,
-
-        5.5f,  6.0f,  2.0f,  3.0f,  5.5f,  6.0f,  3.0f,  3.0f,  5.5f,  6.0f,  4.0f,  5.0f,  5.5f,  6.0f,
-        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
-        5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,
-        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
-        5.5f,  6.0f,  2.0f,  3.0f,  5.5f,  6.0f,  3.0f,  3.0f,  5.5f,  6.0f,  4.0f,  5.0f,  5.5f,  6.0f,
-        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
-
-        5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,
-        0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,  5.5f,  6.0f,  0.0f,  0.0f,
-        5.0f,  6.0f,  2.0f,  3.0f,  5.0f,  6.0f,  3.0f,  3.0f,  5.0f,  6.0f,  4.0f,  5.0f,  5.0f,  6.0f,
-        0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,
-        5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,
-        0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f,  5.0f,  6.0f,  0.0f,  0.0f
-    } );
-
-    DepthwiseConvolution2dDescriptor descriptor;
-    descriptor.m_PadLeft     = 0;
-    descriptor.m_PadRight    = 0;
-    descriptor.m_PadTop      = 1;
-    descriptor.m_PadBottom   = 1;
-    descriptor.m_StrideX     = 1;
-    descriptor.m_StrideY     = 1;
-    descriptor.m_BiasEnabled = biasEnabled;
-    descriptor.m_DataLayout  = dataLayout;
-
     // Permute input if NCHW, the original input and output are in NHWC format.
-    if (dataLayout == DataLayout::NCHW)
+    if (descriptor.m_DataLayout == DataLayout::NCHW)
     {
         PermuteTensorNhwcToNchw(inputInfo, inputData);
         PermuteTensorNhwcToNchw(outputInfo, expectedOutputData);
@@ -217,6 +129,7 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
     ConstTensor weights(weightsInfo, qWeightsData);
     ConstTensor biases(biasesInfo, qBiasesData);
 
+    // Create the network
     INetworkPtr network = CreateDepthwiseConvolution2dNetwork(descriptor,
                                                               inputInfo,
                                                               weightsInfo,
@@ -225,6 +138,7 @@ void DepthwiseConvolution2dEndToEnd(const std::vector<armnn::BackendId>& backend
                                                               weights,
                                                               biases);
 
+    // Run the end-to-end test
     EndToEndLayerTestImpl<ArmnnType, ArmnnType>(std::move(network),
                                                 { { 0, qInputData } },
                                                 { { 0, qExpectedOutputData } },

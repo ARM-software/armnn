@@ -1,7 +1,12 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
+
+// This file contains test cases for Tosa operator mappings using one-to-one strategies.
+// It validates that the mapping of Tosa operators to the runtime layers is correctly performed,
+// ensuring that tensor shapes, operator configurations, and attributes for operators such
+// as Transpose, TransposeConvolution2d, and unimplemented cases are accurately handled.
 
 #include "TosaTestUtils.hpp"
 #include "CommonTestUtils.hpp"

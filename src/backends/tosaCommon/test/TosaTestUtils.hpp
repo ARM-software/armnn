@@ -9,6 +9,7 @@
 
 #include <tosaCommon/TosaMappings.hpp>
 #include <tosaCommon/operatorMappings/TosaOperatorUtils.hpp>
+#include <tosaCommon/operatorMappings/TosaRescaleOperatorUtils.hpp>
 
 #include <doctest/doctest.h>
 #include <numeric>

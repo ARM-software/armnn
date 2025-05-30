@@ -7,6 +7,28 @@
 
 #pragma once
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Creates a raw rescale TOSA operator.
+///
+/// This inline function creates a raw rescale operator for TOSA that adjusts the quantization
+/// parameters for an input tensor. It validates the multipliers and shifts vectors, ensuring they meet
+/// specific criteria for per-channel or global quantization. If any validation fails, an exception is thrown.
+///
+/// @param inputName       : The name of the input tensor.
+/// @param outputName      : The name of the output tensor.
+/// @param multipliers     : A vector of multiplier values for scaling.
+/// @param shifts          : A vector of shift values corresponding to the multipliers.
+/// @param input_zp        : The zero point for the input tensor.
+/// @param output_zp       : The zero point for the output tensor.
+/// @param input_unsigned  : Indicates if the input tensor is unsigned.
+/// @param output_unsigned : Indicates if the output tensor is unsigned.
+/// @param double_round    : If true, applies double rounding during quantization.
+/// @param scale32         : If true, performs 32-bit scaling; otherwise, 16-bit scaling is used.
+/// @param per_channel     : Determines whether per-channel quantization is applied.
+/// @param op              : Pointer to store the created TosaSerializationOperator.
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 inline void CreateRawRescaleTosaOperator(const std::string& inputName,
                                          const std::string& outputName,
                                          const std::vector<int32_t>& multipliers,
@@ -39,12 +61,6 @@ inline void CreateRawRescaleTosaOperator(const std::string& inputName,
     {
         throw armnn::Exception("CreateRawRescaleTosaOperator: \
                                 multipliers must be greater than 1 if per_channel is true.");
-    }
-
-    if (multipliers.size() == 1 && per_channel)
-    {
-        throw armnn::Exception("CreateRawRescaleTosaOperator: \
-                                multipliers size must be greater than 1 if per_channel is true.");
     }
 
     if (multipliers.size() > 1 && !per_channel)
@@ -159,6 +175,25 @@ inline void ComputeMultiplierAndShiftTosaScale16(double scale,
     }
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Creates a Tosa rescale operator.
+///
+/// This inline function computes the multiplier and shift values based on the given scale
+/// using either 32-bit or 16-bit scaling. It then creates a raw rescale operator that adjusts
+/// the quantization parameters for the input tensor.
+///
+/// @param inputName      : The name of the input tensor.
+/// @param outputName     : The name of the output tensor.
+/// @param scale          : The scale factor used to compute the multiplier and shift.
+/// @param input_zp       : The zero point for the input tensor.
+/// @param output_zp      : The zero point for the output tensor.
+/// @param input_unsigned : Indicates if the input tensor is unsigned.
+/// @param output_unsigned: Indicates if the output tensor is unsigned.
+/// @param double_round   : If true, uses double rounding for quantization.
+/// @param scale32        : If true, performs 32-bit scaling; otherwise, 16-bit scaling is used.
+/// @param op             : Pointer to a variable that will store the created TosaSerializationOperator.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 inline void CreateRescaleTosaOperator(const std::string& inputName,
                                       const std::string& outputName,
                                       double scale,
@@ -199,6 +234,27 @@ inline void CreateRescaleTosaOperator(const std::string& inputName,
                                  op);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// @brief Creates a TOSA rescale operator for weight tensors.
+///
+/// This function computes multipliers and shift values for each weight scale by combining the input scale,
+/// weight scale, and output scale. It determines the quantization parameters using either 32-bit or 16-bit
+/// calculations based on the scale32 flag. The per_channel flag is set true if the provided weight scales are more
+/// than one. An exception is thrown if any computation fails.
+///
+/// @param inputName       : The name of the input tensor.
+/// @param outputName      : The name of the output tensor.
+/// @param input_zp        : The zero point for the input tensor.
+/// @param output_zp       : The zero point for the output tensor.
+/// @param input_unsigned  : Indicates if the input tensor is unsigned.
+/// @param output_unsigned : Indicates if the output tensor is unsigned.
+/// @param double_round    : If true, uses double rounding for quantization.
+/// @param scale32         : If true, uses 32-bit scaling; otherwise, uses 16-bit scaling.
+/// @param input_scale     : The scaling factor for the input tensor.
+/// @param output_scale    : The scaling factor for the output tensor.
+/// @param weight_scales   : Vector of weight scales for per-channel quantization.
+/// @param op              : Pointer to store the created TosaSerializationOperator.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 inline void CreateRescaleTosaOperatorForWeights(const std::string& inputName,
                                                 const std::string& outputName,
                                                 int32_t input_zp,

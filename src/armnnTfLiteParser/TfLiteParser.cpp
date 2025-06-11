@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -2343,6 +2343,15 @@ void TfLiteParserImpl::ParseSpaceToBatchND(size_t subgraphIndex, size_t operator
 
     armnn::TensorInfo padListTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 2);
     BufferRawPtr padListBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+
+    // Both block_shape and paddings are supposed to be INT32.
+    if (blockShapeTensorInfo.GetDataType() != armnn::DataType::Signed32 ||
+        padListTensorInfo.GetDataType() != armnn::DataType::Signed32)
+    {
+        throw ParseException(
+            fmt::format("In SpaceToBatchND block_shape and paddings can only be of type INT32. {}",
+                        CHECK_LOCATION().AsString()));
+    }
 
     std::vector<unsigned int> blockShape(blockShapeTensorInfo.GetNumElements());
     ::memcpy(blockShape.data(), blockShapeBufferPtr->data.data(), blockShapeTensorInfo.GetNumBytes());

@@ -1395,6 +1395,9 @@ OptimizationResult ApplyBackendOptimizations(OptimizedNetworkImpl* optNetObjPtr,
         {
             Optimizer::Pass(optGraph, MakeOptimizations(optimizations::PermuteDepthwiseConv2dWeights()));
             Optimizer::Pass(optGraph, MakeOptimizations(optimizations::FusePermuteIntoConstLayer()));
+            Optimizer::Pass(optGraph, MakeOptimizations(optimizations::FoldPadIntoConvolution2d(),
+                                                        optimizations::FoldPadIntoDepthwiseConvolution2d(),
+                                                        optimizations::FoldPadIntoPooling2d()));
         }
 
         // Select sub-graphs based on backend

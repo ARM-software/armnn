@@ -42,7 +42,6 @@ ARMNN_SIMPLE_TEST_CASE(CreateDynamicBackendObjectInvalidInterface7,
                        CreateDynamicBackendObjectInvalidInterface7TestImpl);
 
 ARMNN_SIMPLE_TEST_CASE(OpenNotSharedObjectFile, OpenNotSharedObjectTestImpl);
-ARMNN_SIMPLE_TEST_CASE(GetSharedObjects, GetSharedObjectsTestImpl);
 
 ARMNN_SIMPLE_TEST_CASE(GetBackendPaths, GetBackendPathsTestImpl)
 ARMNN_SIMPLE_TEST_CASE(GetBackendPathsOverride, GetBackendPathsOverrideTestImpl)

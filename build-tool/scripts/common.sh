@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -84,7 +84,7 @@ PROTOBUF_BUILD_TARGET="$PROTOBUF_BUILD_ROOT"/"$TARGET_ARCH"_build
 if [ "$osname" == "Darwin" ]; then
   PROTOBUF_LIBRARY_TARGET="$PROTOBUF_BUILD_HOST"/lib/libprotobuf.dylib
 else
-  PROTOBUF_LIBRARY_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so.23.0.0
+  PROTOBUF_LIBRARY_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so.32.0.9
 fi
 PROTOBUF_ANDROID_LIB_TARGET="$PROTOBUF_BUILD_TARGET"/lib/libprotobuf.so
 

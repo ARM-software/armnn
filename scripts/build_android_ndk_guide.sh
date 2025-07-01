@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.
 #
 # SPDX-License-Identifier: MIT
 #

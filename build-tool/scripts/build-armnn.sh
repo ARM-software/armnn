@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -204,11 +204,11 @@ build_armnn()
     cp "$PROTOBUF_LIBRARY_TARGET" .
   elif [ "$flag_onnx_parser" -eq 1 ]; then
     cd "$ARMNN_BUILD_TARGET"
-    rm -f libprotobuf.so libprotobuf.so.23 libprotobuf.so.23.0.0
+    rm -f libprotobuf.so libprotobuf.so.32 libprotobuf.so.32.0.9
     if [ "$TARGET_ARCH" != "android64" ]; then
       cp "$PROTOBUF_LIBRARY_TARGET" .
-      ln -s libprotobuf.so.23.0.0 ./libprotobuf.so.23
-      ln -s libprotobuf.so.23.0.0 ./libprotobuf.so
+      ln -s libprotobuf.so.32.0.9 ./libprotobuf.so.32
+      ln -s libprotobuf.so.32.0.9 ./libprotobuf.so
     else
       cp "$PROTOBUF_ANDROID_LIB_TARGET" .
     fi

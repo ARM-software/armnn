@@ -265,6 +265,7 @@ build_tflite()
         -DFLATBUFFERS_BUILD_FLATC=OFF \
         -DBUILD_SHARED_LIBS=OFF \
         -DBUILD_TESTING=OFF \
+        -DTFLITE_HOST_TOOLS_DIR="$FLATBUFFERS_BUILD_HOST"/bin \
         "$target_arch_cmd" \
         "$TFLITE_SRC"
   cmake --build . -j "$NUM_THREADS"
@@ -464,16 +465,23 @@ if [ "$TARGET_ARCH" == "android64" ]; then
   download_androidndk
 fi
 
-if [ "$flag_onnx_parser" -eq 1 ] || [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
+if [ "$flag_onnx_parser" -eq 1 ] || [ "$flag_tflite_classic_delegate" -eq 1 ] ||
+   [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
+
   download_flatbuffers
+  download_protobuf
 
   # Host build
   build_flatbuffers 1
+  build_protobuf 1
 
   # Target build for cross compile
   if [ "$NATIVE_BUILD" -eq 0 ]; then
     build_flatbuffers 0
+    build_protobuf 0
   fi
+
+  export PATH="$PATH:$PROTOBUF_BUILD_HOST/bin"
 
   if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
     download_tensorflow
@@ -489,16 +497,6 @@ if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate"
 fi
 
 if [ "$flag_onnx_parser" -eq 1 ]; then
-  download_protobuf
-
-  # Host build
-  build_protobuf 1
-
-  # Target build for cross compile
-  if [ "$NATIVE_BUILD" -eq 0 ]; then
-    build_protobuf 0
-  fi
-
   download_onnx
   generate_onnx_sources
 fi

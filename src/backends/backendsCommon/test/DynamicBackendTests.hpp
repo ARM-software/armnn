@@ -1,5 +1,5 @@
 //
-// Copyright © 2019-2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019-2023, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -695,6 +695,93 @@ void GetBackendPathsOverrideTestImpl()
     // Override with invalid path
     std::vector<std::string> invalidResult = DynamicBackendUtils::GetBackendPaths(subDir4);
     CHECK(invalidResult.empty());
+}
+
+void GetSharedObjectsTestImpl()
+{
+    using namespace armnn;
+    using namespace fs;
+    // The test covers four directories:
+    // <unit test path>/src/backends/backendsCommon/test/
+    //                                                ├─ backendsTestPath1/   -> exists, contains files
+    //                                                ├─ backendsTestPath2/   -> exists, contains files
+    //                                                ├─ backendsTestPath3/   -> exists, but empty
+    //                                                └─ backendsTestPath4/   -> does not exist
+    //
+    // The test sub-directory backendsTestPath1/ contains the following test files:
+    //
+    // Arm_GpuAcc_backend.so                                       -> valid (basic backend name)
+    // Arm_GpuAcc_backend.so.1                                     -> valid (single field version number)
+    // Arm_GpuAcc_backend.so.1.2                                   -> valid (multiple field version number)
+    // Arm_GpuAcc_backend.so.1.2.3                                 -> valid (multiple field version number)
+    // Arm_GpuAcc_backend.so.10.1.27                               -> valid (Multiple digit version)
+    // Arm_GpuAcc_backend.so.10.1.33.                              -> not valid (dot not followed by version number)
+    // Arm_GpuAcc_backend.so.3.4..5                                -> not valid (dot not followed by version number)
+    // Arm_GpuAcc_backend.so.1,1.1                                 -> not valid (comma instead of dot in the version)
+    //
+    // Arm123_GpuAcc_backend.so                                    -> valid (digits in vendor name are allowed)
+    // Arm_GpuAcc456_backend.so                                    -> valid (digits in backend id are allowed)
+    // Arm%Co_GpuAcc_backend.so                                    -> not valid (invalid character in vendor name)
+    // Arm_Gpu.Acc_backend.so                                      -> not valid (invalid character in backend id)
+    //
+    // GpuAcc_backend.so                                           -> not valid (missing vendor name)
+    // _GpuAcc_backend.so                                          -> not valid (missing vendor name)
+    // Arm__backend.so                                             -> not valid (missing backend id)
+    // Arm_GpuAcc.so                                               -> not valid (missing "backend" at the end)
+    // __backend.so                                                -> not valid (missing vendor name and backend id)
+    // __.so                                                       -> not valid (missing all fields)
+    //
+    // Arm_GpuAcc_backend                                          -> not valid (missing at least ".so" at the end)
+    // Arm_GpuAcc_backend_v1.2.so                                  -> not valid (extra version info at the end)
+    //
+    // The test sub-directory backendsTestPath1/ contains the following test files:
+    //
+    // Arm_CpuAcc_backend.so                                       -> valid (basic backend name)
+    // Arm_CpuAcc_backend.so.1 -> Arm_CpuAcc_backend.so            -> valid (symlink to valid backend file)
+    // Arm_CpuAcc_backend.so.1.2 -> Arm_CpuAcc_backend.so.1        -> valid (symlink to valid symlink)
+    // Arm_CpuAcc_backend.so.1.2.3 -> Arm_CpuAcc_backend.so.1.2    -> valid (symlink to valid symlink)
+    //
+    // Arm_no_backend.so -> nothing                                -> not valid (symlink resolves to non-existent file)
+    //
+    // Arm_GpuAcc_backend.so                                       -> valid (but duplicated from backendsTestPath1/)
+    std::string testDynamicBackendsSubDir1 = GetTestSubDirectory(g_TestDynamicBackendsSubDir1);
+    std::string testDynamicBackendsSubDir2 = GetTestSubDirectory(g_TestDynamicBackendsSubDir2);
+    std::string testDynamicBackendsSubDir3 = GetTestSubDirectory(g_TestDynamicBackendsSubDir3);
+    std::string testDynamicBackendsSubDir4 = GetTestSubDirectory(g_TestDynamicBackendsSubDir4);
+    CHECK(exists(testDynamicBackendsSubDir1));
+    CHECK(exists(testDynamicBackendsSubDir2));
+    CHECK(exists(testDynamicBackendsSubDir3));
+    CHECK(!exists(testDynamicBackendsSubDir4));
+    std::vector<std::string> backendPaths
+        {
+            testDynamicBackendsSubDir1,
+            testDynamicBackendsSubDir2,
+            testDynamicBackendsSubDir3,
+            testDynamicBackendsSubDir4
+        };
+    std::vector<std::string> sharedObjects = DynamicBackendUtils::GetSharedObjects(backendPaths);
+    std::vector<fs::path> expectedSharedObjects
+        {
+            path(testDynamicBackendsSubDir1 + "Arm123_GpuAcc_backend.so"),      // Digits in vendor name are allowed
+            path(testDynamicBackendsSubDir1 + "Arm_GpuAcc456_backend.so"),      // Digits in backend id are allowed
+            path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so"),         // Basic backend name
+            path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1"),       // Single field version number
+            path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2"),     // Multiple field version number
+            path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.1.2.3"),   // Multiple field version number
+            path(testDynamicBackendsSubDir1 + "Arm_GpuAcc_backend.so.10.1.27"), // Multiple digit version
+            path(testDynamicBackendsSubDir2 + "Arm_CpuAcc_backend.so"),         // Duplicate symlinks removed
+            path(testDynamicBackendsSubDir2 + "Arm_GpuAcc_backend.so")          // Duplicates with different paths pass
+        };
+    CHECK(sharedObjects.size() == expectedSharedObjects.size());
+    CHECK(fs::equivalent(path(sharedObjects[0]), expectedSharedObjects[0]));
+    CHECK(fs::equivalent(path(sharedObjects[1]), expectedSharedObjects[1]));
+    CHECK(fs::equivalent(path(sharedObjects[2]), expectedSharedObjects[2]));
+    CHECK(fs::equivalent(path(sharedObjects[3]), expectedSharedObjects[3]));
+    CHECK(fs::equivalent(path(sharedObjects[4]), expectedSharedObjects[4]));
+    CHECK(fs::equivalent(path(sharedObjects[5]), expectedSharedObjects[5]));
+    CHECK(fs::equivalent(path(sharedObjects[6]), expectedSharedObjects[6]));
+    CHECK(fs::equivalent(path(sharedObjects[7]), expectedSharedObjects[7]));
+    CHECK(fs::equivalent(path(sharedObjects[8]), expectedSharedObjects[8]));
 }
 
 void CreateDynamicBackendsTestImpl()

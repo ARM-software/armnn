@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -14,8 +14,7 @@ TEST_SUITE("TensorflowLiteParser_SquaredDifference")
     {
         explicit SquaredDifferenceFixture(const std::string & inputShape1,
                                           const std::string & inputShape2,
-                                          const std::string & outputShape,
-                                          const std::string & activation="NONE")
+                                          const std::string & outputShape)
         {
             m_JsonString = R"(
                 {

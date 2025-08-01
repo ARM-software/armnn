@@ -69,6 +69,15 @@ TENSORFLOW_SRC="$SOURCE_DIR"/tensorflow
 TFLITE_SRC="$TENSORFLOW_SRC"/tensorflow/lite
 SCHEMA_SRC="$TENSORFLOW_SRC"/tensorflow/compiler/mlir/lite/schema/schema.fbs
 
+# LiteRT
+LITERT_VERSION=v1.4.0
+LITERT_ROOT_DIR="$SOURCE_DIR"/LiteRT
+
+LITERT_SCHEMA_PATH="$LITERT_ROOT_DIR/third_party/tensorflow/tensorflow/lite/schema"
+LITERT_SCHEMA_FBS_PATH="$LITERT_ROOT_DIR/third_party/tensorflow/tensorflow/compiler/mlir/lite/schema"
+LITERT_TENSORFLOW_ROOT="$LITERT_ROOT_DIR"/third_party/tensorflow
+LITERT_LIBS_DIR="$BUILD_DIR/LiteRT/$TARGET_ARCH"
+
 # TF Lite Schema
 FLATC="$FLATBUFFERS_BUILD_HOST"/bin/flatc
 TFLITE_BUILD_ROOT="$BUILD_DIR"/tflite # Generated TF Lite Schema location

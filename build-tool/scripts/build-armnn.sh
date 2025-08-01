@@ -160,6 +160,11 @@ build_armnn()
       cp "${TENSORFLOW_SRC}/tensorflow/compiler/mlir/lite/schema/conversion_metadata_generated.h" "${TFLITE_SRC}/schema/"
   fi
 
+  if [ -f "$LITERT_SCHEMA_FBS_PATH/schema.fbs" ]; then
+      cp "$LITERT_SCHEMA_FBS_PATH/schema.fbs" "${LITERT_SCHEMA_PATH}"
+      cp "$LITERT_SCHEMA_FBS_PATH/conversion_metadata_generated.h" "${LITERT_SCHEMA_PATH}"
+  fi
+
   local flatbuffers_root="$FLATBUFFERS_BUILD_TARGET"
   local protobuf_root="$PROTOBUF_BUILD_TARGET"
   if [ "$os_darwin" -eq 1 ]; then
@@ -175,6 +180,7 @@ build_armnn()
         -DBUILD_CLASSIC_DELEGATE="$flag_tflite_classic_delegate" \
         -DBUILD_OPAQUE_DELEGATE="$flag_tflite_opaque_delegate" \
         -DBUILD_TF_LITE_PARSER="$flag_tflite_parser" \
+        -DBUILD_LITERT_PARSER="$flag_litert_parser" \
         -DBUILD_DELEGATE_JNI_INTERFACE="$flag_jni" \
         -DBUILD_ONNX_PARSER="$flag_onnx_parser" \
         -DARMCOMPUTENEON="$flag_neon_backend" \
@@ -186,6 +192,8 @@ build_armnn()
         -DTFLITE_ROOT_DIR="$TFLITE_SRC" \
         -DTF_LITE_GENERATED_PATH="$TENSORFLOW_SRC"/tensorflow/compiler/mlir/lite/schema \
         -DTF_LITE_SCHEMA_INCLUDE_PATH="$TENSORFLOW_SRC"/tensorflow/lite/schema \
+        -DLITERT_TENSORFLOW_ROOT="$LITERT_TENSORFLOW_ROOT" \
+        -DLITERT_SCHEMA_PATH="$LITERT_SCHEMA_PATH" \
         -DTFLITE_LIB_ROOT="$TFLITE_BUILD_TARGET" \
         -DFLATBUFFERS_ROOT="$flatbuffers_root" \
         -DFLATC_DIR="$FLATBUFFERS_BUILD_HOST" \
@@ -238,7 +246,9 @@ build_armnn()
   fi
 
   # move ExecuteNetwork to outer directory
-  mv tests/ExecuteNetwork .
+  if [ -e tests/ExecuteNetwork ]; then
+    mv tests/ExecuteNetwork .
+  fi
 
   echo -e "\n***** Built Arm NN for $TARGET_ARCH *****"
 
@@ -314,6 +324,8 @@ build-armnn.sh [OPTION]...
     build the Arm NN TF Lite Parser component
   --onnx-parser
     build the Arm NN ONNX parser component
+  --litert-parser
+    build the Arm NN LiteRT Parser component
   --all
     build all Arm NN components listed above
   --target-arch=[aarch64|android64|x86_64]
@@ -369,6 +381,7 @@ flag_tflite_classic_delegate=0
 flag_tflite_opaque_delegate=0
 flag_tflite_parser=0
 flag_onnx_parser=0
+flag_litert_parser=0
 flag_neon_backend=0
 flag_cl_backend=0
 flag_ref_backend=0
@@ -392,7 +405,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,symlink-armnn,help -n "$name"   -- "$@")
+args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,litert-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,symlink-armnn,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then
@@ -425,11 +438,16 @@ while [ $# -gt 0 ]; do
     flag_onnx_parser=1
     ;;
 
+  --litert-parser)
+    flag_litert_parser=1
+    ;;
+
   --all)
     flag_tflite_classic_delegate=1
     flag_tflite_opaque_delegate=1
     flag_tflite_parser=1
     flag_onnx_parser=1
+    flag_litert_parser=1
     ;;
 
   --target-arch)
@@ -586,6 +604,7 @@ echo "tflite-classic-delegate: $flag_tflite_classic_delegate"
 echo "tflite-opaque-delegate : $flag_tflite_opaque_delegate"
 echo "          tflite-parser: $flag_tflite_parser"
 echo "            onnx-parser: $flag_onnx_parser"
+echo "          litert-parser: $flag_litert_parser"
 echo "           neon-backend: $flag_neon_backend"
 echo "             cl-backend: $flag_cl_backend"
 echo "            ref-backend: $flag_ref_backend"

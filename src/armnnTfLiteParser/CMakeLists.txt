@@ -1,8 +1,8 @@
 #
-# Copyright © 2017, 2023 Arm Ltd. All rights reserved.
+# Copyright © 2017, 2023, 2025 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-if(BUILD_TF_LITE_PARSER)
+if(BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER)
     set(armnn_tf_lite_parser_sources)
     list(APPEND armnn_tf_lite_parser_sources
         ../../include/armnnTfLiteParser/ITfLiteParser.hpp
@@ -22,8 +22,15 @@ if(BUILD_TF_LITE_PARSER)
     set_target_properties(armnnTfLiteParser PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
     target_include_directories(armnnTfLiteParser PRIVATE ../armnn)
     target_include_directories(armnnTfLiteParser PRIVATE ../armnnUtils)
-    target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
 
+    if(BUILD_TF_LITE_PARSER AND BUILD_LITELT_PARSER)
+        target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${LITERT_SCHEMA_PATH}")
+        message(STATUS "Both TfLite Parser and LiteRT parser enabled, defaulting to LiteRT parser.")
+    elseif (BUILD_LITELT_PARSER)
+        target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${LITERT_SCHEMA_PATH}")
+    else ()
+        target_include_directories(armnnTfLiteParser SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+    endif ()
 
     # using the armnn/delegate/cmake/Modules/FindTfLiteSrc.cmake to find the TfLite sources
     # so that we can use the tensorflow/lite/version.h to determine which version of

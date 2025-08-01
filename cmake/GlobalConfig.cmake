@@ -1,5 +1,5 @@
 #
-# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 # Copyright 2020 NXP
 # SPDX-License-Identifier: MIT
 #
@@ -20,6 +20,7 @@ option(LEAK_CHECKING "Build with leak checking enabled" OFF)
 option(GPERFTOOLS_ROOT "Location where the gperftools 'include' and 'lib' folders to be found" Off)
 # options used for tensorflow lite support
 option(BUILD_TF_LITE_PARSER "Build Tensorflow Lite parser" OFF)
+option(BUILD_LITERT_PARSER "Build LiteRT parser" OFF)
 option(BUILD_ARMNN_SERIALIZER "Build Armnn Serializer" OFF)
 option(BUILD_ACCURACY_TOOL "Build Accuracy Tool" OFF)
 option(FLATC_DIR "Path to Flatbuffers compiler" OFF)
@@ -252,7 +253,7 @@ if(BUILD_OPAQUE_DELEGATE)
 endif()
 
 # Flatbuffers support for TF Lite, Armnn Serializer or the TOSA backend.
-if(BUILD_TF_LITE_PARSER OR BUILD_ARMNN_SERIALIZER OR ARMNNTOSAREF)
+if(BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER OR BUILD_ARMNN_SERIALIZER OR ARMNNTOSAREF)
     # verify we have a valid flatbuffers include path
     find_path(FLATBUFFERS_INCLUDE_PATH
               flatbuffers/flatbuffers.h
@@ -279,6 +280,18 @@ if(BUILD_TF_LITE_PARSER)
     message(STATUS "Tf Lite generated header found at: ${TF_LITE_SCHEMA_INCLUDE_PATH}")
 
     add_definitions(-DARMNN_TF_LITE_PARSER)
+endif()
+
+# Flatbuffers schema support for LiteRT
+if(BUILD_LITERT_PARSER)
+    find_path(TF_LITE_SCHEMA_INCLUDE_PATH
+            schema_generated.h
+            PATHS ${LITERT_SCHEMA_PATH}
+            NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
+
+    message(STATUS "LiteRT generated header found at: ${LITERT_SCHEMA_PATH}")
+
+    add_definitions(-DARMNN_LITERT_PARSER)
 endif()
 
 if(BUILD_ARMNN_SERIALIZER)
@@ -486,6 +499,10 @@ endif()
 
 if(NOT BUILD_TF_LITE_PARSER)
     message(STATUS "Tensorflow Lite parser support is disabled")
+endif()
+
+if(NOT BUILD_LITERT_PARSER)
+    message(STATUS "LiteRT parser support is disabled")
 endif()
 
 if(NOT BUILD_ARMNN_SERIALIZER)

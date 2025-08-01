@@ -30,11 +30,19 @@ cmake_policy(SET CMP0057 NEW)
 # our best guess as to where it will be i.e. one directory above
 # the one this CMakeLists.txt file lives in, in a subdirectory
 # called tensorflow
-if (BUILD_TF_LITE_PARSER AND "${TENSORFLOW_ROOT}" STREQUAL "")
-  set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../tensorflow" CACHE INTERNAL "")
-  message(STATUS "Set TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
+if ((BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER) AND "${TENSORFLOW_ROOT}" STREQUAL "")
+    if (BUILD_TF_LITE_PARSER AND BUILD_LITERT_PARSER)
+        message(STATUS "Both TFLite and LiteRT parser selected, prioritizing LiteRT")
+        set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../LiteRT/third_party/tensorflow" CACHE INTERNAL "")
+    elseif (BUILD_LITERT_PARSER)
+        set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../LiteRT/third_party/tensorflow" CACHE INTERNAL "")
+        message(STATUS "Set TENSORFLOW_ROOT to use LiteRT Tensorflow: ${TENSORFLOW_ROOT}")
+    else()
+        set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../tensorflow" CACHE INTERNAL "")
+    endif()
+    message(STATUS "Set TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
 else()
-  message(STATUS "TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
+    message(STATUS "TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/delegate/cmake/Modules/")
@@ -677,7 +685,7 @@ if(BUILD_UNIT_TESTS)
             )
     endif()
 
-    if(BUILD_TF_LITE_PARSER AND ARMNNREF)
+    if((BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER) AND ARMNNREF)
         list(APPEND unittest_sources
              src/armnnTfLiteParser/test/Activations.cpp
              src/armnnTfLiteParser/test/Addition.cpp
@@ -754,13 +762,25 @@ if(BUILD_UNIT_TESTS)
 
         # Generate SchemaText.cpp file which contains the TfLite schema text as a
         # static C-array of bytes. This is needed at runtime for TfLite parser tests.
-        add_custom_command(
-            OUTPUT  SchemaText.cpp
-            COMMAND cp ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs g_TfLiteSchemaText
-            COMMAND xxd -i g_TfLiteSchemaText SchemaText.cpp
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            DEPENDS ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs
-        )
+
+        if (BUILD_LITERT_PARSER)
+            add_custom_command(
+                    OUTPUT  SchemaText.cpp
+                    COMMAND cp ${LITERT_SCHEMA_PATH}/schema.fbs g_TfLiteSchemaText
+                    COMMAND xxd -i g_TfLiteSchemaText SchemaText.cpp
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                    DEPENDS ${LITERT_SCHEMA_PATH}/schema.fbs
+            )
+        elseif(BUILD_TF_LITE_PARSER)
+            add_custom_command(
+                    OUTPUT  SchemaText.cpp
+                    COMMAND cp ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs g_TfLiteSchemaText
+                    COMMAND xxd -i g_TfLiteSchemaText SchemaText.cpp
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                    DEPENDS ${TF_LITE_SCHEMA_INCLUDE_PATH}/schema.fbs
+            )
+        endif ()
+
         list(APPEND unittest_sources ${CMAKE_CURRENT_BINARY_DIR}/SchemaText.cpp)
     endif()
 
@@ -913,8 +933,14 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(UnitTests timelineDecoderJson)
     endif()
 
-    if(BUILD_TF_LITE_PARSER)
-        target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+    if(BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER)
+        if(BUILD_TF_LITE_PARSER AND NOT BUILD_LITERT_PARSER)
+            target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        elseif(BUILD_LITERT_PARSER)
+            target_include_directories(UnitTests SYSTEM PRIVATE "${LITERT_TENSORFLOW_ROOT}")
+            target_include_directories(UnitTests SYSTEM PRIVATE "${LITERT_SCHEMA_PATH}")
+        endif ()
+
         target_include_directories(UnitTests SYSTEM PRIVATE "${FLATBUFFERS_INCLUDE_PATH}")
         target_link_libraries(UnitTests armnnTfLiteParser)
     endif()

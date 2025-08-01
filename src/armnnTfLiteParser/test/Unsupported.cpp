@@ -1,5 +1,5 @@
 //
-// Copyright © 2019 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -33,7 +33,7 @@ public:
                          const char* name,
                          const armnn::LayerBindingId id = 0) override
     {
-        armnn::IgnoreUnused(descriptor, constants, id);
+        armnn::IgnoreUnused(descriptor, constants, id, name);
         switch (layer->GetType())
         {
             case armnn::LayerType::StandIn:

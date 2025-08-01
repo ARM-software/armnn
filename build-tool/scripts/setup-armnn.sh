@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -199,20 +199,41 @@ build_flatbuffers()
 download_tensorflow()
 {
   cd "$SOURCE_DIR"
-  git config --global http.postBuffer 524288000
-  echo -e "\n***** Downloading TensorFlow *****"
-  # Attempt to clone Tensorflow, wait 60 second between attempts. Max 5 tries
-  n=0
-  until [ $n -ge 5 ]
-  do
-    git clone https://github.com/tensorflow/tensorflow.git && break
-    n=$[$n+1]
-    sleep 60
-  done
-  cd "$TENSORFLOW_SRC"
-
-  git checkout "$TENSORFLOW_VERSION"
+  if [ -d "$TENSORFLOW_SRC" ]; then
+    # Tensorflow dir already exists, check the tensorflow version
+    pushd "$TENSORFLOW_SRC" > /dev/null
+    local CURRENT_VER=$(git describe --tags --exact-match 2>/dev/null || git rev-parse --abbrev-ref HEAD)
+    popd > /dev/null
+    if [ "$CURRENT_VER" == "$TENSORFLOW_VERSION" ]; then
+      return
+    else
+      echo -e "\n***** TensorFlow version mismatch (found: $CURRENT_VER, expected: $TENSORFLOW_VERSION) – re-downloading *****"
+      rm -rf "$TENSORFLOW_SRC"
+    fi
+  fi
+  echo -e "\n***** Downloading TensorFlow $TENSORFLOW_VERSION *****"
+  git clone --branch "$TENSORFLOW_VERSION" --depth 1 https://github.com/tensorflow/tensorflow.git
   echo -e "\n***** TensorFlow downloaded *****"
+}
+
+download_litert()
+{
+  cd "$SOURCE_DIR"
+  if [ -d "$SOURCE_DIR/LiteRT" ]; then
+    pushd "$SOURCE_DIR/LiteRT" > /dev/null
+    local CURRENT_VER=$(git describe --tags --exact-match 2>/dev/null || git rev-parse --abbrev-ref HEAD)
+    popd > /dev/null
+    if [ "$CURRENT_VER" == "$LITERT_VERSION" ]; then
+      echo -e "\n***** LiteRT is already at version $LITERT_VERSION – skipping download *****"
+      return
+    else
+      echo -e "\n***** LiteRT version mismatch (found: $CURRENT_VER, expected: $LITERT_VERSION) – re-downloading *****"
+      rm -rf "$SOURCE_DIR/LiteRT"
+    fi
+  fi
+  echo -e "\n***** Downloading LiteRT version $LITERT_VERSION *****"
+  git clone --branch "$LITERT_VERSION" --depth 1 --recursive --shallow-submodules https://github.com/google-ai-edge/LiteRT
+  echo -e "\n***** LiteRT downloaded *****"
 }
 
 build_tflite_cpuinfo()
@@ -330,6 +351,8 @@ setup-armnn.sh [OPTION]...
     setup dependencies for the Arm NN TF Lite Parser
   --onnx-parser
     setup dependencies for the Arm NN ONNX parser
+  --litert-parser
+    setup dependencies for Arm NN LiteRT Parser
   --all
     setup dependencies for all Arm NN components listed above
   --target-arch=[aarch64|android64|x86_64]
@@ -361,6 +384,7 @@ flag_tflite_classic_delegate=0
 flag_tflite_opaque_delegate=0
 flag_tflite_parser=0
 flag_onnx_parser=0
+flag_litert_parser=0
 
 # If --num-threads is not set, the default NUM_THREADS value in common.sh will be used
 num_threads=0
@@ -373,7 +397,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
+args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,litert-parser,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then
@@ -406,11 +430,16 @@ while [ $# -gt 0 ]; do
     flag_onnx_parser=1
     ;;
 
+  --litert-parser)
+    flag_litert_parser=1
+    ;;
+
   --all)
     flag_tflite_classic_delegate=1
     flag_tflite_opaque_delegate=1
     flag_tflite_parser=1
     flag_onnx_parser=1
+    flag_litert_parser=1
     ;;
 
   --target-arch)
@@ -449,6 +478,7 @@ echo "tflite-classic-delegate: $flag_tflite_classic_delegate"
 echo " tflite-opaque-delegate: $flag_tflite_opaque_delegate"
 echo "          tflite-parser: $flag_tflite_parser"
 echo "            onnx-parser: $flag_onnx_parser"
+echo "          litert-parser: $flag_litert_parser"
 echo "            num-threads: $NUM_THREADS"
 echo "         root directory: $ROOT_DIR"
 echo "       source directory: $SOURCE_DIR"
@@ -466,8 +496,8 @@ if [ "$TARGET_ARCH" == "android64" ]; then
 fi
 
 if [ "$flag_onnx_parser" -eq 1 ] || [ "$flag_tflite_classic_delegate" -eq 1 ] ||
-   [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
-
+   [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ] ||
+   [ "$flag_litert_parser" -eq 1 ]; then
   download_flatbuffers
   download_protobuf
 
@@ -483,8 +513,13 @@ if [ "$flag_onnx_parser" -eq 1 ] || [ "$flag_tflite_classic_delegate" -eq 1 ] ||
 
   export PATH="$PATH:$PROTOBUF_BUILD_HOST/bin"
 
-  if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ]; then
+  if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] ||
+     [ "$flag_tflite_parser" -eq 1 ] || [ "$flag_litert_parser" -eq 1 ]; then
     download_tensorflow
+
+    if [ "$flag_litert_parser" -eq 1 ]; then
+      download_litert
+    fi
   fi
 fi
 

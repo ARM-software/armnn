@@ -224,6 +224,11 @@ private:
 
     void ResetParser();
 
+    // Function that checks the provided buffer is valid.
+    static void ValidateBuffer(BufferRawPtr bufferPtr,
+                               const armnn::TensorInfo& tensorInfo,
+                               const std::string& bufferName);
+
     void AddBroadcastReshapeLayer(size_t subgraphIndex,
                                   size_t operatorIndex,
                                   armnn::IConnectableLayer* layer);

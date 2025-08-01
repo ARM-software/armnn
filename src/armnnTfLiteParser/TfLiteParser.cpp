@@ -300,16 +300,36 @@ std::vector<unsigned int> GetUIntBuffer(armnn::TensorInfo info,
                                         size_t bufferIndex)
 {
     TfLiteParserImpl::BufferRawPtr bufferPtr = TfLiteParserImpl::GetBuffer(model, bufferIndex);
+
+    if (!bufferPtr || bufferPtr->data.empty())
+    {
+        throw ParseException("UInt buffer is null or empty.");
+    }
+
+    const size_t numElements = info.GetNumElements();
     std::vector<unsigned int> buffer(info.GetNumElements());
+    buffer.reserve(numElements);
 
     if (info.GetDataType() == DataType::Signed32)
     {
-        ::memcpy(buffer.data(), bufferPtr->data.data(), bufferPtr->data.size());
+        size_t requiredBytes = numElements * sizeof(int32_t);
+        if (bufferPtr->data.size() < requiredBytes)
+        {
+            throw ParseException("UInt buffer too small for Signed32 tensor.");
+        }
+
+        ::memcpy(buffer.data(), bufferPtr->data.data(), requiredBytes);
     }
     else if (info.GetDataType() == DataType::Signed64)
     {
-        std::vector<uint64_t> uint64Buffer(info.GetNumElements());
-        ::memcpy(uint64Buffer.data(), bufferPtr->data.data(), bufferPtr->data.size());
+        size_t requiredBytes = numElements * sizeof(int64_t);
+        if (bufferPtr->data.size() < requiredBytes)
+        {
+            throw ParseException("UInt buffer too small for Signed64 tensor.");
+        }
+
+        std::vector<uint64_t> uint64Buffer(numElements);
+        ::memcpy(uint64Buffer.data(), bufferPtr->data.data(), requiredBytes);
         buffer.assign(std::begin(uint64Buffer), std::end(uint64Buffer));
     }
     else
@@ -621,6 +641,13 @@ CreateConstTensorImpl(TfLiteParserImpl::BufferRawPtr bufferPtr,
     if (!bufferPtr)
     {
         throw armnn::ParseException(fmt::format("Buffer for buffer:{} is null", tensorPtr->buffer).c_str());
+    }
+
+    size_t requiredBytes = tensorInfo.GetNumBytes();
+    if (bufferPtr->data.size() < requiredBytes)
+    {
+        throw ParseException(fmt::format("Buffer for buffer:{} too small. Expected at least {} bytes, got {}.",
+                             tensorPtr->buffer, requiredBytes, bufferPtr->data.size()));
     }
 
     std::unique_ptr<T[]> data(new T[tensorInfo.GetNumElements()]);
@@ -1557,6 +1584,8 @@ void TfLiteParserImpl::ParseExpandDims(size_t subgraphIndex, size_t operatorInde
     armnn::TensorInfo axisTensorInfo  = InputTensorInfo(subgraphIndex, operatorIndex, 1);
 
     BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    ValidateBuffer(axisBufferPtr, axisTensorInfo, "axis");
+
     if (axisBufferPtr == nullptr)
     {
         throw ParseException(fmt::format("{}: Operation has invalid inputs. Failed to read axis.",
@@ -1631,6 +1660,8 @@ void TfLiteParserImpl::ParseTranspose(size_t subgraphIndex, size_t operatorIndex
     {
         armnn::TensorInfo permuteTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
         BufferRawPtr permuteBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+        ValidateBuffer(permuteBufferPtr, permuteTensorInfo, "permute");
+
         auto numPermVecElements = permuteTensorInfo.GetNumElements();
         std::vector<unsigned int> permuteShape(numPermVecElements);
         ::memcpy(permuteShape.data(), permuteBufferPtr->data.data(), permuteTensorInfo.GetNumBytes());
@@ -1705,9 +1736,12 @@ void TfLiteParserImpl::ParseTransposeConv(size_t subgraphIndex, size_t operatorI
         armnn::TensorInfo tensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 0);
         std::vector<int> output_shape(tensorInfo.GetNumElements());
 
+        BufferRawPtr outputBufferPtr = GetBuffer(m_Model, inputs[0]->buffer);
+        ValidateBuffer(outputBufferPtr, tensorInfo, "output");
+
         if (tensorInfo.GetDataType() == DataType::Signed32)
         {
-            ::memcpy(output_shape.data(), GetBuffer(m_Model, inputs[0]->buffer)->data.data(), tensorInfo.GetNumBytes());
+            ::memcpy(output_shape.data(), outputBufferPtr->data.data(), tensorInfo.GetNumBytes());
         }
         if (tensorInfo.GetDataType() == DataType::QAsymmU8)
         {
@@ -1863,9 +1897,11 @@ void TfLiteParserImpl::ParseBatchToSpaceND(size_t subgraphIndex, size_t operator
 
     armnn::TensorInfo blockShapeTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     BufferRawPtr blockShapeBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    ValidateBuffer(blockShapeBufferPtr, blockShapeTensorInfo, "blockShape");
 
     armnn::TensorInfo cropsTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 2);
     BufferRawPtr cropsBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+    ValidateBuffer(cropsBufferPtr, cropsTensorInfo, "crops");
 
     std::vector<unsigned int> blockShape(blockShapeTensorInfo.GetNumElements());
     ::memcpy(blockShape.data(), blockShapeBufferPtr->data.data(), blockShapeTensorInfo.GetNumBytes());
@@ -2165,6 +2201,7 @@ void TfLiteParserImpl::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
     // set begin tensor info for slice descriptor
     armnn::TensorInfo beginTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     BufferRawPtr beginBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    ValidateBuffer(beginBufferPtr, beginTensorInfo, "begin");
 
     std::vector<unsigned int> begin(beginTensorInfo.GetNumElements());
     ::memcpy(begin.data(), beginBufferPtr->data.data(), beginTensorInfo.GetNumBytes());
@@ -2172,6 +2209,7 @@ void TfLiteParserImpl::ParseSlice(size_t subgraphIndex, size_t operatorIndex)
     // set size tensor info for slice descriptor
     armnn::TensorInfo sizeTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 2);
     BufferRawPtr sizeBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+    ValidateBuffer(sizeBufferPtr, sizeTensorInfo, "size");
 
     std::vector<int> signedSize(sizeTensorInfo.GetNumElements(), 1);
 
@@ -2340,9 +2378,11 @@ void TfLiteParserImpl::ParseSpaceToBatchND(size_t subgraphIndex, size_t operator
 
     armnn::TensorInfo blockShapeTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     BufferRawPtr blockShapeBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    ValidateBuffer(blockShapeBufferPtr, blockShapeTensorInfo, "block");
 
     armnn::TensorInfo padListTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 2);
     BufferRawPtr padListBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+    ValidateBuffer(padListBufferPtr, padListTensorInfo, "padList");
 
     // Both block_shape and paddings are supposed to be INT32.
     if (blockShapeTensorInfo.GetDataType() != armnn::DataType::Signed32 ||
@@ -2605,6 +2645,7 @@ void TfLiteParserImpl::ParseStridedSlice(size_t subgraphIndex, size_t operatorIn
 
     armnn::TensorInfo beginTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 1);
     BufferRawPtr beginBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    ValidateBuffer(beginBufferPtr, beginTensorInfo, "begin");
 
     std::vector<int> begin(beginTensorInfo.GetNumElements());
     if (beginBufferPtr->data.data() != nullptr)
@@ -2618,6 +2659,7 @@ void TfLiteParserImpl::ParseStridedSlice(size_t subgraphIndex, size_t operatorIn
 
     armnn::TensorInfo endTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 2);
     BufferRawPtr endBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
+    ValidateBuffer(endBufferPtr, endTensorInfo, "end");
 
     std::vector<int> end(endTensorInfo.GetNumElements());
     if (endBufferPtr->data.data() != nullptr)
@@ -2631,6 +2673,7 @@ void TfLiteParserImpl::ParseStridedSlice(size_t subgraphIndex, size_t operatorIn
 
     armnn::TensorInfo strideTensorInfo = InputTensorInfo(subgraphIndex, operatorIndex, 3);
     BufferRawPtr strideBufferPtr = GetBuffer(m_Model, inputs[3]->buffer);
+    ValidateBuffer(strideBufferPtr, strideTensorInfo, "stride");
 
     std::vector<int> stride(strideTensorInfo.GetNumElements());
 
@@ -2869,9 +2912,11 @@ void TfLiteParserImpl::ParseMean(size_t subgraphIndex, size_t operatorIndex)
 
     armnn::MeanDescriptor desc;
     BufferRawPtr axisBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+
     // Get const axis value from model and set it to descriptor.
-    if (axisBufferPtr != nullptr)
+    if (axisBufferPtr != nullptr && !axisBufferPtr->data.empty())
     {
+        ValidateBuffer(axisBufferPtr, dimTensorInfo, "axis");
         std::vector<int32_t> axisData(dimTensorInfo.GetNumElements());
         ::memcpy(axisData.data(), axisBufferPtr->data.data(), dimTensorInfo.GetNumBytes());
 
@@ -2956,13 +3001,20 @@ void TfLiteParserImpl::ParsePad(size_t subgraphIndex, size_t operatorIndex)
         BufferRawPtr padValueBufferPtr = GetBuffer(m_Model, inputs[2]->buffer);
 
         // Get the pad value from the input tensor
-        if (padValueBufferPtr->data.size() > 0)
+        if (!padValueBufferPtr->data.empty())
         {
             switch (padValueTensorInfo.GetDataType())
             {
                 case armnn::DataType::Float32:
                 {
                     std::vector<float> padValueBuffer(padValueTensorInfo.GetNumElements());
+
+                    const size_t requiredBytes = padValueTensorInfo.GetNumElements() * sizeof(float);
+                    if (padValueBufferPtr->data.size() < requiredBytes)
+                    {
+                        throw ParseException("Pad value buffer is too small for expected data.");
+                    }
+
                     ::memcpy(padValueBuffer.data(), padValueBufferPtr->data.data(), padValueBufferPtr->data.size());
                     desc.m_PadValue = padValueBuffer[0];
                     break;
@@ -2970,6 +3022,13 @@ void TfLiteParserImpl::ParsePad(size_t subgraphIndex, size_t operatorIndex)
                 case armnn::DataType::QAsymmU8:
                 {
                     std::vector<uint8_t> padValueBuffer(padValueTensorInfo.GetNumElements());
+
+                    const size_t requiredBytes = padValueTensorInfo.GetNumElements() * sizeof(uint8_t);
+                    if (padValueBufferPtr->data.size() < requiredBytes)
+                    {
+                        throw ParseException("Pad value buffer is too small for expected data.");
+                    }
+
                     ::memcpy(padValueBuffer.data(), padValueBufferPtr->data.data(), padValueBufferPtr->data.size());
                     desc.m_PadValue = armnn::Dequantize<uint8_t>(padValueBuffer[0],
                                                                  padValueTensorInfo.GetQuantizationScale(),
@@ -2980,6 +3039,13 @@ void TfLiteParserImpl::ParsePad(size_t subgraphIndex, size_t operatorIndex)
                 case armnn::DataType::QSymmS8:
                 {
                     std::vector<int8_t> padValueBuffer(padValueTensorInfo.GetNumElements());
+
+                    const size_t requiredBytes = padValueTensorInfo.GetNumElements() * sizeof(int8_t);
+                    if (padValueBufferPtr->data.size() < requiredBytes)
+                    {
+                        throw ParseException("Pad value buffer is too small for expected data.");
+                    }
+
                     ::memcpy(padValueBuffer.data(), padValueBufferPtr->data.data(), padValueBufferPtr->data.size());
                     desc.m_PadValue = armnn::Dequantize<int8_t>(padValueBuffer[0],
                                                                 padValueTensorInfo.GetQuantizationScale(),
@@ -3037,6 +3103,7 @@ void TfLiteParserImpl::ParseMirrorPad(size_t subgraphIndex, size_t operatorIndex
     BufferRawPtr bufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
 
     std::vector<unsigned int> padBuffer(padTensorInfo.GetNumElements());
+    ValidateBuffer(bufferPtr, padTensorInfo, "axis");
     ::memcpy(padBuffer.data(), bufferPtr->data.data(), padTensorInfo.GetNumBytes());
 
     size_t step = 2;
@@ -3563,6 +3630,7 @@ void TfLiteParserImpl::ParseResize(size_t subgraphIndex, size_t operatorIndex, R
     std::vector<int32_t> sizeTensorData(sizeTensorInfo.GetNumElements());
 
     BufferRawPtr sizeBufferPtr = GetBuffer(m_Model, inputs[1]->buffer);
+    ValidateBuffer(sizeBufferPtr, sizeTensorInfo, "size");
     ::memcpy(sizeTensorData.data(), sizeBufferPtr->data.data(), sizeTensorInfo.GetNumBytes());
 
     ResizeDescriptor desc;
@@ -3670,6 +3738,7 @@ void TfLiteParserImpl::ParseTile(size_t subgraphIndex, size_t operatorIndex)
     if (multiplesBufferPtr != nullptr)
     {
         std::vector<int32_t> multiplesData(multiplesTensorInfo.GetNumElements());
+        ValidateBuffer(multiplesBufferPtr, multiplesTensorInfo, "multiples");
        ::memcpy(multiplesData.data(), multiplesBufferPtr->data.data(), multiplesTensorInfo.GetNumBytes());
         descriptor.m_Multiples.assign(multiplesData.begin(), multiplesData.end());
     }
@@ -4456,6 +4525,7 @@ void TfLiteParserImpl::ParseSplit(size_t subgraphIndex, size_t operatorIndex)
     }
 
     std::vector<int32_t> axisData(axisTensorInfo.GetNumElements());
+    ValidateBuffer(axisBufferPtr, axisTensorInfo, "axis");
     ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
     int32_t axis = axisData[0];
 
@@ -4592,6 +4662,7 @@ void TfLiteParserImpl::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
     }
 
     std::vector<int> axisData(axisTensorInfo.GetNumElements());
+    ValidateBuffer(axisBufferPtr, axisTensorInfo, "axis");
     ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
     int32_t axis = axisData[0];
 
@@ -4628,6 +4699,7 @@ void TfLiteParserImpl::ParseSplitV(size_t subgraphIndex, size_t operatorIndex)
 
     std::vector<int> splitsData(numSplits);
     BufferRawPtr splitsBufferPtr = GetBuffer(m_Model, splitsTensor->buffer);
+    ValidateBuffer(splitsBufferPtr, splitsInfo, "splits");
     ::memcpy(splitsData.data(), splitsBufferPtr->data.data(), splitsInfo.GetNumBytes());
 
     unsigned int idx = 0;
@@ -4762,6 +4834,8 @@ void TfLiteParserImpl::ParseArgMinMax(size_t subgraphIndex, size_t operatorIndex
     }
 
     std::vector<int32_t> axisData(axisTensorInfo.GetNumElements());
+    ValidateBuffer(axisBufferPtr, axisTensorInfo, "axis");
+
     ::memcpy(axisData.data(), axisBufferPtr->data.data(), axisTensorInfo.GetNumBytes());
     int32_t axis = axisData.front();
 
@@ -4982,6 +5056,7 @@ void TfLiteParserImpl::ParseReduce(size_t subgraphIndex, size_t operatorIndex, R
     if (axisBufferPtr != nullptr)
     {
         std::vector<int32_t> axisData(inputTensorInfo1.GetNumElements());
+        ValidateBuffer(axisBufferPtr, inputTensorInfo1, "axis");
         ::memcpy(axisData.data(), axisBufferPtr->data.data(), inputTensorInfo1.GetNumBytes());
 
         // Convert the axis to unsigned int and remove duplicates.
@@ -6079,5 +6154,29 @@ TfLiteParserImpl::SupportedDataStorage::SupportedDataStorage(std::unique_ptr<int
 , m_Int32Data(std::move(data))
 {
 }
+
+void TfLiteParserImpl::ValidateBuffer(BufferRawPtr bufferPtr,
+                                      const armnn::TensorInfo& tensorInfo,
+                                      const std::string& bufferName)
+{
+    if (bufferPtr == nullptr)
+    {
+        throw ParseException(bufferName + " buffer pointer is null.");
+    }
+
+    if (bufferPtr->data.empty())
+    {
+        throw ParseException(bufferName + "  buffer data is empty.");
+    }
+
+    size_t requiredBytes = tensorInfo.GetNumBytes();
+    if (bufferPtr->data.size() < requiredBytes)
+    {
+        throw ParseException(fmt::format(bufferName + " buffer too small. Expected at least {} bytes, got {}.",
+                             requiredBytes, bufferPtr->data.size()));
+    }
+}
+
+
 
 } // armnnTfLiteParser

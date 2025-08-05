@@ -1,5 +1,5 @@
 //
-// Copyright © 2020-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -41,24 +41,29 @@ armnn::DataType GetDataType(const TfLiteTensor& tfLiteTensor)
             return armnn::DataType::QAsymmU8;
         case kTfLiteInt8:
         {
-            auto quantizationInfo = tfLiteTensor.quantization;
-            if (quantizationInfo.type == kTfLiteAffineQuantization)
+            const auto* quantInfo =
+                reinterpret_cast<const TfLiteAffineQuantization*>(tfLiteTensor.quantization.params);
+
+            if (quantInfo && quantInfo->scale)
             {
-                auto* quantization =
-                    reinterpret_cast<TfLiteAffineQuantization*>(tfLiteTensor.quantization.params);
-                if (quantization->zero_point != nullptr && quantization->zero_point->size == 1)
+                // per tensor
+                if (quantInfo->scale->size == 1)
                 {
+                    // currently we don't support QSymmS8 for Tensor quantization
+                    // we don't check zero_point is 0 or not
                     return armnn::DataType::QAsymmS8;
                 }
-                else
+                // per channel
+                else if (quantInfo->scale->size > 1)
                 {
+                    // we only support weight per axis quantization
+                    // we don't check zero_point is 0 or not
                     return armnn::DataType::QSymmS8;
                 }
             }
-            else
-            {
-                return armnn::DataType::QAsymmS8;
-            }
+            // non-quantised case
+            // we return it as QAsymmS8 with default quantisation (scale 1.0 and zero_point = 0)
+            return armnn::DataType::QAsymmS8;
         }
         case kTfLiteInt16:
             return armnn::DataType::QSymmS16;

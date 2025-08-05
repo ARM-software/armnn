@@ -1,5 +1,5 @@
 //
-// Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -437,25 +437,32 @@ armnn::DataType GetDataType(const TfLiteOpaqueTensor* tfLiteTensor)
             return armnn::DataType::QAsymmU8;
         case kTfLiteInt8:
         {
-            auto quantizationInfo = TfLiteOpaqueTensorGetQuantization(tfLiteTensor);
-            if (quantizationInfo.type == kTfLiteAffineQuantization)
-            {
-                auto* quantization =
-                        reinterpret_cast<TfLiteAffineQuantization*>(quantizationInfo.params);
+            const auto quantInfo =
+                TfLiteOpaqueTensorGetQuantization(tfLiteTensor);
 
-                if (quantization->zero_point != nullptr && quantization->zero_point->size == 1)
-                {
-                    return armnn::DataType::QAsymmS8;
-                }
-                else
-                {
-                    return armnn::DataType::QSymmS8;
-                }
-            }
-            else
+            if (quantInfo.type == kTfLiteAffineQuantization && quantInfo.params)
             {
-                return armnn::DataType::QAsymmS8;
+                const auto* quant =
+                    reinterpret_cast<const TfLiteAffineQuantization*>(quantInfo.params);
+                if (quant && quant->scale)
+                {
+                    // per tensor
+                    if (quant->scale->size == 1)
+                    {
+                        // currently we don't support QSymmS8 for Tensor quantization
+                        // we don't check zero_point is 0 or not
+                        return armnn::DataType::QAsymmS8;
+                    }
+                    // per channel
+                    else if (quant->scale->size > 1)
+                    {
+                        // we only support weight per axis quantization
+                        // we don't check zero_point is 0 or not
+                        return armnn::DataType::QSymmS8;
+                    }
+                }
             }
+            return armnn::DataType::QAsymmS8;
         }
         case kTfLiteInt16:
             return armnn::DataType::QSymmS16;

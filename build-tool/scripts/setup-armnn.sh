@@ -231,9 +231,51 @@ download_litert()
       rm -rf "$SOURCE_DIR/LiteRT"
     fi
   fi
+
   echo -e "\n***** Downloading LiteRT version $LITERT_VERSION *****"
   git clone --branch "$LITERT_VERSION" --depth 1 --recursive --shallow-submodules https://github.com/google-ai-edge/LiteRT
   echo -e "\n***** LiteRT downloaded *****"
+
+  local WORKSPACE_FILE="${SOURCE_DIR}/LiteRT/WORKSPACE"
+  if [ -f "$WORKSPACE_FILE" ]; then
+    echo "+++ Patching LiteRT WORKSPACE to use TensorFlow v2.20.0"
+    sed -i.bak 's#strip_prefix = "tensorflow-master"#strip_prefix = "tensorflow-2.20.0"#' "$WORKSPACE_FILE"
+    sed -i.bak 's#https://github.com/tensorflow/tensorflow/archive/master.tar.gz#https://github.com/tensorflow/tensorflow/archive/v2.20.0.tar.gz#' "$WORKSPACE_FILE"
+    echo "+++ WORKSPACE patch complete. Updated contents:"
+    grep "tensorflow" "$WORKSPACE_FILE"
+  else
+    echo "[WARN] WORKSPACE file not found under $WORKSPACE_FILE"
+  fi
+}
+
+download_abseilcpp()
+{
+  cd "$SOURCE_DIR"
+
+  if [ -d "$SOURCE_DIR/abseil-cpp" ]; then
+    pushd "$SOURCE_DIR/abseil-cpp" > /dev/null
+    local CURRENT_VER=$(git describe --tags --exact-match 2>/dev/null || git rev-parse --abbrev-ref HEAD)
+    popd > /dev/null
+
+    if [ "$CURRENT_VER" == "$ABSEIL_VERSION" ]; then
+      echo "+++ abseil-cpp is already at version $ABSEIL_VERSION – skipping download"
+      return
+    else
+      echo "+++ abseil-cpp version mismatch (found: $CURRENT_VER, expected: $ABSEIL_VERSION) – re-downloading"
+      rm -rf "$SOURCE_DIR/abseil-cpp"
+    fi
+  fi
+
+  echo "+++ Downloading abseil-cpp version $ABSEIL_VERSION"
+  git clone --depth 1 --branch "$ABSEIL_VERSION" https://github.com/abseil/abseil-cpp.git
+  echo "+++ abseil-cpp downloaded"
+}
+
+
+download_bazelisk()
+{
+    echo "+++ Downloading Bazelisk"
+    curl --create-dirs -Lo "$BAZELISK_EXE" "${BAZELISK_URL}" && chmod 755 "$BAZELISK_EXE"
 }
 
 build_tflite_cpuinfo()
@@ -299,6 +341,88 @@ build_tflite()
   echo -e "\n***** Built TF Lite for $TARGET_ARCH *****"
 }
 
+build_litert()
+{
+  echo -e "\n***** Building LiteRT for $TARGET_ARCH *****"
+
+  local bazel_args="--define xnn_enable_avx512amx=false \
+                      --define xnn_enable_avxvnniint8=false \
+                      --define xnn_enable_avxvnni=false \
+                      --define xnn_enable_avx512fp16=false"
+
+  local build_targets="//tflite:tensorflowlite \
+                       //tflite/c:libtensorflowlite_c.so \
+                       //tflite/kernels:custom_ops \
+                       //tflite/core/acceleration/configuration:delegate_registry"
+
+  if [ "$TARGET_ARCH" == "android64" ]; then
+    bazel_args+=" --config=android_arm64"
+  elif [ "$TARGET_ARCH" == "aarch64" ]; then
+    bazel_args+=" --cpu=aarch64"
+  else
+    echo "Unsupported Target: $TARGET_ARCH"
+    exit 1
+  fi
+
+  cd "$LITERT_ROOT_DIR"
+
+  echo "+++ Running Bazel build: $BAZELISK_EXE build $bazel_args $build_targets"
+  "$BAZELISK_EXE" build $bazel_args $build_targets
+
+  local BAZEL_OUTPUT="$LITERT_ROOT_DIR/bazel-bin/tflite"
+  local LITERT_INSTALL_DIR="$BUILD_DIR/LiteRT/$TARGET_ARCH"
+  mkdir -p "$LITERT_INSTALL_DIR"
+
+
+  if [ ! -z "$( ls -A "$BAZEL_OUTPUT" )" ]; then
+    cp "$BAZEL_OUTPUT/libtensorflowlite.so" "$LITERT_INSTALL_DIR/"
+    cp "$BAZEL_OUTPUT/c/libtensorflowlite_c.so" "$LITERT_INSTALL_DIR/"
+    cp "$BAZEL_OUTPUT/kernels/libcustom_ops.a" "$LITERT_INSTALL_DIR/"
+    cp "$BAZEL_OUTPUT/core/acceleration/configuration/libdelegate_registry.a" "$LITERT_INSTALL_DIR/"
+  fi
+
+  echo "+++ Installed LiteRT outputs to $LITERT_INSTALL_DIR"
+}
+
+build_abseil()
+{
+  echo -e "\n***** Building abseil-cpp for $TARGET_ARCH *****"
+
+  local absl_build="$BUILD_DIR/abseil/$TARGET_ARCH"
+  local absl_install="$absl_build/install"
+
+  mkdir -p "$absl_build"
+  pushd "$absl_build" > /dev/null
+
+  local cmake_args="-DCMAKE_INSTALL_PREFIX=$absl_install \
+                    -DABSL_ENABLE_INSTALL=ON \
+                    -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+                    -DCMAKE_BUILD_TYPE=Release"
+
+  if [ "$TARGET_ARCH" == "android64" ]; then
+    cmake_args+=" -DCMAKE_TOOLCHAIN_FILE=$NDK_SRC/build/cmake/android.toolchain.cmake \
+                  -DANDROID_ABI=$ANDROID_ARM_ARCH \
+                  -DANDROID_PLATFORM=$ANDROID_API_VERSION"
+  elif [ "$TARGET_ARCH" == "aarch64" ]; then
+    cmake_args+=" -DCMAKE_SYSTEM_NAME=Linux \
+                  -DCMAKE_SYSTEM_PROCESSOR=aarch64"
+    if [ "$HOST_ARCH" == "x86_64" ]; then
+      # Optional: Use known cross-toolchain paths, if available in your environment
+      cmake_args+=" -DCMAKE_C_COMPILER=/usr/bin/aarch64-linux-gnu-gcc \
+                    -DCMAKE_CXX_COMPILER=/usr/bin/aarch64-linux-gnu-g++"
+    fi
+  fi
+
+  cmake $cmake_args "$ABSL_SRC"
+  make install -j "$NUM_THREADS"
+
+  popd > /dev/null
+
+  echo "*** abseil-cpp built and installed to $absl_install"
+}
+
+
+
 generate_tflite_schema()
 {
   echo -e "\n***** Generating TF Lite Schema *****"
@@ -353,6 +477,8 @@ setup-armnn.sh [OPTION]...
     setup dependencies for the Arm NN ONNX parser
   --litert-parser
     setup dependencies for Arm NN LiteRT Parser
+  --litert-delegate
+    setup dependencies for Arm NN LiteRT Delegate
   --all
     setup dependencies for all Arm NN components listed above
   --target-arch=[aarch64|android64|x86_64]
@@ -385,6 +511,7 @@ flag_tflite_opaque_delegate=0
 flag_tflite_parser=0
 flag_onnx_parser=0
 flag_litert_parser=0
+flag_litert_delegate=0
 
 # If --num-threads is not set, the default NUM_THREADS value in common.sh will be used
 num_threads=0
@@ -397,7 +524,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,litert-parser,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
+args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,litert-parser,litert-delegate,all,target-arch:,num-threads:,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then
@@ -434,12 +561,17 @@ while [ $# -gt 0 ]; do
     flag_litert_parser=1
     ;;
 
+  --litert-delegate)
+    flag_litert_delegate=1
+    ;;
+
   --all)
     flag_tflite_classic_delegate=1
     flag_tflite_opaque_delegate=1
     flag_tflite_parser=1
     flag_onnx_parser=1
     flag_litert_parser=1
+    flag_litert_delegate=1
     ;;
 
   --target-arch)
@@ -479,6 +611,7 @@ echo " tflite-opaque-delegate: $flag_tflite_opaque_delegate"
 echo "          tflite-parser: $flag_tflite_parser"
 echo "            onnx-parser: $flag_onnx_parser"
 echo "          litert-parser: $flag_litert_parser"
+echo "        litert-delegate: $flag_litert_delegate"
 echo "            num-threads: $NUM_THREADS"
 echo "         root directory: $ROOT_DIR"
 echo "       source directory: $SOURCE_DIR"
@@ -497,7 +630,8 @@ fi
 
 if [ "$flag_onnx_parser" -eq 1 ] || [ "$flag_tflite_classic_delegate" -eq 1 ] ||
    [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_tflite_parser" -eq 1 ] ||
-   [ "$flag_litert_parser" -eq 1 ]; then
+   [ "$flag_litert_parser" -eq 1 ] || [ "$flag_litert_delegate" -eq 1 ]; then
+
   download_flatbuffers
   download_protobuf
 
@@ -514,10 +648,14 @@ if [ "$flag_onnx_parser" -eq 1 ] || [ "$flag_tflite_classic_delegate" -eq 1 ] ||
   export PATH="$PATH:$PROTOBUF_BUILD_HOST/bin"
 
   if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] ||
-     [ "$flag_tflite_parser" -eq 1 ] || [ "$flag_litert_parser" -eq 1 ]; then
+     [ "$flag_tflite_parser" -eq 1 ] || [ "$flag_litert_parser" -eq 1 ] || [ "$flag_litert_delegate" -eq 1 ]; then
     download_tensorflow
 
-    if [ "$flag_litert_parser" -eq 1 ]; then
+    if [ "$flag_litert_delegate" -eq 1 ]; then
+      download_bazelisk
+      download_abseilcpp
+      download_litert
+    elif [ "$flag_litert_parser" -eq 1 ]; then
       download_litert
     fi
   fi
@@ -529,6 +667,11 @@ fi
 
 if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ]; then
   build_tflite
+fi
+
+if [ "$flag_litert_delegate" -eq 1 ]; then
+  build_abseil
+  build_litert
 fi
 
 if [ "$flag_onnx_parser" -eq 1 ]; then

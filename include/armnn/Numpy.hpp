@@ -375,7 +375,7 @@ namespace armnnNumpy
 
             // write magic string
             out.write(headerInfo.m_MagicString, headerInfo.m_MagicStringLength);
-            out.put(major_version);
+            out.put(static_cast<char>(major_version));
             out.put(0); // minor version
 
             // write header length

@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -360,18 +360,18 @@ void ArmNNExecutor::PrintNetworkInfo()
 
 void ArmNNExecutor::SetupInputsAndOutputs()
 {
-    const unsigned int noOfInputs = m_IOInfo.m_InputNames.size();
+    const size_t noOfInputs = m_IOInfo.m_InputNames.size();
 
     if (m_Params.m_InputNames.size() != 0 && m_Params.m_InputNames.size() != noOfInputs)
     {
         LogAndThrow("Number of input names does not match number of inputs");
     }
 
-    const unsigned int inputFilePaths = m_Params.m_InputTensorDataFilePaths.size();
+    const size_t inputFilePaths = m_Params.m_InputTensorDataFilePaths.size();
     const std::vector<std::string>& inputNames = m_Params.m_InputNames.size() != 0 ?
                                                  m_Params.m_InputNames :
                                                  m_IOInfo.m_InputNames;
-    unsigned int noInputSets = 1;
+    size_t noInputSets = 1;
 
     if (inputFilePaths != 0)
     {
@@ -387,9 +387,9 @@ void ArmNNExecutor::SetupInputsAndOutputs()
         }
     }
 
-    const unsigned int noOfOutputs = m_IOInfo.m_OutputNames.size();
-    const unsigned int outputFilePaths = m_Params.m_OutputTensorFiles.size();
-    unsigned int noOutputSets = 1;
+    const size_t noOfOutputs = m_IOInfo.m_OutputNames.size();
+    const size_t outputFilePaths = m_Params.m_OutputTensorFiles.size();
+    size_t noOutputSets = 1;
 
     if (outputFilePaths != 0)
     {
@@ -516,7 +516,7 @@ void ArmNNExecutor::SetupInputsAndOutputs()
 
     // If iterations > noSets fill the remaining iterations repeating the given files
     // If iterations < noSets just ignore the extra files
-    const unsigned int remainingInputSets = (m_Params.m_Iterations > noInputSets)
+    const size_t remainingInputSets = (m_Params.m_Iterations > noInputSets)
                                           ? m_Params.m_Iterations - noInputSets
                                           : 0;
     for (unsigned int i = 0; i < remainingInputSets; ++i)
@@ -528,7 +528,7 @@ void ArmNNExecutor::SetupInputsAndOutputs()
         }
     }
 
-    const unsigned int remainingOutputSets = (m_Params.m_Iterations > noOutputSets)
+   const size_t remainingOutputSets = (m_Params.m_Iterations > noOutputSets)
                                            ? m_Params.m_Iterations - noOutputSets
                                            : 0;
     for (unsigned int i = 0; i < remainingOutputSets; ++i)
@@ -699,7 +699,7 @@ void ArmNNExecutor::PrintOutputTensors(const armnn::OutputTensors* outputTensors
     };
 
     unsigned int outputIndex = 0;
-    unsigned int numOutputs = outputTensors->size();
+    size_t numOutputs = outputTensors->size();
     for (const auto& output: *outputTensors)
     {
         const auto bindingName = findOutputName(output.first);

@@ -437,25 +437,18 @@ armnn::DataType GetDataType(const TfLiteOpaqueTensor* tfLiteTensor)
             return armnn::DataType::QAsymmU8;
         case kTfLiteInt8:
         {
-            auto quantizationInfo = TfLiteOpaqueTensorGetQuantization(tfLiteTensor);
-            if (quantizationInfo.type == kTfLiteAffineQuantization)
-            {
-                auto* quantization =
-                        reinterpret_cast<TfLiteAffineQuantization*>(quantizationInfo.params);
+            auto q = TfLiteOpaqueTensorGetQuantization(tfLiteTensor);
 
-                if (quantization->zero_point != nullptr && quantization->zero_point->size == 1)
-                {
-                    return armnn::DataType::QAsymmS8;
-                }
-                else
-                {
-                    return armnn::DataType::QSymmS8;
-                }
-            }
-            else
+            int scales = 0;
+            if (q.type == kTfLiteAffineQuantization && q.params)
             {
-                return armnn::DataType::QAsymmS8;
+                const TfLiteAffineQuantization* aq =
+                    reinterpret_cast<const TfLiteAffineQuantization*>(q.params);
+                scales = (aq->scale ? aq->scale->size : 0);
             }
+
+            return (scales > 1) ? armnn::DataType::QSymmS8
+                                : armnn::DataType::QAsymmS8;
         }
         case kTfLiteInt16:
             return armnn::DataType::QSymmS16;

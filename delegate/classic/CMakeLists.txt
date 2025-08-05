@@ -1,5 +1,5 @@
 #
-# Copyright © 2023-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2023-2025 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -68,10 +68,18 @@ endif()
 # Various tflite header files are not warning clean
 # We can't change compilation flags on header files directly, so we need to add them to an interface library first
 add_library(tflite_headers INTERFACE)
-target_include_directories(tflite_headers
-        INTERFACE
+if(BUILD_LITERT_DELEGATE)
+    message(STATUS "LITERT_TENSORFLOW_ROOT being set here: ${LITERT_TENSORFLOW_ROOT}")
+    target_include_directories(tflite_headers
+            INTERFACE
+                $<BUILD_INTERFACE:${LITERT_TENSORFLOW_ROOT}>
+                $<INSTALL_INTERFACE:include/tflite_headers>)
+else ()
+    target_include_directories(tflite_headers
+            INTERFACE
             $<BUILD_INTERFACE:${TfLite_INCLUDE_DIR}>
             $<INSTALL_INTERFACE:include/tflite_headers>)
+endif ()
 
 target_compile_options(tflite_headers
         INTERFACE

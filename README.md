@@ -15,6 +15,11 @@
 
 # Arm NN
 
+**Arm NN**  is now a legacy project and is no longer actively maintained by Arm. As a result, no further updates,
+including security patches and functional improvements, should be expected, and users should be aware that the project
+may not be secure against untrusted inputs or hostile environments.
+Accordingly, it is strongly recommended that **Arm NN** only be used in trusted contexts.
+
 **Arm NN** is the **most performant** machine learning (ML) inference engine for Android and Linux, accelerating ML
 on **Arm Cortex-A CPUs and Arm Mali GPUs**. This ML inference engine is an open source SDK which bridges the gap
 between existing neural network frameworks and power-efficient Arm IP.

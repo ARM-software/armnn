@@ -100,7 +100,7 @@ Once the application executable is built, it can be executed with the following 
 
 ### Keyword Spotting on a supplied audio file
 
-A small selection of suitable wav files containing keywords can be found [here](https://git.mlplatform.org/ml/ethos-u/ml-embedded-evaluation-kit.git/plain/resources/kws/samples/).
+A small selection of suitable wav files containing keywords can be found [here](https://gitlab.arm.com/artificial-intelligence/ethos-u/ml-embedded-evaluation-kit/-/tree/main/resources/kws/samples).
 To run keyword spotting on a supplied audio file and output the result to console:
 
 ```commandline

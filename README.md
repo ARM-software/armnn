@@ -10,7 +10,8 @@
 * [Contributions](#contributions)
 * [Disclaimer](#disclaimer)
 * [License](#license)
-* [Third-Party](#third-party)
+* [Inclusive language commitment](#inclusive-language-commitment)
+* [Third-party](#third-party)
 * [Build Flags](#build-flags)
 
 # Arm NN
@@ -102,9 +103,6 @@ ML models used in Android applications will automatically be accelerated by Arm 
 **For more information about the Arm NN components, please refer to our
 [documentation](https://github.com/ARM-software/armnn/wiki/Documentation).**
 
-Arm NN is a key component of the [machine learning platform](https://mlplatform.org/), which is part of the
-[Linaro Machine Intelligence Initiative](https://www.linaro.org/news/linaro-announces-launch-of-machine-intelligence-initiative/).
-
 For FAQs and troubleshooting advice, see the [FAQ](docs/FAQ.md) or take a look at previous
 [GitHub Issues](https://github.com/ARM-software/armnn/issues).
 
@@ -123,9 +121,7 @@ When the feature is implemented the 'Help wanted' label will be removed.
 
 
 ## Contributions
-The Arm NN project welcomes contributions. For more details on contributing to Arm NN please see the
-[Contributing page](https://mlplatform.org/contributing/) on the [MLPlatform.org](https://mlplatform.org/) website,
-or see the [Contributor Guide](CONTRIBUTING.md).
+The Arm NN project welcomes contributions. For more details on contributing to Arm NN please see the [Contributor Guide](CONTRIBUTING.md).
 
 Particularly if you'd like to implement your own backend next to our CPU, GPU and NPU backends there are guides for
 backend development: [Backend development guide](src/backends/README.md),

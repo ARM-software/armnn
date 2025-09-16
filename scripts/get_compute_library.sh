@@ -79,7 +79,7 @@ fi
 
 if [ ! -d "$ACL_REPO_NAME" ]; then
   echo "Cloning CL Framework"
-  git clone https://review.mlplatform.org/ml/ComputeLibrary "$ACL_REPO_NAME"
+  git clone https://github.com/ARM-software/ComputeLibrary "$ACL_REPO_NAME"
   AssertZeroExitCode "Cloning CL Framework failed"
 fi
 pushd "$ACL_REPO_NAME" > /dev/null
@@ -89,8 +89,8 @@ if [ ! -z "$CLFRAMEWORK_SHA" ]; then
   CLFRAMEWORKREVISION=$CLFRAMEWORK_SHA
 fi
 
-echo "git fetch && git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout $CLFRAMEWORKREVISION"
-git fetch && git fetch https://review.mlplatform.org/ml/ComputeLibrary && git checkout "${CLFRAMEWORKREVISION}"
+echo "git fetch && git fetch https://github.com/ARM-software/ComputeLibrary && git checkout $CLFRAMEWORKREVISION"
+git fetch && git fetch https://github.com/ARM-software/ComputeLibrary && git checkout "${CLFRAMEWORKREVISION}"
 AssertZeroExitCode "Fetching and checking out ${CLFRAMEWORKREVISION} failed"
 # If the target ACL revision includes a branch we also need to do a pull.
 # This generally occurs with a release branch.
@@ -98,11 +98,6 @@ if [[ "${CLFRAMEWORKREVISION}" == *"branches"* ]]; then
   git pull
   AssertZeroExitCode "ACL reference includes a branch but git pull failed."
 fi
-
-# Set commit hook so we can submit reviews to gerrit
-# shellcheck disable=SC2006
-(curl -Lo "$(git rev-parse --git-dir)"/hooks/commit-msg https://review.mlplatform.org/tools/hooks/commit-msg; chmod +x "$(git rev-parse --git-dir)"/hooks/commit-msg)
-AssertZeroExitCode "Setting commit hooks failed"
 
 popd > /dev/null # out of clframework / "$ACL_REPO_NAME"
 popd > /dev/null # back to wherever we were when called

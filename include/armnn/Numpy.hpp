@@ -209,7 +209,9 @@ namespace armnnNumpy
     template<typename T>
     inline void ReadData(std::ifstream& ifStream, T* tensor, const unsigned int& numElements)
     {
-        ifStream.read(reinterpret_cast<char *>(tensor), static_cast<std::streamsize>(sizeof(T) * numElements));
+        const std::streamsize bytes = static_cast<std::streamsize>(sizeof(T)) *
+                                      static_cast<std::streamsize>(numElements);
+        ifStream.read(reinterpret_cast<char *>(tensor), bytes);
     }
 
 

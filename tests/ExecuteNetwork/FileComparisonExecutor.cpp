@@ -187,7 +187,7 @@ Tensor ReadTensorFromFile(const std::string fileName)
 
     // We'll read the entire file into one buffer.
     std::ifstream file(fileName, std::ios::binary);
-    std::vector<char> buffer(fileSize);
+    std::vector<char> buffer(static_cast<std::vector<char>::size_type>(fileSize));
     if (file.read(buffer.data(), static_cast<std::streamsize>(fileSize)))
     {
         std::string tensorName;

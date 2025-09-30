@@ -1,10 +1,11 @@
 //
-// Copyright © 2019, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2019, 2023, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "CommandLineProcessor.hpp"
 
+#include <cstdint>
 #include <cxxopts/cxxopts.hpp>
 #include <iostream>
 

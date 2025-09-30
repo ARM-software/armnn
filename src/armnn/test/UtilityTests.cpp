@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd. All rights reserved.
+// Copyright © 2020, 2025 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -16,6 +16,7 @@
 #include <doctest/doctest.h>
 
 #include <limits>
+#include <cstdint>
 
 // Tests of include/Utility files
 TEST_SUITE("UtilityTests")

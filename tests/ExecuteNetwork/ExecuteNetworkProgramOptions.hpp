@@ -1,5 +1,5 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -15,6 +15,7 @@
  * as close as possible to the usage of cxxopts to avoid polluting other possible uses.
  */
 #define CXXOPTS_VECTOR_DELIMITER '.'
+#include <cstdint>
 #include <cxxopts/cxxopts.hpp>
 
 /// Holds and parses program options for the ExecuteNetwork application

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #pragma once
@@ -13,6 +13,7 @@
 
 #include <armnnUtils/TContainer.hpp>
 
+#include <cstdint>
 #include <cxxopts/cxxopts.hpp>
 #include <fmt/format.h>
 

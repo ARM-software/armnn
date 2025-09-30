@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2021, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include "TestBlocks.hpp"
@@ -9,7 +9,7 @@
 #include <MemoryOptimizerStrategyLibrary.hpp>
 #include <strategies/StrategyValidator.hpp>
 
-
+#include <cstdint>
 #include <cxxopts.hpp>
 
 #include <iostream>

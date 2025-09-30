@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -30,6 +30,7 @@
 #include <TensorIOUtils.hpp>
 
 #include "armnn/utility/StringUtils.hpp"
+#include <cstdint>
 #include <cxxopts/cxxopts.hpp>
 #include "CxxoptsUtils.hpp"
 #include <fmt/format.h>

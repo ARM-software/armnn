@@ -1,5 +1,5 @@
 //
-// Copyright © 2017, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017, 2023, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -11,6 +11,7 @@
 #include <armnnUtils/Filesystem.hpp>
 #include <armnnUtils/TContainer.hpp>
 
+#include <cstdint>
 #include <cxxopts/cxxopts.hpp>
 #include <map>
 

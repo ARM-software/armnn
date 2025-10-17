@@ -1,5 +1,5 @@
 //
-// Copyright © 2020, 2023-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -13,6 +13,7 @@
 #include <armnn/IRuntime.hpp>
 #include <armnn/Logging.hpp>
 
+#include <cstdint>
 #include <cxxopts/cxxopts.hpp>
 #include <ghc/filesystem.hpp>
 

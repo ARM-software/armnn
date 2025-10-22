@@ -1,10 +1,10 @@
 #
-# Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
-
-cmake_minimum_required (VERSION 3.22)
+cmake_minimum_required(VERSION 3.22)
 project(armnnDelegate)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra -Werror -Wold-style-cast -Wno-missing-braces -Wconversion -Wsign-conversion -Wno-comment")
@@ -16,6 +16,7 @@ option(BUILD_OPAQUE_DELEGATE "Build opaque delegate" OFF)
 option(BUILD_SHARED_LIBS "Build share libs" ON)
 option(BUILD_DELEGATE_JNI_INTERFACE "Builds a library to allow accessing the Arm NN delegate from Java code.
                                      This is an experimental feature." ON)
+option(BUILD_LITERT_DELEGATE "Link against LiteRT instead of classic TfLite" OFF)
 
 ## Do not include flatbuffers::ClassicLocale which can cause abort when destroyed
 add_definitions(-DFLATBUFFERS_LOCALE_INDEPENDENT=0)
@@ -38,31 +39,33 @@ if (BUILD_CLASSIC_DELEGATE)
 
     target_include_directories(armnnDelegate
             PUBLIC
-                $<INSTALL_INTERFACE:include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/common/include>
+            $<INSTALL_INTERFACE:include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/common/include>
             PRIVATE
-                ${CMAKE_CURRENT_SOURCE_DIR}/common/src)
+            ${CMAKE_CURRENT_SOURCE_DIR}/common/src)
 endif()
+
 if (BUILD_OPAQUE_DELEGATE)
     add_subdirectory(opaque)
     add_library(armnnOpaqueDelegate ${armnnDelegate_sources})
 
     target_include_directories(armnnOpaqueDelegate
             PUBLIC
-                $<INSTALL_INTERFACE:include>
-                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/common/include>
+            $<INSTALL_INTERFACE:include>
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/common/include>
             PRIVATE
-                ${CMAKE_CURRENT_SOURCE_DIR}/common/src)
+            ${CMAKE_CURRENT_SOURCE_DIR}/common/src)
 endif()
 
 include(GNUInstallDirs)
 
-if (BUILD_CLASSIC_DELEGATE)
+if(BUILD_CLASSIC_DELEGATE)
     target_link_libraries(armnnDelegate PUBLIC Armnn::Armnn)
 
     ## Add armnnClassicDelegateObject as a Dependency
     target_link_libraries(armnnDelegate PUBLIC armnnClassicDelegateObject)
 endif()
+
 if (BUILD_OPAQUE_DELEGATE)
     target_link_libraries(armnnOpaqueDelegate PUBLIC Armnn::Armnn)
 
@@ -70,25 +73,86 @@ if (BUILD_OPAQUE_DELEGATE)
     target_link_libraries(armnnOpaqueDelegate PUBLIC armnnOpaqueDelegateObject)
 endif()
 
-## Add TfLite dependency
-find_package(TfLiteSrc REQUIRED MODULE)
-find_package(TfLite REQUIRED MODULE)
-if (BUILD_CLASSIC_DELEGATE)
-    target_link_libraries(armnnDelegate PUBLIC ${TfLite_LIB})
+if(NOT BUILD_LITERT_DELEGATE)
+    # Classic TfLite
+    find_package(TfLiteSrc REQUIRED MODULE)
+    find_package(TfLite REQUIRED MODULE)
 
-    #  lpthread and ldl are not required for Android
-    if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
-        target_link_libraries(armnnDelegate PUBLIC -lpthread)
-        target_link_libraries(armnnDelegate PUBLIC -ldl)
+    if(BUILD_CLASSIC_DELEGATE)
+        target_link_libraries(armnnDelegate PUBLIC ${TfLite_LIB})
+
+        if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+            target_link_libraries(armnnDelegate PUBLIC -lpthread)
+            target_link_libraries(armnnDelegate PUBLIC -ldl)
+        endif()
     endif()
-endif()
-if (BUILD_OPAQUE_DELEGATE)
-    target_link_libraries(armnnOpaqueDelegate PUBLIC ${TfLite_LIB})
 
-    #  lpthread and ldl are not required for Android
-    if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
-        target_link_libraries(armnnOpaqueDelegate PUBLIC -lpthread)
-        target_link_libraries(armnnOpaqueDelegate PUBLIC -ldl)
+    if(BUILD_OPAQUE_DELEGATE)
+        target_link_libraries(armnnOpaqueDelegate PUBLIC ${TfLite_LIB})
+
+        #  lpthread and ldl are not required for Android
+        if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+            target_link_libraries(armnnOpaqueDelegate PUBLIC -lpthread)
+            target_link_libraries(armnnOpaqueDelegate PUBLIC -ldl)
+        endif()
+    endif()
+else()
+    add_library(TensorFlowLite::Shared UNKNOWN IMPORTED)
+
+    message(STATUS "Using LiteRT libraries from: ${LITERT_LIBS_DIR}")
+    find_library(LITERT_LIB_C_PATH
+            NAMES tensorflowlite_c
+            PATHS ${LITERT_LIBS_DIR}
+            NO_DEFAULT_PATH
+            NO_CMAKE_FIND_ROOT_PATH
+            REQUIRED)
+
+    find_library(LITERT_LIB_PATH
+            NAMES tensorflowlite
+            PATHS ${LITERT_LIBS_DIR}
+            NO_DEFAULT_PATH
+            NO_CMAKE_FIND_ROOT_PATH
+            REQUIRED)
+
+    find_library(LITERT_CUSTOMOPS_PATH
+            NAMES custom_ops
+            PATHS ${LITERT_LIBS_DIR}
+            NO_DEFAULT_PATH
+            NO_CMAKE_FIND_ROOT_PATH
+            REQUIRED)
+
+    find_library(LITERT_DELEGATEREG_PATH
+            NAMES delegate_registry
+            PATHS ${LITERT_LIBS_DIR}
+            NO_DEFAULT_PATH
+            NO_CMAKE_FIND_ROOT_PATH
+            REQUIRED)
+
+    find_package(absl REQUIRED)
+
+    set(LITERT_ABSL_LIBS
+        absl::synchronization
+        absl::base
+        absl::time
+        absl::time_zone
+        absl::civil_time
+        absl::debugging
+        absl::memory)
+
+    set(LITERT_COMPONENTS
+        ${LITERT_LIB_C_PATH}
+        ${LITERT_LIB_PATH}
+        ${LITERT_CUSTOMOPS_PATH}
+        ${LITERT_DELEGATEREG_PATH}
+        ${Flatbuffers_LIB})
+
+    if(BUILD_CLASSIC_DELEGATE)
+        message(STATUS "Linking armnnDelegate against LiteRT: ${LITERT_LIB_PATH}")
+        target_link_libraries(armnnDelegate PUBLIC ${LITERT_ABSL_LIBS} ${LITERT_COMPONENTS})
+    endif()
+
+    if(BUILD_OPAQUE_DELEGATE)
+        target_link_libraries(armnnOpaqueDelegate PUBLIC ${LITERT_ABSL_LIBS} ${LITERT_COMPONENTS})
     endif()
 endif()
 
@@ -97,7 +161,7 @@ endif()
 # We can't change compilation flags on header files directly, so we need to add them to an interface library first
 add_library(thirdparty_headers INTERFACE)
 target_include_directories(thirdparty_headers INTERFACE $<BUILD_INTERFACE:${ARMNN_SOURCE_DIR}/third-party>
-                                                        $<INSTALL_INTERFACE:include/thirdparty_headers>)
+        $<INSTALL_INTERFACE:include/thirdparty_headers>)
 
 target_compile_options(thirdparty_headers INTERFACE -Wno-old-style-cast)
 if (BUILD_CLASSIC_DELEGATE)
@@ -109,7 +173,7 @@ endif()
 
 add_library(profiling_library_headers INTERFACE)
 target_include_directories(profiling_library_headers INTERFACE $<BUILD_INTERFACE:${ARMNN_SOURCE_DIR}/profiling>
-                                                              $<INSTALL_INTERFACE:include/profiling_library_headers>)
+        $<INSTALL_INTERFACE:include/profiling_library_headers>)
 
 if (BUILD_CLASSIC_DELEGATE)
     target_link_libraries(armnnDelegate PUBLIC profiling_library_headers)
@@ -243,20 +307,25 @@ if(BUILD_UNIT_TESTS)
 
     if ( INCLUDE_NDK_BUG_TESTS STREQUAL "ON" )
         list(APPEND commonDelegate_unittest_sources
-             test/NeonDelegateTests_NDK_Issue.cpp)
+            test/NeonDelegateTests_NDK_Issue.cpp)
     endif()
 
     if (BUILD_CLASSIC_DELEGATE)
         set(classicDelegate_unittest_sources)
         list(APPEND classicDelegate_unittest_sources
-             classic/src/test/ArmnnClassicDelegateTest.cpp
-             classic/src/test/DelegateTestInterpreter.cpp
-             test/DelegateOptionsTest.cpp
-             test/DelegateOptionsTestHelper.hpp)
+            classic/src/test/ArmnnClassicDelegateTest.cpp
+            classic/src/test/DelegateTestInterpreter.cpp
+            test/DelegateOptionsTest.cpp
+            test/DelegateOptionsTestHelper.hpp)
 
         add_executable(DelegateUnitTests ${commonDelegate_unittest_sources} ${classicDelegate_unittest_sources})
 
-        target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        if (BUILD_LITERT_DELEGATE)
+            target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${LITERT_SCHEMA_PATH}")
+        else ()
+            target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        endif ()
+
         target_include_directories(DelegateUnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/common/src/test")
         target_include_directories(DelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
 
@@ -265,19 +334,28 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(DelegateUnitTests PRIVATE armnnDelegate)
         target_link_libraries(DelegateUnitTests PRIVATE Armnn::armnnUtils)
         target_link_libraries(DelegateUnitTests PRIVATE profiling_library_headers)
+
+        if (NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+            target_link_libraries(DelegateUnitTests PRIVATE -ldl -lpthread)
+        endif()
     endif()
 
     if (BUILD_OPAQUE_DELEGATE)
         set(opaqueDelegate_unittest_sources)
         list(APPEND opaqueDelegate_unittest_sources
-             opaque/src/test/ArmnnOpaqueDelegateTest.cpp
-             opaque/src/test/DelegateTestInterpreter.cpp)
+            opaque/src/test/ArmnnOpaqueDelegateTest.cpp
+            opaque/src/test/DelegateTestInterpreter.cpp)
 
         # Until all operators are supported, we have to add tests one by one above to opaqueDelegate_unittest_sources.
         # After we add can add commonDelegate_unittest_sources to the add_executable below.
         add_executable(OpaqueDelegateUnitTests ${opaqueDelegate_unittest_sources} ${commonDelegate_unittest_sources})
 
-        target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        if (NOT BUILD_LITERT_DELEGATE)
+            target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
+        else ()
+            target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${LITERT_SCHEMA_PATH}")
+        endif ()
+
         target_include_directories(OpaqueDelegateUnitTests SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/common/src/test")
         target_include_directories(OpaqueDelegateUnitTests PUBLIC ${PROJECT_SOURCE_DIR})
 
@@ -286,6 +364,10 @@ if(BUILD_UNIT_TESTS)
         target_link_libraries(OpaqueDelegateUnitTests PRIVATE armnnOpaqueDelegate)
         target_link_libraries(OpaqueDelegateUnitTests PRIVATE Armnn::armnnUtils)
         target_link_libraries(OpaqueDelegateUnitTests PRIVATE profiling_library_headers)
+
+        if (NOT "${CMAKE_SYSTEM_NAME}" STREQUAL Android)
+            target_link_libraries(OpaqueDelegateUnitTests PRIVATE -ldl -lpthread)
+        endif()
     endif()
 endif()
 
@@ -298,12 +380,12 @@ endif()
 if (BUILD_CLASSIC_DELEGATE)
     set(armnn_delegate_export_targets)
     list(APPEND armnn_delegate_export_targets
-                armnnClassicDelegateObject
-                armnnDelegate
-                tflite_headers
-                flatbuffer_headers
-                profiling_library_headers
-                thirdparty_headers)
+        armnnClassicDelegateObject
+        armnnDelegate
+        tflite_headers
+        flatbuffer_headers
+        profiling_library_headers
+        thirdparty_headers)
 
     install(
             TARGETS ${armnn_delegate_export_targets}
@@ -357,12 +439,12 @@ endif()
 if(BUILD_OPAQUE_DELEGATE)
     set(armnn_opaque_delegate_export_targets)
     list(APPEND armnn_opaque_delegate_export_targets
-                armnnOpaqueDelegateObject
-                armnnOpaqueDelegate
-                tflite_headers
-                flatbuffer_headers
-                profiling_library_headers
-                thirdparty_headers)
+        armnnOpaqueDelegateObject
+        armnnOpaqueDelegate
+        tflite_headers
+        flatbuffer_headers
+        profiling_library_headers
+        thirdparty_headers)
 
     install(
             TARGETS armnnOpaqueDelegate

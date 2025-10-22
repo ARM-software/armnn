@@ -1,17 +1,12 @@
 //
-// Copyright © 2020, 2023 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2023, 2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "ConvolutionTestHelper.hpp"
 
-#include <armnn_delegate.hpp>
-
 #include <flatbuffers/flatbuffers.h>
 #include <tensorflow/lite/interpreter.h>
-#include <tensorflow/lite/kernels/register.h>
-#include <tensorflow/lite/model.h>
-#include <tensorflow/lite/version.h>
 
 #include <doctest/doctest.h>
 

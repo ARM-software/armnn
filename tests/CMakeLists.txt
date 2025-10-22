@@ -1,5 +1,5 @@
 #
-# Copyright © 2018-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2018-2023, 2025 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -142,7 +142,8 @@ if (BUILD_ARMNN_SERIALIZER
         OR BUILD_TF_LITE_PARSER
         OR BUILD_ONNX_PARSER
         OR BUILD_CLASSIC_DELEGATE
-        OR BUILD_OPAQUE_DELEGATE)
+        OR BUILD_OPAQUE_DELEGATE
+        OR BUILD_LITERT_DELEGATE)
     set(ExecuteNetwork_sources
         ExecuteNetwork/IExecutor.hpp
         ExecuteNetwork/ArmNNExecutor.cpp
@@ -157,7 +158,7 @@ if (BUILD_ARMNN_SERIALIZER
         NetworkExecutionUtils/NetworkExecutionUtils.cpp
         NetworkExecutionUtils/NetworkExecutionUtils.hpp)
 
-    if(BUILD_CLASSIC_DELEGATE OR BUILD_OPAQUE_DELEGATE)
+    if(BUILD_CLASSIC_DELEGATE OR BUILD_OPAQUE_DELEGATE OR BUILD_LITERT_DELEGATE)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-comment")
         set(ExecuteNetwork_sources
             ${ExecuteNetwork_sources}
@@ -171,6 +172,10 @@ if (BUILD_ARMNN_SERIALIZER
                                                       ../src/backends
                                                       ./NetworkExecutionUtils
                                                       ${CMAKE_CURRENT_SOURCE_DIR})
+
+    if(BUILD_LITERT_DELEGATE)
+        target_include_directories(ExecuteNetwork PRIVATE ${LITERT_TENSORFLOW_ROOT})
+    endif()
 
     if(EXECUTE_NETWORK_STATIC)
         target_link_libraries(ExecuteNetwork
@@ -196,6 +201,9 @@ if (BUILD_ARMNN_SERIALIZER
         endif()
         if (BUILD_OPAQUE_DELEGATE)
             target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnOpaqueDelegate)
+        endif()
+        if (BUILD_LITERT_DELEGATE)
+            target_link_libraries(ExecuteNetwork ArmnnDelegate::ArmnnDelegate)
         endif()
         target_link_libraries(ExecuteNetwork armnn)
     endif()

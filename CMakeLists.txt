@@ -32,8 +32,8 @@ cmake_policy(SET CMP0057 NEW)
 # called tensorflow
 if ((BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER) AND "${TENSORFLOW_ROOT}" STREQUAL "")
     if (BUILD_TF_LITE_PARSER AND BUILD_LITERT_PARSER)
-        message(STATUS "Both TFLite and LiteRT parser selected, prioritizing LiteRT")
-        set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../LiteRT/third_party/tensorflow" CACHE INTERNAL "")
+        message(STATUS "Both TfLite and LiteRT parser selected, prioritising TfLite")
+        set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../tensorflow" CACHE INTERNAL "")
     elseif (BUILD_LITERT_PARSER)
         set(TENSORFLOW_ROOT "${PROJECT_SOURCE_DIR}/../LiteRT/third_party/tensorflow" CACHE INTERNAL "")
         message(STATUS "Set TENSORFLOW_ROOT to use LiteRT Tensorflow: ${TENSORFLOW_ROOT}")
@@ -43,6 +43,10 @@ if ((BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER) AND "${TENSORFLOW_ROOT}" STREQ
     message(STATUS "Set TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
 else()
     message(STATUS "TENSORFLOW_ROOT: ${TENSORFLOW_ROOT}")
+endif()
+
+if(LITERT_LIBS_DIR)
+    set(LITERT_LIBS_DIR "${LITERT_LIBS_DIR}" CACHE PATH "Path to LiteRT libraries")
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/delegate/cmake/Modules/")
@@ -67,6 +71,7 @@ add_subdirectory(profiling/client/src)
 if(ARMNN_SAMPLE_APPS_ENABLED)
     add_subdirectory(samples)
 endif()
+
 add_subdirectory(src/armnnTfLiteParser)
 add_subdirectory(src/armnnSerializer)
 add_subdirectory(src/armnnDeserializer)
@@ -449,13 +454,19 @@ foreach(lib ${armnnLibraries})
     list(APPEND armnn_sources $<TARGET_OBJECTS:${lib}>)
 endforeach()
 
+# Enable classic delegate when LiteRT delegate is enabled
+if (BUILD_LITERT_DELEGATE AND NOT BUILD_CLASSIC_DELEGATE)
+    message(STATUS "BUILD_LITERT_DELEGATE is enabled, automatically enabling BUILD_CLASSIC_DELEGATE")
+    set(BUILD_CLASSIC_DELEGATE ON CACHE BOOL "Enable Classic Delegate because LiteRT Delegate is enabled" FORCE)
+endif()
+
 # The delegate needs to be placed after armnnLibraries has been fully populated. The armnn_delegate_jni library
 # requires a static armnn build.
 # Explanation:
 # Because backends are added as object libraries they won't be linked to armnn when building armnn statically.
 # A target that uses a static armnn library has to link to the object libraries in the variable armnnLibraries
 # manually to include all symbols from backends.
-if (BUILD_CLASSIC_DELEGATE OR BUILD_OPAQUE_DELEGATE)
+if (BUILD_CLASSIC_DELEGATE OR BUILD_OPAQUE_DELEGATE OR BUILD_LITERT_DELEGATE)
     set(ARMNN_SUB_PROJECT ON)
     set(ARMNN_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     add_subdirectory(delegate)
@@ -466,6 +477,11 @@ endif()
 if (BUILD_OPAQUE_DELEGATE)
     add_definitions(-DARMNN_TFLITE_OPAQUE_DELEGATE)
 endif()
+if(BUILD_LITERT_DELEGATE)
+    add_definitions(-DARMNN_TFLITE_DELEGATE)
+    add_definitions(-DBUILD_LITERT_DELEGATE)
+endif()
+
 
 if (BUILD_SHARED_LIBS)
     add_library_ex(armnn SHARED ${armnn_sources})
@@ -936,7 +952,15 @@ if(BUILD_UNIT_TESTS)
     if(BUILD_TF_LITE_PARSER OR BUILD_LITERT_PARSER)
         if(BUILD_TF_LITE_PARSER AND NOT BUILD_LITERT_PARSER)
             target_include_directories(UnitTests SYSTEM PRIVATE "${TF_LITE_SCHEMA_INCLUDE_PATH}")
-        elseif(BUILD_LITERT_PARSER)
+        endif ()
+
+        if(BUILD_LITERT_PARSER)
+            if(LITERT_TENSORFLOW_ROOT)
+                set(LITERT_TENSORFLOW_ROOT "${LITERT_TENSORFLOW_ROOT}" CACHE PATH "Path to LiteRT Tensorflow root")
+            else()
+                message(WARNING "LITERT_TENSORFLOW_ROOT not passed to ArmNN but is needed for a LiteRT build.")
+            endif ()
+
             target_include_directories(UnitTests SYSTEM PRIVATE "${LITERT_TENSORFLOW_ROOT}")
             target_include_directories(UnitTests SYSTEM PRIVATE "${LITERT_SCHEMA_PATH}")
         endif ()

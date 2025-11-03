@@ -13,7 +13,7 @@ namespace armnnOpaqueDelegate
 #define STRINGIFY_MACRO(s) #s
 
 // ArmNN Delegate version components
-#define OPAQUE_DELEGATE_MAJOR_VERSION 2
+#define OPAQUE_DELEGATE_MAJOR_VERSION 3
 #define OPAQUE_DELEGATE_MINOR_VERSION 1
 #define OPAQUE_DELEGATE_PATCH_VERSION 1
 

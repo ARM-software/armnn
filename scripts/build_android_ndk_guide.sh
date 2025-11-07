@@ -4,7 +4,6 @@
 #
 # SPDX-License-Identifier: MIT
 #
-
 function Usage() {
   echo "This script builds Arm NN for Android using the Android NDK. The script builds"
   echo "the Arm NN core library and its dependencies."
@@ -90,20 +89,21 @@ function GetAndroidNDK {
     cd $WORKING_DIR
     if [[ ! -d android-ndk-r26b ]]; then
         echo "+++ Getting Android NDK"
-        wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
-        unzip android-ndk-r26b-linux.zip
+        wget -O android-ndk-r26b-linux.zip https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
+        unzip -o android-ndk-r26b-linux.zip
+        rm -f android-ndk-r26b-linux.zip
     fi
 }
 
 function GetAndBuildCmake {
     echo "+++ Building Cmake 3.22.1"
     cd $WORKING_DIR
-    sudo apt-get install libssl-dev
+    sudo apt-get update -y && sudo apt-get install -y libssl-dev build-essential ca-certificates
     wget https://github.com/Kitware/CMake/releases/download/v3.22.1/cmake-3.22.1.tar.gz
     tar -zxf cmake-3.22.1.tar.gz
     pushd cmake-3.22.1
     ./bootstrap --prefix=$WORKING_DIR/cmake/install
-    make all install
+    make all install -j16
     popd
 }
 
@@ -130,6 +130,7 @@ function GetAndBuildFlatbuffers {
 
     CXXFLAGS="-fPIC" $CMAKE .. \
           -DFLATBUFFERS_BUILD_FLATC=1 \
+          -DTFLITE_HOST_TOOLS_DIR=$WORKING_DIR/flatbuffers-x86/bin \
           -DCMAKE_INSTALL_PREFIX:PATH=$WORKING_DIR/flatbuffers-x86
 
     make all install -j16
@@ -140,11 +141,11 @@ function GetAndBuildFlatbuffers {
     rm -f CMakeCache.txt
 
     rm -rf build-android
-    mkdir build-android
+    mkdir -p build-android
     cd build-android
 
     rm -rf $WORKING_DIR/flatbuffers-android
-    mkdir $WORKING_DIR/flatbuffers-android
+    mkdir -p $WORKING_DIR/flatbuffers-android
 
     CC=/usr/bin/aarch64-linux-gnu-gcc CXX=/usr/bin/aarch64-linux-gnu-g++ \
     CXXFLAGS="-fPIC" $CMAKE .. \
@@ -216,7 +217,7 @@ function GetAndBuildComputeLibrary {
 }
 
 function GetAndBuildTFLite {
-    TENSORFLOW_REVISION="tags/v2.14.0" # TF 2.14.0
+    TENSORFLOW_REVISION="tags/v2.19.0" # TF 2.19.0
     TFLITE_ROOT_DIR=${WORKING_DIR}/tensorflow/tensorflow/lite
 
     cd $WORKING_DIR
@@ -237,14 +238,29 @@ function GetAndBuildTFLite {
         cd $WORKING_DIR
     fi
 
+    # Ensure we use a known host protoc and headers to generate any protos
+    HOST_PROTOC="$WORKING_DIR/protobuf-host/bin/protoc"
+    PROTOBUF_HOST_INCLUDE="$WORKING_DIR/protobuf-host/include"
+    if [[ ! -x "$HOST_PROTOC" ]]; then
+        echo "Error: Host protoc not found at $HOST_PROTOC. Build Protobuf first." >&2
+        exit 1
+    fi
+
     CMARGS="-DTFLITE_ENABLE_XNNPACK=OFF \
             -DFLATBUFFERS_BUILD_FLATC=OFF \
             -DBUILD_SHARED_LIBS=OFF \
-            -DBUILD_TESTING=OFF"
+            -DBUILD_TESTING=OFF \
+            -DTFLITE_BUILD_EXAMPLES=OFF \
+            -DTFLITE_ENABLE_PROFILING=OFF \
+            -DProtobuf_PROTOC_EXECUTABLE=$HOST_PROTOC \
+            -DProtobuf_INCLUDE_DIRS=$PROTOBUF_HOST_INCLUDE \
+            -DTFLITE_HOST_TOOLS_DIR=$WORKING_DIR/flatbuffers-x86/bin "
 
     # Two different naming conventions; one for build and the other for CC_OPT_FLAGS
     ANDROID_ARM_ARCH="arm64-v8a"
 
+    # Clean previous build to avoid stale generated sources from older protoc
+    rm -rf tflite-out/android
     mkdir -p tflite-out/android
     cd tflite-out/android
 
@@ -265,13 +281,40 @@ function GetAndBuildTFLite {
 
     mkdir -p $WORKING_DIR/tflite-out/tensorflow/tensorflow/lite/schema
 
-    SCHEMA_LOCATION=$WORKING_DIR/tensorflow/tensorflow/lite/schema/schema.fbs
+    # TensorFlow >= 2.14 moved schema to compiler/mlir/lite/schema
+    SCHEMA_LOCATION_NEW=$WORKING_DIR/tensorflow/tensorflow/compiler/mlir/lite/schema/schema.fbs
+    SCHEMA_LOCATION_OLD=$WORKING_DIR/tensorflow/tensorflow/lite/schema/schema.fbs
+    if [[ -f "$SCHEMA_LOCATION_NEW" ]]; then
+        SCHEMA_LOCATION="$SCHEMA_LOCATION_NEW"
+    elif [[ -f "$SCHEMA_LOCATION_OLD" ]]; then
+        SCHEMA_LOCATION="$SCHEMA_LOCATION_OLD"
+    else
+        echo "TensorFlow schema.fbs not found in expected locations." >&2
+        echo "Tried: $SCHEMA_LOCATION_NEW and $SCHEMA_LOCATION_OLD" >&2
+        exit 1
+    fi
 
-    cp $SCHEMA_LOCATION $WORKING_DIR/tflite-out/tensorflow/tensorflow/lite/schema
+    cp "$SCHEMA_LOCATION" $WORKING_DIR/tflite-out/tensorflow/tensorflow/lite/schema
 
     cd $WORKING_DIR/tflite-out/tensorflow/tensorflow/lite/schema
     $WORKING_DIR/flatbuffers-x86/bin/flatc -c --gen-object-api --reflect-types --reflect-names schema.fbs
     AssertZeroExitCode "Failed to generate C++ schema from $SCHEMA_LOCATION"
+}
+
+function GetPrebuiltProtoc {
+    # Download a prebuilt protoc binary + headers to speed up iteration
+    # Set PROTOC_VERSION to override; defaults to 21.9 to align with build-tool flow
+    local ver=${PROTOC_VERSION:-21.9}
+    local url="https://github.com/protocolbuffers/protobuf/releases/download/v${ver}/protoc-${ver}-linux-x86_64.zip"
+    local outzip="$WORKING_DIR/protoc-${ver}-linux-x86_64.zip"
+    local dest="$WORKING_DIR/protobuf-host"
+
+    echo "+++ Downloading prebuilt protoc ${ver}"
+    mkdir -p "$dest"
+    wget -O "$outzip" "$url"
+    unzip -o "$outzip" -d "$dest"
+    rm -f "$outzip"
+    "$dest/bin/protoc" --version || true
 }
 
 function BuildArmNN {
@@ -279,7 +322,7 @@ function BuildArmNN {
 
     rm -rf $WORKING_DIR/armnn/build
 
-    mkdir $WORKING_DIR/armnn/build
+    mkdir -p $WORKING_DIR/armnn/build
     cd $WORKING_DIR/armnn/build
 
     CMARGS="-DCMAKE_BUILD_TYPE=Release \
@@ -424,7 +467,9 @@ if [[ $? != 0 ]] ; then
     echo "Downloading Android NDK failed"
     exit 1
 fi
+
 GetAndBuildCmake
+
 CMAKE=$WORKING_DIR/cmake/install/bin/cmake
 GetAndBuildFlatbuffers
 if [[ $? != 0 ]] ; then
@@ -436,10 +481,14 @@ if [[ $? != 0 ]] ; then
     echo "Cloning Arm NN failed"
     exit 1
 fi
+
 # Build TFLite if the Delegate or Parser is required
-if [[ $DELEGATE == 1 || $TFLITE_PARSER ]]; then
+if [[ "$DELEGATE" -eq 1 || "$TFLITE_PARSER" -eq 1 ]]; then
+    # Faster path: use prebuilt protoc instead of rebuilding
+    GetPrebuiltProtoc
     GetAndBuildTFLite
 fi
+
 if [[ $? != 0 ]] ; then
     echo "Building tflite failed"
     exit 1

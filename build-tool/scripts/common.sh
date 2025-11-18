@@ -69,6 +69,19 @@ TENSORFLOW_SRC="$SOURCE_DIR"/tensorflow
 TFLITE_SRC="$TENSORFLOW_SRC"/tensorflow/lite
 SCHEMA_SRC="$TENSORFLOW_SRC"/tensorflow/compiler/mlir/lite/schema/schema.fbs
 
+# Abseil-cpp
+ABSEIL_VERSION=20250127.1
+ABSL_SRC="$SOURCE_DIR"/abseil-cpp
+ABSL_DIR="$BUILD_DIR"/abseil/"$TARGET_ARCH"/install/lib/cmake/absl
+
+# Bazelisk
+BAZELISK_EXE="$SOURCE_DIR/bazelisk/bazelisk"
+if [[ "$HOST_ARCH" == "x86_64" ]]; then
+  BAZELISK_URL="https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-amd64"
+else
+  BAZELISK_URL="https://github.com/bazelbuild/bazelisk/releases/download/v1.16.0/bazelisk-linux-arm64"
+fi
+
 # LiteRT
 LITERT_VERSION=v1.4.0
 LITERT_ROOT_DIR="$SOURCE_DIR"/LiteRT

@@ -179,6 +179,9 @@ build_armnn()
         -DCMAKE_BUILD_TYPE="$build_type" \
         -DBUILD_CLASSIC_DELEGATE="$flag_tflite_classic_delegate" \
         -DBUILD_OPAQUE_DELEGATE="$flag_tflite_opaque_delegate" \
+        -DBUILD_LITERT_DELEGATE="$flag_litert_delegate" \
+        -DLITERT_LIBS_DIR="$LITERT_LIBS_DIR" \
+        -Dabsl_DIR="$ABSL_DIR" \
         -DBUILD_TF_LITE_PARSER="$flag_tflite_parser" \
         -DBUILD_LITERT_PARSER="$flag_litert_parser" \
         -DBUILD_DELEGATE_JNI_INTERFACE="$flag_jni" \
@@ -228,7 +231,7 @@ build_armnn()
   cp -r "$SOURCE_DIR"/armnn/include .
 
   # Copy all delegate header files to ./include/armnnDelegate
-  if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ]; then
+  if [ "$flag_tflite_classic_delegate" -eq 1 ] || [ "$flag_tflite_opaque_delegate" -eq 1 ] || [ "$flag_litert_delegate" -eq 1 ]; then
     mkdir -p ./include/armnnDelegate/
     cp -r "$SOURCE_DIR"/armnn/delegate/include/* ./include/armnnDelegate/
 
@@ -277,6 +280,7 @@ download_armnn()
   git clone https://github.com/ARM-software/armnn.git armnn
 
   cd "$ARMNN_SRC"
+
   local armnn_branch="$(git rev-parse --abbrev-ref HEAD)"
 
   echo -e "\n***** Arm NN Downloaded: $armnn_branch *****"
@@ -326,6 +330,8 @@ build-armnn.sh [OPTION]...
     build the Arm NN ONNX parser component
   --litert-parser
     build the Arm NN LiteRT Parser component
+  --litert-delegate
+    build the Arm NN LiteRT Delegate component
   --all
     build all Arm NN components listed above
   --target-arch=[aarch64|android64|x86_64]
@@ -382,6 +388,7 @@ flag_tflite_opaque_delegate=0
 flag_tflite_parser=0
 flag_onnx_parser=0
 flag_litert_parser=0
+flag_litert_delegate=0
 flag_neon_backend=0
 flag_cl_backend=0
 flag_ref_backend=0
@@ -405,7 +412,7 @@ if [ $# -eq 0 ]; then
   exit 1
 fi
 
-args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,litert-parser,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,symlink-armnn,help -n "$name"   -- "$@")
+args=$($osgetopt -ohx -l tflite-classic-delegate,tflite-opaque-delegate,tflite-parser,onnx-parser,litert-parser,litert-delegate,all,target-arch:,neon-backend,cl-backend,ref-backend,clean,debug,armnn-cmake-args:,acl-scons-params:,num-threads:,symlink-armnn,help -n "$name"   -- "$@")
 eval set -- "$args"
 while [ $# -gt 0 ]; do
   if [ -n "${opt_prev:-}" ]; then
@@ -442,12 +449,17 @@ while [ $# -gt 0 ]; do
     flag_litert_parser=1
     ;;
 
+  --litert-delegate)
+    flag_litert_delegate=1
+    ;;
+
   --all)
     flag_tflite_classic_delegate=1
     flag_tflite_opaque_delegate=1
     flag_tflite_parser=1
     flag_onnx_parser=1
     flag_litert_parser=1
+    flag_litert_delegate=1
     ;;
 
   --target-arch)
@@ -605,6 +617,7 @@ echo "tflite-opaque-delegate : $flag_tflite_opaque_delegate"
 echo "          tflite-parser: $flag_tflite_parser"
 echo "            onnx-parser: $flag_onnx_parser"
 echo "          litert-parser: $flag_litert_parser"
+echo "        litert-delegate: $flag_litert_delegate"
 echo "           neon-backend: $flag_neon_backend"
 echo "             cl-backend: $flag_cl_backend"
 echo "            ref-backend: $flag_ref_backend"

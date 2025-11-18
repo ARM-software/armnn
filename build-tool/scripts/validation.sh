@@ -40,9 +40,9 @@ if [ "$target_arch" == "android64" ]; then
 fi
 
 # Validation of chosen Arm NN dependencies
-if [ "$flag_tflite_classic_delegate" -eq 0 ] && [ "$flag_tflite_opaque_delegate" -eq 0 ] &&
-   [ "$flag_tflite_parser" -eq 0 ] && [ "$flag_onnx_parser" -eq 0 ] && [ "$flag_litert_parser" -eq 0 ]; then
-  echo "$name: at least one of flags --tflite-classic-delegate, --tflite-opaque-delegate, --tflite-parser, --litert-parser or --onnx-parser must be set (or --all)."
+if [ "$flag_tflite_classic_delegate" -eq 0 ] && [ "$flag_tflite_opaque_delegate" -eq 0 ] && [ "$flag_tflite_parser" -eq 0 ] &&
+   [ "$flag_onnx_parser" -eq 0 ] && [ "$flag_litert_parser" -eq 0 ] && [ "$flag_litert_delegate" -eq 0 ]; then
+  echo "$name: at least one of flags --tflite-classic-delegate, --tflite-opaque-delegate, --tflite-parser or --onnx-parser must be set (or --all)."
   exit 1
 fi
 

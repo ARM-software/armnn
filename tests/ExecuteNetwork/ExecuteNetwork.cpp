@@ -1,5 +1,5 @@
 //
-// Copyright © 2022-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -108,6 +108,6 @@ int main(int argc, const char* argv[])
     {
         FileComparisonExecutor comparisonExecutor(programOptions.m_ExNetParams);
         comparisonExecutor.Execute();
-        return comparisonExecutor.CompareAndPrintResult(outputResults);
+        return static_cast<int>(comparisonExecutor.CompareAndPrintResult(outputResults));
     }
 }

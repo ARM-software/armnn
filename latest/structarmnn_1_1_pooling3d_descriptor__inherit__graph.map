@@ -1,4 +1,5 @@
 <map id="Pooling3dDescriptor" name="Pooling3dDescriptor">
-<area shape="rect" id="node1" title="A Pooling3dDescriptor for the Pooling3dLayer." alt="" coords="5,80,159,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="21,5,143,32"/>
+<area shape="rect" id="Node000001" title="A Pooling3dDescriptor for the Pooling3dLayer." alt="" coords="5,79,144,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="19,5,130,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="77,46,77,79,72,79,72,46"/>
 </map>

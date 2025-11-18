@@ -1,0 +1,7 @@
+<map id="src/backends/tosaCommon/operatorMappings/SpaceToBatchOperator.hpp" name="src/backends/tosaCommon/operatorMappings/SpaceToBatchOperator.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="99,5,317,61"/>
+<area shape="rect" id="Node000002" href="$_tosa_mappings_8cpp.html" title=" " alt="" coords="5,116,187,157"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="169,74,119,118,116,114,165,70"/>
+<area shape="rect" id="Node000003" href="$_space_to_batch_operator_8cpp.html" title=" " alt="" coords="211,109,429,165"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="251,70,292,106,288,110,247,73"/>
+</map>

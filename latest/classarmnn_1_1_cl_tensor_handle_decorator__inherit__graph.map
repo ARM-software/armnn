@@ -1,6 +1,9 @@
 <map id="ClTensorHandleDecorator" name="ClTensorHandleDecorator">
-<area shape="rect" id="node1" title=" " alt="" coords="5,229,192,256"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_cl_tensor_handle.html" title=" " alt="" coords="35,155,162,181"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_i_acl_tensor_handle.html" title=" " alt="" coords="31,80,166,107"/>
-<area shape="rect" id="node4" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="41,5,156,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,226,177,252"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_cl_tensor_handle.html" title=" " alt="" coords="32,153,150,178"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,194,94,226,88,226,88,194"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_i_acl_tensor_handle.html" title=" " alt="" coords="29,79,153,105"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,120,94,152,88,152,88,120"/>
+<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="38,5,144,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="94,46,94,79,88,79,88,46"/>
 </map>

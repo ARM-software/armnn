@@ -1,4 +1,5 @@
 <map id="ClBackendDefaultAllocator" name="ClBackendDefaultAllocator">
-<area shape="rect" id="node1" title="Default Memory Allocator class returned from IBackendInternal::GetDefaultAllocator(MemorySource)" alt="" coords="5,80,201,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_custom_allocator.html" title="Custom Allocator interface." alt="" coords="36,5,171,32"/>
+<area shape="rect" id="Node000001" title="Default Memory Allocator class returned from IBackendInternal::GetDefaultAllocator(MemorySource)" alt="" coords="5,79,184,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_custom_allocator.html" title="Custom Allocator interface." alt="" coords="33,5,156,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,46,97,79,92,79,92,46"/>
 </map>

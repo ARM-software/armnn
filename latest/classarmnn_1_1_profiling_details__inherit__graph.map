@@ -1,4 +1,5 @@
 <map id="ProfilingDetails" name="ProfilingDetails">
-<area shape="rect" id="node1" title="ProfilingDetails class records any details associated with the operator and passes on for outputting ..." alt="" coords="5,80,127,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_json_utils.html" title=" " alt="" coords="27,5,105,32"/>
+<area shape="rect" id="Node000001" title="ProfilingDetails class records any details associated with the operator and passes on for outputting ..." alt="" coords="5,79,115,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_json_utils.html" title=" " alt="" coords="22,5,98,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,46,63,79,57,79,57,46"/>
 </map>

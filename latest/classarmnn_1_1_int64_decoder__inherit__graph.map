@@ -1,8 +1,16 @@
 <map id="Int64Decoder" name="Int64Decoder">
-<area shape="rect" id="node1" title=" " alt="" coords="114,276,223,303"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="51,185,286,227"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="5,81,145,108"/>
-<area shape="rect" id="node4" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="24,5,127,32"/>
-<area shape="rect" id="node5" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="170,81,357,108"/>
-<area shape="rect" id="node6" title=" " alt="" coords="236,5,291,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="127,384,226,410"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="74,294,280,335"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,350,180,384,174,384,174,350"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="17,177,160,203"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="108,214,165,292,161,295,104,217"/>
+<area shape="rect" id="Node000004" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="5,5,98,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="56,46,63,105,86,176,81,177,58,107,50,47"/>
+<area shape="rect" id="Node000005" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="72,80,199,106"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="79,39,124,78,120,82,75,43"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="125,121,97,178,92,175,121,118"/>
+<area shape="rect" id="Node000006" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="185,177,350,203"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="252,217,193,295,189,292,247,214"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="242,80,293,106"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="270,121,270,176,265,176,265,121"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="L2NormalizationDescriptor" name="L2NormalizationDescriptor">
-<area shape="rect" id="node1" title="A L2NormalizationDescriptor for the L2NormalizationLayer." alt="" coords="5,80,201,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="43,5,164,32"/>
+<area shape="rect" id="Node000001" title="A L2NormalizationDescriptor for the L2NormalizationLayer." alt="" coords="5,79,181,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="37,5,149,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,46,96,79,90,79,90,46"/>
 </map>

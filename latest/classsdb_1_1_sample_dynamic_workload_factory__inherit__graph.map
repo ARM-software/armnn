@@ -1,4 +1,5 @@
 <map id="SampleDynamicWorkloadFactory" name="SampleDynamicWorkloadFactory">
-<area shape="rect" id="node1" title=" " alt="" coords="5,80,243,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_workload_factory.html" title=" " alt="" coords="57,5,191,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,221,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_workload_factory.html" title=" " alt="" coords="51,5,175,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,46,116,79,110,79,110,46"/>
 </map>

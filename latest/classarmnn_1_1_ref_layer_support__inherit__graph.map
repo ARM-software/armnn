@@ -1,5 +1,7 @@
 <map id="RefLayerSupport" name="RefLayerSupport">
-<area shape="rect" id="node1" title=" " alt="" coords="10,155,141,181"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_layer_support_base.html" title=" " alt="" coords="5,80,145,107"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_i_layer_support.html" title=" " alt="" coords="19,5,131,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="10,153,129,178"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_support_base.html" title=" " alt="" coords="5,79,134,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,120,72,152,67,152,67,120"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_i_layer_support.html" title=" " alt="" coords="18,5,121,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="72,46,72,79,67,79,67,46"/>
 </map>

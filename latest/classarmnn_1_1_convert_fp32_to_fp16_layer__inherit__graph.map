@@ -1,5 +1,7 @@
 <map id="ConvertFp32ToFp16Layer" name="ConvertFp32ToFp16Layer">
-<area shape="rect" id="node1" title="This layer converts data type Float 32 to Float 16." alt="" coords="5,155,192,181"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="69,80,128,107"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="27,5,170,32"/>
+<area shape="rect" id="Node000001" title="This layer converts data type Float 32 to Float 16." alt="" coords="5,153,177,178"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="64,79,118,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,120,94,152,88,152,88,120"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="26,5,156,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,46,94,79,88,79,88,46"/>
 </map>

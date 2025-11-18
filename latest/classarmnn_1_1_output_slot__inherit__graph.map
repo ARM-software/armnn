@@ -1,4 +1,5 @@
 <map id="OutputSlot" name="OutputSlot">
-<area shape="rect" id="node1" title=" " alt="" coords="7,80,98,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_output_slot.html" title="An output connection slot for a layer." alt="" coords="5,5,100,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="7,79,91,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_output_slot.html" title="An output connection slot for a layer." alt="" coords="5,5,93,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="52,46,52,79,46,79,46,46"/>
 </map>

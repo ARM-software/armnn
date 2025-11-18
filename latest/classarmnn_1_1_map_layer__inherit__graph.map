@@ -1,5 +1,7 @@
 <map id="MapLayer" name="MapLayer">
-<area shape="rect" id="node1" title="This layer represents a memory copy operation." alt="" coords="33,155,120,181"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="47,80,106,107"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="5,5,148,32"/>
+<area shape="rect" id="Node000001" title="This layer represents a memory copy operation." alt="" coords="31,153,110,178"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="44,79,97,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,120,73,152,68,152,68,120"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="5,5,136,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,46,73,79,68,79,68,46"/>
 </map>

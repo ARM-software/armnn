@@ -1,4 +1,5 @@
 <map id="ExecutionFrame" name="ExecutionFrame">
-<area shape="rect" id="node1" title=" " alt="" coords="7,80,134,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_execution_frame.html" title="ExecutionFrame interface to enqueue a workload computation." alt="" coords="5,5,136,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="7,79,124,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_execution_frame.html" title="ExecutionFrame interface to enqueue a workload computation." alt="" coords="5,5,126,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,46,68,79,63,79,63,46"/>
 </map>

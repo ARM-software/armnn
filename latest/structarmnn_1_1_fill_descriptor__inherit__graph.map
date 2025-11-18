@@ -1,4 +1,5 @@
 <map id="FillDescriptor" name="FillDescriptor">
-<area shape="rect" id="node1" title="A FillDescriptor for the FillLayer." alt="" coords="12,80,120,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="5,5,127,32"/>
+<area shape="rect" id="Node000001" title="A FillDescriptor for the FillLayer." alt="" coords="12,79,110,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="5,5,117,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,46,64,79,58,79,58,46"/>
 </map>

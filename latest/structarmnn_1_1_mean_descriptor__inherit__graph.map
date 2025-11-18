@@ -1,4 +1,5 @@
 <map id="MeanDescriptor" name="MeanDescriptor">
-<area shape="rect" id="node1" title="A MeanDescriptor for the MeanLayer." alt="" coords="5,80,131,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="7,5,129,32"/>
+<area shape="rect" id="Node000001" title="A MeanDescriptor for the MeanLayer." alt="" coords="5,79,119,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="6,5,118,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,46,65,79,59,79,59,46"/>
 </map>

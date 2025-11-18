@@ -1,4 +1,9 @@
 <map id="OptionalReferenceSwitch&lt; true, T &gt;" name="OptionalReferenceSwitch&lt; true, T &gt;">
-<area shape="rect" id="node1" title="This is the special case for reference types." alt="" coords="5,80,192,121"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_optional_base.html" title="OptionalBase is the common functionality between reference and non&#45;reference optional types." alt="" coords="44,5,153,32"/>
+<area shape="rect" id="Node000001" title="This is the special case for reference types." alt="" coords="5,192,175,233"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_optional_base.html" title="OptionalBase is the common functionality between reference and non&#45;reference optional types." alt="" coords="40,5,140,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,47,84,121,87,192,82,192,78,121,81,46"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="99,46,102,121,98,192,93,192,96,121,94,47"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_optional_reference_switch.html" title="The default implementation is the non&#45;reference case." alt="" coords="140,80,309,121"/>
+<area shape="poly" id="edge4_Node000003_Node000002" title=" " alt="" coords="125,37,193,78,191,82,122,41"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="191,133,116,194,112,190,187,129"/>
 </map>

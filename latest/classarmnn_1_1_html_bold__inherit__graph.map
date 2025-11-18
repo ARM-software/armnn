@@ -1,5 +1,7 @@
 <map id="HtmlBold" name="HtmlBold">
-<area shape="rect" id="node1" title=" " alt="" coords="25,155,107,181"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_html_simple_tag.html" title=" " alt="" coords="5,80,127,107"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_dot_base.html" title=" " alt="" coords="27,5,105,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="23,153,98,178"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_html_simple_tag.html" title=" " alt="" coords="5,79,116,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,120,63,152,58,152,58,120"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_dot_base.html" title=" " alt="" coords="24,5,97,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="63,46,63,79,58,79,58,46"/>
 </map>

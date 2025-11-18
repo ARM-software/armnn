@@ -1,4 +1,5 @@
 <map id="DebugQueueDescriptor" name="DebugQueueDescriptor">
-<area shape="rect" id="node1" title=" " alt="" coords="5,80,179,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="27,5,157,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,163,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="24,5,144,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,46,87,79,81,79,81,46"/>
 </map>

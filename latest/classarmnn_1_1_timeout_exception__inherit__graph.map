@@ -1,5 +1,7 @@
 <map id="TimeoutException" name="TimeoutException">
-<area shape="rect" id="node1" title=" " alt="" coords="5,155,145,181"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="32,80,119,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="32,5,119,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,132,178"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="29,79,108,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,120,71,152,66,152,66,120"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="30,5,107,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,46,71,79,66,79,66,46"/>
 </map>

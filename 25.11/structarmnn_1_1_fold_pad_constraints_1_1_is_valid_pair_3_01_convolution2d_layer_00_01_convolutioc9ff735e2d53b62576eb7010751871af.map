@@ -1,0 +1,10 @@
+<map id="IsValidPair&lt; Convolution2dLayer, Convolution2dDescriptor &gt;" name="IsValidPair&lt; Convolution2dLayer, Convolution2dDescriptor &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,197,221,238"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="15,5,96,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="59,46,68,105,85,155,105,196,100,198,80,157,62,107,54,47"/>
+<area shape="rect" id="Node000004" href="$structarmnn_1_1_fold_pad_constraints_1_1_is_valid_pair.html" title=" " alt="" coords="78,80,210,106"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="83,39,131,78,128,82,80,43"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="270,80,345,106"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="311,122,306,150,291,175,263,190,222,202,221,197,261,185,287,171,301,148,305,121"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="123,119,117,131,111,165,112,197,107,197,105,165,111,129,118,117"/>
+</map>

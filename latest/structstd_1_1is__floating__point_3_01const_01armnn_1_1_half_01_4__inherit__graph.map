@@ -1,4 +1,5 @@
 <map id="is_floating_point&lt; const armnn::Half &gt;" name="is_floating_point&lt; const armnn::Half &gt;">
-<area shape="rect" id="node1" title=" " alt="" coords="5,95,163,136"/>
-<area shape="rect" id="node2" title=" " alt="" coords="11,5,157,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,94,147,135"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="12,5,140,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="79,62,79,94,73,94,73,62"/>
 </map>

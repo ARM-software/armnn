@@ -1,5 +1,7 @@
 <map id="PolymorphicDowncastException" name="PolymorphicDowncastException">
-<area shape="rect" id="node1" title=" " alt="" coords="5,155,236,181"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="77,80,164,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="77,5,164,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,216,178"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="71,79,150,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="113,120,113,152,108,152,108,120"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="72,5,149,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="113,46,113,79,108,79,108,46"/>
 </map>

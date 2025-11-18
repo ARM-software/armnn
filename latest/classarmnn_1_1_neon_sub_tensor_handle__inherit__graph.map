@@ -1,5 +1,7 @@
 <map id="NeonSubTensorHandle" name="NeonSubTensorHandle">
-<area shape="rect" id="node1" title=" " alt="" coords="5,155,173,181"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_acl_tensor_handle.html" title=" " alt="" coords="22,80,157,107"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="32,5,147,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,161,178"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_acl_tensor_handle.html" title=" " alt="" coords="21,79,145,105"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,120,86,152,80,152,80,120"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="30,5,136,31"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="86,46,86,79,80,79,80,46"/>
 </map>

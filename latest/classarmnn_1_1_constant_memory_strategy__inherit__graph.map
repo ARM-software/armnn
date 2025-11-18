@@ -1,4 +1,5 @@
 <map id="ConstantMemoryStrategy" name="ConstantMemoryStrategy">
-<area shape="rect" id="node1" title=" " alt="" coords="10,80,199,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_memory_optimizer_strategy.html" title=" " alt="" coords="5,5,204,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="9,79,179,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_memory_optimizer_strategy.html" title=" " alt="" coords="5,5,183,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,46,97,79,91,79,91,46"/>
 </map>

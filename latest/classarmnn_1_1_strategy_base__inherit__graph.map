@@ -1,4 +1,5 @@
 <map id="StrategyBase&lt; DefaultStrategy &gt;" name="StrategyBase&lt; DefaultStrategy &gt;">
-<area shape="rect" id="node1" title="Strategy base class with empty implementations." alt="" coords="5,80,248,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_i_strategy.html" title=" " alt="" coords="86,5,167,32"/>
+<area shape="rect" id="Node000001" title="Strategy base class with empty implementations." alt="" coords="5,79,221,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_i_strategy.html" title=" " alt="" coords="76,5,150,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,46,116,79,110,79,110,46"/>
 </map>

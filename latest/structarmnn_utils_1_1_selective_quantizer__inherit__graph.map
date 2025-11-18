@@ -1,0 +1,9 @@
+<map id="SelectiveQuantizer&lt; T, DoQuantize &gt;" name="SelectiveQuantizer&lt; T, DoQuantize &gt;">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,80,137,121"/>
+<area shape="rect" id="Node000002" href="$structarmnn_utils_1_1_selective_quantizer_3_01_t_00_01false_01_4.html" title=" " alt="" coords="344,5,475,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,70,160,52,207,41,255,32,343,24,343,30,256,38,208,46,162,58,120,75"/>
+<area shape="rect" id="Node000003" href="$structarmnn_utils_1_1_selective_quantizer_3_01armnn_1_1_b_float16_00_01false_01_4.html" title=" " alt="" coords="321,80,498,121"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,98,321,98,321,103,152,103"/>
+<area shape="rect" id="Node000004" href="$structarmnn_utils_1_1_selective_quantizer_3_01armnn_1_1_half_00_01false_01_4.html" title=" " alt="" coords="335,145,484,186"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="149,123,161,126,251,143,335,155,334,160,250,149,160,131,147,128"/>
+</map>

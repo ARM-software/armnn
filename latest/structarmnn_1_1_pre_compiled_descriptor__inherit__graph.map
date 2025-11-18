@@ -1,4 +1,5 @@
 <map id="PreCompiledDescriptor" name="PreCompiledDescriptor">
-<area shape="rect" id="node1" title="A PreCompiledDescriptor for the PreCompiledLayer." alt="" coords="5,80,177,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="31,5,152,32"/>
+<area shape="rect" id="Node000001" title="A PreCompiledDescriptor for the PreCompiledLayer." alt="" coords="5,79,162,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="28,5,139,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,46,86,79,81,79,81,46"/>
 </map>

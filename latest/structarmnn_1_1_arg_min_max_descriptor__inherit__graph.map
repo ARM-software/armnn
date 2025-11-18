@@ -1,4 +1,5 @@
 <map id="ArgMinMaxDescriptor" name="ArgMinMaxDescriptor">
-<area shape="rect" id="node1" title="An ArgMinMaxDescriptor for ArgMinMaxLayer." alt="" coords="5,80,168,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="26,5,147,32"/>
+<area shape="rect" id="Node000001" title="An ArgMinMaxDescriptor for ArgMinMaxLayer." alt="" coords="5,79,153,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="23,5,135,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,46,82,79,76,79,76,46"/>
 </map>

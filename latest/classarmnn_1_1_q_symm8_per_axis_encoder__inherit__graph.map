@@ -1,9 +1,16 @@
 <map id="QSymm8PerAxisEncoder" name="QSymm8PerAxisEncoder">
-<area shape="rect" id="node1" title=" " alt="" coords="105,380,288,407"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="113,289,281,331"/>
-<area shape="rect" id="node3" href="$classarmnn_1_1_encoder.html" title=" " alt="" coords="49,178,182,205"/>
-<area shape="rect" id="node4" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="5,5,108,32"/>
-<area shape="rect" id="node5" href="$classarmnn_1_1_encoder.html" title=" " alt="" coords="78,81,217,108"/>
-<area shape="rect" id="node6" href="$classarmnn_1_1_per_axis_iterator.html" title="PerAxisIterator for per&#45;axis quantization." alt="" coords="206,171,353,212"/>
-<area shape="rect" id="node7" title=" " alt="" coords="252,81,307,108"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="97,399,267,425"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="108,309,257,350"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,365,185,399,180,399,180,365"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_encoder.html" title=" " alt="" coords="50,184,168,210"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="125,223,173,307,169,310,121,225"/>
+<area shape="rect" id="Node000004" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="5,5,98,31"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="54,46,57,75,63,105,82,149,103,182,98,185,78,151,58,107,52,76,49,47"/>
+<area shape="rect" id="Node000005" href="$classarmnn_1_1_encoder.html" title=" " alt="" coords="73,80,198,106"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="79,39,124,78,120,82,75,43"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="131,122,115,185,109,183,126,120"/>
+<area shape="rect" id="Node000006" href="$classarmnn_1_1_per_axis_iterator.html" title="PerAxisIterator for per&#45;axis quantization." alt="" coords="192,177,322,218"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="240,233,196,310,191,307,236,230"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="231,80,282,106"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="260,121,260,177,254,177,254,121"/>
 </map>

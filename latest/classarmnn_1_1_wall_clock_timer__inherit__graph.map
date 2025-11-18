@@ -1,4 +1,5 @@
 <map id="WallClockTimer" name="WallClockTimer">
-<area shape="rect" id="node1" title=" " alt="" coords="5,80,129,107"/>
-<area shape="rect" id="node2" href="$classarmnn_1_1_instrument.html" title=" " alt="" coords="21,5,114,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,119,105"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_instrument.html" title=" " alt="" coords="20,5,104,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="65,46,65,79,59,79,59,46"/>
 </map>

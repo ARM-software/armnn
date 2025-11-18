@@ -1,4 +1,5 @@
 <map id="GatherNdQueueDescriptor" name="GatherNdQueueDescriptor">
-<area shape="rect" id="node1" title=" " alt="" coords="5,80,199,107"/>
-<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="37,5,167,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,181,105"/>
+<area shape="rect" id="Node000002" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="33,5,153,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,46,96,79,90,79,90,46"/>
 </map>

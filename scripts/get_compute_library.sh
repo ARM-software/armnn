@@ -89,8 +89,8 @@ if [ ! -z "$CLFRAMEWORK_SHA" ]; then
   CLFRAMEWORKREVISION=$CLFRAMEWORK_SHA
 fi
 
-echo "git fetch && git fetch https://github.com/ARM-software/ComputeLibrary && git checkout $CLFRAMEWORKREVISION"
-git fetch && git fetch https://github.com/ARM-software/ComputeLibrary && git checkout "${CLFRAMEWORKREVISION}"
+echo "git fetch && git fetch https://github.com/ARM-software/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD"
+git fetch && git fetch https://github.com/ARM-software/ComputeLibrary $CLFRAMEWORKREVISION && git checkout FETCH_HEAD
 AssertZeroExitCode "Fetching and checking out ${CLFRAMEWORKREVISION} failed"
 # If the target ACL revision includes a branch we also need to do a pull.
 # This generally occurs with a release branch.

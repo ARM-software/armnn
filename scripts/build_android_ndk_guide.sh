@@ -401,7 +401,6 @@ function BuildStandaloneDynamicBackend {
 # push sources to board
 function PushBuildSourcesToBoard {
     cd $WORKING_DIR/armnn/build
-    adb start-server
     adb shell rm -rf /data/local/tmp/*
     echo "+++ Pushing sources to board"
     adb root
@@ -451,10 +450,31 @@ function PushBuildSourcesToBoard {
         adb push -p ${WORKING_DIR}/armnn/src/dynamic/sample/build/libArm_SampleDynamic_backend.so /data/local/tmp/dynamic/sample/
     fi
     echo "+++ Running UnitTests"
-    adb shell LD_LIBRARY_PATH=/data/local/tmp:/vendor/lib64:/vendor/lib64/egl /data/local/tmp/UnitTests ; printf $?
-    if [[ $DELEGATE == 1 ]]; then
-        adb shell LD_LIBRARY_PATH=/data/local/tmp:/vendor/lib64:/vendor/lib64/egl /data/local/tmp/DelegateUnitTests ; printf $?
+    adb shell LD_LIBRARY_PATH=/data/local/tmp:/vendor/lib64:/vendor/lib64/egl /data/local/tmp/UnitTests
+    TEST_RESULT=$?
+    printf '%s\n' "$TEST_RESULT"
+    if [[ $TEST_RESULT -ne 0 ]]; then
+        echo "Tests failed"
+        exit 1
     fi
+    if [[ $DELEGATE == 1 ]]; then
+        adb shell LD_LIBRARY_PATH=/data/local/tmp:/vendor/lib64:/vendor/lib64/egl /data/local/tmp/DelegateUnitTests
+        TEST_RESULT=$?
+        printf '%s\n' "$TEST_RESULT"
+        if [[ $TEST_RESULT -ne 0 ]]; then
+            echo "DelegateTests failed"
+            exit 1
+        fi
+    fi
+}
+
+verifyAdbConnection() {
+    adb devices | grep -w "device" > /dev/null
+    if [[ $? != 0 ]]; then
+        echo "No connected Android device found. Please connect a device and enable ADB."
+        return 1
+    fi
+    return 0
 }
 
 # Cleanup any previous runs, setup clean directories
@@ -505,6 +525,11 @@ if [[ $? != 0 ]] ; then
 fi
 if [[ $DYNAMIC_SAMPLE == 1 ]]; then
   BuildStandaloneDynamicBackend
+fi
+verifyAdbConnection
+if [[ $? != 0 ]] ; then
+    echo "ADB connection failed"
+    exit 1
 fi
 if [[ $PUSH_TO_BOARD == 1 ]]; then
   PushBuildSourcesToBoard

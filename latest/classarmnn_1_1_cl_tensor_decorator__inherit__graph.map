@@ -1,5 +1,5 @@
 <map id="ClTensorDecorator" name="ClTensorDecorator">
 <area shape="rect" id="Node000001" title="ClTensorDecorator wraps an existing CL tensor allowing us to override the TensorInfo for it." alt="" coords="5,79,136,105"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="30,5,111,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,46,73,79,68,79,68,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,45,73,79,68,78,69,48"/>
 </map>

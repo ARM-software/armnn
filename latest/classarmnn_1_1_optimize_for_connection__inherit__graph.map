@@ -1,43 +1,13 @@
 <map id="OptimizeForConnection&lt; BaseType, ChildType, Wrapped &gt;" name="OptimizeForConnection&lt; BaseType, ChildType, Wrapped &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="868,694,1029,750"/>
-<area shape="rect" id="Node000006" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1419,76,1648,147"/>
-<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="948,679,955,553,971,390,984,309,1002,237,1024,178,1037,156,1052,139,1092,110,1136,89,1183,76,1232,69,1282,66,1331,68,1419,80,1419,85,1330,73,1282,72,1233,74,1184,81,1138,94,1094,114,1055,143,1041,159,1028,180,1007,238,989,311,976,391,960,553,954,679"/>
-<area shape="rect" id="Node000007" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1386,175,1681,231"/>
-<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="950,679,960,572,978,439,992,373,1008,314,1028,267,1052,235,1068,227,1097,220,1179,211,1386,202,1386,207,1180,216,1098,226,1070,232,1055,239,1033,269,1013,316,997,374,984,439,965,573,955,679"/>
-<area shape="rect" id="Node000008" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1453,255,1614,311"/>
-<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="952,679,964,588,985,479,1013,379,1031,340,1052,315,1073,306,1110,299,1216,289,1453,281,1453,287,1217,294,1111,304,1075,311,1055,319,1036,343,1018,381,990,480,970,589,957,679"/>
-<area shape="rect" id="Node000009" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1447,335,1620,391"/>
-<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="947,679,951,613,966,535,980,494,998,456,1022,421,1052,392,1073,383,1109,377,1213,368,1447,361,1447,366,1213,373,1110,382,1074,389,1055,396,1026,425,1002,459,985,496,971,536,956,614,952,679"/>
-<area shape="rect" id="Node000010" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1410,415,1657,471"/>
-<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="951,678,960,627,978,568,1007,511,1028,486,1052,465,1071,458,1102,452,1193,445,1410,440,1410,445,1193,450,1103,458,1072,463,1055,470,1031,490,1012,514,983,570,965,629,956,679"/>
-<area shape="rect" id="Node000011" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1418,497,1649,568"/>
-<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="962,679,976,648,996,615,1021,584,1052,560,1072,553,1104,548,1198,540,1418,532,1418,537,1198,545,1105,553,1073,558,1055,564,1025,588,1000,618,981,650,967,681"/>
-<area shape="rect" id="Node000012" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1418,592,1649,663"/>
-<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="996,683,1023,667,1053,654,1121,641,1215,632,1418,625,1418,630,1215,638,1121,646,1054,659,1025,671,999,687"/>
-<area shape="rect" id="Node000013" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1431,687,1636,757"/>
-<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="1045,719,1430,719,1430,725,1045,725"/>
-<area shape="rect" id="Node000014" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1415,781,1652,852"/>
-<area shape="poly" id="edge15_Node000001_Node000014" title=" " alt="" coords="996,757,1024,775,1054,788,1146,811,1242,823,1333,827,1415,825,1415,830,1333,832,1241,829,1145,817,1052,794,1021,780,993,761"/>
-<area shape="rect" id="Node000015" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1408,876,1659,947"/>
-<area shape="poly" id="edge16_Node000001_Node000015" title=" " alt="" coords="964,764,977,798,997,835,1022,870,1055,897,1081,908,1116,915,1207,923,1310,923,1408,919,1408,924,1310,929,1207,929,1116,921,1079,913,1052,901,1018,874,992,838,973,801,959,766"/>
-<area shape="rect" id="Node000016" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1391,971,1676,1041"/>
-<area shape="poly" id="edge17_Node000001_Node000016" title=" " alt="" coords="955,765,962,820,979,884,992,915,1009,945,1030,972,1055,994,1079,1006,1111,1014,1196,1023,1294,1023,1390,1018,1390,1023,1294,1028,1196,1028,1111,1020,1077,1011,1052,999,1026,976,1004,948,987,918,974,885,957,821,949,766"/>
-<area shape="rect" id="Node000017" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1447,1065,1620,1136"/>
-<area shape="poly" id="edge18_Node000001_Node000017" title=" " alt="" coords="958,765,971,848,992,948,1020,1038,1037,1071,1055,1093,1083,1107,1123,1116,1172,1121,1227,1123,1342,1118,1446,1109,1447,1114,1342,1124,1227,1128,1172,1126,1122,1121,1081,1112,1052,1097,1032,1074,1015,1040,987,949,966,849,953,765"/>
-<area shape="rect" id="Node000018" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1447,1160,1620,1231"/>
-<area shape="poly" id="edge19_Node000001_Node000018" title=" " alt="" coords="955,765,965,869,983,999,997,1063,1013,1119,1032,1164,1055,1193,1074,1200,1109,1204,1212,1207,1446,1198,1446,1204,1212,1213,1109,1210,1073,1205,1052,1197,1028,1167,1008,1121,992,1064,978,1000,960,870,950,765"/>
-<area shape="rect" id="Node000019" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1447,1255,1620,1325"/>
-<area shape="poly" id="edge20_Node000001_Node000019" title=" " alt="" coords="954,765,961,886,977,1041,991,1118,1008,1187,1029,1242,1041,1262,1055,1277,1083,1292,1122,1302,1171,1308,1226,1310,1341,1307,1446,1298,1446,1303,1342,1312,1226,1315,1170,1313,1121,1307,1081,1297,1052,1281,1037,1265,1024,1244,1003,1188,985,1119,972,1042,955,887,949,765"/>
-<area shape="rect" id="Node000020" href="$classarmnn_1_1_optimize_for_connection.html" title=" " alt="" coords="1403,1349,1664,1420"/>
-<area shape="poly" id="edge21_Node000001_Node000020" title=" " alt="" coords="953,765,956,907,969,1093,982,1186,1000,1270,1025,1336,1039,1361,1055,1380,1095,1407,1139,1426,1186,1437,1235,1441,1285,1440,1333,1436,1422,1418,1423,1423,1334,1441,1285,1446,1235,1447,1185,1442,1137,1431,1092,1412,1052,1384,1035,1365,1020,1339,995,1271,977,1187,964,1094,950,907,947,766"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="582,687,819,757"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="834,719,868,719,868,725,834,725"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,658,100,684"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="115,657,203,645,314,637,437,638,499,644,559,654,600,667,638,684,636,689,598,672,558,659,498,649,436,643,314,642,203,651,116,663"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="149,688,311,729"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="116,682,149,689,148,694,114,687"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="16,716,89,741"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="104,734,149,738,264,742,354,740,558,727,582,726,582,731,558,733,354,746,264,748,149,743,104,739"/>
-<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="104,720,148,715,149,720,104,726"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="327,717,335,718,463,722,582,722,582,727,463,727,335,723,327,722"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="864,38,1025,94"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="578,31,815,101"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="830,63,866,66,861,66,830,69"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,16,100,42"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,18,201,10,311,4,433,5,555,17,603,30,598,30,554,22,433,10,312,9,202,15,116,23"/>
+<area shape="rect" id="Node000005" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="149,38,311,78"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="115,36,151,44,146,45,116,42"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="16,73,89,99"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="104,86,149,87,311,87,575,75,581,75,311,93,149,93,104,91"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="104,75,151,70,146,71,105,81"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="327,61,335,62,581,67,575,68,335,67,327,67"/>
 </map>

@@ -1,5 +1,5 @@
 <map id="LstmDescriptor" name="LstmDescriptor">
 <area shape="rect" id="Node000001" title="An LstmDescriptor for the LstmLayer." alt="" coords="6,79,116,105"/>
 <area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="5,5,117,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,46,64,79,58,79,58,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,45,64,79,58,78,59,48"/>
 </map>

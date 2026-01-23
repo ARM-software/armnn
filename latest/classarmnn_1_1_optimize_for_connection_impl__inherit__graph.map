@@ -1,5 +1,5 @@
 <map id="OptimizeForConnectionImpl&lt; BaseType, ChildType, Wrapped &gt;" name="OptimizeForConnectionImpl&lt; BaseType, ChildType, Wrapped &gt;">
 <area shape="rect" id="Node000001" title="Wrapper Optimization class that calls Wrapped::Run for every connection BaseType &#45;&gt; ChildType." alt="" coords="5,79,189,135"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="61,5,133,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,47,100,78,94,78,94,47"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,45,100,79,94,78,95,49"/>
 </map>

@@ -1,7 +1,7 @@
 <map id="MemoryExportException" name="MemoryExportException">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,170,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="48,79,127,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,120,90,152,85,152,85,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,118,90,153,85,151,86,122"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="49,5,126,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="90,46,90,79,85,79,85,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="89,44,90,79,85,78,86,49"/>
 </map>

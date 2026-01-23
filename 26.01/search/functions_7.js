@@ -1,0 +1,14 @@
+var searchData=
+[
+  ['has_5fvalue_0',['has_value',['../classarmnn_1_1_optional_base.html#a86b749ce2c4bc627fa8a1fcfaf0e314f',1,'armnn::OptionalBase']]],
+  ['hasaxis_1',['HasAxis',['../structarmnn_1_1_views_descriptor.html#a0863c05ae66572108c23853f8f003b55',1,'armnn::ViewsDescriptor']]],
+  ['hascapability_2',['HasCapability',['../namespacearmnn.html#abd839f0f103c1ae19a4b38d59b869108',1,'armnn::HasCapability(const std::string &amp;name, const BackendCapabilities &amp;capabilities)'],['../namespacearmnn.html#a8439e8b224a1fb7abdf449c8e6775469',1,'armnn::HasCapability(const std::string &amp;name, const armnn::BackendId &amp;backend)'],['../namespacearmnn.html#ae702febbc6139e20b2b8c4f03ff89b01',1,'armnn::HasCapability(const BackendOptions::BackendOption &amp;capability, const BackendCapabilities &amp;capabilities)'],['../namespacearmnn.html#a78fe085e22e9822075ad791aa5cc34d5',1,'armnn::HasCapability(const BackendOptions::BackendOption &amp;backendOption, const armnn::BackendId &amp;backend)']]],
+  ['haskernelmeasurements_3',['HasKernelMeasurements',['../classarmnn_1_1_instrument.html#af86639ebdd7db055ee07c3d924d4c0ff',1,'armnn::Instrument::HasKernelMeasurements()'],['../classarmnn_1_1_open_cl_timer.html#ae9faa4ff4d8569776b5686e472c46bb0',1,'armnn::OpenClTimer::HasKernelMeasurements()'],['../classarmnn_1_1_neon_timer.html#ae9faa4ff4d8569776b5686e472c46bb0',1,'armnn::NeonTimer::HasKernelMeasurements()']]],
+  ['hasmatchingcapability_4',['HasMatchingCapability',['../namespacearmnn.html#a406399d2a16ead98e4e93cdd57adead4',1,'armnn::HasMatchingCapability(const BackendOptions::BackendOption &amp;capability, const BackendCapabilities &amp;capabilities)'],['../namespacearmnn.html#ab627d99aaab05ad358c60fb931cee241',1,'armnn::HasMatchingCapability(const BackendOptions::BackendOption &amp;backendOption, const armnn::BackendId &amp;backend)']]],
+  ['hasmultiplequantizationscales_5',['HasMultipleQuantizationScales',['../classarmnn_1_1_tensor_info.html#af672d1c9e2a120a18926cb645981fbb7',1,'armnn::TensorInfo']]],
+  ['hasperaxisquantization_6',['HasPerAxisQuantization',['../classarmnn_1_1_tensor_info.html#ab85cd8cc10c96a7c99c14042c251fc48',1,'armnn::TensorInfo']]],
+  ['htmlbold_7',['HtmlBold',['../classarmnn_1_1_html_bold.html#ab20b25fdfa1906d94ed0b2bc02b8fc72',1,'armnn::HtmlBold']]],
+  ['htmlfont_8',['HtmlFont',['../classarmnn_1_1_html_font.html#a2b4fc23bc1f6abd681d9111805c694b8',1,'armnn::HtmlFont::HtmlFont(std::ostream &amp;stream, int fontSize, const char *color, const char *face)'],['../classarmnn_1_1_html_font.html#ac09375f1f65ca49653602f208d5d1293',1,'armnn::HtmlFont::HtmlFont(std::ostream &amp;stream)']]],
+  ['htmlsection_9',['HtmlSection',['../classarmnn_1_1_html_section.html#af2f5392606e5c3105ecac45bb5d73da1',1,'armnn::HtmlSection']]],
+  ['htmlsimpletag_10',['HtmlSimpleTag',['../classarmnn_1_1_html_simple_tag.html#a043aaed12483b95132c474e1b2cc24bb',1,'armnn::HtmlSimpleTag']]]
+];

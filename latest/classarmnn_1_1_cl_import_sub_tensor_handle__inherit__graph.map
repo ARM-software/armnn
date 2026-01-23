@@ -1,9 +1,9 @@
 <map id="ClImportSubTensorHandle" name="ClImportSubTensorHandle">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,226,180,252"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_i_cl_tensor_handle.html" title=" " alt="" coords="33,153,152,178"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,194,95,226,90,226,90,194"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,192,95,227,90,225,91,196"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_i_acl_tensor_handle.html" title=" " alt="" coords="30,79,155,105"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,120,95,152,90,152,90,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,118,95,153,90,152,91,123"/>
 <area shape="rect" id="Node000004" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="40,5,145,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="95,46,95,79,90,79,90,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="93,44,95,79,90,78,92,49"/>
 </map>

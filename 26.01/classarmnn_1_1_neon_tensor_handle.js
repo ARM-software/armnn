@@ -1,0 +1,22 @@
+var classarmnn_1_1_neon_tensor_handle =
+[
+    [ "NeonTensorHandle", "classarmnn_1_1_neon_tensor_handle.html#aec1964e898a1dfc9c6be2f5589c0ee33", null ],
+    [ "NeonTensorHandle", "classarmnn_1_1_neon_tensor_handle.html#a8be757c370ed96fdb90168e2ff0216d6", null ],
+    [ "Allocate", "classarmnn_1_1_neon_tensor_handle.html#ac4c894e28b763523748ba2bb718d569d", null ],
+    [ "CanBeImported", "classarmnn_1_1_neon_tensor_handle.html#ae69aed5d7a4cc5deb4488dc6841b2096", null ],
+    [ "DecorateTensorHandle", "classarmnn_1_1_neon_tensor_handle.html#a937b32594cf8f2ea8df5cbb653e3d769", null ],
+    [ "GetDataType", "classarmnn_1_1_neon_tensor_handle.html#ad3e63bb560123889f1ec98e40c5f8279", null ],
+    [ "GetImportFlags", "classarmnn_1_1_neon_tensor_handle.html#aa1d3334a17a9f136fe65ed833fbf68b4", null ],
+    [ "GetParent", "classarmnn_1_1_neon_tensor_handle.html#a5ae5911d8497ce3680a26f010d6ac5aa", null ],
+    [ "GetShape", "classarmnn_1_1_neon_tensor_handle.html#a8e8d2fbabcac19f9e12779080ddff54e", null ],
+    [ "GetStrides", "classarmnn_1_1_neon_tensor_handle.html#a967f220393d291f71dabce0c06bf9b6c", null ],
+    [ "GetTensor", "classarmnn_1_1_neon_tensor_handle.html#a7713bd6d8b37b3aef903a734baa566dc", null ],
+    [ "GetTensor", "classarmnn_1_1_neon_tensor_handle.html#a59e1108d9944431f994a572796d05ad2", null ],
+    [ "Import", "classarmnn_1_1_neon_tensor_handle.html#a468bf13728df2ac9ec772733047ff136", null ],
+    [ "Manage", "classarmnn_1_1_neon_tensor_handle.html#a19aa18d78d5ac31e3a3c8f782f0e8606", null ],
+    [ "Map", "classarmnn_1_1_neon_tensor_handle.html#a3bea7477ce33940eea71d87bedfbe2bb", null ],
+    [ "SetImportEnabledFlag", "classarmnn_1_1_neon_tensor_handle.html#a9b8adcb578eb6f9ad63c21b1fa43bb14", null ],
+    [ "SetImportFlags", "classarmnn_1_1_neon_tensor_handle.html#acd3ddbebcda4124217925ae36d551441", null ],
+    [ "SetMemoryGroup", "classarmnn_1_1_neon_tensor_handle.html#af9c82a4633347a36ad10c8bfab384396", null ],
+    [ "Unmap", "classarmnn_1_1_neon_tensor_handle.html#a88ab6decf78c152e746b7d8dc2dd931f", null ]
+];

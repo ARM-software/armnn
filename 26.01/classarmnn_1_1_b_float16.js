@@ -1,0 +1,13 @@
+var classarmnn_1_1_b_float16 =
+[
+    [ "BFloat16", "classarmnn_1_1_b_float16.html#a8f4fc25560afea5a7a45cdbf20fc30ca", null ],
+    [ "BFloat16", "classarmnn_1_1_b_float16.html#a2448669b496e643b34aef839c124cf92", null ],
+    [ "BFloat16", "classarmnn_1_1_b_float16.html#a58f28952f1e43061905be5f1789cccfe", null ],
+    [ "BFloat16", "classarmnn_1_1_b_float16.html#ac5c86c8ca117ed170c80f74e98b55d9b", null ],
+    [ "operator float", "classarmnn_1_1_b_float16.html#abc4ec9f715112697477f2f425122ce21", null ],
+    [ "operator=", "classarmnn_1_1_b_float16.html#a711ab9f079cf2a3b5d54aa8c867de45b", null ],
+    [ "operator=", "classarmnn_1_1_b_float16.html#ab92ee437b336e5f1d19cdd756ed322f5", null ],
+    [ "operator==", "classarmnn_1_1_b_float16.html#aecfc3fae6930caee98c9fc8b973068a8", null ],
+    [ "ToFloat32", "classarmnn_1_1_b_float16.html#afe0f15d338fde36113a613f6e165b0e9", null ],
+    [ "Val", "classarmnn_1_1_b_float16.html#afbd0d2d6540777e3898d125b79f6a5bc", null ]
+];

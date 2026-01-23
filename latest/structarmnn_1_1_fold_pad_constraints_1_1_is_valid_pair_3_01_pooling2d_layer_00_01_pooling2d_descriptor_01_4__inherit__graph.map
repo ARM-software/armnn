@@ -1,10 +1,5 @@
 <map id="IsValidPair&lt; Pooling2dLayer, Pooling2dDescriptor &gt;" name="IsValidPair&lt; Pooling2dLayer, Pooling2dDescriptor &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="10,197,197,238"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,87,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="49,46,58,105,76,155,95,196,90,198,71,157,53,107,44,47"/>
-<area shape="rect" id="Node000004" href="$structarmnn_1_1_fold_pad_constraints_1_1_is_valid_pair.html" title=" " alt="" coords="68,80,200,106"/>
-<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="74,39,121,78,118,82,70,43"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="259,80,334,106"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="300,122,295,150,280,175,247,192,198,205,197,200,245,187,276,171,290,148,294,121"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="114,119,108,131,101,165,103,197,98,197,96,165,102,129,109,117"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,193,120"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="61,5,137,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,44,101,80,97,78,97,48"/>
 </map>

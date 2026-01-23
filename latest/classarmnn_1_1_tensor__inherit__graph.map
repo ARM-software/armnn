@@ -1,7 +1,7 @@
 <map id="Tensor" name="Tensor">
-<area shape="rect" id="Node000001" title="A tensor defined by a TensorInfo (shape and data type) and a mutable backing store." alt="" coords="70,177,130,203"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_base_tensor.html" title=" " alt="" coords="26,102,174,128"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,143,103,177,97,177,97,143"/>
+<area shape="rect" id="Node000001" title="A tensor defined by a TensorInfo (shape and data type) and a mutable backing store." alt="" coords="70,169,130,195"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_base_tensor.html" title=" " alt="" coords="26,94,174,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,133,102,170,98,168,98,137"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_base_tensor.html" title=" " alt="" coords="5,5,195,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="103,46,103,101,97,101,97,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,44,103,94,97,93,99,49"/>
 </map>

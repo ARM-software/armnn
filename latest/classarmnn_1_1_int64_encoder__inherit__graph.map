@@ -1,16 +1,16 @@
 <map id="Int64Encoder" name="Int64Encoder">
-<area shape="rect" id="Node000001" title=" " alt="" coords="128,384,226,410"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="96,294,258,335"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,350,180,384,174,384,174,350"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_encoder.html" title=" " alt="" coords="26,177,157,203"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,214,166,292,161,295,106,217"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="128,363,226,388"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="96,273,258,313"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="179,327,179,364,175,361,175,330"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_encoder.html" title=" " alt="" coords="26,169,157,195"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,204,164,272,159,273,109,209"/>
 <area shape="rect" id="Node000004" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="5,5,98,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="55,46,63,105,76,144,88,175,83,178,71,146,58,107,50,47"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="53,44,63,105,75,140,88,168,83,169,70,142,58,107,52,49"/>
 <area shape="rect" id="Node000005" href="$classarmnn_1_1_encoder.html" title=" " alt="" coords="73,80,198,106"/>
-<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="79,39,124,78,120,82,75,43"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="126,121,100,178,95,175,121,119"/>
-<area shape="rect" id="Node000006" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="181,177,346,203"/>
-<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="248,217,193,295,188,292,244,214"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="76,39,124,79,119,81,77,44"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="121,122,100,170,95,167,124,117"/>
+<area shape="rect" id="Node000006" href="$classarmnn_1_1_typed_iterator.html" title=" " alt="" coords="181,169,346,195"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="247,205,194,274,190,270,243,208"/>
 <area shape="rect" id="Node000007" title=" " alt="" coords="238,80,289,106"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="266,121,266,176,261,176,261,121"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="265,119,266,170,261,168,262,124"/>
 </map>

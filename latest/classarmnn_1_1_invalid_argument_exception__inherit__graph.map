@@ -1,7 +1,7 @@
 <map id="InvalidArgumentException" name="InvalidArgumentException">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,179,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="52,79,132,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,120,95,152,89,152,89,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,118,94,153,90,151,90,122"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="53,5,131,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,46,95,79,89,79,89,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,44,95,79,89,78,91,49"/>
 </map>

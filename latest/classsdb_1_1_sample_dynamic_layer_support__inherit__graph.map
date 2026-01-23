@@ -1,7 +1,7 @@
 <map id="SampleDynamicLayerSupport" name="SampleDynamicLayerSupport">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,200,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_support_base.html" title=" " alt="" coords="38,79,167,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,120,105,152,100,152,100,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,118,105,153,100,151,101,122"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_i_layer_support.html" title=" " alt="" coords="51,5,154,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,46,105,79,100,79,100,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,44,105,79,100,78,101,49"/>
 </map>

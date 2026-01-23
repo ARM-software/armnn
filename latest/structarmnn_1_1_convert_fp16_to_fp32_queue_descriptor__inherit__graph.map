@@ -1,5 +1,5 @@
 <map id="ConvertFp16ToFp32QueueDescriptor" name="ConvertFp16ToFp32QueueDescriptor">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,79,243,105"/>
 <area shape="rect" id="Node000002" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="64,5,184,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,46,127,79,121,79,121,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="126,45,126,80,122,77,122,48"/>
 </map>

@@ -1,9 +1,9 @@
 <map id="DivisionLayer" name="DivisionLayer">
 <area shape="rect" id="Node000001" title="This layer represents a division operation." alt="" coords="34,226,135,252"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_elementwise_base_layer.html" title="NOTE: this is an abstract class to encapsulate the element wise operations, it does not implement: st..." alt="" coords="5,153,164,178"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,194,87,226,82,226,82,194"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,192,87,227,82,225,83,196"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="58,79,111,105"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="87,120,87,152,82,152,82,120"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="86,118,87,153,82,152,83,123"/>
 <area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="19,5,150,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,46,87,79,82,79,82,46"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="85,44,87,79,82,78,84,49"/>
 </map>

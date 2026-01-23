@@ -1,5 +1,5 @@
 <map id="OpenClTimer" name="OpenClTimer">
 <area shape="rect" id="Node000001" title="OpenClTimer instrument that times all OpenCl kernels executed between calls to Start() and Stop()." alt="" coords="5,79,104,105"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_instrument.html" title=" " alt="" coords="13,5,96,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,46,57,79,52,79,52,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="56,45,57,79,52,78,53,48"/>
 </map>

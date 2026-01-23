@@ -1,0 +1,26 @@
+var dir_5bee762cfd03f62aa80233ed05f1bfdf =
+[
+    [ "AddBroadcastReshapeLayer.hpp", "_add_broadcast_reshape_layer_8hpp.html", "_add_broadcast_reshape_layer_8hpp" ],
+    [ "AddDebug.hpp", "_add_debug_8hpp.html", "_add_debug_8hpp" ],
+    [ "All.hpp", "_all_8hpp.html", null ],
+    [ "ConvertConstants.hpp", "_convert_constants_8hpp.html", "_convert_constants_8hpp" ],
+    [ "ConvertConstDequantisationLayersToConstLayers.hpp", "_convert_const_dequantisation_layers_to_const_layers_8hpp.html", "_convert_const_dequantisation_layers_to_const_layers_8hpp" ],
+    [ "ConvertConstPermuteLayersToConstLayers.hpp", "_convert_const_permute_layers_to_const_layers_8hpp.html", "_convert_const_permute_layers_to_const_layers_8hpp" ],
+    [ "ConvertFp32NetworkToFp16.hpp", "_convert_fp32_network_to_fp16_8hpp.html", "_convert_fp32_network_to_fp16_8hpp" ],
+    [ "DeleteBroadcastTo.hpp", "_delete_broadcast_to_8hpp.html", "_delete_broadcast_to_8hpp" ],
+    [ "FoldPadIntoLayer2d.hpp", "_fold_pad_into_layer2d_8hpp.html", "_fold_pad_into_layer2d_8hpp" ],
+    [ "FuseBatchNorm.hpp", "_fuse_batch_norm_8hpp.html", "_fuse_batch_norm_8hpp" ],
+    [ "MaxMinIntoBoundedRelu.hpp", "_max_min_into_bounded_relu_8hpp.html", "_max_min_into_bounded_relu_8hpp" ],
+    [ "MovePermuteUp.hpp", "_move_permute_up_8hpp.html", "_move_permute_up_8hpp" ],
+    [ "MoveTransposeUp.hpp", "_move_transpose_up_8hpp.html", "_move_transpose_up_8hpp" ],
+    [ "Optimization.hpp", "_optimization_8hpp.html", "_optimization_8hpp" ],
+    [ "OptimizeConsecutiveReshapes.hpp", "_optimize_consecutive_reshapes_8hpp.html", "_optimize_consecutive_reshapes_8hpp" ],
+    [ "OptimizeInverseConversions.hpp", "_optimize_inverse_conversions_8hpp.html", "_optimize_inverse_conversions_8hpp" ],
+    [ "OptimizeInversePermutes.hpp", "_optimize_inverse_permutes_8hpp.html", "_optimize_inverse_permutes_8hpp" ],
+    [ "PermuteAndBatchToSpaceAsDepthToSpace.hpp", "_permute_and_batch_to_space_as_depth_to_space_8hpp.html", "_permute_and_batch_to_space_as_depth_to_space_8hpp" ],
+    [ "PermuteAsReshape.hpp", "_permute_as_reshape_8hpp.html", "_permute_as_reshape_8hpp" ],
+    [ "PermuteDepthwiseConv2dWeights.hpp", "_permute_depthwise_conv2d_weights_8hpp.html", "_permute_depthwise_conv2d_weights_8hpp" ],
+    [ "SquashEqualSiblings.hpp", "_squash_equal_siblings_8hpp.html", "_squash_equal_siblings_8hpp" ],
+    [ "TransposeAsReshape.hpp", "_transpose_as_reshape_8hpp.html", "_transpose_as_reshape_8hpp" ],
+    [ "TurboConvertConstDequantisationLayersToConstLayers.hpp", "_turbo_convert_const_dequantisation_layers_to_const_layers_8hpp.html", "_turbo_convert_const_dequantisation_layers_to_const_layers_8hpp" ]
+];

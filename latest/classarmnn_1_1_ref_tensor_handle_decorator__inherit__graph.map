@@ -1,7 +1,7 @@
 <map id="RefTensorHandleDecorator" name="RefTensorHandleDecorator">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,185,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_ref_tensor_handle.html" title=" " alt="" coords="34,79,156,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,120,98,152,92,152,92,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,118,97,153,93,151,93,122"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_i_tensor_handle.html" title=" " alt="" coords="42,5,148,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="98,46,98,79,92,79,92,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="96,44,98,79,92,78,94,49"/>
 </map>

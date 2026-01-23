@@ -1,10 +1,5 @@
 <map id="IsValidPair&lt; DepthwiseConvolution2dLayer, DepthwiseConvolution2dDescriptor &gt;" name="IsValidPair&lt; DepthwiseConvolution2dLayer, DepthwiseConvolution2dDescriptor &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,218,283,258"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="46,5,127,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,46,99,105,118,167,138,216,133,218,112,168,93,107,85,47"/>
-<area shape="rect" id="Node000004" href="$structarmnn_1_1_fold_pad_constraints_1_1_is_valid_pair.html" title=" " alt="" coords="108,80,241,106"/>
-<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="114,39,162,78,159,82,111,43"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="326,80,402,106"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="369,121,366,159,359,179,347,196,322,210,284,221,282,216,320,205,344,192,354,176,360,158,364,121"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="154,119,148,131,142,153,140,176,143,217,138,217,135,176,137,152,143,129,149,117"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,283,120"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="106,5,182,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="146,44,146,80,142,77,142,48"/>
 </map>

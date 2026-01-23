@@ -1,7 +1,7 @@
 <map id="BackendCapabilityException" name="BackendCapabilityException">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,194,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="60,79,139,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,120,102,152,97,152,97,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="101,118,102,153,97,151,98,122"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="61,5,138,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,46,102,79,97,79,97,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="101,44,102,79,97,78,98,49"/>
 </map>

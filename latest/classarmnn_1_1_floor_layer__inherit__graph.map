@@ -1,7 +1,7 @@
 <map id="FloorLayer" name="FloorLayer">
 <area shape="rect" id="Node000001" title="This layer represents a floor operation." alt="" coords="29,153,112,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="44,79,97,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,120,73,152,68,152,68,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,118,73,153,68,151,69,122"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="5,5,136,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,46,73,79,68,79,68,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,44,73,79,68,78,70,49"/>
 </map>

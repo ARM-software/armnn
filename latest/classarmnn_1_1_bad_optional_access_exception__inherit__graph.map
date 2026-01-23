@@ -1,7 +1,7 @@
 <map id="BadOptionalAccessException" name="BadOptionalAccessException">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,200,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="63,79,142,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,120,105,152,100,152,100,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,118,105,153,100,151,101,122"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="64,5,141,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="105,46,105,79,100,79,100,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="104,44,105,79,100,78,101,49"/>
 </map>

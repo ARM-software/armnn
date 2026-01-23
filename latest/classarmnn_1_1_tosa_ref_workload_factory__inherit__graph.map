@@ -1,5 +1,5 @@
 <map id="TosaRefWorkloadFactory" name="TosaRefWorkloadFactory">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,79,174,105"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_i_workload_factory.html" title=" " alt="" coords="28,5,151,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,46,92,79,87,79,87,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,45,92,79,87,78,88,48"/>
 </map>

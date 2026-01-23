@@ -1,11 +1,5 @@
 <map id="IsValidPair&lt; L, D &gt;" name="IsValidPair&lt; L, D &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="136,136,268,162"/>
-<area shape="rect" id="Node000003" href="$structarmnn_1_1_fold_pad_constraints_1_1_is_valid_pair_3_01_convolution2d_layer_00_01_convolution2d_descriptor_01_4.html" title=" " alt="" coords="547,34,763,74"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="226,123,255,100,291,81,356,62,422,51,487,46,547,45,547,50,488,51,423,56,357,67,293,86,258,104,229,127"/>
-<area shape="rect" id="Node000004" href="$structarmnn_1_1_fold_pad_constraints_1_1_is_valid_pair_3_01_depthwise_convolution2d_layer_00_01_ab29f6ddde6982af57e107f1e84dc771.html" title=" " alt="" coords="516,128,794,169"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="284,146,516,146,516,151,284,151"/>
-<area shape="rect" id="Node000005" href="$structarmnn_1_1_fold_pad_constraints_1_1_is_valid_pair_3_01_pooling2d_layer_00_01_pooling2d_descriptor_01_4.html" title=" " alt="" coords="561,203,749,244"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="236,168,263,183,293,195,362,211,432,220,561,225,561,230,432,225,361,216,292,200,261,188,234,173"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,136,87,162"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="102,146,136,146,136,151,102,151"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,79,138,105"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="31,5,112,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,45,74,79,69,78,70,48"/>
 </map>

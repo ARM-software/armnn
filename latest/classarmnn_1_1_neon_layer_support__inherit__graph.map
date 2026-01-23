@@ -1,7 +1,7 @@
 <map id="NeonLayerSupport" name="NeonLayerSupport">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,135,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_support_base.html" title=" " alt="" coords="6,79,134,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="73,120,73,152,67,152,67,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,118,73,153,67,151,68,122"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_i_layer_support.html" title=" " alt="" coords="19,5,121,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="73,46,73,79,67,79,67,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="71,44,73,79,67,78,69,49"/>
 </map>

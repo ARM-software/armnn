@@ -1,7 +1,7 @@
 <map id="NeonWorkloadFactory" name="NeonWorkloadFactory">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,156,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_workload_factory_base.html" title=" " alt="" coords="6,79,155,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="83,120,83,152,78,152,78,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,118,83,153,78,151,79,122"/>
 <area shape="rect" id="Node000003" href="$classarmnn_1_1_i_workload_factory.html" title=" " alt="" coords="19,5,142,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="83,46,83,79,78,79,78,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="82,44,83,79,78,78,79,49"/>
 </map>

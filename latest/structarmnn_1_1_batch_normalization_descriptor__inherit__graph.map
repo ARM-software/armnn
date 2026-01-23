@@ -1,5 +1,5 @@
 <map id="BatchNormalizationDescriptor" name="BatchNormalizationDescriptor">
 <area shape="rect" id="Node000001" title="A BatchNormalizationDescriptor for the BatchNormalizationLayer." alt="" coords="5,79,201,105"/>
 <area shape="rect" id="Node000002" href="$structarmnn_1_1_base_descriptor.html" title="Base class for all descriptors." alt="" coords="47,5,159,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,46,106,79,100,79,100,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="105,45,105,80,101,77,101,48"/>
 </map>

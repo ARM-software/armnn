@@ -1,5 +1,5 @@
 <map id="ClTunedParameters" name="ClTunedParameters">
 <area shape="rect" id="Node000001" title=" " alt="" coords="24,79,162,105"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_i_gpu_acc_tuned_parameters.html" title="Manages a set of GpuAcc parameters which have been tuned for maximum performance." alt="" coords="5,5,181,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,46,96,79,90,79,90,46"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,45,95,80,91,78,91,48"/>
 </map>

@@ -1,29 +1,13 @@
 <map id="OptimizeForExclusiveConnection&lt; BaseType, ChildType, Wrapped &gt;" name="OptimizeForExclusiveConnection&lt; BaseType, ChildType, Wrapped &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="875,445,1103,485"/>
-<area shape="rect" id="Node000006" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1472,76,1744,131"/>
-<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="991,428,1001,362,1024,280,1041,238,1064,198,1092,161,1126,131,1165,107,1207,90,1252,78,1297,70,1388,67,1472,73,1471,79,1388,72,1298,76,1253,83,1209,95,1167,112,1129,135,1096,165,1068,200,1046,240,1029,282,1006,363,996,429"/>
-<area shape="rect" id="Node000007" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1423,170,1793,226"/>
-<area shape="poly" id="edge8_Node000001_Node000007" title=" " alt="" coords="997,429,1013,381,1039,324,1076,269,1099,245,1126,225,1166,215,1238,207,1423,199,1423,204,1238,212,1167,220,1128,230,1103,249,1080,273,1044,327,1018,383,1002,430"/>
-<area shape="rect" id="Node000008" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1485,265,1731,321"/>
-<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="1010,430,1058,373,1090,344,1126,323,1155,313,1192,305,1283,295,1386,290,1484,289,1485,294,1386,295,1284,300,1192,310,1156,318,1128,327,1093,349,1062,376,1014,433"/>
-<area shape="rect" id="Node000009" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1465,372,1751,443"/>
-<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="1099,439,1127,434,1303,417,1465,408,1465,414,1303,422,1128,440,1099,444"/>
-<area shape="rect" id="Node000010" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1465,487,1751,558"/>
-<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="1040,490,1082,509,1128,524,1214,537,1302,542,1387,541,1465,537,1465,542,1387,547,1302,547,1213,542,1127,529,1080,514,1038,495"/>
-<area shape="rect" id="Node000011" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1471,594,1745,680"/>
-<area shape="poly" id="edge12_Node000001_Node000011" title=" " alt="" coords="1009,497,1028,532,1055,570,1088,605,1129,632,1155,641,1189,647,1276,653,1375,651,1471,646,1471,652,1375,657,1276,658,1189,652,1153,646,1126,637,1085,609,1051,573,1024,535,1004,500"/>
-<area shape="rect" id="Node000012" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1471,709,1745,794"/>
-<area shape="poly" id="edge13_Node000001_Node000012" title=" " alt="" coords="998,500,1012,557,1036,624,1053,659,1074,691,1099,719,1129,743,1154,754,1188,762,1274,769,1374,768,1471,762,1471,768,1374,774,1274,774,1187,767,1152,759,1126,747,1095,723,1070,694,1048,661,1031,627,1007,558,993,501"/>
-<area shape="rect" id="Node000013" href="$classarmnn_1_1_optimize_for_exclusive_connection.html" title=" " alt="" coords="1486,819,1730,890"/>
-<area shape="poly" id="edge14_Node000001_Node000013" title=" " alt="" coords="994,501,1001,575,1009,621,1021,669,1039,717,1062,763,1092,804,1129,838,1169,862,1213,879,1259,890,1306,896,1400,895,1485,883,1486,888,1400,900,1306,901,1258,895,1211,884,1167,867,1126,843,1088,808,1057,766,1034,719,1016,670,1004,622,996,576,989,501"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="573,430,826,500"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="841,462,874,462,874,468,841,468"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,401,100,427"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="115,401,201,389,310,381,430,382,491,387,550,397,593,410,633,427,631,432,591,415,549,402,490,393,430,387,310,386,201,395,115,406"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="149,431,311,472"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="116,425,149,432,148,437,114,430"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="16,459,89,484"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="104,476,149,481,262,485,349,483,549,470,573,469,573,474,549,476,349,488,261,491,149,486,104,482"/>
-<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="104,463,148,458,149,463,104,468"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="327,460,335,461,458,465,573,465,573,470,457,470,335,466,327,465"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="871,45,1099,85"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="569,30,822,100"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="837,62,873,65,868,65,837,68"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,15,100,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,17,200,9,308,4,427,4,546,16,597,29,591,29,545,21,426,10,308,9,200,15,116,22"/>
+<area shape="rect" id="Node000005" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="149,37,311,77"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="115,35,151,43,146,44,116,41"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="16,72,89,98"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="104,85,149,86,311,86,566,75,571,75,311,92,149,92,104,90"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="104,74,151,69,146,70,105,80"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="327,60,335,61,571,66,566,67,335,66,327,66"/>
 </map>

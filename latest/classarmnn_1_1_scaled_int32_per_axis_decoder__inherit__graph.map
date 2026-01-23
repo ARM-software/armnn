@@ -1,16 +1,16 @@
 <map id="ScaledInt32PerAxisDecoder" name="ScaledInt32PerAxisDecoder">
-<area shape="rect" id="Node000001" title=" " alt="" coords="90,399,275,425"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="91,309,273,350"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,365,185,399,180,399,180,365"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="49,184,168,210"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="125,223,173,307,169,310,121,225"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="90,378,275,403"/>
+<area shape="rect" id="Node000002" href="$classarmnn_1_1_per_axis_iterator.html" title=" " alt="" coords="91,288,273,328"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,342,184,379,180,376,180,345"/>
+<area shape="rect" id="Node000003" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="49,176,168,202"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="125,213,173,287,167,288,123,218"/>
 <area shape="rect" id="Node000004" href="$classarmnn_1_1_base_iterator.html" title=" " alt="" coords="5,5,98,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="54,46,57,75,63,105,82,149,103,182,98,185,78,151,58,107,52,76,49,47"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="52,44,57,75,63,105,82,144,102,175,97,177,77,147,58,107,51,76,51,49"/>
 <area shape="rect" id="Node000005" href="$classarmnn_1_1_decoder.html" title=" " alt="" coords="72,80,199,106"/>
-<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="79,39,124,78,120,82,75,43"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="131,122,115,185,109,183,126,120"/>
-<area shape="rect" id="Node000006" href="$classarmnn_1_1_per_axis_iterator.html" title="PerAxisIterator for per&#45;axis quantization." alt="" coords="193,177,323,218"/>
-<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="241,233,196,310,191,307,237,230"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="76,39,124,79,119,81,77,44"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="129,118,115,177,110,175,127,123"/>
+<area shape="rect" id="Node000006" href="$classarmnn_1_1_per_axis_iterator.html" title="PerAxisIterator for per&#45;axis quantization." alt="" coords="193,169,323,210"/>
+<area shape="poly" id="edge6_Node000002_Node000006" title=" " alt="" coords="239,221,197,289,193,285,235,224"/>
 <area shape="rect" id="Node000007" title=" " alt="" coords="232,80,284,106"/>
-<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="261,121,261,177,256,177,256,121"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="259,119,261,169,256,168,257,124"/>
 </map>

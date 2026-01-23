@@ -1,7 +1,7 @@
 <map id="UnimplementedException" name="UnimplementedException">
 <area shape="rect" id="Node000001" title=" " alt="" coords="5,153,176,178"/>
 <area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="51,79,130,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="93,120,93,152,88,152,88,120"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,118,93,153,88,151,89,122"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="52,5,129,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,46,93,79,88,79,88,46"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="92,44,93,79,88,78,89,49"/>
 </map>

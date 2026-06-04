@@ -1,9 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "NeonBackendModelContext.hpp"
+
+#include <arm_compute/core/CPP/CPPTypes.h>
 
 namespace
 {
@@ -32,7 +34,7 @@ namespace armnn
 {
 
 NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOptions)
-    : m_IsFastMathEnabled(false), m_NumberOfThreads(0)
+    : m_IsFastMathEnabled(false), m_NumberOfThreads(0), m_IsSmeEnabled(true)
 {
    if (!modelOptions.empty())
    {
@@ -40,14 +42,20 @@ NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOption
        {
            if (name == "FastMathEnabled")
            {
-               m_IsFastMathEnabled |= ParseBool(value, false);
+               m_IsFastMathEnabled = ParseBool(value, m_IsFastMathEnabled);
            }
            if (name == "NumberOfThreads")
            {
-               m_NumberOfThreads |= ParseUnsignedInt(value, 0);
+               m_NumberOfThreads = ParseUnsignedInt(value, m_NumberOfThreads);
+           }
+           if (name == "SmeEnabled")
+           {
+               m_IsSmeEnabled = ParseBool(value, m_IsSmeEnabled);
            }
        });
    }
+
+   arm_compute::CPUInfo::get().set_sme_allowed(m_IsSmeEnabled);
 }
 
 bool NeonBackendModelContext::IsFastMathEnabled() const
@@ -58,6 +66,11 @@ bool NeonBackendModelContext::IsFastMathEnabled() const
 unsigned int NeonBackendModelContext::GetNumberOfThreads() const
 {
     return m_NumberOfThreads;
+}
+
+bool NeonBackendModelContext::IsSmeEnabled() const
+{
+    return m_IsSmeEnabled;
 }
 
 } // namespace armnn

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -19,6 +19,8 @@
 #include <armnn/backends/MemCopyWorkload.hpp>
 #include <backendsCommon/MemImportWorkload.hpp>
 #include <armnn/backends/TensorHandle.hpp>
+
+#include <arm_compute/core/CPP/CPPTypes.h>
 
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <neon/workloads/NeonWorkloads.hpp>
@@ -62,6 +64,8 @@ void NeonWorkloadFactory::SetNumberOfThreads()
         // Only set if within limit or valid input
         auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
         auto numberOfThreads = modelOptions->GetNumberOfThreads();
+
+        arm_compute::CPUInfo::get().set_sme_allowed(modelOptions->IsSmeEnabled());
 
         if (numberOfThreads != 0 && numberOfThreads >= MIN_THREADS && numberOfThreads <= MAX_THREADS)
         {

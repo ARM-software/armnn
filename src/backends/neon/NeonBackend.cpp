@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -134,11 +134,7 @@ IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport() const
 
 IBackendInternal::ILayerSupportSharedPtr NeonBackend::GetLayerSupport(const ModelOptions& modelOptions) const
 {
-    static ILayerSupportSharedPtr layerSupport
-        {
-            new NeonLayerSupport(CreateBackendSpecificModelContext(modelOptions))
-        };
-    return layerSupport;
+    return ILayerSupportSharedPtr{new NeonLayerSupport(CreateBackendSpecificModelContext(modelOptions))};
 }
 
 OptimizationViews NeonBackend::OptimizeSubgraphView(const SubgraphView& subgraph,

@@ -34,7 +34,7 @@ namespace armnn
 {
 
 NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOptions)
-    : m_IsFastMathEnabled(false), m_NumberOfThreads(0), m_IsSmeEnabled(true)
+    : m_IsFastMathEnabled(false), m_NumberOfThreads(0), m_IsSveEnabled(true), m_IsSmeEnabled(true)
 {
    if (!modelOptions.empty())
    {
@@ -52,9 +52,14 @@ NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOption
            {
                m_IsSmeEnabled = ParseBool(value, m_IsSmeEnabled);
            }
+           if (name == "SveEnabled")
+           {
+               m_IsSveEnabled = ParseBool(value, m_IsSveEnabled);
+           }
        });
    }
 
+   arm_compute::CPUInfo::get().set_sve_allowed(m_IsSveEnabled);
    arm_compute::CPUInfo::get().set_sme_allowed(m_IsSmeEnabled);
 }
 
@@ -66,6 +71,11 @@ bool NeonBackendModelContext::IsFastMathEnabled() const
 unsigned int NeonBackendModelContext::GetNumberOfThreads() const
 {
     return m_NumberOfThreads;
+}
+
+bool NeonBackendModelContext::IsSveEnabled() const
+{
+    return m_IsSveEnabled;
 }
 
 bool NeonBackendModelContext::IsSmeEnabled() const

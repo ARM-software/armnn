@@ -16,6 +16,8 @@ namespace armnn
 ///    results with reduced or different precision. The fast_math flag will not have any effect on int8 performance.
 ///  - "NumberOfThreads"\n
 ///    Specify the number of threads used by the CpuAcc backend.
+///  - "SveEnabled"\n
+///    Specify whether SVE/SVE2 implementations may be selected by the CpuAcc backend.
 ///  - "SmeEnabled"\n
 ///    Specify whether SME/SME2 implementations may be selected by the CpuAcc backend.
 class NeonBackendModelContext : public IBackendModelContext
@@ -27,11 +29,14 @@ public:
 
     unsigned int GetNumberOfThreads() const;
 
+    bool IsSveEnabled() const;
+
     bool IsSmeEnabled() const;
 
 private:
     bool m_IsFastMathEnabled;
     unsigned int m_NumberOfThreads;
+    bool m_IsSveEnabled;
     bool m_IsSmeEnabled;
 };
 

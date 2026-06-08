@@ -50,6 +50,10 @@ namespace
 struct Sme2ShapeProfile
 {
     unsigned int m_GemmLikeOps = 0;
+    unsigned int m_DepthwiseConvolution2dOps = 0;
+    unsigned int m_SmallDenseProjectionOps = 0;
+    int64_t m_GemmMacs = 0;
+    int64_t m_NonPointwiseGemmMacs = 0;
     bool m_HasFp16 = false;
     bool m_HasQuantized = false;
     bool m_HasSegmentationShape = false;
@@ -127,7 +131,8 @@ void RecordGemmShape(Sme2ShapeProfile& profile,
                      int64_t n,
                      int64_t k,
                      int64_t kernelH,
-                     int64_t kernelW)
+                     int64_t kernelW,
+                     bool isDenseProjection)
 {
     if (m <= 0 || n <= 0 || k <= 0)
     {
@@ -137,6 +142,16 @@ void RecordGemmShape(Sme2ShapeProfile& profile,
     ++profile.m_GemmLikeOps;
 
     const bool is1x1 = kernelH == 1 && kernelW == 1;
+    const int64_t macs = m * n * k;
+    profile.m_GemmMacs += macs;
+    if (!is1x1)
+    {
+        profile.m_NonPointwiseGemmMacs += macs;
+    }
+    if (isDenseProjection && is1x1 && m <= 256 && n <= 1024 && k <= 1024)
+    {
+        ++profile.m_SmallDenseProjectionOps;
+    }
 
     if (is1x1 && m == 2304 && ((n >= 900 && k <= 384) || (n <= 384 && k >= 900)))
     {
@@ -204,7 +219,7 @@ void RecordConvolution2d(Sme2ShapeProfile& profile, const Layer& layer)
     const int64_t outputElements = NumElements(outputShape);
     const int64_t m = n > 0 ? outputElements / n : 0;
 
-    RecordGemmShape(profile, m, n, k, kernelH, kernelW);
+    RecordGemmShape(profile, m, n, k, kernelH, kernelW, false);
 }
 
 void RecordFullyConnected(Sme2ShapeProfile& profile, const Layer& layer)
@@ -245,7 +260,7 @@ void RecordFullyConnected(Sme2ShapeProfile& profile, const Layer& layer)
     const int64_t outputElements = NumElements(outputInfo.GetShape());
     const int64_t m = n > 0 ? outputElements / n : 0;
 
-    RecordGemmShape(profile, m, n, k, 1, 1);
+    RecordGemmShape(profile, m, n, k, 1, 1, true);
 }
 
 void RecordBatchMatMul(Sme2ShapeProfile& profile, const Layer& layer)
@@ -281,7 +296,27 @@ void RecordBatchMatMul(Sme2ShapeProfile& profile, const Layer& layer)
         k = DimensionFromEnd(lhsShape, 2);
     }
 
-    RecordGemmShape(profile, m, n, k, 1, 1);
+    RecordGemmShape(profile, m, n, k, 1, 1, true);
+}
+
+void RecordDepthwiseConvolution2d(Sme2ShapeProfile& profile, const Layer& layer)
+{
+    ++profile.m_DepthwiseConvolution2dOps;
+
+    for (unsigned int i = 0; i < layer.GetNumInputSlots(); ++i)
+    {
+        if (layer.GetInputSlot(i).IsTensorInfoSet())
+        {
+            RecordTensorType(profile, layer.GetInputSlot(i).GetTensorInfo());
+        }
+    }
+    for (unsigned int i = 0; i < layer.GetNumOutputSlots(); ++i)
+    {
+        if (layer.GetOutputSlot(i).IsTensorInfoSet())
+        {
+            RecordTensorType(profile, layer.GetOutputSlot(i).GetTensorInfo());
+        }
+    }
 }
 
 Sme2ShapeProfile BuildSme2ShapeProfile(const Graph& graph, bool reduceFp32ToFp16)
@@ -301,6 +336,9 @@ Sme2ShapeProfile BuildSme2ShapeProfile(const Graph& graph, bool reduceFp32ToFp16
                 break;
             case LayerType::BatchMatMul:
                 RecordBatchMatMul(profile, *layer);
+                break;
+            case LayerType::DepthwiseConvolution2d:
+                RecordDepthwiseConvolution2d(profile, *layer);
                 break;
             default:
                 for (unsigned int i = 0; i < layer->GetNumInputSlots(); ++i)
@@ -353,6 +391,30 @@ unsigned int GetCpuAccNumberOfThreads(const ModelOptions& modelOptions)
     return numberOfThreads;
 }
 
+bool HasFloatSmeRegressionRisk(const Sme2ShapeProfile& profile)
+{
+    const bool isFloatOnly = !profile.m_HasFp16 && !profile.m_HasQuantized;
+    if (!isFloatOnly)
+    {
+        return false;
+    }
+
+    const bool hasHeavySpatialConvolution =
+        profile.m_GemmMacs > 0 &&
+        profile.m_NonPointwiseGemmMacs * 2 >= profile.m_GemmMacs &&
+        !profile.m_HasSegmentationShape;
+
+    const bool hasSmallDenseGraph =
+        profile.m_DepthwiseConvolution2dOps == 0 &&
+        profile.m_SmallDenseProjectionOps >= 4 &&
+        !profile.m_HasSmallMLargeNProjection;
+
+    return profile.m_HasPoseShape ||
+           profile.m_HasStyleTransferShape ||
+           hasHeavySpatialConvolution ||
+           hasSmallDenseGraph;
+}
+
 bool ShouldDisableSme(const Sme2ShapeProfile& profile)
 {
     if (profile.m_GemmLikeOps == 0)
@@ -360,7 +422,17 @@ bool ShouldDisableSme(const Sme2ShapeProfile& profile)
         return false;
     }
 
-    return (profile.m_HasFp16 || profile.m_HasQuantized) && !profile.m_HasSmallMLargeNProjection;
+    if (profile.m_HasFp16)
+    {
+        return true;
+    }
+
+    if (profile.m_HasQuantized)
+    {
+        return !profile.m_HasSmallMLargeNProjection;
+    }
+
+    return HasFloatSmeRegressionRisk(profile);
 }
 
 unsigned int SelectNumberOfThreads(const Sme2ShapeProfile& profile, unsigned int requestedThreads)
@@ -392,10 +464,11 @@ void ApplySme2ShapePolicy(const Graph& graph, bool reduceFp32ToFp16, ModelOption
 {
     const Sme2ShapeProfile profile = BuildSme2ShapeProfile(graph, reduceFp32ToFp16);
     const bool smeEnabled = !ShouldDisableSme(profile);
+    const bool sveEnabled = smeEnabled || profile.m_HasQuantized;
     const unsigned int requestedThreads = GetCpuAccNumberOfThreads(modelOptions);
     const unsigned int selectedThreads = SelectNumberOfThreads(profile, requestedThreads);
 
-    modelOptions.push_back(BackendOptions("CpuAcc", {{"SmeEnabled", smeEnabled}}));
+    modelOptions.push_back(BackendOptions("CpuAcc", {{"SmeEnabled", smeEnabled}, {"SveEnabled", sveEnabled}}));
     if (selectedThreads != requestedThreads)
     {
         modelOptions.push_back(BackendOptions("CpuAcc", {{"NumberOfThreads", selectedThreads}}));

@@ -65,6 +65,7 @@ void NeonWorkloadFactory::SetNumberOfThreads()
         auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
         auto numberOfThreads = modelOptions->GetNumberOfThreads();
 
+        arm_compute::CPUInfo::get().set_sve_allowed(modelOptions->IsSveEnabled());
         arm_compute::CPUInfo::get().set_sme_allowed(modelOptions->IsSmeEnabled());
 
         if (numberOfThreads != 0 && numberOfThreads >= MIN_THREADS && numberOfThreads <= MAX_THREADS)

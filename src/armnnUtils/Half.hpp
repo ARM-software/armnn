@@ -20,25 +20,15 @@
 namespace armnn
 {
     using Half = half_float::half; //import half float implementation
+
+template<typename T>
+struct IsArmnnHalf
+    : std::is_same<typename std::remove_cv<T>::type, Half>
+{};
+
+template<typename T>
+struct IsFloatingPoint
+    : std::integral_constant<bool, std::is_floating_point<T>::value || IsArmnnHalf<T>::value>
+{};
+
 } //namespace armnn
-
-
-namespace std
-{
-
-template<>
-struct is_floating_point<armnn::Half>
-    : integral_constant< bool, true >
-{};
-
-template<>
-struct is_floating_point<const armnn::Half>
-    : integral_constant< bool, true >
-{};
-
-template<>
-struct is_floating_point<volatile armnn::Half>
-    : integral_constant< bool, true >
-{};
-
-} //namespace std

@@ -1,5 +1,5 @@
 //
-// Copyright © 2026 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -27,6 +27,29 @@ unsigned int ParseUnsignedInt(const armnn::BackendOptions::Var& value, unsigned 
     }
     return defaultValue;
 }
+
+// Some downstream Android builds consume ArmNN with a ComputeLibrary revision
+// that does not yet expose runtime ISA masking. Keep the model option compatible
+// with those builds while using the ACL controls when they are available.
+template <typename CpuInfo>
+auto SetSveAllowed(CpuInfo& cpuInfo, bool isEnabled, int) -> decltype(cpuInfo.set_sve_allowed(isEnabled), void())
+{
+    cpuInfo.set_sve_allowed(isEnabled);
+}
+
+template <typename CpuInfo>
+void SetSveAllowed(CpuInfo&, bool, long)
+{}
+
+template <typename CpuInfo>
+auto SetSmeAllowed(CpuInfo& cpuInfo, bool isEnabled, int) -> decltype(cpuInfo.set_sme_allowed(isEnabled), void())
+{
+    cpuInfo.set_sme_allowed(isEnabled);
+}
+
+template <typename CpuInfo>
+void SetSmeAllowed(CpuInfo&, bool, long)
+{}
 
 } // namespace anonymous
 
@@ -74,8 +97,9 @@ unsigned int NeonBackendModelContext::GetNumberOfThreads() const
 
 void NeonBackendModelContext::ApplyAclIsaPolicy() const
 {
-    arm_compute::CPUInfo::get().set_sve_allowed(m_IsSveEnabled);
-    arm_compute::CPUInfo::get().set_sme_allowed(m_IsSmeEnabled);
+    arm_compute::CPUInfo& cpuInfo = arm_compute::CPUInfo::get();
+    SetSveAllowed(cpuInfo, m_IsSveEnabled, 0);
+    SetSmeAllowed(cpuInfo, m_IsSmeEnabled, 0);
 }
 
 } // namespace armnn

@@ -126,7 +126,8 @@ void RecordGemmShape(Sme2ShapeProfile& profile,
         ++profile.m_SmallDenseProjectionOps;
     }
 
-    if (is1x1 && m == 2304 && ((n >= 900 && k <= 384) || (n <= 384 && k >= 900)))
+    const bool hasModerateSpatialM = m >= 2048 && m <= 2560;
+    if (is1x1 && hasModerateSpatialM && ((n >= 900 && k <= 384) || (n <= 384 && k >= 900)))
     {
         profile.m_HasSegmentationShape = true;
     }
@@ -438,6 +439,11 @@ unsigned int SelectNumberOfThreads(const Sme2ShapeProfile& profile, unsigned int
 void ApplySme2ShapePolicy(const Graph& graph, bool reduceFp32ToFp16, ModelOptions& modelOptions)
 {
     const Sme2ShapeProfile profile = BuildSme2ShapeProfile(graph, reduceFp32ToFp16);
+    if (profile.m_GemmLikeOps == 0)
+    {
+        return;
+    }
+
     const bool smeEnabled = !ShouldDisableSme(profile);
     const bool sveEnabled = smeEnabled || profile.m_HasQuantized;
     const unsigned int requestedThreads = GetCpuAccNumberOfThreads(modelOptions);

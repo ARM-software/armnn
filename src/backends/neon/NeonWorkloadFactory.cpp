@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2026 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024, 2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 

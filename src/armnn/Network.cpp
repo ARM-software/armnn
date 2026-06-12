@@ -35,6 +35,7 @@
 #include <fmt/format.h>
 
 #include <fcntl.h>
+#include <algorithm>
 #include <memory>
 #include <vector>
 #include <armnn/ArmNN.hpp>
@@ -2096,8 +2097,11 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         optGraph.InferTensorInfos();
     }
 
-    ApplySme2ShapePolicy(optGraph, options.GetReduceFp32ToFp16(), optimizedOptions);
-    optNetObjPtr->pOptimizedNetworkImpl->GetModelOptions() = optimizedOptions;
+    if (std::count(backendPreferences.begin(), backendPreferences.end(), armnn::Compute::CpuAcc) > 0)
+    {
+        ApplySme2ShapePolicy(optGraph, options.GetReduceFp32ToFp16(), optimizedOptions);
+        optNetObjPtr->pOptimizedNetworkImpl->GetModelOptions() = optimizedOptions;
+    }
 
     // Initialize backend settings
     BackendSettings backendSettings(backendPreferences, deviceSpec);

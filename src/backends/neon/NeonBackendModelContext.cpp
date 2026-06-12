@@ -59,8 +59,7 @@ NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOption
        });
    }
 
-   arm_compute::CPUInfo::get().set_sve_allowed(m_IsSveEnabled);
-   arm_compute::CPUInfo::get().set_sme_allowed(m_IsSmeEnabled);
+   ApplyAclIsaPolicy();
 }
 
 bool NeonBackendModelContext::IsFastMathEnabled() const
@@ -73,14 +72,10 @@ unsigned int NeonBackendModelContext::GetNumberOfThreads() const
     return m_NumberOfThreads;
 }
 
-bool NeonBackendModelContext::IsSveEnabled() const
+void NeonBackendModelContext::ApplyAclIsaPolicy() const
 {
-    return m_IsSveEnabled;
-}
-
-bool NeonBackendModelContext::IsSmeEnabled() const
-{
-    return m_IsSmeEnabled;
+    arm_compute::CPUInfo::get().set_sve_allowed(m_IsSveEnabled);
+    arm_compute::CPUInfo::get().set_sme_allowed(m_IsSmeEnabled);
 }
 
 } // namespace armnn

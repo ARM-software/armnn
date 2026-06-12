@@ -29,9 +29,7 @@ public:
 
     unsigned int GetNumberOfThreads() const;
 
-    bool IsSveEnabled() const;
-
-    bool IsSmeEnabled() const;
+    void ApplyAclIsaPolicy() const;
 
 private:
     bool m_IsFastMathEnabled;

@@ -385,6 +385,8 @@ list(APPEND armnn_sources
     src/armnn/Logging.cpp
     src/armnn/Network.cpp
     src/armnn/Network.hpp
+    src/armnn/Sme2ShapePolicy.cpp
+    src/armnn/Sme2ShapePolicy.hpp
     src/armnn/NetworkUtils.cpp
     src/armnn/NetworkUtils.hpp
     src/armnn/Observable.cpp

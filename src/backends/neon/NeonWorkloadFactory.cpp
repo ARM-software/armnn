@@ -20,8 +20,6 @@
 #include <backendsCommon/MemImportWorkload.hpp>
 #include <armnn/backends/TensorHandle.hpp>
 
-#include <arm_compute/core/CPP/CPPTypes.h>
-
 #include <neon/workloads/NeonWorkloadUtils.hpp>
 #include <neon/workloads/NeonWorkloads.hpp>
 
@@ -65,8 +63,7 @@ void NeonWorkloadFactory::SetNumberOfThreads()
         auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
         auto numberOfThreads = modelOptions->GetNumberOfThreads();
 
-        arm_compute::CPUInfo::get().set_sve_allowed(modelOptions->IsSveEnabled());
-        arm_compute::CPUInfo::get().set_sme_allowed(modelOptions->IsSmeEnabled());
+        modelOptions->ApplyAclIsaPolicy();
 
         if (numberOfThreads != 0 && numberOfThreads >= MIN_THREADS && numberOfThreads <= MAX_THREADS)
         {

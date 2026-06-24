@@ -149,7 +149,8 @@ build_armnn()
                            -DCMAKE_SYSTEM_VERSION=$ANDROID_API_VERSION \
                            -DCMAKE_ANDROID_ARCH_ABI=$ANDROID_ARM_ARCH \
                            -DCMAKE_SYSROOT=$ANDROID64_x86_TOOLCHAIN/sysroot \
-                           -DCMAKE_EXE_LINKER_FLAGS='-pie -llog'"
+                           -DCMAKE_EXE_LINKER_FLAGS='-pie -llog' \
+                           -DCMAKE_SHARED_LINKER_FLAGS='-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384'"
     ;;
   esac
 

@@ -332,6 +332,7 @@ function BuildArmNN {
             -DCMAKE_SYSTEM_VERSION=$ANDROID_API \
             -DCMAKE_ANDROID_ARCH_ABI=arm64-v8a \
             -DCMAKE_SYSROOT=$WORKING_DIR/android-ndk-r26b/toolchains/llvm/prebuilt/linux-x86_64/sysroot \
+            -DCMAKE_SHARED_LINKER_FLAGS='-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384' \
             -DARMCOMPUTE_ROOT=$WORKING_DIR/ComputeLibrary \
             -DARMCOMPUTE_BUILD_DIR=$WORKING_DIR/ComputeLibrary/build \
             -DARMCOMPUTENEON=$ACL_NEON -DARMCOMPUTECL=$ACL_CL -DARMNNREF=$REFERENCE \

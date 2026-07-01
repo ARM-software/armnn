@@ -36,8 +36,10 @@ ARMNN_KLEIDIAI_NEON_MLA_C := $(ARMNN_KLEIDIAI_NEON_MLA_DIR)/kai_matmul_clamp_f32
 ARMNN_KLEIDIAI_NEON_MLA_ASM := $(ARMNN_KLEIDIAI_NEON_MLA_DIR)/kai_matmul_clamp_f32_f32_f32p8x1biasf32_6x8x4_neon_mla_asm.S
 ARMNN_LINK_KLEIDIAI_NEON_MLA_ASM ?= 1
 
-# Some released ACL Android builds include the KleidiAI C wrapper without the matching
-# assembly implementation. Link it from the integration tree when the wrapper is present.
+# Some released ACL Android builds include this KleidiAI C wrapper in arm_compute_library.a
+# without the matching assembly implementation object. ACL still owns the kernel selection
+# and call path; this Android integration build only links the missing implementation object
+# from the sibling clframework checkout so final driver links can resolve the wrapper call.
 ifeq ($(ARMNN_LINK_KLEIDIAI_NEON_MLA_ASM),1)
 ifneq ($(wildcard $(LOCAL_PATH)/$(ARMNN_KLEIDIAI_NEON_MLA_C)),)
 ifeq ($(wildcard $(LOCAL_PATH)/$(ARMNN_KLEIDIAI_NEON_MLA_ASM)),)
@@ -302,8 +304,10 @@ LOCAL_SRC_FILES := \
         src/armnnSerializer/SerializerUtils.cpp \
         src/armnnDeserializer/Deserializer.cpp
 
+ifeq ($(TARGET_ARCH),arm64)
 ifneq ($(ARMNN_KLEIDIAI_NEON_MLA_ASM_SRC),)
-LOCAL_SRC_FILES_arm64 += $(ARMNN_KLEIDIAI_NEON_MLA_ASM_SRC)
+LOCAL_SRC_FILES += $(ARMNN_KLEIDIAI_NEON_MLA_ASM_SRC)
+endif
 endif
 
 LOCAL_STATIC_LIBRARIES := \

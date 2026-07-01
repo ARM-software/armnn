@@ -445,7 +445,7 @@ void ApplySme2ShapePolicy(const Graph& graph, bool reduceFp32ToFp16, ModelOption
     }
 
     const bool smeEnabled = !ShouldDisableSme(profile);
-    const bool sveEnabled = smeEnabled || profile.m_HasQuantized;
+    const bool sveEnabled = true;
     const unsigned int requestedThreads = GetCpuAccNumberOfThreads(modelOptions);
     const unsigned int selectedThreads = SelectNumberOfThreads(profile, requestedThreads);
 

@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2026 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 #include <doctest/doctest.h>
@@ -73,7 +73,8 @@ TEST_CASE("HalfType")
     CHECK_EQ(sizeof(c), 2);
 
     // Test half type is floating point type
-    CHECK(std::is_floating_point<armnn::Half>::value);
+    CHECK(armnn::IsFloatingPoint<armnn::Half>::value);
+    CHECK(armnn::IsFloatingPoint<const armnn::Half>::value);
 
     // Test utility function returns correct type.
     using ResolvedType = armnn::ResolveType<armnn::DataType::Float16>;

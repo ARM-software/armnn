@@ -25,6 +25,10 @@ unsigned int ParseUnsignedInt(const armnn::BackendOptions::Var& value, unsigned 
     {
         return value.AsUnsignedInt();
     }
+    if (value.IsInt() && value.AsInt() >= 0)
+    {
+        return static_cast<unsigned int>(value.AsInt());
+    }
     return defaultValue;
 }
 
@@ -81,8 +85,6 @@ NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOption
            }
        });
    }
-
-   ApplyAclIsaPolicy();
 }
 
 bool NeonBackendModelContext::IsFastMathEnabled() const

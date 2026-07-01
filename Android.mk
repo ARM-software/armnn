@@ -1,5 +1,5 @@
 #
-# Copyright © 2017-2024 ARM Ltd and Contributors. All rights reserved.
+# Copyright © 2017-2026 ARM Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -31,6 +31,21 @@ ARMNN_BACKENDS_HEADER_PATH := $(LOCAL_PATH)/src/backends
 ARMNN_PROFILING_HEADER_PATH := $(LOCAL_PATH)/src/profiling
 ARMNN_SERIALIZER_HEADER_PATH := $(LOCAL_PATH)/src/armnnSerializer
 ARMNN_DESERIALIZER_HEADER_PATH := $(LOCAL_PATH)/src/armnnDeserializer
+ARMNN_KLEIDIAI_NEON_MLA_DIR := ../clframework/third_party/kleidiai/kai/ukernels/matmul/matmul_clamp_f32_f32_f32p
+ARMNN_KLEIDIAI_NEON_MLA_C := $(ARMNN_KLEIDIAI_NEON_MLA_DIR)/kai_matmul_clamp_f32_f32_f32p8x1biasf32_6x8x4_neon_mla.c
+ARMNN_KLEIDIAI_NEON_MLA_ASM := $(ARMNN_KLEIDIAI_NEON_MLA_DIR)/kai_matmul_clamp_f32_f32_f32p8x1biasf32_6x8x4_neon_mla_asm.S
+ARMNN_LINK_KLEIDIAI_NEON_MLA_ASM ?= 1
+
+# Some released ACL Android builds include the KleidiAI C wrapper without the matching
+# assembly implementation. Link it from the integration tree when the wrapper is present.
+ifeq ($(ARMNN_LINK_KLEIDIAI_NEON_MLA_ASM),1)
+ifneq ($(wildcard $(LOCAL_PATH)/$(ARMNN_KLEIDIAI_NEON_MLA_C)),)
+ifeq ($(wildcard $(LOCAL_PATH)/$(ARMNN_KLEIDIAI_NEON_MLA_ASM)),)
+$(error KleidiAI NEON MLA wrapper found but asm implementation is missing: $(LOCAL_PATH)/$(ARMNN_KLEIDIAI_NEON_MLA_ASM))
+endif
+ARMNN_KLEIDIAI_NEON_MLA_ASM_SRC := $(ARMNN_KLEIDIAI_NEON_MLA_ASM)
+endif
+endif
 
 # find the common.mk and backend.mk files in the backend source folders
 ARMNN_BACKEND_COMMON_MAKEFILE_LOCAL_PATHS := $(wildcard $(LOCAL_PATH)/src/backends/*/common.mk)
@@ -176,6 +191,7 @@ LOCAL_SRC_FILES := \
         src/armnn/LoadedNetwork.cpp \
         src/armnn/Logging.cpp \
         src/armnn/Network.cpp \
+        src/armnn/Sme2ShapePolicy.cpp \
         src/armnn/NetworkUtils.cpp \
         src/armnn/Observable.cpp \
         src/armnn/Optimizer.cpp \
@@ -285,6 +301,10 @@ LOCAL_SRC_FILES := \
         src/armnnSerializer/Serializer.cpp \
         src/armnnSerializer/SerializerUtils.cpp \
         src/armnnDeserializer/Deserializer.cpp
+
+ifneq ($(ARMNN_KLEIDIAI_NEON_MLA_ASM_SRC),)
+LOCAL_SRC_FILES_arm64 += $(ARMNN_KLEIDIAI_NEON_MLA_ASM_SRC)
+endif
 
 LOCAL_STATIC_LIBRARIES := \
         libflatbuffers-framework \

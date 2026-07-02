@@ -1,5 +1,5 @@
 //
-// Copyright © 2017 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2026 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -96,7 +96,7 @@ float SelectiveDequantize(T value, float scale, int32_t offset)
 template<typename ItType>
 struct IsFloatingPointIterator
 {
-    static constexpr bool value=std::is_floating_point<typename std::iterator_traits<ItType>::value_type>::value;
+    static constexpr bool value=armnn::IsFloatingPoint<typename std::iterator_traits<ItType>::value_type>::value;
 };
 
 template <typename T, typename FloatIt,

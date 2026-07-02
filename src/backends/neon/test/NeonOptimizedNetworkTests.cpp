@@ -1,9 +1,11 @@
 //
-// Copyright © 2017, 2023 Arm Ltd. All rights reserved.
+// Copyright © 2017, 2023, 2026 Arm Ltd. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "NeonWorkloadFactoryHelper.hpp"
+
+#include "../NeonBackendModelContext.hpp"
 
 #include <Graph.hpp>
 #include <Network.hpp>
@@ -144,6 +146,16 @@ TEST_CASE("NumberOfThreadsTestOnCpuAcc")
     CHECK(modelOptionsOut.size() == 1);
     CHECK(modelOptionsOut[0].GetOption(0).GetName() == "NumberOfThreads");
     CHECK(modelOptionsOut[0].GetOption(0).GetValue().AsUnsignedInt() == numberOfThreads);
+}
+
+TEST_CASE("SignedNumberOfThreadsTestOnCpuAcc")
+{
+    const int numberOfThreads = 2;
+    armnn::ModelOptions modelOptions = {armnn::BackendOptions("CpuAcc", {{"NumberOfThreads", numberOfThreads}})};
+
+    armnn::NeonBackendModelContext modelContext(modelOptions);
+
+    CHECK(modelContext.GetNumberOfThreads() == static_cast<unsigned int>(numberOfThreads));
 }
 
 }

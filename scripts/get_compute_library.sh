@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2018-2025 Arm Ltd. All rights reserved.
+# Copyright © 2018-2026 Arm Ltd. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -10,7 +10,7 @@ CMD=$( basename "$0" )
 #DEFAULT_CLFRAMEWORKREVISION="branches/arm_compute_24_08" # Release 24.08
 #
 # For pinning to a revision use this:
-DEFAULT_CLFRAMEWORKREVISION="c9a1fff898abd5109b759e8e16616519dc758fdd" # Update release version and SONAME for v52.7.0
+DEFAULT_CLFRAMEWORKREVISION="7b256bb7965f2fd99cdee790a4b0e56dab438a8c" # Update release version and SONAME for v53.2.0
 usage() {
   echo -e "get_compute_library.sh: Clones the Arm Compute Library (ACL) repo from the ML Platform server and checks out
   the pinned version of ACL based on the SHA string defined at the top of this script (DEFAULT_CLFRAMEWORKREVISION).

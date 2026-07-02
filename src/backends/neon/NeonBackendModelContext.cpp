@@ -1,9 +1,11 @@
 //
-// Copyright © 2020 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2020, 2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "NeonBackendModelContext.hpp"
+
+#include <arm_compute/core/CPP/CPPTypes.h>
 
 namespace
 {
@@ -23,8 +25,35 @@ unsigned int ParseUnsignedInt(const armnn::BackendOptions::Var& value, unsigned 
     {
         return value.AsUnsignedInt();
     }
+    if (value.IsInt() && value.AsInt() >= 0)
+    {
+        return static_cast<unsigned int>(value.AsInt());
+    }
     return defaultValue;
 }
+
+// Some downstream Android builds consume ArmNN with a ComputeLibrary revision
+// that does not yet expose runtime ISA masking. Keep the model option compatible
+// with those builds while using the ACL controls when they are available.
+template <typename CpuInfo>
+auto SetSveAllowed(CpuInfo& cpuInfo, bool isEnabled, int) -> decltype(cpuInfo.set_sve_allowed(isEnabled), void())
+{
+    cpuInfo.set_sve_allowed(isEnabled);
+}
+
+template <typename CpuInfo>
+void SetSveAllowed(CpuInfo&, bool, long)
+{}
+
+template <typename CpuInfo>
+auto SetSmeAllowed(CpuInfo& cpuInfo, bool isEnabled, int) -> decltype(cpuInfo.set_sme_allowed(isEnabled), void())
+{
+    cpuInfo.set_sme_allowed(isEnabled);
+}
+
+template <typename CpuInfo>
+void SetSmeAllowed(CpuInfo&, bool, long)
+{}
 
 } // namespace anonymous
 
@@ -32,7 +61,7 @@ namespace armnn
 {
 
 NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOptions)
-    : m_IsFastMathEnabled(false), m_NumberOfThreads(0)
+    : m_IsFastMathEnabled(false), m_NumberOfThreads(0), m_IsSveEnabled(true), m_IsSmeEnabled(true)
 {
    if (!modelOptions.empty())
    {
@@ -40,11 +69,19 @@ NeonBackendModelContext::NeonBackendModelContext(const ModelOptions& modelOption
        {
            if (name == "FastMathEnabled")
            {
-               m_IsFastMathEnabled |= ParseBool(value, false);
+               m_IsFastMathEnabled = ParseBool(value, m_IsFastMathEnabled);
            }
            if (name == "NumberOfThreads")
            {
-               m_NumberOfThreads |= ParseUnsignedInt(value, 0);
+               m_NumberOfThreads = ParseUnsignedInt(value, m_NumberOfThreads);
+           }
+           if (name == "SmeEnabled")
+           {
+               m_IsSmeEnabled = ParseBool(value, m_IsSmeEnabled);
+           }
+           if (name == "SveEnabled")
+           {
+               m_IsSveEnabled = ParseBool(value, m_IsSveEnabled);
            }
        });
    }
@@ -58,6 +95,13 @@ bool NeonBackendModelContext::IsFastMathEnabled() const
 unsigned int NeonBackendModelContext::GetNumberOfThreads() const
 {
     return m_NumberOfThreads;
+}
+
+void NeonBackendModelContext::ApplyAclIsaPolicy() const
+{
+    arm_compute::CPUInfo& cpuInfo = arm_compute::CPUInfo::get();
+    SetSveAllowed(cpuInfo, m_IsSveEnabled, 0);
+    SetSmeAllowed(cpuInfo, m_IsSmeEnabled, 0);
 }
 
 } // namespace armnn

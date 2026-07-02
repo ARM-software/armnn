@@ -1,9 +1,10 @@
 //
-// Copyright © 2017-2025 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
 #include "Network.hpp"
+#include "Sme2ShapePolicy.hpp"
 #include "Graph.hpp"
 #include "Layer.hpp"
 #include "DeviceSpec.hpp"
@@ -2096,6 +2097,12 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
         optGraph.InferTensorInfos();
     }
 
+    if (std::count(backendPreferences.begin(), backendPreferences.end(), armnn::Compute::CpuAcc) > 0)
+    {
+        ApplySme2ShapePolicy(optGraph, options.GetReduceFp32ToFp16(), optimizedOptions);
+        optNetObjPtr->pOptimizedNetworkImpl->GetModelOptions() = optimizedOptions;
+    }
+
     // Initialize backend settings
     BackendSettings backendSettings(backendPreferences, deviceSpec);
     auto availablePreferredBackends = backendSettings.GetAvailablePreferredBackends();
@@ -2207,7 +2214,7 @@ IOptimizedNetworkPtr Optimize(const Graph& inGraph,
     OptimizationResult backendOptimizationResult = ApplyBackendOptimizations(optNetObjPtr->pOptimizedNetworkImpl.get(),
                                                                              backendSettings,
                                                                              backends,
-                                                                             options.GetModelOptions(),
+                                                                             optimizedOptions,
                                                                              messages);
     if (backendOptimizationResult.m_Error)
     {

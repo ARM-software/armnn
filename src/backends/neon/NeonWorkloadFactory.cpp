@@ -1,5 +1,5 @@
 //
-// Copyright © 2017-2024 Arm Ltd and Contributors. All rights reserved.
+// Copyright © 2017-2024, 2026 Arm Ltd and Contributors. All rights reserved.
 // SPDX-License-Identifier: MIT
 //
 
@@ -62,6 +62,8 @@ void NeonWorkloadFactory::SetNumberOfThreads()
         // Only set if within limit or valid input
         auto modelOptions = dynamic_cast<NeonBackendModelContext*>(m_ModelContextPtr.get());
         auto numberOfThreads = modelOptions->GetNumberOfThreads();
+
+        modelOptions->ApplyAclIsaPolicy();
 
         if (numberOfThreads != 0 && numberOfThreads >= MIN_THREADS && numberOfThreads <= MAX_THREADS)
         {

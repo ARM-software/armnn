@@ -1,5 +1,5 @@
 #
-# Copyright © 2020, 2023-2025 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2020, 2023-2026 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -150,7 +150,7 @@ if (TfLite_LIB MATCHES .a$)
                                       TfLite_ruy_prepare_packed_matrices_LIB TfLite_ruy_system_aligned_alloc_LIB TfLite_ruy_threadpool_LIB
                                       TfLite_ruy_trmul_LIB TfLite_ruy_tune_LIB TfLite_ruy_wait_LIB TfLite_ruy_profiler_LIB TfLite_cpuinfo_LIB
                                       TfLite_abseil_synchronization_LIB TfLite_abseil_graphCycle_internal_LIB TfLite_abseil_raw_logging_internal_LIB
-                                      TfLite_abseil_kernel_timeout_LIB TfLite_abseil_internal_strings_LIB)
+                                      TfLite_abseil_internal_strings_LIB)
     # Set external variables for usage in CMakeLists.txt
     if (TFLITE_FOUND)
         # WARNING! The order of these libraries is critical. Moving them
@@ -166,7 +166,10 @@ if (TfLite_LIB MATCHES .a$)
                                      ${TfLite_ruy_prepare_packed_matrices_LIB} ${TfLite_ruy_system_aligned_alloc_LIB}
                                      ${TfLite_ruy_tune_LIB} ${TfLite_ruy_wait_LIB} ${TfLite_ruy_profiler_LIB}
                                      ${TfLite_cpuinfo_LIB} ${TfLite_abseil_synchronization_LIB} ${TfLite_abseil_graphCycle_internal_LIB}
-                                     ${TfLite_abseil_raw_logging_internal_LIB} ${TfLite_abseil_kernel_timeout_LIB} ${TfLite_abseil_internal_strings_LIB})
+                                     ${TfLite_abseil_raw_logging_internal_LIB} ${TfLite_abseil_internal_strings_LIB})
+        if(TfLite_abseil_kernel_timeout_LIB)
+            list(APPEND TfLite_LIB ${TfLite_abseil_kernel_timeout_LIB})
+        endif()
     endif ()
 elseif (TfLite_LIB MATCHES .so$)
     message("-- Dynamic tensorflow lite library found, using for ArmNN build")

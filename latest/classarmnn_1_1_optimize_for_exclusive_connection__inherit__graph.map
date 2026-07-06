@@ -1,13 +1,8 @@
 <map id="OptimizeForExclusiveConnection&lt; BaseType, ChildType, Wrapped &gt;" name="OptimizeForExclusiveConnection&lt; BaseType, ChildType, Wrapped &gt;">
-<area shape="rect" id="Node000001" title=" " alt="" coords="871,45,1099,85"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="569,30,822,100"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="837,62,873,65,868,65,837,68"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,15,100,40"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="114,17,200,9,308,4,427,4,546,16,597,29,591,29,545,21,426,10,308,9,200,15,116,22"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="149,37,311,77"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="115,35,151,43,146,44,116,41"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="16,72,89,98"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="104,85,149,86,311,86,566,75,571,75,311,92,149,92,104,90"/>
-<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="104,74,151,69,146,70,105,80"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="327,60,335,61,571,66,566,67,335,66,327,66"/>
+<area shape="rect" id="node1" title=" " alt="" coords="1001,43,1252,85"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_optimize_for_type_impl.html" title=" " alt="" coords="676,29,952,99"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,21,112,48"/>
+<area shape="rect" id="node6" href="$classarmnn_1_1_optimize_for_type_impl.html" title="Wrapper Optimization base class that calls Wrapped::Run() for every layer of type BaseType." alt="" coords="189,38,369,79"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_optimize_for_exclusive_connection_impl.html" title="Wrapper Optimization class that calls Wrapped::Run for every connection BaseType &#45;&gt; ChildType." alt="" coords="161,104,397,160"/>
+<area shape="rect" id="node5" title=" " alt="" coords="19,80,99,107"/>
 </map>

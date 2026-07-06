@@ -1,0 +1,10 @@
+var classarmnn_1_1_resize_layer =
+[
+    [ "ResizeLayer", "classarmnn_1_1_resize_layer.html#a5221489c87e9fd2715dd5ab0322187db", null ],
+    [ "~ResizeLayer", "classarmnn_1_1_resize_layer.html#a1364d6c1374c813887875509b1d7e833", null ],
+    [ "Clone", "classarmnn_1_1_resize_layer.html#a4eb20df5c6b827ce8ae0d883d0cebcde", null ],
+    [ "CreateWorkload", "classarmnn_1_1_resize_layer.html#adfa912d0c4c6c00f1af2cbfa799572b7", null ],
+    [ "ExecuteStrategy", "classarmnn_1_1_resize_layer.html#a46fc3fdd4b2a5dd6d184e57983cf20bc", null ],
+    [ "InferOutputShapes", "classarmnn_1_1_resize_layer.html#a65ca562c882ad619684445a1402f415a", null ],
+    [ "ValidateTensorShapesFromInputs", "classarmnn_1_1_resize_layer.html#a8c8f543d7e9729362c266d12ec169966", null ]
+];

@@ -1,10 +1,6 @@
 <map id="ElementwiseBinaryQueueDescriptor" name="ElementwiseBinaryQueueDescriptor">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,274,237,300"/>
-<area shape="rect" id="Node000002" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="12,184,230,225"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,238,123,275,119,272,119,242"/>
-<area shape="rect" id="Node000003" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="56,5,175,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="118,45,123,184,118,183,114,48"/>
-<area shape="rect" id="Node000004" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="137,80,350,121"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="148,37,215,79,210,81,148,42"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="207,133,146,186,143,182,211,129"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,276,263,303"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="11,185,257,227"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="63,5,194,32"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="150,81,385,123"/>
 </map>

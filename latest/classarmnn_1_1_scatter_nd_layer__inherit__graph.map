@@ -1,12 +1,7 @@
 <map id="ScatterNdLayer" name="ScatterNdLayer">
-<area shape="rect" id="Node000001" title="This layer represents a ScatterNd operator." alt="" coords="31,349,144,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,170,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="89,313,90,349,85,348,86,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="56,80,109,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="85,120,90,259,84,259,81,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="103,155,250,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="108,114,156,154,151,156,108,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="17,5,147,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="83,44,85,80,80,80,82,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="148,210,107,260,103,257,151,206"/>
+<area shape="rect" id="node1" title="This layer represents a ScatterNd operator." alt="" coords="35,352,158,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,188,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="62,81,121,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="113,157,275,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="20,5,163,32"/>
 </map>

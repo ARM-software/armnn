@@ -1,12 +1,7 @@
 <map id="ActivationLayer" name="ActivationLayer">
-<area shape="rect" id="Node000001" title="This layer represents an activation operation with the specified activation function." alt="" coords="31,349,142,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,168,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="88,313,89,349,84,348,85,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="54,80,108,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="84,120,89,259,83,259,80,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="102,155,250,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="107,114,155,154,150,156,107,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="16,5,146,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="82,44,84,80,79,80,81,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="147,210,106,260,102,257,150,206"/>
+<area shape="rect" id="node1" title="This layer represents an activation operation with the specified activation function." alt="" coords="36,352,160,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,191,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="63,81,122,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="114,157,277,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="21,5,164,32"/>
 </map>

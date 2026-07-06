@@ -1,12 +1,7 @@
 <map id="ElementwiseUnaryLayer" name="ElementwiseUnaryLayer">
-<area shape="rect" id="Node000001" title="This layer represents a elementwiseUnary operation." alt="" coords="31,349,195,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,221,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="115,313,115,350,111,347,111,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="81,80,134,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="110,120,115,259,110,258,106,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="129,155,276,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="134,114,182,154,177,156,134,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="42,5,173,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="108,44,110,80,105,80,107,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="177,206,132,260,128,257,173,210"/>
+<area shape="rect" id="node1" title="This layer represents a elementwiseUnary operation." alt="" coords="36,352,217,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,248,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="92,81,151,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="143,157,305,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="50,5,193,32"/>
 </map>

@@ -1,12 +1,7 @@
 <map id="BatchMatMulLayer" name="BatchMatMulLayer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="31,349,162,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,188,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="98,313,99,350,94,348,95,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="64,80,118,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,120,99,259,93,258,90,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="112,155,260,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="117,114,165,154,160,156,117,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="26,5,156,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="92,44,94,80,89,80,91,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="160,206,116,260,112,257,157,210"/>
+<area shape="rect" id="node1" title=" " alt="" coords="36,352,180,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,211,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="73,81,132,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="124,157,287,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="31,5,174,32"/>
 </map>

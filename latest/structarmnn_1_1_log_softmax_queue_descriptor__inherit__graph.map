@@ -1,10 +1,6 @@
 <map id="LogSoftmaxQueueDescriptor" name="LogSoftmaxQueueDescriptor">
-<area shape="rect" id="Node000001" title=" " alt="" coords="17,274,207,300"/>
-<area shape="rect" id="Node000002" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="5,184,219,225"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,238,114,275,110,272,110,242"/>
-<area shape="rect" id="Node000003" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="47,5,166,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="109,45,114,184,109,183,105,48"/>
-<area shape="rect" id="Node000004" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="128,80,341,121"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="139,37,206,79,201,81,139,42"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="198,133,137,186,134,182,202,129"/>
+<area shape="rect" id="node1" title=" " alt="" coords="19,276,227,303"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="5,185,240,227"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="52,5,183,32"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="139,81,373,123"/>
 </map>

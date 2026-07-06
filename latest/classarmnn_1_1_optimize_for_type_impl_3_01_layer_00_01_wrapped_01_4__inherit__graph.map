@@ -1,7 +1,5 @@
 <map id="OptimizeForTypeImpl&lt; Layer, Wrapped &gt;" name="OptimizeForTypeImpl&lt; Layer, Wrapped &gt;">
-<area shape="rect" id="Node000001" title="Specialization that calls Wrapped::Run() for any layer type." alt="" coords="33,79,178,120"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,5,100,31"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,41,95,78,90,79,68,46"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="124,5,197,31"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,43,121,81,117,77,141,45"/>
+<area shape="rect" id="node1" title="Specialization that calls Wrapped::Run() for any layer type." alt="" coords="37,80,197,121"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_optimization.html" title=" " alt="" coords="5,5,112,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="136,5,216,32"/>
 </map>

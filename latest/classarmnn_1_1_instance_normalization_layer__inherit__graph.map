@@ -1,12 +1,7 @@
 <map id="InstanceNormalizationLayer" name="InstanceNormalizationLayer">
-<area shape="rect" id="Node000001" title="This layer represents an instance normalization operation." alt="" coords="31,349,215,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,241,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,313,125,350,121,347,121,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="91,80,144,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,120,125,259,120,258,116,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="139,155,286,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="144,114,192,154,187,156,144,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="52,5,183,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="118,44,120,81,115,80,117,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="187,206,142,260,138,257,183,210"/>
+<area shape="rect" id="node1" title="This layer represents an instance normalization operation." alt="" coords="36,352,241,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,272,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="104,81,163,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="155,157,317,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="62,5,205,32"/>
 </map>

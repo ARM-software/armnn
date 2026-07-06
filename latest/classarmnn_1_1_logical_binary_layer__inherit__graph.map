@@ -1,12 +1,7 @@
 <map id="LogicalBinaryLayer" name="LogicalBinaryLayer">
-<area shape="rect" id="Node000001" title="This layer represents a Logical Binary operation." alt="" coords="31,349,163,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,189,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,313,99,350,95,348,95,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="65,80,118,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,120,99,259,94,258,90,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="113,155,260,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="118,114,166,154,161,156,118,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="26,5,157,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="92,44,94,80,89,80,91,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="161,206,116,260,112,257,157,210"/>
+<area shape="rect" id="node1" title="This layer represents a Logical Binary operation." alt="" coords="35,352,182,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,212,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="74,81,133,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="125,157,287,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="32,5,175,32"/>
 </map>

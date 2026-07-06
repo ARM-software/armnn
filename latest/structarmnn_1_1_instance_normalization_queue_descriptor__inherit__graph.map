@@ -1,10 +1,6 @@
 <map id="InstanceNormalizationQueueDescriptor" name="InstanceNormalizationQueueDescriptor">
-<area shape="rect" id="Node000001" title=" " alt="" coords="28,274,218,315"/>
-<area shape="rect" id="Node000002" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="5,184,241,225"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,238,125,275,121,273,121,242"/>
-<area shape="rect" id="Node000003" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="58,5,177,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="120,45,125,184,120,183,117,48"/>
-<area shape="rect" id="Node000004" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="139,80,352,121"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="150,37,217,79,212,81,150,42"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="209,133,148,186,145,182,213,129"/>
+<area shape="rect" id="node1" title=" " alt="" coords="33,276,244,317"/>
+<area shape="rect" id="node2" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="5,185,272,227"/>
+<area shape="rect" id="node3" href="$structarmnn_1_1_queue_descriptor.html" title=" " alt="" coords="68,5,199,32"/>
+<area shape="rect" id="node4" href="$structarmnn_1_1_queue_descriptor_with_parameters.html" title=" " alt="" coords="155,81,389,123"/>
 </map>

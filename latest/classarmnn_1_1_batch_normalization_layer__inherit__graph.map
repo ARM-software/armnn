@@ -1,12 +1,7 @@
 <map id="BatchNormalizationLayer" name="BatchNormalizationLayer">
-<area shape="rect" id="Node000001" title="This layer represents a batch normalization operation." alt="" coords="31,349,199,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,225,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="117,313,117,350,113,347,113,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="83,80,136,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="112,120,117,259,112,258,108,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="131,155,278,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="136,114,184,154,179,156,136,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="44,5,175,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="110,44,112,80,107,80,109,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="179,206,134,260,130,257,175,210"/>
+<area shape="rect" id="node1" title="This layer represents a batch normalization operation." alt="" coords="36,352,223,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,253,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="95,81,153,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="145,157,308,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="53,5,195,32"/>
 </map>

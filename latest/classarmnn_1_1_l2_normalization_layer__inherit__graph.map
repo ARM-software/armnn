@@ -1,12 +1,7 @@
 <map id="L2NormalizationLayer" name="L2NormalizationLayer">
-<area shape="rect" id="Node000001" title="This layer represents a L2 normalization operation." alt="" coords="31,349,179,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,205,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,313,107,350,103,347,103,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="73,80,126,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="102,120,107,259,102,258,98,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="121,155,268,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="126,114,174,154,169,156,126,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="35,5,165,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="100,44,102,80,97,80,99,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="169,206,124,260,120,257,165,210"/>
+<area shape="rect" id="node1" title="This layer represents a L2 normalization operation." alt="" coords="36,352,201,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,232,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="84,81,143,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="135,157,297,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="42,5,185,32"/>
 </map>

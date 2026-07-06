@@ -1,7 +1,5 @@
 <map id="FileNotFoundException" name="FileNotFoundException">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,153,163,178"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="44,79,124,105"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,118,86,153,82,151,82,122"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="45,5,123,31"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="85,44,87,79,81,78,83,49"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,155,176,181"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_exception.html" title="Base class for all ArmNN exceptions so that users can filter to just those." alt="" coords="47,80,134,107"/>
+<area shape="rect" id="node3" title=" " alt="" coords="47,5,134,32"/>
 </map>

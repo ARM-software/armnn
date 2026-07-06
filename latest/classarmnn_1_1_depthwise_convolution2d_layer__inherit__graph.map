@@ -1,12 +1,7 @@
 <map id="DepthwiseConvolution2dLayer" name="DepthwiseConvolution2dLayer">
-<area shape="rect" id="Node000001" title="This layer represents a depthwise convolution 2d operation." alt="" coords="31,364,230,390"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,274,256,315"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="132,328,133,365,128,362,129,332"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="98,80,152,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="128,120,133,274,127,273,124,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="146,155,294,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="151,114,199,154,194,156,151,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="60,5,190,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="126,44,128,81,123,80,125,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="198,206,148,275,144,272,194,210"/>
+<area shape="rect" id="node1" title="This layer represents a depthwise convolution 2d operation." alt="" coords="36,367,257,393"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,276,288,317"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="112,81,171,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="163,157,325,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="70,5,213,32"/>
 </map>

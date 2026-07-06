@@ -1,12 +1,7 @@
 <map id="ElementwiseBinaryLayer" name="ElementwiseBinaryLayer">
-<area shape="rect" id="Node000001" title="This layer represents a elementwiseBinary operation." alt="" coords="31,349,197,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,223,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="116,313,116,350,112,347,112,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="82,80,135,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="111,120,116,259,111,258,107,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="130,155,277,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="135,114,183,154,178,156,135,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="44,5,174,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="109,44,111,80,106,80,108,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="178,206,133,260,129,257,174,210"/>
+<area shape="rect" id="node1" title="This layer represents a elementwiseBinary operation." alt="" coords="36,352,220,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,251,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="93,81,152,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="144,157,307,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="51,5,194,32"/>
 </map>

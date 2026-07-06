@@ -1,12 +1,7 @@
 <map id="PreCompiledLayer" name="PreCompiledLayer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="31,349,160,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,186,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,313,98,350,93,348,94,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="64,80,117,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="93,120,98,259,92,258,89,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="111,155,258,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="116,114,164,154,159,156,116,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="25,5,155,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="91,44,93,80,88,80,90,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="159,206,115,260,111,257,156,210"/>
+<area shape="rect" id="node1" title=" " alt="" coords="36,352,177,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,208,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="72,81,131,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="123,157,285,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="30,5,173,32"/>
 </map>

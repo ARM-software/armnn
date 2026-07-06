@@ -1,12 +1,7 @@
 <map id="DepthToSpaceLayer" name="DepthToSpaceLayer">
-<area shape="rect" id="Node000001" title="This layer represents a DepthToSpace operation." alt="" coords="31,349,171,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,197,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,313,103,350,99,348,99,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="69,80,122,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="99,120,103,259,98,258,94,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="117,155,264,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="122,114,170,154,165,156,122,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="30,5,161,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="96,44,98,80,93,80,95,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="165,206,120,260,116,257,161,210"/>
+<area shape="rect" id="node1" title="This layer represents a DepthToSpace operation." alt="" coords="35,352,186,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,216,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="76,81,135,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="127,157,289,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="34,5,177,32"/>
 </map>

@@ -1,12 +1,7 @@
 <map id="ChannelShuffleLayer" name="ChannelShuffleLayer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="31,349,174,375"/>
-<area shape="rect" id="Node000002" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,259,200,300"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="104,313,105,350,100,347,101,317"/>
-<area shape="rect" id="Node000003" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="70,80,124,106"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="100,120,105,259,99,258,96,123"/>
-<area shape="rect" id="Node000005" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="118,155,266,196"/>
-<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="123,114,171,154,166,156,123,119"/>
-<area shape="rect" id="Node000004" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="32,5,162,31"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="98,44,100,80,95,80,97,49"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="166,206,122,260,118,257,163,210"/>
+<area shape="rect" id="node1" title=" " alt="" coords="36,352,192,379"/>
+<area shape="rect" id="node2" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="5,261,223,303"/>
+<area shape="rect" id="node3" href="$classarmnn_1_1_layer.html" title=" " alt="" coords="79,81,138,108"/>
+<area shape="rect" id="node5" href="$classarmnn_1_1_layer_with_parameters.html" title=" " alt="" coords="130,157,293,199"/>
+<area shape="rect" id="node4" href="$classarmnn_1_1_i_connectable_layer.html" title="Interface for a layer that is connectable to other layers via InputSlots and OutputSlots." alt="" coords="37,5,180,32"/>
 </map>

@@ -358,7 +358,15 @@ build_litert()
   if [ "$TARGET_ARCH" == "android64" ]; then
     bazel_args+=" --config=android_arm64"
   elif [ "$TARGET_ARCH" == "aarch64" ]; then
-    bazel_args+=" --cpu=aarch64"
+    if [ "$NATIVE_BUILD" -eq 0 ]; then
+      # Bare --cpu=aarch64 resolves against @local_config_cc on x86_64 hosts,
+      # which has no aarch64 toolchain. Use LiteRT's embedded Linux config for
+      # cross builds so Bazel selects the ARM cross toolchain and native host
+      # toolchain.
+      bazel_args+=" --config=elinux_aarch64"
+    else
+      bazel_args+=" --cpu=aarch64"
+    fi
   else
     echo "Unsupported Target: $TARGET_ARCH"
     exit 1

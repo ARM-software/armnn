@@ -1,5 +1,5 @@
 #
-# Copyright © 2022-2023 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2026 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -49,6 +49,7 @@ WORKDIR /home/arm-user
 COPY --chown=arm-user:arm-user ./scripts/validation.sh .
 COPY --chown=arm-user:arm-user ./scripts/common.sh .
 COPY --chown=arm-user:arm-user ./scripts/setup-armnn.sh .
+COPY --chown=arm-user:arm-user ./scripts/aarch64-toolchain ./aarch64-toolchain
 
 # Run setup-armnn.sh: download and install Arm NN dependencies
 ARG SETUP_ARGS=""

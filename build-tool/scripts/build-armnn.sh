@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2026 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -224,6 +224,13 @@ build_armnn()
     else
       cp "$PROTOBUF_ANDROID_LIB_TARGET" .
     fi
+  fi
+
+  # Include LiteRT runtime dependencies in the exported Arm NN build.
+  if [ "$flag_litert_delegate" -eq 1 ]; then
+    cp "$LITERT_LIBS_DIR/libtensorflowlite.so" \
+       "$LITERT_LIBS_DIR/libtensorflowlite_c.so" \
+       "$ARMNN_BUILD_TARGET/"
   fi
 
   # Copy Arm NN include directory into build output

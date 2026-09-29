@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright © 2022-2025 Arm Ltd and Contributors. All rights reserved.
+# Copyright © 2022-2026 Arm Ltd and Contributors. All rights reserved.
 # SPDX-License-Identifier: MIT
 #
 
@@ -11,7 +11,7 @@ set -o nounset  # Catch references to undefined variables.
 set -o pipefail # Catch non zero exit codes within pipelines.
 set -o errexit  # Catch and propagate non zero exit codes.
 
-rel_path=$(dirname "$0") # relative path from where script is executed to script location
+rel_path=$(cd "$(dirname "$0")" && pwd) # keep script resources accessible after changing directory
 
 # Figure out platform specific settings
 osname=$(uname)
@@ -345,10 +345,14 @@ build_litert()
 {
   echo -e "\n***** Building LiteRT for $TARGET_ARCH *****"
 
-  local bazel_args="--define xnn_enable_avx512amx=false \
-                      --define xnn_enable_avxvnniint8=false \
-                      --define xnn_enable_avxvnni=false \
-                      --define xnn_enable_avx512fp16=false"
+  # Use a Python version supported by LiteRT's requirements locks.
+  # Match the TF Lite CMake build by disabling XNNPACK and its KleidiAI kernels.
+  local bazel_args=(--repo_env=HERMETIC_PYTHON_VERSION=3.11
+                   --define tflite_with_xnnpack=false
+                   --define xnn_enable_avx512amx=false
+                   --define xnn_enable_avxvnniint8=false
+                   --define xnn_enable_avxvnni=false
+                   --define xnn_enable_avx512fp16=false)
 
   local build_targets="//tflite:tensorflowlite \
                        //tflite/c:libtensorflowlite_c.so \
@@ -356,18 +360,37 @@ build_litert()
                        //tflite/core/acceleration/configuration:delegate_registry"
 
   if [ "$TARGET_ARCH" == "android64" ]; then
-    bazel_args+=" --config=android_arm64"
+    bazel_args+=(--config=android_arm64)
+    # Reuse CMake's NDK settings; the numeric major version selects the modern NDK rules.
+    local -x ANDROID_NDK_HOME="$NDK_SRC"
+    local -x ANDROID_NDK_API_LEVEL="$ANDROID_API_VERSION"
+    local -x ANDROID_NDK_VERSION="${NDK_VERSION%%[!0-9]*}"
   elif [ "$TARGET_ARCH" == "aarch64" ]; then
-    bazel_args+=" --cpu=aarch64"
+    if [ "$NATIVE_BUILD" -eq 0 ]; then
+      # Use Arm NN's system cross compiler and sysroot. LiteRT's bundled GCC 11
+      # toolchain requires newer GLIBC/GLIBCXX symbols than Ubuntu 20.04 provides.
+      bazel_args+=(--config=elinux_aarch64
+                   "--override_repository=local_config_embedded_arm=$rel_path/aarch64-toolchain")
+    else
+      bazel_args+=(--cpu=aarch64)
+    fi
+  elif [ "$TARGET_ARCH" == "x86_64" ]; then
+    bazel_args+=(--cpu=k8)
   else
     echo "Unsupported Target: $TARGET_ARCH"
     exit 1
   fi
 
+  # Android's NDK toolchain already emits PIC but does not support --force_pic.
+  # Other targets need PIC archives for Arm NN's shared delegate libraries.
+  if [ "$TARGET_ARCH" != "android64" ]; then
+    bazel_args+=(--force_pic)
+  fi
+
   cd "$LITERT_ROOT_DIR"
 
-  echo "+++ Running Bazel build: $BAZELISK_EXE build $bazel_args $build_targets"
-  "$BAZELISK_EXE" build $bazel_args $build_targets
+  echo "+++ Running Bazel build: $BAZELISK_EXE build ${bazel_args[*]} $build_targets"
+  "$BAZELISK_EXE" build "${bazel_args[@]}" $build_targets
 
   local BAZEL_OUTPUT="$LITERT_ROOT_DIR/bazel-bin/tflite"
   local LITERT_INSTALL_DIR="$BUILD_DIR/LiteRT/$TARGET_ARCH"

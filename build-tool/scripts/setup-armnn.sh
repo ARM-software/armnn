@@ -361,7 +361,7 @@ build_litert()
     if [ "$NATIVE_BUILD" -eq 0 ]; then
       # Bare --cpu=aarch64 resolves against @local_config_cc on x86_64 hosts,
       # which has no aarch64 toolchain. Use LiteRT's embedded Linux config for
-      # cross builds so Bazel selects the ARM cross toolchain and native host
+      # cross-builds so Bazel selects the cross-toolchain and native host
       # toolchain.
       bazel_args+=" --config=elinux_aarch64"
     else

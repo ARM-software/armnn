@@ -4,6 +4,10 @@
 //
 
 #include "Sme2ShapePolicy.hpp"
+#include "Sme2CmeInfo.hpp"
+#if defined(__ANDROID__)
+#include <android/log.h>
+#endif
 
 #include "Graph.hpp"
 #include "Layer.hpp"
@@ -438,16 +442,36 @@ unsigned int SelectNumberOfThreads(const Sme2ShapeProfile& profile, unsigned int
 
 void ApplySme2ShapePolicy(const Graph& graph, bool reduceFp32ToFp16, ModelOptions& modelOptions)
 {
+    static const Sme2CmeInfo cmeInfo = detect_num_smcus();
+    const bool multipleSmcus = cmeInfo.m_CountKnown && cmeInfo.m_Count >= 2U;
+#if defined(__ANDROID__)
+    static const bool logged = [&]
+    {
+        __android_log_print(ANDROID_LOG_INFO, "ArmNN-CME",
+            "SMCU count known=%d count=%u topology_override=%d requested_threads=%u",
+            cmeInfo.m_CountKnown, cmeInfo.m_Count, multipleSmcus, GetCpuAccNumberOfThreads(modelOptions));
+        return true;
+    }();
+    (void)logged;
+#endif
     const Sme2ShapeProfile profile = BuildSme2ShapeProfile(graph, reduceFp32ToFp16);
     if (profile.m_GemmLikeOps == 0)
     {
         return;
     }
 
-    const bool smeEnabled = !ShouldDisableSme(profile);
+    const bool smeEnabled = multipleSmcus || !ShouldDisableSme(profile);
     const bool sveEnabled = true;
     const unsigned int requestedThreads = GetCpuAccNumberOfThreads(modelOptions);
     const unsigned int selectedThreads = SelectNumberOfThreads(profile, requestedThreads);
+
+#if defined(__ANDROID__)
+    if (multipleSmcus && selectedThreads != requestedThreads)
+    {
+        __android_log_print(ANDROID_LOG_INFO, "ArmNN-CME",
+            "Stock worker cap retained: requested=%u selected=%u", requestedThreads, selectedThreads);
+    }
+#endif
 
     modelOptions.push_back(BackendOptions("CpuAcc", {{"SmeEnabled", smeEnabled}, {"SveEnabled", sveEnabled}}));
     if (selectedThreads != requestedThreads)
